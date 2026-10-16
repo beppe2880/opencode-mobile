@@ -2,7 +2,7 @@
 # ---- Build ----
 agp = "9.2.1"
 kotlin = "2.2.10"
-composeBom = "2025.12.00"
+composeBom = "2026.09.00"
 kotlinxSerialization = "1.8.1"
 kotlinxCoroutines = "1.10.2"
 ksp = "2.3.12"
