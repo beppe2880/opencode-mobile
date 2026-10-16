@@ -20,7 +20,7 @@ room = "2.8.5"
 koin = "4.2.0"
 
 # ---- Networking ----
-okhttp = "4.12.0"
+okhttp = "5.5.0"
 retrofit = "3.0.0"
 
 # ---- Markdown rendering (Compose) ----
