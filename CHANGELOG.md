@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/beppe2880/opencode-mobile/compare/v0.4.0...v0.5.0) (2026-10-17)
+
+
+### Features
+
+* **settings:** Choose which kinds of notifications to get ([#22](https://github.com/beppe2880/opencode-mobile/issues/22)) ([fa2a825](https://github.com/beppe2880/opencode-mobile/commit/fa2a825f100a0f79e0e5c0432e22012734af4f88))
+
+
+### Bug fixes
+
+* **chat:** Undo prompts older than the loaded history and prompts with only images ([#24](https://github.com/beppe2880/opencode-mobile/issues/24)) ([823ae3a](https://github.com/beppe2880/opencode-mobile/commit/823ae3a45401e0b6893e6c4873fef4f1997d22f4))
+
 ## [0.4.0](https://github.com/beppe2880/opencode-mobile/compare/v0.3.0...v0.4.0) (2026-10-17)
 
 
