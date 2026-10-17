@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.0](https://github.com/beppe2880/opencode-mobile/compare/v0.3.0...v0.4.0) (2026-10-17)
+
+
+### Features
+
+* **chat:** Run ! shell commands from the composer ([#19](https://github.com/beppe2880/opencode-mobile/issues/19)) ([35e60e6](https://github.com/beppe2880/opencode-mobile/commit/35e60e628147308501f4a7cddaed3b469539cb93))
+* **chat:** Show queued prompts and let them be sent now, edited or removed ([#20](https://github.com/beppe2880/opencode-mobile/issues/20)) ([38e0d01](https://github.com/beppe2880/opencode-mobile/commit/38e0d01ae7b88147ad9f5e1b77078fb6b7ada319))
+* **chat:** Show the files a session changed with their diffs ([#18](https://github.com/beppe2880/opencode-mobile/issues/18)) ([4aaf04c](https://github.com/beppe2880/opencode-mobile/commit/4aaf04cd5bfc6d8e4c39132c122dea45d3984839))
+* Notify pending permissions and finished sessions ([#17](https://github.com/beppe2880/opencode-mobile/issues/17)) ([e0336d2](https://github.com/beppe2880/opencode-mobile/commit/e0336d26c02bb1d63983abb3c110e0ad933c92d7))
+
+
+### Documentation
+
+* Add a demo video and GIF to the README ([#15](https://github.com/beppe2880/opencode-mobile/issues/15)) ([765ee28](https://github.com/beppe2880/opencode-mobile/commit/765ee2824a948092823e23074ac1b9deab5bddf7))
+
 ## 0.3.0 (2026-10-16)
 
 First public release. Earlier versions were developed privately; their notes are kept below.
