@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "io.github.beppe2880.opencodemobile.feature.chat"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         minSdk = 26
     }

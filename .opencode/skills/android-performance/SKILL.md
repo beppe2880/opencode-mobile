@@ -46,9 +46,8 @@ the initialized dependency and how failures/retries behave.
 - Inspect AGP version and current release configuration first.
 - This project currently has minification disabled; enabling it is a dedicated
   release task, not cleanup.
-- With AGP 9.2.1, do not document the AGP 9.3 standalone R8 analyzer task as
-  available; use current build outputs and heuristic analysis until upgraded by
-  an explicit task.
+- AGP 9.4.1 includes the standalone R8 analyzer task (added in AGP 9.3); verify
+  its output against the release build before acting on it.
 - Remove or narrow keep rules only with release-build and runtime evidence.
 - Validate kotlinx-serialization (generated API models and union serializers),
   Retrofit interfaces, Koin, CameraX and the markdown renderer after R8 changes.

@@ -45,7 +45,7 @@ if (System.getenv("CI") != null && releaseSigning == null &&
 
 android {
     namespace = "io.github.beppe2880.opencodemobile"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "io.github.beppe2880.opencodemobile"

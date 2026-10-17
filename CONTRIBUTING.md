@@ -15,7 +15,7 @@ issues and pull requests that still miss them after 72 hours are closed.
 
 ## Build and run
 
-Requirements: JDK 21, the Android SDK (compile SDK 36), and an OpenCode 2.x server.
+Requirements: JDK 21, the Android SDK (compile SDK 37), and an OpenCode 2.x server.
 
 ```bash
 cd android

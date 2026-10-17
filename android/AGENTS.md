@@ -2,8 +2,8 @@
 
 ## Scope
 
-`android/` is a multi-module Android application built with Gradle 9.4.1, AGP 9.2.1
-(built-in Kotlin), Kotlin 2.2.10, Java 11, compile/target SDK 36 and min SDK 26. The UI
+`android/` is a multi-module Android application built with Gradle 9.4.1, AGP 9.4.1
+(built-in Kotlin), Kotlin 2.4.21, Java 11, compile SDK 37, target SDK 36 and min SDK 26. The UI
 uses Jetpack Compose and Material 3 themed with OpenCode V2 tokens; state uses MVI; Koin
 provides dependency injection; the OpenCode HTTP client is generated (Retrofit +
 kotlinx.serialization).

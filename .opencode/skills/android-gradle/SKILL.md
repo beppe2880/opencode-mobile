@@ -5,7 +5,7 @@ description: Use for opencode-mobile AGP 9, Gradle Kotlin DSL, the version catal
 
 # Android Gradle
 
-The project uses Gradle 9.4.1, AGP 9.2.1, Kotlin 2.2.10, compile/target SDK 36,
+The project uses Gradle 9.4.1, AGP 9.4.1, Kotlin 2.4.21, compile SDK 37, target SDK 36,
 min SDK 26, Java 11 source/target compatibility, and a Gradle daemon toolchain
 pinned to JDK 21. There are no product flavors; build types are `debug`
 (application ID suffix `.debug`, label "OpenCode Dev") and `release`.

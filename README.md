@@ -86,7 +86,7 @@ the device.
 
 ## Build from source
 
-Requirements: JDK 21 and the Android SDK (compile SDK 36).
+Requirements: JDK 21 and the Android SDK (compile SDK 37).
 
 ```bash
 git clone <this repository>
