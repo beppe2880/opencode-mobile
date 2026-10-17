@@ -227,9 +227,11 @@ data class AppSettings(
     val groupActivity: Boolean = true,
     /**
      * While sessions run, keep the connection in the background and notify when one needs an
-     * answer or finishes. Off by default; enabling it needs the notification permission.
+     * answer or finishes. Only works once the notification permission is granted.
      */
-    val notifications: Boolean = false,
+    val notifications: Boolean = true,
+    /** The one-time explanation of notifications, shown once a server is connected, was answered. */
+    val notificationsIntroShown: Boolean = false,
 )
 
 interface SettingsRepository {

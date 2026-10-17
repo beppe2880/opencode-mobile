@@ -110,6 +110,7 @@ fun OcConfirmDialog(
     onDismiss: () -> Unit,
     destructive: Boolean = false,
     testTagPrefix: String = "confirm",
+    dismissLabel: String? = null,
 ) {
     val c = OcTheme.colors
     AlertDialog(
@@ -128,7 +129,7 @@ fun OcConfirmDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss, modifier = Modifier.testTag("${testTagPrefix}_cancel_button")) {
-                Text(stringResource(R.string.oc_cancel), color = c.textMuted)
+                Text(dismissLabel ?: stringResource(R.string.oc_cancel), color = c.textMuted)
             }
         },
     )

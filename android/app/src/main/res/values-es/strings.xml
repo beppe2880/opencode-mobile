@@ -25,4 +25,8 @@
     <string name="notif_untitled">Sesión sin título</string>
     <string name="notif_attention_public">Una sesión espera tu respuesta</string>
     <string name="notif_reply_failed">No se pudo enviar la respuesta. Abre la sesión para responder.</string>
+    <string name="notif_intro_title">Recibe avisos de tus sesiones</string>
+    <string name="notif_intro_text">Mientras una sesión está en curso, la app sigue conectada a tu servidor en segundo plano para avisarte cuando el agente necesita un permiso o una respuesta, y cuando termina. Puedes permitir o rechazar un cambio directamente desde la notificación.\n\nLas notificaciones llegan directamente de tu servidor, sin otros servicios de por medio. Puedes desactivarlas cuando quieras en Ajustes.</string>
+    <string name="notif_intro_allow">Permitir</string>
+    <string name="notif_intro_later">Ahora no</string>
 </resources>

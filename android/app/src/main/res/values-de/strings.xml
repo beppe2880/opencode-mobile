@@ -24,4 +24,8 @@
     <string name="notif_untitled">Sitzung ohne Titel</string>
     <string name="notif_attention_public">Eine Sitzung wartet auf deine Antwort</string>
     <string name="notif_reply_failed">Antwort konnte nicht gesendet werden. Öffne die Sitzung, um zu antworten.</string>
+    <string name="notif_intro_title">Benachrichtigungen zu deinen Sitzungen</string>
+    <string name="notif_intro_text">Während eine Sitzung läuft, bleibt die App im Hintergrund mit deinem Server verbunden, um dich zu benachrichtigen, wenn der Agent eine Berechtigung oder eine Antwort braucht und wenn er fertig ist. Eine Änderung kannst du direkt in der Benachrichtigung erlauben oder ablehnen.\n\nDie Benachrichtigungen kommen direkt von deinem Server, ohne weiteren Dienst dazwischen. Du kannst sie jederzeit in den Einstellungen ausschalten.</string>
+    <string name="notif_intro_allow">Erlauben</string>
+    <string name="notif_intro_later">Nicht jetzt</string>
 </resources>

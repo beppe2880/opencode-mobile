@@ -24,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
+import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
                             openSessionId = openSession,
                             onSessionOpened = { sessionToOpen.value = null },
                         )
+                        if (activeServer != null && !appSettings.notificationsIntroShown) NotificationsIntro(settings)
                     }
                 }
             }

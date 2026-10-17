@@ -25,4 +25,8 @@
     <string name="notif_untitled">Sessione senza titolo</string>
     <string name="notif_attention_public">Una sessione aspetta una tua risposta</string>
     <string name="notif_reply_failed">Impossibile inviare la risposta. Apri la sessione per rispondere.</string>
+    <string name="notif_intro_title">Ricevi notifiche sulle sessioni</string>
+    <string name="notif_intro_text">Mentre una sessione è in corso, l\'app resta connessa al tuo server in background per avvisarti quando l\'agente chiede un permesso o una risposta, e quando ha finito. Puoi consentire o rifiutare una modifica direttamente dalla notifica.\n\nLe notifiche arrivano direttamente dal tuo server, senza altri servizi in mezzo. Puoi disattivarle quando vuoi nelle Impostazioni.</string>
+    <string name="notif_intro_allow">Consenti</string>
+    <string name="notif_intro_later">Non ora</string>
 </resources>

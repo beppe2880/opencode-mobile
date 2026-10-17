@@ -52,6 +52,9 @@ jobs:
           java-version: 21
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - name: Check translation coverage and format arguments
+        # Every language is required on the release pull request; elsewhere only English and Italian.
+        env:
+          STRICT_LOCALES: ${{ startsWith(github.head_ref, 'release-please--') && '1' || '0' }}
         run: bun test tools/locales.test.ts
       - name: Check android/core/api matches api/openapi.json
         working-directory: tools/api-gen

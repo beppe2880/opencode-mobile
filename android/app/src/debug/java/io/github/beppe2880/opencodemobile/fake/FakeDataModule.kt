@@ -326,7 +326,8 @@ internal class FakeDrafts : DraftRepository {
 }
 
 internal class FakeSettings : SettingsRepository {
-    private val _settings = MutableStateFlow(AppSettings())
+    // Sample data is for screenshots and UI work: skip the notification explanation.
+    private val _settings = MutableStateFlow(AppSettings(notificationsIntroShown = true))
     override val settings: StateFlow<AppSettings> = _settings.asStateFlow()
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         _settings.value = transform(_settings.value)

@@ -40,6 +40,13 @@ env:
     visible:
       id: sessions_list
     timeout: 20000
+# A fresh install explains session notifications once after the first connection.
+- extendedWaitUntil:
+    visible:
+      id: notifications_intro_dialog
+    timeout: 5000
+- tapOn:
+    id: notifications_intro_cancel_button
 - assertVisible:
     id: sessions_connection_indicator
 - takeScreenshot: .maestro/output/connect-paired

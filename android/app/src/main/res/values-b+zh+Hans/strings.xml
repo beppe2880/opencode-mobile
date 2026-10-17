@@ -23,4 +23,8 @@
     <string name="notif_untitled">无标题会话</string>
     <string name="notif_attention_public">有会话在等待你的回复</string>
     <string name="notif_reply_failed">无法发送回复。请打开会话进行回复。</string>
+    <string name="notif_intro_title">接收会话通知</string>
+    <string name="notif_intro_text">会话运行期间，应用会在后台与你的服务器保持连接，在智能体需要权限或回复时以及完成时通知你。你可以直接在通知中允许或拒绝修改。\n\n通知直接来自你的服务器，中间没有其他服务。你可以随时在设置中关闭通知。</string>
+    <string name="notif_intro_allow">允许</string>
+    <string name="notif_intro_later">以后再说</string>
 </resources>

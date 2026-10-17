@@ -11,6 +11,13 @@ env:
     visible:
       id: sessions_list
     timeout: 15000
+- runFlow:
+    when:
+      visible:
+        id: notifications_intro_dialog
+    commands:
+      - tapOn:
+          id: notifications_intro_cancel_button
 - tapOn:
     id: sessions_search_field
 - inputText: ${OC_SESSION_QUERY}

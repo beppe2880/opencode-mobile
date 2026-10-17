@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test"
+import { afterAll, expect, test } from "bun:test"
 import { resolve } from "node:path"
 
 const root = resolve(import.meta.dir, "..")
@@ -22,6 +22,17 @@ function placeholders(text: string): string[] {
   return [...text.matchAll(/%(?:\d+\$)?[ds%]/g)].map(match => match[0]).sort()
 }
 
+// English and Italian are written with every change; the other languages are translated in
+// one batch before a release. STRICT_LOCALES=1 (set on release pull requests) requires all.
+const alwaysTranslated = ["it"]
+const strict = process.env.STRICT_LOCALES === "1"
+const pending: string[] = []
+
+afterAll(() => {
+  if (pending.length === 0) return
+  console.warn(`${pending.length} strings to translate before the next release:\n  ${pending.join("\n  ")}`)
+})
+
 for (const module of modules) {
   const res = `${root}/android/${module}/src/main/res`
   const source = resources(await Bun.file(`${res}/values/strings.xml`).text())
@@ -31,6 +42,10 @@ for (const module of modules) {
       for (const [name, original] of source) {
         if (!original.translatable) continue
         const value = translated.get(name)
+        if (value === undefined && !strict && !alwaysTranslated.includes(locale)) {
+          pending.push(`${module} ${locale} ${name}`)
+          continue
+        }
         expect(value, `Missing ${name}`).toBeDefined()
         expect(value!.type).toBe(original.type)
         if (original.type === "string") {

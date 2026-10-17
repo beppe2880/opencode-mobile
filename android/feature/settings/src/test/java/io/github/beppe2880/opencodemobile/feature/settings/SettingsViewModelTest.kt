@@ -70,6 +70,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `notifications turn on only once the permission is granted`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(notifications = false)
         val vm = vm()
         vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
         val effect = async { vm.effect.first() }
@@ -89,6 +90,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `a denied permission sends the next attempt to the system settings`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(notifications = false)
         val vm = vm()
         vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
         vm.onEvent(SettingsEvent.NotificationsChanged(true))
@@ -104,6 +106,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `allowing notifications elsewhere does not turn them on`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(notifications = false)
         val vm = vm()
         vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
         vm.onEvent(SettingsEvent.NotificationAccess(allowed = true))

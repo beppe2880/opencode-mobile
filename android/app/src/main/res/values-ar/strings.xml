@@ -28,4 +28,8 @@
     <string name="notif_untitled">جلسة بلا عنوان</string>
     <string name="notif_attention_public">جلسة بانتظار ردك</string>
     <string name="notif_reply_failed">تعذّر إرسال الرد. افتح الجلسة للرد.</string>
+    <string name="notif_intro_title">تلقَّ إشعارات بشأن جلساتك</string>
+    <string name="notif_intro_text">أثناء تشغيل جلسة، يبقى التطبيق متصلًا بخادمك في الخلفية ليُعلمك عندما يحتاج الوكيل إلى إذن أو إجابة، وعندما ينتهي. يمكنك السماح بتعديل أو رفضه مباشرةً من الإشعار.\n\nتأتي الإشعارات مباشرةً من خادمك دون أي خدمة أخرى بينهما. يمكنك إيقافها في أي وقت من الإعدادات.</string>
+    <string name="notif_intro_allow">السماح</string>
+    <string name="notif_intro_later">ليس الآن</string>
 </resources>

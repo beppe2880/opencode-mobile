@@ -23,4 +23,8 @@
     <string name="notif_untitled">無題のセッション</string>
     <string name="notif_attention_public">セッションがあなたの応答を待っています</string>
     <string name="notif_reply_failed">応答を送信できませんでした。セッションを開いて応答してください。</string>
+    <string name="notif_intro_title">セッションの通知を受け取る</string>
+    <string name="notif_intro_text">セッションの実行中、アプリはバックグラウンドでサーバーとの接続を保ち、エージェントが許可や応答を求めたときと作業が終わったときに通知します。変更の許可や拒否は通知から直接行えます。\n\n通知はサーバーから直接届き、ほかのサービスを経由しません。設定でいつでもオフにできます。</string>
+    <string name="notif_intro_allow">許可</string>
+    <string name="notif_intro_later">後で</string>
 </resources>

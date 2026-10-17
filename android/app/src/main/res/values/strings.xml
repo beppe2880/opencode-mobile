@@ -24,4 +24,8 @@
     <string name="notif_untitled">Untitled session</string>
     <string name="notif_attention_public">A session is waiting for your answer</string>
     <string name="notif_reply_failed">Couldn\'t send the answer. Open the session to reply.</string>
+    <string name="notif_intro_title">Get notified about your sessions</string>
+    <string name="notif_intro_text">While a session runs, the app stays connected to your server in the background to tell you when the agent needs a permission or an answer, and when it finishes. You can allow or reject an edit right from the notification.\n\nNotifications come straight from your server, with no other service in between. You can turn them off anytime in Settings.</string>
+    <string name="notif_intro_allow">Allow</string>
+    <string name="notif_intro_later">Not now</string>
 </resources>

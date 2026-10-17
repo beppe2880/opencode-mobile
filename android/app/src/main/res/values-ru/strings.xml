@@ -26,4 +26,8 @@
     <string name="notif_untitled">Сессия без названия</string>
     <string name="notif_attention_public">Сессия ждёт вашего ответа</string>
     <string name="notif_reply_failed">Не удалось отправить ответ. Откройте сессию, чтобы ответить.</string>
+    <string name="notif_intro_title">Уведомления о ваших сессиях</string>
+    <string name="notif_intro_text">Пока выполняется сессия, приложение остаётся подключённым к вашему серверу в фоне, чтобы сообщить, когда агенту нужно разрешение или ответ и когда он закончит. Разрешить или отклонить изменение можно прямо в уведомлении.\n\nУведомления приходят напрямую с вашего сервера, без посторонних сервисов. Их можно отключить в любой момент в настройках.</string>
+    <string name="notif_intro_allow">Разрешить</string>
+    <string name="notif_intro_later">Не сейчас</string>
 </resources>
