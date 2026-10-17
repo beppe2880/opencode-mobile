@@ -165,6 +165,12 @@ interface ChatRepository {
         attachments: List<PromptAttachment> = emptyList(),
     ): Result<Unit> = Result.success(Unit)
 
+    /**
+     * Runs [command] in the session's shell, like `!` in the TUI; the output joins the
+     * transcript. Long commands keep running on the server after this returns.
+     */
+    suspend fun shell(sessionId: String, command: String): Result<Unit> = Result.success(Unit)
+
     suspend fun interrupt(sessionId: String): Result<Unit>
 
     /**

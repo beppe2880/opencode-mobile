@@ -61,6 +61,8 @@
     <string name="chat_offline">オフライン · 再接続中</string>
     <string name="chat_unauthorized">保存された認証情報がサーバーに拒否されました · サーバーを再度ペアリングしてください</string>
     <string name="chat_shell_exit">終了コード %1$s</string>
+    <string name="chat_shell_hint">シェルで実行されます</string>
+    <string name="chat_shell_hint_in">%1$s のシェルで実行されます</string>
     <string name="chat_new_messages">新しいメッセージ</string>
     <string name="chat_command_compact">履歴を要約してコンテキストを空ける</string>
     <string name="chat_command_fork">このセッションを新しいセッションにコピー</string>

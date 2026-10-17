@@ -76,6 +76,8 @@
     <string name="chat_offline">غير متصل · جارٍ إعادة الاتصال</string>
     <string name="chat_unauthorized">رفض الخادم بيانات الاعتماد المحفوظة · أعد إقران الخادم</string>
     <string name="chat_shell_exit">رمز الخروج %1$s</string>
+    <string name="chat_shell_hint">يُشغَّل في الصدفة</string>
+    <string name="chat_shell_hint_in">يُشغَّل في الصدفة ضمن %1$s</string>
     <string name="chat_new_messages">رسائل جديدة</string>
     <string name="chat_command_compact">تلخيص السجل لتحرير مساحة السياق</string>
     <string name="chat_command_fork">نسخ هذه الجلسة إلى جلسة جديدة</string>

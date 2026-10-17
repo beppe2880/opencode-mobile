@@ -70,6 +70,8 @@
     <string name="chat_offline">Нет подключения · переподключение</string>
     <string name="chat_unauthorized">Сервер отклонил сохранённые учётные данные · подключите сервер заново</string>
     <string name="chat_shell_exit">код выхода %1$s</string>
+    <string name="chat_shell_hint">Выполняется в оболочке</string>
+    <string name="chat_shell_hint_in">Выполняется в оболочке в %1$s</string>
     <string name="chat_new_messages">Новые сообщения</string>
     <string name="chat_command_compact">Сжать историю, чтобы освободить контекст</string>
     <string name="chat_command_fork">Скопировать эту сессию в новую</string>

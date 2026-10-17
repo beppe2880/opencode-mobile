@@ -64,6 +64,8 @@
     <string name="chat_offline">Offline · riconnessione</string>
     <string name="chat_unauthorized">Il server ha rifiutato le credenziali salvate · abbina di nuovo il server</string>
     <string name="chat_shell_exit">uscita %1$s</string>
+    <string name="chat_shell_hint">Viene eseguito nella shell</string>
+    <string name="chat_shell_hint_in">Viene eseguito nella shell in %1$s</string>
     <string name="chat_new_messages">Nuovi messaggi</string>
     <string name="chat_command_compact">Riassume la cronologia per liberare contesto</string>
     <string name="chat_command_fork">Copia questa sessione in una nuova</string>

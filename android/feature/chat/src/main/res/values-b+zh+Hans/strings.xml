@@ -61,6 +61,8 @@
     <string name="chat_offline">离线 · 正在重新连接</string>
     <string name="chat_unauthorized">服务器拒绝了已保存的凭据 · 请重新配对此服务器</string>
     <string name="chat_shell_exit">退出码 %1$s</string>
+    <string name="chat_shell_hint">在 Shell 中运行</string>
+    <string name="chat_shell_hint_in">在 %1$s 的 Shell 中运行</string>
     <string name="chat_new_messages">新消息</string>
     <string name="chat_command_compact">总结历史记录以释放上下文</string>
     <string name="chat_command_fork">将此会话复制到新会话</string>

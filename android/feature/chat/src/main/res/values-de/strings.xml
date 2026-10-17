@@ -64,6 +64,8 @@
     <string name="chat_offline">Offline · Verbindung wird wiederhergestellt</string>
     <string name="chat_unauthorized">Der Server hat die gespeicherten Zugangsdaten abgelehnt · kopple den Server neu</string>
     <string name="chat_shell_exit">Exit %1$s</string>
+    <string name="chat_shell_hint">Wird in der Shell ausgeführt</string>
+    <string name="chat_shell_hint_in">Wird in der Shell in %1$s ausgeführt</string>
     <string name="chat_new_messages">Neue Nachrichten</string>
     <string name="chat_command_compact">Verlauf zusammenfassen, um Kontext freizugeben</string>
     <string name="chat_command_fork">Diese Sitzung in eine neue kopieren</string>

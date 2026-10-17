@@ -64,6 +64,8 @@
     <string name="chat_offline">Hors ligne · reconnexion</string>
     <string name="chat_unauthorized">Le serveur a refusé les identifiants enregistrés · associez à nouveau le serveur</string>
     <string name="chat_shell_exit">sortie %1$s</string>
+    <string name="chat_shell_hint">S\'exécute dans le shell</string>
+    <string name="chat_shell_hint_in">S\'exécute dans le shell dans %1$s</string>
     <string name="chat_new_messages">Nouveaux messages</string>
     <string name="chat_command_compact">Résumer l’historique pour libérer du contexte</string>
     <string name="chat_command_fork">Copier cette session dans une nouvelle</string>

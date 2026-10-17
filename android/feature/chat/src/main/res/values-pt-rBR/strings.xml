@@ -64,6 +64,8 @@
     <string name="chat_offline">Offline · reconectando</string>
     <string name="chat_unauthorized">O servidor recusou as credenciais salvas · pareie o servidor novamente</string>
     <string name="chat_shell_exit">saída %1$s</string>
+    <string name="chat_shell_hint">Executa no shell</string>
+    <string name="chat_shell_hint_in">Executa no shell em %1$s</string>
     <string name="chat_new_messages">Novas mensagens</string>
     <string name="chat_command_compact">Resumir o histórico para liberar contexto</string>
     <string name="chat_command_fork">Copiar esta sessão para uma nova</string>

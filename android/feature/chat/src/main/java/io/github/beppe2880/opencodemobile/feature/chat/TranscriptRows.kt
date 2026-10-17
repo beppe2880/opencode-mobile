@@ -273,7 +273,10 @@ internal fun ShellBlock(item: ChatItem.Shell, modifier: Modifier = Modifier) {
             .padding(OcSpacing.md),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
     ) {
-        Text("$ ${item.command}", style = OcTheme.mono.code, color = c.textBase)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
+            Text("$ ${item.command}", style = OcTheme.mono.code, color = c.textBase, modifier = Modifier.weight(1f, fill = false))
+            if (item.status == "running") OcSpinner(Modifier.testTag("chat_shell_running"))
+        }
         if (item.output.isNotBlank()) {
             Text(
                 item.output.trimEnd().lines().takeLast(OUTPUT_PREVIEW_LINES).joinToString("\n"),

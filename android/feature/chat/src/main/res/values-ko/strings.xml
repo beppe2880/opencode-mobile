@@ -61,6 +61,8 @@
     <string name="chat_offline">오프라인 · 다시 연결 중</string>
     <string name="chat_unauthorized">서버가 저장된 자격 증명을 거부했습니다 · 서버를 다시 페어링하세요</string>
     <string name="chat_shell_exit">종료 코드 %1$s</string>
+    <string name="chat_shell_hint">셸에서 실행됨</string>
+    <string name="chat_shell_hint_in">%1$s 경로의 셸에서 실행됨</string>
     <string name="chat_new_messages">새 메시지</string>
     <string name="chat_command_compact">기록을 요약하여 컨텍스트 확보</string>
     <string name="chat_command_fork">이 세션을 새 세션으로 복사</string>

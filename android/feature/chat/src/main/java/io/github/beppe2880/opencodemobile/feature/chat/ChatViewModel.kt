@@ -484,6 +484,7 @@ class ChatViewModel(
         val state = currentState
         if (!state.canSend) return
         val text = state.draft.trim()
+        Completions.shell(text)?.let { return runShell(it, text) }
         val slash = Completions.slash(text)
         Completions.Builtin.of(slash?.name)?.let { return runBuiltin(it) }
         val command = slash?.name?.takeIf { name -> state.commands.any { it.name == name } }
@@ -524,6 +525,32 @@ class ChatViewModel(
                         )
                     }
                     rebuild()
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                },
+            )
+        }
+    }
+
+    /**
+     * `!command`: runs it in the session's shell like the TUI. Its output joins the transcript
+     * through the event stream; attachments stay in the composer for the next prompt.
+     */
+    private fun runShell(command: String, draft: String) {
+        val revert = revertMessageId
+        revertMessageId = null
+        updateState { it.copy(draft = "", suggestions = emptyList(), sending = true) }
+        rebuild()
+        sendEffect(ChatEffect.PromptSent)
+        viewModelScope.launch {
+            val committed = if (revert != null) chat.commitRevert(sessionId) else Result.success(Unit)
+            // The server answers when the command exits; the composer is free again at once.
+            updateState { it.copy(sending = false) }
+            committed.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
+                onSuccess = { scheduleReload() },
+                onFailure = { error ->
+                    if (committed.isFailure) revertMessageId = revert
+                    rebuild()
+                    updateState { if (it.draft.isEmpty()) it.copy(draft = draft) else it }
                     sendEffect(ChatEffect.ShowMessage(error.toUiText()))
                 },
             )
@@ -617,6 +644,10 @@ class ChatViewModel(
     /** Offers `/` commands at the start of the draft and `@` files for the word being typed. */
     private fun updateSuggestions(draft: String) {
         suggestJob?.cancel()
+        if (Completions.shell(draft) != null) {
+            if (currentState.suggestions.isNotEmpty()) updateState { it.copy(suggestions = emptyList()) }
+            return
+        }
         Completions.slashSuggestions(draft, currentState.commands)?.let { commands ->
             updateState { it.copy(suggestions = commands) }
             return

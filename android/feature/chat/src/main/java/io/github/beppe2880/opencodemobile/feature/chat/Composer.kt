@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowUpward
@@ -90,9 +92,10 @@ internal fun Composer(
         shadowElevation = 2.dp,
     ) {
         Column(Modifier.padding(start = OcSpacing.md, end = OcSpacing.xs, top = OcSpacing.sm, bottom = OcSpacing.xs)) {
-            AnimatedVisibility(visible = state.running && state.draft.isNotBlank()) {
+            AnimatedVisibility(visible = state.running && state.draft.isNotBlank() && !state.isShell) {
                 DeliveryToggle(state.delivery, onSelect = { onEvent(ChatEvent.DeliveryChanged(it)) })
             }
+            AnimatedVisibility(visible = state.isShell) { ShellHint(state.directory) }
             if (state.uploads.isNotEmpty()) {
                 AttachmentChips(
                     state.uploads,
@@ -183,6 +186,28 @@ internal fun Composer(
                 }
             }
         }
+    }
+}
+
+/** Shown while the draft is a `!command`: it runs in the shell instead of going to the agent. */
+@Composable
+private fun ShellHint(directory: String) {
+    val c = OcTheme.colors
+    Row(
+        modifier = Modifier
+            .padding(top = OcSpacing.xs, end = OcSpacing.sm)
+            .testTag("chat_shell_hint"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        Icon(Icons.Outlined.Terminal, contentDescription = null, tint = c.textAccent, modifier = Modifier.size(14.dp))
+        Text(
+            text = if (directory.isEmpty()) stringResource(R.string.chat_shell_hint) else stringResource(R.string.chat_shell_hint_in, directory),
+            style = MaterialTheme.typography.labelSmall,
+            color = c.textAccent,
+            maxLines = 1,
+            overflow = TextOverflow.StartEllipsis,
+        )
     }
 }
 

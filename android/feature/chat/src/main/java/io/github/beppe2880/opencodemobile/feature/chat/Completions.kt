@@ -30,6 +30,10 @@ internal object Completions {
     /** `@query` as the last word of the draft (start of text or after whitespace). */
     private val MENTION = Regex("(?:^|(?<=\\s))@(\\S*)$")
 
+    /** The command of a `!command` draft, run in the session's shell; null for other drafts. */
+    fun shell(text: String): String? =
+        text.trim().takeIf { it.startsWith("!") }?.drop(1)?.trim()
+
     fun slash(text: String): Slash? =
         SLASH_COMMAND.matchEntire(text)?.let { Slash(it.groupValues[1], it.groupValues[2].trim()) }
 

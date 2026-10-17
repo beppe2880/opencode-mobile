@@ -80,7 +80,14 @@ data class ChatState(
     val changes: ChangesPanel? = null,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
-    val canSend: Boolean get() = (draft.isNotBlank() || uploads.isNotEmpty()) && !sending && !reverting
+
+    /** The draft is a `!command` for the session's shell. */
+    val isShell: Boolean get() = Completions.shell(draft) != null
+    val canSend: Boolean get() = when {
+        sending || reverting -> false
+        isShell -> !Completions.shell(draft).isNullOrEmpty()
+        else -> draft.isNotBlank() || uploads.isNotEmpty()
+    }
     val modelLabel: ModelLabel? get() = model?.let(models::labelFor)
 
     fun isExpanded(key: String, defaultExpanded: Boolean = false): Boolean = (key in toggled) != defaultExpanded

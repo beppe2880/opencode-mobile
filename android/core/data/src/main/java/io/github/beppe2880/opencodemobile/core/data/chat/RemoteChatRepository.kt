@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionMessageInfo
 import io.github.beppe2880.opencodemobile.api.models.SessionPermissionReplyRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionPromptRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionRevertStageRequest
+import io.github.beppe2880.opencodemobile.api.models.SessionShellRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionSwitchAgentRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionSwitchModelRequest
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
@@ -23,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
@@ -39,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.withLock
+import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -249,6 +252,19 @@ internal class RemoteChatRepository(
             delivery = delivery.toApi(),
         )
         awaitSuccess { api.sessionCommand(sessionId, request) }
+    }
+
+    /**
+     * The server answers once the command exits. A command that outlasts the read timeout is
+     * not stopped by it: the server keeps it running and the transcript shows its output.
+     */
+    override suspend fun shell(sessionId: String, command: String): Result<Unit> = resultOf {
+        val api = clients.active().sessions
+        try {
+            awaitSuccess { api.sessionShell(sessionId, SessionShellRequest(command = command)) }
+        } catch (e: OpenCodeError.Unreachable) {
+            if (e.cause !is SocketTimeoutException) throw e
+        }
     }
 
     override suspend fun interrupt(sessionId: String): Result<Unit> = resultOf {

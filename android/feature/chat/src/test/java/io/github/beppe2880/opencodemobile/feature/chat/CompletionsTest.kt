@@ -16,6 +16,13 @@ class CompletionsTest {
     }
 
     @Test
+    fun `a bang prompt is a shell command`() {
+        assertEquals("ls -la", Completions.shell("  !ls -la "))
+        assertEquals("", Completions.shell("!"))
+        assertNull(Completions.shell("run !ls"))
+    }
+
+    @Test
     fun `slash suggestions list built-ins first and filter by prefix`() {
         val commands = listOf(Command("review", "Review changes"), Command("release", null))
 

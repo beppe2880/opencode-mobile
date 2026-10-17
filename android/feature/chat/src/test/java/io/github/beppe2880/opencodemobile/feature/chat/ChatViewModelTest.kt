@@ -107,6 +107,30 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a bang draft runs in the shell instead of going to the agent`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.DraftChanged("!"))
+        assertTrue(vm.state.value.isShell)
+        assertFalse(vm.state.value.canSend)
+
+        vm.onEvent(ChatEvent.DraftChanged("!git status"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("git status"), chat.shells)
+        assertTrue(chat.prompts.isEmpty())
+        assertEquals("", vm.state.value.draft)
+
+        // A failed command gives the draft back.
+        chat.shellResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        vm.onEvent(ChatEvent.DraftChanged("!ls"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals("!ls", vm.state.value.draft)
+    }
+
+    @Test
     fun `the changes sheet loads the whole session first, then the chosen range`() = runTest(main.testDispatcher) {
         val edit = FileDiff("src/a.kt", "modified", 1, 1, "@@ -1 +1 @@\n-a\n+b")
         chat.changesByScope[ChangesScope.Session] = Result.success(listOf(edit))
@@ -745,6 +769,12 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
         return Result.success(Unit)
+    }
+    val shells = mutableListOf<String>()
+    var shellResult: Result<Unit> = Result.success(Unit)
+    override suspend fun shell(sessionId: String, command: String): Result<Unit> {
+        shells += command
+        return shellResult
     }
     val changesByScope = mutableMapOf<ChangesScope, Result<List<FileDiff>>>()
     val changesRequests = mutableListOf<ChangesScope>()
