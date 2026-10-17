@@ -2,4 +2,25 @@
 <resources>
     <string name="app_select_session">세션 선택</string>
     <string name="app_select_session_message">목록에서 세션을 선택하거나 새로 시작하세요.</string>
+
+    <string name="notif_channel_running">실행 중인 세션</string>
+    <string name="notif_channel_attention">응답 대기 중</string>
+    <string name="notif_channel_finished">완료된 세션</string>
+    <plurals name="notif_running_count">
+        <item quantity="other">세션 %1$d개 실행 중</item>
+    </plurals>
+    <string name="notif_activity_thinking">생각하는 중…</string>
+    <string name="notif_activity_writing">작성하는 중…</string>
+    <string name="notif_activity_tool">%1$s 실행 중</string>
+    <string name="notif_activity_working">작업 중…</string>
+    <string name="notif_permission_text">권한 필요: %1$s</string>
+    <string name="notif_question_text">질문: %1$s</string>
+    <string name="notif_allow_once">한 번 허용</string>
+    <string name="notif_reject">거부</string>
+    <string name="notif_finished">완료됨</string>
+    <string name="notif_failed">실패함</string>
+    <string name="notif_interrupted">중지됨</string>
+    <string name="notif_untitled">제목 없는 세션</string>
+    <string name="notif_attention_public">세션이 응답을 기다리고 있습니다</string>
+    <string name="notif_reply_failed">응답을 보내지 못했습니다. 세션을 열어 응답하세요.</string>
 </resources>

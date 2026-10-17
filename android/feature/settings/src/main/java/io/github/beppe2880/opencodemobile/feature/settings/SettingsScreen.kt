@@ -97,6 +97,7 @@ fun SettingsScreen(
                 item(key = "servers") { ServersSection(state, onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
+                item(key = "notifications") { NotificationsSection(state, onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
         }
@@ -269,6 +270,24 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.agentColorOutline,
                 onCheckedChange = { onEvent(SettingsEvent.AgentColorOutlineChanged(it)) },
                 modifier = Modifier.testTag("settings_agent_outline_switch"),
+            )
+        }
+    }
+}
+
+@Composable
+private fun NotificationsSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
+    val blocked = state.notificationsBlocked && !state.notificationsAllowed
+    Section(stringResource(R.string.settings_notifications)) {
+        OcCard {
+            OcSwitchRow(
+                title = stringResource(R.string.settings_session_notifications),
+                subtitle = stringResource(
+                    if (blocked) R.string.settings_session_notifications_blocked else R.string.settings_session_notifications_sub,
+                ),
+                checked = state.settings.notifications && state.notificationsAllowed,
+                onCheckedChange = { onEvent(SettingsEvent.NotificationsChanged(it)) },
+                modifier = Modifier.testTag("settings_notifications_switch"),
             )
         }
     }

@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Mostrar razonamientos y llamadas a herramientas consecutivos en una sola fila</string>
     <string name="settings_agent_outline">Borde del color del agente</string>
     <string name="settings_agent_outline_sub">Delinear el cuadro del mensaje con el color del agente seleccionado</string>
+    <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_session_notifications">Notificaciones de sesiones</string>
+    <string name="settings_session_notifications_sub">Mientras haya sesiones en curso, sigue conectada en segundo plano y te avisa cuando una espera una respuesta o termina</string>
+    <string name="settings_session_notifications_blocked">Las notificaciones están bloqueadas. Toca para permitirlas en los ajustes del sistema</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_app_version">Versión de la app</string>
     <string name="settings_server_version">Versión del servidor</string>

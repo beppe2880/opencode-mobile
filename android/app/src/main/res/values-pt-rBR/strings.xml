@@ -2,4 +2,27 @@
 <resources>
     <string name="app_select_session">Selecione uma sessão</string>
     <string name="app_select_session_message">Escolha uma sessão na lista ou inicie uma nova.</string>
+
+    <string name="notif_channel_running">Sessões em andamento</string>
+    <string name="notif_channel_attention">Aguardando você</string>
+    <string name="notif_channel_finished">Sessões concluídas</string>
+    <plurals name="notif_running_count">
+        <item quantity="one">%1$d sessão em andamento</item>
+        <item quantity="many">%1$d sessões em andamento</item>
+        <item quantity="other">%1$d sessões em andamento</item>
+    </plurals>
+    <string name="notif_activity_thinking">Pensando…</string>
+    <string name="notif_activity_writing">Escrevendo…</string>
+    <string name="notif_activity_tool">Executando %1$s</string>
+    <string name="notif_activity_working">Trabalhando…</string>
+    <string name="notif_permission_text">Permissão necessária: %1$s</string>
+    <string name="notif_question_text">Pergunta: %1$s</string>
+    <string name="notif_allow_once">Permitir uma vez</string>
+    <string name="notif_reject">Rejeitar</string>
+    <string name="notif_finished">Concluída</string>
+    <string name="notif_failed">Falhou</string>
+    <string name="notif_interrupted">Interrompida</string>
+    <string name="notif_untitled">Sessão sem título</string>
+    <string name="notif_attention_public">Uma sessão está aguardando sua resposta</string>
+    <string name="notif_reply_failed">Não foi possível enviar a resposta. Abra a sessão para responder.</string>
 </resources>

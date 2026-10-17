@@ -2,4 +2,28 @@
 <resources>
     <string name="app_select_session">Выберите сессию</string>
     <string name="app_select_session_message">Выберите сессию из списка или начните новую.</string>
+
+    <string name="notif_channel_running">Выполняемые сессии</string>
+    <string name="notif_channel_attention">Ждут вашего ответа</string>
+    <string name="notif_channel_finished">Завершённые сессии</string>
+    <plurals name="notif_running_count">
+        <item quantity="one">Выполняется %1$d сессия</item>
+        <item quantity="few">Выполняются %1$d сессии</item>
+        <item quantity="many">Выполняется %1$d сессий</item>
+        <item quantity="other">Выполняется %1$d сессии</item>
+    </plurals>
+    <string name="notif_activity_thinking">Думает…</string>
+    <string name="notif_activity_writing">Пишет…</string>
+    <string name="notif_activity_tool">Выполняет %1$s</string>
+    <string name="notif_activity_working">Работает…</string>
+    <string name="notif_permission_text">Требуется разрешение: %1$s</string>
+    <string name="notif_question_text">Вопрос: %1$s</string>
+    <string name="notif_allow_once">Разрешить один раз</string>
+    <string name="notif_reject">Отклонить</string>
+    <string name="notif_finished">Завершена</string>
+    <string name="notif_failed">Ошибка</string>
+    <string name="notif_interrupted">Остановлена</string>
+    <string name="notif_untitled">Сессия без названия</string>
+    <string name="notif_attention_public">Сессия ждёт вашего ответа</string>
+    <string name="notif_reply_failed">Не удалось отправить ответ. Откройте сессию, чтобы ответить.</string>
 </resources>

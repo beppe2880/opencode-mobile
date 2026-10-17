@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
     <string name="settings_agent_outline">エージェント色の枠線</string>
     <string name="settings_agent_outline_sub">選択したエージェントの色で入力欄を囲む</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_session_notifications">セッションの通知</string>
+    <string name="settings_session_notifications_sub">セッションの実行中はバックグラウンドで接続を保ち、応答待ちや完了のときに通知します</string>
+    <string name="settings_session_notifications_blocked">通知がブロックされています。タップしてシステム設定で許可してください</string>
     <string name="settings_about">このアプリについて</string>
     <string name="settings_app_version">アプリのバージョン</string>
     <string name="settings_server_version">サーバーのバージョン</string>

@@ -2,4 +2,30 @@
 <resources>
     <string name="app_select_session">اختر جلسة</string>
     <string name="app_select_session_message">اختر جلسة من القائمة أو ابدأ جلسة جديدة.</string>
+
+    <string name="notif_channel_running">الجلسات الجارية</string>
+    <string name="notif_channel_attention">بانتظار ردك</string>
+    <string name="notif_channel_finished">الجلسات المنتهية</string>
+    <plurals name="notif_running_count">
+        <item quantity="zero">لا توجد جلسات جارية (%1$d)</item>
+        <item quantity="one">جلسة واحدة جارية (%1$d)</item>
+        <item quantity="two">جلستان جاريتان (%1$d)</item>
+        <item quantity="few">%1$d جلسات جارية</item>
+        <item quantity="many">%1$d جلسة جارية</item>
+        <item quantity="other">%1$d جلسة جارية</item>
+    </plurals>
+    <string name="notif_activity_thinking">يفكّر…</string>
+    <string name="notif_activity_writing">يكتب…</string>
+    <string name="notif_activity_tool">يشغّل %1$s</string>
+    <string name="notif_activity_working">يعمل…</string>
+    <string name="notif_permission_text">مطلوب إذن: %1$s</string>
+    <string name="notif_question_text">سؤال: %1$s</string>
+    <string name="notif_allow_once">السماح مرة واحدة</string>
+    <string name="notif_reject">رفض</string>
+    <string name="notif_finished">انتهت</string>
+    <string name="notif_failed">فشلت</string>
+    <string name="notif_interrupted">توقفت</string>
+    <string name="notif_untitled">جلسة بلا عنوان</string>
+    <string name="notif_attention_public">جلسة بانتظار ردك</string>
+    <string name="notif_reply_failed">تعذّر إرسال الرد. افتح الجلسة للرد.</string>
 </resources>

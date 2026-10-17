@@ -65,6 +65,12 @@ interface EventRepository {
 
     /** Typed events; reconnects automatically while collected. Emits [ServerEvent.Connected] after each (re)connect. */
     val events: Flow<ServerEvent>
+
+    /**
+     * While enabled, [events] stays connected with no screen visible: a foreground service is
+     * watching running sessions to notify the user. Normally the stream pauses in the background.
+     */
+    fun keepAliveInBackground(enabled: Boolean) {}
 }
 
 interface SessionRepository {
@@ -219,6 +225,11 @@ data class AppSettings(
     val agentColorOutline: Boolean = true,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
+    /**
+     * While sessions run, keep the connection in the background and notify when one needs an
+     * answer or finishes. Off by default; enabling it needs the notification permission.
+     */
+    val notifications: Boolean = false,
 )
 
 interface SettingsRepository {

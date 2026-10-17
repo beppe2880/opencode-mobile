@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Mostra in un\'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
     <string name="settings_agent_outline">Bordo col colore dell\'agente</string>
     <string name="settings_agent_outline_sub">Colora il bordo del riquadro di scrittura con il colore dell\'agente selezionato</string>
+    <string name="settings_notifications">Notifiche</string>
+    <string name="settings_session_notifications">Notifiche delle sessioni</string>
+    <string name="settings_session_notifications_sub">Mentre le sessioni sono in corso, resta connessa in background e ti avvisa quando una aspetta una risposta o finisce</string>
+    <string name="settings_session_notifications_blocked">Le notifiche sono bloccate. Tocca per consentirle nelle impostazioni di sistema</string>
     <string name="settings_about">Informazioni</string>
     <string name="settings_app_version">Versione app</string>
     <string name="settings_server_version">Versione server</string>

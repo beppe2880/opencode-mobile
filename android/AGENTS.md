@@ -28,7 +28,7 @@ repository boundaries.
 
 | Module | Responsibility |
 |---|---|
-| `:app` | `OpenCodeApplication` (starts Koin), `MainActivity`, root navigation, `appModule` (ViewModels) |
+| `:app` | `OpenCodeApplication` (starts Koin), `MainActivity`, root navigation, `appModule` (ViewModels), optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver) |
 | `:feature:connect` | QR scan, paste link, manual URL + password/code, saved servers |
 | `:feature:sessions` | Session list, search, project filter, create/rename/delete |
 | `:feature:chat` | Live transcript, composer, agent/model pickers, permissions, interrupt |

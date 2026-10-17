@@ -2,4 +2,25 @@
 <resources>
     <string name="app_select_session">选择会话</string>
     <string name="app_select_session_message">从列表中选择会话或新建会话。</string>
+
+    <string name="notif_channel_running">运行中的会话</string>
+    <string name="notif_channel_attention">等待你的回复</string>
+    <string name="notif_channel_finished">已完成的会话</string>
+    <plurals name="notif_running_count">
+        <item quantity="other">%1$d 个会话正在运行</item>
+    </plurals>
+    <string name="notif_activity_thinking">正在思考…</string>
+    <string name="notif_activity_writing">正在撰写…</string>
+    <string name="notif_activity_tool">正在运行 %1$s</string>
+    <string name="notif_activity_working">正在工作…</string>
+    <string name="notif_permission_text">需要权限：%1$s</string>
+    <string name="notif_question_text">问题：%1$s</string>
+    <string name="notif_allow_once">允许一次</string>
+    <string name="notif_reject">拒绝</string>
+    <string name="notif_finished">已完成</string>
+    <string name="notif_failed">失败</string>
+    <string name="notif_interrupted">已停止</string>
+    <string name="notif_untitled">无标题会话</string>
+    <string name="notif_attention_public">有会话在等待你的回复</string>
+    <string name="notif_reply_failed">无法发送回复。请打开会话进行回复。</string>
 </resources>

@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -119,6 +120,23 @@ class SseEventRepositoryTest {
         assertEquals(1, server.requestCount)
 
         visible.value = false
+        withTimeout(5_000) { repository.connection.first { it == ConnectionState.Disconnected } }
+        collecting.cancel()
+    }
+
+    @Test
+    fun `stays connected in the background while kept alive`() = runBlocking {
+        server.enqueue(openStream())
+        val collecting = repository.events.launchIn(scope)
+        withTimeout(5_000) { repository.connection.first { it == ConnectionState.Connected } }
+
+        repository.keepAliveInBackground(true)
+        visible.value = false
+        delay(300)
+        assertEquals(ConnectionState.Connected, repository.connection.value)
+        assertEquals(1, server.requestCount)
+
+        repository.keepAliveInBackground(false)
         withTimeout(5_000) { repository.connection.first { it == ConnectionState.Disconnected } }
         collecting.cancel()
     }

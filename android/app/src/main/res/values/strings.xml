@@ -2,4 +2,26 @@
 <resources>
     <string name="app_select_session">Select a session</string>
     <string name="app_select_session_message">Pick a session from the list or start a new one.</string>
+
+    <string name="notif_channel_running">Running sessions</string>
+    <string name="notif_channel_attention">Waiting for you</string>
+    <string name="notif_channel_finished">Finished sessions</string>
+    <plurals name="notif_running_count">
+        <item quantity="one">%1$d session running</item>
+        <item quantity="other">%1$d sessions running</item>
+    </plurals>
+    <string name="notif_activity_thinking">Thinking…</string>
+    <string name="notif_activity_writing">Writing…</string>
+    <string name="notif_activity_tool">Running %1$s</string>
+    <string name="notif_activity_working">Working…</string>
+    <string name="notif_permission_text">Permission required: %1$s</string>
+    <string name="notif_question_text">Question: %1$s</string>
+    <string name="notif_allow_once">Allow once</string>
+    <string name="notif_reject">Reject</string>
+    <string name="notif_finished">Finished</string>
+    <string name="notif_failed">Failed</string>
+    <string name="notif_interrupted">Stopped</string>
+    <string name="notif_untitled">Untitled session</string>
+    <string name="notif_attention_public">A session is waiting for your answer</string>
+    <string name="notif_reply_failed">Couldn\'t send the answer. Open the session to reply.</string>
 </resources>

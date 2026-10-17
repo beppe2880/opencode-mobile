@@ -2,4 +2,26 @@
 <resources>
     <string name="app_select_session">Wähle eine Sitzung</string>
     <string name="app_select_session_message">Wähle eine Sitzung aus der Liste oder starte eine neue.</string>
+
+    <string name="notif_channel_running">Laufende Sitzungen</string>
+    <string name="notif_channel_attention">Wartet auf dich</string>
+    <string name="notif_channel_finished">Beendete Sitzungen</string>
+    <plurals name="notif_running_count">
+        <item quantity="one">%1$d Sitzung läuft</item>
+        <item quantity="other">%1$d Sitzungen laufen</item>
+    </plurals>
+    <string name="notif_activity_thinking">Denkt nach…</string>
+    <string name="notif_activity_writing">Schreibt…</string>
+    <string name="notif_activity_tool">Führt %1$s aus</string>
+    <string name="notif_activity_working">Arbeitet…</string>
+    <string name="notif_permission_text">Berechtigung erforderlich: %1$s</string>
+    <string name="notif_question_text">Frage: %1$s</string>
+    <string name="notif_allow_once">Einmal erlauben</string>
+    <string name="notif_reject">Ablehnen</string>
+    <string name="notif_finished">Fertig</string>
+    <string name="notif_failed">Fehlgeschlagen</string>
+    <string name="notif_interrupted">Gestoppt</string>
+    <string name="notif_untitled">Sitzung ohne Titel</string>
+    <string name="notif_attention_public">Eine Sitzung wartet auf deine Antwort</string>
+    <string name="notif_reply_failed">Antwort konnte nicht gesendet werden. Öffne die Sitzung, um zu antworten.</string>
 </resources>

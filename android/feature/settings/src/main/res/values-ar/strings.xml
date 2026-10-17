@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
     <string name="settings_agent_outline">إطار بلون الوكيل</string>
     <string name="settings_agent_outline_sub">تحديد مربع الرسالة بلون الوكيل المختار</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_session_notifications">إشعارات الجلسات</string>
+    <string name="settings_session_notifications_sub">أثناء تشغيل الجلسات، يبقى التطبيق متصلًا في الخلفية ويُعلمك عندما تنتظر جلسة ردًا أو تنتهي</string>
+    <string name="settings_session_notifications_blocked">الإشعارات محظورة. انقر للسماح بها في إعدادات النظام</string>
     <string name="settings_about">حول التطبيق</string>
     <string name="settings_app_version">إصدار التطبيق</string>
     <string name="settings_server_version">إصدار الخادم</string>

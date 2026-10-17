@@ -26,6 +26,10 @@ Treat every scanned QR, pasted link, intent and server payload as untrusted.
 
 - Camera is requested only when the user opens the QR scanner, with rationale and
   a manual fallback when denied.
+- Notifications are opt-in: `POST_NOTIFICATIONS` is requested only from the Settings
+  switch, and the `dataSync` foreground service runs only while sessions run with the
+  switch on. Attention notifications are `VISIBILITY_PRIVATE` with a generic public version,
+  and their Allow/Reject actions require an unlocked device.
 - Do not add a permission without explicit need.
 
 ## Credentials And Sensitive Data

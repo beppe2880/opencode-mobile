@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
     <string name="settings_agent_outline">Agent color outline</string>
     <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_session_notifications">Session notifications</string>
+    <string name="settings_session_notifications_sub">While sessions run, stay connected in the background and notify you when one needs an answer or finishes</string>
+    <string name="settings_session_notifications_blocked">Notifications are blocked. Tap to allow them in the system settings</string>
     <string name="settings_about">About</string>
     <string name="settings_app_version">App version</string>
     <string name="settings_server_version">Server version</string>

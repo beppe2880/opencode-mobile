@@ -55,6 +55,8 @@ private val ListPaneWidth = 360.dp
 fun AppNavHost(
     hasActiveServer: Boolean,
     modifier: Modifier = Modifier,
+    openSessionId: String? = null,
+    onSessionOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -66,6 +68,15 @@ fun AppNavHost(
                 popUpTo(navController.graph.id) { inclusive = true }
             }
         }
+    }
+
+    // A tapped notification opens its chat above the session list, replacing other screens.
+    LaunchedEffect(openSessionId, hasActiveServer) {
+        if (openSessionId == null || !hasActiveServer) return@LaunchedEffect
+        navController.navigate(ChatDestination(openSessionId)) {
+            popUpTo<SessionsDestination>()
+        }
+        onSessionOpened()
     }
 
     NavHost(navController = navController, startDestination = start, modifier = modifier) {

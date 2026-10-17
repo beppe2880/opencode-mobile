@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">연속된 생각과 도구 호출을 하나의 행으로 표시</string>
     <string name="settings_agent_outline">에이전트 색상 테두리</string>
     <string name="settings_agent_outline_sub">선택한 에이전트의 색상으로 메시지 상자 테두리 표시</string>
+    <string name="settings_notifications">알림</string>
+    <string name="settings_session_notifications">세션 알림</string>
+    <string name="settings_session_notifications_sub">세션이 실행되는 동안 백그라운드에서 연결을 유지하고, 응답을 기다리거나 완료되면 알려 줍니다</string>
+    <string name="settings_session_notifications_blocked">알림이 차단되어 있습니다. 탭하여 시스템 설정에서 허용하세요</string>
     <string name="settings_about">정보</string>
     <string name="settings_app_version">앱 버전</string>
     <string name="settings_server_version">서버 버전</string>

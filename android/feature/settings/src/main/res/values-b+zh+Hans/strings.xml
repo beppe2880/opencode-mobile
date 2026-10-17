@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
     <string name="settings_agent_outline">智能体颜色边框</string>
     <string name="settings_agent_outline_sub">使用所选智能体的颜色描绘消息框边框</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_session_notifications">会话通知</string>
+    <string name="settings_session_notifications_sub">会话运行期间在后台保持连接，并在会话等待回复或完成时通知你</string>
+    <string name="settings_session_notifications_blocked">通知已被屏蔽。点按以在系统设置中允许通知</string>
     <string name="settings_about">关于</string>
     <string name="settings_app_version">应用版本</string>
     <string name="settings_server_version">服务器版本</string>

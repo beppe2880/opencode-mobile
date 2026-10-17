@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_agent_outline">Umrandung in Agentenfarbe</string>
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
+    <string name="settings_notifications">Benachrichtigungen</string>
+    <string name="settings_session_notifications">Sitzungsbenachrichtigungen</string>
+    <string name="settings_session_notifications_sub">Solange Sitzungen laufen, im Hintergrund verbunden bleiben und benachrichtigen, wenn eine auf eine Antwort wartet oder fertig ist</string>
+    <string name="settings_session_notifications_blocked">Benachrichtigungen sind blockiert. Tippen, um sie in den Systemeinstellungen zu erlauben</string>
     <string name="settings_about">Über die App</string>
     <string name="settings_app_version">App-Version</string>
     <string name="settings_server_version">Serverversion</string>

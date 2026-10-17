@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
     <string name="settings_agent_outline">Рамка цвета агента</string>
     <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
+    <string name="settings_notifications">Уведомления</string>
+    <string name="settings_session_notifications">Уведомления о сессиях</string>
+    <string name="settings_session_notifications_sub">Пока выполняются сессии, оставаться на связи в фоне и сообщать, когда сессия ждёт ответа или завершается</string>
+    <string name="settings_session_notifications_blocked">Уведомления заблокированы. Нажмите, чтобы разрешить их в настройках системы</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_app_version">Версия приложения</string>
     <string name="settings_server_version">Версия сервера</string>

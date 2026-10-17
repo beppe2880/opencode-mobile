@@ -33,6 +33,10 @@
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_agent_outline">Contour aux couleurs de l’agent</string>
     <string name="settings_agent_outline_sub">Utiliser la couleur de l’agent sélectionné pour le contour du champ de message</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_session_notifications">Notifications des sessions</string>
+    <string name="settings_session_notifications_sub">Pendant l’exécution des sessions, reste connectée en arrière-plan et vous prévient quand l’une attend une réponse ou se termine</string>
+    <string name="settings_session_notifications_blocked">Les notifications sont bloquées. Touchez pour les autoriser dans les paramètres du système</string>
     <string name="settings_about">À propos</string>
     <string name="settings_app_version">Version de l’application</string>
     <string name="settings_server_version">Version du serveur</string>

@@ -25,6 +25,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
             .putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
+            .putBoolean(KEY_NOTIFICATIONS, next.notifications)
             .apply()
     }
 
@@ -38,6 +39,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
+            notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
         )
     }
 
@@ -49,5 +51,6 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_GROUP_ACTIVITY = "group_activity"
+        const val KEY_NOTIFICATIONS = "notifications"
     }
 }

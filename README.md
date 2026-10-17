@@ -33,6 +33,9 @@ agent's questions while you are away from the desk.
   from any prompt.
 - **Approve from the phone**: permission requests and the agent's questions show up in
   the chat.
+- **Optional notifications**: while sessions run, the app stays connected in the background
+  and tells you when one needs an answer or finishes. Allow or reject an edit right from the
+  notification. Off by default; turn it on in Settings.
 - **Switch agent, model and reasoning level** per session, with recently used models first.
 - **Fast on large sessions**: transcripts are cached on the device and synced incrementally.
 - **Swipe between chats**, reading position remembered per chat, drafts saved per session.
@@ -111,7 +114,6 @@ Architecture, conventions and the design system are documented in [`AGENTS.md`](
 Planned work lives in [issues labeled `feature`](../../issues?q=is%3Aissue+is%3Aopen+label%3Afeature).
 Highlights:
 
-- Notifications for finished sessions and pending permissions, with replies from the notification.
 - Session diff and changed files.
 - `!` shell commands and management of queued prompts.
 - A terminal through the server's PTY.

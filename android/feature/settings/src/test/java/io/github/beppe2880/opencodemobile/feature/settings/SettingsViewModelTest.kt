@@ -8,12 +8,15 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -63,6 +66,49 @@ class SettingsViewModelTest {
             settings.settings.value,
         )
         assertEquals(settings.settings.value, vm.state.value.settings)
+    }
+
+    @Test
+    fun `notifications turn on only once the permission is granted`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
+        val effect = async { vm.effect.first() }
+        vm.onEvent(SettingsEvent.NotificationsChanged(true))
+        advanceUntilIdle()
+        assertEquals(SettingsEffect.RequestNotificationPermission, effect.await())
+        assertFalse(settings.settings.value.notifications)
+
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = true))
+        advanceUntilIdle()
+        assertTrue(settings.settings.value.notifications)
+
+        vm.onEvent(SettingsEvent.NotificationsChanged(false))
+        advanceUntilIdle()
+        assertFalse(settings.settings.value.notifications)
+    }
+
+    @Test
+    fun `a denied permission sends the next attempt to the system settings`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
+        vm.onEvent(SettingsEvent.NotificationsChanged(true))
+        assertEquals(SettingsEffect.RequestNotificationPermission, vm.effect.first())
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = false, blocked = true))
+        advanceUntilIdle()
+        assertTrue(vm.state.value.notificationsBlocked)
+        assertFalse(settings.settings.value.notifications)
+
+        vm.onEvent(SettingsEvent.NotificationsChanged(true))
+        assertEquals(SettingsEffect.OpenNotificationSettings, vm.effect.first())
+    }
+
+    @Test
+    fun `allowing notifications elsewhere does not turn them on`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = false))
+        vm.onEvent(SettingsEvent.NotificationAccess(allowed = true))
+        advanceUntilIdle()
+        assertFalse(settings.settings.value.notifications)
     }
 
     @Test

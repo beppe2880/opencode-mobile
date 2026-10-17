@@ -18,6 +18,9 @@ class SettingsViewModel(
 ) {
     private var probeJob: Job? = null
 
+    /** The switch asked for the notification permission and turns on once it is granted. */
+    private var awaitingPermission = false
+
     init {
         viewModelScope.launch { servers.servers.collect { list -> updateState { it.copy(servers = list) } } }
         viewModelScope.launch { settings.settings.collect { s -> updateState { it.copy(settings = s) } } }
@@ -56,6 +59,27 @@ class SettingsViewModel(
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
+            is SettingsEvent.NotificationsChanged -> when {
+                !event.enabled || currentState.notificationsAllowed -> update { it.copy(notifications = event.enabled) }
+                else -> {
+                    awaitingPermission = true
+                    sendEffect(
+                        if (currentState.notificationsBlocked) SettingsEffect.OpenNotificationSettings
+                        else SettingsEffect.RequestNotificationPermission,
+                    )
+                }
+            }
+            is SettingsEvent.NotificationAccess -> {
+                updateState {
+                    it.copy(
+                        notificationsAllowed = event.allowed,
+                        notificationsBlocked = !event.allowed && (event.blocked || it.notificationsBlocked),
+                    )
+                }
+                // Granting the permission asked for by the switch turns notifications on.
+                if (event.allowed && awaitingPermission) update { it.copy(notifications = true) }
+                if (event.allowed || event.blocked) awaitingPermission = false
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -23,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -30,15 +32,20 @@ class MainActivity : ComponentActivity() {
     private val servers: ServerRepository by inject()
     private val settings: SettingsRepository by inject()
 
+    /** Session to open, from a tapped notification; cleared once navigated. */
+    private val sessionToOpen = MutableStateFlow<String?>(null)
+
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) readSessionToOpen(intent)
         keepSplashUntilLoaded()
         setContent {
             val appSettings by settings.settings.collectAsStateWithLifecycle()
             val loaded by servers.loaded.collectAsStateWithLifecycle()
             val activeServer by servers.activeServer.collectAsStateWithLifecycle()
+            val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val dark = appSettings.theme.isDark()
             DisposableEffect(dark) {
                 val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
@@ -53,10 +60,33 @@ class MainActivity : ComponentActivity() {
                         .semantics { testTagsAsResourceId = true },
                 ) {
                     // Choosing the start screen needs the saved servers, read off the main thread.
-                    if (loaded) AppNavHost(hasActiveServer = activeServer != null)
+                    if (loaded) {
+                        AppNavHost(
+                            hasActiveServer = activeServer != null,
+                            openSessionId = openSession,
+                            onSessionOpened = { sessionToOpen.value = null },
+                        )
+                    }
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        readSessionToOpen(intent)
+    }
+
+    /** The launcher activity is exported: accept only a well-formed session id. */
+    private fun readSessionToOpen(intent: Intent?) {
+        val id = intent?.getStringExtra(EXTRA_SESSION_ID) ?: return
+        intent.removeExtra(EXTRA_SESSION_ID)
+        if (SESSION_ID.matches(id)) sessionToOpen.value = id
+    }
+
+    companion object {
+        const val EXTRA_SESSION_ID = "io.github.beppe2880.opencodemobile.extra.SESSION_ID"
+        private val SESSION_ID = Regex("ses_[A-Za-z0-9]{1,64}")
     }
 
     /** Holds the first frame (the system splash screen) until the saved servers are read. */

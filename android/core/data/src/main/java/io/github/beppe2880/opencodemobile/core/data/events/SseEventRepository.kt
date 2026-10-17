@@ -32,8 +32,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.random.Random
 
 /**
- * One shared `/api/event` connection for the active server while the app is visible and at
- * least one screen collects [events]. Failed, stalled or closed streams reconnect with jittered
+ * One shared `/api/event` connection for the active server while the app is visible (or
+ * [keepAliveInBackground] is on) and at least one collector exists. Failed, stalled or closed streams reconnect with jittered
  * exponential backoff, cut short when a network becomes available; every successful
  * (re)connect emits [ServerEvent.Connected] so screens reload. A 401 sets
  * [ConnectionState.Unauthorized] and stops retrying until the active server, its address or
@@ -54,8 +54,16 @@ internal class SseEventRepository(
     private val _connection = MutableStateFlow(ConnectionState.Disconnected)
     override val connection: StateFlow<ConnectionState> = _connection.asStateFlow()
 
+    private val keepAlive = MutableStateFlow(false)
+
+    override fun keepAliveInBackground(enabled: Boolean) {
+        keepAlive.value = enabled
+    }
+
     override val events: Flow<ServerEvent> =
-        combine(servers.activeServer, visibility.isVisible) { server, visible -> server?.takeIf { visible } }
+        combine(servers.activeServer, visibility.isVisible, keepAlive) { server, visible, alive ->
+            server?.takeIf { visible || alive }
+        }
             .distinctUntilChanged(::sameConnection)
             .flatMapLatest { server -> if (server == null) emptyFlow() else reconnecting(server) }
             .shareIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis))
