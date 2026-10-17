@@ -71,21 +71,27 @@ class SseEventRepositoryTest {
 
     private val connectedEvent = "data: {\"id\":\"e0\",\"type\":\"server.connected\",\"data\":{}}\n\n"
 
-    private fun stream(vararg sessionIds: String) = MockResponse()
+    /**
+     * `server.connected` and one execution per session. An [open] stream then keeps sending
+     * heartbeats, so the 1 ms test backoff cannot reconnect (and add a request) before the asserts.
+     */
+    private fun stream(vararg sessionIds: String, open: Boolean = false) = MockResponse()
         .setHeader("Content-Type", "text/event-stream")
         .setBody(
             connectedEvent +
                 sessionIds.joinToString("") { id ->
                     "data: {\"id\":\"e_$id\",\"created\":1,\"type\":\"session.execution.started\"," +
                         "\"data\":{\"sessionID\":\"$id\"},\"durable\":{\"aggregateID\":\"$id\",\"seq\":1,\"version\":1}}\n\n"
-                },
+                } +
+                if (open) ": heartbeat\n\n".repeat(10_000) else "",
         )
+        .apply { if (open) throttleBody(1024, 1, TimeUnit.SECONDS) }
 
     @Test
     fun `announces every reconnect and maps events`() = runBlocking {
         server.enqueue(stream("ses_1"))
         server.enqueue(MockResponse().setResponseCode(503))
-        server.enqueue(stream("ses_2"))
+        server.enqueue(stream("ses_2", open = true))
 
         val events = withTimeout(5_000) { repository.events.take(4).toList() }
 
@@ -178,7 +184,7 @@ class SseEventRepositoryTest {
                 .setBody(connectedEvent + ": heartbeat\n\n")
                 .throttleBody(connectedEvent.length.toLong(), 2, TimeUnit.SECONDS),
         )
-        server.enqueue(stream("ses_1"))
+        server.enqueue(stream("ses_1", open = true))
 
         val events = withTimeout(5_000) { repository.events.take(3).toList() }
 
