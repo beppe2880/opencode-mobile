@@ -325,6 +325,28 @@ internal class RemoteChatRepository(
         awaitSuccess { api.sessionRevertStage(sessionId, SessionRevertStageRequest(messageID = messageId)) }
     }
 
+    /** Message ids sort by creation, so the prompts are paged newest first until one is older. */
+    override suspend fun previousPrompt(sessionId: String, beforeMessageId: String?): Result<Message.User?> = resultOf {
+        val api = clients.active().sessions
+        var cursor: String? = null
+        repeat(MAX_PROMPT_PAGES) {
+            val page = awaitBody {
+                api.sessionMessageList(
+                    sessionId,
+                    limit = PROMPT_PAGE_SIZE.toString(),
+                    order = SessionApi.OrderSessionMessageList.DESC,
+                    cursor = cursor,
+                    type = SessionApi.TypeSessionMessageList.USER,
+                )
+            }
+            page.data.mapNotNull { it.toDomain() as? Message.User }
+                .firstOrNull { beforeMessageId == null || it.id < beforeMessageId }
+                ?.let { return@resultOf it }
+            cursor = page.cursor.next.takeIf { page.data.receivedCount == PROMPT_PAGE_SIZE } ?: return@resultOf null
+        }
+        null
+    }
+
     override suspend fun clearRevert(sessionId: String): Result<Unit> = resultOf {
         val api = clients.active().sessions
         awaitSuccess { api.sessionRevertClear(sessionId) }
@@ -403,5 +425,8 @@ internal class RemoteChatRepository(
 
         /** Unchanged lines around each hunk; without them the server sends whole files. */
         const val DIFF_CONTEXT_LINES = 3
+
+        const val PROMPT_PAGE_SIZE = 50
+        const val MAX_PROMPT_PAGES = 20
     }
 }

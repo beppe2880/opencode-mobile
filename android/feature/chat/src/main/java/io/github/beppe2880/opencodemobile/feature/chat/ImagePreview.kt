@@ -5,6 +5,7 @@ import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
@@ -76,7 +77,13 @@ private fun rememberDataImage(dataUri: String?, maxSide: Int): ImageBitmap? {
 
 /** A square thumbnail of a sent image; an image icon while it is not available locally. */
 @Composable
-internal fun ImageThumbnail(dataUri: String?, onClick: () -> Unit, modifier: Modifier = Modifier, size: Dp = 72.dp) {
+internal fun ImageThumbnail(
+    dataUri: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 72.dp,
+    onLongClick: (() -> Unit)? = null,
+) {
     val c = OcTheme.colors
     val bitmap = rememberDataImage(dataUri, maxSide = 256)
     Box(
@@ -84,7 +91,13 @@ internal fun ImageThumbnail(dataUri: String?, onClick: () -> Unit, modifier: Mod
             .size(size)
             .clip(RoundedCornerShape(OcRadius.md))
             .background(c.layer02)
-            .clickable(role = Role.Image, onClickLabel = stringResource(R.string.chat_open_image), onClick = onClick),
+            .combinedClickable(
+                role = Role.Image,
+                onClickLabel = stringResource(R.string.chat_open_image),
+                onLongClickLabel = onLongClick?.let { stringResource(R.string.chat_message_actions) },
+                onLongClick = onLongClick,
+                onClick = onClick,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         if (bitmap != null) {

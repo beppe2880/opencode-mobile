@@ -84,6 +84,8 @@ internal fun UserBubble(
                     ImageThumbnail(
                         dataUri = image.dataUri,
                         onClick = { onOpenImage(index) },
+                        // A prompt of images alone has no text bubble to long press.
+                        onLongClick = onLongPress?.takeIf { item.text.isBlank() },
                         modifier = Modifier.testTag("chat_user_image_${item.key}_$index"),
                     )
                 }
@@ -93,7 +95,9 @@ internal fun UserBubble(
             .alpha(if (item.pending) 0.75f else 1f)
             .clip(RoundedCornerShape(OcRadius.lg))
             .background(c.userBubbleBg)
-        if (onLongPress != null) {
+        if (item.text.isBlank() && item.images.isNotEmpty()) {
+            // Images only: no empty bubble below them.
+        } else if (onLongPress != null) {
             // Long press opens the message actions (copy, undo), replacing text selection.
             Text(
                 text = item.text,

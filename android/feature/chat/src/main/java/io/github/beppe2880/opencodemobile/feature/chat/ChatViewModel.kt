@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
+import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
@@ -468,10 +469,15 @@ class ChatViewModel(
         }
     }
 
-    /** Messages before the staged revert point; all of them when nothing is reverted. */
+    /**
+     * Messages before the staged revert point; all of them when nothing is reverted. Server ids
+     * sort by creation, so the cut also works when the reverted prompt is older than the
+     * loaded history (then everything loaded is hidden).
+     */
     private fun visibleMessages(): List<Message> {
-        val cut = revertMessageId?.let { id -> messages.indexOfFirst { it.id == id } }?.takeIf { it >= 0 }
-        return if (cut == null) messages else messages.subList(0, cut)
+        val id = revertMessageId ?: return messages
+        val cut = messages.indexOfFirst { !it.id.startsWith(LOCAL_PREFIX) && it.id >= id }
+        return if (cut < 0) messages else messages.subList(0, cut)
     }
 
     /**
@@ -524,6 +530,8 @@ class ChatViewModel(
                 compacting = compacting,
             )
         }
+        // The revert point is older than the loaded history: bring it in so the chat is not blank.
+        if (revertMessageId != null && visible.isEmpty() && messages.isNotEmpty()) loadOlder()
     }
 
     /** Local optimistic prompts and live streaming state not yet reflected by [server]. */
@@ -630,19 +638,33 @@ class ChatViewModel(
         }
     }
 
-    /** `/undo`: reverts the last prompt, like the OpenCode TUI. */
+    /**
+     * `/undo`: reverts the last prompt, like the OpenCode TUI. A long turn can push the prompt
+     * before it out of the loaded history; then it is looked up on the server.
+     */
     private fun undo() {
-        val last = visibleMessages().lastOrNull { it is Message.User && !it.pending && !it.id.startsWith(LOCAL_PREFIX) }
-        if (last == null) {
-            sendEffect(ChatEffect.ShowMessage(UiText.Res(R.string.chat_nothing_to_undo)))
-            return
+        if (currentState.reverting) return
+        val last = visibleMessages().lastOrNull { it is Message.User && !it.pending && !it.id.startsWith(LOCAL_PREFIX) } as? Message.User
+        if (last != null) return revert(last)
+        updateState { it.copy(reverting = true) }
+        viewModelScope.launch {
+            val previous = chat.previousPrompt(sessionId, revertMessageId).getOrElse { error ->
+                updateState { it.copy(reverting = false) }
+                sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                return@launch
+            }
+            updateState { it.copy(reverting = false) }
+            if (previous == null) sendEffect(ChatEffect.ShowMessage(UiText.Res(R.string.chat_nothing_to_undo))) else revert(previous)
         }
-        revert(last.id)
     }
 
     private fun revert(messageId: String) {
+        (messages.firstOrNull { it.id == messageId } as? Message.User)?.let(::revert)
+    }
+
+    private fun revert(message: Message.User) {
+        val messageId = message.id
         if (currentState.reverting) return
-        val message = messages.firstOrNull { it.id == messageId } as? Message.User ?: return
         updateState { it.copy(reverting = true) }
         viewModelScope.launch {
             // The server refuses to revert a busy session: stop it first.
@@ -653,7 +675,14 @@ class ChatViewModel(
             chat.revert(sessionId, messageId).fold(
                 onSuccess = {
                     revertMessageId = messageId
-                    updateState { it.copy(reverting = false, draft = message.text) }
+                    val restored = restoredImages(message)
+                    updateState { s ->
+                        s.copy(
+                            reverting = false,
+                            draft = message.text,
+                            attachments = (s.attachments + restored).distinctBy { it.uri },
+                        )
+                    }
                     rebuild()
                 },
                 onFailure = { error ->
@@ -661,6 +690,18 @@ class ChatViewModel(
                     sendEffect(ChatEffect.ShowMessage(error.toUiText()))
                 },
             )
+        }
+    }
+
+    /** The images of an undone prompt, back in the composer like its text; those not available are skipped. */
+    private suspend fun restoredImages(message: Message.User): List<PromptAttachment> {
+        if (message.images.isEmpty()) return emptyList()
+        val known = message.images.map { it.dataUri }
+        val uris = if (known.all { it != null }) known
+        else images.get(message.id) ?: chat.messageImages(sessionId, message.id).getOrNull().orEmpty()
+        return message.images.mapIndexedNotNull { i, image ->
+            val uri = known[i] ?: uris.getOrNull(i) ?: return@mapIndexedNotNull null
+            PromptAttachment(uri = uri, name = image.name ?: "image-${i + 1}", mime = image.mime)
         }
     }
 

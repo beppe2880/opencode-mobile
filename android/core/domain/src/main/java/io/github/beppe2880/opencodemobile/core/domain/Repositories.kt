@@ -211,6 +211,12 @@ interface ChatRepository {
     /** Hides [messageId] and everything after it and restores the files changed since. */
     suspend fun revert(sessionId: String, messageId: String): Result<Unit> = Result.success(Unit)
 
+    /**
+     * The newest prompt older than [beforeMessageId] (any prompt when null), read from the
+     * server: it may be older than the loaded history. Null when there is none.
+     */
+    suspend fun previousPrompt(sessionId: String, beforeMessageId: String?): Result<Message.User?> = Result.success(null)
+
     /** Brings back what a staged revert hid. */
     suspend fun clearRevert(sessionId: String): Result<Unit> = Result.success(Unit)
 

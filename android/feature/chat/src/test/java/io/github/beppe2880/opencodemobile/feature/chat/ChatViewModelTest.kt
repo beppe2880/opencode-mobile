@@ -354,6 +354,34 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `undo finds the previous prompt on the server when a long turn pushed it out of the loaded history`() = runTest(main.testDispatcher) {
+        // Only the newest page is loaded: the photo prompt and the agent's long previous turn.
+        chat.transcript = listOf(
+            Message.Assistant("msg_02", 2, "build", model, emptyList(), completedAt = 3),
+            Message.User("msg_04", 4, "", images = listOf(ImageAttachment("photo.png", "image/png", "data:image/png;base64,AA=="))),
+            Message.Assistant("msg_05", 5, "build", model, emptyList(), completedAt = 6),
+        )
+        chat.serverPrompts = listOf(Message.User("msg_04", 4, ""), Message.User("msg_01", 1, "add the settings"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        // The first undo hides the photo prompt and puts the photo back in the composer.
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("msg_04"), chat.reverts)
+        assertEquals(listOf("photo.png"), vm.state.value.attachments.map { it.name })
+
+        // The second one reverts a prompt that is not loaded: everything loaded is hidden.
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("msg_04", "msg_01"), chat.reverts)
+        assertEquals("add the settings", vm.state.value.draft)
+        assertTrue(vm.state.value.items.isEmpty())
+    }
+
+    @Test
     fun `tapping the undo and redo suggestions runs them at once`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -787,6 +815,10 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         forms = forms.filterNot { it.id == formId }
         return Result.success(Unit)
     }
+    /** All prompts on the server, newest first. */
+    var serverPrompts: List<Message.User> = emptyList()
+    override suspend fun previousPrompt(sessionId: String, beforeMessageId: String?): Result<Message.User?> =
+        Result.success(serverPrompts.firstOrNull { beforeMessageId == null || it.id < beforeMessageId })
     override suspend fun revert(sessionId: String, messageId: String): Result<Unit> {
         reverts += messageId
         return Result.success(Unit)
