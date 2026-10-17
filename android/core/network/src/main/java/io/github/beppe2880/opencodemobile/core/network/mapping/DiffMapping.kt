@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.core.network.mapping
 
+import io.github.beppe2880.opencodemobile.api.models.FileDiffInfo
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -25,6 +26,9 @@ internal fun JsonObject?.fileDiffs(): List<FileDiff> =
             patch = patch,
         )
     }
+
+fun FileDiffInfo.toDomain(): FileDiff =
+    FileDiff(path = file, status = status.value, additions = additions.toInt(), deletions = deletions.toInt(), patch = patch)
 
 private fun writeDiff(toolName: String, input: JsonObject): FileDiff? {
     if (toolName != "write") return null

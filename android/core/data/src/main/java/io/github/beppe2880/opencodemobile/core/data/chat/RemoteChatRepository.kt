@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.core.data.chat
 
+import io.github.beppe2880.opencodemobile.api.apis.SessionApi
 import io.github.beppe2880.opencodemobile.api.models.FormReply
 import io.github.beppe2880.opencodemobile.api.models.PermissionReply
 import io.github.beppe2880.opencodemobile.api.models.SessionCommandRequest
@@ -15,7 +16,9 @@ import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.CachedEntry
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.resultOf
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.Message
@@ -298,6 +301,28 @@ internal class RemoteChatRepository(
         awaitSuccess { api.sessionRevertCommit(sessionId) }
     }
 
+    /**
+     * The newest turn is the server default; the whole session runs from the turn of the first
+     * prompt through that of the last one.
+     */
+    override suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> = resultOf {
+        val api = clients.active().sessions
+        val range = if (scope == ChangesScope.Session) {
+            val first = firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.ASC) ?: return@resultOf emptyList()
+            first to firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.DESC)
+        } else {
+            null
+        }
+        awaitBody { api.sessionDiff(sessionId, from = range?.first, to = range?.second, context = DIFF_CONTEXT_LINES.toString()) }
+            .data.map { it.toDomain() }
+    }
+
+    private suspend fun firstUserMessage(sessionId: String, order: SessionApi.OrderSessionMessageList): String? {
+        val api = clients.active().sessions
+        val page = awaitBody { api.sessionMessageList(sessionId, limit = "1", order = order, type = SessionApi.TypeSessionMessageList.USER) }
+        return page.data.firstOrNull()?.toDomain()?.id
+    }
+
     private fun PromptDelivery.toApi(): SessionInboxDelivery = when (this) {
         PromptDelivery.Steer -> SessionInboxDelivery.STEER
         PromptDelivery.Queue -> SessionInboxDelivery.QUEUE
@@ -341,5 +366,8 @@ internal class RemoteChatRepository(
 
         /** First page of every sync: enough to fill the screen, and usually all that is new. */
         const val NEWEST_PAGE_SIZE = 50
+
+        /** Unchanged lines around each hunk; without them the server sends whole files. */
+        const val DIFF_CONTEXT_LINES = 3
     }
 }

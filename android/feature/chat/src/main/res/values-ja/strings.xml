@@ -30,6 +30,19 @@
     <plurals name="chat_diff_more_lines">
         <item quantity="other">他 %d 行</item>
     </plurals>
+    <string name="chat_changes">変更</string>
+    <string name="chat_changes_open">変更されたファイルを表示</string>
+    <string name="chat_changes_session">セッション全体</string>
+    <string name="chat_changes_last_turn">直近のターン</string>
+    <plurals name="chat_changes_files">
+        <item quantity="other">%d 個のファイルが変更されました</item>
+    </plurals>
+    <string name="chat_changes_empty">変更されたファイルはありません</string>
+    <string name="chat_changes_empty_session">このセッションでエージェントはファイルを編集していません。</string>
+    <string name="chat_changes_empty_turn">直近のターンでエージェントはファイルを編集していません。</string>
+    <string name="chat_changes_error">変更を読み込めませんでした</string>
+    <string name="chat_expanded">展開済み</string>
+    <string name="chat_collapsed">折りたたみ済み</string>
     <string name="chat_copy_response">返信をコピー</string>
     <string name="chat_interrupted">中断</string>
     <string name="chat_empty_title">会話を始める</string>

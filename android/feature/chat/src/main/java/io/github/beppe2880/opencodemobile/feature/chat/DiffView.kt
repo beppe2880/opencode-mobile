@@ -71,6 +71,8 @@ internal fun FileDiffView(
     full: Boolean,
     onToggleFull: () -> Unit,
     modifier: Modifier = Modifier,
+    /** False when the path and stats already show right above. */
+    showHeader: Boolean = true,
 ) {
     val c = OcTheme.colors
     val lines = remember(diff.patch) { UnifiedDiff.parse(diff.patch) }
@@ -79,13 +81,6 @@ internal fun FileDiffView(
     val numberWidth = remember(lines) {
         (lines.maxOfOrNull { maxOf(it.oldLine ?: 0, it.newLine ?: 0) } ?: 0).toString().length
     }
-    val path = if (directory.isNotEmpty()) diff.path.removePrefix("$directory/") else diff.path
-    val statusLabel = when (diff.status) {
-        "added" -> stringResource(R.string.chat_diff_added)
-        "deleted" -> stringResource(R.string.chat_diff_deleted)
-        FileDiff.WRITTEN -> stringResource(R.string.chat_diff_written)
-        else -> null
-    }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -93,21 +88,8 @@ internal fun FileDiffView(
             .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.md))
             .background(c.layer01),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.sm, vertical = OcSpacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
-        ) {
-            Text(
-                text = path,
-                style = OcTheme.mono.codeSmall,
-                color = c.textBase,
-                maxLines = 1,
-                overflow = TextOverflow.StartEllipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            statusLabel?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = c.textFaint) }
-            DiffStats(diff.additions, diff.deletions)
+        if (showHeader) {
+            FileDiffHeader(diff, directory, Modifier.fillMaxWidth().padding(horizontal = OcSpacing.sm, vertical = OcSpacing.xs))
         }
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val viewport = maxWidth
@@ -134,6 +116,35 @@ internal fun FileDiffView(
                     .testTag("chat_diff_more_${diff.path}"),
             )
         }
+    }
+}
+
+/** Path relative to [directory], status and line counts of one changed file. */
+@Composable
+internal fun FileDiffHeader(diff: FileDiff, directory: String, modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    val path = if (directory.isNotEmpty()) diff.path.removePrefix("$directory/") else diff.path
+    val statusLabel = when (diff.status) {
+        "added" -> stringResource(R.string.chat_diff_added)
+        "deleted" -> stringResource(R.string.chat_diff_deleted)
+        FileDiff.WRITTEN -> stringResource(R.string.chat_diff_written)
+        else -> null
+    }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    ) {
+        Text(
+            text = path,
+            style = OcTheme.mono.codeSmall,
+            color = c.textBase,
+            maxLines = 1,
+            overflow = TextOverflow.StartEllipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        statusLabel?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = c.textFaint) }
+        DiffStats(diff.additions, diff.deletions)
     }
 }
 

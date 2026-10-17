@@ -36,6 +36,22 @@
         <item quantity="many">Ещё %d строк</item>
         <item quantity="other">Ещё %d строки</item>
     </plurals>
+    <string name="chat_changes">Изменения</string>
+    <string name="chat_changes_open">Показать изменённые файлы</string>
+    <string name="chat_changes_session">Вся сессия</string>
+    <string name="chat_changes_last_turn">Последний ход</string>
+    <plurals name="chat_changes_files">
+        <item quantity="one">Изменён %d файл</item>
+        <item quantity="few">Изменено %d файла</item>
+        <item quantity="many">Изменено %d файлов</item>
+        <item quantity="other">Изменено %d файла</item>
+    </plurals>
+    <string name="chat_changes_empty">Нет изменённых файлов</string>
+    <string name="chat_changes_empty_session">Агент не изменил ни одного файла в этой сессии.</string>
+    <string name="chat_changes_empty_turn">Агент не изменил ни одного файла в последнем ходе.</string>
+    <string name="chat_changes_error">Не удалось загрузить изменения</string>
+    <string name="chat_expanded">Развёрнуто</string>
+    <string name="chat_collapsed">Свёрнуто</string>
     <string name="chat_copy_response">Копировать ответ</string>
     <string name="chat_interrupted">Прервано</string>
     <string name="chat_empty_title">Начните разговор</string>

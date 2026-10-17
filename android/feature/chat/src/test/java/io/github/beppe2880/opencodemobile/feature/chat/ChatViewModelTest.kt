@@ -4,6 +4,8 @@ import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
@@ -102,6 +104,33 @@ class ChatViewModelTest {
         val alone = vm(FakeSessions(model, order = listOf("x")))
         assertNull(alone.state.value.previousSession)
         assertNull(alone.state.value.nextSession)
+    }
+
+    @Test
+    fun `the changes sheet loads the whole session first, then the chosen range`() = runTest(main.testDispatcher) {
+        val edit = FileDiff("src/a.kt", "modified", 1, 1, "@@ -1 +1 @@\n-a\n+b")
+        chat.changesByScope[ChangesScope.Session] = Result.success(listOf(edit))
+        chat.changesByScope[ChangesScope.LastTurn] = Result.failure(OpenCodeError.Unreachable("offline"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.OpenChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesPanel(ChangesScope.Session, files = listOf(edit), loading = false), vm.state.value.changes)
+
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.LastTurn))
+        advanceUntilIdle()
+        val failed = vm.state.value.changes!!
+        assertNull(failed.files)
+        assertTrue(failed.error != null)
+
+        // A finished step may have edited files: the open sheet reloads its range.
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(listOf(ChangesScope.Session, ChangesScope.LastTurn, ChangesScope.LastTurn), chat.changesRequests)
+
+        vm.onEvent(ChatEvent.CloseChanges)
+        assertNull(vm.state.value.changes)
     }
 
     @Test
@@ -716,6 +745,12 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
         return Result.success(Unit)
+    }
+    val changesByScope = mutableMapOf<ChangesScope, Result<List<FileDiff>>>()
+    val changesRequests = mutableListOf<ChangesScope>()
+    override suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> {
+        changesRequests += scope
+        return changesByScope[scope] ?: Result.success(emptyList())
     }
     override suspend fun interrupt(sessionId: String) = Result.success(Unit)
     override suspend fun switchAgent(sessionId: String, agent: String) = switchResult

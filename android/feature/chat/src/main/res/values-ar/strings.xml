@@ -40,6 +40,24 @@
         <item quantity="many">%d سطرًا إضافيًا</item>
         <item quantity="other">%d سطر إضافي</item>
     </plurals>
+    <string name="chat_changes">التغييرات</string>
+    <string name="chat_changes_open">عرض الملفات المعدّلة</string>
+    <string name="chat_changes_session">الجلسة كاملة</string>
+    <string name="chat_changes_last_turn">الدورة الأخيرة</string>
+    <plurals name="chat_changes_files">
+        <item quantity="zero">لم يُعدَّل أي ملف (%d)</item>
+        <item quantity="one">عُدِّل ملف واحد (%d)</item>
+        <item quantity="two">عُدِّل ملفان (%d)</item>
+        <item quantity="few">عُدِّلت %d ملفات</item>
+        <item quantity="many">عُدِّل %d ملفًا</item>
+        <item quantity="other">عُدِّل %d ملف</item>
+    </plurals>
+    <string name="chat_changes_empty">لا توجد ملفات معدّلة</string>
+    <string name="chat_changes_empty_session">لم يُعدِّل الوكيل أي ملف في هذه الجلسة.</string>
+    <string name="chat_changes_empty_turn">لم يُعدِّل الوكيل أي ملف في الدورة الأخيرة.</string>
+    <string name="chat_changes_error">تعذّر تحميل التغييرات</string>
+    <string name="chat_expanded">مُوسَّع</string>
+    <string name="chat_collapsed">مطوي</string>
     <string name="chat_copy_response">نسخ الرد</string>
     <string name="chat_interrupted">متوقف</string>
     <string name="chat_empty_title">ابدأ المحادثة</string>

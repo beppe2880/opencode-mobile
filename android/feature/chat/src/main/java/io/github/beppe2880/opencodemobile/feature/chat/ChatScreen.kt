@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Difference
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -68,7 +69,15 @@ fun ChatScreen(
         modifier = modifier,
         containerColor = c.bgBase,
         contentWindowInsets = WindowInsets(0),
-        topBar = { ChatTopBar(state, showBack, onBack = { onEvent(ChatEvent.Back) }, onContext = { contextOpen = true }) },
+        topBar = {
+            ChatTopBar(
+                state,
+                showBack,
+                onBack = { onEvent(ChatEvent.Back) },
+                onContext = { contextOpen = true },
+                onChanges = { onEvent(ChatEvent.OpenChanges) },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Column(
@@ -125,6 +134,7 @@ fun ChatScreen(
     state.preview?.let { preview ->
         ImagePreviewDialog(preview, onDismiss = { onEvent(ChatEvent.ClosePreview) })
     }
+    state.changes?.let { ChangesSheet(state, it, onEvent) }
     if (contextOpen) {
         ContextSheet(
             context = state.context,
@@ -136,7 +146,7 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatTopBar(state: ChatState, showBack: Boolean, onBack: () -> Unit, onContext: () -> Unit) {
+private fun ChatTopBar(state: ChatState, showBack: Boolean, onBack: () -> Unit, onContext: () -> Unit, onChanges: () -> Unit) {
     val c = OcTheme.colors
     OcTopBar(
         title = state.title.ifEmpty { " " },
@@ -158,6 +168,12 @@ private fun ChatTopBar(state: ChatState, showBack: Boolean, onBack: () -> Unit, 
         },
         actions = {
             state.context?.let { ContextIndicator(it, state.compacting, onClick = onContext) }
+            OcIconButton(
+                icon = Icons.Outlined.Difference,
+                contentDescription = stringResource(R.string.chat_changes_open),
+                onClick = onChanges,
+                modifier = Modifier.testTag("chat_changes_button"),
+            )
             state.agent?.let { agent ->
                 val color = c.agents.forAgent(agent)
                 Text(

@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
@@ -52,6 +53,7 @@ class ChatViewModel(
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
     private val imageRequests = HashSet<String>()
     private var suggestJob: Job? = null
+    private var changesJob: Job? = null
 
     /** Models of the most recently updated sessions, across every project. */
     private var recentFromSessions: List<ModelRef> = emptyList()
@@ -139,6 +141,12 @@ class ChatViewModel(
             is ChatEvent.Revert -> revert(event.messageId)
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
+            ChatEvent.OpenChanges -> loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+            ChatEvent.CloseChanges -> {
+                changesJob?.cancel()
+                updateState { it.copy(changes = null) }
+            }
+            is ChatEvent.LoadChanges -> loadChanges(event.scope)
         }
     }
 
@@ -339,6 +347,8 @@ class ChatViewModel(
             is ServerEvent.StepEnded -> {
                 applyEvent(event)
                 scheduleReload()
+                // A step may have edited files: the open sheet follows along.
+                currentState.changes?.let { loadChanges(it.scope) }
             }
             is ServerEvent.InboxEnqueued -> {
                 messages = messages.filterNot { it is Message.User && it.id.startsWith(LOCAL_PREFIX) && it.text == event.text }
@@ -725,6 +735,27 @@ class ChatViewModel(
             chat.switchModel(sessionId, model).onFailure { error ->
                 updateState { it.copy(model = previous) }
                 sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+            }
+        }
+    }
+
+    /** Loads [scope] into the changes sheet; files of the same scope stay shown while it reloads. */
+    private fun loadChanges(scope: ChangesScope) {
+        changesJob?.cancel()
+        updateState { s ->
+            val kept = s.changes?.takeIf { it.scope == scope }?.files
+            s.copy(changes = ChangesPanel(scope, files = kept, loading = true))
+        }
+        changesJob = viewModelScope.launch {
+            val result = chat.changes(sessionId, scope)
+            updateState { s ->
+                val panel = s.changes ?: return@updateState s
+                s.copy(
+                    changes = result.fold(
+                        onSuccess = { panel.copy(files = it, loading = false, error = null) },
+                        onFailure = { panel.copy(loading = false, error = it.toUiText()) },
+                    ),
+                )
             }
         }
     }

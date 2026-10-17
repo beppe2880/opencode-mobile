@@ -31,6 +31,8 @@ agent's questions while you are away from the desk.
 - **Drive the agent**: send prompts (steer or queue while it runs), `/` commands, `@` file
   mentions and image attachments; stop, undo and redo, compact the context, fork a session
   from any prompt.
+- **Review the changes**: every file the agent edited, with its diff, for the whole session
+  or the last turn.
 - **Approve from the phone**: permission requests and the agent's questions show up in
   the chat.
 - **Notifications**: while sessions run, the app stays connected in the background and tells
@@ -115,7 +117,6 @@ Architecture, conventions and the design system are documented in [`AGENTS.md`](
 Planned work lives in [issues labeled `feature`](../../issues?q=is%3Aissue+is%3Aopen+label%3Afeature).
 Highlights:
 
-- Session diff and changed files.
 - `!` shell commands and management of queued prompts.
 - A terminal through the server's PTY.
 

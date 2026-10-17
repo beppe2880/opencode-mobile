@@ -121,6 +121,9 @@ interface DraftRepository {
 
 enum class PromptDelivery { Steer, Queue }
 
+/** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
+enum class ChangesScope { LastTurn, Session }
+
 interface ChatRepository {
     /**
      * Transcript, oldest first. System instructions are omitted; [Message.Idle] and
@@ -195,6 +198,9 @@ interface ChatRepository {
 
     /** Makes a staged revert permanent (done before sending a new prompt). */
     suspend fun commitRevert(sessionId: String): Result<Unit> = Result.success(Unit)
+
+    /** Files the session changed in [scope], with unified diffs; empty before the first prompt. */
+    suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> = Result.success(emptyList())
 }
 
 interface CatalogRepository {

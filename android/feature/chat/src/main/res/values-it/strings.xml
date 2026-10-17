@@ -32,6 +32,20 @@
         <item quantity="one">ancora %d riga</item>
         <item quantity="other">ancora %d righe</item>
     </plurals>
+    <string name="chat_changes">Modifiche</string>
+    <string name="chat_changes_open">Mostra file modificati</string>
+    <string name="chat_changes_session">Intera sessione</string>
+    <string name="chat_changes_last_turn">Ultimo turno</string>
+    <plurals name="chat_changes_files">
+        <item quantity="one">%d file modificato</item>
+        <item quantity="other">%d file modificati</item>
+    </plurals>
+    <string name="chat_changes_empty">Nessun file modificato</string>
+    <string name="chat_changes_empty_session">L\'agente non ha modificato alcun file in questa sessione.</string>
+    <string name="chat_changes_empty_turn">L\'agente non ha modificato alcun file nell\'ultimo turno.</string>
+    <string name="chat_changes_error">Impossibile caricare le modifiche</string>
+    <string name="chat_expanded">Espanso</string>
+    <string name="chat_collapsed">Compresso</string>
     <string name="chat_copy_response">Copia risposta</string>
     <string name="chat_interrupted">Interrotto</string>
     <string name="chat_empty_title">Inizia la conversazione</string>

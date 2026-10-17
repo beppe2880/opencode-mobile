@@ -30,6 +30,19 @@
     <plurals name="chat_diff_more_lines">
         <item quantity="other">还有 %d 行</item>
     </plurals>
+    <string name="chat_changes">变更</string>
+    <string name="chat_changes_open">显示已更改的文件</string>
+    <string name="chat_changes_session">整个会话</string>
+    <string name="chat_changes_last_turn">最近一轮</string>
+    <plurals name="chat_changes_files">
+        <item quantity="other">已更改 %d 个文件</item>
+    </plurals>
+    <string name="chat_changes_empty">没有已更改的文件</string>
+    <string name="chat_changes_empty_session">智能体在此会话中未编辑任何文件。</string>
+    <string name="chat_changes_empty_turn">智能体在最近一轮中未编辑任何文件。</string>
+    <string name="chat_changes_error">无法加载变更</string>
+    <string name="chat_expanded">已展开</string>
+    <string name="chat_collapsed">已折叠</string>
     <string name="chat_copy_response">复制回复</string>
     <string name="chat_interrupted">已中断</string>
     <string name="chat_empty_title">开始对话</string>

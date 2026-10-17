@@ -2,8 +2,10 @@ package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.Agent
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
@@ -74,6 +76,8 @@ data class ChatState(
     val preview: ImagePreview? = null,
     /** Where the user left this chat last time; null opens it at the bottom. */
     val savedScroll: ScrollMemory.Anchor? = null,
+    /** The sheet of files the session changed; null while closed. */
+    val changes: ChangesPanel? = null,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
     val canSend: Boolean get() = (draft.isNotBlank() || uploads.isNotEmpty()) && !sending && !reverting
@@ -83,6 +87,14 @@ data class ChatState(
 }
 
 data class SessionPeek(val id: String, val title: String)
+
+/** Changed files of [scope]; [files] is null until first loaded, and kept while it refreshes. */
+data class ChangesPanel(
+    val scope: ChangesScope,
+    val files: List<FileDiff>? = null,
+    val loading: Boolean = true,
+    val error: UiText? = null,
+)
 
 /** An image shown full screen; [dataUri] is null while it is fetched or when that [failed]. */
 data class ImagePreview(val name: String?, val dataUri: String?, val failed: Boolean = false)
@@ -154,6 +166,11 @@ sealed interface ChatEvent {
 
     /** Copies the history before [messageId] to a new session and opens it with that prompt as draft. */
     data class Fork(val messageId: String) : ChatEvent
+
+    data object OpenChanges : ChatEvent
+    data object CloseChanges : ChatEvent
+    /** Shows another range in the open changes sheet, or reloads the current one. */
+    data class LoadChanges(val scope: ChangesScope) : ChatEvent
 }
 
 sealed interface ChatEffect {

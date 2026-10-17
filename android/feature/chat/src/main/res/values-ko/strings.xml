@@ -30,6 +30,19 @@
     <plurals name="chat_diff_more_lines">
         <item quantity="other">%d줄 더 보기</item>
     </plurals>
+    <string name="chat_changes">변경 사항</string>
+    <string name="chat_changes_open">변경된 파일 표시</string>
+    <string name="chat_changes_session">전체 세션</string>
+    <string name="chat_changes_last_turn">마지막 턴</string>
+    <plurals name="chat_changes_files">
+        <item quantity="other">파일 %d개 변경됨</item>
+    </plurals>
+    <string name="chat_changes_empty">변경된 파일 없음</string>
+    <string name="chat_changes_empty_session">이 세션에서 에이전트가 편집한 파일이 없습니다.</string>
+    <string name="chat_changes_empty_turn">마지막 턴에서 에이전트가 편집한 파일이 없습니다.</string>
+    <string name="chat_changes_error">변경 사항을 불러올 수 없습니다</string>
+    <string name="chat_expanded">펼쳐짐</string>
+    <string name="chat_collapsed">접힘</string>
     <string name="chat_copy_response">응답 복사</string>
     <string name="chat_interrupted">중단됨</string>
     <string name="chat_empty_title">대화 시작</string>
