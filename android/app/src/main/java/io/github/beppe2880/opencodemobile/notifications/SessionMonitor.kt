@@ -145,7 +145,9 @@ class SessionMonitor(
     private suspend fun ended(sessionId: String, outcome: SessionOutcome) {
         val session = _running.value[sessionId]
         _running.update { it - sessionId }
-        if (session != null && !visible.value) notifier.finished(sessionId, session.title, outcome)
+        if (session != null && !visible.value && settings.settings.value.notifyFinished) {
+            notifier.finished(sessionId, session.title, outcome)
+        }
     }
 
     private suspend fun forget(sessionId: String) {
@@ -191,8 +193,9 @@ class SessionMonitor(
             }
             if (now.isEmpty()) pending.remove(sessionId) else pending[sessionId] = now
             if (visible.value) return
-            val newPermissions = permissions.filter { it.id !in notified }
-            val newForms = forms.filter { it.id !in notified }
+            val enabled = settings.settings.value
+            val newPermissions = if (enabled.notifyPermissions) permissions.filter { it.id !in notified } else emptyList()
+            val newForms = if (enabled.notifyQuestions) forms.filter { it.id !in notified } else emptyList()
             if (newPermissions.isEmpty() && newForms.isEmpty()) return
             val title = titleOf(sessionId)
             newPermissions.forEach { notifier.permission(title, it) }

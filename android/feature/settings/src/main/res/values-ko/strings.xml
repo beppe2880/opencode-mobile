@@ -36,6 +36,12 @@
     <string name="settings_notifications">알림</string>
     <string name="settings_session_notifications">세션 알림</string>
     <string name="settings_session_notifications_sub">세션이 실행되는 동안 백그라운드에서 연결을 유지하고, 응답을 기다리거나 완료되면 알려 줍니다</string>
+    <string name="settings_notify_permissions">권한 요청</string>
+    <string name="settings_notify_permissions_sub">에이전트가 명령 실행이나 파일 편집을 요청하면 허용 또는 거부할 수 있습니다</string>
+    <string name="settings_notify_questions">질문</string>
+    <string name="settings_notify_questions_sub">에이전트가 질문할 때</string>
+    <string name="settings_notify_finished">종료된 세션</string>
+    <string name="settings_notify_finished_sub">세션이 완료되거나 실패하거나 중지될 때</string>
     <string name="settings_session_notifications_blocked">알림이 차단되어 있습니다. 탭하여 시스템 설정에서 허용하세요</string>
     <string name="settings_about">정보</string>
     <string name="settings_app_version">앱 버전</string>

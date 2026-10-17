@@ -36,6 +36,12 @@
     <string name="settings_notifications">الإشعارات</string>
     <string name="settings_session_notifications">إشعارات الجلسات</string>
     <string name="settings_session_notifications_sub">أثناء تشغيل الجلسات، يبقى التطبيق متصلًا في الخلفية ويُعلمك عندما تنتظر جلسة ردًا أو تنتهي</string>
+    <string name="settings_notify_permissions">طلبات الأذونات</string>
+    <string name="settings_notify_permissions_sub">عندما يطلب الوكيل تشغيل أمر أو تعديل ملف، مع خيارَي السماح والرفض</string>
+    <string name="settings_notify_questions">الأسئلة</string>
+    <string name="settings_notify_questions_sub">عندما يطرح عليك الوكيل سؤالًا</string>
+    <string name="settings_notify_finished">الجلسات المنتهية</string>
+    <string name="settings_notify_finished_sub">عندما تنتهي جلسة أو تفشل أو تُوقف</string>
     <string name="settings_session_notifications_blocked">الإشعارات محظورة. انقر للسماح بها في إعدادات النظام</string>
     <string name="settings_about">حول التطبيق</string>
     <string name="settings_app_version">إصدار التطبيق</string>

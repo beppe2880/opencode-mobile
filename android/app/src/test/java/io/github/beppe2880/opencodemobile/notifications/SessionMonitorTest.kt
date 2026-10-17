@@ -112,6 +112,22 @@ class SessionMonitorTest {
     }
 
     @Test
+    fun `each kind of notification can be turned off on its own`() = runTest {
+        settings.settings.value = AppSettings(notifyPermissions = false, notifyFinished = false)
+        sessions.add(session("ses_a", "Fix the bug"))
+        monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        chat.forms["ses_a"] = listOf(Form("frm_1", "ses_a", "Which database?", emptyList()))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded))
+
+        assertEquals(listOf("question Fix the bug frm_1"), notifier.attention())
+        assertTrue(notifier.log.none { it.startsWith("finished") })
+    }
+
+    @Test
     fun `a request seen while the app is open is notified when the app leaves`() = runTest {
         sessions.add(session("ses_a", "Fix the bug"))
         visible.value = true

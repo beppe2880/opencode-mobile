@@ -36,6 +36,12 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_session_notifications">Session notifications</string>
     <string name="settings_session_notifications_sub">While sessions run, stay connected in the background and notify you when one needs an answer or finishes</string>
+    <string name="settings_notify_permissions">Permission requests</string>
+    <string name="settings_notify_permissions_sub">When the agent asks to run a command or edit a file, with Allow and Reject</string>
+    <string name="settings_notify_questions">Questions</string>
+    <string name="settings_notify_questions_sub">When the agent asks you a question</string>
+    <string name="settings_notify_finished">Finished sessions</string>
+    <string name="settings_notify_finished_sub">When a session finishes, fails or is stopped</string>
     <string name="settings_session_notifications_blocked">Notifications are blocked. Tap to allow them in the system settings</string>
     <string name="settings_about">About</string>
     <string name="settings_app_version">App version</string>

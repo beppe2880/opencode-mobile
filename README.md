@@ -37,8 +37,9 @@ agent's questions while you are away from the desk.
   the chat.
 - **Notifications**: while sessions run, the app stays connected in the background and tells
   you when one needs an answer or finishes. Allow or reject an edit right from the
-  notification. The app explains them and asks for permission after you connect; turn them
-  off anytime in Settings.
+  notification. The app explains them and asks for permission after you connect; in Settings
+  you choose which kinds you get (permission requests, questions, finished sessions) or turn
+  them off.
 - **Switch agent, model and reasoning level** per session, with recently used models first.
 - **Fast on large sessions**: transcripts are cached on the device and synced incrementally.
 - **Swipe between chats**, reading position remembered per chat, drafts saved per session.

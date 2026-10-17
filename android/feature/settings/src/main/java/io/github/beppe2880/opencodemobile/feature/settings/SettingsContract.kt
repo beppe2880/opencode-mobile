@@ -42,6 +42,9 @@ sealed interface SettingsEvent {
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent
+    data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent
+    data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
+    data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent

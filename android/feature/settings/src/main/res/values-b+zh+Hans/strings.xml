@@ -36,6 +36,12 @@
     <string name="settings_notifications">通知</string>
     <string name="settings_session_notifications">会话通知</string>
     <string name="settings_session_notifications_sub">会话运行期间在后台保持连接，并在会话等待回复或完成时通知你</string>
+    <string name="settings_notify_permissions">权限请求</string>
+    <string name="settings_notify_permissions_sub">当代理请求运行命令或编辑文件时，提供“允许”和“拒绝”</string>
+    <string name="settings_notify_questions">问题</string>
+    <string name="settings_notify_questions_sub">当代理向你提问时</string>
+    <string name="settings_notify_finished">已结束的会话</string>
+    <string name="settings_notify_finished_sub">会话完成、失败或被停止时</string>
     <string name="settings_session_notifications_blocked">通知已被屏蔽。点按以在系统设置中允许通知</string>
     <string name="settings_about">关于</string>
     <string name="settings_app_version">应用版本</string>

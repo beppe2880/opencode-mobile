@@ -36,6 +36,12 @@
     <string name="settings_notifications">通知</string>
     <string name="settings_session_notifications">セッションの通知</string>
     <string name="settings_session_notifications_sub">セッションの実行中はバックグラウンドで接続を保ち、応答待ちや完了のときに通知します</string>
+    <string name="settings_notify_permissions">権限のリクエスト</string>
+    <string name="settings_notify_permissions_sub">エージェントがコマンドの実行やファイルの編集を求めたとき。「許可」と「拒否」が表示されます</string>
+    <string name="settings_notify_questions">質問</string>
+    <string name="settings_notify_questions_sub">エージェントから質問されたとき</string>
+    <string name="settings_notify_finished">終了したセッション</string>
+    <string name="settings_notify_finished_sub">セッションが完了、失敗、または停止したとき</string>
     <string name="settings_session_notifications_blocked">通知がブロックされています。タップしてシステム設定で許可してください</string>
     <string name="settings_about">このアプリについて</string>
     <string name="settings_app_version">アプリのバージョン</string>

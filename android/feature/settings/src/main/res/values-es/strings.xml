@@ -36,6 +36,12 @@
     <string name="settings_notifications">Notificaciones</string>
     <string name="settings_session_notifications">Notificaciones de sesiones</string>
     <string name="settings_session_notifications_sub">Mientras haya sesiones en curso, sigue conectada en segundo plano y te avisa cuando una espera una respuesta o termina</string>
+    <string name="settings_notify_permissions">Solicitudes de permiso</string>
+    <string name="settings_notify_permissions_sub">Cuando el agente pide ejecutar un comando o editar un archivo, con Permitir y Rechazar</string>
+    <string name="settings_notify_questions">Preguntas</string>
+    <string name="settings_notify_questions_sub">Cuando el agente te hace una pregunta</string>
+    <string name="settings_notify_finished">Sesiones finalizadas</string>
+    <string name="settings_notify_finished_sub">Cuando una sesión termina, falla o se detiene</string>
     <string name="settings_session_notifications_blocked">Las notificaciones están bloqueadas. Toca para permitirlas en los ajustes del sistema</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_app_version">Versión de la app</string>

@@ -36,6 +36,12 @@
     <string name="settings_notifications">Уведомления</string>
     <string name="settings_session_notifications">Уведомления о сессиях</string>
     <string name="settings_session_notifications_sub">Пока выполняются сессии, оставаться на связи в фоне и сообщать, когда сессия ждёт ответа или завершается</string>
+    <string name="settings_notify_permissions">Запросы разрешений</string>
+    <string name="settings_notify_permissions_sub">Когда агент просит выполнить команду или изменить файл, с кнопками «Разрешить» и «Отклонить»</string>
+    <string name="settings_notify_questions">Вопросы</string>
+    <string name="settings_notify_questions_sub">Когда агент задаёт вам вопрос</string>
+    <string name="settings_notify_finished">Завершённые сессии</string>
+    <string name="settings_notify_finished_sub">Когда сессия завершается, терпит ошибку или останавливается</string>
     <string name="settings_session_notifications_blocked">Уведомления заблокированы. Нажмите, чтобы разрешить их в настройках системы</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_app_version">Версия приложения</string>

@@ -254,6 +254,12 @@ data class AppSettings(
      * answer or finishes. Only works once the notification permission is granted.
      */
     val notifications: Boolean = true,
+    /** With [notifications] on: permission requests, with Allow and Reject actions. */
+    val notifyPermissions: Boolean = true,
+    /** With [notifications] on: questions the agent asks. */
+    val notifyQuestions: Boolean = true,
+    /** With [notifications] on: sessions that finish, fail or are interrupted. */
+    val notifyFinished: Boolean = true,
     /** The one-time explanation of notifications, shown once a server is connected, was answered. */
     val notificationsIntroShown: Boolean = false,
 )

@@ -278,6 +278,7 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
 @Composable
 private fun NotificationsSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
     val blocked = state.notificationsBlocked && !state.notificationsAllowed
+    val on = state.settings.notifications && state.notificationsAllowed
     Section(stringResource(R.string.settings_notifications)) {
         OcCard {
             OcSwitchRow(
@@ -285,10 +286,37 @@ private fun NotificationsSection(state: SettingsState, onEvent: (SettingsEvent) 
                 subtitle = stringResource(
                     if (blocked) R.string.settings_session_notifications_blocked else R.string.settings_session_notifications_sub,
                 ),
-                checked = state.settings.notifications && state.notificationsAllowed,
+                checked = on,
                 onCheckedChange = { onEvent(SettingsEvent.NotificationsChanged(it)) },
                 modifier = Modifier.testTag("settings_notifications_switch"),
             )
+            // Each kind only matters while session notifications are on.
+            if (on) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_notify_permissions),
+                    subtitle = stringResource(R.string.settings_notify_permissions_sub),
+                    checked = state.settings.notifyPermissions,
+                    onCheckedChange = { onEvent(SettingsEvent.NotifyPermissionsChanged(it)) },
+                    modifier = Modifier.testTag("settings_notify_permissions_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_notify_questions),
+                    subtitle = stringResource(R.string.settings_notify_questions_sub),
+                    checked = state.settings.notifyQuestions,
+                    onCheckedChange = { onEvent(SettingsEvent.NotifyQuestionsChanged(it)) },
+                    modifier = Modifier.testTag("settings_notify_questions_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_notify_finished),
+                    subtitle = stringResource(R.string.settings_notify_finished_sub),
+                    checked = state.settings.notifyFinished,
+                    onCheckedChange = { onEvent(SettingsEvent.NotifyFinishedChanged(it)) },
+                    modifier = Modifier.testTag("settings_notify_finished_switch"),
+                )
+            }
         }
     }
 }

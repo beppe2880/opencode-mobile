@@ -26,6 +26,9 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
             .putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
             .putBoolean(KEY_NOTIFICATIONS, next.notifications)
+            .putBoolean(KEY_NOTIFY_PERMISSIONS, next.notifyPermissions)
+            .putBoolean(KEY_NOTIFY_QUESTIONS, next.notifyQuestions)
+            .putBoolean(KEY_NOTIFY_FINISHED, next.notifyFinished)
             .putBoolean(KEY_NOTIFICATIONS_INTRO, next.notificationsIntroShown)
             .apply()
     }
@@ -41,6 +44,9 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
+            notifyPermissions = prefs.getBoolean(KEY_NOTIFY_PERMISSIONS, defaults.notifyPermissions),
+            notifyQuestions = prefs.getBoolean(KEY_NOTIFY_QUESTIONS, defaults.notifyQuestions),
+            notifyFinished = prefs.getBoolean(KEY_NOTIFY_FINISHED, defaults.notifyFinished),
             notificationsIntroShown = prefs.getBoolean(KEY_NOTIFICATIONS_INTRO, defaults.notificationsIntroShown),
         )
     }
@@ -54,6 +60,9 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_GROUP_ACTIVITY = "group_activity"
         const val KEY_NOTIFICATIONS = "notifications"
+        const val KEY_NOTIFY_PERMISSIONS = "notify_permissions"
+        const val KEY_NOTIFY_QUESTIONS = "notify_questions"
+        const val KEY_NOTIFY_FINISHED = "notify_finished"
         const val KEY_NOTIFICATIONS_INTRO = "notifications_intro_shown"
     }
 }

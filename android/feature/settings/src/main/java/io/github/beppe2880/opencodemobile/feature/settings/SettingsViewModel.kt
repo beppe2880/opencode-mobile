@@ -69,6 +69,9 @@ class SettingsViewModel(
                     )
                 }
             }
+            is SettingsEvent.NotifyPermissionsChanged -> update { it.copy(notifyPermissions = event.enabled) }
+            is SettingsEvent.NotifyQuestionsChanged -> update { it.copy(notifyQuestions = event.enabled) }
+            is SettingsEvent.NotifyFinishedChanged -> update { it.copy(notifyFinished = event.enabled) }
             is SettingsEvent.NotificationAccess -> {
                 updateState {
                     it.copy(
