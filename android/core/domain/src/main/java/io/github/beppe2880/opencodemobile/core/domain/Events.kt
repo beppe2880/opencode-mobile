@@ -74,6 +74,7 @@ sealed interface ServerEvent {
     data class InboxEnqueued(override val sessionId: String, val inboxId: String, val text: String, val at: Long) : SessionScoped
     data class InboxDelivered(override val sessionId: String, val inboxId: String) : SessionScoped
     data class InboxCancelled(override val sessionId: String, val inboxId: String) : SessionScoped
+    data class InboxDeliveryChanged(override val sessionId: String, val inboxId: String, val delivery: PromptDelivery) : SessionScoped
 
     data class UsageUpdated(override val sessionId: String, val cost: Double, val tokens: TokenUsage) : SessionScoped
 

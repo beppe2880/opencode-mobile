@@ -121,6 +121,9 @@ interface DraftRepository {
 
 enum class PromptDelivery { Steer, Queue }
 
+/** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
+data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
+
 /** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
 enum class ChangesScope { LastTurn, Session }
 
@@ -170,6 +173,15 @@ interface ChatRepository {
      * transcript. Long commands keep running on the server after this returns.
      */
     suspend fun shell(sessionId: String, command: String): Result<Unit> = Result.success(Unit)
+
+    /** Prompts sent but not delivered yet, oldest first. */
+    suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
+
+    /** Removes a prompt that has not been delivered; a no-op once it was. */
+    suspend fun cancelQueued(sessionId: String, inboxId: String): Result<Unit> = Result.success(Unit)
+
+    /** Delivers a queued prompt at the next step instead of after the current work. */
+    suspend fun steerQueued(sessionId: String, inboxId: String): Result<Unit> = Result.success(Unit)
 
     suspend fun interrupt(sessionId: String): Result<Unit>
 

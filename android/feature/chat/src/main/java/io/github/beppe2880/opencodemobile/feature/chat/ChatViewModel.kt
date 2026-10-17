@@ -12,6 +12,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
+import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -54,6 +56,7 @@ class ChatViewModel(
     private val imageRequests = HashSet<String>()
     private var suggestJob: Job? = null
     private var changesJob: Job? = null
+    private var queueJob: Job? = null
 
     /** Models of the most recently updated sessions, across every project. */
     private var recentFromSessions: List<ModelRef> = emptyList()
@@ -147,6 +150,9 @@ class ChatViewModel(
                 updateState { it.copy(changes = null) }
             }
             is ChatEvent.LoadChanges -> loadChanges(event.scope)
+            is ChatEvent.SteerQueued -> steerQueued(event.id)
+            is ChatEvent.EditQueued -> editQueued(event.id)
+            is ChatEvent.RemoveQueued -> removeQueued(event.id)
         }
     }
 
@@ -159,6 +165,7 @@ class ChatViewModel(
             val active = async { sessions.active() }
             val perms = async { chat.permissions(sessionId) }
             val pendingForms = async { chat.forms(sessionId) }
+            val inbox = async { chat.inbox(sessionId) }
 
             val sessionResult = session.await()
             val transcriptResult = transcript.await()
@@ -176,6 +183,7 @@ class ChatViewModel(
             val lastAssistant = messages.lastOrNull { it is Message.Assistant } as? Message.Assistant
             val activeIds = active.await().getOrNull()
             val permissionList = perms.await().getOrNull()
+            val queuedList = inbox.await().getOrNull()?.queuedOnly()
             updateState {
                 val model = s.model ?: lastAssistant?.model ?: it.model
                 it.copy(
@@ -185,6 +193,7 @@ class ChatViewModel(
                     model = model,
                     running = activeIds?.contains(sessionId) ?: it.running,
                     permissions = permissionList ?: it.permissions,
+                    queued = queuedList ?: it.queued,
                     recentModels = recentModels(model),
                     loading = false,
                     synced = true,
@@ -353,6 +362,11 @@ class ChatViewModel(
             is ServerEvent.InboxEnqueued -> {
                 messages = messages.filterNot { it is Message.User && it.id.startsWith(LOCAL_PREFIX) && it.text == event.text }
                 applyEvent(event)
+                refreshQueue()
+            }
+            is ServerEvent.InboxDelivered, is ServerEvent.InboxCancelled, is ServerEvent.InboxDeliveryChanged -> {
+                applyEvent(event)
+                refreshQueue()
             }
             else -> applyEvent(event)
         }
@@ -365,6 +379,52 @@ class ChatViewModel(
             rebuild()
         }
     }
+
+    private fun refreshQueue() {
+        queueJob?.cancel()
+        queueJob = viewModelScope.launch {
+            chat.inbox(sessionId).onSuccess { list ->
+                updateState { it.copy(queued = list.queuedOnly()) }
+                rebuild()
+            }
+        }
+    }
+
+    private fun steerQueued(id: String) {
+        val prompt = currentState.queued.firstOrNull { it.id == id } ?: return
+        updateState { s -> s.copy(queued = s.queued - prompt) }
+        // Shown in the transcript as pending until delivered at the next step.
+        if (messages.none { it.id == id }) messages = messages + Message.User(id, prompt.createdAt, prompt.text, pending = true)
+        rebuild()
+        viewModelScope.launch {
+            chat.steerQueued(sessionId, id).onFailure { error ->
+                sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                refreshQueue()
+            }
+        }
+    }
+
+    /** Cancels the queued prompt and puts its text back in the composer, before what is typed there. */
+    private fun editQueued(id: String) {
+        val prompt = currentState.queued.firstOrNull { it.id == id } ?: return
+        removeQueued(id)
+        updateState { s -> s.copy(draft = listOf(prompt.text, s.draft).filter { it.isNotBlank() }.joinToString("\n\n")) }
+    }
+
+    private fun removeQueued(id: String) {
+        val prompt = currentState.queued.firstOrNull { it.id == id } ?: return
+        updateState { s -> s.copy(queued = s.queued - prompt) }
+        messages = messages.filterNot { it.id == id }
+        rebuild()
+        viewModelScope.launch {
+            chat.cancelQueued(sessionId, id).onFailure { error ->
+                sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                refreshQueue()
+            }
+        }
+    }
+
+    private fun List<QueuedPrompt>.queuedOnly(): List<QueuedPrompt> = filter { it.delivery == PromptDelivery.Queue }
 
     private fun refreshPermissions() {
         viewModelScope.launch {
@@ -443,7 +503,10 @@ class ChatViewModel(
         val state = currentState
         val visible = visibleMessages()
         val reverted = messages.subList(visible.size, messages.size).count { it is Message.User }
-        val items = ChatItemsBuilder.build(withImages(visible), state.running, showReasoning, state.models::labelFor, groupActivity)
+        // Queued prompts show above the composer instead of as pending bubbles.
+        val queuedIds = state.queued.mapTo(HashSet()) { it.id }
+        val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
+        val items = ChatItemsBuilder.build(withImages(shown), state.running, showReasoning, state.models::labelFor, groupActivity)
         val backgroundable = BackgroundableWork.find(visible)?.takeIf { it.key !in movedToBackground }
         val compactions = visible.filterIsInstance<Message.Notice>()
             .filter { it.kind == NoticeKind.Compacting || it.kind == NoticeKind.Compaction }

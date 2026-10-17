@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 @Immutable
@@ -76,6 +77,8 @@ data class ChatState(
     val preview: ImagePreview? = null,
     /** Where the user left this chat last time; null opens it at the bottom. */
     val savedScroll: ScrollMemory.Anchor? = null,
+    /** Prompts queued to run after the current work, oldest first; shown above the composer. */
+    val queued: List<QueuedPrompt> = emptyList(),
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
 ) {
@@ -178,6 +181,12 @@ sealed interface ChatEvent {
     data object CloseChanges : ChatEvent
     /** Shows another range in the open changes sheet, or reloads the current one. */
     data class LoadChanges(val scope: ChangesScope) : ChatEvent
+
+    /** Delivers a queued prompt at the next step instead of after the current work. */
+    data class SteerQueued(val id: String) : ChatEvent
+    /** Takes a queued prompt back into the composer. */
+    data class EditQueued(val id: String) : ChatEvent
+    data class RemoveQueued(val id: String) : ChatEvent
 }
 
 sealed interface ChatEffect {

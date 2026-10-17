@@ -28,6 +28,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
@@ -104,6 +105,36 @@ class ChatViewModelTest {
         val alone = vm(FakeSessions(model, order = listOf("x")))
         assertNull(alone.state.value.previousSession)
         assertNull(alone.state.value.nextSession)
+    }
+
+    @Test
+    fun `queued prompts show above the composer and can be sent now, edited or removed`() = runTest(main.testDispatcher) {
+        chat.inbox = listOf(
+            QueuedPrompt("q1", "add tests", PromptDelivery.Queue, 1),
+            QueuedPrompt("q2", "then lint", PromptDelivery.Queue, 2),
+            QueuedPrompt("q3", "steering", PromptDelivery.Steer, 3),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(listOf("q1", "q2"), vm.state.value.queued.map { it.id })
+
+        // The enqueued prompt is not repeated as a pending bubble in the transcript.
+        events.flow.emit(ServerEvent.InboxEnqueued("s1", "q1", "add tests", 1))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.items.any { it.key == "q1" })
+
+        vm.onEvent(ChatEvent.SteerQueued("q1"))
+        advanceUntilIdle()
+        assertEquals(listOf("q1"), chat.steered)
+        assertEquals(listOf("q2"), vm.state.value.queued.map { it.id })
+        assertTrue(vm.state.value.items.any { it.key == "q1" })
+
+        vm.onEvent(ChatEvent.DraftChanged("and docs"))
+        vm.onEvent(ChatEvent.EditQueued("q2"))
+        advanceUntilIdle()
+        assertEquals(listOf("q2"), chat.cancelled)
+        assertEquals("then lint\n\nand docs", vm.state.value.draft)
+        assertTrue(vm.state.value.queued.isEmpty())
     }
 
     @Test
@@ -768,6 +799,20 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     var commits = 0
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
+        return Result.success(Unit)
+    }
+    var inbox: List<QueuedPrompt> = emptyList()
+    val cancelled = mutableListOf<String>()
+    val steered = mutableListOf<String>()
+    override suspend fun inbox(sessionId: String) = Result.success(inbox)
+    override suspend fun cancelQueued(sessionId: String, inboxId: String): Result<Unit> {
+        cancelled += inboxId
+        inbox = inbox.filterNot { it.id == inboxId }
+        return Result.success(Unit)
+    }
+    override suspend fun steerQueued(sessionId: String, inboxId: String): Result<Unit> {
+        steered += inboxId
+        inbox = inbox.map { if (it.id == inboxId) it.copy(delivery = PromptDelivery.Steer) else it }
         return Result.success(Unit)
     }
     val shells = mutableListOf<String>()

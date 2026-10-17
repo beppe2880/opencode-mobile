@@ -8,6 +8,13 @@
     <string name="chat_delivery_hint">L\'agente sta lavorando. Guidalo subito o metti il messaggio in coda.</string>
     <string name="chat_jump_latest">Vai all\'ultimo</string>
     <string name="chat_queued">In coda</string>
+    <plurals name="chat_queue_title">
+        <item quantity="one">%d prompt in coda · verrà eseguito al termine dell\'agente</item>
+        <item quantity="other">%d prompt in coda · verranno eseguiti al termine dell\'agente</item>
+    </plurals>
+    <string name="chat_queue_steer">Invia ora</string>
+    <string name="chat_queue_edit">Modifica prompt in coda</string>
+    <string name="chat_queue_remove">Rimuovi prompt in coda</string>
     <string name="chat_sending">Invio…</string>
     <plurals name="chat_attachments">
         <item quantity="one">%1$d allegato</item>

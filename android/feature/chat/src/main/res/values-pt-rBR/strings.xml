@@ -8,6 +8,13 @@
     <string name="chat_delivery_hint">O agente está trabalhando. Redirecione agora ou coloque a mensagem na fila para depois.</string>
     <string name="chat_jump_latest">Ir para o mais recente</string>
     <string name="chat_queued">Na fila</string>
+    <plurals name="chat_queue_title">
+        <item quantity="one">%d prompt na fila · será executado quando o agente terminar</item>
+        <item quantity="other">%d prompts na fila · serão executados quando o agente terminar</item>
+    </plurals>
+    <string name="chat_queue_steer">Enviar agora</string>
+    <string name="chat_queue_edit">Editar prompt da fila</string>
+    <string name="chat_queue_remove">Remover prompt da fila</string>
     <string name="chat_sending">Enviando…</string>
     <plurals name="chat_attachments">
         <item quantity="one">%1$d anexo</item>

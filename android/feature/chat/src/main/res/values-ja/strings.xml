@@ -8,6 +8,12 @@
     <string name="chat_delivery_hint">エージェントが作業中です。今すぐ方向を修正するか、後で処理するようメッセージをキューに追加できます。</string>
     <string name="chat_jump_latest">最新に移動</string>
     <string name="chat_queued">キュー内</string>
+    <plurals name="chat_queue_title">
+        <item quantity="other">キュー内の %d 件のプロンプト · エージェントの完了後に実行されます</item>
+    </plurals>
+    <string name="chat_queue_steer">今すぐ送信</string>
+    <string name="chat_queue_edit">キュー内のプロンプトを編集</string>
+    <string name="chat_queue_remove">キュー内のプロンプトを削除</string>
     <string name="chat_sending">送信中…</string>
     <plurals name="chat_attachments">
         <item quantity="other">添付 %1$d 件</item>

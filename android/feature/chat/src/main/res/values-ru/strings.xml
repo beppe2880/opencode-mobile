@@ -8,6 +8,15 @@
     <string name="chat_delivery_hint">Агент работает. Скорректируйте его сейчас или поставьте сообщение в очередь.</string>
     <string name="chat_jump_latest">К последнему сообщению</string>
     <string name="chat_queued">В очереди</string>
+    <plurals name="chat_queue_title">
+        <item quantity="one">%d промпт в очереди · выполнится после завершения агента</item>
+        <item quantity="few">%d промпта в очереди · выполнятся после завершения агента</item>
+        <item quantity="many">%d промптов в очереди · выполнятся после завершения агента</item>
+        <item quantity="other">%d промпта в очереди · выполнятся после завершения агента</item>
+    </plurals>
+    <string name="chat_queue_steer">Отправить сейчас</string>
+    <string name="chat_queue_edit">Изменить промпт в очереди</string>
+    <string name="chat_queue_remove">Удалить промпт из очереди</string>
     <string name="chat_sending">Отправка…</string>
     <plurals name="chat_attachments">
         <item quantity="one">%1$d вложение</item>

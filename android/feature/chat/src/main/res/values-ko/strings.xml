@@ -8,6 +8,12 @@
     <string name="chat_delivery_hint">에이전트가 작업 중입니다. 지금 방향을 수정하거나 메시지를 대기열에 추가하세요.</string>
     <string name="chat_jump_latest">최신으로 이동</string>
     <string name="chat_queued">대기 중</string>
+    <plurals name="chat_queue_title">
+        <item quantity="other">대기 중인 프롬프트 %d개 · 에이전트가 완료되면 실행됩니다</item>
+    </plurals>
+    <string name="chat_queue_steer">지금 보내기</string>
+    <string name="chat_queue_edit">대기 중인 프롬프트 편집</string>
+    <string name="chat_queue_remove">대기 중인 프롬프트 제거</string>
     <string name="chat_sending">전송 중…</string>
     <plurals name="chat_attachments">
         <item quantity="other">첨부파일 %1$d개</item>

@@ -93,6 +93,9 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     }
     is OpenCodeEvent.SessioninboxdeliveredWrapper -> ServerEvent.InboxDelivered(value.data.sessionID, value.data.inboxID)
     is OpenCodeEvent.SessioninboxcancelledWrapper -> ServerEvent.InboxCancelled(value.data.sessionID, value.data.inboxID)
+    is OpenCodeEvent.SessioninboxdeliverychangedWrapper -> with(value.data) {
+        ServerEvent.InboxDeliveryChanged(sessionID, inboxID, delivery.toDomain())
+    }
 
     is OpenCodeEvent.SessionusageupdatedWrapper -> with(value.data) {
         ServerEvent.UsageUpdated(sessionID, cost, tokens.toDomain())

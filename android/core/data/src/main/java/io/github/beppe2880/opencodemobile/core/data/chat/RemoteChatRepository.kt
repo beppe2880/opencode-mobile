@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.api.models.PermissionReply
 import io.github.beppe2880.opencodemobile.api.models.SessionCommandRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionCompactRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxDelivery
+import io.github.beppe2880.opencodemobile.api.models.SessionInboxUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageInfo
 import io.github.beppe2880.opencodemobile.api.models.SessionPermissionReplyRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionPromptRequest
@@ -29,12 +30,14 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.network.MessageCodec
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.awaitSuccess
 import io.github.beppe2880.opencodemobile.core.network.mapping.toApi
 import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import io.github.beppe2880.opencodemobile.core.network.mapping.toJson
+import io.github.beppe2880.opencodemobile.core.network.mapping.toQueuedPrompt
 import io.github.beppe2880.opencodemobile.core.network.receivedCount
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -265,6 +268,21 @@ internal class RemoteChatRepository(
         } catch (e: OpenCodeError.Unreachable) {
             if (e.cause !is SocketTimeoutException) throw e
         }
+    }
+
+    override suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = resultOf {
+        val api = clients.active().sessions
+        awaitBody { api.sessionInboxList(sessionId) }.data.mapNotNull { it.toQueuedPrompt() }
+    }
+
+    override suspend fun cancelQueued(sessionId: String, inboxId: String): Result<Unit> = resultOf {
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionInboxCancel(sessionId, inboxId) }
+    }
+
+    override suspend fun steerQueued(sessionId: String, inboxId: String): Result<Unit> = resultOf {
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionInboxUpdate(sessionId, inboxId, SessionInboxUpdateRequest(SessionInboxDelivery.STEER)) }
     }
 
     override suspend fun interrupt(sessionId: String): Result<Unit> = resultOf {

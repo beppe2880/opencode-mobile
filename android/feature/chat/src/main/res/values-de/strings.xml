@@ -8,6 +8,13 @@
     <string name="chat_delivery_hint">Der Agent arbeitet. Steuere ihn jetzt um oder reihe die Nachricht für später ein.</string>
     <string name="chat_jump_latest">Zum neuesten Beitrag</string>
     <string name="chat_queued">Eingereiht</string>
+    <plurals name="chat_queue_title">
+        <item quantity="one">%d Prompt eingereiht · läuft, wenn der Agent fertig ist</item>
+        <item quantity="other">%d Prompts eingereiht · laufen, wenn der Agent fertig ist</item>
+    </plurals>
+    <string name="chat_queue_steer">Jetzt senden</string>
+    <string name="chat_queue_edit">Eingereihten Prompt bearbeiten</string>
+    <string name="chat_queue_remove">Eingereihten Prompt entfernen</string>
     <string name="chat_sending">Wird gesendet…</string>
     <plurals name="chat_attachments">
         <item quantity="one">%1$d Anhang</item>

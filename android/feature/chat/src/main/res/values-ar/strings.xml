@@ -8,6 +8,17 @@
     <string name="chat_delivery_hint">الوكيل يعمل. وجّهه الآن أو أضف الرسالة إلى الطابور لوقت لاحق.</string>
     <string name="chat_jump_latest">الانتقال إلى الأحدث</string>
     <string name="chat_queued">في الطابور</string>
+    <plurals name="chat_queue_title">
+        <item quantity="zero">%d مطالبة في الطابور · تعمل عند انتهاء الوكيل</item>
+        <item quantity="one">مطالبة واحدة في الطابور (%d) · تعمل عند انتهاء الوكيل</item>
+        <item quantity="two">مطالبتان في الطابور (%d) · تعملان عند انتهاء الوكيل</item>
+        <item quantity="few">%d مطالبات في الطابور · تعمل عند انتهاء الوكيل</item>
+        <item quantity="many">%d مطالبة في الطابور · تعمل عند انتهاء الوكيل</item>
+        <item quantity="other">%d مطالبة في الطابور · تعمل عند انتهاء الوكيل</item>
+    </plurals>
+    <string name="chat_queue_steer">إرسال الآن</string>
+    <string name="chat_queue_edit">تعديل المطالبة في الطابور</string>
+    <string name="chat_queue_remove">إزالة المطالبة من الطابور</string>
     <string name="chat_sending">جارٍ الإرسال…</string>
     <plurals name="chat_attachments">
         <item quantity="zero">لا مرفقات (%1$d)</item>

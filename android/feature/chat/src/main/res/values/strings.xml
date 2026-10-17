@@ -8,6 +8,13 @@
     <string name="chat_delivery_hint">The agent is working. Steer it now or queue the message for later.</string>
     <string name="chat_jump_latest">Jump to latest</string>
     <string name="chat_queued">Queued</string>
+    <plurals name="chat_queue_title">
+        <item quantity="one">%d prompt queued · runs when the agent finishes</item>
+        <item quantity="other">%d prompts queued · run when the agent finishes</item>
+    </plurals>
+    <string name="chat_queue_steer">Send now</string>
+    <string name="chat_queue_edit">Edit queued prompt</string>
+    <string name="chat_queue_remove">Remove queued prompt</string>
     <string name="chat_sending">Sending…</string>
     <plurals name="chat_attachments">
         <item quantity="one">%1$d attachment</item>
