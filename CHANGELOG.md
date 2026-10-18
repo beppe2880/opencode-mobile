@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/beppe2880/opencode-mobile/compare/v0.5.0...v0.6.0) (2026-10-18)
+
+
+### Features
+
+* **settings:** Show usage statistics ([#35](https://github.com/beppe2880/opencode-mobile/issues/35)) ([a1eadd7](https://github.com/beppe2880/opencode-mobile/commit/a1eadd7df526e0ac35d3ef12726ae86c04c09a5d))
+
+
+### Documentation
+
+* Remove the demo video from the README ([#25](https://github.com/beppe2880/opencode-mobile/issues/25)) ([eceaea9](https://github.com/beppe2880/opencode-mobile/commit/eceaea9b1dfb2d1ad7118f0346b95508096f90f5))
+
 ## [0.5.0](https://github.com/beppe2880/opencode-mobile/compare/v0.4.0...v0.5.0) (2026-10-17)
 
 
