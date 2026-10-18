@@ -9,12 +9,6 @@ agent's questions while you are away from the desk.
 ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3ddc84)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-<p align="center">
-  <img src="docs/media/demo.gif" width="300" alt="Demo: a prompt sent from the phone, the agent's edit approved, then a fork of the session">
-  <br>
-  <sub>Real OpenCode server, sped up 1.5×. <a href="docs/media/demo.mp4">Full-speed video</a>.</sub>
-</p>
-
 <p>
   <img src="docs/screenshots/sessions.png" width="200" alt="Session list">
   <img src="docs/screenshots/chat.png" width="200" alt="Chat">
