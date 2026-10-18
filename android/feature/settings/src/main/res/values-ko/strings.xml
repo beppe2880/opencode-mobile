@@ -33,6 +33,34 @@
     <string name="settings_group_activity_sub">연속된 생각과 도구 호출을 하나의 행으로 표시</string>
     <string name="settings_agent_outline">에이전트 색상 테두리</string>
     <string name="settings_agent_outline_sub">선택한 에이전트의 색상으로 메시지 상자 테두리 표시</string>
+    <string name="settings_usage">사용 통계</string>
+    <string name="settings_usage_sub">이 서버의 비용, 토큰 및 활동</string>
+    <string name="usage_title">사용량</string>
+    <string name="usage_today">오늘</string>
+    <string name="usage_week">7일</string>
+    <string name="usage_month">30일</string>
+    <string name="usage_error">통계를 불러올 수 없습니다</string>
+    <string name="usage_empty">활동 없음</string>
+    <string name="usage_empty_message">이 기간에 이 서버에서 실행된 세션이 없습니다.</string>
+    <string name="usage_cost">비용</string>
+    <string name="usage_prompts">프롬프트</string>
+    <string name="usage_sessions">세션</string>
+    <string name="usage_steps">단계</string>
+    <string name="usage_input">입력 토큰</string>
+    <string name="usage_output">출력 토큰</string>
+    <string name="usage_cached">캐시에서</string>
+    <plurals name="usage_active_days">
+        <item quantity="other">%d일 동안 활동</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="other">%d일 연속</item>
+    </plurals>
+    <string name="usage_activity">일별 단계</string>
+    <string name="usage_activity_description">일별 단계; 가장 활발했던 날은 %1$s, %2$d단계</string>
+    <string name="usage_models">모델</string>
+    <plurals name="usage_model_steps">
+        <item quantity="other">%s 단계</item>
+    </plurals>
     <string name="settings_notifications">알림</string>
     <string name="settings_session_notifications">세션 알림</string>
     <string name="settings_session_notifications_sub">세션이 실행되는 동안 백그라운드에서 연결을 유지하고, 응답을 기다리거나 완료되면 알려 줍니다</string>

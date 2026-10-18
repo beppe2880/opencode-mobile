@@ -33,6 +33,37 @@
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_agent_outline">Umrandung in Agentenfarbe</string>
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
+    <string name="settings_usage">Nutzungsstatistik</string>
+    <string name="settings_usage_sub">Kosten, Token und Aktivität auf diesem Server</string>
+    <string name="usage_title">Nutzung</string>
+    <string name="usage_today">Heute</string>
+    <string name="usage_week">7 Tage</string>
+    <string name="usage_month">30 Tage</string>
+    <string name="usage_error">Statistik konnte nicht geladen werden</string>
+    <string name="usage_empty">Keine Aktivität</string>
+    <string name="usage_empty_message">In diesem Zeitraum wurde auf diesem Server keine Sitzung ausgeführt.</string>
+    <string name="usage_cost">Kosten</string>
+    <string name="usage_prompts">Prompts</string>
+    <string name="usage_sessions">Sitzungen</string>
+    <string name="usage_steps">Schritte</string>
+    <string name="usage_input">Eingabe-Token</string>
+    <string name="usage_output">Ausgabe-Token</string>
+    <string name="usage_cached">Aus Cache</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Aktiv an %d Tag</item>
+        <item quantity="other">Aktiv an %d Tagen</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d Tag in Folge</item>
+        <item quantity="other">%d Tage in Folge</item>
+    </plurals>
+    <string name="usage_activity">Schritte pro Tag</string>
+    <string name="usage_activity_description">Schritte pro Tag; der aktivste Tag war %1$s mit %2$d Schritten</string>
+    <string name="usage_models">Modelle</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s Schritt</item>
+        <item quantity="other">%s Schritte</item>
+    </plurals>
     <string name="settings_notifications">Benachrichtigungen</string>
     <string name="settings_session_notifications">Sitzungsbenachrichtigungen</string>
     <string name="settings_session_notifications_sub">Solange Sitzungen laufen, im Hintergrund verbunden bleiben und benachrichtigen, wenn eine auf eine Antwort wartet oder fertig ist</string>

@@ -33,6 +33,37 @@
     <string name="settings_group_activity_sub">Mostrar raciocínios e chamadas de ferramentas consecutivos em uma única linha</string>
     <string name="settings_agent_outline">Borda na cor do agente</string>
     <string name="settings_agent_outline_sub">Contornar a caixa de mensagem com a cor do agente selecionado</string>
+    <string name="settings_usage">Estatísticas de uso</string>
+    <string name="settings_usage_sub">Custo, tokens e atividade neste servidor</string>
+    <string name="usage_title">Uso</string>
+    <string name="usage_today">Hoje</string>
+    <string name="usage_week">7 dias</string>
+    <string name="usage_month">30 dias</string>
+    <string name="usage_error">Não foi possível carregar as estatísticas</string>
+    <string name="usage_empty">Nenhuma atividade</string>
+    <string name="usage_empty_message">Nenhuma sessão foi executada neste servidor neste período.</string>
+    <string name="usage_cost">Custo</string>
+    <string name="usage_prompts">Prompts</string>
+    <string name="usage_sessions">Sessões</string>
+    <string name="usage_steps">Etapas</string>
+    <string name="usage_input">Tokens de entrada</string>
+    <string name="usage_output">Tokens de saída</string>
+    <string name="usage_cached">Do cache</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Ativo em %d dia</item>
+        <item quantity="other">Ativo em %d dias</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d dia seguido</item>
+        <item quantity="other">%d dias seguidos</item>
+    </plurals>
+    <string name="usage_activity">Etapas por dia</string>
+    <string name="usage_activity_description">Etapas por dia; o dia mais movimentado foi %1$s com %2$d etapas</string>
+    <string name="usage_models">Modelos</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s etapa</item>
+        <item quantity="other">%s etapas</item>
+    </plurals>
     <string name="settings_notifications">Notificações</string>
     <string name="settings_session_notifications">Notificações de sessões</string>
     <string name="settings_session_notifications_sub">Enquanto houver sessões em andamento, fica conectado em segundo plano e avisa quando uma espera uma resposta ou termina</string>

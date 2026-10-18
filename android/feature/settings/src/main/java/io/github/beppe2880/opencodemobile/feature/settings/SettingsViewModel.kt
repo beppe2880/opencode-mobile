@@ -36,6 +36,7 @@ class SettingsViewModel(
         when (event) {
             SettingsEvent.Back -> sendEffect(SettingsEffect.NavigateBack)
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
+            SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
             is SettingsEvent.SelectServer -> viewModelScope.launch { servers.activate(event.serverId) }
             is SettingsEvent.RequestRename -> updateState { it.copy(renaming = event.server) }
             is SettingsEvent.RequestRemove -> updateState { it.copy(removing = event.server) }

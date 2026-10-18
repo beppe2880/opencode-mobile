@@ -24,7 +24,35 @@ data class TokenUsage(
     val cacheWrite: Long = 0,
 ) {
     val total: Long get() = input + output + reasoning + cacheRead + cacheWrite
+
+    operator fun plus(other: TokenUsage) = TokenUsage(
+        input + other.input,
+        output + other.output,
+        reasoning + other.reasoning,
+        cacheRead + other.cacheRead,
+        cacheWrite + other.cacheWrite,
+    )
 }
+
+/** Activity and spending of every session in a time range, as the server counts them. */
+data class UsageStats(
+    val sessions: Long,
+    val subagents: Long,
+    val prompts: Long,
+    val steps: Long,
+    val cost: Double,
+    val tokens: TokenUsage,
+    val activeDays: Long,
+    val streak: Long,
+    /** Steps per local day (`yyyy-MM-dd`), oldest first. */
+    val activity: List<DailyActivity>,
+    /** One entry per model (variants merged), most expensive first. */
+    val models: List<ModelUsage>,
+)
+
+data class DailyActivity(val date: String, val steps: Long)
+
+data class ModelUsage(val model: ModelRef, val steps: Long, val cost: Double, val tokens: TokenUsage)
 
 enum class SessionOutcome { Succeeded, Failed, Interrupted }
 

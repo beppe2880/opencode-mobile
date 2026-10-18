@@ -93,6 +93,10 @@ interface SessionRepository {
 
     suspend fun projects(): Result<List<Project>>
 
+    /** Usage between [from] and [to] (epoch millis), with days counted in [timeZone] (IANA id). */
+    suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> =
+        Result.failure(OpenCodeError.NotFound("Usage statistics are not available"))
+
     /**
      * The sessions of saved server [serverId] last loaded by [list] without a search for
      * [directory], kept on the device so they show before the server answers; null when never loaded.

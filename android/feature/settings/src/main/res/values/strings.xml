@@ -33,6 +33,37 @@
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
     <string name="settings_agent_outline">Agent color outline</string>
     <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
+    <string name="settings_usage">Usage statistics</string>
+    <string name="settings_usage_sub">Cost, tokens and activity on this server</string>
+    <string name="usage_title">Usage</string>
+    <string name="usage_today">Today</string>
+    <string name="usage_week">7 days</string>
+    <string name="usage_month">30 days</string>
+    <string name="usage_error">Could not load the statistics</string>
+    <string name="usage_empty">No activity</string>
+    <string name="usage_empty_message">No session ran on this server in this period.</string>
+    <string name="usage_cost">Cost</string>
+    <string name="usage_prompts">Prompts</string>
+    <string name="usage_sessions">Sessions</string>
+    <string name="usage_steps">Steps</string>
+    <string name="usage_input">Input tokens</string>
+    <string name="usage_output">Output tokens</string>
+    <string name="usage_cached">From cache</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Active on %d day</item>
+        <item quantity="other">Active on %d days</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d day in a row</item>
+        <item quantity="other">%d days in a row</item>
+    </plurals>
+    <string name="usage_activity">Steps per day</string>
+    <string name="usage_activity_description">Steps per day; the busiest day was %1$s with %2$d steps</string>
+    <string name="usage_models">Models</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s step</item>
+        <item quantity="other">%s steps</item>
+    </plurals>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_session_notifications">Session notifications</string>
     <string name="settings_session_notifications_sub">While sessions run, stay connected in the background and notify you when one needs an answer or finishes</string>

@@ -31,12 +31,13 @@ fun formatTokensPerSecond(rate: Double): String = String.format(Locale.US, "%.1f
 /** Exact count with locale grouping, like the TUI: `19,952 tok` (`19.952 tok` in Italian). */
 fun formatTokenTotal(count: Long): String = NumberFormat.getIntegerInstance().format(count) + " tok"
 
-/** `1.2k`, `35k`, `1.4M` tokens. */
+/** `1.2k`, `35k`, `1.4M`, `1.8B` tokens. */
 fun formatTokens(count: Long): String = when {
     count < 1_000 -> count.toString()
     count < 10_000 -> String.format(Locale.US, "%.1fk", count / 1_000.0)
     count < 1_000_000 -> "${count / 1_000}k"
-    else -> String.format(Locale.US, "%.1fM", count / 1_000_000.0)
+    count < 1_000_000_000 -> String.format(Locale.US, "%.1fM", count / 1_000_000.0)
+    else -> String.format(Locale.US, "%.1fB", count / 1_000_000_000.0)
 }
 
 /** Localized relative time, e.g. "5 min ago"; "just now" under a minute. */

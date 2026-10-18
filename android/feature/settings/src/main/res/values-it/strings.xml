@@ -33,6 +33,37 @@
     <string name="settings_group_activity_sub">Mostra in un\'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
     <string name="settings_agent_outline">Bordo col colore dell\'agente</string>
     <string name="settings_agent_outline_sub">Colora il bordo del riquadro di scrittura con il colore dell\'agente selezionato</string>
+    <string name="settings_usage">Statistiche di utilizzo</string>
+    <string name="settings_usage_sub">Costi, token e attività su questo server</string>
+    <string name="usage_title">Utilizzo</string>
+    <string name="usage_today">Oggi</string>
+    <string name="usage_week">7 giorni</string>
+    <string name="usage_month">30 giorni</string>
+    <string name="usage_error">Impossibile caricare le statistiche</string>
+    <string name="usage_empty">Nessuna attività</string>
+    <string name="usage_empty_message">Nessuna sessione è stata eseguita su questo server in questo periodo.</string>
+    <string name="usage_cost">Costo</string>
+    <string name="usage_prompts">Prompt</string>
+    <string name="usage_sessions">Sessioni</string>
+    <string name="usage_steps">Step</string>
+    <string name="usage_input">Token di input</string>
+    <string name="usage_output">Token di output</string>
+    <string name="usage_cached">Dalla cache</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Attivo per %d giorno</item>
+        <item quantity="other">Attivo per %d giorni</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d giorno di fila</item>
+        <item quantity="other">%d giorni di fila</item>
+    </plurals>
+    <string name="usage_activity">Step al giorno</string>
+    <string name="usage_activity_description">Step al giorno; il giorno più intenso è stato %1$s con %2$d step</string>
+    <string name="usage_models">Modelli</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s step</item>
+        <item quantity="other">%s step</item>
+    </plurals>
     <string name="settings_notifications">Notifiche</string>
     <string name="settings_session_notifications">Notifiche delle sessioni</string>
     <string name="settings_session_notifications_sub">Mentre le sessioni sono in corso, resta connessa in background e ti avvisa quando una aspetta una risposta o finisce</string>

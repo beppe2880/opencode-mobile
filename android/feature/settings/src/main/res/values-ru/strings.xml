@@ -33,6 +33,43 @@
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
     <string name="settings_agent_outline">Рамка цвета агента</string>
     <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
+    <string name="settings_usage">Статистика использования</string>
+    <string name="settings_usage_sub">Стоимость, токены и активность на этом сервере</string>
+    <string name="usage_title">Использование</string>
+    <string name="usage_today">Сегодня</string>
+    <string name="usage_week">7 дней</string>
+    <string name="usage_month">30 дней</string>
+    <string name="usage_error">Не удалось загрузить статистику</string>
+    <string name="usage_empty">Нет активности</string>
+    <string name="usage_empty_message">За этот период на сервере не выполнялось ни одной сессии.</string>
+    <string name="usage_cost">Стоимость</string>
+    <string name="usage_prompts">Промпты</string>
+    <string name="usage_sessions">Сессии</string>
+    <string name="usage_steps">Шаги</string>
+    <string name="usage_input">Входные токены</string>
+    <string name="usage_output">Выходные токены</string>
+    <string name="usage_cached">Из кэша</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Активен %d день</item>
+        <item quantity="few">Активен %d дня</item>
+        <item quantity="many">Активен %d дней</item>
+        <item quantity="other">Активен %d дня</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d день подряд</item>
+        <item quantity="few">%d дня подряд</item>
+        <item quantity="many">%d дней подряд</item>
+        <item quantity="other">%d дня подряд</item>
+    </plurals>
+    <string name="usage_activity">Шаги по дням</string>
+    <string name="usage_activity_description">Шаги по дням; самый активный день — %1$s, %2$d шагов</string>
+    <string name="usage_models">Модели</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s шаг</item>
+        <item quantity="few">%s шага</item>
+        <item quantity="many">%s шагов</item>
+        <item quantity="other">%s шага</item>
+    </plurals>
     <string name="settings_notifications">Уведомления</string>
     <string name="settings_session_notifications">Уведомления о сессиях</string>
     <string name="settings_session_notifications_sub">Пока выполняются сессии, оставаться на связи в фоне и сообщать, когда сессия ждёт ответа или завершается</string>

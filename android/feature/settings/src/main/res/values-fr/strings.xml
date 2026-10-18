@@ -33,6 +33,37 @@
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_agent_outline">Contour aux couleurs de l’agent</string>
     <string name="settings_agent_outline_sub">Utiliser la couleur de l’agent sélectionné pour le contour du champ de message</string>
+    <string name="settings_usage">Statistiques d\'utilisation</string>
+    <string name="settings_usage_sub">Coût, jetons et activité sur ce serveur</string>
+    <string name="usage_title">Utilisation</string>
+    <string name="usage_today">Aujourd’hui</string>
+    <string name="usage_week">7 jours</string>
+    <string name="usage_month">30 jours</string>
+    <string name="usage_error">Impossible de charger les statistiques</string>
+    <string name="usage_empty">Aucune activité</string>
+    <string name="usage_empty_message">Aucune session n’a été exécutée sur ce serveur sur cette période.</string>
+    <string name="usage_cost">Coût</string>
+    <string name="usage_prompts">Prompts</string>
+    <string name="usage_sessions">Sessions</string>
+    <string name="usage_steps">Étapes</string>
+    <string name="usage_input">Jetons d’entrée</string>
+    <string name="usage_output">Jetons de sortie</string>
+    <string name="usage_cached">Depuis le cache</string>
+    <plurals name="usage_active_days">
+        <item quantity="one">Actif %d jour</item>
+        <item quantity="other">Actif %d jours</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="one">%d jour d’affilée</item>
+        <item quantity="other">%d jours d’affilée</item>
+    </plurals>
+    <string name="usage_activity">Étapes par jour</string>
+    <string name="usage_activity_description">Étapes par jour ; le jour le plus actif était %1$s avec %2$d étapes</string>
+    <string name="usage_models">Modèles</string>
+    <plurals name="usage_model_steps">
+        <item quantity="one">%s étape</item>
+        <item quantity="other">%s étapes</item>
+    </plurals>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_session_notifications">Notifications des sessions</string>
     <string name="settings_session_notifications_sub">Pendant l’exécution des sessions, reste connectée en arrière-plan et vous prévient quand l’une attend une réponse ou se termine</string>

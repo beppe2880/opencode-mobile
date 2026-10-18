@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.UsageStats
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.awaitSuccess
 import io.github.beppe2880.opencodemobile.core.network.mapping.toApi
@@ -116,6 +117,18 @@ internal class RemoteSessionRepository(
         val api = clients.forProfile(profile).projects
         awaitBody { api.projectList() }.map { it.toDomain() }.sortedByDescending { it.updatedAt }
             .also { lists.write(profile.id, ListCache.PROJECTS_KEY, SessionListCodec.encodeProjects(it)) }
+    }
+
+    override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> = resultOf {
+        val api = clients.active().sessions
+        awaitBody {
+            api.experimentalSessionStats(
+                from = from.toString(),
+                to = to.toString(),
+                timezone = timeZone,
+                tools = SessionApi.ToolsExperimentalSessionStats.NONE,
+            )
+        }.data.toDomain()
     }
 
     private companion object {

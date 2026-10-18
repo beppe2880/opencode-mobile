@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -46,6 +47,9 @@ data class ChatDestination(val sessionId: String)
 
 @Serializable
 data object SettingsDestination
+
+@Serializable
+data object UsageDestination
 
 /** Width at which Sessions and Chat are shown side by side. */
 private val ListDetailMinWidth = 840.dp
@@ -120,7 +124,11 @@ fun AppNavHost(
             SettingsRoute(
                 onBack = { navController.popBackStack() },
                 onAddServer = { navController.navigate(ConnectDestination(addServer = true)) },
+                onOpenUsage = { navController.navigate(UsageDestination) },
             )
+        }
+        composable<UsageDestination> {
+            UsageRoute(onBack = { navController.popBackStack() })
         }
     }
 }

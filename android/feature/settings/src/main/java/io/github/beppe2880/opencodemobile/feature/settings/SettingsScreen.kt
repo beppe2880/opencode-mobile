@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -95,6 +97,7 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
             ) {
                 item(key = "servers") { ServersSection(state, onEvent) }
+                if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
                 item(key = "notifications") { NotificationsSection(state, onEvent) }
@@ -203,6 +206,22 @@ private fun ServerRow(server: ServerProfile, active: Boolean, onEvent: (Settings
         },
         modifier = Modifier.testTag("settings_server_${server.id}"),
     )
+}
+
+@Composable
+private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(R.string.usage_title)) {
+        OcCard {
+            OcListRow(
+                title = stringResource(R.string.settings_usage),
+                subtitle = stringResource(R.string.settings_usage_sub),
+                onClick = { onEvent(SettingsEvent.OpenUsage) },
+                leading = { Icon(Icons.Outlined.QueryStats, contentDescription = null, tint = OcTheme.colors.iconMuted) },
+                trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = OcTheme.colors.iconMuted) },
+                modifier = Modifier.testTag("settings_usage_row"),
+            )
+        }
+    }
 }
 
 @Composable

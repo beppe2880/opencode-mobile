@@ -33,6 +33,34 @@
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
     <string name="settings_agent_outline">エージェント色の枠線</string>
     <string name="settings_agent_outline_sub">選択したエージェントの色で入力欄を囲む</string>
+    <string name="settings_usage">利用統計</string>
+    <string name="settings_usage_sub">このサーバーのコスト、トークン、アクティビティ</string>
+    <string name="usage_title">利用状況</string>
+    <string name="usage_today">今日</string>
+    <string name="usage_week">7日間</string>
+    <string name="usage_month">30日間</string>
+    <string name="usage_error">統計を読み込めませんでした</string>
+    <string name="usage_empty">アクティビティなし</string>
+    <string name="usage_empty_message">この期間にこのサーバーでセッションは実行されていません。</string>
+    <string name="usage_cost">コスト</string>
+    <string name="usage_prompts">プロンプト</string>
+    <string name="usage_sessions">セッション</string>
+    <string name="usage_steps">ステップ</string>
+    <string name="usage_input">入力トークン</string>
+    <string name="usage_output">出力トークン</string>
+    <string name="usage_cached">キャッシュから</string>
+    <plurals name="usage_active_days">
+        <item quantity="other">%d 日間アクティブ</item>
+    </plurals>
+    <plurals name="usage_streak">
+        <item quantity="other">%d 日連続</item>
+    </plurals>
+    <string name="usage_activity">1日ごとのステップ数</string>
+    <string name="usage_activity_description">1日ごとのステップ数；最も活発だった日は %1$s で %2$d ステップ</string>
+    <string name="usage_models">モデル</string>
+    <plurals name="usage_model_steps">
+        <item quantity="other">%s ステップ</item>
+    </plurals>
     <string name="settings_notifications">通知</string>
     <string name="settings_session_notifications">セッションの通知</string>
     <string name="settings_session_notifications_sub">セッションの実行中はバックグラウンドで接続を保ち、応答待ちや完了のときに通知します</string>

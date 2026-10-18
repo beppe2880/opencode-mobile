@@ -34,6 +34,8 @@ agent's questions while you are away from the desk.
   notification. The app explains them and asks for permission after you connect; in Settings
   you choose which kinds you get (permission requests, questions, finished sessions) or turn
   them off.
+- **Usage statistics**: cost, tokens and activity per day and per model, for today, the
+  last 7 or 30 days.
 - **Switch agent, model and reasoning level** per session, with recently used models first.
 - **Fast on large sessions**: transcripts are cached on the device and synced incrementally.
 - **Swipe between chats**, reading position remembered per chat, drafts saved per session.

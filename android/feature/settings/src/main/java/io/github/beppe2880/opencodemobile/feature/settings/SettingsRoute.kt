@@ -22,6 +22,7 @@ fun SettingsRoute(
     onBack: () -> Unit,
     onAddServer: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenUsage: () -> Unit = {},
 ) {
     val viewModel: SettingsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -38,6 +39,7 @@ fun SettingsRoute(
         when (effect) {
             SettingsEffect.NavigateBack -> onBack()
             SettingsEffect.OpenConnect -> onAddServer()
+            SettingsEffect.OpenUsage -> onOpenUsage()
             SettingsEffect.RequestNotificationPermission ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permission.launch(Manifest.permission.POST_NOTIFICATIONS)

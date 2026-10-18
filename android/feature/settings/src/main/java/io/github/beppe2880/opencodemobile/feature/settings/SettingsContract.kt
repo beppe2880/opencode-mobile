@@ -28,6 +28,7 @@ data class SettingsState(
 sealed interface SettingsEvent {
     data object Back : SettingsEvent
     data object AddServer : SettingsEvent
+    data object OpenUsage : SettingsEvent
     data class SelectServer(val serverId: String) : SettingsEvent
     data class RequestRename(val server: ServerProfile) : SettingsEvent
     data class ConfirmRename(val name: String) : SettingsEvent
@@ -53,6 +54,7 @@ sealed interface SettingsEvent {
 sealed interface SettingsEffect {
     data object NavigateBack : SettingsEffect
     data object OpenConnect : SettingsEffect
+    data object OpenUsage : SettingsEffect
     data object RequestNotificationPermission : SettingsEffect
     data object OpenNotificationSettings : SettingsEffect
 }
