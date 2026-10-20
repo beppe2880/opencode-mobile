@@ -658,6 +658,29 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `failed send after a committed revert reloads instead of resurrecting reverted messages`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val loadsBefore = chat.messageLoads
+
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("u1"), chat.reverts)
+
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("hello again"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(1, chat.commits)
+        assertEquals(0, vm.state.value.revertedCount)
+        // The revert is permanent server-side, so the chat must reload from the server
+        // instead of rendering the messages it still holds locally.
+        assertTrue(chat.messageLoads > loadsBefore)
+    }
+
+    @Test
     fun `permission reply removes the request`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -778,8 +801,10 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     override suspend fun prefetch(sessionIds: List<String>, lastMessages: Int) {
         prefetched += sessionIds to lastMessages
     }
+    var messageLoads = 0
     override suspend fun messages(sessionId: String): Result<List<Message>> {
         gate?.await()
+        messageLoads++
         return messagesResult.map { transcript }
     }
     override suspend fun prompt(

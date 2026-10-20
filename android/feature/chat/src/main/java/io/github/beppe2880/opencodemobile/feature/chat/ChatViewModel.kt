@@ -586,7 +586,9 @@ class ChatViewModel(
                     scheduleReload()
                 },
                 onFailure = { error ->
-                    if (committed.isFailure) revertMessageId = revert
+                    // The revert stays permanent when the commit itself went through, so the
+                    // local transcript has to be refreshed to match the server.
+                    if (committed.isFailure) revertMessageId = revert else scheduleReload()
                     messages = messages.filterNot { it.id == local.id }
                     updateState {
                         it.copy(
