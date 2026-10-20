@@ -97,13 +97,17 @@ internal class RemoteSessionRepository(
     }
 
     override suspend fun rename(sessionId: String, title: String): Result<Unit> = resultOf {
-        val api = clients.active().sessions
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionUpdate(sessionId, SessionUpdateRequest(title = title)) }
+        seen[profile.id to sessionId]?.let { seen[profile.id to sessionId] = it.copy(title = title) }
     }
 
     override suspend fun delete(sessionId: String): Result<Unit> = resultOf {
-        val api = clients.active().sessions
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionRemove(sessionId) }
+        seen.remove(profile.id to sessionId)
     }
 
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = resultOf {
