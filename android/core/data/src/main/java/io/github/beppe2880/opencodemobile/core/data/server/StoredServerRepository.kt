@@ -15,6 +15,7 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,11 +57,19 @@ internal class StoredServerRepository(
 
     init {
         scope.launch(ioDispatcher) {
-            val saved = store.load().let { raw ->
-                raw.copy(activeId = raw.activeId?.takeIf { id -> raw.profiles.any { it.id == id } })
+            try {
+                val saved = store.load().let { raw ->
+                    raw.copy(activeId = raw.activeId?.takeIf { id -> raw.profiles.any { it.id == id } })
+                }
+                mutex.withLock { publish(saved) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // An unreadable store (for example a Keystore failure) must not keep
+                // the app from starting; the user pairs again instead.
+            } finally {
+                _loaded.value = true
             }
-            mutex.withLock { publish(saved) }
-            _loaded.value = true
         }
     }
 

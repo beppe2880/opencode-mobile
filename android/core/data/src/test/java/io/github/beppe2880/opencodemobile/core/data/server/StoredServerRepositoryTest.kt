@@ -7,7 +7,9 @@ import io.github.beppe2880.opencodemobile.core.data.profile
 import io.github.beppe2880.opencodemobile.core.domain.ConnectTarget
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -164,4 +166,18 @@ class StoredServerRepositoryTest {
             TestGraph(store).servers.parseConnectTarget("http://10.0.2.2:4096/auth/connect/abc"),
         )
     }
+
+    @Test
+    fun `a store that fails to load leaves the repository empty but usable`() = runTest {
+        val failing = object : ServerStore {
+            override fun load(): StoredServers = throw SecurityException("keystore unavailable")
+            override fun save(servers: StoredServers) = Unit
+        }
+        val repository = StoredServerRepository(failing, OpenCodeClientFactory())
+
+        repository.loaded.first { it }
+        assertEquals(emptyList<ServerProfile>(), repository.servers.value)
+        assertNull(repository.activeServer.value)
+    }
 }
+
