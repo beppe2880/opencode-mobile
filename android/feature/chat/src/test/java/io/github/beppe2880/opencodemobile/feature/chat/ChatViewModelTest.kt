@@ -645,6 +645,28 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a missed execution end leaves stop usable after reconnecting`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { activeIds = setOf("s1") }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.ExecutionStarted("s1"))
+        runCurrent()
+        assertTrue(vm.state.value.running)
+
+        vm.onEvent(ChatEvent.Stop)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.stopping)
+
+        // The connection drops before ExecutionEnded arrives; on reconnect the server still
+        // reports the session as running.
+        events.flow.emit(ServerEvent.Connected)
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.running)
+        assertFalse(vm.state.value.stopping)
+    }
+
+    @Test
     fun `failed send restores the draft and removes the pending prompt`() = runTest(main.testDispatcher) {
         chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
         val vm = vm()
@@ -731,7 +753,8 @@ private class FakeSessions(
 ) : SessionRepository {
     private val session = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null)
     override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
-    override suspend fun active(): Result<Set<String>> = Result.success(emptySet())
+    var activeIds: Set<String> = emptySet()
+    override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
     override suspend fun get(sessionId: String) = Result.success(session)
     override fun cached(sessionId: String) = titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order

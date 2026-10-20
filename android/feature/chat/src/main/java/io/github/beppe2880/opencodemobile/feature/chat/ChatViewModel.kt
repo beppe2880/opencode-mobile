@@ -193,6 +193,9 @@ class ChatViewModel(
                     agent = s.agent ?: lastAssistant?.agent ?: it.agent,
                     model = model,
                     running = activeIds?.contains(sessionId) ?: it.running,
+                    // Stop only asks the server to interrupt. If its ExecutionEnded was lost with
+                    // the connection, a fresh server view must not leave the button disabled.
+                    stopping = if (activeIds != null) false else it.stopping,
                     permissions = permissionList ?: it.permissions,
                     queued = queuedList ?: it.queued,
                     recentModels = recentModels(model),
