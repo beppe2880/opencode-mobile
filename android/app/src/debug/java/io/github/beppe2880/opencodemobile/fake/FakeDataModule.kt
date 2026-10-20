@@ -29,6 +29,16 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.UsageStats
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
+import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.DailyActivity
+import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
+import java.time.Instant
+import java.time.ZoneId
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +54,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import org.koin.dsl.module
+import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 
 /**
  * In-memory data layer with realistic sample data for UI work on the emulator without a
@@ -51,6 +62,7 @@ import org.koin.dsl.module
  * Enable with `./gradlew :app:installDebug -PfakeData=true`.
  */
 val fakeDataModule = module {
+    single(AppScope) { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single { FakeStore() }
     single<ServerRepository> { FakeServers() }
     single<ServerDiscovery> {
@@ -78,12 +90,22 @@ internal class FakeStore {
     val sessions = MutableStateFlow(SampleData.sessions.map { it.copy(createdAt = it.createdAt + shift, updatedAt = it.updatedAt + shift) })
     val transcripts = mutableMapOf<String, List<Message>>()
     val permissions = mutableMapOf<String, List<PermissionRequest>>()
-    val running = mutableSetOf("ses_2")
+    val running = mutableSetOf(DotfilesDemo.SESSION, "ses_6")
+    val inbox = mutableMapOf(
+        "ses_6" to listOf(
+            QueuedPrompt("in_1", "Then add a test for expired coupons", PromptDelivery.Queue, now - 60_000),
+            QueuedPrompt("in_2", "And mention coupons in the README", PromptDelivery.Queue, now - 30_000),
+        ),
+    )
+    val forms = mutableMapOf("ses_3" to listOf(FakeSamples.checkoutForm))
 
     init {
         val base = SampleData.transcript.map { shiftMessage(it, shift) }
         sessions.value.forEach { transcripts[it.id] = base }
-        permissions["ses_2"] = listOf(SampleData.permission.copy(sessionId = "ses_2"))
+        permissions["ses_6"] = listOf(SampleData.permission.copy(sessionId = "ses_6"))
+        transcripts[DotfilesDemo.SESSION] = DotfilesDemo.transcript()
+        sessions.value = sessions.value.map { if (it.id == DotfilesDemo.SESSION) it.copy(model = SampleData.sonnet) else it }
+        permissions[DotfilesDemo.SESSION] = listOf(DotfilesDemo.backupPermission)
     }
 
     private fun shiftMessage(message: Message, shift: Long): Message = when (message) {
@@ -103,7 +125,8 @@ internal class FakeStore {
 internal class FakeServers : ServerRepository {
     private val _servers = MutableStateFlow(SampleData.servers)
     override val servers: StateFlow<List<ServerProfile>> = _servers.asStateFlow()
-    private val _active = MutableStateFlow<ServerProfile?>(null)
+    // Starts signed in to the first sample server; "Add server" still opens the connect flow.
+    private val _active = MutableStateFlow(SampleData.servers.firstOrNull())
     override val activeServer: StateFlow<ServerProfile?> = _active.asStateFlow()
 
     override suspend fun probe(baseUrl: String, password: String?): Result<ServerInfo> {
@@ -223,9 +246,48 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
     }
 
     override suspend fun projects(): Result<List<Project>> = Result.success(SampleData.projects)
+
+    override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> {
+        delay(LATENCY)
+        val zone = ZoneId.of(timeZone)
+        val first = Instant.ofEpochMilli(from).atZone(zone).toLocalDate()
+        val last = Instant.ofEpochMilli(to).atZone(zone).toLocalDate()
+        // Counted back from today, so today always has activity.
+        val pattern = longArrayOf(184, 47, 158, 312, 96, 241, 0, 205, 266, 131)
+        val days = generateSequence(first) { it.plusDays(1) }.takeWhile { !it.isAfter(last) }.toList()
+        val activity = days.mapIndexed { i, day -> DailyActivity(day.toString(), pattern[(days.size - 1 - i) % pattern.size]) }
+        val steps = activity.sumOf { it.steps }
+        fun tokens(share: Double) = TokenUsage(
+            input = (steps * 310 * share).toLong(),
+            output = (steps * 1_150 * share).toLong(),
+            reasoning = (steps * 240 * share).toLong(),
+            cacheRead = (steps * 41_000 * share).toLong(),
+            cacheWrite = (steps * 2_600 * share).toLong(),
+        )
+        val models = listOf(
+            ModelUsage(SampleData.sonnet, (steps * 0.62).toLong(), steps * 0.031, tokens(0.62)),
+            ModelUsage(SampleData.gpt, (steps * 0.27).toLong(), steps * 0.018, tokens(0.27)),
+            ModelUsage(SampleData.haiku, steps - (steps * 0.62).toLong() - (steps * 0.27).toLong(), steps * 0.0014, tokens(0.11)),
+        )
+        return Result.success(
+            UsageStats(
+                sessions = (steps / 38).coerceAtLeast(if (steps > 0) 1 else 0),
+                subagents = steps / 120,
+                prompts = steps / 9,
+                steps = steps,
+                cost = models.sumOf { it.cost },
+                tokens = tokens(1.0),
+                activeDays = activity.count { it.steps > 0 }.toLong(),
+                streak = activity.takeLastWhile { it.steps > 0 }.size.toLong(),
+                activity = activity,
+                models = models,
+            ),
+        )
+    }
 }
 
 internal class FakeChat(private val store: FakeStore, private val events: FakeEvents) : ChatRepository {
+    private val demo = DotfilesDemo(store, events)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override suspend fun messages(sessionId: String): Result<List<Message>> {
@@ -241,6 +303,11 @@ internal class FakeChat(private val store: FakeStore, private val events: FakeEv
     ): Result<Unit> {
         delay(150)
         val now = System.currentTimeMillis()
+        if (delivery == PromptDelivery.Queue && sessionId in store.running) {
+            store.inbox[sessionId] = store.inbox[sessionId].orEmpty() + QueuedPrompt("in_$now", text, delivery, now)
+            events.emit(ServerEvent.InboxEnqueued(sessionId, "in_$now", text, now))
+            return Result.success(Unit)
+        }
         val uploads = attachments.count { it.mention == null }
         store.transcripts[sessionId] = store.transcripts[sessionId].orEmpty() + Message.User("u_$now", now, text, uploads)
         scope.launch { simulateReply(sessionId, text) }
@@ -302,11 +369,59 @@ internal class FakeChat(private val store: FakeStore, private val events: FakeEv
         return Result.success(Unit)
     }
 
+    override suspend fun shell(sessionId: String, command: String): Result<Unit> {
+        delay(600)
+        val now = System.currentTimeMillis()
+        val output = FakeSamples.shellOutput(command)
+        store.transcripts[sessionId] = store.transcripts[sessionId].orEmpty() +
+            Message.Shell("sh_$now", now, command, "completed", output, "0")
+        events.emit(ServerEvent.TranscriptChanged(sessionId, "shell"))
+        return Result.success(Unit)
+    }
+
+    override suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> =
+        Result.success(store.inbox[sessionId].orEmpty())
+
+    override suspend fun cancelQueued(sessionId: String, inboxId: String): Result<Unit> {
+        delay(150)
+        store.inbox[sessionId] = store.inbox[sessionId].orEmpty().filterNot { it.id == inboxId }
+        events.emit(ServerEvent.InboxCancelled(sessionId, inboxId))
+        return Result.success(Unit)
+    }
+
+    override suspend fun steerQueued(sessionId: String, inboxId: String): Result<Unit> {
+        delay(150)
+        val prompt = store.inbox[sessionId].orEmpty().firstOrNull { it.id == inboxId } ?: return Result.success(Unit)
+        store.inbox[sessionId] = store.inbox[sessionId].orEmpty().filterNot { it.id == inboxId }
+        events.emit(ServerEvent.InboxDelivered(sessionId, inboxId))
+        return prompt(sessionId, prompt.text, PromptDelivery.Steer, emptyList())
+    }
+
+    override suspend fun forms(sessionId: String): Result<List<Form>> = Result.success(store.forms[sessionId].orEmpty())
+
+    override suspend fun replyForm(sessionId: String, formId: String, answers: Map<String, FormAnswer>): Result<Unit> {
+        delay(LATENCY)
+        if (demo.onForm(formId, answers)) return Result.success(Unit)
+        store.forms[sessionId] = store.forms[sessionId].orEmpty().filterNot { it.id == formId }
+        events.emit(ServerEvent.FormsChanged(sessionId))
+        return Result.success(Unit)
+    }
+
+    override suspend fun cancelForm(sessionId: String, formId: String): Result<Unit> = replyForm(sessionId, formId, mapOf("ls" to FormAnswer.Text("eza")))
+
+    override suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> {
+        delay(LATENCY)
+        val directory = store.sessions.value.firstOrNull { it.id == sessionId }?.directory.orEmpty()
+        val diffs = FakeSamples.diffs(directory)
+        return Result.success(if (scope == ChangesScope.LastTurn) diffs.take(2) else diffs)
+    }
+
     override suspend fun permissions(sessionId: String): Result<List<PermissionRequest>> =
         Result.success(store.permissions[sessionId].orEmpty())
 
     override suspend fun replyPermission(sessionId: String, requestId: String, decision: PermissionDecision, message: String?): Result<Unit> {
         delay(LATENCY)
+        if (demo.onPermission(requestId, decision)) return Result.success(Unit)
         store.permissions[sessionId] = store.permissions[sessionId].orEmpty().filterNot { it.id == requestId }
         return Result.success(Unit)
     }

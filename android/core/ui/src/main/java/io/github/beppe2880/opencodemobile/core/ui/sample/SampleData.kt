@@ -25,7 +25,7 @@ object SampleData {
 
     val haiku = ModelRef(id = "claude-haiku-5-5", providerId = "anthropic")
     val sonnet = ModelRef(id = "claude-sonnet-5", providerId = "anthropic")
-    val gpt = ModelRef(id = "gpt-5.2", providerId = "openai")
+    val gpt = ModelRef(id = "gpt-astra", providerId = "openai")
 
     val servers = listOf(
         ServerProfile("srv-desktop", "Desktop", "http://localhost:4096", secret = "x", credential = CredentialKind.PairingToken, addedAt = NOW - DAY),
@@ -76,7 +76,7 @@ object SampleData {
     val models = listOf(
         ModelInfo(haiku, "Claude Haiku 5.5", "anthropic", "claude", 200_000, true, emptyList(), NOW - 10 * DAY, true, "active", "Anthropic"),
         ModelInfo(sonnet, "Claude Sonnet 5", "anthropic", "claude", 1_000_000, true, listOf("high"), NOW - 30 * DAY, true, "active", "Anthropic"),
-        ModelInfo(gpt, "GPT-5.2", "openai", "gpt", 400_000, true, listOf("low", "medium", "high"), NOW - 20 * DAY, true, "active", "OpenAI"),
+        ModelInfo(gpt, "GPT Astra", "openai", "gpt", 400_000, true, listOf("low", "medium", "high"), NOW - 20 * DAY, true, "active", "OpenAI"),
         ModelInfo(ModelRef("gemini-3-pro", "google"), "Gemini 3 Pro", "google", "gemini", 1_000_000, true, emptyList(), NOW - 40 * DAY, true, "active", "Google"),
     )
 
