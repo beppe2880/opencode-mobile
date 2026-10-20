@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -52,9 +53,25 @@ class SessionMonitorTest {
         runCurrent()
     }
 
+    private fun refreshJobIds(monitor: SessionMonitor): Set<String> {
+        val field = SessionMonitor::class.java.getDeclaredField("refreshJobs")
+        field.isAccessible = true
+        val jobs = field.get(monitor)
+        return synchronized(jobs) { (jobs as Map<*, *>).keys.map { it.toString() }.toSet() }
+    }
+
     @Test
-    fun `does nothing while notifications are off`() = runTest {
-        settings.settings.value = AppSettings(notifications = false)
+    fun `completed refresh jobs leave the job map`() = runTest {
+        val monitor = monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        advanceUntilIdle()
+
+        assertTrue(refreshJobIds(monitor).isEmpty())
+    }
+
+    @Test
+    fun `does nothing while notifications are off`() = runTest {        settings.settings.value = AppSettings(notifications = false)
         val monitor = monitor()
         assertEquals(0, events.flow.subscriptionCount.value)
 
