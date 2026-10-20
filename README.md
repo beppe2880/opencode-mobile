@@ -10,6 +10,11 @@ agent's questions while you are away from the desk.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 <p>
+  <img src="docs/media/agent-run.gif" width="300" alt="The agent edits files, asks a question and waits for approval while you follow along on the phone">
+  <img src="docs/media/usage-and-settings.gif" width="300" alt="Usage statistics and settings">
+</p>
+
+<p>
   <img src="docs/screenshots/sessions.png" width="200" alt="Session list">
   <img src="docs/screenshots/chat.png" width="200" alt="Chat">
   <img src="docs/screenshots/chat-dark.png" width="200" alt="Chat in dark theme">
