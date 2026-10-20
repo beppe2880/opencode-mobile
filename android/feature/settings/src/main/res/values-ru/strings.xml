@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
     <string name="settings_agent_outline">Рамка цвета агента</string>
     <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
+    <string name="settings_dictation">Голосовой ввод</string>
+    <string name="settings_dictation_sub">Кнопка микрофона в поле сообщения, использует распознавание речи телефона</string>
     <string name="settings_usage">Статистика использования</string>
     <string name="settings_usage_sub">Стоимость, токены и активность на этом сервере</string>
     <string name="usage_title">Использование</string>

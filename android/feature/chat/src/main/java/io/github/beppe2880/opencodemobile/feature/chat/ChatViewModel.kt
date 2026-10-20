@@ -89,7 +89,7 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 groupActivity = s.groupActivity
                 updateState {
-                    it.copy(expandToolsByDefault = s.expandToolsByDefault, showCost = s.showCost, swipeEnabled = s.swipeBetweenChats, agentColorOutline = s.agentColorOutline)
+                    it.copy(expandToolsByDefault = s.expandToolsByDefault, showCost = s.showCost, swipeEnabled = s.swipeBetweenChats, agentColorOutline = s.agentColorOutline, dictation = s.dictation)
                 }
                 rebuild()
             }

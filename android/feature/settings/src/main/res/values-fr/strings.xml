@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_agent_outline">Contour aux couleurs de l’agent</string>
     <string name="settings_agent_outline_sub">Utiliser la couleur de l’agent sélectionné pour le contour du champ de message</string>
+    <string name="settings_dictation">Saisie vocale</string>
+    <string name="settings_dictation_sub">Bouton micro dans le champ de message, utilisant la reconnaissance vocale du téléphone</string>
     <string name="settings_usage">Statistiques d\'utilisation</string>
     <string name="settings_usage_sub">Coût, jetons et activité sur ce serveur</string>
     <string name="usage_title">Utilisation</string>

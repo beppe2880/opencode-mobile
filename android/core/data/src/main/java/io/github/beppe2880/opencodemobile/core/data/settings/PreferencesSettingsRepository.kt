@@ -24,6 +24,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_SHOW_COST, next.showCost)
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
+            .putBoolean(KEY_DICTATION, next.dictation)
             .putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
             .putBoolean(KEY_NOTIFICATIONS, next.notifications)
             .putBoolean(KEY_NOTIFY_PERMISSIONS, next.notifyPermissions)
@@ -42,6 +43,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
+            dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
             notifyPermissions = prefs.getBoolean(KEY_NOTIFY_PERMISSIONS, defaults.notifyPermissions),
@@ -58,6 +60,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
+        const val KEY_DICTATION = "dictation"
         const val KEY_GROUP_ACTIVITY = "group_activity"
         const val KEY_NOTIFICATIONS = "notifications"
         const val KEY_NOTIFY_PERMISSIONS = "notify_permissions"

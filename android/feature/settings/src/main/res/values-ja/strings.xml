@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
     <string name="settings_agent_outline">エージェント色の枠線</string>
     <string name="settings_agent_outline_sub">選択したエージェントの色で入力欄を囲む</string>
+    <string name="settings_dictation">音声入力</string>
+    <string name="settings_dictation_sub">入力欄のマイクボタン。端末の音声認識を使用します</string>
     <string name="settings_usage">利用統計</string>
     <string name="settings_usage_sub">このサーバーのコスト、トークン、アクティビティ</string>
     <string name="usage_title">利用状況</string>

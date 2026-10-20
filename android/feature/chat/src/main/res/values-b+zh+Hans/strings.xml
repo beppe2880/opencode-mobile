@@ -91,6 +91,12 @@
     <string name="chat_close_preview">关闭</string>
     <string name="chat_image_failed">无法加载图片</string>
     <string name="chat_attachment_failed">无法添加附件（最大 10 MB）</string>
+    <string name="chat_dictation_start">听写</string>
+    <string name="chat_dictation_stop">停止听写</string>
+    <string name="chat_dictation_listening">正在聆听</string>
+    <string name="chat_dictation_no_speech">没听清，请再试一次</string>
+    <string name="chat_dictation_permission">请允许麦克风权限以进行听写，或使用键盘的语音输入</string>
+    <string name="chat_dictation_failed">语音输入暂时不可用</string>
     <string name="chat_command_undo">撤销上次提示及其文件更改</string>
     <string name="chat_command_redo">恢复已撤销的内容</string>
     <string name="chat_nothing_to_undo">没有可撤销的内容</string>

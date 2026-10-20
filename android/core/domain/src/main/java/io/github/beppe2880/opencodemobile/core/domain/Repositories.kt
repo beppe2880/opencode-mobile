@@ -257,6 +257,8 @@ data class AppSettings(
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
+    /** A microphone button in the composer dictates through the system speech recognizer. */
+    val dictation: Boolean = true,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
     /**

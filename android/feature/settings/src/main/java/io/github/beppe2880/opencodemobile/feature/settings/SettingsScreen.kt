@@ -290,6 +290,14 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 onCheckedChange = { onEvent(SettingsEvent.AgentColorOutlineChanged(it)) },
                 modifier = Modifier.testTag("settings_agent_outline_switch"),
             )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(R.string.settings_dictation),
+                subtitle = stringResource(R.string.settings_dictation_sub),
+                checked = settings.dictation,
+                onCheckedChange = { onEvent(SettingsEvent.DictationChanged(it)) },
+                modifier = Modifier.testTag("settings_dictation_switch"),
+            )
         }
     }
 }

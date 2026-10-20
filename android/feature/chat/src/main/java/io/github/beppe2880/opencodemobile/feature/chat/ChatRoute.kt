@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import android.Manifest
 import android.content.ClipData
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -54,6 +56,29 @@ fun ChatRoute(
             }
         }
     }
+    val dictation = rememberDictation()
+    val startDictation = {
+        val typed = viewModel.state.value.draft
+        dictation.start(
+            onText = { spoken -> viewModel.onEvent(ChatEvent.DraftChanged(appendDictated(typed, spoken))) },
+            onFailure = { failure ->
+                val message = when (failure) {
+                    DictationFailure.NoSpeech -> R.string.chat_dictation_no_speech
+                    DictationFailure.Permission -> R.string.chat_dictation_permission
+                    DictationFailure.Unavailable, DictationFailure.Other -> R.string.chat_dictation_failed
+                }
+                scope.launch { snackbar.showSnackbar(context.getString(message)) }
+            },
+        )
+    }
+    // Asked on the first tap of the microphone; when denied, the keyboard's own voice typing still works.
+    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            startDictation()
+        } else {
+            scope.launch { snackbar.showSnackbar(context.getString(R.string.chat_dictation_permission)) }
+        }
+    }
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(MAX_PICKED), readAttachments)
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments(), readAttachments)
 
@@ -61,7 +86,10 @@ fun ChatRoute(
         when (effect) {
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString(context))
             ChatEffect.NavigateBack -> onBack()
-            ChatEffect.PromptSent -> listState.scrollToItem(0)
+            ChatEffect.PromptSent -> {
+                dictation.cancel()
+                listState.scrollToItem(0)
+            }
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)
             is ChatEffect.SwitchSession -> onSwitchSession(effect.sessionId)
         }
@@ -81,6 +109,14 @@ fun ChatRoute(
             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
         onAttachFile = { filePicker.launch(arrayOf("*/*")) },
+        voice = if (state.dictation && dictation.available) VoiceInput(dictation.listening, dictation.level) else null,
+        onDictate = {
+            when {
+                dictation.listening -> dictation.stop()
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED -> startDictation()
+                else -> micPermission.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        },
         showBack = showBack,
         snackbarHostState = snackbar,
         listState = listState,

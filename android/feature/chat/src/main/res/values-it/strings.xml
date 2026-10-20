@@ -95,6 +95,12 @@
     <string name="chat_close_preview">Chiudi</string>
     <string name="chat_image_failed">Impossibile caricare l\'immagine</string>
     <string name="chat_attachment_failed">Impossibile allegare il file (max 10 MB)</string>
+    <string name="chat_dictation_start">Detta</string>
+    <string name="chat_dictation_stop">Interrompi dettatura</string>
+    <string name="chat_dictation_listening">In ascolto</string>
+    <string name="chat_dictation_no_speech">Non ho capito, riprova</string>
+    <string name="chat_dictation_permission">Consenti l\'uso del microfono per dettare, oppure usa la digitazione vocale della tastiera</string>
+    <string name="chat_dictation_failed">L\'input vocale non è disponibile al momento</string>
     <string name="chat_command_undo">Annulla l\'ultimo prompt e le modifiche ai file</string>
     <string name="chat_command_redo">Ripristina ciò che è stato annullato</string>
     <string name="chat_nothing_to_undo">Niente da annullare</string>

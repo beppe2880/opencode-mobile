@@ -75,6 +75,17 @@ class ChatViewModelTest {
         ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, clock = { 42 })
 
     @Test
+    fun `the microphone follows the voice input setting`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.dictation)
+
+        settings.settings.value = AppSettings(dictation = false)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.dictation)
+    }
+
+    @Test
     fun `the draft is restored, kept while typing and cleared once sent`() = runTest(main.testDispatcher) {
         drafts.save("s1", "half a thought")
         val vm = vm()

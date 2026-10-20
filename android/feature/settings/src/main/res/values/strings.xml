@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
     <string name="settings_agent_outline">Agent color outline</string>
     <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
+    <string name="settings_dictation">Voice input</string>
+    <string name="settings_dictation_sub">Microphone button in the message box, using the phone\'s speech recognition</string>
     <string name="settings_usage">Usage statistics</string>
     <string name="settings_usage_sub">Cost, tokens and activity on this server</string>
     <string name="usage_title">Usage</string>

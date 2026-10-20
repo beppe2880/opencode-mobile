@@ -59,6 +59,8 @@ internal fun BottomArea(
     onEvent: (ChatEvent) -> Unit,
     onAttachPhoto: () -> Unit,
     onAttachFile: () -> Unit,
+    voice: VoiceInput? = null,
+    onDictate: () -> Unit = {},
 ) {
     val c = OcTheme.colors
     Column(
@@ -117,7 +119,7 @@ internal fun BottomArea(
         if (state.suggestions.isNotEmpty()) {
             SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
         }
-        Composer(state, onEvent, onAttachPhoto, onAttachFile)
+        Composer(state, onEvent, onAttachPhoto, onAttachFile, voice = voice, onDictate = onDictate)
     }
 }
 

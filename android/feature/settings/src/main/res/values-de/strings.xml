@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_agent_outline">Umrandung in Agentenfarbe</string>
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
+    <string name="settings_dictation">Spracheingabe</string>
+    <string name="settings_dictation_sub">Mikrofon-Taste im Nachrichtenfeld, nutzt die Spracherkennung des Telefons</string>
     <string name="settings_usage">Nutzungsstatistik</string>
     <string name="settings_usage_sub">Kosten, Token und Aktivität auf diesem Server</string>
     <string name="usage_title">Nutzung</string>

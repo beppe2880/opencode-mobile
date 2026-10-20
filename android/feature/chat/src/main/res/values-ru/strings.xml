@@ -103,6 +103,12 @@
     <string name="chat_close_preview">Закрыть</string>
     <string name="chat_image_failed">Не удалось загрузить изображение</string>
     <string name="chat_attachment_failed">Не удалось прикрепить файл (макс. 10 МБ)</string>
+    <string name="chat_dictation_start">Диктовать</string>
+    <string name="chat_dictation_stop">Остановить диктовку</string>
+    <string name="chat_dictation_listening">Слушаю</string>
+    <string name="chat_dictation_no_speech">Не удалось распознать, попробуйте снова</string>
+    <string name="chat_dictation_permission">Разрешите доступ к микрофону для диктовки или используйте голосовой ввод клавиатуры</string>
+    <string name="chat_dictation_failed">Голосовой ввод сейчас недоступен</string>
     <string name="chat_command_undo">Отменить последний запрос и его изменения файлов</string>
     <string name="chat_command_redo">Восстановить отменённое</string>
     <string name="chat_nothing_to_undo">Нечего отменять</string>

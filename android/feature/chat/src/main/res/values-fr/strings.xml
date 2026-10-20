@@ -95,6 +95,12 @@
     <string name="chat_close_preview">Fermer</string>
     <string name="chat_image_failed">Impossible de charger l’image</string>
     <string name="chat_attachment_failed">Impossible de joindre le fichier (10 Mo max.)</string>
+    <string name="chat_dictation_start">Dicter</string>
+    <string name="chat_dictation_stop">Arrêter la dictée</string>
+    <string name="chat_dictation_listening">Écoute en cours</string>
+    <string name="chat_dictation_no_speech">Je n\'ai pas compris, réessayez</string>
+    <string name="chat_dictation_permission">Autorisez le micro pour dicter, ou utilisez la saisie vocale de votre clavier</string>
+    <string name="chat_dictation_failed">La saisie vocale n\'est pas disponible pour le moment</string>
     <string name="chat_command_undo">Annuler le dernier message et ses modifications de fichiers</string>
     <string name="chat_command_redo">Rétablir ce qui a été annulé</string>
     <string name="chat_nothing_to_undo">Rien à annuler</string>

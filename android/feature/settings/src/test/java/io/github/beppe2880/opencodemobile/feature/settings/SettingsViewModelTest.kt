@@ -51,6 +51,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
+        vm.onEvent(SettingsEvent.DictationChanged(false))
         advanceUntilIdle()
 
         assertEquals(
@@ -61,6 +62,7 @@ class SettingsViewModelTest {
                 showCost = false,
                 swipeBetweenChats = false,
                 agentColorOutline = false,
+                dictation = false,
                 groupActivity = false,
             ),
             settings.settings.value,

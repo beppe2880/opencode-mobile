@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +28,9 @@ import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,6 +54,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -76,6 +81,8 @@ internal fun Composer(
     onAttachPhoto: () -> Unit,
     onAttachFile: () -> Unit,
     modifier: Modifier = Modifier,
+    voice: VoiceInput? = null,
+    onDictate: () -> Unit = {},
 ) {
     val c = OcTheme.colors
     val haptics = LocalHapticFeedback.current
@@ -158,6 +165,7 @@ internal fun Composer(
                             .testTag("chat_model_selector"),
                     )
                 }
+                if (voice != null) MicButton(voice, onDictate)
                 if (state.running) {
                     OcRoundIconButton(
                         icon = Icons.Filled.Stop,
@@ -186,6 +194,37 @@ internal fun Composer(
                 }
             }
         }
+    }
+}
+
+/** Starts or stops dictation; while listening it fills with the accent color and pulses with the voice. */
+@Composable
+private fun MicButton(voice: VoiceInput, onClick: () -> Unit) {
+    val c = OcTheme.colors
+    if (voice.listening) {
+        val listening = stringResource(R.string.chat_dictation_listening)
+        val scale by animateFloatAsState(1f + voice.level * 0.15f, label = "mic_level")
+        OcRoundIconButton(
+            icon = Icons.Filled.Mic,
+            contentDescription = stringResource(R.string.chat_dictation_stop),
+            onClick = onClick,
+            container = c.bgAccent,
+            content = c.onAccent,
+            modifier = Modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
+                .semantics { stateDescription = listening }
+                .testTag("chat_mic_button"),
+        )
+    } else {
+        OcIconButton(
+            icon = Icons.Outlined.Mic,
+            contentDescription = stringResource(R.string.chat_dictation_start),
+            onClick = onClick,
+            modifier = Modifier.testTag("chat_mic_button"),
+        )
     }
 }
 

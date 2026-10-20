@@ -39,6 +39,8 @@ agent's questions while you are away from the desk.
   notification. The app explains them and asks for permission after you connect; in Settings
   you choose which kinds you get (permission requests, questions, finished sessions) or turn
   them off.
+- **Voice input**: dictate prompts with the microphone in the message box, using the
+  phone's speech recognition (can be turned off in Settings).
 - **Usage statistics**: cost, tokens and activity per day and per model, for today, the
   last 7 or 30 days.
 - **Switch agent, model and reasoning level** per session, with recently used models first.

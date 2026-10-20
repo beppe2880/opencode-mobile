@@ -95,6 +95,12 @@
     <string name="chat_close_preview">Close</string>
     <string name="chat_image_failed">The image could not be loaded</string>
     <string name="chat_attachment_failed">Could not attach the file (max 10 MB)</string>
+    <string name="chat_dictation_start">Dictate</string>
+    <string name="chat_dictation_stop">Stop dictation</string>
+    <string name="chat_dictation_listening">Listening</string>
+    <string name="chat_dictation_no_speech">Didn\'t catch that, try again</string>
+    <string name="chat_dictation_permission">Allow the microphone to dictate, or use your keyboard\'s voice typing</string>
+    <string name="chat_dictation_failed">Voice input is not available right now</string>
     <string name="chat_command_undo">Undo the last prompt and its file changes</string>
     <string name="chat_command_redo">Restore what was undone</string>
     <string name="chat_nothing_to_undo">Nothing to undo</string>

@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
     <string name="settings_agent_outline">إطار بلون الوكيل</string>
     <string name="settings_agent_outline_sub">تحديد مربع الرسالة بلون الوكيل المختار</string>
+    <string name="settings_dictation">الإدخال الصوتي</string>
+    <string name="settings_dictation_sub">زر الميكروفون في مربع الرسالة، باستخدام التعرف على الكلام في الهاتف</string>
     <string name="settings_usage">إحصاءات الاستخدام</string>
     <string name="settings_usage_sub">التكلفة والرموز والنشاط على هذا الخادم</string>
     <string name="usage_title">الاستخدام</string>

@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
     <string name="settings_agent_outline">智能体颜色边框</string>
     <string name="settings_agent_outline_sub">使用所选智能体的颜色描绘消息框边框</string>
+    <string name="settings_dictation">语音输入</string>
+    <string name="settings_dictation_sub">消息框中的麦克风按钮，使用手机的语音识别</string>
     <string name="settings_usage">用量统计</string>
     <string name="settings_usage_sub">本服务器上的费用、token 和活动</string>
     <string name="usage_title">用量</string>

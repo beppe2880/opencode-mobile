@@ -91,6 +91,12 @@
     <string name="chat_close_preview">閉じる</string>
     <string name="chat_image_failed">画像を読み込めませんでした</string>
     <string name="chat_attachment_failed">ファイルを添付できませんでした（最大 10 MB）</string>
+    <string name="chat_dictation_start">音声入力</string>
+    <string name="chat_dictation_stop">音声入力を停止</string>
+    <string name="chat_dictation_listening">聞き取り中</string>
+    <string name="chat_dictation_no_speech">聞き取れませんでした。もう一度お試しください</string>
+    <string name="chat_dictation_permission">マイクを許可して音声入力するか、キーボードの音声入力を使用してください</string>
+    <string name="chat_dictation_failed">現在、音声入力は利用できません</string>
     <string name="chat_command_undo">直前のプロンプトとファイル変更を取り消す</string>
     <string name="chat_command_redo">取り消した内容を復元</string>
     <string name="chat_nothing_to_undo">取り消せる内容はありません</string>

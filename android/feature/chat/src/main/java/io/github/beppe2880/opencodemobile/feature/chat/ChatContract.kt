@@ -44,6 +44,8 @@ data class ChatState(
     val expandToolsByDefault: Boolean = false,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
+    /** The microphone button of the composer (setting). */
+    val dictation: Boolean = true,
     /** Uploaded files and picked `@` mentions for the next prompt. */
     val attachments: List<PromptAttachment> = emptyList(),
     /** `@` file or `/` command completions for the end of the draft. */

@@ -111,6 +111,12 @@
     <string name="chat_close_preview">إغلاق</string>
     <string name="chat_image_failed">تعذر تحميل الصورة</string>
     <string name="chat_attachment_failed">تعذر إرفاق الملف (الحد الأقصى 10 MB)</string>
+    <string name="chat_dictation_start">الإملاء الصوتي</string>
+    <string name="chat_dictation_stop">إيقاف الإملاء</string>
+    <string name="chat_dictation_listening">جارٍ الاستماع</string>
+    <string name="chat_dictation_no_speech">لم أتمكن من الفهم، حاول مرة أخرى</string>
+    <string name="chat_dictation_permission">اسمح بالوصول إلى الميكروفون للإملاء، أو استخدم الكتابة الصوتية في لوحة المفاتيح</string>
+    <string name="chat_dictation_failed">الإدخال الصوتي غير متاح حاليًا</string>
     <string name="chat_command_undo">التراجع عن آخر طلب وتغييراته على الملفات</string>
     <string name="chat_command_redo">استعادة ما تم التراجع عنه</string>
     <string name="chat_nothing_to_undo">لا شيء للتراجع عنه</string>

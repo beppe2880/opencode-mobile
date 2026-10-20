@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Mostrar razonamientos y llamadas a herramientas consecutivos en una sola fila</string>
     <string name="settings_agent_outline">Borde del color del agente</string>
     <string name="settings_agent_outline_sub">Delinear el cuadro del mensaje con el color del agente seleccionado</string>
+    <string name="settings_dictation">Entrada de voz</string>
+    <string name="settings_dictation_sub">Botón del micrófono en el cuadro del mensaje, usando el reconocimiento de voz del teléfono</string>
     <string name="settings_usage">Estadísticas de uso</string>
     <string name="settings_usage_sub">Coste, tokens y actividad en este servidor</string>
     <string name="usage_title">Uso</string>

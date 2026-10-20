@@ -33,6 +33,8 @@
     <string name="settings_group_activity_sub">Mostra in un\'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
     <string name="settings_agent_outline">Bordo col colore dell\'agente</string>
     <string name="settings_agent_outline_sub">Colora il bordo del riquadro di scrittura con il colore dell\'agente selezionato</string>
+    <string name="settings_dictation">Input vocale</string>
+    <string name="settings_dictation_sub">Pulsante del microfono nel riquadro di scrittura, con il riconoscimento vocale del telefono</string>
     <string name="settings_usage">Statistiche di utilizzo</string>
     <string name="settings_usage_sub">Costi, token e attività su questo server</string>
     <string name="usage_title">Utilizzo</string>
