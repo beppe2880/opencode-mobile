@@ -75,14 +75,16 @@ internal fun ToolsGroup(
                     .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.lg))
                     .padding(vertical = OcSpacing.xs),
             ) {
-                item.tools.forEach { tool ->
+                item.tools.forEachIndexed { index, tool ->
+                    // Call ids repeat across steps; the group key plus position is unique.
+                    val id = "${item.key}#$index"
                     ToolRow(
                         tool = tool,
                         directory = directory,
-                        expanded = isExpanded("o:${tool.callId}"),
-                        full = isExpanded("f:${tool.callId}"),
-                        onToggle = { onToggle("o:${tool.callId}") },
-                        onToggleFull = { onToggle("f:${tool.callId}") },
+                        expanded = isExpanded("o:$id"),
+                        full = isExpanded("f:$id"),
+                        onToggle = { onToggle("o:$id") },
+                        onToggleFull = { onToggle("f:$id") },
                         onOpenSession = onOpenSession,
                     )
                 }

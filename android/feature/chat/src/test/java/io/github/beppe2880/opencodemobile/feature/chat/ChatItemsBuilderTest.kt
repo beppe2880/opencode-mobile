@@ -32,7 +32,7 @@ class ChatItemsBuilderTest {
         )
         val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names)
 
-        assertEquals(listOf("u1", "tools-1", "a2/text-0", "footer-a2"), items.map { it.key })
+        assertEquals(listOf("u1", "tools-a1/1", "a2/text-0", "footer-a2"), items.map { it.key })
         val tools = items[1] as ChatItem.Tools
         assertEquals(listOf("read", "bash"), tools.tools.map { it.name })
         val footer = items.last() as ChatItem.Footer
@@ -41,6 +41,20 @@ class ChatItemsBuilderTest {
         assertEquals("Anthropic", footer.provider)
         assertEquals("done", footer.copyText)
         assertEquals(0.02, footer.cost, 1e-9)
+    }
+
+    @Test
+    fun `tool groups keep unique keys when call ids repeat across steps`() {
+        val messages = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant("a1", listOf(tool("call_0", "read"), Part.Text(0, "next")), created = 100),
+            assistant("a2", listOf(tool("call_0", "bash"), Part.Text(0, "done")), created = 1_200),
+        )
+        val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names)
+
+        val keys = items.map { it.key }
+        assertEquals(keys.distinct(), keys)
+        assertEquals(listOf("tools-a1/call_0", "tools-a2/call_0"), items.filterIsInstance<ChatItem.Tools>().map { it.key })
     }
 
     @Test
@@ -238,7 +252,7 @@ class ChatItemsBuilderTest {
         )
         val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names)
 
-        assertEquals(listOf("u1", "tools-1", "a1/error", "footer-a1", "n1"), items.map { it.key })
+        assertEquals(listOf("u1", "tools-a1/1", "a1/error", "footer-a1", "n1"), items.map { it.key })
         assertTrue((items[3] as ChatItem.Footer).interrupted)
         assertEquals(1, (items[1] as ChatItem.Tools).failed)
     }
