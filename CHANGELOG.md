@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.7.0](https://github.com/beppe2880/opencode-mobile/compare/v0.6.0...v0.7.0) (2026-10-21)
+
+
+### Features
+
+* **chat:** Dictate prompts with the microphone ([#39](https://github.com/beppe2880/opencode-mobile/issues/39)) ([aeb2ead](https://github.com/beppe2880/opencode-mobile/commit/aeb2ead6a7c8cfea6f07477caa3fd4742d293144))
+
+
+### Bug fixes
+
+* **chat:** Keep prompt image positions when a payload is missing ([#57](https://github.com/beppe2880/opencode-mobile/issues/57)) ([4684d8d](https://github.com/beppe2880/opencode-mobile/commit/4684d8dbbee8b2e8e9717693404fb3a52f7b7797))
+* **chat:** Keep reverted messages gone when the revert is committed ([#44](https://github.com/beppe2880/opencode-mobile/issues/44)) ([4679e22](https://github.com/beppe2880/opencode-mobile/commit/4679e222e5bec73774f78057e8aaaede2ac1b338))
+* **chat:** Keep tool row keys unique when call ids repeat ([#62](https://github.com/beppe2880/opencode-mobile/issues/62)) ([4312222](https://github.com/beppe2880/opencode-mobile/commit/43122220baf90e2b2aca749d18bd7440a92d581a))
+* **chat:** Re-enable stop after a reconnect loses the execution end ([#51](https://github.com/beppe2880/opencode-mobile/issues/51)) ([9efd2d0](https://github.com/beppe2880/opencode-mobile/commit/9efd2d0c963ce47ec6918aae676fcffa7f80e023))
+* **connect:** Re-check the camera permission when the scanner resumes ([#45](https://github.com/beppe2880/opencode-mobile/issues/45)) ([f8c1487](https://github.com/beppe2880/opencode-mobile/commit/f8c14870d9a72014f8de73c263cc4d409c7d351a))
+* **data:** Keep the cached session in sync after rename and delete ([#55](https://github.com/beppe2880/opencode-mobile/issues/55)) ([4adf274](https://github.com/beppe2880/opencode-mobile/commit/4adf274e441871826e5fbf98b1672a92e209cb67))
+* **data:** Make the sample data mode start and cover every screen ([#36](https://github.com/beppe2880/opencode-mobile/issues/36)) ([f18baa6](https://github.com/beppe2880/opencode-mobile/commit/f18baa6b7889406118da44a699a127f845bbd926))
+* **data:** Start empty when the server store cannot be read ([#47](https://github.com/beppe2880/opencode-mobile/issues/47)) ([20c517a](https://github.com/beppe2880/opencode-mobile/commit/20c517a6c8a19212abd77bef0ed831cfba4a1cb4))
+* Drop finished refresh jobs from the monitor ([#49](https://github.com/beppe2880/opencode-mobile/issues/49)) ([fcd02f5](https://github.com/beppe2880/opencode-mobile/commit/fcd02f5970b7bacb103cfcb8d912adfc4fcef406))
+
+
+### Documentation
+
+* Add demo GIFs to the README ([#37](https://github.com/beppe2880/opencode-mobile/issues/37)) ([8ae46f7](https://github.com/beppe2880/opencode-mobile/commit/8ae46f77ae2d4db30b58fa9f117d1b7abde8215c))
+
 ## [0.6.0](https://github.com/beppe2880/opencode-mobile/compare/v0.5.0...v0.6.0) (2026-10-18)
 
 
