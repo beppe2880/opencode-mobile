@@ -53,13 +53,6 @@ class SessionMonitorTest {
         runCurrent()
     }
 
-    private fun refreshJobIds(monitor: SessionMonitor): Set<String> {
-        val field = SessionMonitor::class.java.getDeclaredField("refreshJobs")
-        field.isAccessible = true
-        val jobs = field.get(monitor)
-        return synchronized(jobs) { (jobs as Map<*, *>).keys.map { it.toString() }.toSet() }
-    }
-
     @Test
     fun `completed refresh jobs leave the job map`() = runTest {
         val monitor = monitor()
@@ -67,11 +60,12 @@ class SessionMonitorTest {
         emit(ServerEvent.PermissionChanged("ses_a"))
         advanceUntilIdle()
 
-        assertTrue(refreshJobIds(monitor).isEmpty())
+        assertEquals(0, monitor.refreshJobCount)
     }
 
     @Test
-    fun `does nothing while notifications are off`() = runTest {        settings.settings.value = AppSettings(notifications = false)
+    fun `does nothing while notifications are off`() = runTest {
+        settings.settings.value = AppSettings(notifications = false)
         val monitor = monitor()
         assertEquals(0, events.flow.subscriptionCount.value)
 

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.notifications
 
+import androidx.annotation.VisibleForTesting
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
@@ -79,6 +80,9 @@ class SessionMonitor(
     private val pending = mutableMapOf<String, Set<String>>()
     private val notified = mutableSetOf<String>()
     private val refreshJobs = mutableMapOf<String, Job>()
+
+    @VisibleForTesting
+    internal val refreshJobCount: Int get() = synchronized(refreshJobs) { refreshJobs.size }
 
     fun start(scope: CoroutineScope) {
         scope.launch {
