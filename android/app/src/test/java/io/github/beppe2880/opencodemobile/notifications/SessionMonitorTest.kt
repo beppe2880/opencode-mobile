@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -50,6 +51,16 @@ class SessionMonitorTest {
     private suspend fun TestScope.emit(event: ServerEvent) {
         events.flow.emit(event)
         runCurrent()
+    }
+
+    @Test
+    fun `completed refresh jobs leave the job map`() = runTest {
+        val monitor = monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        advanceUntilIdle()
+
+        assertEquals(0, monitor.refreshJobCount)
     }
 
     @Test
