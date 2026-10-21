@@ -768,9 +768,9 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     var olderResult: Result<List<Message>?>? = null
     override suspend fun olderMessages(sessionId: String): Result<List<Message>?> =
         olderResult ?: Result.success(olderPages.removeFirstOrNull())
-    var images: Result<List<String>> = Result.success(emptyList())
+    var images: Result<List<String?>> = Result.success(emptyList())
     val imageRequests = mutableListOf<String>()
-    override suspend fun messageImages(sessionId: String, messageId: String): Result<List<String>> {
+    override suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> {
         imageRequests += messageId
         return images
     }

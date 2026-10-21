@@ -150,8 +150,12 @@ interface ChatRepository {
      */
     suspend fun olderMessages(sessionId: String): Result<List<Message>?> = Result.success(null)
 
-    /** The images attached to one prompt as `data:` URIs, fetched from the server. */
-    suspend fun messageImages(sessionId: String, messageId: String): Result<List<String>> = Result.success(emptyList())
+    /**
+     * The images attached to one prompt as `data:` URIs, fetched from the server, one entry per
+     * attachment in prompt order. An attachment without an inline payload (for example a file
+     * referenced by path) keeps its place as a null.
+     */
+    suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> = Result.success(emptyList())
 
     /** Stores the last [lastMessages] of sessions not cached yet so they open instantly. Never fails. */
     suspend fun prefetch(sessionIds: List<String>, lastMessages: Int = 2) {}

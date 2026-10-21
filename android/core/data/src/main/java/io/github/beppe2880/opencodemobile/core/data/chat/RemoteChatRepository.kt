@@ -101,10 +101,11 @@ internal class RemoteChatRepository(
         }
     }
 
-    override suspend fun messageImages(sessionId: String, messageId: String): Result<List<String>> = resultOf {
+    override suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> = resultOf {
         val api = clients.active().sessions
         val user = awaitBody { api.sessionMessageGet(sessionId, messageId) }.data.toDomain() as? Message.User
-        user?.images.orEmpty().mapNotNull { it.dataUri }
+        // One entry per attachment so callers can index by prompt position.
+        user?.images.orEmpty().map { it.dataUri }
     }
 
     /**

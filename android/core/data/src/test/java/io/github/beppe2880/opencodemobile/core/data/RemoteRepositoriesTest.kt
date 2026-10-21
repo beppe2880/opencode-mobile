@@ -282,6 +282,24 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `message images keep their position when an image has no payload`() = runBlocking {
+        server.enqueue(
+            MockResponse().setBody(
+                """
+                {"data":{"id":"msg_i","time":{"created":1},"type":"user","text":"look","files":[
+                  {"name":"a.png","mime":"image/png","data":"","source":{"type":"uri","uri":"file:///tmp/a.png"}},
+                  {"name":"b.png","mime":"image/png","data":"QUJD","source":{"type":"inline"}}
+                ]}}
+                """.trimIndent(),
+            ),
+        )
+
+        val images = RemoteChatRepository(graph.clients, InMemoryMessageCache()).messageImages("ses_1", "msg_i").getOrThrow()
+
+        assertEquals(listOf(null, "data:image/png;base64,QUJD"), images)
+    }
+
+    @Test
     fun `create sends location, agent and model`() = runBlocking {
         server.enqueue(MockResponse().setBody(fixture("session_get.json")))
 

@@ -7,15 +7,15 @@ package io.github.beppe2880.opencodemobile.feature.chat
  */
 class ImageMemory(private val maxMessages: Int = 24) {
 
-    private val images = object : LinkedHashMap<String, List<String>>(16, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<String>>) = size > maxMessages
+    private val images = object : LinkedHashMap<String, List<String?>>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<String?>>) = size > maxMessages
     }
 
     @Synchronized
-    fun get(messageId: String): List<String>? = images[messageId]
+    fun get(messageId: String): List<String?>? = images[messageId]
 
     @Synchronized
-    fun put(messageId: String, dataUris: List<String>) {
+    fun put(messageId: String, dataUris: List<String?>) {
         images[messageId] = dataUris
     }
 }
