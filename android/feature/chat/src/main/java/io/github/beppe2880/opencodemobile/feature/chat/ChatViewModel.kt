@@ -193,6 +193,9 @@ class ChatViewModel(
                     agent = s.agent ?: lastAssistant?.agent ?: it.agent,
                     model = model,
                     running = activeIds?.contains(sessionId) ?: it.running,
+                    // Stop only asks the server to interrupt. If its ExecutionEnded was lost with
+                    // the connection, a fresh server view must not leave the button disabled.
+                    stopping = if (activeIds != null) false else it.stopping,
                     permissions = permissionList ?: it.permissions,
                     queued = queuedList ?: it.queued,
                     recentModels = recentModels(model),
@@ -481,6 +484,27 @@ class ChatViewModel(
     }
 
     /**
+     * A new prompt or shell command commits the staged revert, which deletes its messages on the
+     * server: they leave the transcript now instead of showing again while the commit runs.
+     * Returns them for [restoreReverted].
+     */
+    private fun takeReverted(): List<Message> {
+        if (revertMessageId == null) return emptyList()
+        val visible = visibleMessages()
+        val reverted = messages.subList(visible.size, messages.size).toList()
+        messages = visible.toList()
+        revertMessageId = null
+        return reverted
+    }
+
+    /** The commit failed, so the revert is still only staged: its messages are hidden again. */
+    private fun restoreReverted(messageId: String, reverted: List<Message>) {
+        val known = messages.mapTo(HashSet()) { it.id }
+        messages = messages + reverted.filter { it.id !in known }
+        revertMessageId = messageId
+    }
+
+    /**
      * Fills in prompt images the message cache dropped, from [images]; the missing ones are
      * fetched in the background (once per message) and the transcript rebuilt when they arrive.
      */
@@ -564,8 +588,7 @@ class ChatViewModel(
         val delivery = state.delivery
         val revert = revertMessageId
         val local = Message.User("$LOCAL_PREFIX${localIds++}", clock(), text, pending = true, attachments = state.uploads.size)
-        // A new prompt makes a staged revert permanent, so the hidden messages stay hidden.
-        revertMessageId = null
+        val reverted = takeReverted()
         messages = messages + local
         updateState { it.copy(draft = "", attachments = emptyList(), suggestions = emptyList(), sending = true) }
         rebuild()
@@ -586,8 +609,8 @@ class ChatViewModel(
                     scheduleReload()
                 },
                 onFailure = { error ->
-                    if (committed.isFailure) revertMessageId = revert
                     messages = messages.filterNot { it.id == local.id }
+                    if (revert != null && committed.isFailure) restoreReverted(revert, reverted)
                     updateState {
                         it.copy(
                             sending = false,
@@ -608,7 +631,7 @@ class ChatViewModel(
      */
     private fun runShell(command: String, draft: String) {
         val revert = revertMessageId
-        revertMessageId = null
+        val reverted = takeReverted()
         updateState { it.copy(draft = "", suggestions = emptyList(), sending = true) }
         rebuild()
         sendEffect(ChatEffect.PromptSent)
@@ -619,7 +642,7 @@ class ChatViewModel(
             committed.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
                 onSuccess = { scheduleReload() },
                 onFailure = { error ->
-                    if (committed.isFailure) revertMessageId = revert
+                    if (revert != null && committed.isFailure) restoreReverted(revert, reverted)
                     rebuild()
                     updateState { if (it.draft.isEmpty()) it.copy(draft = draft) else it }
                     sendEffect(ChatEffect.ShowMessage(error.toUiText()))

@@ -20,6 +20,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -297,6 +298,22 @@ class RemoteRepositoriesTest {
         val images = RemoteChatRepository(graph.clients, InMemoryMessageCache()).messageImages("ses_1", "msg_i").getOrThrow()
 
         assertEquals(listOf(null, "data:image/png;base64,QUJD"), images)
+    }
+
+    @Test
+    fun `rename and delete keep the session cache in sync`() = runBlocking {
+        server.enqueue(MockResponse().setBody(fixture("session_get.json")))
+        val repository = RemoteSessionRepository(graph.clients)
+        val session = repository.get("ses_ec9cb5c70ffe3M22jWcPWdSAIF").getOrThrow()
+        assertEquals(session.title, repository.cached(session.id)?.title)
+
+        server.enqueue(MockResponse().setResponseCode(200))
+        repository.rename(session.id, "Renamed").getOrThrow()
+        assertEquals("Renamed", repository.cached(session.id)?.title)
+
+        server.enqueue(MockResponse().setResponseCode(204))
+        repository.delete(session.id).getOrThrow()
+        assertNull(repository.cached(session.id))
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.notifications
 
+import androidx.annotation.VisibleForTesting
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
@@ -80,6 +81,9 @@ class SessionMonitor(
     private val notified = mutableSetOf<String>()
     private val refreshJobs = mutableMapOf<String, Job>()
 
+    @VisibleForTesting
+    internal val refreshJobCount: Int get() = synchronized(refreshJobs) { refreshJobs.size }
+
     fun start(scope: CoroutineScope) {
         scope.launch {
             combine(settings.settings.map { it.notifications }, servers.activeServer.map { it?.id }) { on, server ->
@@ -152,6 +156,7 @@ class SessionMonitor(
 
     private suspend fun forget(sessionId: String) {
         _running.update { it - sessionId }
+        synchronized(refreshJobs) { refreshJobs.remove(sessionId)?.cancel() }
         lock.withLock {
             pending.remove(sessionId)?.filter { notified.remove(it) }?.forEach(notifier::cancelAttention)
         }
@@ -179,7 +184,12 @@ class SessionMonitor(
     private fun refresh(scope: CoroutineScope, sessionId: String) {
         synchronized(refreshJobs) {
             refreshJobs.remove(sessionId)?.cancel()
-            refreshJobs[sessionId] = scope.launch { syncAttention(sessionId) }
+            val job = scope.launch { syncAttention(sessionId) }
+            refreshJobs[sessionId] = job
+            // Finished jobs must not keep their session id in the map for the process lifetime.
+            job.invokeOnCompletion {
+                synchronized(refreshJobs) { if (refreshJobs[sessionId] === job) refreshJobs.remove(sessionId) }
+            }
         }
     }
 
@@ -213,6 +223,10 @@ class SessionMonitor(
 
     private suspend fun reset() {
         _running.value = emptyMap()
+        synchronized(refreshJobs) {
+            refreshJobs.values.forEach { it.cancel() }
+            refreshJobs.clear()
+        }
         lock.withLock {
             notified.forEach(notifier::cancelAttention)
             notified.clear()

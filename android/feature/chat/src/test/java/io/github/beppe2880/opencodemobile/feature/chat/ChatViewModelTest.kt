@@ -645,6 +645,28 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a missed execution end leaves stop usable after reconnecting`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { activeIds = setOf("s1") }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.ExecutionStarted("s1"))
+        runCurrent()
+        assertTrue(vm.state.value.running)
+
+        vm.onEvent(ChatEvent.Stop)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.stopping)
+
+        // The connection drops before ExecutionEnded arrives; on reconnect the server still
+        // reports the session as running.
+        events.flow.emit(ServerEvent.Connected)
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.running)
+        assertFalse(vm.state.value.stopping)
+    }
+
+    @Test
     fun `failed send restores the draft and removes the pending prompt`() = runTest(main.testDispatcher) {
         chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
         val vm = vm()
@@ -655,6 +677,69 @@ class ChatViewModelTest {
 
         assertEquals("retry me", vm.state.value.draft)
         assertTrue(vm.state.value.items.none { it is ChatItem.User && it.pending })
+    }
+
+    @Test
+    fun `reverted messages stay gone while the prompt that commits the revert is sent and after it fails`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("hello again"))
+        vm.onEvent(ChatEvent.Send)
+        assertTrue(vm.state.value.items.none { it.key == "u1" })
+
+        advanceUntilIdle()
+        // The commit went through, so the server no longer has u1.
+        assertEquals(1, chat.commits)
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(0, vm.state.value.revertedCount)
+        assertEquals("hello again", vm.state.value.draft)
+    }
+
+    @Test
+    fun `a failed revert commit keeps the revert staged`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        chat.commitResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("hello again"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(1, vm.state.value.revertedCount)
+        assertEquals("hello again", vm.state.value.draft)
+        // Redo still brings the staged messages back.
+        vm.onEvent(ChatEvent.DraftChanged("/redo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+    }
+
+    @Test
+    fun `a failed shell command after a committed revert does not bring the reverted messages back`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/undo"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        chat.shellResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("!ls"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(1, chat.commits)
+        assertEquals(emptyList<String>(), vm.state.value.items.map { it.key })
+        assertEquals(0, vm.state.value.revertedCount)
     }
 
     @Test
@@ -731,7 +816,8 @@ private class FakeSessions(
 ) : SessionRepository {
     private val session = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null)
     override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
-    override suspend fun active(): Result<Set<String>> = Result.success(emptySet())
+    var activeIds: Set<String> = emptySet()
+    override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
     override suspend fun get(sessionId: String) = Result.success(session)
     override fun cached(sessionId: String) = titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
@@ -829,9 +915,10 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         return Result.success(Unit)
     }
     var commits = 0
+    var commitResult: Result<Unit> = Result.success(Unit)
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
-        return Result.success(Unit)
+        return commitResult
     }
     var inbox: List<QueuedPrompt> = emptyList()
     val cancelled = mutableListOf<String>()
