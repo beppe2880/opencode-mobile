@@ -105,7 +105,8 @@
       fontFamily,
       fontSize: 13,
       scrollback: 5000,
-      cursorBlink: true,
+      // A blinking cursor repaints the WebView twice a second even when nothing happens.
+      cursorBlink: false,
       allowProposedApi: false,
     });
     fit = new FitAddon.FitAddon();
