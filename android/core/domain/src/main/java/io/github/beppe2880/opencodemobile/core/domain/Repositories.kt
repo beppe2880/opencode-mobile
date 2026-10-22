@@ -283,8 +283,6 @@ data class AppSettings(
      * screen; null for its default layout.
      */
     val terminalKeys: List<List<String>>? = null,
-    /** Applies to terminals opened afterwards. */
-    val terminalRenderer: TerminalRenderer = TerminalRenderer.Native,
 )
 
 interface SettingsRepository {

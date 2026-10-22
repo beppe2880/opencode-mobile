@@ -1,6 +1,5 @@
 package io.github.beppe2880.opencodemobile.feature.terminal
 
-import android.graphics.Typeface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,12 +22,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -36,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.sp
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
@@ -46,17 +42,13 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.core.ui.theme.terminalAnsi
 import kotlinx.coroutines.launch
-import org.connectbot.terminal.ModifierManager
-import org.connectbot.terminal.Terminal
 import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
 @Composable
 fun TerminalScreen(
     state: TerminalState,
-    surface: TerminalSurface,
-    modifiers: ModifierManager,
+    surface: WebSurface,
     onEvent: (TerminalEvent) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -65,14 +57,6 @@ fun TerminalScreen(
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
-    val typeface = remember(context) { runCatching { context.resources.getFont(UiR.font.plex_mono_regular) }.getOrDefault(Typeface.MONOSPACE) }
-    LaunchedEffect(surface, c) {
-        (surface as? NativeSurface)?.emulator?.applyColorScheme(
-            ansiColors = c.terminalAnsi.map { it.toArgb() }.toIntArray(),
-            defaultForeground = c.textBase.toArgb(),
-            defaultBackground = c.bgDeep.toArgb(),
-        )
-    }
 
     Scaffold(
         modifier = modifier,
@@ -122,19 +106,7 @@ fun TerminalScreen(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
-                    when (surface) {
-                        is NativeSurface -> Terminal(
-                            terminalEmulator = surface.emulator,
-                            modifier = Modifier.fillMaxSize().padding(horizontal = OcSpacing.xs).testTag("terminal_view"),
-                            typeface = typeface,
-                            initialFontSize = 12.sp,
-                            backgroundColor = c.bgDeep,
-                            foregroundColor = c.textBase,
-                            keyboardEnabled = state.link == TerminalLink.Connected,
-                            modifierManager = modifiers,
-                        )
-                        is WebSurface -> WebTerminalView(surface, Modifier.fillMaxSize().testTag("terminal_view"))
-                    }
+                    WebTerminalView(surface, Modifier.fillMaxSize().testTag("terminal_view"))
                     LinkBanner(state.link, onRestart = { onEvent(TerminalEvent.Restart) }, Modifier.align(Alignment.BottomCenter))
                 }
             }

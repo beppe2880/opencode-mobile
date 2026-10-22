@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.feature.settings
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
-import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 
 /** Build information provided by the app module. */
@@ -37,7 +36,6 @@ sealed interface SettingsEvent {
     data object ConfirmRemove : SettingsEvent
     data object DismissDialog : SettingsEvent
     data class ThemeChanged(val theme: ThemeMode) : SettingsEvent
-    data class TerminalRendererChanged(val renderer: TerminalRenderer) : SettingsEvent
     data class ShowReasoningChanged(val enabled: Boolean) : SettingsEvent
     data class ExpandToolsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent

@@ -20,10 +20,6 @@
     <string name="settings_theme_system">النظام</string>
     <string name="settings_theme_light">فاتحة</string>
     <string name="settings_theme_dark">داكنة</string>
-    <string name="settings_terminal">الطرفية</string>
-    <string name="settings_terminal_native">أصلي</string>
-    <string name="settings_terminal_web">ويب</string>
-    <string name="settings_terminal_renderer_sub">الأصلي يرسم بـ libvterm، والويب بـ xterm.js داخل WebView. يُطبَّق على الطرفيات المفتوحة لاحقًا.</string>
     <string name="settings_conversation">المحادثة</string>
     <string name="settings_show_reasoning">إظهار الاستدلال</string>
     <string name="settings_show_reasoning_sub">عرض كتل «فكّر لمدة…» المطوية في المحادثة</string>

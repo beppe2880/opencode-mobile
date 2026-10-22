@@ -46,8 +46,6 @@ if (System.getenv("CI") != null && releaseSigning == null &&
 android {
     namespace = "io.github.beppe2880.opencodemobile"
     compileSdk = 37
-    // Strips debug symbols from the terminal's native library (about 10 MB); release.yml installs it.
-    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "io.github.beppe2880.opencodemobile"

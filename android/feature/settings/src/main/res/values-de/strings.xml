@@ -20,10 +20,6 @@
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Hell</string>
     <string name="settings_theme_dark">Dunkel</string>
-    <string name="settings_terminal">Terminal</string>
-    <string name="settings_terminal_native">Nativ</string>
-    <string name="settings_terminal_web">Web</string>
-    <string name="settings_terminal_renderer_sub">Nativ zeichnet mit libvterm, Web mit xterm.js in einer WebView. Gilt für danach geöffnete Terminals.</string>
     <string name="settings_conversation">Unterhaltung</string>
     <string name="settings_show_reasoning">Denkprozess anzeigen</string>
     <string name="settings_show_reasoning_sub">Eingeklappte „Nachgedacht für…“-Blöcke im Verlauf anzeigen</string>

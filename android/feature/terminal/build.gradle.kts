@@ -31,7 +31,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.connectbot.termlib)
 
     testImplementation(project(":core:testing"))
     testImplementation(libs.junit)

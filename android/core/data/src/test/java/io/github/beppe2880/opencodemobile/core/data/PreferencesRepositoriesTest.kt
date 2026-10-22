@@ -4,7 +4,6 @@ import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftReposi
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
-import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -18,15 +17,12 @@ class PreferencesRepositoriesTest {
         val prefs = InMemoryPreferences()
         val keys = listOf(listOf("esc", "ctrl"), listOf("text:wq\u001f\u001b:wq\r"))
         PreferencesSettingsRepository(prefs).update {
-            it.copy(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys, terminalRenderer = TerminalRenderer.Web)
+            it.copy(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys)
         }
 
         val reopened = PreferencesSettingsRepository(prefs).settings.value
 
-        assertEquals(
-            AppSettings(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys, terminalRenderer = TerminalRenderer.Web),
-            reopened,
-        )
+        assertEquals(AppSettings(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys), reopened)
         assertEquals(AppSettings(), PreferencesSettingsRepository(InMemoryPreferences()).settings.value)
     }
 

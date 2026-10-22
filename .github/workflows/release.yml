@@ -74,10 +74,6 @@ jobs:
           fi
           echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
 
-      - name: Install the NDK that strips native libraries
-        # Matches android.ndkVersion; without it native debug symbols ship in the APK.
-        run: (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;28.2.13676358" > /dev/null
-
       - name: Test and build the signed APK
         working-directory: android
         env:

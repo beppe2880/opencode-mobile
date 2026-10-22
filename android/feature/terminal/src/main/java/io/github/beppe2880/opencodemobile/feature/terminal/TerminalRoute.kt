@@ -28,7 +28,6 @@ fun TerminalRoute(directory: String, onBack: () -> Unit, modifier: Modifier = Mo
     TerminalScreen(
         state = state,
         surface = viewModel.surface,
-        modifiers = viewModel.modifiers,
         onEvent = viewModel::onEvent,
         modifier = modifier,
         snackbarHostState = snackbar,

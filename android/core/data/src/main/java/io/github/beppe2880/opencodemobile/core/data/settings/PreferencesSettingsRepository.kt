@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.core.data.settings
 import android.content.SharedPreferences
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
-import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +34,6 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_NOTIFY_QUESTIONS, next.notifyQuestions)
             .putBoolean(KEY_NOTIFY_FINISHED, next.notifyFinished)
             .putBoolean(KEY_NOTIFICATIONS_INTRO, next.notificationsIntroShown)
-            .putString(KEY_TERMINAL_RENDERER, next.terminalRenderer.name)
             .putString(KEY_TERMINAL_KEYS, next.terminalKeys?.let { Json.encodeToString(KeyRows, it) })
             .apply()
     }
@@ -56,8 +54,6 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             notifyQuestions = prefs.getBoolean(KEY_NOTIFY_QUESTIONS, defaults.notifyQuestions),
             notifyFinished = prefs.getBoolean(KEY_NOTIFY_FINISHED, defaults.notifyFinished),
             notificationsIntroShown = prefs.getBoolean(KEY_NOTIFICATIONS_INTRO, defaults.notificationsIntroShown),
-            terminalRenderer = TerminalRenderer.entries.firstOrNull { it.name == prefs.getString(KEY_TERMINAL_RENDERER, null) }
-                ?: defaults.terminalRenderer,
             terminalKeys = prefs.getString(KEY_TERMINAL_KEYS, null)?.let { stored ->
                 try {
                     Json.decodeFromString(KeyRows, stored)
@@ -83,7 +79,6 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_NOTIFY_FINISHED = "notify_finished"
         const val KEY_NOTIFICATIONS_INTRO = "notifications_intro_shown"
         const val KEY_TERMINAL_KEYS = "terminal_keys"
-        const val KEY_TERMINAL_RENDERER = "terminal_renderer"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }

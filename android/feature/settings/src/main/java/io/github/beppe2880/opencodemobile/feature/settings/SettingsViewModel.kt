@@ -54,7 +54,6 @@ class SettingsViewModel(
                 viewModelScope.launch { servers.remove(server.id) }
             }
             is SettingsEvent.ThemeChanged -> update { it.copy(theme = event.theme) }
-            is SettingsEvent.TerminalRendererChanged -> update { it.copy(terminalRenderer = event.renderer) }
             is SettingsEvent.ShowReasoningChanged -> update { it.copy(showReasoning = event.enabled) }
             is SettingsEvent.ExpandToolsChanged -> update { it.copy(expandToolsByDefault = event.enabled) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }

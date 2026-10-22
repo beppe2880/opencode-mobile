@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.feature.terminal
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
-import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.connectbot.terminal.ModifierManager
 
 class TerminalViewModel(
     directory: String,
@@ -31,19 +29,8 @@ class TerminalViewModel(
     private val input = Channel<ByteArray>(Channel.UNLIMITED)
     private val size = MutableStateFlow<Pair<Int, Int>?>(null)
 
-    /** The screen the shell draws on, chosen in Settings when the terminal opens. */
-    val surface: TerminalSurface = when (settings.settings.value.terminalRenderer) {
-        TerminalRenderer.Native -> NativeSurface(send = { input.trySend(it) }, onResize = ::onResize)
-        TerminalRenderer.Web -> WebSurface(send = { input.trySend(it) }, onResize = ::onResize, onModifiersUsed = ::clearTransients)
-    }
-
-    /** Modifiers of the key bar, also applied to the next key typed on the keyboard. */
-    val modifiers: ModifierManager = object : ModifierManager {
-        override fun isCtrlActive() = currentState.modifier(TermModifier.Ctrl) != ModifierState.Off
-        override fun isAltActive() = currentState.modifier(TermModifier.Alt) != ModifierState.Off
-        override fun isShiftActive() = currentState.modifier(TermModifier.Shift) != ModifierState.Off
-        override fun clearTransients() = this@TerminalViewModel.clearTransients()
-    }
+    /** The screen the shell draws on; kept here so it survives configuration changes. */
+    val surface = WebSurface(send = { input.trySend(it) }, onResize = ::onResize, onModifiersUsed = ::clearTransients)
 
     private var session: Job? = null
     private var terminalId: String? = null
