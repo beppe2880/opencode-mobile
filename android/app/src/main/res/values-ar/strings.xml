@@ -41,9 +41,9 @@
     <string name="widget_empty">لا توجد جلسات بعد. اضغط «جديدة» لبدء جلسة.</string>
     <string name="widget_offline">%1$s · غير متصل، عرض الجلسات المحفوظة</string>
     <plurals name="widget_running">
-        <item quantity="zero">%1$s · لا توجد جلسات جارية</item>
-        <item quantity="one">%1$s · جلسة جارية واحدة</item>
-        <item quantity="two">%1$s · جلستان جاريتان</item>
+        <item quantity="zero">%1$s · %2$d جلسة جارية</item>
+        <item quantity="one">%1$s · %2$d جلسة جارية</item>
+        <item quantity="two">%1$s · %2$d جلستان جاريتان</item>
         <item quantity="few">%1$s · %2$d جلسات جارية</item>
         <item quantity="many">%1$s · %2$d جلسة جارية</item>
         <item quantity="other">%1$s · %2$d جلسة جارية</item>
