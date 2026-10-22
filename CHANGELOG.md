@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.0](https://github.com/beppe2880/opencode-mobile/compare/v0.7.0...v0.8.0) (2026-10-22)
+
+
+### Features
+
+* Add a home screen widget with running and recent sessions ([#67](https://github.com/beppe2880/opencode-mobile/issues/67)) ([40210e9](https://github.com/beppe2880/opencode-mobile/commit/40210e984ceaf77c078c6d86ff292572d936aca5))
+* Add a read-only file viewer ([#69](https://github.com/beppe2880/opencode-mobile/issues/69)) ([39a54f6](https://github.com/beppe2880/opencode-mobile/commit/39a54f63ecb8f58306a750db6b75d89ce1428eee))
+* Add a terminal through the PTY WebSocket ([#66](https://github.com/beppe2880/opencode-mobile/issues/66)) ([a48fc61](https://github.com/beppe2880/opencode-mobile/commit/a48fc611bd1870ac5fbb9fef37f0442ad995031a))
+
+
+### Bug fixes
+
+* **chat:** Show the compaction summary in the transcript ([#64](https://github.com/beppe2880/opencode-mobile/issues/64)) ([74b4003](https://github.com/beppe2880/opencode-mobile/commit/74b400362eb5bd564f64d10004d2e784c57621d4))
+
 ## [0.7.0](https://github.com/beppe2880/opencode-mobile/compare/v0.6.0...v0.7.0) (2026-10-21)
 
 
