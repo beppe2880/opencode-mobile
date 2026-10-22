@@ -20,6 +20,10 @@
     <string name="settings_theme_system">跟随系统</string>
     <string name="settings_theme_light">浅色</string>
     <string name="settings_theme_dark">深色</string>
+    <string name="settings_terminal">终端</string>
+    <string name="settings_terminal_native">原生</string>
+    <string name="settings_terminal_web">网页</string>
+    <string name="settings_terminal_renderer_sub">原生使用 libvterm 绘制，网页使用 WebView 中的 xterm.js 绘制。对之后打开的终端生效。</string>
     <string name="settings_conversation">对话</string>
     <string name="settings_show_reasoning">显示推理</string>
     <string name="settings_show_reasoning_sub">在对话中显示折叠的“已思考…”区块</string>

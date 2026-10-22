@@ -20,6 +20,10 @@
     <string name="settings_theme_system">Système</string>
     <string name="settings_theme_light">Clair</string>
     <string name="settings_theme_dark">Sombre</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_terminal_native">Natif</string>
+    <string name="settings_terminal_web">Web</string>
+    <string name="settings_terminal_renderer_sub">Natif affiche avec libvterm, Web avec xterm.js dans une WebView. S’applique aux terminaux ouverts ensuite.</string>
     <string name="settings_conversation">Conversation</string>
     <string name="settings_show_reasoning">Afficher le raisonnement</string>
     <string name="settings_show_reasoning_sub">Afficher les blocs repliés « Réflexion pendant… » dans la conversation</string>

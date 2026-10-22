@@ -20,6 +20,10 @@
     <string name="settings_theme_system">Sistema</string>
     <string name="settings_theme_light">Claro</string>
     <string name="settings_theme_dark">Escuro</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_terminal_native">Nativo</string>
+    <string name="settings_terminal_web">Web</string>
+    <string name="settings_terminal_renderer_sub">Nativo desenha com libvterm, Web com xterm.js em um WebView. Vale para os terminais abertos depois.</string>
     <string name="settings_conversation">Conversa</string>
     <string name="settings_show_reasoning">Mostrar raciocínio</string>
     <string name="settings_show_reasoning_sub">Exibir blocos recolhidos “Pensou por…” na conversa</string>

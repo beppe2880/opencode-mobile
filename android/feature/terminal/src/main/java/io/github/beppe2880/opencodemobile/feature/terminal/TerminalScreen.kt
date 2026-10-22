@@ -50,13 +50,12 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.terminalAnsi
 import kotlinx.coroutines.launch
 import org.connectbot.terminal.ModifierManager
 import org.connectbot.terminal.Terminal
-import org.connectbot.terminal.TerminalEmulator
 import io.github.beppe2880.opencodemobile.core.ui.R as UiR
 
 @Composable
 fun TerminalScreen(
     state: TerminalState,
-    emulator: TerminalEmulator,
+    surface: TerminalSurface,
     modifiers: ModifierManager,
     onEvent: (TerminalEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -67,8 +66,8 @@ fun TerminalScreen(
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val typeface = remember(context) { runCatching { context.resources.getFont(UiR.font.plex_mono_regular) }.getOrDefault(Typeface.MONOSPACE) }
-    LaunchedEffect(emulator, c) {
-        emulator.applyColorScheme(
+    LaunchedEffect(surface, c) {
+        (surface as? NativeSurface)?.emulator?.applyColorScheme(
             ansiColors = c.terminalAnsi.map { it.toArgb() }.toIntArray(),
             defaultForeground = c.textBase.toArgb(),
             defaultBackground = c.bgDeep.toArgb(),
@@ -123,16 +122,19 @@ fun TerminalScreen(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
-                    Terminal(
-                        terminalEmulator = emulator,
-                        modifier = Modifier.fillMaxSize().padding(horizontal = OcSpacing.xs).testTag("terminal_view"),
-                        typeface = typeface,
-                        initialFontSize = 12.sp,
-                        backgroundColor = c.bgDeep,
-                        foregroundColor = c.textBase,
-                        keyboardEnabled = state.link == TerminalLink.Connected,
-                        modifierManager = modifiers,
-                    )
+                    when (surface) {
+                        is NativeSurface -> Terminal(
+                            terminalEmulator = surface.emulator,
+                            modifier = Modifier.fillMaxSize().padding(horizontal = OcSpacing.xs).testTag("terminal_view"),
+                            typeface = typeface,
+                            initialFontSize = 12.sp,
+                            backgroundColor = c.bgDeep,
+                            foregroundColor = c.textBase,
+                            keyboardEnabled = state.link == TerminalLink.Connected,
+                            modifierManager = modifiers,
+                        )
+                        is WebSurface -> WebTerminalView(surface, Modifier.fillMaxSize().testTag("terminal_view"))
+                    }
                     LinkBanner(state.link, onRestart = { onEvent(TerminalEvent.Restart) }, Modifier.align(Alignment.BottomCenter))
                 }
             }

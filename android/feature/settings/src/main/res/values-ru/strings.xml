@@ -20,6 +20,10 @@
     <string name="settings_theme_system">Системная</string>
     <string name="settings_theme_light">Светлая</string>
     <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_terminal">Терминал</string>
+    <string name="settings_terminal_native">Нативный</string>
+    <string name="settings_terminal_web">Веб</string>
+    <string name="settings_terminal_renderer_sub">Нативный рисует через libvterm, Веб — через xterm.js в WebView. Применяется к терминалам, открытым после этого.</string>
     <string name="settings_conversation">Разговор</string>
     <string name="settings_show_reasoning">Показывать рассуждения</string>
     <string name="settings_show_reasoning_sub">Показывать свёрнутые блоки «Размышлял…» в истории</string>

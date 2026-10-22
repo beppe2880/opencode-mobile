@@ -9,6 +9,9 @@ data class TerminalInfo(
     val running: Boolean,
 )
 
+/** What draws the terminal: libvterm in native code, or xterm.js in a WebView. */
+enum class TerminalRenderer { Native, Web }
+
 enum class TerminalLink { Connecting, Connected, Reconnecting, Exited }
 
 /** What an attached terminal reports: its output, and how the connection is doing. */

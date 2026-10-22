@@ -27,7 +27,7 @@ fun TerminalRoute(directory: String, onBack: () -> Unit, modifier: Modifier = Mo
     }
     TerminalScreen(
         state = state,
-        emulator = viewModel.emulator,
+        surface = viewModel.surface,
         modifiers = viewModel.modifiers,
         onEvent = viewModel::onEvent,
         modifier = modifier,

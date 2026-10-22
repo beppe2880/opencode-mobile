@@ -20,6 +20,10 @@
     <string name="settings_theme_system">システム</string>
     <string name="settings_theme_light">ライト</string>
     <string name="settings_theme_dark">ダーク</string>
+    <string name="settings_terminal">ターミナル</string>
+    <string name="settings_terminal_native">ネイティブ</string>
+    <string name="settings_terminal_web">Web</string>
+    <string name="settings_terminal_renderer_sub">ネイティブは libvterm、Web は WebView 内の xterm.js で描画します。以降に開くターミナルに適用されます。</string>
     <string name="settings_conversation">会話</string>
     <string name="settings_show_reasoning">思考過程を表示</string>
     <string name="settings_show_reasoning_sub">会話に折りたたまれた「思考時間…」ブロックを表示</string>

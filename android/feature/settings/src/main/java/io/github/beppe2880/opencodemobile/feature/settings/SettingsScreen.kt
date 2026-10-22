@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
+import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
@@ -100,6 +101,7 @@ fun SettingsScreen(
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
+                item(key = "terminal") { TerminalSection(state.settings.terminalRenderer, onEvent) }
                 item(key = "notifications") { NotificationsSection(state, onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
@@ -235,6 +237,26 @@ private fun AppearanceSection(theme: ThemeMode, onEvent: (SettingsEvent) -> Unit
             ),
             selected = theme,
             onSelect = { onEvent(SettingsEvent.ThemeChanged(it)) },
+        )
+    }
+}
+
+@Composable
+private fun TerminalSection(renderer: TerminalRenderer, onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(R.string.settings_terminal)) {
+        OcSegmentedControl(
+            segments = listOf(
+                OcSegment(TerminalRenderer.Native, stringResource(R.string.settings_terminal_native), "settings_terminal_native"),
+                OcSegment(TerminalRenderer.Web, stringResource(R.string.settings_terminal_web), "settings_terminal_web"),
+            ),
+            selected = renderer,
+            onSelect = { onEvent(SettingsEvent.TerminalRendererChanged(it)) },
+        )
+        Text(
+            text = stringResource(R.string.settings_terminal_renderer_sub),
+            style = MaterialTheme.typography.bodySmall,
+            color = OcTheme.colors.textMuted,
+            modifier = Modifier.padding(top = OcSpacing.sm, start = OcSpacing.xs, end = OcSpacing.xs),
         )
     }
 }

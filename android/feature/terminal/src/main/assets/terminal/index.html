@@ -1,0 +1,24 @@
+<!doctype html>
+<!--
+  Web renderer of the terminal screen. Vendored from npm, see LICENSE-*:
+  @xterm/xterm 6.0.0 (xterm.js, xterm.css) and @xterm/addon-fit 0.11.0 (addon-fit.js).
+  The page only talks to the app through the OcTerminal bridge; the WebView blocks network loads.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="xterm.css">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: transparent; }
+    #terminal { position: absolute; top: 0; bottom: 0; left: 4px; right: 4px; }
+    .xterm .xterm-viewport { overflow-y: auto; }
+  </style>
+  <script src="xterm.js"></script>
+  <script src="addon-fit.js"></script>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script src="terminal.js"></script>
+</body>
+</html>

@@ -1,10 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.terminal
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
+import io.github.beppe2880.opencodemobile.core.domain.TerminalRenderer
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -22,9 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.connectbot.terminal.ModifierManager
-import org.connectbot.terminal.TerminalEmulator
-import org.connectbot.terminal.TerminalEmulatorFactory
-import org.connectbot.terminal.VTermKey
 
 class TerminalViewModel(
     directory: String,
@@ -34,26 +30,19 @@ class TerminalViewModel(
 
     private val input = Channel<ByteArray>(Channel.UNLIMITED)
     private val size = MutableStateFlow<Pair<Int, Int>?>(null)
-    private val main = Handler(Looper.getMainLooper())
 
-    // Replaying old output makes the emulator answer queries the shell asked long ago; those
-    // answers are dropped until the replay has been drawn.
-    private var forwardInput = false
-
-    /** The screen the shell draws on; kept here so it survives configuration changes. */
-    val emulator: TerminalEmulator = TerminalEmulatorFactory.create(
-        onKeyboardInput = { bytes -> if (forwardInput) input.trySend(bytes) },
-        onResize = { size.value = it.columns to it.rows },
-    )
+    /** The screen the shell draws on, chosen in Settings when the terminal opens. */
+    val surface: TerminalSurface = when (settings.settings.value.terminalRenderer) {
+        TerminalRenderer.Native -> NativeSurface(send = { input.trySend(it) }, onResize = ::onResize)
+        TerminalRenderer.Web -> WebSurface(send = { input.trySend(it) }, onResize = ::onResize, onModifiersUsed = ::clearTransients)
+    }
 
     /** Modifiers of the key bar, also applied to the next key typed on the keyboard. */
     val modifiers: ModifierManager = object : ModifierManager {
         override fun isCtrlActive() = currentState.modifier(TermModifier.Ctrl) != ModifierState.Off
         override fun isAltActive() = currentState.modifier(TermModifier.Alt) != ModifierState.Off
         override fun isShiftActive() = currentState.modifier(TermModifier.Shift) != ModifierState.Off
-        override fun clearTransients() = updateState { state ->
-            state.copy(modifiers = state.modifiers.filterValues { it == ModifierState.Locked })
-        }
+        override fun clearTransients() = this@TerminalViewModel.clearTransients()
     }
 
     private var session: Job? = null
@@ -66,19 +55,29 @@ class TerminalViewModel(
                 updateState { it.copy(keyRows = rows) }
             }
         }
+        viewModelScope.launch {
+            state.map { modifierMask(it) }.distinctUntilChanged().collect(surface::setModifiers)
+        }
+    }
+
+    private fun onResize(columns: Int, rows: Int) {
+        size.value = columns to rows
+    }
+
+    private fun clearTransients() = updateState { state ->
+        state.copy(modifiers = state.modifiers.filterValues { it == ModifierState.Locked })
     }
 
     override fun onEvent(event: TerminalEvent) {
         when (event) {
             is TerminalEvent.Press -> press(event.key)
-            is TerminalEvent.Paste -> if (event.text.isNotEmpty()) emulator.pasteText(event.text)
+            is TerminalEvent.Paste -> if (event.text.isNotEmpty()) surface.paste(event.text)
             is TerminalEvent.EditKeys -> updateState { it.copy(editingKeys = event.open) }
             is TerminalEvent.SaveKeys -> saveKeys(BarKeys.toSettings(event.rows))
             TerminalEvent.ResetKeys -> saveKeys(null)
             TerminalEvent.Retry -> open()
             TerminalEvent.Restart -> {
-                // Full reset (RIS): the new shell starts on a clean screen.
-                emulator.writeInput("\u001bc".toByteArray())
+                surface.reset()
                 open()
             }
             TerminalEvent.AskClose -> updateState { it.copy(confirmClose = true) }
@@ -91,7 +90,7 @@ class TerminalViewModel(
     @OptIn(FlowPreview::class)
     private fun open() {
         session?.cancel()
-        forwardInput = false
+        surface.setLive(false)
         updateState { it.copy(link = TerminalLink.Connecting, error = null) }
         session = viewModelScope.launch {
             val directory = currentState.directory
@@ -109,7 +108,7 @@ class TerminalViewModel(
             try {
                 terminals.attach(directory, terminal.id, input.receiveAsFlow()).collect { update ->
                     when (update) {
-                        is TerminalUpdate.Output -> emulator.writeInput(update.text.toByteArray())
+                        is TerminalUpdate.Output -> surface.write(update.text)
                         is TerminalUpdate.Link -> onLink(update.state)
                     }
                 }
@@ -124,12 +123,7 @@ class TerminalViewModel(
     }
 
     private fun onLink(link: TerminalLink) {
-        if (link == TerminalLink.Connected) {
-            // Queued behind the emulator callbacks of the replay just written.
-            main.post { forwardInput = true }
-        } else {
-            forwardInput = false
-        }
+        surface.setLive(link == TerminalLink.Connected)
         updateState { it.copy(link = link) }
     }
 
@@ -155,15 +149,15 @@ class TerminalViewModel(
                 state.copy(modifiers = state.modifiers + (key.modifier to state.modifier(key.modifier).next()))
             }
             is BarKey.Special -> {
-                emulator.dispatchKey(modifierMask(), key.key.code)
-                modifiers.clearTransients()
+                surface.key(key.key, modifierMask(currentState))
+                clearTransients()
             }
             is BarKey.Text -> {
                 val codePoints = key.text.codePoints().toArray()
                 if (codePoints.size == 1) {
-                    emulator.dispatchCharacter(modifierMask(), codePoints[0])
-                    modifiers.clearTransients()
-                } else if (forwardInput) {
+                    surface.character(codePoints[0], modifierMask(currentState))
+                    clearTransients()
+                } else if (currentState.link == TerminalLink.Connected) {
                     // Macros go to the shell as they are, not as a bracketed paste.
                     input.trySend(key.text.toByteArray())
                 }
@@ -177,46 +171,13 @@ class TerminalViewModel(
         viewModelScope.launch { settings.update { it.copy(terminalKeys = rows) } }
     }
 
-    private fun modifierMask(): Int = currentState.modifiers
+    private fun modifierMask(state: TerminalState): Int = state.modifiers
         .filterValues { it != ModifierState.Off }
         .keys.fold(0) { mask, modifier -> mask or modifier.mask }
 
-    override fun onCleared() {
-        main.removeCallbacksAndMessages(null)
-        emulator.close()
-    }
+    override fun onCleared() = surface.close()
 
     private companion object {
         const val RESIZE_DEBOUNCE_MILLIS = 150L
     }
 }
-
-private val SpecialKey.code: Int
-    get() = when (this) {
-        SpecialKey.Escape -> VTermKey.ESCAPE
-        SpecialKey.Tab -> VTermKey.TAB
-        SpecialKey.Enter -> VTermKey.ENTER
-        SpecialKey.Backspace -> VTermKey.BACKSPACE
-        SpecialKey.Left -> VTermKey.LEFT
-        SpecialKey.Down -> VTermKey.DOWN
-        SpecialKey.Up -> VTermKey.UP
-        SpecialKey.Right -> VTermKey.RIGHT
-        SpecialKey.Home -> VTermKey.HOME
-        SpecialKey.End -> VTermKey.END
-        SpecialKey.PageUp -> VTermKey.PAGEUP
-        SpecialKey.PageDown -> VTermKey.PAGEDOWN
-        SpecialKey.Insert -> VTermKey.INS
-        SpecialKey.Delete -> VTermKey.DEL
-        SpecialKey.F1 -> VTermKey.FUNCTION_1
-        SpecialKey.F2 -> VTermKey.FUNCTION_2
-        SpecialKey.F3 -> VTermKey.FUNCTION_3
-        SpecialKey.F4 -> VTermKey.FUNCTION_4
-        SpecialKey.F5 -> VTermKey.FUNCTION_5
-        SpecialKey.F6 -> VTermKey.FUNCTION_6
-        SpecialKey.F7 -> VTermKey.FUNCTION_7
-        SpecialKey.F8 -> VTermKey.FUNCTION_8
-        SpecialKey.F9 -> VTermKey.FUNCTION_9
-        SpecialKey.F10 -> VTermKey.FUNCTION_10
-        SpecialKey.F11 -> VTermKey.FUNCTION_11
-        SpecialKey.F12 -> VTermKey.FUNCTION_12
-    }

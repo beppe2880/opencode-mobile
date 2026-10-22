@@ -20,6 +20,10 @@
     <string name="settings_theme_system">시스템</string>
     <string name="settings_theme_light">라이트</string>
     <string name="settings_theme_dark">다크</string>
+    <string name="settings_terminal">터미널</string>
+    <string name="settings_terminal_native">네이티브</string>
+    <string name="settings_terminal_web">웹</string>
+    <string name="settings_terminal_renderer_sub">네이티브는 libvterm으로, 웹은 WebView의 xterm.js로 그립니다. 이후에 여는 터미널에 적용됩니다.</string>
     <string name="settings_conversation">대화</string>
     <string name="settings_show_reasoning">추론 표시</string>
     <string name="settings_show_reasoning_sub">대화에 접힌 “생각한 시간…” 블록 표시</string>
