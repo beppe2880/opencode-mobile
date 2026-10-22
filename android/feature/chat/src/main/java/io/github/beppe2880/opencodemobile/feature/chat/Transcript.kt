@@ -185,7 +185,13 @@ internal fun Transcript(
                         modifier = rowModifier,
                     )
                     is ChatItem.Error -> ErrorRow(item, rowModifier)
-                    is ChatItem.Notice -> NoticeRow(item, rowModifier)
+                    is ChatItem.Notice -> NoticeRow(
+                        item = item,
+                        cache = cache,
+                        expanded = state.isExpanded("n:${item.key}"),
+                        onToggle = { onToggle("n:${item.key}") },
+                        modifier = rowModifier,
+                    )
                     is ChatItem.Shell -> ShellBlock(item, rowModifier)
                     is ChatItem.Footer -> TurnFooter(item, onCopy, rowModifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
                     is ChatItem.Working -> WorkingRow(rowModifier)

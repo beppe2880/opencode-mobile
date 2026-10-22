@@ -222,31 +222,63 @@ internal fun DisclosureRow(
     }
 }
 
+/** An inline divider notice; a completed compaction expands to show its summary. */
 @Composable
-internal fun NoticeRow(item: ChatItem.Notice, modifier: Modifier = Modifier) {
+internal fun NoticeRow(
+    item: ChatItem.Notice,
+    cache: MarkdownCache,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val c = OcTheme.colors
     val color = if (item.kind == NoticeKind.Error) c.danger.fg else c.textFaint
-    Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = OcSpacing.xxs),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
-    ) {
-        Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
-        Icon(if (item.kind == NoticeKind.Error) Icons.Outlined.ErrorOutline else Icons.Outlined.Info, null, tint = color, modifier = Modifier.size(12.dp))
-        Text(
-            when (item.kind) {
-                // The completed notice carries the whole summary: too long for a divider label.
-                NoticeKind.Compacting -> stringResource(R.string.chat_compacting)
-                NoticeKind.Compaction -> stringResource(R.string.chat_compacted)
-                else -> item.text
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 280.dp),
-        )
-        Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+    val summary = item.text.takeIf { item.kind == NoticeKind.Compaction && it.isNotBlank() }
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = OcSpacing.xxs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+        ) {
+            Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+            val icon = if (item.kind == NoticeKind.Error) Icons.Outlined.ErrorOutline else Icons.Outlined.Info
+            val label: @Composable () -> Unit = {
+                Icon(icon, null, tint = color, modifier = Modifier.size(12.dp))
+                Text(
+                    when (item.kind) {
+                        // The completed notice carries the whole summary: too long for a divider label.
+                        NoticeKind.Compacting -> stringResource(R.string.chat_compacting)
+                        NoticeKind.Compaction -> stringResource(R.string.chat_compacted)
+                        else -> item.text
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = color,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 280.dp),
+                )
+            }
+            if (summary != null) {
+                DisclosureRow(expanded = expanded, onToggle = onToggle, testTag = "chat_compaction_${item.key}") { label() }
+            } else {
+                label()
+            }
+            Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
+        }
+        if (summary != null) {
+            AnimatedVisibility(visible = expanded) {
+                Box(
+                    Modifier
+                        .padding(top = OcSpacing.xs)
+                        .fillMaxWidth()
+                        .background(c.layer01, RoundedCornerShape(OcRadius.md))
+                        .padding(OcSpacing.md)
+                        .testTag("chat_compaction_summary_${item.key}"),
+                ) {
+                    SelectionContainer { OcMarkdown(id = "${item.key}/summary", content = summary, cache = cache) }
+                }
+            }
+        }
     }
 }
 
