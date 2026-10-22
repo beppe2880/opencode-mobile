@@ -32,4 +32,25 @@
     <string name="notif_intro_text">أثناء تشغيل جلسة، يبقى التطبيق متصلًا بخادمك في الخلفية ليُعلمك عندما يحتاج الوكيل إلى إذن أو إجابة، وعندما ينتهي. يمكنك السماح بتعديل أو رفضه مباشرةً من الإشعار.\n\nتأتي الإشعارات مباشرةً من خادمك دون أي خدمة أخرى بينهما. يمكنك إيقافها في أي وقت من الإعدادات.</string>
     <string name="notif_intro_allow">السماح</string>
     <string name="notif_intro_later">ليس الآن</string>
+    <string name="widget_label">جلسات OpenCode</string>
+    <string name="widget_description">الجلسات الجارية والأخيرة، وزر لبدء جلسة جديدة.</string>
+    <string name="widget_new_session">جديدة</string>
+    <string name="widget_refresh">تحديث</string>
+    <string name="widget_not_connected">غير متصل</string>
+    <string name="widget_no_server">افتح التطبيق للاتصال بخادم.</string>
+    <string name="widget_empty">لا توجد جلسات بعد. اضغط «جديدة» لبدء جلسة.</string>
+    <string name="widget_offline">%1$s · غير متصل، عرض الجلسات المحفوظة</string>
+    <plurals name="widget_running">
+        <item quantity="zero">%1$s · لا توجد جلسات جارية</item>
+        <item quantity="one">%1$s · جلسة جارية واحدة</item>
+        <item quantity="two">%1$s · جلستان جاريتان</item>
+        <item quantity="few">%1$s · %2$d جلسات جارية</item>
+        <item quantity="many">%1$s · %2$d جلسة جارية</item>
+        <item quantity="other">%1$s · %2$d جلسة جارية</item>
+    </plurals>
+    <string name="widget_session_running">جارية</string>
+    <string name="widget_untitled">جلسة جديدة</string>
+    <string name="widget_preview_server">خادمي · جلسة جارية واحدة</string>
+    <string name="widget_preview_session">إصلاح إعادة توجيه تسجيل الدخول</string>
+    <string name="widget_preview_session_2">إضافة الوضع الداكن إلى الإعدادات</string>
 </resources>

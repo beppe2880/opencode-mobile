@@ -30,4 +30,23 @@
     <string name="notif_intro_text">Пока выполняется сессия, приложение остаётся подключённым к вашему серверу в фоне, чтобы сообщить, когда агенту нужно разрешение или ответ и когда он закончит. Разрешить или отклонить изменение можно прямо в уведомлении.\n\nУведомления приходят напрямую с вашего сервера, без посторонних сервисов. Их можно отключить в любой момент в настройках.</string>
     <string name="notif_intro_allow">Разрешить</string>
     <string name="notif_intro_later">Не сейчас</string>
+    <string name="widget_label">Сеансы OpenCode</string>
+    <string name="widget_description">Запущенные и недавние сеансы, а также кнопка для запуска нового.</string>
+    <string name="widget_new_session">Новый</string>
+    <string name="widget_refresh">Обновить</string>
+    <string name="widget_not_connected">Не подключено</string>
+    <string name="widget_no_server">Откройте приложение, чтобы подключиться к серверу.</string>
+    <string name="widget_empty">Сессий пока нет. Нажмите «Новый», чтобы начать.</string>
+    <string name="widget_offline">%1$s · офлайн, показаны сохранённые сеансы</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d запущен</item>
+        <item quantity="few">%1$s · %2$d запущено</item>
+        <item quantity="many">%1$s · %2$d запущено</item>
+        <item quantity="other">%1$s · %2$d запущено</item>
+    </plurals>
+    <string name="widget_session_running">запущен</string>
+    <string name="widget_untitled">Новый сеанс</string>
+    <string name="widget_preview_server">Мой сервер · 1 запущен</string>
+    <string name="widget_preview_session">Исправить перенаправление при входе</string>
+    <string name="widget_preview_session_2">Добавить тёмную тему в настройки</string>
 </resources>

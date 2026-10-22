@@ -27,4 +27,20 @@
     <string name="notif_intro_text">セッションの実行中、アプリはバックグラウンドでサーバーとの接続を保ち、エージェントが許可や応答を求めたときと作業が終わったときに通知します。変更の許可や拒否は通知から直接行えます。\n\n通知はサーバーから直接届き、ほかのサービスを経由しません。設定でいつでもオフにできます。</string>
     <string name="notif_intro_allow">許可</string>
     <string name="notif_intro_later">後で</string>
+    <string name="widget_label">OpenCode セッション</string>
+    <string name="widget_description">実行中および最近のセッションと、新しいセッションを開始するボタン。</string>
+    <string name="widget_new_session">新規</string>
+    <string name="widget_refresh">更新</string>
+    <string name="widget_not_connected">未接続</string>
+    <string name="widget_no_server">サーバーに接続するにはアプリを開いてください。</string>
+    <string name="widget_empty">まだセッションがありません。「新規」をタップして開始してください。</string>
+    <string name="widget_offline">%1$s · オフライン、保存済みのセッションを表示中</string>
+    <plurals name="widget_running">
+        <item quantity="other">%1$s · 実行中 %2$d 件</item>
+    </plurals>
+    <string name="widget_session_running">実行中</string>
+    <string name="widget_untitled">新しいセッション</string>
+    <string name="widget_preview_server">マイサーバー · 実行中 1 件</string>
+    <string name="widget_preview_session">ログインのリダイレクトを修正</string>
+    <string name="widget_preview_session_2">設定にダークモードを追加</string>
 </resources>

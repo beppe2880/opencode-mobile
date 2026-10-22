@@ -130,6 +130,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.glance.appwidget)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.koin.android)

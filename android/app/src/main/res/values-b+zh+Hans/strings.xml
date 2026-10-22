@@ -27,4 +27,20 @@
     <string name="notif_intro_text">会话运行期间，应用会在后台与你的服务器保持连接，在智能体需要权限或回复时以及完成时通知你。你可以直接在通知中允许或拒绝修改。\n\n通知直接来自你的服务器，中间没有其他服务。你可以随时在设置中关闭通知。</string>
     <string name="notif_intro_allow">允许</string>
     <string name="notif_intro_later">以后再说</string>
+    <string name="widget_label">OpenCode 会话</string>
+    <string name="widget_description">正在运行和最近的会话，以及一个用于新建会话的按钮。</string>
+    <string name="widget_new_session">新建</string>
+    <string name="widget_refresh">刷新</string>
+    <string name="widget_not_connected">未连接</string>
+    <string name="widget_no_server">打开应用以连接服务器。</string>
+    <string name="widget_empty">还没有会话。点按“新建”开始一个。</string>
+    <string name="widget_offline">%1$s · 离线，显示已保存的会话</string>
+    <plurals name="widget_running">
+        <item quantity="other">%1$s · %2$d 个运行中</item>
+    </plurals>
+    <string name="widget_session_running">运行中</string>
+    <string name="widget_untitled">新会话</string>
+    <string name="widget_preview_server">我的服务器 · 1 个运行中</string>
+    <string name="widget_preview_session">修复登录重定向</string>
+    <string name="widget_preview_session_2">在设置中添加深色模式</string>
 </resources>

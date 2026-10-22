@@ -28,4 +28,21 @@
     <string name="notif_intro_text">Während eine Sitzung läuft, bleibt die App im Hintergrund mit deinem Server verbunden, um dich zu benachrichtigen, wenn der Agent eine Berechtigung oder eine Antwort braucht und wenn er fertig ist. Eine Änderung kannst du direkt in der Benachrichtigung erlauben oder ablehnen.\n\nDie Benachrichtigungen kommen direkt von deinem Server, ohne weiteren Dienst dazwischen. Du kannst sie jederzeit in den Einstellungen ausschalten.</string>
     <string name="notif_intro_allow">Erlauben</string>
     <string name="notif_intro_later">Nicht jetzt</string>
+    <string name="widget_label">OpenCode-Sitzungen</string>
+    <string name="widget_description">Laufende und letzte Sitzungen sowie eine Schaltfläche, um eine neue zu starten.</string>
+    <string name="widget_new_session">Neu</string>
+    <string name="widget_refresh">Aktualisieren</string>
+    <string name="widget_not_connected">Nicht verbunden</string>
+    <string name="widget_no_server">Öffne die App, um eine Verbindung zu einem Server herzustellen.</string>
+    <string name="widget_empty">Noch keine Sitzungen. Tippe auf Neu, um eine zu starten.</string>
+    <string name="widget_offline">%1$s · offline, gespeicherte Sitzungen werden angezeigt</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d laufend</item>
+        <item quantity="other">%1$s · %2$d laufend</item>
+    </plurals>
+    <string name="widget_session_running">läuft</string>
+    <string name="widget_untitled">Neue Sitzung</string>
+    <string name="widget_preview_server">Mein Server · 1 laufend</string>
+    <string name="widget_preview_session">Login-Weiterleitung reparieren</string>
+    <string name="widget_preview_session_2">Dunklen Modus zu den Einstellungen hinzufügen</string>
 </resources>

@@ -2,4 +2,10 @@
 <resources>
     <color name="oc_bg_deep">#FAFAFA</color>
     <color name="oc_launcher_bg">#161616</color>
+    <!-- Widget preview in the launcher's picker; the widget itself uses the OcTheme tokens. -->
+    <color name="oc_widget_bg">#FFFFFF</color>
+    <color name="oc_widget_surface">#F2F2F2</color>
+    <color name="oc_widget_text">#161616</color>
+    <color name="oc_widget_muted">#5C5C5C</color>
+    <color name="oc_widget_accent">#3B5CF6</color>
 </resources>

@@ -16,12 +16,17 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitorService
+import io.github.beppe2880.opencodemobile.widget.WidgetLoader
+import io.github.beppe2880.opencodemobile.widget.WidgetUpdater
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+private val AppVisible = named("AppVisible")
 
 val appModule = module {
     single { AppInfo(versionName = BuildConfig.VERSION_NAME, apiVersion = OpenCodeApiVersion.OPENCODE) }
@@ -36,10 +41,15 @@ val appModule = module {
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
 
     single { AndroidMonitorNotifier(androidContext()) }
-    single {
-        val visible = ProcessLifecycleOwner.get().lifecycle.currentStateFlow
+    // Whether a screen of the app is shown.
+    single(AppVisible) {
+        ProcessLifecycleOwner.get().lifecycle.currentStateFlow
             .map { it.isAtLeast(Lifecycle.State.STARTED) }
             .stateIn(get(AppScope), SharingStarted.Eagerly, false)
+    }
+    single { WidgetLoader(get(), get()) }
+    single { WidgetUpdater(androidContext(), get(), get(), get(AppVisible)) }
+    single {
         SessionMonitor(
             events = get(),
             sessions = get(),
@@ -47,7 +57,7 @@ val appModule = module {
             settings = get(),
             servers = get(),
             notifier = get<AndroidMonitorNotifier>(),
-            visible = visible,
+            visible = get(AppVisible),
             startService = { SessionMonitorService.start(androidContext()) },
         )
     }

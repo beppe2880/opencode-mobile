@@ -29,4 +29,21 @@
     <string name="notif_intro_text">Pendant l’exécution d’une session, l’app reste connectée à votre serveur en arrière-plan pour vous prévenir quand l’agent a besoin d’une autorisation ou d’une réponse, et quand il a terminé. Vous pouvez autoriser ou refuser une modification directement depuis la notification.\n\nLes notifications viennent directement de votre serveur, sans autre service intermédiaire. Vous pouvez les désactiver à tout moment dans les paramètres.</string>
     <string name="notif_intro_allow">Autoriser</string>
     <string name="notif_intro_later">Plus tard</string>
+    <string name="widget_label">Sessions OpenCode</string>
+    <string name="widget_description">Sessions en cours et récentes, et un bouton pour en démarrer une nouvelle.</string>
+    <string name="widget_new_session">Nouvelle</string>
+    <string name="widget_refresh">Actualiser</string>
+    <string name="widget_not_connected">Non connecté</string>
+    <string name="widget_no_server">Ouvrez l\'application pour vous connecter à un serveur.</string>
+    <string name="widget_empty">Aucune session pour l\'instant. Appuyez sur Nouvelle pour en démarrer une.</string>
+    <string name="widget_offline">%1$s · hors ligne, affichage des sessions enregistrées</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d en cours</item>
+        <item quantity="other">%1$s · %2$d en cours</item>
+    </plurals>
+    <string name="widget_session_running">en cours</string>
+    <string name="widget_untitled">Nouvelle session</string>
+    <string name="widget_preview_server">Mon serveur · 1 en cours</string>
+    <string name="widget_preview_session">Corriger la redirection de connexion</string>
+    <string name="widget_preview_session_2">Ajouter le mode sombre aux paramètres</string>
 </resources>

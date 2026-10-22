@@ -65,6 +65,9 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     openSessionId: String? = null,
     onSessionOpened: () -> Unit = {},
+    /** Opens the new session sheet over the session list (widget button). */
+    openNewSession: Boolean = false,
+    onNewSessionOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -85,6 +88,15 @@ fun AppNavHost(
             popUpTo<SessionsDestination>()
         }
         onSessionOpened()
+    }
+
+    // Handed to the session list, which opens its sheet and clears it.
+    var pendingNewSession by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(openNewSession, hasActiveServer) {
+        if (!openNewSession || !hasActiveServer) return@LaunchedEffect
+        navController.popBackStack(SessionsDestination, inclusive = false)
+        pendingNewSession = true
+        onNewSessionOpened()
     }
 
     NavHost(navController = navController, startDestination = start, modifier = modifier) {
@@ -108,6 +120,8 @@ fun AppNavHost(
             SessionsListDetail(
                 onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
                 onOpenSettings = { navController.navigate(SettingsDestination) },
+                openNewSession = pendingNewSession,
+                onNewSessionOpened = { pendingNewSession = false },
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
             )
         }
@@ -148,17 +162,26 @@ private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenTerminal: (String) -> Unit,
+    openNewSession: Boolean,
+    onNewSessionOpened: () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth) {
-            SessionsRoute(onOpenChat = onOpenChatFullScreen, onOpenSettings = onOpenSettings)
+            SessionsRoute(
+                onOpenChat = onOpenChatFullScreen,
+                onOpenSettings = onOpenSettings,
+                openNewSession = openNewSession,
+                onNewSessionOpened = onNewSessionOpened,
+            )
         } else {
             Row(Modifier.fillMaxSize()) {
                 SessionsRoute(
                     onOpenChat = { selected = it },
                     onOpenSettings = onOpenSettings,
                     selectedSessionId = selected,
+                    openNewSession = openNewSession,
+                    onNewSessionOpened = onNewSessionOpened,
                     modifier = Modifier.width(ListPaneWidth).fillMaxHeight(),
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)

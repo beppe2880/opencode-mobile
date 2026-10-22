@@ -230,6 +230,37 @@ class SessionsViewModelTest {
         assertEquals(SessionsEffect.OpenChat("new"), vm.effect.first())
     }
 
+    @Test
+    fun `a new session sheet opened before the list loads gets the directory of the latest session`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        sessions.gate = gate
+        val vm = vm()
+        runCurrent()
+        vm.onEvent(SessionsEvent.StartNewSession)
+        runCurrent()
+        assertEquals("", vm.state.value.newSession!!.directory)
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `a directory typed before the list loads is kept`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        sessions.gate = gate
+        val vm = vm()
+        runCurrent()
+        vm.onEvent(SessionsEvent.StartNewSession)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("/tmp/x", custom = true))
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals("/tmp/x", vm.state.value.newSession!!.directory)
+    }
+
     private fun session(id: String, updated: Long) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
         agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = null,

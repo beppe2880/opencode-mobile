@@ -29,4 +29,21 @@
     <string name="notif_intro_text">Mientras una sesión está en curso, la app sigue conectada a tu servidor en segundo plano para avisarte cuando el agente necesita un permiso o una respuesta, y cuando termina. Puedes permitir o rechazar un cambio directamente desde la notificación.\n\nLas notificaciones llegan directamente de tu servidor, sin otros servicios de por medio. Puedes desactivarlas cuando quieras en Ajustes.</string>
     <string name="notif_intro_allow">Permitir</string>
     <string name="notif_intro_later">Ahora no</string>
+    <string name="widget_label">Sesiones de OpenCode</string>
+    <string name="widget_description">Sesiones en ejecución y recientes, y un botón para iniciar una nueva.</string>
+    <string name="widget_new_session">Nueva</string>
+    <string name="widget_refresh">Actualizar</string>
+    <string name="widget_not_connected">No conectado</string>
+    <string name="widget_no_server">Abre la app para conectarte a un servidor.</string>
+    <string name="widget_empty">Aún no hay sesiones. Toca Nueva para iniciar una.</string>
+    <string name="widget_offline">%1$s · sin conexión, mostrando sesiones guardadas</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d en ejecución</item>
+        <item quantity="other">%1$s · %2$d en ejecución</item>
+    </plurals>
+    <string name="widget_session_running">en ejecución</string>
+    <string name="widget_untitled">Nueva sesión</string>
+    <string name="widget_preview_server">Mi servidor · 1 en ejecución</string>
+    <string name="widget_preview_session">Corregir la redirección del inicio de sesión</string>
+    <string name="widget_preview_session_2">Añadir modo oscuro a los ajustes</string>
 </resources>

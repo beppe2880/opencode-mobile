@@ -29,4 +29,21 @@
     <string name="notif_intro_text">Mentre una sessione è in corso, l\'app resta connessa al tuo server in background per avvisarti quando l\'agente chiede un permesso o una risposta, e quando ha finito. Puoi consentire o rifiutare una modifica direttamente dalla notifica.\n\nLe notifiche arrivano direttamente dal tuo server, senza altri servizi in mezzo. Puoi disattivarle quando vuoi nelle Impostazioni.</string>
     <string name="notif_intro_allow">Consenti</string>
     <string name="notif_intro_later">Non ora</string>
+    <string name="widget_label">Sessioni OpenCode</string>
+    <string name="widget_description">Sessioni in esecuzione e recenti, e un pulsante per avviarne una nuova.</string>
+    <string name="widget_new_session">Nuova</string>
+    <string name="widget_refresh">Aggiorna</string>
+    <string name="widget_not_connected">Non connesso</string>
+    <string name="widget_no_server">Apri l\'app per connetterti a un server.</string>
+    <string name="widget_empty">Nessuna sessione ancora. Tocca Nuova per iniziarne una.</string>
+    <string name="widget_offline">%1$s · offline, sessioni salvate</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d in esecuzione</item>
+        <item quantity="other">%1$s · %2$d in esecuzione</item>
+    </plurals>
+    <string name="widget_session_running">in esecuzione</string>
+    <string name="widget_untitled">Nuova sessione</string>
+    <string name="widget_preview_server">Il mio server · 1 in esecuzione</string>
+    <string name="widget_preview_session">Correggi il reindirizzamento del login</string>
+    <string name="widget_preview_session_2">Aggiungi la modalità scura alle impostazioni</string>
 </resources>

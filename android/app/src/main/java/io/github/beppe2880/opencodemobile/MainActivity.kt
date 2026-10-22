@@ -33,20 +33,24 @@ class MainActivity : ComponentActivity() {
     private val servers: ServerRepository by inject()
     private val settings: SettingsRepository by inject()
 
-    /** Session to open, from a tapped notification; cleared once navigated. */
+    /** Session to open, from a tapped notification or widget; cleared once navigated. */
     private val sessionToOpen = MutableStateFlow<String?>(null)
+
+    /** The widget's new session button was tapped; cleared once the sheet is open. */
+    private val newSessionRequested = MutableStateFlow(false)
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) readSessionToOpen(intent)
+        if (savedInstanceState == null) readIntent(intent)
         keepSplashUntilLoaded()
         setContent {
             val appSettings by settings.settings.collectAsStateWithLifecycle()
             val loaded by servers.loaded.collectAsStateWithLifecycle()
             val activeServer by servers.activeServer.collectAsStateWithLifecycle()
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
+            val newSession by newSessionRequested.collectAsStateWithLifecycle()
             val dark = appSettings.theme.isDark()
             DisposableEffect(dark) {
                 val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
@@ -66,6 +70,8 @@ class MainActivity : ComponentActivity() {
                             hasActiveServer = activeServer != null,
                             openSessionId = openSession,
                             onSessionOpened = { sessionToOpen.value = null },
+                            openNewSession = newSession,
+                            onNewSessionOpened = { newSessionRequested.value = false },
                         )
                         if (activeServer != null && !appSettings.notificationsIntroShown) NotificationsIntro(settings)
                     }
@@ -76,18 +82,24 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        readSessionToOpen(intent)
+        readIntent(intent)
     }
 
     /** The launcher activity is exported: accept only a well-formed session id. */
-    private fun readSessionToOpen(intent: Intent?) {
-        val id = intent?.getStringExtra(EXTRA_SESSION_ID) ?: return
+    private fun readIntent(intent: Intent?) {
+        intent ?: return
+        if (intent.getBooleanExtra(EXTRA_NEW_SESSION, false)) {
+            intent.removeExtra(EXTRA_NEW_SESSION)
+            newSessionRequested.value = true
+        }
+        val id = intent.getStringExtra(EXTRA_SESSION_ID) ?: return
         intent.removeExtra(EXTRA_SESSION_ID)
         if (SESSION_ID.matches(id)) sessionToOpen.value = id
     }
 
     companion object {
         const val EXTRA_SESSION_ID = "io.github.beppe2880.opencodemobile.extra.SESSION_ID"
+        const val EXTRA_NEW_SESSION = "io.github.beppe2880.opencodemobile.extra.NEW_SESSION"
         private val SESSION_ID = Regex("ses_[A-Za-z0-9]{1,64}")
     }
 

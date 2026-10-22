@@ -28,4 +28,22 @@
     <string name="notif_intro_text">While a session runs, the app stays connected to your server in the background to tell you when the agent needs a permission or an answer, and when it finishes. You can allow or reject an edit right from the notification.\n\nNotifications come straight from your server, with no other service in between. You can turn them off anytime in Settings.</string>
     <string name="notif_intro_allow">Allow</string>
     <string name="notif_intro_later">Not now</string>
+    <string name="widget_title" translatable="false">OpenCode</string>
+    <string name="widget_label">OpenCode sessions</string>
+    <string name="widget_description">Running and recent sessions, and a button to start a new one.</string>
+    <string name="widget_new_session">New</string>
+    <string name="widget_refresh">Refresh</string>
+    <string name="widget_not_connected">Not connected</string>
+    <string name="widget_no_server">Open the app to connect to a server.</string>
+    <string name="widget_empty">No sessions yet. Tap New to start one.</string>
+    <string name="widget_offline">%1$s · offline, showing saved sessions</string>
+    <plurals name="widget_running">
+        <item quantity="one">%1$s · %2$d running</item>
+        <item quantity="other">%1$s · %2$d running</item>
+    </plurals>
+    <string name="widget_session_running">running</string>
+    <string name="widget_untitled">New session</string>
+    <string name="widget_preview_server">My server · 1 running</string>
+    <string name="widget_preview_session">Fix the login redirect</string>
+    <string name="widget_preview_session_2">Add dark mode to settings</string>
 </resources>

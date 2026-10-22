@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="oc_bg_deep">#080808</color>
+    <color name="oc_widget_bg">#161616</color>
+    <color name="oc_widget_surface">#2E2E2E</color>
+    <color name="oc_widget_text">#FAFAFA</color>
+    <color name="oc_widget_muted">#AEAEAE</color>
 </resources>

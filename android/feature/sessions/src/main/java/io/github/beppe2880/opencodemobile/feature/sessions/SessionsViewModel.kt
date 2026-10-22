@@ -182,6 +182,7 @@ class SessionsViewModel(
                             error = null,
                         )
                     }
+                    fillNewSessionDirectory()
                     prefetch(list)
                 },
                 onFailure = { error ->
@@ -208,6 +209,7 @@ class SessionsViewModel(
         if (cached == null) return
         sessionList = cached
         updateState { it.copy(groups = group(cached), loading = false, error = null) }
+        fillNewSessionDirectory()
     }
 
     private fun loadProjects(cachedFirst: Boolean = false) {
@@ -217,10 +219,12 @@ class SessionsViewModel(
             if (cachedFirst && id != null) {
                 sessions.cachedProjects(id)?.let { projects ->
                     updateState { it.copy(projects = projects.sortedByDescending { p -> p.updatedAt }) }
+                    fillNewSessionDirectory()
                 }
             }
             sessions.projects().onSuccess { projects ->
                 updateState { it.copy(projects = projects.sortedByDescending { p -> p.updatedAt }) }
+                fillNewSessionDirectory()
             }
         }
     }
@@ -295,6 +299,20 @@ class SessionsViewModel(
                 )
             }
         }
+    }
+
+    /**
+     * The sheet can open before anything is loaded (the widget's button at a cold start): once
+     * sessions or projects arrive, it gets the directory it would have started with.
+     */
+    private fun fillNewSessionDirectory() {
+        val new = currentState.newSession ?: return
+        if (new.directory.isNotBlank() || new.customDirectory) return
+        val directory = currentState.directoryFilter
+            ?: sessionList.firstOrNull()?.directory
+            ?: currentState.projects.firstOrNull()?.directory
+            ?: return
+        updateNew { it.copy(directory = directory) }
     }
 
     private fun create() {

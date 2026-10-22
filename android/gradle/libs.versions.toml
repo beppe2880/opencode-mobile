@@ -17,6 +17,7 @@ navigationCompose = "2.10.2"
 securityCrypto = "1.1.0"
 camerax = "1.4.2"
 room = "2.8.5"
+glance = "1.2.0"
 
 # ---- DI ----
 koin = "4.2.2"
@@ -49,6 +50,7 @@ androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", 
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 # ---- Compose ----
