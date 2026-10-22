@@ -278,6 +278,11 @@ data class AppSettings(
     val notifyFinished: Boolean = true,
     /** The one-time explanation of notifications, shown once a server is connected, was answered. */
     val notificationsIntroShown: Boolean = false,
+    /**
+     * Rows of the key bar above the keyboard in the terminal, as key specs owned by the terminal
+     * screen; null for its default layout.
+     */
+    val terminalKeys: List<List<String>>? = null,
 )
 
 interface SettingsRepository {

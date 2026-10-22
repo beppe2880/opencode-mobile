@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_error_title">Impossible d’ouvrir le terminal</string>
+    <string name="terminal_reconnecting">Connexion perdue, reconnexion…</string>
+    <string name="terminal_exited">Le shell s’est arrêté.</string>
+    <string name="terminal_new">Nouveau terminal</string>
+    <string name="terminal_close">Fermer le terminal</string>
+    <string name="terminal_close_title">Fermer ce terminal ?</string>
+    <string name="terminal_close_message">Le shell et tout ce qui s’exécute encore dedans seront arrêtés sur le serveur.</string>
+    <string name="terminal_close_confirm">Fermer</string>
+    <string name="terminal_key_escape">Échap</string>
+    <string name="terminal_key_enter">Entrée</string>
+    <string name="terminal_key_backspace">Retour arrière</string>
+    <string name="terminal_key_paste">Coller</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Flèche gauche</string>
+    <string name="terminal_key_down">Flèche bas</string>
+    <string name="terminal_key_up">Flèche haut</string>
+    <string name="terminal_key_right">Flèche droite</string>
+    <string name="terminal_key_home">Début</string>
+    <string name="terminal_key_end">Fin</string>
+    <string name="terminal_key_page_up">Page précédente</string>
+    <string name="terminal_key_page_down">Page suivante</string>
+    <string name="terminal_modifier_off">Désactivé</string>
+    <string name="terminal_modifier_once">Activé pour la touche suivante</string>
+    <string name="terminal_modifier_locked">Verrouillé</string>
+    <string name="terminal_keys_edit">Modifier les touches</string>
+    <string name="terminal_keys_title">Barre de touches</string>
+    <string name="terminal_keys_hint">Appuie sur une touche pour la déplacer ou la retirer. Ctrl, Alt et Maj : appuie une fois pour la touche suivante, deux fois pour les garder activées.</string>
+    <string name="terminal_keys_row">Ligne %1$d</string>
+    <string name="terminal_keys_add_to_row">Ajouter une touche à la ligne %1$d</string>
+    <string name="terminal_keys_pick">Appuie sur les touches à ajouter :</string>
+    <string name="terminal_keys_move_left">Déplacer à gauche</string>
+    <string name="terminal_keys_move_right">Déplacer à droite</string>
+    <string name="terminal_keys_other_row">Déplacer vers l’autre ligne</string>
+    <string name="terminal_keys_remove">Retirer la touche</string>
+    <string name="terminal_keys_custom">Touche personnalisée</string>
+    <string name="terminal_keys_custom_label">Libellé</string>
+    <string name="terminal_keys_custom_text">Envoie</string>
+    <string name="terminal_keys_custom_text_hint">\\e Échap, \\r Entrée, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Ajouter</string>
+    <string name="terminal_keys_cancel">Annuler</string>
+    <string name="terminal_keys_reset">Rétablir les valeurs par défaut</string>
+    <string name="terminal_keys_done">OK</string>
+</resources>

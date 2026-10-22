@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.SessionsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageViewModel
+import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitorService
@@ -32,6 +33,7 @@ val appModule = module {
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
+    viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
 
     single { AndroidMonitorNotifier(androidContext()) }
     single {

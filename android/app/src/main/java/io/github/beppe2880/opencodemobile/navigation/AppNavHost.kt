@@ -34,6 +34,7 @@ import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
+import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -50,6 +51,9 @@ data object SettingsDestination
 
 @Serializable
 data object UsageDestination
+
+@Serializable
+data class TerminalDestination(val directory: String)
 
 /** Width at which Sessions and Chat are shown side by side. */
 private val ListDetailMinWidth = 840.dp
@@ -104,6 +108,7 @@ fun AppNavHost(
             SessionsListDetail(
                 onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
                 onOpenSettings = { navController.navigate(SettingsDestination) },
+                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
             )
         }
         composable<ChatDestination> { entry ->
@@ -112,6 +117,7 @@ fun AppNavHost(
                 sessionId = args.sessionId,
                 onBack = { navController.popBackStack() },
                 onOpenSession = { navController.navigate(ChatDestination(it)) },
+                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
                 onSwitchSession = {
                     // Replaces this chat, so Back still returns to the session list.
                     navController.navigate(ChatDestination(it)) {
@@ -130,6 +136,9 @@ fun AppNavHost(
         composable<UsageDestination> {
             UsageRoute(onBack = { navController.popBackStack() })
         }
+        composable<TerminalDestination> { entry ->
+            TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })
+        }
     }
 }
 
@@ -138,6 +147,7 @@ fun AppNavHost(
 private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenTerminal: (String) -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -159,6 +169,7 @@ private fun SessionsListDetail(
                         onBack = { selected = null },
                         showBack = false,
                         onOpenSession = onOpenChatFullScreen,
+                        onOpenTerminal = onOpenTerminal,
                         onSwitchSession = { selected = it },
                         modifier = Modifier.weight(1f),
                     )

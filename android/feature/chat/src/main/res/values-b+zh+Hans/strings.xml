@@ -38,6 +38,7 @@
     </plurals>
     <string name="chat_changes">变更</string>
     <string name="chat_changes_open">显示已更改的文件</string>
+    <string name="chat_terminal_open">打开终端</string>
     <string name="chat_changes_session">整个会话</string>
     <string name="chat_changes_last_turn">最近一轮</string>
     <plurals name="chat_changes_files">

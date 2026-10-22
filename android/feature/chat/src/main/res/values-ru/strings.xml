@@ -47,6 +47,7 @@
     </plurals>
     <string name="chat_changes">Изменения</string>
     <string name="chat_changes_open">Показать изменённые файлы</string>
+    <string name="chat_terminal_open">Открыть терминал</string>
     <string name="chat_changes_session">Вся сессия</string>
     <string name="chat_changes_last_turn">Последний ход</string>
     <plurals name="chat_changes_files">

@@ -38,6 +38,7 @@
     </plurals>
     <string name="chat_changes">変更</string>
     <string name="chat_changes_open">変更されたファイルを表示</string>
+    <string name="chat_terminal_open">ターミナルを開く</string>
     <string name="chat_changes_session">セッション全体</string>
     <string name="chat_changes_last_turn">直近のターン</string>
     <plurals name="chat_changes_files">

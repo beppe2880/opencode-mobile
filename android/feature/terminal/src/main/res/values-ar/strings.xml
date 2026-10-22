@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">الطرفية</string>
+    <string name="terminal_error_title">تعذّر فتح الطرفية</string>
+    <string name="terminal_reconnecting">فُقد الاتصال، جارٍ إعادة الاتصال…</string>
+    <string name="terminal_exited">انتهت الصدفة.</string>
+    <string name="terminal_new">طرفية جديدة</string>
+    <string name="terminal_close">إغلاق الطرفية</string>
+    <string name="terminal_close_title">إغلاق هذه الطرفية؟</string>
+    <string name="terminal_close_message">ستُوقف الصدفة وأي شيء لا يزال يعمل فيها على الخادم.</string>
+    <string name="terminal_close_confirm">إغلاق</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">إدخال</string>
+    <string name="terminal_key_backspace">حذف للخلف</string>
+    <string name="terminal_key_paste">لصق</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">السهم الأيسر</string>
+    <string name="terminal_key_down">السهم لأسفل</string>
+    <string name="terminal_key_up">السهم لأعلى</string>
+    <string name="terminal_key_right">السهم الأيمن</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page Up</string>
+    <string name="terminal_key_page_down">Page Down</string>
+    <string name="terminal_modifier_off">إيقاف</string>
+    <string name="terminal_modifier_once">مفعّل للمفتاح التالي</string>
+    <string name="terminal_modifier_locked">مفعّل ومقفل</string>
+    <string name="terminal_keys_edit">تعديل المفاتيح</string>
+    <string name="terminal_keys_title">شريط المفاتيح</string>
+    <string name="terminal_keys_hint">اضغط على مفتاح لنقله أو إزالته. Ctrl وAlt وShift: اضغط مرة للمفتاح التالي، ومرتين للإبقاء عليه مفعّلاً.</string>
+    <string name="terminal_keys_row">الصف %1$d</string>
+    <string name="terminal_keys_add_to_row">إضافة مفتاح إلى الصف %1$d</string>
+    <string name="terminal_keys_pick">اضغط على المفاتيح التي تريد إضافتها:</string>
+    <string name="terminal_keys_move_left">نقل لليسار</string>
+    <string name="terminal_keys_move_right">نقل لليمين</string>
+    <string name="terminal_keys_other_row">نقل إلى الصف الآخر</string>
+    <string name="terminal_keys_remove">إزالة المفتاح</string>
+    <string name="terminal_keys_custom">مفتاح مخصص</string>
+    <string name="terminal_keys_custom_label">التسمية</string>
+    <string name="terminal_keys_custom_text">يرسل</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc، \\r إدخال، \\t Tab، ^C Ctrl+C</string>
+    <string name="terminal_keys_add">إضافة</string>
+    <string name="terminal_keys_cancel">إلغاء</string>
+    <string name="terminal_keys_reset">استعادة الافتراضي</string>
+    <string name="terminal_keys_done">تم</string>
+</resources>

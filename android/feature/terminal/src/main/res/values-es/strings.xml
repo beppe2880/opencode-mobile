@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_error_title">No se pudo abrir la terminal</string>
+    <string name="terminal_reconnecting">Se perdió la conexión, reconectando…</string>
+    <string name="terminal_exited">La shell se ha cerrado.</string>
+    <string name="terminal_new">Nueva terminal</string>
+    <string name="terminal_close">Cerrar terminal</string>
+    <string name="terminal_close_title">¿Cerrar esta terminal?</string>
+    <string name="terminal_close_message">La shell y todo lo que siga ejecutándose en ella se detendrán en el servidor.</string>
+    <string name="terminal_close_confirm">Cerrar</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">Intro</string>
+    <string name="terminal_key_backspace">Retroceso</string>
+    <string name="terminal_key_paste">Pegar</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Flecha izquierda</string>
+    <string name="terminal_key_down">Flecha abajo</string>
+    <string name="terminal_key_up">Flecha arriba</string>
+    <string name="terminal_key_right">Flecha derecha</string>
+    <string name="terminal_key_home">Inicio</string>
+    <string name="terminal_key_end">Fin</string>
+    <string name="terminal_key_page_up">Re Pág</string>
+    <string name="terminal_key_page_down">Av Pág</string>
+    <string name="terminal_modifier_off">Desactivado</string>
+    <string name="terminal_modifier_once">Activado para la siguiente tecla</string>
+    <string name="terminal_modifier_locked">Bloqueado activado</string>
+    <string name="terminal_keys_edit">Editar teclas</string>
+    <string name="terminal_keys_title">Barra de teclas</string>
+    <string name="terminal_keys_hint">Toca una tecla para moverla o quitarla. Ctrl, Alt y Mayús: toca una vez para la siguiente tecla, dos veces para mantenerlas activas.</string>
+    <string name="terminal_keys_row">Fila %1$d</string>
+    <string name="terminal_keys_add_to_row">Añadir una tecla a la fila %1$d</string>
+    <string name="terminal_keys_pick">Toca las teclas que quieras añadir:</string>
+    <string name="terminal_keys_move_left">Mover a la izquierda</string>
+    <string name="terminal_keys_move_right">Mover a la derecha</string>
+    <string name="terminal_keys_other_row">Mover a la otra fila</string>
+    <string name="terminal_keys_remove">Quitar tecla</string>
+    <string name="terminal_keys_custom">Tecla personalizada</string>
+    <string name="terminal_keys_custom_label">Etiqueta</string>
+    <string name="terminal_keys_custom_text">Envía</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc, \\r Intro, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Añadir</string>
+    <string name="terminal_keys_cancel">Cancelar</string>
+    <string name="terminal_keys_reset">Restablecer</string>
+    <string name="terminal_keys_done">Listo</string>
+</resources>

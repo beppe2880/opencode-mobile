@@ -113,6 +113,7 @@ dependencies {
     implementation(project(":feature:sessions"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:terminal"))
     // Link parsing for the in-memory fake data module.
     debugImplementation(project(":core:network"))
 

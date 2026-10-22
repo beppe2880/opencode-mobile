@@ -22,7 +22,7 @@ pinned to JDK 21. There are no product flavors; build types are `debug`
 ## Module Graph
 
 ```text
-app -> feature:{connect,sessions,chat,settings} -> core:{ui,mvi,domain}
+app -> feature:{connect,sessions,chat,settings,terminal} -> core:{ui,mvi,domain}
 app -> core:data -> core:network -> core:api (generated)
 core:data, core:network, core:ui -> core:domain
 ```

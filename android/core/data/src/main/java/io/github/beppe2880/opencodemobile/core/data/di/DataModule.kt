@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
+import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
@@ -31,6 +32,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,6 +82,7 @@ val dataModule = module {
     single<SessionRepository> { RemoteSessionRepository(get(), get()) }
     single<ChatRepository> { RemoteChatRepository(get(), get()) }
     single<CatalogRepository> { RemoteCatalogRepository(get()) }
+    single<TerminalRepository> { RemoteTerminalRepository(get()) }
     single<SettingsRepository> {
         PreferencesSettingsRepository(androidContext().getSharedPreferences("settings", Context.MODE_PRIVATE))
     }

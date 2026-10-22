@@ -41,6 +41,7 @@
     </plurals>
     <string name="chat_changes">Cambios</string>
     <string name="chat_changes_open">Mostrar archivos modificados</string>
+    <string name="chat_terminal_open">Abrir terminal</string>
     <string name="chat_changes_session">Sesión completa</string>
     <string name="chat_changes_last_turn">Último turno</string>
     <plurals name="chat_changes_files">

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">터미널</string>
+    <string name="terminal_error_title">터미널을 열 수 없습니다</string>
+    <string name="terminal_reconnecting">연결이 끊겼습니다. 다시 연결하는 중…</string>
+    <string name="terminal_exited">셸이 종료되었습니다.</string>
+    <string name="terminal_new">새 터미널</string>
+    <string name="terminal_close">터미널 닫기</string>
+    <string name="terminal_close_title">이 터미널을 닫으시겠습니까?</string>
+    <string name="terminal_close_message">셸과 셸에서 실행 중인 모든 작업이 서버에서 중지됩니다.</string>
+    <string name="terminal_close_confirm">닫기</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">엔터</string>
+    <string name="terminal_key_backspace">백스페이스</string>
+    <string name="terminal_key_paste">붙여넣기</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">왼쪽 화살표</string>
+    <string name="terminal_key_down">아래쪽 화살표</string>
+    <string name="terminal_key_up">위쪽 화살표</string>
+    <string name="terminal_key_right">오른쪽 화살표</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page Up</string>
+    <string name="terminal_key_page_down">Page Down</string>
+    <string name="terminal_modifier_off">끔</string>
+    <string name="terminal_modifier_once">다음 키에만 켜짐</string>
+    <string name="terminal_modifier_locked">고정하여 켜짐</string>
+    <string name="terminal_keys_edit">키 편집</string>
+    <string name="terminal_keys_title">키 바</string>
+    <string name="terminal_keys_hint">키를 탭하면 이동하거나 제거할 수 있습니다. Ctrl, Alt, Shift: 한 번 탭하면 다음 키에 적용, 두 번 탭하면 계속 켜 둡니다.</string>
+    <string name="terminal_keys_row">%1$d번 줄</string>
+    <string name="terminal_keys_add_to_row">%1$d번 줄에 키 추가</string>
+    <string name="terminal_keys_pick">추가할 키를 탭하세요:</string>
+    <string name="terminal_keys_move_left">왼쪽으로 이동</string>
+    <string name="terminal_keys_move_right">오른쪽으로 이동</string>
+    <string name="terminal_keys_other_row">다른 줄로 이동</string>
+    <string name="terminal_keys_remove">키 제거</string>
+    <string name="terminal_keys_custom">사용자 지정 키</string>
+    <string name="terminal_keys_custom_label">레이블</string>
+    <string name="terminal_keys_custom_text">전송</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc, \\r 엔터, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">추가</string>
+    <string name="terminal_keys_cancel">취소</string>
+    <string name="terminal_keys_reset">기본값으로 재설정</string>
+    <string name="terminal_keys_done">완료</string>
+</resources>

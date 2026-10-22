@@ -53,6 +53,7 @@
     </plurals>
     <string name="chat_changes">التغييرات</string>
     <string name="chat_changes_open">عرض الملفات المعدّلة</string>
+    <string name="chat_terminal_open">فتح الطرفية</string>
     <string name="chat_changes_session">الجلسة كاملة</string>
     <string name="chat_changes_last_turn">الدورة الأخيرة</string>
     <plurals name="chat_changes_files">

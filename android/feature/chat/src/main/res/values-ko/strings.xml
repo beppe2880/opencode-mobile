@@ -38,6 +38,7 @@
     </plurals>
     <string name="chat_changes">변경 사항</string>
     <string name="chat_changes_open">변경된 파일 표시</string>
+    <string name="chat_terminal_open">터미널 열기</string>
     <string name="chat_changes_session">전체 세션</string>
     <string name="chat_changes_last_turn">마지막 턴</string>
     <plurals name="chat_changes_files">

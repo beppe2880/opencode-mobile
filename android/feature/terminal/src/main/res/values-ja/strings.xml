@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">ターミナル</string>
+    <string name="terminal_error_title">ターミナルを開けませんでした</string>
+    <string name="terminal_reconnecting">接続が切れました。再接続しています…</string>
+    <string name="terminal_exited">シェルが終了しました。</string>
+    <string name="terminal_new">新しいターミナル</string>
+    <string name="terminal_close">ターミナルを閉じる</string>
+    <string name="terminal_close_title">このターミナルを閉じますか？</string>
+    <string name="terminal_close_message">シェルと実行中の処理は、サーバー上で停止されます。</string>
+    <string name="terminal_close_confirm">閉じる</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">Enter</string>
+    <string name="terminal_key_backspace">Backspace</string>
+    <string name="terminal_key_paste">貼り付け</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">左矢印</string>
+    <string name="terminal_key_down">下矢印</string>
+    <string name="terminal_key_up">上矢印</string>
+    <string name="terminal_key_right">右矢印</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page Up</string>
+    <string name="terminal_key_page_down">Page Down</string>
+    <string name="terminal_modifier_off">オフ</string>
+    <string name="terminal_modifier_once">次のキーのみオン</string>
+    <string name="terminal_modifier_locked">ロックオン</string>
+    <string name="terminal_keys_edit">キーを編集</string>
+    <string name="terminal_keys_title">キーバー</string>
+    <string name="terminal_keys_hint">キーをタップすると移動または削除できます。Ctrl、Alt、Shift は1回タップで次のキーに適用、2回タップでオンのまま維持します。</string>
+    <string name="terminal_keys_row">行 %1$d</string>
+    <string name="terminal_keys_add_to_row">行 %1$d にキーを追加</string>
+    <string name="terminal_keys_pick">追加するキーをタップ:</string>
+    <string name="terminal_keys_move_left">左へ移動</string>
+    <string name="terminal_keys_move_right">右へ移動</string>
+    <string name="terminal_keys_other_row">もう一方の行へ移動</string>
+    <string name="terminal_keys_remove">キーを削除</string>
+    <string name="terminal_keys_custom">カスタムキー</string>
+    <string name="terminal_keys_custom_label">ラベル</string>
+    <string name="terminal_keys_custom_text">送信内容</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc、\\r Enter、\\t Tab、^C Ctrl+C</string>
+    <string name="terminal_keys_add">追加</string>
+    <string name="terminal_keys_cancel">キャンセル</string>
+    <string name="terminal_keys_reset">初期設定に戻す</string>
+    <string name="terminal_keys_done">完了</string>
+</resources>

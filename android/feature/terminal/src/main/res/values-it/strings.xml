@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminale</string>
+    <string name="terminal_error_title">Impossibile aprire il terminale</string>
+    <string name="terminal_reconnecting">Connessione persa, riconnessione in corso…</string>
+    <string name="terminal_exited">La shell si è chiusa.</string>
+    <string name="terminal_new">Nuovo terminale</string>
+    <string name="terminal_close">Chiudi terminale</string>
+    <string name="terminal_close_title">Chiudere questo terminale?</string>
+    <string name="terminal_close_message">La shell e tutto ciò che è ancora in esecuzione al suo interno verranno interrotti sul server.</string>
+    <string name="terminal_close_confirm">Chiudi</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">Invio</string>
+    <string name="terminal_key_backspace">Backspace</string>
+    <string name="terminal_key_paste">Incolla</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Freccia sinistra</string>
+    <string name="terminal_key_down">Freccia giù</string>
+    <string name="terminal_key_up">Freccia su</string>
+    <string name="terminal_key_right">Freccia destra</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">Fine</string>
+    <string name="terminal_key_page_up">Pagina su</string>
+    <string name="terminal_key_page_down">Pagina giù</string>
+    <string name="terminal_modifier_off">Disattivato</string>
+    <string name="terminal_modifier_once">Attivo per il tasto successivo</string>
+    <string name="terminal_modifier_locked">Bloccato attivo</string>
+    <string name="terminal_keys_edit">Modifica tasti</string>
+    <string name="terminal_keys_title">Barra dei tasti</string>
+    <string name="terminal_keys_hint">Tocca un tasto per spostarlo o rimuoverlo. Ctrl, Alt e Maiusc: tocca una volta per il tasto successivo, due volte per tenerli attivi.</string>
+    <string name="terminal_keys_row">Riga %1$d</string>
+    <string name="terminal_keys_add_to_row">Aggiungi un tasto alla riga %1$d</string>
+    <string name="terminal_keys_pick">Tocca i tasti da aggiungere:</string>
+    <string name="terminal_keys_move_left">Sposta a sinistra</string>
+    <string name="terminal_keys_move_right">Sposta a destra</string>
+    <string name="terminal_keys_other_row">Sposta nell’altra riga</string>
+    <string name="terminal_keys_remove">Rimuovi tasto</string>
+    <string name="terminal_keys_custom">Tasto personalizzato</string>
+    <string name="terminal_keys_custom_label">Etichetta</string>
+    <string name="terminal_keys_custom_text">Invia</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc, \\r Invio, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Aggiungi</string>
+    <string name="terminal_keys_cancel">Annulla</string>
+    <string name="terminal_keys_reset">Ripristina predefiniti</string>
+    <string name="terminal_keys_done">Fine</string>
+</resources>

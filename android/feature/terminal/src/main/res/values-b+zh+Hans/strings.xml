@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">终端</string>
+    <string name="terminal_error_title">无法打开终端</string>
+    <string name="terminal_reconnecting">连接已断开，正在重新连接…</string>
+    <string name="terminal_exited">Shell 已退出。</string>
+    <string name="terminal_new">新建终端</string>
+    <string name="terminal_close">关闭终端</string>
+    <string name="terminal_close_title">关闭此终端？</string>
+    <string name="terminal_close_message">服务器上将停止该 Shell 及其中仍在运行的所有内容。</string>
+    <string name="terminal_close_confirm">关闭</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">回车</string>
+    <string name="terminal_key_backspace">退格</string>
+    <string name="terminal_key_paste">粘贴</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">左方向键</string>
+    <string name="terminal_key_down">下方向键</string>
+    <string name="terminal_key_up">上方向键</string>
+    <string name="terminal_key_right">右方向键</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page Up</string>
+    <string name="terminal_key_page_down">Page Down</string>
+    <string name="terminal_modifier_off">关闭</string>
+    <string name="terminal_modifier_once">仅对下一个按键生效</string>
+    <string name="terminal_modifier_locked">已锁定开启</string>
+    <string name="terminal_keys_edit">编辑按键</string>
+    <string name="terminal_keys_title">按键栏</string>
+    <string name="terminal_keys_hint">点按按键可移动或移除。Ctrl、Alt 和 Shift：点按一次作用于下一个按键，点按两次保持开启。</string>
+    <string name="terminal_keys_row">第 %1$d 行</string>
+    <string name="terminal_keys_add_to_row">向第 %1$d 行添加按键</string>
+    <string name="terminal_keys_pick">点按要添加的按键：</string>
+    <string name="terminal_keys_move_left">左移</string>
+    <string name="terminal_keys_move_right">右移</string>
+    <string name="terminal_keys_other_row">移到另一行</string>
+    <string name="terminal_keys_remove">移除按键</string>
+    <string name="terminal_keys_custom">自定义按键</string>
+    <string name="terminal_keys_custom_label">标签</string>
+    <string name="terminal_keys_custom_text">发送</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc、\\r 回车、\\t Tab、^C Ctrl+C</string>
+    <string name="terminal_keys_add">添加</string>
+    <string name="terminal_keys_cancel">取消</string>
+    <string name="terminal_keys_reset">恢复默认</string>
+    <string name="terminal_keys_done">完成</string>
+</resources>

@@ -37,6 +37,8 @@ fun ChatRoute(
     onOpenSession: (String) -> Unit = {},
     /** Replaces this chat with another session of the list (swipe). */
     onSwitchSession: (String) -> Unit = {},
+    /** Opens a shell in the folder of the session. */
+    onOpenTerminal: (String) -> Unit = {},
 ) {
     val viewModel: ChatViewModel = koinViewModel(key = "chat-$sessionId") { parametersOf(sessionId) }
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -92,6 +94,7 @@ fun ChatRoute(
             }
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)
             is ChatEffect.SwitchSession -> onSwitchSession(effect.sessionId)
+            is ChatEffect.OpenTerminal -> onOpenTerminal(effect.directory)
         }
     }
 

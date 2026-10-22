@@ -33,6 +33,7 @@ repository boundaries.
 | `:feature:sessions` | Session list, search, project filter, create/rename/delete |
 | `:feature:chat` | Live transcript, composer, agent/model pickers, permissions, interrupt |
 | `:feature:settings` | Servers, theme, display preferences, about |
+| `:feature:terminal` | Server shell over the PTY WebSocket (ConnectBot termlib), configurable key bar |
 | `:core:ui` | `OcTheme` tokens, typography (Inter, IBM Plex Mono), `Oc*` components, Markdown |
 | `:core:mvi` | `BaseViewModel`, `CollectEffect`, `OptimisticState` |
 | `:core:domain` | UI-facing models, repository interfaces, `TranscriptReducer` |

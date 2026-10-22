@@ -190,6 +190,7 @@ sealed interface ChatEvent {
     data class Fork(val messageId: String) : ChatEvent
 
     data object OpenChanges : ChatEvent
+    data object OpenTerminal : ChatEvent
     data object CloseChanges : ChatEvent
 
     /** Shows another range in the open changes sheet, or reloads the current one. */
@@ -209,4 +210,5 @@ sealed interface ChatEffect {
     data object PromptSent : ChatEffect
     data class OpenSession(val sessionId: String) : ChatEffect
     data class SwitchSession(val sessionId: String) : ChatEffect
+    data class OpenTerminal(val directory: String) : ChatEffect
 }

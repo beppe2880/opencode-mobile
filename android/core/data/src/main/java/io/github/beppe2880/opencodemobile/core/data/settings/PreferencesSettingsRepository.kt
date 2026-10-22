@@ -7,6 +7,9 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 
 /** Non-sensitive UI preferences. Unknown stored values fall back to [AppSettings] defaults. */
 internal class PreferencesSettingsRepository(private val prefs: SharedPreferences) : SettingsRepository {
@@ -31,6 +34,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_NOTIFY_QUESTIONS, next.notifyQuestions)
             .putBoolean(KEY_NOTIFY_FINISHED, next.notifyFinished)
             .putBoolean(KEY_NOTIFICATIONS_INTRO, next.notificationsIntroShown)
+            .putString(KEY_TERMINAL_KEYS, next.terminalKeys?.let { Json.encodeToString(KeyRows, it) })
             .apply()
     }
 
@@ -50,6 +54,13 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             notifyQuestions = prefs.getBoolean(KEY_NOTIFY_QUESTIONS, defaults.notifyQuestions),
             notifyFinished = prefs.getBoolean(KEY_NOTIFY_FINISHED, defaults.notifyFinished),
             notificationsIntroShown = prefs.getBoolean(KEY_NOTIFICATIONS_INTRO, defaults.notificationsIntroShown),
+            terminalKeys = prefs.getString(KEY_TERMINAL_KEYS, null)?.let { stored ->
+                try {
+                    Json.decodeFromString(KeyRows, stored)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            },
         )
     }
 
@@ -67,5 +78,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_NOTIFY_QUESTIONS = "notify_questions"
         const val KEY_NOTIFY_FINISHED = "notify_finished"
         const val KEY_NOTIFICATIONS_INTRO = "notifications_intro_shown"
+        const val KEY_TERMINAL_KEYS = "terminal_keys"
+        val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }

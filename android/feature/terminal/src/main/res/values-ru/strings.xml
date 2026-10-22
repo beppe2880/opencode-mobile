@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Терминал</string>
+    <string name="terminal_error_title">Не удалось открыть терминал</string>
+    <string name="terminal_reconnecting">Соединение потеряно, повторное подключение…</string>
+    <string name="terminal_exited">Оболочка завершила работу.</string>
+    <string name="terminal_new">Новый терминал</string>
+    <string name="terminal_close">Закрыть терминал</string>
+    <string name="terminal_close_title">Закрыть этот терминал?</string>
+    <string name="terminal_close_message">Оболочка и все процессы, запущенные в ней, будут остановлены на сервере.</string>
+    <string name="terminal_close_confirm">Закрыть</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">Enter</string>
+    <string name="terminal_key_backspace">Backspace</string>
+    <string name="terminal_key_paste">Вставить</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Стрелка влево</string>
+    <string name="terminal_key_down">Стрелка вниз</string>
+    <string name="terminal_key_up">Стрелка вверх</string>
+    <string name="terminal_key_right">Стрелка вправо</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page Up</string>
+    <string name="terminal_key_page_down">Page Down</string>
+    <string name="terminal_modifier_off">Выкл.</string>
+    <string name="terminal_modifier_once">Включено для следующей клавиши</string>
+    <string name="terminal_modifier_locked">Включено и закреплено</string>
+    <string name="terminal_keys_edit">Изменить клавиши</string>
+    <string name="terminal_keys_title">Панель клавиш</string>
+    <string name="terminal_keys_hint">Нажмите клавишу, чтобы переместить или удалить её. Ctrl, Alt и Shift: нажмите один раз для следующей клавиши, дважды — чтобы держать включённой.</string>
+    <string name="terminal_keys_row">Ряд %1$d</string>
+    <string name="terminal_keys_add_to_row">Добавить клавишу в ряд %1$d</string>
+    <string name="terminal_keys_pick">Нажмите клавиши, которые нужно добавить:</string>
+    <string name="terminal_keys_move_left">Переместить влево</string>
+    <string name="terminal_keys_move_right">Переместить вправо</string>
+    <string name="terminal_keys_other_row">Переместить в другой ряд</string>
+    <string name="terminal_keys_remove">Удалить клавишу</string>
+    <string name="terminal_keys_custom">Своя клавиша</string>
+    <string name="terminal_keys_custom_label">Надпись</string>
+    <string name="terminal_keys_custom_text">Отправляет</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc, \\r Enter, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Добавить</string>
+    <string name="terminal_keys_cancel">Отмена</string>
+    <string name="terminal_keys_reset">Сбросить по умолчанию</string>
+    <string name="terminal_keys_done">Готово</string>
+</resources>

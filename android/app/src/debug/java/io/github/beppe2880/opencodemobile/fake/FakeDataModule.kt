@@ -37,6 +37,10 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.TerminalInfo
+import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
+import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
+import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
@@ -82,6 +86,7 @@ val fakeDataModule = module {
     single<CatalogRepository> { FakeCatalog() }
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
+    single<TerminalRepository> { FakeTerminals() }
 }
 
 private const val LATENCY = 350L
@@ -449,5 +454,20 @@ internal class FakeSettings : SettingsRepository {
     override val settings: StateFlow<AppSettings> = _settings.asStateFlow()
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         _settings.value = transform(_settings.value)
+    }
+}
+
+/** A terminal that echoes what is typed, like a shell without commands. */
+internal class FakeTerminals : TerminalRepository {
+    override suspend fun open(directory: String) = Result.success(TerminalInfo(id = "pty_fake", title = "Terminal 1", running = true))
+
+    override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int) = Result.success(Unit)
+
+    override suspend fun close(directory: String, terminalId: String) = Result.success(Unit)
+
+    override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate> = flow {
+        emit(TerminalUpdate.Link(TerminalLink.Connected))
+        emit(TerminalUpdate.Output("\u001b[32m~/${directory.substringAfterLast('/')}\u001b[0m $ "))
+        input.collect { bytes -> emit(TerminalUpdate.Output(bytes.decodeToString().replace("\r", "\r\n$ "))) }
     }
 }

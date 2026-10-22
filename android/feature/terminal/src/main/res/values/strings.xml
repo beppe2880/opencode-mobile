@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_error_title">Couldn’t open the terminal</string>
+    <string name="terminal_reconnecting">Connection lost, reconnecting…</string>
+    <string name="terminal_exited">The shell has exited.</string>
+    <string name="terminal_new">New terminal</string>
+    <string name="terminal_close">Close terminal</string>
+    <string name="terminal_close_title">Close this terminal?</string>
+    <string name="terminal_close_message">The shell and anything still running in it will be stopped on the server.</string>
+    <string name="terminal_close_confirm">Close</string>
+    <string name="terminal_key_escape">Escape</string>
+    <string name="terminal_key_enter">Enter</string>
+    <string name="terminal_key_backspace">Backspace</string>
+    <string name="terminal_key_paste">Paste</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Left arrow</string>
+    <string name="terminal_key_down">Down arrow</string>
+    <string name="terminal_key_up">Up arrow</string>
+    <string name="terminal_key_right">Right arrow</string>
+    <string name="terminal_key_home">Home</string>
+    <string name="terminal_key_end">End</string>
+    <string name="terminal_key_page_up">Page up</string>
+    <string name="terminal_key_page_down">Page down</string>
+    <string name="terminal_modifier_off">Off</string>
+    <string name="terminal_modifier_once">On for the next key</string>
+    <string name="terminal_modifier_locked">Locked on</string>
+    <string name="terminal_keys_edit">Edit keys</string>
+    <string name="terminal_keys_title">Key bar</string>
+    <string name="terminal_keys_hint">Tap a key to move or remove it. Ctrl, Alt and Shift: tap once for the next key, twice to keep them on.</string>
+    <string name="terminal_keys_row">Row %1$d</string>
+    <string name="terminal_keys_add_to_row">Add a key to row %1$d</string>
+    <string name="terminal_keys_pick">Tap the keys to add:</string>
+    <string name="terminal_keys_move_left">Move left</string>
+    <string name="terminal_keys_move_right">Move right</string>
+    <string name="terminal_keys_other_row">Move to the other row</string>
+    <string name="terminal_keys_remove">Remove key</string>
+    <string name="terminal_keys_custom">Custom key</string>
+    <string name="terminal_keys_custom_label">Label</string>
+    <string name="terminal_keys_custom_text">Sends</string>
+    <string name="terminal_keys_custom_text_hint">\\e Escape, \\r Enter, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Add</string>
+    <string name="terminal_keys_cancel">Cancel</string>
+    <string name="terminal_keys_reset">Reset to default</string>
+    <string name="terminal_keys_done">Done</string>
+</resources>

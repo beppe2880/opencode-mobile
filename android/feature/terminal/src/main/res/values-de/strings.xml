@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_error_title">Terminal konnte nicht geöffnet werden</string>
+    <string name="terminal_reconnecting">Verbindung verloren, wird neu verbunden…</string>
+    <string name="terminal_exited">Die Shell wurde beendet.</string>
+    <string name="terminal_new">Neues Terminal</string>
+    <string name="terminal_close">Terminal schließen</string>
+    <string name="terminal_close_title">Dieses Terminal schließen?</string>
+    <string name="terminal_close_message">Die Shell und alles, was darin noch läuft, werden auf dem Server beendet.</string>
+    <string name="terminal_close_confirm">Schließen</string>
+    <string name="terminal_key_escape">Esc</string>
+    <string name="terminal_key_enter">Enter</string>
+    <string name="terminal_key_backspace">Rücktaste</string>
+    <string name="terminal_key_paste">Einfügen</string>
+    <string name="terminal_key_tab">Tab</string>
+    <string name="terminal_key_left">Pfeil links</string>
+    <string name="terminal_key_down">Pfeil runter</string>
+    <string name="terminal_key_up">Pfeil hoch</string>
+    <string name="terminal_key_right">Pfeil rechts</string>
+    <string name="terminal_key_home">Pos1</string>
+    <string name="terminal_key_end">Ende</string>
+    <string name="terminal_key_page_up">Bild auf</string>
+    <string name="terminal_key_page_down">Bild ab</string>
+    <string name="terminal_modifier_off">Aus</string>
+    <string name="terminal_modifier_once">Ein für die nächste Taste</string>
+    <string name="terminal_modifier_locked">Dauerhaft ein</string>
+    <string name="terminal_keys_edit">Tasten bearbeiten</string>
+    <string name="terminal_keys_title">Tastenleiste</string>
+    <string name="terminal_keys_hint">Tippe auf eine Taste, um sie zu verschieben oder zu entfernen. Strg, Alt und Umschalt: einmal tippen für die nächste Taste, zweimal tippen, um sie dauerhaft zu aktivieren.</string>
+    <string name="terminal_keys_row">Zeile %1$d</string>
+    <string name="terminal_keys_add_to_row">Taste zu Zeile %1$d hinzufügen</string>
+    <string name="terminal_keys_pick">Tippe die Tasten an, die du hinzufügen möchtest:</string>
+    <string name="terminal_keys_move_left">Nach links</string>
+    <string name="terminal_keys_move_right">Nach rechts</string>
+    <string name="terminal_keys_other_row">In die andere Zeile verschieben</string>
+    <string name="terminal_keys_remove">Taste entfernen</string>
+    <string name="terminal_keys_custom">Eigene Taste</string>
+    <string name="terminal_keys_custom_label">Beschriftung</string>
+    <string name="terminal_keys_custom_text">Sendet</string>
+    <string name="terminal_keys_custom_text_hint">\\e Esc, \\r Enter, \\t Tab, ^C Ctrl+C</string>
+    <string name="terminal_keys_add">Hinzufügen</string>
+    <string name="terminal_keys_cancel">Abbrechen</string>
+    <string name="terminal_keys_reset">Auf Standard zurücksetzen</string>
+    <string name="terminal_keys_done">Fertig</string>
+</resources>

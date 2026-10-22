@@ -32,6 +32,9 @@ highlights = "1.1.0"
 # ---- QR decoding ----
 zxing = "3.5.4"
 
+# ---- Terminal emulator (libvterm, Compose) ----
+termlib = "0.3.14"
+
 # ---- Test ----
 junit = "4.13.2"
 robolectric = "4.17"
@@ -90,6 +93,9 @@ highlights = { group = "dev.snipme", name = "highlights", version.ref = "highlig
 
 # ---- QR ----
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
+
+# ---- Terminal ----
+connectbot-termlib = { group = "org.connectbot", name = "termlib", version.ref = "termlib" }
 
 # ---- Test ----
 junit = { group = "junit", name = "junit", version.ref = "junit" }

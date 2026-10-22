@@ -15,11 +15,14 @@ class PreferencesRepositoriesTest {
     @Test
     fun `settings survive a restart and missing keys keep their defaults`() = runBlocking {
         val prefs = InMemoryPreferences()
-        PreferencesSettingsRepository(prefs).update { it.copy(theme = ThemeMode.Dark, showCost = false, groupActivity = false) }
+        val keys = listOf(listOf("esc", "ctrl"), listOf("text:wq\u001f\u001b:wq\r"))
+        PreferencesSettingsRepository(prefs).update {
+            it.copy(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys)
+        }
 
         val reopened = PreferencesSettingsRepository(prefs).settings.value
 
-        assertEquals(AppSettings(theme = ThemeMode.Dark, showCost = false, groupActivity = false), reopened)
+        assertEquals(AppSettings(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys), reopened)
         assertEquals(AppSettings(), PreferencesSettingsRepository(InMemoryPreferences()).settings.value)
     }
 

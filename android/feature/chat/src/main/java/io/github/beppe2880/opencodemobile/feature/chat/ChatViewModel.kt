@@ -153,6 +153,7 @@ class ChatViewModel(
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
             ChatEvent.OpenChanges -> loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+            ChatEvent.OpenTerminal -> currentState.directory.takeIf { it.isNotEmpty() }?.let { sendEffect(ChatEffect.OpenTerminal(it)) }
             ChatEvent.CloseChanges -> {
                 changesJob?.cancel()
                 updateState { it.copy(changes = null) }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Difference
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -78,6 +79,7 @@ fun ChatScreen(
                 onBack = { onEvent(ChatEvent.Back) },
                 onContext = { contextOpen = true },
                 onChanges = { onEvent(ChatEvent.OpenChanges) },
+                onTerminal = { onEvent(ChatEvent.OpenTerminal) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -148,7 +150,14 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatTopBar(state: ChatState, showBack: Boolean, onBack: () -> Unit, onContext: () -> Unit, onChanges: () -> Unit) {
+private fun ChatTopBar(
+    state: ChatState,
+    showBack: Boolean,
+    onBack: () -> Unit,
+    onContext: () -> Unit,
+    onChanges: () -> Unit,
+    onTerminal: () -> Unit,
+) {
     val c = OcTheme.colors
     OcTopBar(
         title = state.title.ifEmpty { " " },
@@ -175,6 +184,13 @@ private fun ChatTopBar(state: ChatState, showBack: Boolean, onBack: () -> Unit, 
                 contentDescription = stringResource(R.string.chat_changes_open),
                 onClick = onChanges,
                 modifier = Modifier.testTag("chat_changes_button"),
+            )
+            OcIconButton(
+                icon = Icons.Outlined.Terminal,
+                contentDescription = stringResource(R.string.chat_terminal_open),
+                onClick = onTerminal,
+                enabled = state.directory.isNotEmpty(),
+                modifier = Modifier.testTag("chat_terminal_button"),
             )
             state.agent?.let { agent ->
                 val color = c.agents.forAgent(agent)
