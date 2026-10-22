@@ -122,4 +122,5 @@
     </plurals>
     <string name="chat_older_failed">以前のメッセージを読み込めませんでした</string>
     <string name="chat_older_retry">再試行</string>
+    <string name="chat_open_file">ファイルを開く</string>
 </resources>

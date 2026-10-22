@@ -140,4 +140,5 @@
     </plurals>
     <string name="chat_older_failed">Не удалось загрузить предыдущие сообщения</string>
     <string name="chat_older_retry">Повторить</string>
+    <string name="chat_open_file">Открыть файл</string>
 </resources>

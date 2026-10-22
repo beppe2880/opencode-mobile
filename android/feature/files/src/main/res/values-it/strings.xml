@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">A capo automatico</string>
+    <string name="file_wrap_on">Attivo</string>
+    <string name="file_wrap_off">Disattivo</string>
+    <string name="file_copy">Copia contenuto del file</string>
+    <string name="file_reload">Ricarica</string>
+    <string name="file_error_title">Impossibile aprire il file</string>
+    <string name="file_empty">Questo file è vuoto</string>
+    <string name="file_binary_title">Nessuna anteprima per questo file</string>
+    <string name="file_binary_message">Non è un file di testo né un\'immagine (%1$s, %2$s).</string>
+    <string name="file_truncated">Mostrati i primi %1$s di %2$s.</string>
+</resources>

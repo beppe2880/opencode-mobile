@@ -20,6 +20,8 @@ sealed interface Message {
         val pending: Boolean = false,
         /** Images attached to the prompt, in order. */
         val images: List<ImageAttachment> = emptyList(),
+        /** Server files attached by path (`@` mentions), absolute; counted in [attachments]. */
+        val files: List<String> = emptyList(),
     ) : Message
 
     data class Assistant(

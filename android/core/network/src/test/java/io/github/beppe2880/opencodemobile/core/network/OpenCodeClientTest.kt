@@ -110,6 +110,43 @@ class OpenCodeClientTest {
     }
 
     @Test
+    fun `reading a file asks for its start by path segments and reports the whole size`() = runBlocking {
+        server.enqueue(
+            MockResponse().setResponseCode(206).setBody("hello")
+                .setHeader("Content-Type", "text/plain; charset=utf-8")
+                .setHeader("Content-Range", "bytes 0-4/1000"),
+        )
+        val client = factory.create(baseUrl, BasicCredentials(password = "s3cret"))
+
+        val read = client.readFile("/home/me/app", "src/a b#1.kt", maxBytes = 5)
+
+        assertEquals("hello", read.bytes.decodeToString())
+        assertEquals("text/plain", read.mime)
+        assertEquals(1000L, read.size)
+        val request = server.takeRequest()
+        assertEquals("/api/fs/read/src/a%20b%231.kt?location%5Bdirectory%5D=%2Fhome%2Fme%2Fapp", request.path)
+        assertEquals("bytes=0-4", request.getHeader("Range"))
+        assertEquals("Basic b3BlbmNvZGU6czNjcmV0", request.getHeader("Authorization"))
+    }
+
+    @Test
+    fun `an empty file reads as no bytes and a missing one as NotFound`() = runBlocking {
+        server.enqueue(MockResponse().setResponseCode(416))
+        server.enqueue(MockResponse().setResponseCode(404).setBody("""{"_tag":"FileNotFoundError","message":"File not found: x"}"""))
+        val client = factory.create(baseUrl, BasicCredentials(password = "s3cret"))
+
+        val empty = client.readFile("/app", "empty.txt", maxBytes = 10)
+        assertEquals(0, empty.bytes.size)
+        assertEquals(0L, empty.size)
+        try {
+            client.readFile("/app", "x", maxBytes = 10)
+            fail("expected NotFound")
+        } catch (e: OpenCodeError.NotFound) {
+            assertEquals("File not found: x", e.message)
+        }
+    }
+
+    @Test
     fun `connection refused maps to Unreachable`() = runBlocking {
         val closedPort = ServerSocket(0).use { it.localPort }
         val client = factory.create("http://127.0.0.1:$closedPort", BasicCredentials(password = "p"))

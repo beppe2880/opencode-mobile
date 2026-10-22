@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">自动换行</string>
+    <string name="file_wrap_on">开</string>
+    <string name="file_wrap_off">关</string>
+    <string name="file_copy">复制文件内容</string>
+    <string name="file_reload">重新加载</string>
+    <string name="file_error_title">无法打开文件</string>
+    <string name="file_empty">文件为空</string>
+    <string name="file_binary_title">此文件无法预览</string>
+    <string name="file_binary_message">这既不是文本文件也不是图片（%1$s，%2$s）。</string>
+    <string name="file_truncated">仅显示前 %1$s（共 %2$s）。</string>
+</resources>

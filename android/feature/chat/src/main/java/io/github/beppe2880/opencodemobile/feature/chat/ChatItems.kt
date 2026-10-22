@@ -40,6 +40,7 @@ sealed interface ChatItem {
         val pending: Boolean,
         val attachments: Int,
         val images: List<ImageAttachment> = emptyList(),
+        val files: List<String> = emptyList(),
     ) : ChatItem
     data class Text(override val key: String, val text: String, val streaming: Boolean) : ChatItem
     data class Reasoning(override val key: String, val text: String, val streaming: Boolean, val durationMs: Long?) : ChatItem
@@ -201,7 +202,7 @@ object ChatItemsBuilder {
         messages.forEachIndexed { index, message ->
             when (message) {
                 is Message.User -> startTurn(message.createdAt) {
-                    out += ChatItem.User(message.id, message.text, message.pending, message.attachments, message.images)
+                    out += ChatItem.User(message.id, message.text, message.pending, message.attachments, message.images, message.files)
                 }
                 is Message.Synthetic -> startTurn(message.createdAt)
                 is Message.Idle -> {

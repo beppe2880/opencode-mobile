@@ -34,6 +34,7 @@ repository boundaries.
 | `:feature:chat` | Live transcript, composer, agent/model pickers, permissions, interrupt |
 | `:feature:settings` | Servers, theme, display preferences, about |
 | `:feature:terminal` | Server shell over the PTY WebSocket (xterm.js in a WebView), configurable key bar |
+| `:feature:files` | Read-only file viewer (`/api/fs/read`): highlighted text with line numbers, images |
 | `:core:ui` | `OcTheme` tokens, typography (Inter, IBM Plex Mono), `Oc*` components, Markdown |
 | `:core:mvi` | `BaseViewModel`, `CollectEffect`, `OptimisticState` |
 | `:core:domain` | UI-facing models, repository interfaces, `TranscriptReducer` |

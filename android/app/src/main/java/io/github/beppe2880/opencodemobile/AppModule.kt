@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ScrollMemory
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectViewModel
+import io.github.beppe2880.opencodemobile.feature.files.FileViewerViewModel
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsViewModel
@@ -39,6 +40,7 @@ val appModule = module {
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
+    viewModel { params -> FileViewerViewModel(params.get(), get()) }
 
     single { AndroidMonitorNotifier(androidContext()) }
     // Whether a screen of the app is shown.

@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.network.mapping
 
+import io.github.beppe2880.opencodemobile.api.models.PromptFileAttachment
+import io.github.beppe2880.opencodemobile.api.models.PromptFileSource
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageAssistant
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageAssistantContentInner
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageAssistantTool
@@ -17,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import kotlinx.serialization.json.JsonNull
+import java.net.URI
 
 /**
  * Maps one stored message to its transcript entry, or null for entries the transcript hides
@@ -36,6 +39,7 @@ fun SessionMessageInfo.toDomain(): Message? = when (this) {
                 // Stored copies have the payload emptied (see MessageCodec.slim).
                 ImageAttachment(file.name, file.mime, file.data.takeIf { it.isNotEmpty() }?.let { "data:${file.mime};base64,$it" })
             },
+            files = files.orEmpty().filterNot { it.mime.startsWith("image/") }.mapNotNull { it.serverPath() },
         )
     }
     is SessionMessageInfo.SessionMessageAssistantValue -> value.toDomain()
@@ -160,3 +164,11 @@ private fun SessionMessageShell.toDomain(): Message.Shell = Message.Shell(
     output = output?.output.orEmpty(),
     exit = exit?.takeUnless { it is JsonNull }?.displayText(),
 )
+
+/** Absolute path of a file attached by reference (`file://` URI); null for uploaded content. */
+internal fun PromptFileAttachment.serverPath(): String? {
+    val uri = (source as? PromptFileSource.PromptFileSourceAnyOf1Value)?.value?.uri ?: return null
+    if (!uri.startsWith("file://")) return null
+    // This app sends paths unencoded; other clients may percent-encode them.
+    return runCatching { URI(uri).path }.getOrNull()?.takeIf { it.isNotEmpty() } ?: uri.removePrefix("file://")
+}

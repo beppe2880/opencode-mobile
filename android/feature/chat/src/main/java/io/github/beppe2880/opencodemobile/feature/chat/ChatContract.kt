@@ -145,6 +145,9 @@ sealed interface ChatEvent {
     /** Opens a subagent's child session. */
     data class OpenSession(val sessionId: String) : ChatEvent
 
+    /** Opens a file of the server read-only; [path] is absolute or relative to the session folder. */
+    data class OpenFile(val path: String) : ChatEvent
+
     /** Replaces this chat with a neighbor in the session list (swipe). */
     data class SwitchSession(val sessionId: String) : ChatEvent
 
@@ -211,4 +214,5 @@ sealed interface ChatEffect {
     data class OpenSession(val sessionId: String) : ChatEffect
     data class SwitchSession(val sessionId: String) : ChatEffect
     data class OpenTerminal(val directory: String) : ChatEffect
+    data class OpenFile(val directory: String, val path: String) : ChatEffect
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">긴 줄 자동 줄바꿈</string>
+    <string name="file_wrap_on">켜짐</string>
+    <string name="file_wrap_off">꺼짐</string>
+    <string name="file_copy">파일 내용 복사</string>
+    <string name="file_reload">다시 불러오기</string>
+    <string name="file_error_title">파일을 열 수 없습니다</string>
+    <string name="file_empty">이 파일은 비어 있습니다</string>
+    <string name="file_binary_title">이 파일은 미리 볼 수 없습니다</string>
+    <string name="file_binary_message">텍스트 파일도 이미지도 아닙니다(%1$s, %2$s).</string>
+    <string name="file_truncated">%2$s 중 처음 %1$s을(를) 표시합니다.</string>
+</resources>

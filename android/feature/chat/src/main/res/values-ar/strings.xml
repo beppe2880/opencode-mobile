@@ -152,4 +152,5 @@
     </plurals>
     <string name="chat_older_failed">تعذّر تحميل الرسائل السابقة</string>
     <string name="chat_older_retry">إعادة المحاولة</string>
+    <string name="chat_open_file">فتح الملف</string>
 </resources>

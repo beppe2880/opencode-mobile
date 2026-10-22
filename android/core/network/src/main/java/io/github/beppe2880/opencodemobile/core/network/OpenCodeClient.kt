@@ -22,9 +22,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -36,6 +40,7 @@ import okio.ByteString.Companion.toByteString
 import retrofit2.Retrofit
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
 
 /** Authenticated access to one OpenCode server. Create through [OpenCodeClientFactory]. */
 class OpenCodeClient internal constructor(
@@ -112,6 +117,46 @@ class OpenCodeClient internal constructor(
         awaitClose { socket.cancel() }
     }.buffer(Channel.UNLIMITED)
 
+    /**
+     * The first [maxBytes] of [path], relative to [directory]. The generated client cannot
+     * address `/api/fs/read/{path}` (its path is a wildcard), so the request is built here.
+     * Fails with [OpenCodeError.NotFound] when the file does not exist.
+     */
+    suspend fun readFile(directory: String, path: String, maxBytes: Int): FileBytes {
+        val url = baseUrl.toHttpUrl().newBuilder()
+            .addPathSegments("api/fs/read")
+            .apply { path.split('/').filter { it.isNotEmpty() }.forEach(::addPathSegment) }
+            .addQueryParameter("location[directory]", directory)
+            .build()
+        val request = Request.Builder().url(url).header("Range", "bytes=0-${maxBytes - 1}").build()
+        val response = try {
+            http.newCall(request).await()
+        } catch (e: IOException) {
+            throw e.toOpenCodeError()
+        }
+        return response.use {
+            when {
+                // An empty file has no byte to start the range at.
+                response.code == RANGE_NOT_SATISFIABLE -> FileBytes(ByteArray(0), null, 0)
+                !response.isSuccessful -> throw httpError(response.code, response.body?.readBounded())
+                else -> withContext(Dispatchers.IO) {
+                    val bytes = try {
+                        val source = response.body!!.source()
+                        source.request(maxBytes.toLong())
+                        source.buffer.readByteArray(minOf(source.buffer.size, maxBytes.toLong()))
+                    } catch (e: IOException) {
+                        throw e.toOpenCodeError()
+                    }
+                    // `Content-Range: bytes 0-1023/52341` carries the whole size of a partial read.
+                    val size = response.header("Content-Range")?.substringAfterLast('/')?.toLongOrNull()
+                        ?: response.body?.contentLength()?.takeIf { it >= 0 }
+                        ?: bytes.size.toLong()
+                    FileBytes(bytes, response.header("Content-Type")?.substringBefore(';')?.trim(), size)
+                }
+            }
+        }
+    }
+
     private fun streamClient(readTimeoutMillis: Long): OkHttpClient =
         http.newBuilder().readTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS).build()
 
@@ -156,10 +201,25 @@ class OpenCodeClient internal constructor(
 
         private const val PTY_PING_SECONDS = 20L
         private const val NORMAL_CLOSURE = 1000
+        private const val RANGE_NOT_SATISFIABLE = 416
 
         /** Close code the server uses when the PTY does not exist or has exited. */
         private const val PTY_GONE = 4404
     }
+}
+
+/** Bytes read from a file of the server; [size] is the whole file, [bytes] may be only its start. */
+class FileBytes(val bytes: ByteArray, val mime: String?, val size: Long)
+
+/** Runs the call on OkHttp's dispatcher; cancelling the coroutine cancels the call. */
+private suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
+    continuation.invokeOnCancellation { cancel() }
+    enqueue(
+        object : Callback {
+            override fun onResponse(call: Call, response: Response) = continuation.resume(response) { _, value, _ -> value.close() }
+            override fun onFailure(call: Call, e: IOException) = continuation.resumeWithException(e)
+        },
+    )
 }
 
 /** One message of the PTY WebSocket. */

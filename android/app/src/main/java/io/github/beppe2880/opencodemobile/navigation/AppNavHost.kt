@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
+import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
@@ -54,6 +55,9 @@ data object UsageDestination
 
 @Serializable
 data class TerminalDestination(val directory: String)
+
+@Serializable
+data class FileDestination(val directory: String, val path: String)
 
 /** Width at which Sessions and Chat are shown side by side. */
 private val ListDetailMinWidth = 840.dp
@@ -123,6 +127,7 @@ fun AppNavHost(
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
             )
         }
         composable<ChatDestination> { entry ->
@@ -132,6 +137,7 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onOpenSession = { navController.navigate(ChatDestination(it)) },
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
                 onSwitchSession = {
                     // Replaces this chat, so Back still returns to the session list.
                     navController.navigate(ChatDestination(it)) {
@@ -153,6 +159,10 @@ fun AppNavHost(
         composable<TerminalDestination> { entry ->
             TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })
         }
+        composable<FileDestination> { entry ->
+            val args = entry.toRoute<FileDestination>()
+            FileViewerRoute(directory = args.directory, path = args.path, onBack = { navController.popBackStack() })
+        }
     }
 }
 
@@ -162,6 +172,7 @@ private fun SessionsListDetail(
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenTerminal: (String) -> Unit,
+    onOpenFile: (String, String) -> Unit,
     openNewSession: Boolean,
     onNewSessionOpened: () -> Unit,
 ) {
@@ -193,6 +204,7 @@ private fun SessionsListDetail(
                         showBack = false,
                         onOpenSession = onOpenChatFullScreen,
                         onOpenTerminal = onOpenTerminal,
+                        onOpenFile = onOpenFile,
                         onSwitchSession = { selected = it },
                         modifier = Modifier.weight(1f),
                     )

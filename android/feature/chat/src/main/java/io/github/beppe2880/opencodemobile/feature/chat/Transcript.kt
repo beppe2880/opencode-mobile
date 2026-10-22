@@ -157,6 +157,8 @@ internal fun Transcript(
                         modifier = rowModifier,
                         onLongPress = if (item.pending) null else { { actionsFor = item.key } },
                         onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
+                        directory = state.directory,
+                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                     )
                     is ChatItem.Text -> AssistantText(item, cache, rowModifier)
                     is ChatItem.Reasoning -> ReasoningBlock(
@@ -172,6 +174,7 @@ internal fun Transcript(
                         isExpanded = isExpanded,
                         onToggle = onToggle,
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
                     )
                     is ChatItem.Activity -> ActivityGroup(
@@ -182,6 +185,7 @@ internal fun Transcript(
                         isExpanded = isExpanded,
                         onToggle = onToggle,
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
                     )
                     is ChatItem.Error -> ErrorRow(item, rowModifier)

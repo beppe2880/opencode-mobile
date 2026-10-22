@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +41,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
+import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegmentedControl
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
@@ -128,6 +130,7 @@ internal fun ChangesSheet(state: ChatState, panel: ChangesPanel, onEvent: (ChatE
                         full = state.isExpanded("changes-full:${file.path}"),
                         onToggle = { onEvent(ChatEvent.Toggle("changes:${file.path}")) },
                         onToggleFull = { onEvent(ChatEvent.Toggle("changes-full:${file.path}")) },
+                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                     )
                 }
             }
@@ -143,6 +146,7 @@ private fun ChangedFile(
     full: Boolean,
     onToggle: () -> Unit,
     onToggleFull: () -> Unit,
+    onOpenFile: (String) -> Unit,
 ) {
     val c = OcTheme.colors
     val shape = RoundedCornerShape(OcRadius.md)
@@ -163,6 +167,14 @@ private fun ChangedFile(
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
         ) {
             FileDiffHeader(file, directory, Modifier.weight(1f))
+            if (file.status != "deleted") {
+                OcIconButton(
+                    icon = Icons.Outlined.FileOpen,
+                    contentDescription = stringResource(R.string.chat_open_file),
+                    onClick = { onOpenFile(file.path) },
+                    modifier = Modifier.size(36.dp).testTag("chat_changes_open_${file.path}"),
+                )
+            }
             Icon(
                 if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
                 contentDescription = null,

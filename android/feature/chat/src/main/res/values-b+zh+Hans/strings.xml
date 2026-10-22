@@ -122,4 +122,5 @@
     </plurals>
     <string name="chat_older_failed">无法加载更早的消息</string>
     <string name="chat_older_retry">重试</string>
+    <string name="chat_open_file">打开文件</string>
 </resources>

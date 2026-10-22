@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">Wrap long lines</string>
+    <string name="file_wrap_on">On</string>
+    <string name="file_wrap_off">Off</string>
+    <string name="file_copy">Copy file contents</string>
+    <string name="file_reload">Reload</string>
+    <string name="file_error_title">Couldn\'t open the file</string>
+    <string name="file_empty">This file is empty</string>
+    <string name="file_binary_title">No preview for this file</string>
+    <string name="file_binary_message">It is not a text file or an image (%1$s, %2$s).</string>
+    <string name="file_truncated">Showing the first %1$s of %2$s.</string>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">Quebrar linhas longas</string>
+    <string name="file_wrap_on">Ativado</string>
+    <string name="file_wrap_off">Desativado</string>
+    <string name="file_copy">Copiar conteúdo do arquivo</string>
+    <string name="file_reload">Recarregar</string>
+    <string name="file_error_title">Não foi possível abrir o arquivo</string>
+    <string name="file_empty">Este arquivo está vazio</string>
+    <string name="file_binary_title">Sem pré-visualização para este arquivo</string>
+    <string name="file_binary_message">Não é um arquivo de texto nem uma imagem (%1$s, %2$s).</string>
+    <string name="file_truncated">Mostrando os primeiros %1$s de %2$s.</string>
+</resources>

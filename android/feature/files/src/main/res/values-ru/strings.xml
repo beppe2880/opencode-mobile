@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">Переносить длинные строки</string>
+    <string name="file_wrap_on">Вкл</string>
+    <string name="file_wrap_off">Выкл</string>
+    <string name="file_copy">Копировать содержимое файла</string>
+    <string name="file_reload">Обновить</string>
+    <string name="file_error_title">Не удалось открыть файл</string>
+    <string name="file_empty">Файл пуст</string>
+    <string name="file_binary_title">Нет предпросмотра для этого файла</string>
+    <string name="file_binary_message">Это не текстовый файл и не изображение (%1$s, %2$s).</string>
+    <string name="file_truncated">Показаны первые %1$s из %2$s.</string>
+</resources>

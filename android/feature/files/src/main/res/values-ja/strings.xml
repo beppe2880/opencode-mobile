@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">長い行を折り返す</string>
+    <string name="file_wrap_on">オン</string>
+    <string name="file_wrap_off">オフ</string>
+    <string name="file_copy">ファイルの内容をコピー</string>
+    <string name="file_reload">再読み込み</string>
+    <string name="file_error_title">ファイルを開けませんでした</string>
+    <string name="file_empty">このファイルは空です</string>
+    <string name="file_binary_title">このファイルはプレビューできません</string>
+    <string name="file_binary_message">テキストファイルでも画像でもありません（%1$s、%2$s）。</string>
+    <string name="file_truncated">先頭の %1$s を表示（全体 %2$s）。</string>
+</resources>

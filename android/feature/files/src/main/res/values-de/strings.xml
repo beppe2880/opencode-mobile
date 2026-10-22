@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="file_wrap_lines">Lange Zeilen umbrechen</string>
+    <string name="file_wrap_on">Ein</string>
+    <string name="file_wrap_off">Aus</string>
+    <string name="file_copy">Dateiinhalt kopieren</string>
+    <string name="file_reload">Neu laden</string>
+    <string name="file_error_title">Datei konnte nicht geöffnet werden</string>
+    <string name="file_empty">Diese Datei ist leer</string>
+    <string name="file_binary_title">Keine Vorschau für diese Datei</string>
+    <string name="file_binary_message">Es ist weder eine Textdatei noch ein Bild (%1$s, %2$s).</string>
+    <string name="file_truncated">Die ersten %1$s von %2$s werden angezeigt.</string>
+</resources>

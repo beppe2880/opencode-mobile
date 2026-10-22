@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
+import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -73,6 +77,8 @@ internal fun FileDiffView(
     modifier: Modifier = Modifier,
     /** False when the path and stats already show right above. */
     showHeader: Boolean = true,
+    /** Shows an open button in the header. */
+    onOpenFile: (() -> Unit)? = null,
 ) {
     val c = OcTheme.colors
     val lines = remember(diff.patch) { UnifiedDiff.parse(diff.patch) }
@@ -89,7 +95,15 @@ internal fun FileDiffView(
             .background(c.layer01),
     ) {
         if (showHeader) {
-            FileDiffHeader(diff, directory, Modifier.fillMaxWidth().padding(horizontal = OcSpacing.sm, vertical = OcSpacing.xs))
+            FileDiffHeader(
+                diff,
+                directory,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = OcSpacing.sm, end = if (onOpenFile != null) 0.dp else OcSpacing.sm)
+                    .padding(vertical = OcSpacing.xs),
+                onOpenFile = onOpenFile,
+            )
         }
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val viewport = maxWidth
@@ -121,7 +135,7 @@ internal fun FileDiffView(
 
 /** Path relative to [directory], status and line counts of one changed file. */
 @Composable
-internal fun FileDiffHeader(diff: FileDiff, directory: String, modifier: Modifier = Modifier) {
+internal fun FileDiffHeader(diff: FileDiff, directory: String, modifier: Modifier = Modifier, onOpenFile: (() -> Unit)? = null) {
     val c = OcTheme.colors
     val path = if (directory.isNotEmpty()) diff.path.removePrefix("$directory/") else diff.path
     val statusLabel = when (diff.status) {
@@ -145,6 +159,14 @@ internal fun FileDiffHeader(diff: FileDiff, directory: String, modifier: Modifie
         )
         statusLabel?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = c.textFaint) }
         DiffStats(diff.additions, diff.deletions)
+        if (onOpenFile != null) {
+            OcIconButton(
+                icon = Icons.Outlined.FileOpen,
+                contentDescription = stringResource(R.string.chat_open_file),
+                onClick = onOpenFile,
+                modifier = Modifier.size(36.dp).testTag("chat_diff_open_${diff.path}"),
+            )
+        }
     }
 }
 

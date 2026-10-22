@@ -15,6 +15,8 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.ui.graphics.vector.ImageVector
+import io.github.beppe2880.opencodemobile.core.domain.Part
+import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 
 /** Presentation helpers for tool calls; tolerant of partial JSON input while streaming. */
 object ToolInfo {
@@ -53,6 +55,14 @@ object ToolInfo {
         "patch", "apply_patch" -> Icons.Outlined.Difference
         else -> Icons.Outlined.Build
     }
+
+    /** The file a read, write or edit call works on, once its input is complete. */
+    fun filePath(tool: Part.Tool): String? {
+        if (tool.status == ToolStatus.Streaming || tool.name.lowercase() !in FILE_TOOLS) return null
+        return listOf("filePath", "path").firstNotNullOfOrNull { key -> stringField(tool.input, key)?.takeIf { it.isNotBlank() } }
+    }
+
+    private val FILE_TOOLS = setOf("read", "write", "edit", "multiedit")
 
     private val PRIMARY_KEYS = listOf("command", "filePath", "path", "pattern", "url", "query", "description", "prompt", "name")
 

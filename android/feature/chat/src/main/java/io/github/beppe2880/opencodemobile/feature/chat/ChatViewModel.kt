@@ -119,6 +119,7 @@ class ChatViewModel(
             ChatEvent.MoveToBackground -> moveToBackground()
             ChatEvent.Compact -> compact()
             is ChatEvent.OpenSession -> sendEffect(ChatEffect.OpenSession(event.sessionId))
+            is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
             is ChatEvent.SwitchSession -> sendEffect(ChatEffect.SwitchSession(event.sessionId))
             ChatEvent.LoadOlder -> loadOlder()
             // Not part of the state: only read back when the chat opens again.
@@ -595,7 +596,14 @@ class ChatViewModel(
         val attachments = state.attachments
         val delivery = state.delivery
         val revert = revertMessageId
-        val local = Message.User("$LOCAL_PREFIX${localIds++}", clock(), text, pending = true, attachments = state.uploads.size)
+        val local = Message.User(
+            "$LOCAL_PREFIX${localIds++}",
+            clock(),
+            text,
+            pending = true,
+            attachments = attachments.size,
+            files = attachments.filter { it.mention != null }.map { it.uri.removePrefix("file://") },
+        )
         val reverted = takeReverted()
         messages = messages + local
         updateState { it.copy(draft = "", attachments = emptyList(), suggestions = emptyList(), sending = true) }

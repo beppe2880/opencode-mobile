@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -56,6 +57,7 @@ internal fun ToolsGroup(
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
+    onOpenFile: (String) -> Unit = {},
 ) {
     val c = OcTheme.colors
     Column(modifier = modifier.fillMaxWidth()) {
@@ -86,6 +88,7 @@ internal fun ToolsGroup(
                         onToggle = { onToggle("o:$id") },
                         onToggleFull = { onToggle("f:$id") },
                         onOpenSession = onOpenSession,
+                        onOpenFile = onOpenFile,
                     )
                 }
             }
@@ -104,6 +107,7 @@ internal fun ActivityGroup(
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
+    onOpenFile: (String) -> Unit = {},
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -139,6 +143,7 @@ internal fun ActivityGroup(
                             isExpanded = isExpanded,
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,
+                            onOpenFile = onOpenFile,
                         )
                         else -> Unit
                     }
@@ -201,9 +206,11 @@ private fun ToolRow(
     onToggle: () -> Unit,
     onToggleFull: () -> Unit,
     onOpenSession: (String) -> Unit,
+    onOpenFile: (String) -> Unit,
 ) {
     val c = OcTheme.colors
     val child = SessionInsights.childSession(tool)
+    val file = ToolInfo.filePath(tool)
     val argument = ToolInfo.primaryArgument(tool.input)?.let { arg ->
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
@@ -237,6 +244,14 @@ private fun ToolRow(
             if (tool.diffs.isNotEmpty()) {
                 DiffStats(tool.diffs.sumOf { it.additions }, tool.diffs.sumOf { it.deletions })
             }
+            if (file != null) {
+                OcIconButton(
+                    icon = Icons.Outlined.FileOpen,
+                    contentDescription = stringResource(R.string.chat_open_file),
+                    onClick = { onOpenFile(file) },
+                    modifier = Modifier.size(36.dp).testTag("chat_open_file_${tool.callId}"),
+                )
+            }
             if (child != null) {
                 OcIconButton(
                     icon = Icons.AutoMirrored.Outlined.OpenInNew,
@@ -249,7 +264,8 @@ private fun ToolRow(
         }
         AnimatedVisibility(visible = expanded) {
             if (tool.diffs.isNotEmpty() && tool.error == null) {
-                ToolDiffs(tool, directory, full, onToggleFull)
+                // Patches change several files and have no button of their own: each diff gets one.
+                ToolDiffs(tool, directory, full, onToggleFull, onOpenFile.takeIf { file == null })
             } else {
                 ToolOutput(tool, full, onToggleFull)
             }
@@ -258,14 +274,16 @@ private fun ToolRow(
 }
 
 @Composable
-private fun ToolDiffs(tool: Part.Tool, directory: String, full: Boolean, onToggleFull: () -> Unit) {
+private fun ToolDiffs(tool: Part.Tool, directory: String, full: Boolean, onToggleFull: () -> Unit, onOpenFile: ((String) -> Unit)?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
-        tool.diffs.forEach { diff -> FileDiffView(diff, directory, full, onToggleFull) }
+        tool.diffs.forEach { diff ->
+            FileDiffView(diff, directory, full, onToggleFull, onOpenFile = onOpenFile?.takeIf { diff.status != "deleted" }?.let { open -> { open(diff.path) } })
+        }
     }
 }
 

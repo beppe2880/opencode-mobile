@@ -18,6 +18,22 @@ class MessageMappingTest {
         Fixtures.json.decodeFromString<SessionMessageInfo>(json).toDomain()
 
     @Test
+    fun `files mentioned by path are listed apart from images and uploads`() {
+        val user = map(
+            """{"id":"msg_u","time":{"created":1},"type":"user","text":"look at @src/a b.kt","files":[
+                 {"data":"","mime":"text/plain","name":"src/a b.kt","source":{"type":"uri","uri":"file:///home/me/app/src/a%20b.kt"}},
+                 {"data":"","mime":"text/plain","name":"raw.kt","source":{"type":"uri","uri":"file:///home/me/app/raw.kt"}},
+                 {"data":"","mime":"image/png","name":"shot.png","source":{"type":"uri","uri":"file:///home/me/shot.png"}},
+                 {"data":"aGk=","mime":"text/plain","name":"notes.txt","source":{"type":"inline"}}
+               ]}""",
+        ) as Message.User
+
+        assertEquals(listOf("/home/me/app/src/a b.kt", "/home/me/app/raw.kt"), user.files)
+        assertEquals(4, user.attachments)
+        assertEquals(1, user.images.size)
+    }
+
+    @Test
     fun `idle markers keep outcome and error as turn boundaries`() {
         val failed = map(
             """{"id":"msg_1","time":{"created":5},"type":"idle","outcome":"failed",

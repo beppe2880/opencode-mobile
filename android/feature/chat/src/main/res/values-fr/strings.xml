@@ -128,4 +128,5 @@
     </plurals>
     <string name="chat_older_failed">Impossible de charger les messages précédents</string>
     <string name="chat_older_retry">Réessayer</string>
+    <string name="chat_open_file">Ouvrir le fichier</string>
 </resources>

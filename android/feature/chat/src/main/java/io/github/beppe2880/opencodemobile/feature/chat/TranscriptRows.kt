@@ -10,6 +10,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Info
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
+import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
@@ -69,6 +72,8 @@ internal fun UserBubble(
     modifier: Modifier = Modifier,
     onLongPress: (() -> Unit)? = null,
     onOpenImage: (Int) -> Unit = {},
+    directory: String = "",
+    onOpenFile: (String) -> Unit = {},
 ) {
     val c = OcTheme.colors
     Column(
@@ -123,8 +128,25 @@ internal fun UserBubble(
                 )
             }
         }
-        // Images show as thumbnails above; only the other files are counted.
-        val files = item.attachments - item.images.size
+        if (item.files.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(top = OcSpacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs, Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                item.files.forEachIndexed { index, path ->
+                    OcChip(
+                        text = path.removePrefix("${directory.trimEnd('/')}/"),
+                        onClick = { onOpenFile(path) },
+                        leadingIcon = Icons.Outlined.Description,
+                        mono = true,
+                        modifier = Modifier.testTag("chat_user_file_${item.key}_$index"),
+                    )
+                }
+            }
+        }
+        // Images show as thumbnails above and mentioned files as chips; only uploads are counted.
+        val files = item.attachments - item.images.size - item.files.size
         if (item.pending || files > 0) {
             Row(
                 modifier = Modifier.padding(top = OcSpacing.xs),

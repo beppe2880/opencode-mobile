@@ -3,7 +3,7 @@ import { resolve } from "node:path"
 
 const root = resolve(import.meta.dir, "..")
 const locales = ["it", "es", "fr", "de", "pt-rBR", "ru", "b+zh+Hans", "ja", "ko", "ar"]
-const modules = ["app", "core/ui", "feature/connect", "feature/chat", "feature/sessions", "feature/settings"]
+const modules = ["app", "core/ui", "feature/connect", "feature/chat", "feature/sessions", "feature/settings", "feature/terminal", "feature/files"]
 
 type Resource = { type: string; body: string; translatable: boolean }
 
