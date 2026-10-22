@@ -58,7 +58,9 @@ class ConnectViewModel(
         when (event) {
             is ConnectEvent.UrlChanged -> onUrlChanged(event.value)
             is ConnectEvent.SecretChanged -> updateState {
-                it.copy(secret = event.value.trim(), secretError = null, submitError = null)
+                // Pairing codes tolerate stray whitespace; passwords are sent verbatim.
+                val secret = if (it.method == AuthMethod.Password) event.value else event.value.trim()
+                it.copy(secret = secret, secretError = null, submitError = null)
             }
             is ConnectEvent.MethodChanged -> updateState {
                 it.copy(method = event.method, secret = "", secretError = null, submitError = null, probe = null)

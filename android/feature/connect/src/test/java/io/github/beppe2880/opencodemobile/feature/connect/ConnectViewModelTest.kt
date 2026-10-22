@@ -182,6 +182,17 @@ class ConnectViewModelTest {
         assertEquals("s1", repo.activated.single())
         assertEquals(ConnectEffect.Connected, vm.effect.first())
     }
+
+    @Test
+    fun `a password keeps its leading and trailing spaces`() = runTest(main.testDispatcher) {
+        val vm = ConnectViewModel(repo, discovery)
+        advanceUntilIdle()
+
+        vm.onEvent(ConnectEvent.MethodChanged(AuthMethod.Password))
+        vm.onEvent(ConnectEvent.SecretChanged("  s3cret "))
+
+        assertEquals("  s3cret ", vm.state.value.secret)
+    }
 }
 
 private class FakeDiscovery : ServerDiscovery {
@@ -232,4 +243,6 @@ private class FakeServerRepository : ServerRepository {
         }
         return ConnectTarget.Url(if ("://" in text) text.trimEnd('/') else "http://${text.trimEnd('/')}")
     }
+
+
 }
