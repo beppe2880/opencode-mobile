@@ -24,6 +24,8 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putString(KEY_THEME, next.theme.name)
             .putBoolean(KEY_SHOW_REASONING, next.showReasoning)
             .putBoolean(KEY_EXPAND_TOOLS, next.expandToolsByDefault)
+            .putBoolean(KEY_FOLLOW_RUNNING, next.followRunningTools)
+            .putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
             .putBoolean(KEY_SHOW_COST, next.showCost)
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
@@ -44,6 +46,8 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             theme = ThemeMode.entries.firstOrNull { it.name == prefs.getString(KEY_THEME, null) } ?: defaults.theme,
             showReasoning = prefs.getBoolean(KEY_SHOW_REASONING, defaults.showReasoning),
             expandToolsByDefault = prefs.getBoolean(KEY_EXPAND_TOOLS, defaults.expandToolsByDefault),
+            followRunningTools = prefs.getBoolean(KEY_FOLLOW_RUNNING, defaults.followRunningTools),
+            showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
@@ -68,6 +72,8 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_THEME = "theme"
         const val KEY_SHOW_REASONING = "show_reasoning"
         const val KEY_EXPAND_TOOLS = "expand_tools_by_default"
+        const val KEY_FOLLOW_RUNNING = "follow_running_tools"
+        const val KEY_FULL_COMMANDS = "show_full_commands"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"

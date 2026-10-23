@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Exibir blocos recolhidos “Pensou por…” na conversa</string>
     <string name="settings_expand_tools">Expandir chamadas de ferramentas</string>
     <string name="settings_expand_tools_sub">Exibir ferramentas expandidas em vez de um resumo de uma linha</string>
+    <string name="settings_follow_running">Acompanhar ferramentas em execução</string>
+    <string name="settings_follow_running_sub">Manter ferramentas e raciocínio abertos enquanto são executados e mostrar a saída dos comandos conforme chega</string>
+    <string name="settings_full_commands">Mostrar comandos completos</string>
+    <string name="settings_full_commands_sub">Quebrar em várias linhas os comandos e caminhos longos nas linhas de ferramentas em vez de cortá-los</string>
     <string name="settings_show_cost">Mostrar custo</string>
     <string name="settings_show_cost_sub">Mostrar o custo em dólares de cada turno abaixo da resposta</string>
     <string name="settings_swipe_chats">Deslizar entre conversas</string>

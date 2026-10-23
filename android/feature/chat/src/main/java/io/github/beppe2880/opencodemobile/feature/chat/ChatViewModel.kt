@@ -99,6 +99,8 @@ class ChatViewModel(
                 updateState {
                     it.copy(
                         expandToolsByDefault = s.expandToolsByDefault,
+                        followRunningTools = s.followRunningTools,
+                        showFullCommands = s.showFullCommands,
                         showCost = s.showCost,
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,
@@ -564,13 +566,7 @@ class ChatViewModel(
      * while the tool runs, its shell output is read every [LIVE_OUTPUT_POLL_MS].
      */
     private fun followShells(visible: List<Message>) {
-        val running = visible.asSequence()
-            .filterIsInstance<Message.Assistant>()
-            .flatMap { it.parts }
-            .filterIsInstance<Part.Tool>()
-            .filter { it.status == ToolStatus.Running }
-            .mapNotNull { tool -> tool.metadata[SHELL_ID]?.let { tool.callId to it } }
-            .toMap()
+        val running = if (currentState.followRunningTools) runningShells(visible) else emptyMap()
         (liveJobs.keys - running.keys).forEach { callId ->
             liveJobs.remove(callId)?.cancel()
             liveOutput.remove(callId)
@@ -596,6 +592,15 @@ class ChatViewModel(
             job.start()
         }
     }
+
+    /** Shell ids of the running `bash` tools, by call id. */
+    private fun runningShells(visible: List<Message>): Map<String, String> = visible.asSequence()
+        .filterIsInstance<Message.Assistant>()
+        .flatMap { it.parts }
+        .filterIsInstance<Part.Tool>()
+        .filter { it.status == ToolStatus.Running }
+        .mapNotNull { tool -> tool.metadata[SHELL_ID]?.let { tool.callId to it } }
+        .toMap()
 
     private fun rebuild() {
         val state = currentState

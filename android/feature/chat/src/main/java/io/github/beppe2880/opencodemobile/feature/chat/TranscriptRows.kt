@@ -184,7 +184,13 @@ internal fun AssistantText(item: ChatItem.Text, cache: MarkdownCache, modifier: 
 }
 
 @Composable
-internal fun ReasoningBlock(item: ChatItem.Reasoning, expanded: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+internal fun ReasoningBlock(
+    item: ChatItem.Reasoning,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+    followLive: Boolean = false,
+) {
     val c = OcTheme.colors
     val label = when {
         item.streaming -> stringResource(R.string.chat_thinking)
@@ -192,7 +198,7 @@ internal fun ReasoningBlock(item: ChatItem.Reasoning, expanded: Boolean, onToggl
         else -> stringResource(R.string.chat_thought)
     }
     // Thinking in progress stays open so it can be followed live.
-    val open = expanded || item.streaming
+    val open = expanded || (followLive && item.streaming)
     Column(modifier = modifier.fillMaxWidth()) {
         DisclosureRow(
             expanded = open,

@@ -38,6 +38,8 @@ sealed interface SettingsEvent {
     data class ThemeChanged(val theme: ThemeMode) : SettingsEvent
     data class ShowReasoningChanged(val enabled: Boolean) : SettingsEvent
     data class ExpandToolsChanged(val enabled: Boolean) : SettingsEvent
+    data class FollowRunningToolsChanged(val enabled: Boolean) : SettingsEvent
+    data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent

@@ -653,6 +653,21 @@ class ChatViewModelTest {
         assertEquals(reads, chat.shellReads.size)
     }
 
+    @Test
+    fun `running tools are not followed when the setting is off`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(followRunningTools = false)
+        val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        chat.shellPages += "line 1\n"
+        val vm = vm()
+        advanceTimeBy(2_000)
+        runCurrent()
+
+        assertTrue(chat.shellReads.isEmpty())
+        assertNull(vm.tool("c1").output)
+        assertFalse(vm.state.value.followRunningTools)
+    }
+
     private fun ChatViewModel.tool(callId: String): Part.Tool = state.value.items
         .flatMap { item ->
             when (item) {

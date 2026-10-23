@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Mostra i blocchi compressi “Ragionato per…” nella conversazione</string>
     <string name="settings_expand_tools">Espandi chiamate agli strumenti</string>
     <string name="settings_expand_tools_sub">Mostra le righe degli strumenti espanse invece di un riepilogo</string>
+    <string name="settings_follow_running">Segui strumenti in esecuzione</string>
+    <string name="settings_follow_running_sub">Tieni aperti strumenti e ragionamento mentre sono in corso e mostra l\'output dei comandi man mano che arriva</string>
+    <string name="settings_full_commands">Mostra comandi completi</string>
+    <string name="settings_full_commands_sub">Manda a capo comandi e percorsi lunghi nelle righe degli strumenti invece di troncarli</string>
     <string name="settings_show_cost">Mostra costo</string>
     <string name="settings_show_cost_sub">Mostra sotto la risposta il costo in dollari di ogni turno</string>
     <string name="settings_swipe_chats">Scorri tra le chat</string>

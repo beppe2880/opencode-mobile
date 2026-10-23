@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">대화에 접힌 “생각한 시간…” 블록 표시</string>
     <string name="settings_expand_tools">도구 호출 펼치기</string>
     <string name="settings_expand_tools_sub">한 줄 요약 대신 도구 행을 펼쳐서 표시</string>
+    <string name="settings_follow_running">실행 중인 도구 따라가기</string>
+    <string name="settings_follow_running_sub">도구와 생각을 실행하는 동안 펼쳐 두고 명령 출력을 도착하는 대로 표시</string>
+    <string name="settings_full_commands">전체 명령 표시</string>
+    <string name="settings_full_commands_sub">도구 행에서 긴 명령과 경로를 잘라내지 않고 여러 줄로 줄바꿈</string>
     <string name="settings_show_cost">비용 표시</string>
     <string name="settings_show_cost_sub">응답 아래에 각 턴의 달러 비용 표시</string>
     <string name="settings_swipe_chats">스와이프로 채팅 전환</string>

@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Afficher les blocs repliés « Réflexion pendant… » dans la conversation</string>
     <string name="settings_expand_tools">Développer les appels d’outils</string>
     <string name="settings_expand_tools_sub">Développer les lignes des outils plutôt que d’afficher un résumé sur une ligne</string>
+    <string name="settings_follow_running">Suivre les outils en cours</string>
+    <string name="settings_follow_running_sub">Garder les outils et la réflexion ouverts pendant leur exécution et afficher la sortie des commandes au fur et à mesure</string>
+    <string name="settings_full_commands">Afficher les commandes complètes</string>
+    <string name="settings_full_commands_sub">Renvoyer à la ligne les commandes et chemins longs dans les lignes d’outils au lieu de les tronquer</string>
     <string name="settings_show_cost">Afficher le coût</string>
     <string name="settings_show_cost_sub">Afficher le coût en dollars de chaque tour sous la réponse</string>
     <string name="settings_swipe_chats">Balayer entre les discussions</string>

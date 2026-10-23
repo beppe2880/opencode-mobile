@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Eingeklappte „Nachgedacht für…“-Blöcke im Verlauf anzeigen</string>
     <string name="settings_expand_tools">Werkzeugaufrufe aufklappen</string>
     <string name="settings_expand_tools_sub">Werkzeugzeilen aufgeklappt statt als einzeilige Zusammenfassung anzeigen</string>
+    <string name="settings_follow_running">Laufende Werkzeuge verfolgen</string>
+    <string name="settings_follow_running_sub">Werkzeuge und Denkprozess während der Ausführung geöffnet lassen und die Befehlsausgabe live anzeigen</string>
+    <string name="settings_full_commands">Vollständige Befehle anzeigen</string>
+    <string name="settings_full_commands_sub">Lange Befehle und Pfade in Werkzeugzeilen umbrechen, statt sie abzuschneiden</string>
     <string name="settings_show_cost">Kosten anzeigen</string>
     <string name="settings_show_cost_sub">Kosten jedes Durchlaufs in Dollar unter der Antwort anzeigen</string>
     <string name="settings_swipe_chats">Zwischen Chats wischen</string>

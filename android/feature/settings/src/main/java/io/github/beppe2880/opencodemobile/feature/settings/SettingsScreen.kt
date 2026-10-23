@@ -260,6 +260,22 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
             )
             OcDivider()
             OcSwitchRow(
+                title = stringResource(R.string.settings_follow_running),
+                subtitle = stringResource(R.string.settings_follow_running_sub),
+                checked = settings.followRunningTools,
+                onCheckedChange = { onEvent(SettingsEvent.FollowRunningToolsChanged(it)) },
+                modifier = Modifier.testTag("settings_follow_running_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(R.string.settings_full_commands),
+                subtitle = stringResource(R.string.settings_full_commands_sub),
+                checked = settings.showFullCommands,
+                onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
+                modifier = Modifier.testTag("settings_full_commands_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
                 title = stringResource(R.string.settings_group_activity),
                 subtitle = stringResource(R.string.settings_group_activity_sub),
                 checked = settings.groupActivity,

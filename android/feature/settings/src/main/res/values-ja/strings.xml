@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">会話に折りたたまれた「思考時間…」ブロックを表示</string>
     <string name="settings_expand_tools">ツール呼び出しを展開</string>
     <string name="settings_expand_tools_sub">ツールの行を1行の要約ではなく展開して表示</string>
+    <string name="settings_follow_running">実行中のツールを追跡</string>
+    <string name="settings_follow_running_sub">ツールの実行中や思考中は行を展開したままにし、コマンドの出力をリアルタイムで表示</string>
+    <string name="settings_full_commands">完全なコマンドを表示</string>
+    <string name="settings_full_commands_sub">ツール行で長いコマンドやパスを切り捨てず、折り返して表示</string>
     <string name="settings_show_cost">費用を表示</string>
     <string name="settings_show_cost_sub">各ターンの費用をドルで返信の下に表示</string>
     <string name="settings_swipe_chats">スワイプでチャットを切り替え</string>

@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">在对话中显示折叠的“已思考…”区块</string>
     <string name="settings_expand_tools">展开工具调用</string>
     <string name="settings_expand_tools_sub">展开显示工具详情，而不是单行摘要</string>
+    <string name="settings_follow_running">跟随运行中的工具</string>
+    <string name="settings_follow_running_sub">工具运行或思考时保持其展开，并实时显示命令输出</string>
+    <string name="settings_full_commands">显示完整命令</string>
+    <string name="settings_full_commands_sub">在工具行中自动换行显示长命令和路径，而不是截断</string>
     <string name="settings_show_cost">显示费用</string>
     <string name="settings_show_cost_sub">在回复下方显示每轮的美元费用</string>
     <string name="settings_swipe_chats">滑动切换聊天</string>

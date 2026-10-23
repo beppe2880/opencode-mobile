@@ -42,6 +42,10 @@ data class ChatState(
     /** Keys whose expansion differs from the default (see [isExpanded]). */
     val toggled: Set<String> = emptySet(),
     val expandToolsByDefault: Boolean = false,
+    /** Running tools and thinking stay open, with live command output (setting). */
+    val followRunningTools: Boolean = true,
+    /** Tool rows wrap long commands and paths (setting). */
+    val showFullCommands: Boolean = false,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
     /** The microphone button of the composer (setting). */

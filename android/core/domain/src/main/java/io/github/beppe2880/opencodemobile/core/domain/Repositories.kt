@@ -265,6 +265,10 @@ data class AppSettings(
     val theme: ThemeMode = ThemeMode.System,
     val showReasoning: Boolean = true,
     val expandToolsByDefault: Boolean = false,
+    /** Tools and thinking stay open while they run, with a command's output shown as it arrives. */
+    val followRunningTools: Boolean = true,
+    /** Long commands and paths in tool rows wrap instead of being cut to one line. */
+    val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */

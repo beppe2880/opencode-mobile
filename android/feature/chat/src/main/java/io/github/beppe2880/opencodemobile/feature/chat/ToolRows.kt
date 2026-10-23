@@ -8,6 +8,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -58,10 +59,12 @@ internal fun ToolsGroup(
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
     onOpenFile: (String) -> Unit = {},
+    followLive: Boolean = false,
+    fullCommands: Boolean = false,
 ) {
     val c = OcTheme.colors
     // Work in progress stays open so it can be followed live; it folds back once done.
-    val open = expanded || item.running
+    val open = expanded || (followLive && item.running)
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking = null),
@@ -91,6 +94,8 @@ internal fun ToolsGroup(
                         onToggleFull = { onToggle("f:$id") },
                         onOpenSession = onOpenSession,
                         onOpenFile = onOpenFile,
+                        followLive = followLive,
+                        fullCommand = fullCommands,
                     )
                 }
             }
@@ -110,6 +115,8 @@ internal fun ActivityGroup(
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
     onOpenFile: (String) -> Unit = {},
+    followLive: Boolean = false,
+    fullCommands: Boolean = false,
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -117,7 +124,7 @@ internal fun ActivityGroup(
         item.thinkingMs >= 1_000 -> stringResource(R.string.chat_thought_for, formatDuration(item.thinkingMs))
         else -> stringResource(R.string.chat_thought)
     }
-    val open = expanded || item.running
+    val open = expanded || (followLive && item.running)
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking),
@@ -138,6 +145,7 @@ internal fun ActivityGroup(
                             item = entry,
                             expanded = isExpanded("r:${entry.key}"),
                             onToggle = { onToggle("r:${entry.key}") },
+                            followLive = followLive,
                         )
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
@@ -147,6 +155,8 @@ internal fun ActivityGroup(
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,
                             onOpenFile = onOpenFile,
+                            followLive = followLive,
+                            fullCommands = fullCommands,
                         )
                         else -> Unit
                     }
@@ -210,6 +220,8 @@ private fun ToolRow(
     onToggleFull: () -> Unit,
     onOpenSession: (String) -> Unit,
     onOpenFile: (String) -> Unit,
+    followLive: Boolean,
+    fullCommand: Boolean,
 ) {
     val c = OcTheme.colors
     val child = SessionInsights.childSession(tool)
@@ -218,54 +230,73 @@ private fun ToolRow(
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
     val running = tool.status == ToolStatus.Running || tool.status == ToolStatus.Streaming
-    val open = expanded || running
+    val open = expanded || (followLive && running)
     val statusLabel = when (tool.status) {
         ToolStatus.Streaming, ToolStatus.Running -> stringResource(R.string.chat_tool_running)
         ToolStatus.Completed -> stringResource(R.string.chat_tool_completed)
         ToolStatus.Error -> stringResource(R.string.chat_tool_failed)
     }
+    // With full commands on, the argument gets its own full-width lines under the title.
+    val wrapArgument = fullCommand && !argument.isNullOrEmpty()
     Column(Modifier.fillMaxWidth()) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(role = Role.Button, onClick = onToggle)
                 .semantics { stateDescription = statusLabel }
-                .heightIn(min = 44.dp)
-                .padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)
                 .testTag("chat_tool_${tool.callId}"),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
         ) {
-            Icon(ToolInfo.icon(tool.name), contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
-            Text(ToolInfo.title(tool.name), style = OcTheme.mono.label, color = c.textBase)
-            Text(
-                text = argument.orEmpty(),
-                style = OcTheme.mono.codeSmall,
-                color = c.textMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            if (tool.diffs.isNotEmpty()) {
-                DiffStats(tool.diffs.sumOf { it.additions }, tool.diffs.sumOf { it.deletions })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 44.dp)
+                    .padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+            ) {
+                Icon(ToolInfo.icon(tool.name), contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
+                Text(ToolInfo.title(tool.name), style = OcTheme.mono.label, color = c.textBase)
+                if (wrapArgument) {
+                    Spacer(Modifier.weight(1f))
+                } else {
+                    Text(
+                        text = argument.orEmpty(),
+                        style = OcTheme.mono.codeSmall,
+                        color = c.textMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (tool.diffs.isNotEmpty()) {
+                    DiffStats(tool.diffs.sumOf { it.additions }, tool.diffs.sumOf { it.deletions })
+                }
+                if (file != null) {
+                    OcIconButton(
+                        icon = Icons.Outlined.FileOpen,
+                        contentDescription = stringResource(R.string.chat_open_file),
+                        onClick = { onOpenFile(file) },
+                        modifier = Modifier.size(36.dp).testTag("chat_open_file_${tool.callId}"),
+                    )
+                }
+                if (child != null) {
+                    OcIconButton(
+                        icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                        contentDescription = stringResource(R.string.chat_open_subagent),
+                        onClick = { onOpenSession(child) },
+                        modifier = Modifier.size(36.dp).testTag("chat_open_subagent_${tool.callId}"),
+                    )
+                }
+                ToolStatusIcon(tool.status)
             }
-            if (file != null) {
-                OcIconButton(
-                    icon = Icons.Outlined.FileOpen,
-                    contentDescription = stringResource(R.string.chat_open_file),
-                    onClick = { onOpenFile(file) },
-                    modifier = Modifier.size(36.dp).testTag("chat_open_file_${tool.callId}"),
+            if (wrapArgument) {
+                Text(
+                    text = argument.orEmpty(),
+                    style = OcTheme.mono.codeSmall,
+                    color = c.textMuted,
+                    modifier = Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
                 )
             }
-            if (child != null) {
-                OcIconButton(
-                    icon = Icons.AutoMirrored.Outlined.OpenInNew,
-                    contentDescription = stringResource(R.string.chat_open_subagent),
-                    onClick = { onOpenSession(child) },
-                    modifier = Modifier.size(36.dp).testTag("chat_open_subagent_${tool.callId}"),
-                )
-            }
-            ToolStatusIcon(tool.status)
         }
         // A running tool has nothing to show until its output starts arriving.
         AnimatedVisibility(visible = open && !(running && tool.output.isNullOrEmpty())) {

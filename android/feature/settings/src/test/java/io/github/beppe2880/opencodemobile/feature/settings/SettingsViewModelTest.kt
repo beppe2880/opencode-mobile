@@ -52,6 +52,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
         vm.onEvent(SettingsEvent.DictationChanged(false))
+        vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
+        vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         advanceUntilIdle()
 
         assertEquals(
@@ -59,6 +61,8 @@ class SettingsViewModelTest {
                 ThemeMode.Dark,
                 showReasoning = false,
                 expandToolsByDefault = true,
+                followRunningTools = false,
+                showFullCommands = true,
                 showCost = false,
                 swipeBetweenChats = false,
                 agentColorOutline = false,

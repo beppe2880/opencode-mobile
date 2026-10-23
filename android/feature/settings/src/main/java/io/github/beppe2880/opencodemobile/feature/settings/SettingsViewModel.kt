@@ -56,6 +56,8 @@ class SettingsViewModel(
             is SettingsEvent.ThemeChanged -> update { it.copy(theme = event.theme) }
             is SettingsEvent.ShowReasoningChanged -> update { it.copy(showReasoning = event.enabled) }
             is SettingsEvent.ExpandToolsChanged -> update { it.copy(expandToolsByDefault = event.enabled) }
+            is SettingsEvent.FollowRunningToolsChanged -> update { it.copy(followRunningTools = event.enabled) }
+            is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }

@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Показывать свёрнутые блоки «Размышлял…» в истории</string>
     <string name="settings_expand_tools">Разворачивать вызовы инструментов</string>
     <string name="settings_expand_tools_sub">Показывать вызовы инструментов развёрнутыми вместо краткой строки</string>
+    <string name="settings_follow_running">Следить за запущенными инструментами</string>
+    <string name="settings_follow_running_sub">Держать инструменты и рассуждения развёрнутыми во время выполнения и показывать вывод команд по мере поступления</string>
+    <string name="settings_full_commands">Показывать полные команды</string>
+    <string name="settings_full_commands_sub">Переносить длинные команды и пути на несколько строк в строках инструментов вместо обрезки</string>
     <string name="settings_show_cost">Показывать стоимость</string>
     <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>
     <string name="settings_swipe_chats">Перелистывать чаты</string>

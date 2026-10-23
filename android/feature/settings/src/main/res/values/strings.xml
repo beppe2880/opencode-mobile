@@ -25,6 +25,10 @@
     <string name="settings_show_reasoning_sub">Display collapsed “Thought for…” blocks in the transcript</string>
     <string name="settings_expand_tools">Expand tool calls</string>
     <string name="settings_expand_tools_sub">Show tool rows expanded instead of a one-line summary</string>
+    <string name="settings_follow_running">Follow running tools</string>
+    <string name="settings_follow_running_sub">Keep tools and thinking open while they run and show command output as it arrives</string>
+    <string name="settings_full_commands">Show full commands</string>
+    <string name="settings_full_commands_sub">Wrap long commands and paths in tool rows instead of cutting them off</string>
     <string name="settings_show_cost">Show cost</string>
     <string name="settings_show_cost_sub">Show the cost in dollars of each turn below the reply</string>
     <string name="settings_swipe_chats">Swipe between chats</string>

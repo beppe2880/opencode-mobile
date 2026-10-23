@@ -166,6 +166,7 @@ internal fun Transcript(
                         expanded = state.isExpanded("r:${item.key}"),
                         onToggle = { onToggle("r:${item.key}") },
                         modifier = rowModifier,
+                        followLive = state.followRunningTools,
                     )
                     is ChatItem.Tools -> ToolsGroup(
                         item = item,
@@ -176,6 +177,8 @@ internal fun Transcript(
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
                         onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
+                        followLive = state.followRunningTools,
+                        fullCommands = state.showFullCommands,
                     )
                     is ChatItem.Activity -> ActivityGroup(
                         item = item,
@@ -187,6 +190,8 @@ internal fun Transcript(
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
                         onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
+                        followLive = state.followRunningTools,
+                        fullCommands = state.showFullCommands,
                     )
                     is ChatItem.Error -> ErrorRow(item, rowModifier)
                     is ChatItem.Notice -> NoticeRow(
