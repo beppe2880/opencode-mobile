@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -280,6 +281,20 @@ class RemoteRepositoriesTest {
         assertEquals("event probe", sessions.single().title)
         assertEquals("/api/session?limit=100&order=desc&search=probe&parentID=null", server.takeRequest().path)
         assertEquals(setOf("ses_a"), repository.active().getOrThrow())
+    }
+
+    @Test
+    fun `shell output is read from the cursor in the session directory`() = runBlocking {
+        server.enqueue(
+            MockResponse().setBody(
+                """{"location":{"directory":"/repo"},"data":{"output":"line 2\n","cursor":14,"size":14,"truncated":false}}""",
+            ),
+        )
+
+        val page = RemoteChatRepository(graph.clients, InMemoryMessageCache()).shellOutput("/repo", "sh_1", 7).getOrThrow()
+
+        assertEquals(ShellOutput("line 2\n", 14), page)
+        assertEquals("/api/shell/sh_1/output?location%5Bdirectory%5D=%2Frepo&cursor=7", server.takeRequest().path)
     }
 
     @Test

@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.network.MessageCodec
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.awaitSuccess
@@ -262,6 +263,12 @@ internal class RemoteChatRepository(
      * The server answers once the command exits. A command that outlasts the read timeout is
      * not stopped by it: the server keeps it running and the transcript shows its output.
      */
+    override suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> = resultOf {
+        val api = clients.active().shells
+        val page = awaitBody { api.shellOutput(shellId, locationDirectory = directory, cursor = cursor.toString()) }.data
+        ShellOutput(page.output.orEmpty(), page.cursor)
+    }
+
     override suspend fun shell(sessionId: String, command: String): Result<Unit> = resultOf {
         val api = clients.active().sessions
         try {

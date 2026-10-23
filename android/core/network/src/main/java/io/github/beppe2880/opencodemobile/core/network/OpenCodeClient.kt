@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.api.apis.ProviderApi
 import io.github.beppe2880.opencodemobile.api.apis.PtyApi
 import io.github.beppe2880.opencodemobile.api.apis.ServerApi
 import io.github.beppe2880.opencodemobile.api.apis.SessionApi
+import io.github.beppe2880.opencodemobile.api.apis.ShellApi
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEvent
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEventSerializer
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -58,6 +59,7 @@ class OpenCodeClient internal constructor(
     val commands: CommandApi = retrofit.create(CommandApi::class.java)
     val files: FilesystemApi = retrofit.create(FilesystemApi::class.java)
     val pty: PtyApi = retrofit.create(PtyApi::class.java)
+    val shells: ShellApi = retrofit.create(ShellApi::class.java)
 
     private val streamHttp: OkHttpClient by lazy { streamClient(STREAM_READ_TIMEOUT_MILLIS) }
 

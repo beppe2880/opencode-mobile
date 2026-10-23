@@ -60,16 +60,18 @@ internal fun ToolsGroup(
     onOpenFile: (String) -> Unit = {},
 ) {
     val c = OcTheme.colors
+    // Work in progress stays open so it can be followed live; it folds back once done.
+    val open = expanded || item.running
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking = null),
             running = item.running,
             failed = item.failed > 0,
-            expanded = expanded,
+            expanded = open,
             onToggle = { onToggle("g:${item.key}") },
             testTag = "chat_tools_${item.key}",
         )
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(visible = open) {
             Column(
                 modifier = Modifier
                     .padding(top = OcSpacing.xs)
@@ -115,16 +117,17 @@ internal fun ActivityGroup(
         item.thinkingMs >= 1_000 -> stringResource(R.string.chat_thought_for, formatDuration(item.thinkingMs))
         else -> stringResource(R.string.chat_thought)
     }
+    val open = expanded || item.running
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking),
             running = item.running,
             failed = item.failed > 0,
-            expanded = expanded,
+            expanded = open,
             onToggle = { onToggle("a:${item.key}") },
             testTag = "chat_activity_${item.key}",
         )
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(visible = open) {
             Column(
                 modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
@@ -214,6 +217,8 @@ private fun ToolRow(
     val argument = ToolInfo.primaryArgument(tool.input)?.let { arg ->
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
+    val running = tool.status == ToolStatus.Running || tool.status == ToolStatus.Streaming
+    val open = expanded || running
     val statusLabel = when (tool.status) {
         ToolStatus.Streaming, ToolStatus.Running -> stringResource(R.string.chat_tool_running)
         ToolStatus.Completed -> stringResource(R.string.chat_tool_completed)
@@ -262,12 +267,13 @@ private fun ToolRow(
             }
             ToolStatusIcon(tool.status)
         }
-        AnimatedVisibility(visible = expanded) {
+        // A running tool has nothing to show until its output starts arriving.
+        AnimatedVisibility(visible = open && !(running && tool.output.isNullOrEmpty())) {
             if (tool.diffs.isNotEmpty() && tool.error == null) {
                 // Patches change several files and have no button of their own: each diff gets one.
                 ToolDiffs(tool, directory, full, onToggleFull, onOpenFile.takeIf { file == null })
             } else {
-                ToolOutput(tool, full, onToggleFull)
+                ToolOutput(tool, full, onToggleFull, live = running)
             }
         }
     }
@@ -298,12 +304,17 @@ private fun ToolStatusIcon(status: ToolStatus) {
 }
 
 @Composable
-private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit) {
+private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit, live: Boolean = false) {
     val c = OcTheme.colors
     val raw = (tool.error ?: tool.output).orEmpty().trimEnd()
     val lines = raw.lines()
     val truncated = !full && lines.size > OUTPUT_PREVIEW_LINES
-    val shown = if (truncated) lines.take(OUTPUT_PREVIEW_LINES).joinToString("\n") else raw
+    // While the tool runs, the newest lines are the interesting ones.
+    val shown = when {
+        !truncated -> raw
+        live -> lines.takeLast(OUTPUT_PREVIEW_LINES).joinToString("\n")
+        else -> lines.take(OUTPUT_PREVIEW_LINES).joinToString("\n")
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()

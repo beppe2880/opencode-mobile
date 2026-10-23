@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -629,6 +631,39 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a running bash tool shows its shell output live until it finishes`() = runTest(main.testDispatcher) {
+        val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        chat.shellPages += listOf("line 1\n", "line 2\n")
+        val vm = vm()
+        advanceTimeBy(2_000)
+        runCurrent()
+
+        assertEquals("line 1\nline 2\n", vm.tool("c1").output)
+        assertEquals(listOf(0L, 7L, 14L), chat.shellReads.take(3).map { it.second })
+        assertTrue(chat.shellReads.all { it.first == "sh_1" })
+
+        events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "line 1\nline 2\nline 3\n", emptyMap(), 9))
+        runCurrent()
+        val reads = chat.shellReads.size
+        advanceTimeBy(5_000)
+        runCurrent()
+
+        assertEquals("line 1\nline 2\nline 3\n", vm.tool("c1").output)
+        assertEquals(reads, chat.shellReads.size)
+    }
+
+    private fun ChatViewModel.tool(callId: String): Part.Tool = state.value.items
+        .flatMap { item ->
+            when (item) {
+                is ChatItem.Tools -> item.tools
+                is ChatItem.Activity -> item.tools
+                else -> emptyList()
+            }
+        }
+        .single { it.callId == callId }
+
+    @Test
     fun `execution end reloads messages from the server`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -949,6 +984,13 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     }
     val shells = mutableListOf<String>()
     var shellResult: Result<Unit> = Result.success(Unit)
+    val shellPages = ArrayDeque<String>()
+    val shellReads = mutableListOf<Pair<String, Long>>()
+    override suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> {
+        shellReads += shellId to cursor
+        val text = shellPages.removeFirstOrNull().orEmpty()
+        return Result.success(ShellOutput(text, cursor + text.length))
+    }
     override suspend fun shell(sessionId: String, command: String): Result<Unit> {
         shells += command
         return shellResult

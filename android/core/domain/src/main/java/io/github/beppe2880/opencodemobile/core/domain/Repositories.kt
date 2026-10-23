@@ -125,6 +125,9 @@ interface DraftRepository {
 
 enum class PromptDelivery { Steer, Queue }
 
+/** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
+data class ShellOutput(val text: String, val cursor: Long)
+
 /** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
 data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
 
@@ -181,6 +184,13 @@ interface ChatRepository {
      * transcript. Long commands keep running on the server after this returns.
      */
     suspend fun shell(sessionId: String, command: String): Result<Unit> = Result.success(Unit)
+
+    /**
+     * Output a shell command (for example a running `bash` tool) has written since byte
+     * [cursor]; the returned cursor is where the next read starts.
+     */
+    suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> =
+        Result.success(ShellOutput("", cursor))
 
     /** Prompts sent but not delivered yet, oldest first. */
     suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
