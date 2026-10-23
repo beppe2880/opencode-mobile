@@ -44,6 +44,8 @@ data class ChatState(
     val expandToolsByDefault: Boolean = false,
     /** Which running work stays open (settings); null when following is off. */
     val live: LiveFollow? = LiveFollow(),
+    /** An opened tool group shows each tool's output (setting). */
+    val showToolDetails: Boolean = true,
     /** Tool rows wrap long commands and paths (setting). */
     val showFullCommands: Boolean = false,
     val showCost: Boolean = true,

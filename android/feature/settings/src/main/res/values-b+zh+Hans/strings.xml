@@ -39,6 +39,8 @@
     <string name="settings_live_other">其他工具</string>
     <string name="settings_live_other_sub">网页、子代理、待办事项和 MCP 工具</string>
     <string name="settings_full_commands">显示完整命令</string>
+    <string name="settings_tool_details">显示工具详情</string>
+    <string name="settings_tool_details_sub">展开一组工具时会显示每个工具的输出或差异，而不仅仅是名称</string>
     <string name="settings_full_commands_sub">在工具行中自动换行显示长命令和路径，而不是截断</string>
     <string name="settings_show_cost">显示费用</string>
     <string name="settings_show_cost_sub">在回复下方显示每轮的美元费用</string>

@@ -39,6 +39,8 @@
     <string name="settings_live_other">その他のツール</string>
     <string name="settings_live_other_sub">Web、サブエージェント、ToDo、MCP ツール</string>
     <string name="settings_full_commands">完全なコマンドを表示</string>
+    <string name="settings_tool_details">ツールの詳細を表示</string>
+    <string name="settings_tool_details_sub">ツールのグループを開くと、名前だけでなく各ツールの出力や差分が表示されます</string>
     <string name="settings_full_commands_sub">ツール行で長いコマンドやパスを切り捨てず、折り返して表示</string>
     <string name="settings_show_cost">費用を表示</string>
     <string name="settings_show_cost_sub">各ターンの費用をドルで返信の下に表示</string>

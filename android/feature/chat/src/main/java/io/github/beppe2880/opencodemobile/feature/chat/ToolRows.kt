@@ -63,6 +63,8 @@ internal fun ToolsGroup(
     fullCommands: Boolean = false,
     /** The agent is still working on this group: the tools [live] covers stay open. */
     inLiveGroup: Boolean = false,
+    /** Rows open on their output when the group opens; tapping one folds it. */
+    details: Boolean = false,
 ) {
     val c = OcTheme.colors
     // Work in progress stays open so it can be followed live; it folds back once done.
@@ -90,7 +92,7 @@ internal fun ToolsGroup(
                     ToolRow(
                         tool = tool,
                         directory = directory,
-                        expanded = isExpanded("o:$id"),
+                        expanded = isExpanded("o:$id") != details,
                         full = isExpanded("f:$id"),
                         onToggle = { onToggle("o:$id") },
                         onToggleFull = { onToggle("f:$id") },
@@ -122,6 +124,8 @@ internal fun ActivityGroup(
     fullCommands: Boolean = false,
     /** The agent is still working on this group: its newest tools stay open between calls. */
     inLiveGroup: Boolean = false,
+    /** Inner tool groups open with every tool's output when this group opens. */
+    details: Boolean = false,
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -158,7 +162,7 @@ internal fun ActivityGroup(
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
                             directory = directory,
-                            expanded = isExpanded("g:${entry.key}") != defaultToolsExpanded,
+                            expanded = isExpanded("g:${entry.key}") != (defaultToolsExpanded || details),
                             isExpanded = isExpanded,
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,
@@ -166,6 +170,7 @@ internal fun ActivityGroup(
                             live = live,
                             fullCommands = fullCommands,
                             inLiveGroup = inLiveGroup && entry === latestTools,
+                            details = details,
                         )
                         else -> Unit
                     }

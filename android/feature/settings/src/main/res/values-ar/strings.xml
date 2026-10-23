@@ -39,6 +39,8 @@
     <string name="settings_live_other">أدوات أخرى</string>
     <string name="settings_live_other_sub">الويب والوكلاء الفرعيون والمهام وأدوات MCP</string>
     <string name="settings_full_commands">عرض الأوامر كاملة</string>
+    <string name="settings_tool_details">عرض تفاصيل الأدوات</string>
+    <string name="settings_tool_details_sub">فتح مجموعة من الأدوات يعرض مخرجات كل أداة وفرق تعديلها، لا اسمها فقط</string>
     <string name="settings_full_commands_sub">التفاف الأوامر والمسارات الطويلة على عدة أسطر في صفوف الأدوات بدلًا من قطعها</string>
     <string name="settings_show_cost">إظهار التكلفة</string>
     <string name="settings_show_cost_sub">عرض تكلفة كل جولة بالدولار أسفل الرد</string>

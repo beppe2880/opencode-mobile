@@ -63,6 +63,7 @@ class SettingsViewModel(
             is SettingsEvent.LiveReadsChanged -> update { it.copy(liveReads = event.enabled) }
             is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
+            is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }

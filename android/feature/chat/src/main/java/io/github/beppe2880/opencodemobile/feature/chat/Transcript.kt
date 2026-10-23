@@ -185,12 +185,14 @@ internal fun Transcript(
                         live = state.live,
                         fullCommands = state.showFullCommands,
                         inLiveGroup = item.key == liveGroupKey,
+                        details = state.showToolDetails,
                     )
                     is ChatItem.Activity -> ActivityGroup(
                         item = item,
                         directory = state.directory,
                         expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded),
                         inLiveGroup = item.key == liveGroupKey,
+                        details = state.showToolDetails,
                         defaultToolsExpanded = defaultToolsExpanded,
                         isExpanded = isExpanded,
                         onToggle = onToggle,

@@ -277,6 +277,8 @@ data class AppSettings(
     val liveReads: Boolean = false,
     /** With [followRunningTools]: every other tool (web, subagents, todos, MCP...). */
     val liveOther: Boolean = false,
+    /** Opening a tool group shows each tool's output or diff, not only its name. */
+    val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */
     val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */

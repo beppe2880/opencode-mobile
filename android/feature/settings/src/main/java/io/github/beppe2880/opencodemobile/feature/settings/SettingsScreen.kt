@@ -365,6 +365,14 @@ private fun LiveActivitySection(settings: AppSettings, onEvent: (SettingsEvent) 
                 onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
                 modifier = Modifier.testTag("settings_full_commands_switch"),
             )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(R.string.settings_tool_details),
+                subtitle = stringResource(R.string.settings_tool_details_sub),
+                checked = settings.showToolDetails,
+                onCheckedChange = { onEvent(SettingsEvent.ShowToolDetailsChanged(it)) },
+                modifier = Modifier.testTag("settings_tool_details_switch"),
+            )
         }
     }
 }

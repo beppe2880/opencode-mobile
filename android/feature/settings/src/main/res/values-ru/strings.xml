@@ -39,6 +39,8 @@
     <string name="settings_live_other">Другие инструменты</string>
     <string name="settings_live_other_sub">Веб, субагенты, задачи и инструменты MCP</string>
     <string name="settings_full_commands">Показывать полные команды</string>
+    <string name="settings_tool_details">Показывать детали инструментов</string>
+    <string name="settings_tool_details_sub">При открытии группы инструментов показываются результат или diff каждого, а не только их названия</string>
     <string name="settings_full_commands_sub">Переносить длинные команды и пути на несколько строк в строках инструментов вместо обрезки</string>
     <string name="settings_show_cost">Показывать стоимость</string>
     <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>

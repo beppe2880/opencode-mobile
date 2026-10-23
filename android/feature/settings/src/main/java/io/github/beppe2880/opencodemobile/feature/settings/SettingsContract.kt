@@ -45,6 +45,7 @@ sealed interface SettingsEvent {
     data class LiveReadsChanged(val enabled: Boolean) : SettingsEvent
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
+    data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent

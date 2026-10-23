@@ -39,6 +39,8 @@
     <string name="settings_live_other">Altri strumenti</string>
     <string name="settings_live_other_sub">Web, subagenti, todo e strumenti MCP</string>
     <string name="settings_full_commands">Mostra comandi completi</string>
+    <string name="settings_tool_details">Mostra dettagli degli strumenti</string>
+    <string name="settings_tool_details_sub">Aprendo un gruppo di strumenti mostra l\'output o il diff di ciascuno, non solo il nome</string>
     <string name="settings_full_commands_sub">Manda a capo comandi e percorsi lunghi nelle righe degli strumenti invece di troncarli</string>
     <string name="settings_show_cost">Mostra costo</string>
     <string name="settings_show_cost_sub">Mostra sotto la risposta il costo in dollari di ogni turno</string>

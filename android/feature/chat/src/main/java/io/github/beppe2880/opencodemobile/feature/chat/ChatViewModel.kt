@@ -101,6 +101,7 @@ class ChatViewModel(
                         expandToolsByDefault = s.expandToolsByDefault,
                         live = LiveFollow.of(s),
                         showFullCommands = s.showFullCommands,
+                        showToolDetails = s.showToolDetails,
                         showCost = s.showCost,
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,

@@ -39,6 +39,8 @@
     <string name="settings_live_other">Otras herramientas</string>
     <string name="settings_live_other_sub">Web, subagentes, tareas pendientes y herramientas MCP</string>
     <string name="settings_full_commands">Mostrar comandos completos</string>
+    <string name="settings_tool_details">Mostrar detalles de las herramientas</string>
+    <string name="settings_tool_details_sub">Al abrir un grupo de herramientas se muestra la salida o el diff de cada una, no solo su nombre</string>
     <string name="settings_full_commands_sub">Ajustar en varias líneas los comandos y rutas largos en las filas de herramientas en lugar de cortarlos</string>
     <string name="settings_show_cost">Mostrar coste</string>
     <string name="settings_show_cost_sub">Mostrar el coste en dólares de cada turno debajo de la respuesta</string>

@@ -39,6 +39,8 @@
     <string name="settings_live_other">Autres outils</string>
     <string name="settings_live_other_sub">Web, sous-agents, tâches et outils MCP</string>
     <string name="settings_full_commands">Afficher les commandes complètes</string>
+    <string name="settings_tool_details">Afficher les détails des outils</string>
+    <string name="settings_tool_details_sub">Ouvrir un groupe d’outils affiche la sortie ou le diff de chacun, et pas seulement son nom</string>
     <string name="settings_full_commands_sub">Renvoyer à la ligne les commandes et chemins longs dans les lignes d’outils au lieu de les tronquer</string>
     <string name="settings_show_cost">Afficher le coût</string>
     <string name="settings_show_cost_sub">Afficher le coût en dollars de chaque tour sous la réponse</string>

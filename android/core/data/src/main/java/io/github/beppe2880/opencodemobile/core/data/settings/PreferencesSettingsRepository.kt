@@ -31,6 +31,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_LIVE_READS, next.liveReads)
             .putBoolean(KEY_LIVE_OTHER, next.liveOther)
             .putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
+            .putBoolean(KEY_TOOL_DETAILS, next.showToolDetails)
             .putBoolean(KEY_SHOW_COST, next.showCost)
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
@@ -58,6 +59,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             liveReads = prefs.getBoolean(KEY_LIVE_READS, defaults.liveReads),
             liveOther = prefs.getBoolean(KEY_LIVE_OTHER, defaults.liveOther),
             showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
+            showToolDetails = prefs.getBoolean(KEY_TOOL_DETAILS, defaults.showToolDetails),
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
@@ -89,6 +91,7 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_LIVE_READS = "live_reads"
         const val KEY_LIVE_OTHER = "live_other"
         const val KEY_FULL_COMMANDS = "show_full_commands"
+        const val KEY_TOOL_DETAILS = "show_tool_details"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"

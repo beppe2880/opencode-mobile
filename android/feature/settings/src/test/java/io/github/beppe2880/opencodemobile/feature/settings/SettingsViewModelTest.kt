@@ -54,6 +54,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.DictationChanged(false))
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
+        vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -73,6 +74,7 @@ class SettingsViewModelTest {
                 liveReads = true,
                 liveOther = true,
                 showFullCommands = true,
+                showToolDetails = false,
                 showCost = false,
                 swipeBetweenChats = false,
                 agentColorOutline = false,

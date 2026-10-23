@@ -39,6 +39,8 @@
     <string name="settings_live_other">기타 도구</string>
     <string name="settings_live_other_sub">웹, 하위 에이전트, 할 일 및 MCP 도구</string>
     <string name="settings_full_commands">전체 명령 표시</string>
+    <string name="settings_tool_details">도구 세부 정보 표시</string>
+    <string name="settings_tool_details_sub">도구 그룹을 열면 이름만이 아니라 각 도구의 출력 또는 diff가 표시됩니다</string>
     <string name="settings_full_commands_sub">도구 행에서 긴 명령과 경로를 잘라내지 않고 여러 줄로 줄바꿈</string>
     <string name="settings_show_cost">비용 표시</string>
     <string name="settings_show_cost_sub">응답 아래에 각 턴의 달러 비용 표시</string>

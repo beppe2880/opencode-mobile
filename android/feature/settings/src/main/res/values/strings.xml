@@ -39,6 +39,8 @@
     <string name="settings_live_other">Other tools</string>
     <string name="settings_live_other_sub">Web, subagents, todos and MCP tools</string>
     <string name="settings_full_commands">Show full commands</string>
+    <string name="settings_tool_details">Show tool details</string>
+    <string name="settings_tool_details_sub">Opening a group of tools shows each one\'s output or diff, not only its name</string>
     <string name="settings_full_commands_sub">Wrap long commands and paths in tool rows instead of cutting them off</string>
     <string name="settings_show_cost">Show cost</string>
     <string name="settings_show_cost_sub">Show the cost in dollars of each turn below the reply</string>

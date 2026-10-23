@@ -39,6 +39,8 @@
     <string name="settings_live_other">Weitere Werkzeuge</string>
     <string name="settings_live_other_sub">Web, Subagenten, Aufgaben und MCP-Werkzeuge</string>
     <string name="settings_full_commands">Vollständige Befehle anzeigen</string>
+    <string name="settings_tool_details">Werkzeugdetails anzeigen</string>
+    <string name="settings_tool_details_sub">Beim Öffnen einer Werkzeuggruppe werden Ausgabe oder Diff jedes Werkzeugs angezeigt, nicht nur sein Name</string>
     <string name="settings_full_commands_sub">Lange Befehle und Pfade in Werkzeugzeilen umbrechen, statt sie abzuschneiden</string>
     <string name="settings_show_cost">Kosten anzeigen</string>
     <string name="settings_show_cost_sub">Kosten jedes Durchlaufs in Dollar unter der Antwort anzeigen</string>
