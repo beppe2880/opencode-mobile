@@ -265,8 +265,18 @@ data class AppSettings(
     val theme: ThemeMode = ThemeMode.System,
     val showReasoning: Boolean = true,
     val expandToolsByDefault: Boolean = false,
-    /** Tools and thinking stay open while they run, with a command's output shown as it arrives. */
+    /** Running work stays open while the agent works; the kinds below choose which. */
     val followRunningTools: Boolean = true,
+    /** With [followRunningTools]: thinking in progress. */
+    val liveThinking: Boolean = true,
+    /** With [followRunningTools]: shell commands, with their output as it arrives. */
+    val liveShell: Boolean = true,
+    /** With [followRunningTools]: file edits and writes, with their diff once applied. */
+    val liveEdits: Boolean = true,
+    /** With [followRunningTools]: reads and searches, with their result. */
+    val liveReads: Boolean = false,
+    /** With [followRunningTools]: every other tool (web, subagents, todos, MCP...). */
+    val liveOther: Boolean = false,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */
     val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */

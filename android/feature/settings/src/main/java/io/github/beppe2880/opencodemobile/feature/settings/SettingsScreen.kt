@@ -100,6 +100,7 @@ fun SettingsScreen(
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
+                item(key = "live") { LiveActivitySection(state.settings, onEvent) }
                 item(key = "notifications") { NotificationsSection(state, onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
@@ -260,22 +261,6 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
             )
             OcDivider()
             OcSwitchRow(
-                title = stringResource(R.string.settings_follow_running),
-                subtitle = stringResource(R.string.settings_follow_running_sub),
-                checked = settings.followRunningTools,
-                onCheckedChange = { onEvent(SettingsEvent.FollowRunningToolsChanged(it)) },
-                modifier = Modifier.testTag("settings_follow_running_switch"),
-            )
-            OcDivider()
-            OcSwitchRow(
-                title = stringResource(R.string.settings_full_commands),
-                subtitle = stringResource(R.string.settings_full_commands_sub),
-                checked = settings.showFullCommands,
-                onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
-                modifier = Modifier.testTag("settings_full_commands_switch"),
-            )
-            OcDivider()
-            OcSwitchRow(
                 title = stringResource(R.string.settings_group_activity),
                 subtitle = stringResource(R.string.settings_group_activity_sub),
                 checked = settings.groupActivity,
@@ -313,6 +298,72 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.dictation,
                 onCheckedChange = { onEvent(SettingsEvent.DictationChanged(it)) },
                 modifier = Modifier.testTag("settings_dictation_switch"),
+            )
+        }
+    }
+}
+
+@Composable
+private fun LiveActivitySection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(R.string.settings_live_activity)) {
+        OcCard {
+            OcSwitchRow(
+                title = stringResource(R.string.settings_follow_running),
+                subtitle = stringResource(R.string.settings_follow_running_sub),
+                checked = settings.followRunningTools,
+                onCheckedChange = { onEvent(SettingsEvent.FollowRunningToolsChanged(it)) },
+                modifier = Modifier.testTag("settings_follow_running_switch"),
+            )
+            // Each kind only matters while following is on.
+            if (settings.followRunningTools) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_live_thinking),
+                    subtitle = stringResource(R.string.settings_live_thinking_sub),
+                    checked = settings.liveThinking,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveThinkingChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_thinking_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_live_shell),
+                    subtitle = stringResource(R.string.settings_live_shell_sub),
+                    checked = settings.liveShell,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveShellChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_shell_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_live_edits),
+                    subtitle = stringResource(R.string.settings_live_edits_sub),
+                    checked = settings.liveEdits,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveEditsChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_edits_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_live_reads),
+                    subtitle = stringResource(R.string.settings_live_reads_sub),
+                    checked = settings.liveReads,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveReadsChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_reads_switch"),
+                )
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_live_other),
+                    subtitle = stringResource(R.string.settings_live_other_sub),
+                    checked = settings.liveOther,
+                    onCheckedChange = { onEvent(SettingsEvent.LiveOtherChanged(it)) },
+                    modifier = Modifier.testTag("settings_live_other_switch"),
+                )
+            }
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(R.string.settings_full_commands),
+                subtitle = stringResource(R.string.settings_full_commands_sub),
+                checked = settings.showFullCommands,
+                onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
+                modifier = Modifier.testTag("settings_full_commands_switch"),
             )
         }
     }

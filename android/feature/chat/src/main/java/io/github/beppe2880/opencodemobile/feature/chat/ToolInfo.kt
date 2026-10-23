@@ -56,6 +56,16 @@ object ToolInfo {
         else -> Icons.Outlined.Build
     }
 
+    enum class Kind { Shell, Edit, Read, Other }
+
+    /** Kind of tool, for the settings that follow running work. */
+    fun kind(name: String): Kind = when (name.lowercase()) {
+        "bash", "shell" -> Kind.Shell
+        "write", "edit", "multiedit", "patch", "apply_patch" -> Kind.Edit
+        "read", "grep", "glob", "list", "ls", "codesearch" -> Kind.Read
+        else -> Kind.Other
+    }
+
     /** The file a read, write or edit call works on, once its input is complete. */
     fun filePath(tool: Part.Tool): String? {
         if (tool.status == ToolStatus.Streaming || tool.name.lowercase() !in FILE_TOOLS) return null

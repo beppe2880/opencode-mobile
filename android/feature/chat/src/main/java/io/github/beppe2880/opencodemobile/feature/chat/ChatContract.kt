@@ -42,8 +42,8 @@ data class ChatState(
     /** Keys whose expansion differs from the default (see [isExpanded]). */
     val toggled: Set<String> = emptySet(),
     val expandToolsByDefault: Boolean = false,
-    /** Running tools and thinking stay open, with live command output (setting). */
-    val followRunningTools: Boolean = true,
+    /** Which running work stays open (settings); null when following is off. */
+    val live: LiveFollow? = LiveFollow(),
     /** Tool rows wrap long commands and paths (setting). */
     val showFullCommands: Boolean = false,
     val showCost: Boolean = true,

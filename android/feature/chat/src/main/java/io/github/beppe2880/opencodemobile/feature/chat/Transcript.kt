@@ -139,8 +139,8 @@ internal fun Transcript(
     }
     val defaultToolsExpanded = state.expandToolsByDefault
     // While the agent works, its newest tool group stays open between one tool and the next.
-    val liveGroupKey = remember(state.items, state.running, state.followRunningTools) {
-        if (!state.running || !state.followRunningTools) null
+    val liveGroupKey = remember(state.items, state.running, state.live) {
+        if (!state.running || state.live == null) null
         else state.items.lastOrNull { it !is ChatItem.Working }?.takeIf { it is ChatItem.Tools || it is ChatItem.Activity }?.key
     }
     val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
@@ -171,32 +171,33 @@ internal fun Transcript(
                         expanded = state.isExpanded("r:${item.key}"),
                         onToggle = { onToggle("r:${item.key}") },
                         modifier = rowModifier,
-                        followLive = state.followRunningTools,
+                        live = state.live,
                     )
                     is ChatItem.Tools -> ToolsGroup(
                         item = item,
                         directory = state.directory,
-                        expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded) || item.key == liveGroupKey,
+                        expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded),
                         isExpanded = isExpanded,
                         onToggle = onToggle,
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
                         onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
-                        followLive = state.followRunningTools,
+                        live = state.live,
                         fullCommands = state.showFullCommands,
+                        inLiveGroup = item.key == liveGroupKey,
                     )
                     is ChatItem.Activity -> ActivityGroup(
                         item = item,
                         directory = state.directory,
-                        expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded) || item.key == liveGroupKey,
-                        keepLatestOpen = item.key == liveGroupKey,
+                        expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded),
+                        inLiveGroup = item.key == liveGroupKey,
                         defaultToolsExpanded = defaultToolsExpanded,
                         isExpanded = isExpanded,
                         onToggle = onToggle,
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
                         onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
                         modifier = rowModifier,
-                        followLive = state.followRunningTools,
+                        live = state.live,
                         fullCommands = state.showFullCommands,
                     )
                     is ChatItem.Error -> ErrorRow(item, rowModifier)

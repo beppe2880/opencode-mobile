@@ -189,7 +189,7 @@ internal fun ReasoningBlock(
     expanded: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    followLive: Boolean = false,
+    live: LiveFollow? = null,
 ) {
     val c = OcTheme.colors
     val label = when {
@@ -198,7 +198,7 @@ internal fun ReasoningBlock(
         else -> stringResource(R.string.chat_thought)
     }
     // Thinking in progress stays open so it can be followed live.
-    val open = expanded || (followLive && item.streaming)
+    val open = expanded || (live?.thinking == true && item.streaming)
     Column(modifier = modifier.fillMaxWidth()) {
         DisclosureRow(
             expanded = open,

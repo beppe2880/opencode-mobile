@@ -99,7 +99,7 @@ class ChatViewModel(
                 updateState {
                     it.copy(
                         expandToolsByDefault = s.expandToolsByDefault,
-                        followRunningTools = s.followRunningTools,
+                        live = LiveFollow.of(s),
                         showFullCommands = s.showFullCommands,
                         showCost = s.showCost,
                         swipeEnabled = s.swipeBetweenChats,
@@ -566,7 +566,7 @@ class ChatViewModel(
      * while the tool runs, its shell output is read every [LIVE_OUTPUT_POLL_MS].
      */
     private fun followShells(visible: List<Message>) {
-        val running = if (currentState.followRunningTools) runningShells(visible) else emptyMap()
+        val running = if (currentState.live?.shell == true) runningShells(visible) else emptyMap()
         (liveJobs.keys - running.keys).forEach { callId ->
             liveJobs.remove(callId)?.cancel()
             liveOutput.remove(callId)

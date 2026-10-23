@@ -25,6 +25,11 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_SHOW_REASONING, next.showReasoning)
             .putBoolean(KEY_EXPAND_TOOLS, next.expandToolsByDefault)
             .putBoolean(KEY_FOLLOW_RUNNING, next.followRunningTools)
+            .putBoolean(KEY_LIVE_THINKING, next.liveThinking)
+            .putBoolean(KEY_LIVE_SHELL, next.liveShell)
+            .putBoolean(KEY_LIVE_EDITS, next.liveEdits)
+            .putBoolean(KEY_LIVE_READS, next.liveReads)
+            .putBoolean(KEY_LIVE_OTHER, next.liveOther)
             .putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
             .putBoolean(KEY_SHOW_COST, next.showCost)
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
@@ -47,6 +52,11 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             showReasoning = prefs.getBoolean(KEY_SHOW_REASONING, defaults.showReasoning),
             expandToolsByDefault = prefs.getBoolean(KEY_EXPAND_TOOLS, defaults.expandToolsByDefault),
             followRunningTools = prefs.getBoolean(KEY_FOLLOW_RUNNING, defaults.followRunningTools),
+            liveThinking = prefs.getBoolean(KEY_LIVE_THINKING, defaults.liveThinking),
+            liveShell = prefs.getBoolean(KEY_LIVE_SHELL, defaults.liveShell),
+            liveEdits = prefs.getBoolean(KEY_LIVE_EDITS, defaults.liveEdits),
+            liveReads = prefs.getBoolean(KEY_LIVE_READS, defaults.liveReads),
+            liveOther = prefs.getBoolean(KEY_LIVE_OTHER, defaults.liveOther),
             showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
@@ -73,6 +83,11 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_SHOW_REASONING = "show_reasoning"
         const val KEY_EXPAND_TOOLS = "expand_tools_by_default"
         const val KEY_FOLLOW_RUNNING = "follow_running_tools"
+        const val KEY_LIVE_THINKING = "live_thinking"
+        const val KEY_LIVE_SHELL = "live_shell"
+        const val KEY_LIVE_EDITS = "live_edits"
+        const val KEY_LIVE_READS = "live_reads"
+        const val KEY_LIVE_OTHER = "live_other"
         const val KEY_FULL_COMMANDS = "show_full_commands"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"

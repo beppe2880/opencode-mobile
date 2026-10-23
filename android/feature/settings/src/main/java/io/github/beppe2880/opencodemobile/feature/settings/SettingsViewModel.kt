@@ -57,6 +57,11 @@ class SettingsViewModel(
             is SettingsEvent.ShowReasoningChanged -> update { it.copy(showReasoning = event.enabled) }
             is SettingsEvent.ExpandToolsChanged -> update { it.copy(expandToolsByDefault = event.enabled) }
             is SettingsEvent.FollowRunningToolsChanged -> update { it.copy(followRunningTools = event.enabled) }
+            is SettingsEvent.LiveThinkingChanged -> update { it.copy(liveThinking = event.enabled) }
+            is SettingsEvent.LiveShellChanged -> update { it.copy(liveShell = event.enabled) }
+            is SettingsEvent.LiveEditsChanged -> update { it.copy(liveEdits = event.enabled) }
+            is SettingsEvent.LiveReadsChanged -> update { it.copy(liveReads = event.enabled) }
+            is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }

@@ -59,12 +59,14 @@ internal fun ToolsGroup(
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
     onOpenFile: (String) -> Unit = {},
-    followLive: Boolean = false,
+    live: LiveFollow? = null,
     fullCommands: Boolean = false,
+    /** The agent is still working on this group: the tools [live] covers stay open. */
+    inLiveGroup: Boolean = false,
 ) {
     val c = OcTheme.colors
     // Work in progress stays open so it can be followed live; it folds back once done.
-    val open = expanded || (followLive && item.running)
+    val open = expanded || (live != null && (inLiveGroup || item.running) && item.tools.any(live::covers))
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking = null),
@@ -94,7 +96,8 @@ internal fun ToolsGroup(
                         onToggleFull = { onToggle("f:$id") },
                         onOpenSession = onOpenSession,
                         onOpenFile = onOpenFile,
-                        followLive = followLive,
+                        live = live,
+                        inLiveGroup = inLiveGroup,
                         fullCommand = fullCommands,
                     )
                 }
@@ -115,10 +118,10 @@ internal fun ActivityGroup(
     modifier: Modifier = Modifier,
     onOpenSession: (String) -> Unit = {},
     onOpenFile: (String) -> Unit = {},
-    followLive: Boolean = false,
+    live: LiveFollow? = null,
     fullCommands: Boolean = false,
     /** The agent is still working on this group: its newest tools stay open between calls. */
-    keepLatestOpen: Boolean = false,
+    inLiveGroup: Boolean = false,
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -126,7 +129,9 @@ internal fun ActivityGroup(
         item.thinkingMs >= 1_000 -> stringResource(R.string.chat_thought_for, formatDuration(item.thinkingMs))
         else -> stringResource(R.string.chat_thought)
     }
-    val open = expanded || (followLive && item.running)
+    val followed = live != null &&
+        (item.tools.any(live::covers) || (live.thinking && item.thoughts.any { it.streaming }))
+    val open = expanded || (followed && (inLiveGroup || item.running))
     Column(modifier = modifier.fillMaxWidth()) {
         GroupSummary(
             summary = toolsSummary(item.tools, thinking),
@@ -148,18 +153,19 @@ internal fun ActivityGroup(
                             item = entry,
                             expanded = isExpanded("r:${entry.key}"),
                             onToggle = { onToggle("r:${entry.key}") },
-                            followLive = followLive,
+                            live = live,
                         )
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
                             directory = directory,
-                            expanded = (isExpanded("g:${entry.key}") != defaultToolsExpanded) || (keepLatestOpen && entry === latestTools),
+                            expanded = isExpanded("g:${entry.key}") != defaultToolsExpanded,
                             isExpanded = isExpanded,
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,
                             onOpenFile = onOpenFile,
-                            followLive = followLive,
+                            live = live,
                             fullCommands = fullCommands,
+                            inLiveGroup = inLiveGroup && entry === latestTools,
                         )
                         else -> Unit
                     }
@@ -223,7 +229,8 @@ private fun ToolRow(
     onToggleFull: () -> Unit,
     onOpenSession: (String) -> Unit,
     onOpenFile: (String) -> Unit,
-    followLive: Boolean,
+    live: LiveFollow?,
+    inLiveGroup: Boolean,
     fullCommand: Boolean,
 ) {
     val c = OcTheme.colors
@@ -233,7 +240,8 @@ private fun ToolRow(
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
     val running = tool.status == ToolStatus.Running || tool.status == ToolStatus.Streaming
-    val open = expanded || (followLive && running)
+    // Followed kinds open while they run and, in the group the agent is still working on, once done.
+    val open = expanded || (live?.covers(tool) == true && (running || inLiveGroup))
     val statusLabel = when (tool.status) {
         ToolStatus.Streaming, ToolStatus.Running -> stringResource(R.string.chat_tool_running)
         ToolStatus.Completed -> stringResource(R.string.chat_tool_completed)

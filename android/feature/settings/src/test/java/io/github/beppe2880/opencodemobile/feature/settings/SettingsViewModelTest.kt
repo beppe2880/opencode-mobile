@@ -54,6 +54,11 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.DictationChanged(false))
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
+        vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
+        vm.onEvent(SettingsEvent.LiveShellChanged(false))
+        vm.onEvent(SettingsEvent.LiveEditsChanged(false))
+        vm.onEvent(SettingsEvent.LiveReadsChanged(true))
+        vm.onEvent(SettingsEvent.LiveOtherChanged(true))
         advanceUntilIdle()
 
         assertEquals(
@@ -62,6 +67,11 @@ class SettingsViewModelTest {
                 showReasoning = false,
                 expandToolsByDefault = true,
                 followRunningTools = false,
+                liveThinking = false,
+                liveShell = false,
+                liveEdits = false,
+                liveReads = true,
+                liveOther = true,
                 showFullCommands = true,
                 showCost = false,
                 swipeBetweenChats = false,
