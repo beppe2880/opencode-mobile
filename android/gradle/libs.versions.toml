@@ -3,7 +3,7 @@
 agp = "9.4.1"
 kotlin = "2.4.21"
 composeBom = "2026.09.00"
-kotlinxSerialization = "1.11.0"
+kotlinxSerialization = "1.12.0"
 kotlinxCoroutines = "1.11.0"
 ksp = "2.3.12"
 spotless = "8.10.4"
@@ -27,7 +27,7 @@ okhttp = "5.5.0"
 retrofit = "3.0.0"
 
 # ---- Markdown rendering (Compose) ----
-markdownRenderer = "0.45.0"
+markdownRenderer = "0.46.0"
 highlights = "1.1.0"
 
 # ---- QR decoding ----
