@@ -208,7 +208,8 @@ internal fun ReasoningBlock(
             Text(label, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
             if (item.streaming) OcSpinner(size = 10.dp)
         }
-        AnimatedVisibility(visible = open) {
+        // Summarized thinking only arrives at the end: no empty box while it streams.
+        AnimatedVisibility(visible = open && item.text.isNotBlank()) {
             Text(
                 text = item.text,
                 style = MaterialTheme.typography.bodySmall,
