@@ -117,6 +117,8 @@ internal fun ActivityGroup(
     onOpenFile: (String) -> Unit = {},
     followLive: Boolean = false,
     fullCommands: Boolean = false,
+    /** The agent is still working on this group: its newest tools stay open between calls. */
+    keepLatestOpen: Boolean = false,
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -139,6 +141,7 @@ internal fun ActivityGroup(
                 modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {
+                val latestTools = item.entries.lastOrNull { it is ChatItem.Tools }
                 item.entries.forEach { entry ->
                     when (entry) {
                         is ChatItem.Reasoning -> ReasoningBlock(
@@ -150,7 +153,7 @@ internal fun ActivityGroup(
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
                             directory = directory,
-                            expanded = isExpanded("g:${entry.key}") != defaultToolsExpanded,
+                            expanded = (isExpanded("g:${entry.key}") != defaultToolsExpanded) || (keepLatestOpen && entry === latestTools),
                             isExpanded = isExpanded,
                             onToggle = onToggle,
                             onOpenSession = onOpenSession,

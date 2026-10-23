@@ -138,6 +138,11 @@ internal fun Transcript(
         if (state.synced) seenNewest = newestKey
     }
     val defaultToolsExpanded = state.expandToolsByDefault
+    // While the agent works, its newest tool group stays open between one tool and the next.
+    val liveGroupKey = remember(state.items, state.running, state.followRunningTools) {
+        if (!state.running || !state.followRunningTools) null
+        else state.items.lastOrNull { it !is ChatItem.Working }?.takeIf { it is ChatItem.Tools || it is ChatItem.Activity }?.key
+    }
     val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
     val onToggle: (String) -> Unit = { key -> onEvent(ChatEvent.Toggle(key)) }
     Box(Modifier.fillMaxSize()) {
@@ -171,7 +176,7 @@ internal fun Transcript(
                     is ChatItem.Tools -> ToolsGroup(
                         item = item,
                         directory = state.directory,
-                        expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded),
+                        expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded) || item.key == liveGroupKey,
                         isExpanded = isExpanded,
                         onToggle = onToggle,
                         onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
@@ -183,7 +188,8 @@ internal fun Transcript(
                     is ChatItem.Activity -> ActivityGroup(
                         item = item,
                         directory = state.directory,
-                        expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded),
+                        expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded) || item.key == liveGroupKey,
+                        keepLatestOpen = item.key == liveGroupKey,
                         defaultToolsExpanded = defaultToolsExpanded,
                         isExpanded = isExpanded,
                         onToggle = onToggle,
