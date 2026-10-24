@@ -261,6 +261,13 @@ interface CatalogRepository {
 
 enum class ThemeMode { System, Light, Dark }
 
+val OUTPUT_LINE_CHOICES = listOf(6, 12, 24, 50)
+val LIVE_INTERVAL_CHOICES = listOf(300L, 700L, 1_500L, 3_000L)
+val TEXT_SCALE_CHOICES = listOf(0.85f, 1f, 1.15f, 1.3f)
+
+/** Defaults for everything a user can change, keeping what is not a preference (seen intros, terminal keys). */
+fun AppSettings.reset(): AppSettings = AppSettings(notificationsIntroShown = notificationsIntroShown, terminalKeys = terminalKeys)
+
 data class AppSettings(
     val theme: ThemeMode = ThemeMode.System,
     val showReasoning: Boolean = true,
@@ -277,6 +284,14 @@ data class AppSettings(
     val liveReads: Boolean = false,
     /** With [followRunningTools]: every other tool (web, subagents, todos, MCP...). */
     val liveOther: Boolean = false,
+    /** Lines of tool output shown before "Show more"; one of [OUTPUT_LINE_CHOICES]. */
+    val outputPreviewLines: Int = 12,
+    /** How often a running command's output is read, in milliseconds; one of [LIVE_INTERVAL_CHOICES]. */
+    val liveOutputIntervalMs: Long = 700,
+    /** The steps followed live stay open after the answer ends instead of folding back. */
+    val keepLiveStepsOpen: Boolean = false,
+    /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
+    val chatTextScale: Float = 1f,
     /** Opening a tool group shows each tool's output or diff, not only its name. */
     val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */

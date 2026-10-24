@@ -355,12 +355,13 @@ private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit,
     val c = OcTheme.colors
     val raw = (tool.error ?: tool.output).orEmpty().trimEnd()
     val lines = raw.lines()
-    val truncated = !full && lines.size > OUTPUT_PREVIEW_LINES
+    val previewLines = LocalOutputLines.current
+    val truncated = !full && lines.size > previewLines
     // While the tool runs, the newest lines are the interesting ones.
     val shown = when {
         !truncated -> raw
-        live -> lines.takeLast(OUTPUT_PREVIEW_LINES).joinToString("\n")
-        else -> lines.take(OUTPUT_PREVIEW_LINES).joinToString("\n")
+        live -> lines.takeLast(previewLines).joinToString("\n")
+        else -> lines.take(previewLines).joinToString("\n")
     }
     Column(
         modifier = Modifier
@@ -379,7 +380,7 @@ private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit,
                     .padding(OcSpacing.sm),
             )
         }
-        if (lines.size > OUTPUT_PREVIEW_LINES) {
+        if (lines.size > previewLines) {
             Text(
                 text = stringResource(if (full) R.string.chat_show_less else R.string.chat_show_more),
                 style = MaterialTheme.typography.labelMedium,

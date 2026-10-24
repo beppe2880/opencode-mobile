@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -63,8 +64,8 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 
-/** Lines of tool and shell output shown before "Show more". */
-internal const val OUTPUT_PREVIEW_LINES = 12
+/** Lines of tool and shell output shown before "Show more" (setting). */
+internal val LocalOutputLines = staticCompositionLocalOf { 12 }
 
 @Composable
 internal fun UserBubble(
@@ -346,7 +347,7 @@ internal fun ShellBlock(item: ChatItem.Shell, modifier: Modifier = Modifier) {
         }
         if (item.output.isNotBlank()) {
             Text(
-                item.output.trimEnd().lines().takeLast(OUTPUT_PREVIEW_LINES).joinToString("\n"),
+                item.output.trimEnd().lines().takeLast(LocalOutputLines.current).joinToString("\n"),
                 style = OcTheme.mono.codeSmall,
                 color = c.textMuted,
             )

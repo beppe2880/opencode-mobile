@@ -75,6 +75,7 @@ class ChatViewModel(
     /** What running shell tools have printed so far, by call id, and the jobs reading it. */
     private val liveOutput = HashMap<String, String>()
     private val liveJobs = HashMap<String, Job>()
+    private var liveOutputIntervalMs: Long = settings.settings.value.liveOutputIntervalMs
 
     /** First message of a staged revert; it and everything after are hidden. */
     private var revertMessageId: String? = null
@@ -95,6 +96,7 @@ class ChatViewModel(
         viewModelScope.launch {
             settings.settings.collect { s ->
                 showReasoning = s.showReasoning
+                liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
                 updateState {
                     it.copy(
@@ -102,6 +104,9 @@ class ChatViewModel(
                         live = LiveFollow.of(s),
                         showFullCommands = s.showFullCommands,
                         showToolDetails = s.showToolDetails,
+                        outputPreviewLines = s.outputPreviewLines,
+                        keepLiveStepsOpen = s.keepLiveStepsOpen,
+                        chatTextScale = s.chatTextScale,
                         showCost = s.showCost,
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,
@@ -564,7 +569,7 @@ class ChatViewModel(
 
     /**
      * The server streams a `bash` tool's output only to its shell, not to the event stream:
-     * while the tool runs, its shell output is read every [LIVE_OUTPUT_POLL_MS].
+     * while the tool runs, its shell output is read every [liveOutputIntervalMs] (setting).
      */
     private fun followShells(visible: List<Message>) {
         val running = if (currentState.live?.shell == true) runningShells(visible) else emptyMap()
@@ -586,7 +591,7 @@ class ChatViewModel(
                             rebuild()
                         }
                     }
-                    delay(LIVE_OUTPUT_POLL_MS)
+                    delay(liveOutputIntervalMs)
                 }
             }
             liveJobs[callId] = job
@@ -1020,7 +1025,6 @@ class ChatViewModel(
     private companion object {
         const val LOCAL_PREFIX = "local-"
         const val RELOAD_DEBOUNCE_MS = 400L
-        const val LIVE_OUTPUT_POLL_MS = 700L
         const val SHELL_ID = "shellID"
         const val LOCAL_MATCH_WINDOW = 10
         const val SUGGEST_DEBOUNCE_MS = 150L

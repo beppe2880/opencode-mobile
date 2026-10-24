@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.reset
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -40,7 +41,12 @@ class SettingsViewModel(
             is SettingsEvent.SelectServer -> viewModelScope.launch { servers.activate(event.serverId) }
             is SettingsEvent.RequestRename -> updateState { it.copy(renaming = event.server) }
             is SettingsEvent.RequestRemove -> updateState { it.copy(removing = event.server) }
-            SettingsEvent.DismissDialog -> updateState { it.copy(renaming = null, removing = null) }
+            SettingsEvent.DismissDialog -> updateState { it.copy(renaming = null, removing = null, resetting = false) }
+            SettingsEvent.RequestReset -> updateState { it.copy(resetting = true) }
+            SettingsEvent.ConfirmReset -> {
+                updateState { it.copy(resetting = false) }
+                update { it.reset() }
+            }
             is SettingsEvent.ConfirmRename -> {
                 val server = currentState.renaming ?: return
                 updateState { it.copy(renaming = null) }
@@ -64,6 +70,10 @@ class SettingsViewModel(
             is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
+            is SettingsEvent.OutputPreviewLinesChanged -> update { it.copy(outputPreviewLines = event.lines) }
+            is SettingsEvent.LiveOutputIntervalChanged -> update { it.copy(liveOutputIntervalMs = event.millis) }
+            is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }
+            is SettingsEvent.ChatTextScaleChanged -> update { it.copy(chatTextScale = event.scale) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }

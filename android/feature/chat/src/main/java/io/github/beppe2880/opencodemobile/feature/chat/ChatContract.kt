@@ -44,6 +44,12 @@ data class ChatState(
     val expandToolsByDefault: Boolean = false,
     /** Which running work stays open (settings); null when following is off. */
     val live: LiveFollow? = LiveFollow(),
+    /** Lines of tool output before "Show more" (setting). */
+    val outputPreviewLines: Int = 12,
+    /** Steps followed live stay open after the answer (setting). */
+    val keepLiveStepsOpen: Boolean = false,
+    /** Transcript text size relative to the system one (setting). */
+    val chatTextScale: Float = 1f,
     /** An opened tool group shows each tool's output (setting). */
     val showToolDetails: Boolean = true,
     /** Tool rows wrap long commands and paths (setting). */

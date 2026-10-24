@@ -55,6 +55,10 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
+        vm.onEvent(SettingsEvent.OutputPreviewLinesChanged(24))
+        vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
+        vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
+        vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -75,6 +79,10 @@ class SettingsViewModelTest {
                 liveOther = true,
                 showFullCommands = true,
                 showToolDetails = false,
+                outputPreviewLines = 24,
+                liveOutputIntervalMs = 1_500,
+                keepLiveStepsOpen = true,
+                chatTextScale = 0.85f,
                 showCost = false,
                 swipeBetweenChats = false,
                 agentColorOutline = false,
@@ -144,6 +152,34 @@ class SettingsViewModelTest {
 
         assertNull(vm.state.value.removing)
         assertEquals(listOf("a"), vm.state.value.servers.map { it.id })
+    }
+
+    @Test
+    fun `reset needs confirmation and keeps intros and terminal keys`() = runTest(main.testDispatcher) {
+        val keys = listOf(listOf("esc"))
+        settings.settings.value = AppSettings(
+            theme = ThemeMode.Dark,
+            outputPreviewLines = 50,
+            chatTextScale = 1.3f,
+            notificationsIntroShown = true,
+            terminalKeys = keys,
+        )
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SettingsEvent.RequestReset)
+        assertTrue(vm.state.value.resetting)
+        vm.onEvent(SettingsEvent.DismissDialog)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.resetting)
+        assertEquals(ThemeMode.Dark, settings.settings.value.theme)
+
+        vm.onEvent(SettingsEvent.RequestReset)
+        vm.onEvent(SettingsEvent.ConfirmReset)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.resetting)
+        assertEquals(AppSettings(notificationsIntroShown = true, terminalKeys = keys), settings.settings.value)
     }
 
     @Test

@@ -31,9 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -43,8 +45,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
@@ -143,138 +147,148 @@ internal fun Transcript(
         if (!state.running || state.live == null) null
         else state.items.lastOrNull { it !is ChatItem.Working }?.takeIf { it is ChatItem.Tools || it is ChatItem.Activity }?.key
     }
+    // Groups followed live in this visit; with the setting on they stay open once the answer ends.
+    val followed = remember(state.sessionId) { mutableStateSetOf<String>() }
+    LaunchedEffect(liveGroupKey) { liveGroupKey?.let(followed::add) }
+    val keptOpen: (String) -> Boolean = { key -> state.keepLiveStepsOpen && key != liveGroupKey && key in followed }
     val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
     val onToggle: (String) -> Unit = { key -> onEvent(ChatEvent.Toggle(key)) }
-    Box(Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            reverseLayout = true,
-            modifier = Modifier.fillMaxSize().testTag("chat_transcript"),
-            contentPadding = PaddingValues(vertical = OcSpacing.lg),
-            verticalArrangement = Arrangement.spacedBy(OcSpacing.md, Alignment.Bottom),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            items(reversed, key = { it.key }, contentType = { it::class }) { item ->
-                val rowModifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter)
-                when (item) {
-                    is ChatItem.User -> UserBubble(
-                        item = item,
-                        modifier = rowModifier,
-                        onLongPress = if (item.pending) null else { { actionsFor = item.key } },
-                        onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
-                        directory = state.directory,
-                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                    )
-                    is ChatItem.Text -> AssistantText(item, cache, rowModifier)
-                    is ChatItem.Reasoning -> ReasoningBlock(
-                        item = item,
-                        expanded = state.isExpanded("r:${item.key}"),
-                        onToggle = { onToggle("r:${item.key}") },
-                        modifier = rowModifier,
-                        live = state.live,
-                    )
-                    is ChatItem.Tools -> ToolsGroup(
-                        item = item,
-                        directory = state.directory,
-                        expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded),
-                        isExpanded = isExpanded,
-                        onToggle = onToggle,
-                        onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                        modifier = rowModifier,
-                        live = state.live,
-                        fullCommands = state.showFullCommands,
-                        inLiveGroup = item.key == liveGroupKey,
-                        details = state.showToolDetails,
-                    )
-                    is ChatItem.Activity -> ActivityGroup(
-                        item = item,
-                        directory = state.directory,
-                        expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded),
-                        inLiveGroup = item.key == liveGroupKey,
-                        details = state.showToolDetails,
-                        defaultToolsExpanded = defaultToolsExpanded,
-                        isExpanded = isExpanded,
-                        onToggle = onToggle,
-                        onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-                        onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                        modifier = rowModifier,
-                        live = state.live,
-                        fullCommands = state.showFullCommands,
-                    )
-                    is ChatItem.Error -> ErrorRow(item, rowModifier)
-                    is ChatItem.Notice -> NoticeRow(
-                        item = item,
-                        cache = cache,
-                        expanded = state.isExpanded("n:${item.key}"),
-                        onToggle = { onToggle("n:${item.key}") },
-                        modifier = rowModifier,
-                    )
-                    is ChatItem.Shell -> ShellBlock(item, rowModifier)
-                    is ChatItem.Footer -> TurnFooter(item, onCopy, rowModifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
-                    is ChatItem.Working -> WorkingRow(rowModifier)
-                }
-            }
-            if (state.loadingOlder) {
-                item(key = "loading-older") {
-                    Box(Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_loading_older"), contentAlignment = Alignment.Center) {
-                        OcSpinner(size = 16.dp)
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(density.density, density.fontScale * state.chatTextScale),
+        LocalOutputLines provides state.outputPreviewLines,
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                reverseLayout = true,
+                modifier = Modifier.fillMaxSize().testTag("chat_transcript"),
+                contentPadding = PaddingValues(vertical = OcSpacing.lg),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.md, Alignment.Bottom),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(reversed, key = { it.key }, contentType = { it::class }) { item ->
+                    val rowModifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter)
+                    when (item) {
+                        is ChatItem.User -> UserBubble(
+                            item = item,
+                            modifier = rowModifier,
+                            onLongPress = if (item.pending) null else { { actionsFor = item.key } },
+                            onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
+                            directory = state.directory,
+                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+                        )
+                        is ChatItem.Text -> AssistantText(item, cache, rowModifier)
+                        is ChatItem.Reasoning -> ReasoningBlock(
+                            item = item,
+                            expanded = state.isExpanded("r:${item.key}"),
+                            onToggle = { onToggle("r:${item.key}") },
+                            modifier = rowModifier,
+                            live = state.live,
+                        )
+                        is ChatItem.Tools -> ToolsGroup(
+                            item = item,
+                            directory = state.directory,
+                            expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+                            isExpanded = isExpanded,
+                            onToggle = onToggle,
+                            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+                            modifier = rowModifier,
+                            live = state.live,
+                            fullCommands = state.showFullCommands,
+                            inLiveGroup = item.key == liveGroupKey,
+                            details = state.showToolDetails || keptOpen(item.key),
+                        )
+                        is ChatItem.Activity -> ActivityGroup(
+                            item = item,
+                            directory = state.directory,
+                            expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+                            inLiveGroup = item.key == liveGroupKey,
+                            details = state.showToolDetails || keptOpen(item.key),
+                            defaultToolsExpanded = defaultToolsExpanded,
+                            isExpanded = isExpanded,
+                            onToggle = onToggle,
+                            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+                            modifier = rowModifier,
+                            live = state.live,
+                            fullCommands = state.showFullCommands,
+                        )
+                        is ChatItem.Error -> ErrorRow(item, rowModifier)
+                        is ChatItem.Notice -> NoticeRow(
+                            item = item,
+                            cache = cache,
+                            expanded = state.isExpanded("n:${item.key}"),
+                            onToggle = { onToggle("n:${item.key}") },
+                            modifier = rowModifier,
+                        )
+                        is ChatItem.Shell -> ShellBlock(item, rowModifier)
+                        is ChatItem.Footer -> TurnFooter(item, onCopy, rowModifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
+                        is ChatItem.Working -> WorkingRow(rowModifier)
                     }
                 }
-            } else if (state.olderFailed) {
-                item(key = "older-failed") {
-                    Column(
-                        Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_older_failed"),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-                    ) {
-                        Text(
-                            stringResource(R.string.chat_older_failed),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = OcTheme.colors.textMuted,
-                        )
-                        OcChip(
-                            text = stringResource(R.string.chat_older_retry),
-                            onClick = { onEvent(ChatEvent.LoadOlder) },
-                            modifier = Modifier.testTag("chat_older_retry_button"),
-                        )
+                if (state.loadingOlder) {
+                    item(key = "loading-older") {
+                        Box(Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_loading_older"), contentAlignment = Alignment.Center) {
+                            OcSpinner(size = 16.dp)
+                        }
+                    }
+                } else if (state.olderFailed) {
+                    item(key = "older-failed") {
+                        Column(
+                            Modifier.fillMaxWidth().padding(vertical = OcSpacing.sm).testTag("chat_older_failed"),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                        ) {
+                            Text(
+                                stringResource(R.string.chat_older_failed),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = OcTheme.colors.textMuted,
+                            )
+                            OcChip(
+                                text = stringResource(R.string.chat_older_retry),
+                                onClick = { onEvent(ChatEvent.LoadOlder) },
+                                modifier = Modifier.testTag("chat_older_retry_button"),
+                            )
+                        }
                     }
                 }
             }
-        }
-        AnimatedVisibility(
-            visible = !stickToBottom,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut(),
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
-        ) {
-            val jump = {
-                stickToBottom = true
-                hasNew = false
-                scope.launch { listState.animateScrollToItem(0) }
-                Unit
-            }
-            if (hasNew) {
-                OcChip(
-                    text = stringResource(R.string.chat_new_messages),
-                    onClick = jump,
-                    selected = true,
-                    leadingIcon = Icons.Outlined.ArrowDownward,
-                    modifier = Modifier
-                        .shadow(2.dp, RoundedCornerShape(OcRadius.md))
-                        .testTag("chat_new_messages_button"),
-                )
-            } else {
-                OcRoundIconButton(
-                    icon = Icons.Outlined.ArrowDownward,
-                    contentDescription = stringResource(R.string.chat_jump_latest),
-                    onClick = jump,
-                    container = OcTheme.colors.bgBase,
-                    content = OcTheme.colors.iconBase,
-                    modifier = Modifier
-                        .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
-                        .testTag("chat_jump_latest_button"),
-                )
+            AnimatedVisibility(
+                visible = !stickToBottom,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
+            ) {
+                val jump = {
+                    stickToBottom = true
+                    hasNew = false
+                    scope.launch { listState.animateScrollToItem(0) }
+                    Unit
+                }
+                if (hasNew) {
+                    OcChip(
+                        text = stringResource(R.string.chat_new_messages),
+                        onClick = jump,
+                        selected = true,
+                        leadingIcon = Icons.Outlined.ArrowDownward,
+                        modifier = Modifier
+                            .shadow(2.dp, RoundedCornerShape(OcRadius.md))
+                            .testTag("chat_new_messages_button"),
+                    )
+                } else {
+                    OcRoundIconButton(
+                        icon = Icons.Outlined.ArrowDownward,
+                        contentDescription = stringResource(R.string.chat_jump_latest),
+                        onClick = jump,
+                        container = OcTheme.colors.bgBase,
+                        content = OcTheme.colors.iconBase,
+                        modifier = Modifier
+                            .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
+                            .testTag("chat_jump_latest_button"),
+                    )
+                }
             }
         }
     }

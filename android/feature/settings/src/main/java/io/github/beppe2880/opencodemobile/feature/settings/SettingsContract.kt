@@ -19,6 +19,8 @@ data class SettingsState(
     val apiVersion: String = "",
     val renaming: ServerProfile? = null,
     val removing: ServerProfile? = null,
+    /** The confirmation to reset every setting is open. */
+    val resetting: Boolean = false,
     /** The system lets the app post notifications. */
     val notificationsAllowed: Boolean = true,
     /** The permission was denied: only the system settings can grant it now. */
@@ -46,6 +48,12 @@ sealed interface SettingsEvent {
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
+    data class OutputPreviewLinesChanged(val lines: Int) : SettingsEvent
+    data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
+    data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent
+    data class ChatTextScaleChanged(val scale: Float) : SettingsEvent
+    data object RequestReset : SettingsEvent
+    data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent

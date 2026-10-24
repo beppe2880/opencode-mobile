@@ -669,6 +669,22 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `shell output is read at the interval from the settings`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(liveOutputIntervalMs = 3_000)
+        val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        vm()
+        advanceTimeBy(5_000)
+        runCurrent()
+
+        // Reads at 0 and 3 s; the default 700 ms would have read 8 times.
+        assertEquals(2, chat.shellReads.size)
+        // The tool ends, so the reading stops and the test can finish.
+        events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "", emptyMap(), 9))
+        runCurrent()
+    }
+
+    @Test
     fun `shell output is not read when shell commands are not followed`() = runTest(main.testDispatcher) {
         settings.settings.value = AppSettings(liveShell = false)
         val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))

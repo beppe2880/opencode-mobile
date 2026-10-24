@@ -2,7 +2,10 @@ package io.github.beppe2880.opencodemobile.core.data.settings
 
 import android.content.SharedPreferences
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +35,10 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             .putBoolean(KEY_LIVE_OTHER, next.liveOther)
             .putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
             .putBoolean(KEY_TOOL_DETAILS, next.showToolDetails)
+            .putInt(KEY_OUTPUT_LINES, next.outputPreviewLines)
+            .putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
+            .putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
+            .putFloat(KEY_TEXT_SCALE, next.chatTextScale)
             .putBoolean(KEY_SHOW_COST, next.showCost)
             .putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
             .putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
@@ -60,6 +67,13 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
             liveOther = prefs.getBoolean(KEY_LIVE_OTHER, defaults.liveOther),
             showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
             showToolDetails = prefs.getBoolean(KEY_TOOL_DETAILS, defaults.showToolDetails),
+            outputPreviewLines = prefs.getInt(KEY_OUTPUT_LINES, defaults.outputPreviewLines)
+                .takeIf { it in OUTPUT_LINE_CHOICES } ?: defaults.outputPreviewLines,
+            liveOutputIntervalMs = prefs.getLong(KEY_LIVE_INTERVAL, defaults.liveOutputIntervalMs)
+                .takeIf { it in LIVE_INTERVAL_CHOICES } ?: defaults.liveOutputIntervalMs,
+            keepLiveStepsOpen = prefs.getBoolean(KEY_KEEP_LIVE_OPEN, defaults.keepLiveStepsOpen),
+            chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
+                .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
@@ -92,6 +106,10 @@ internal class PreferencesSettingsRepository(private val prefs: SharedPreference
         const val KEY_LIVE_OTHER = "live_other"
         const val KEY_FULL_COMMANDS = "show_full_commands"
         const val KEY_TOOL_DETAILS = "show_tool_details"
+        const val KEY_OUTPUT_LINES = "output_preview_lines"
+        const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
+        const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
+        const val KEY_TEXT_SCALE = "chat_text_scale"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"

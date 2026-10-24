@@ -16,14 +16,36 @@ class PreferencesRepositoriesTest {
     fun `settings survive a restart and missing keys keep their defaults`() = runBlocking {
         val prefs = InMemoryPreferences()
         val keys = listOf(listOf("esc", "ctrl"), listOf("text:wq\u001f\u001b:wq\r"))
-        PreferencesSettingsRepository(prefs).update {
-            it.copy(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys)
-        }
+        val changed = AppSettings(
+            theme = ThemeMode.Dark,
+            showCost = false,
+            groupActivity = false,
+            terminalKeys = keys,
+            outputPreviewLines = 24,
+            liveOutputIntervalMs = 3_000,
+            keepLiveStepsOpen = true,
+            chatTextScale = 1.15f,
+        )
+        PreferencesSettingsRepository(prefs).update { changed }
 
         val reopened = PreferencesSettingsRepository(prefs).settings.value
 
-        assertEquals(AppSettings(theme = ThemeMode.Dark, showCost = false, groupActivity = false, terminalKeys = keys), reopened)
+        assertEquals(changed, reopened)
         assertEquals(AppSettings(), PreferencesSettingsRepository(InMemoryPreferences()).settings.value)
+    }
+
+    @Test
+    fun `stored values outside the choices fall back to the defaults`() {
+        val prefs = InMemoryPreferences()
+        prefs.edit()
+            .putInt("output_preview_lines", 7)
+            .putLong("live_output_interval_ms", 1)
+            .putFloat("chat_text_scale", 4f)
+            .commit()
+
+        val settings = PreferencesSettingsRepository(prefs).settings.value
+
+        assertEquals(AppSettings(), settings)
     }
 
     @Test

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,9 +40,14 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
+import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
@@ -98,10 +104,11 @@ fun SettingsScreen(
             ) {
                 item(key = "servers") { ServersSection(state, onEvent) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
-                item(key = "appearance") { AppearanceSection(state.settings.theme, onEvent) }
+                item(key = "appearance") { AppearanceSection(state.settings, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
                 item(key = "live") { LiveActivitySection(state.settings, onEvent) }
                 item(key = "notifications") { NotificationsSection(state, onEvent) }
+                item(key = "reset") { ResetSection(onEvent) }
                 item(key = "about") { AboutSection(state) }
             }
         }
@@ -115,6 +122,17 @@ fun SettingsScreen(
             onConfirm = { onEvent(SettingsEvent.ConfirmRename(it)) },
             onDismiss = { onEvent(SettingsEvent.DismissDialog) },
             testTagPrefix = "settings_rename",
+        )
+    }
+    if (state.resetting) {
+        OcConfirmDialog(
+            title = stringResource(R.string.settings_reset_title),
+            text = stringResource(R.string.settings_reset_message),
+            confirmLabel = stringResource(R.string.settings_reset_confirm),
+            destructive = true,
+            onConfirm = { onEvent(SettingsEvent.ConfirmReset) },
+            onDismiss = { onEvent(SettingsEvent.DismissDialog) },
+            testTagPrefix = "settings_reset",
         )
     }
     state.removing?.let { server ->
@@ -226,7 +244,7 @@ private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
 }
 
 @Composable
-private fun AppearanceSection(theme: ThemeMode, onEvent: (SettingsEvent) -> Unit) {
+private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(R.string.settings_appearance)) {
         OcSegmentedControl(
             segments = listOf(
@@ -234,8 +252,46 @@ private fun AppearanceSection(theme: ThemeMode, onEvent: (SettingsEvent) -> Unit
                 OcSegment(ThemeMode.Light, stringResource(R.string.settings_theme_light), "settings_theme_light"),
                 OcSegment(ThemeMode.Dark, stringResource(R.string.settings_theme_dark), "settings_theme_dark"),
             ),
-            selected = theme,
+            selected = settings.theme,
             onSelect = { onEvent(SettingsEvent.ThemeChanged(it)) },
+        )
+        OcCard {
+            val sizes = listOf(R.string.settings_text_small, R.string.settings_text_default, R.string.settings_text_large, R.string.settings_text_largest)
+            ChoiceRow(
+                title = stringResource(R.string.settings_text_size),
+                subtitle = stringResource(R.string.settings_text_size_sub),
+                choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(sizes[i]), "settings_text_size_$i") },
+                selected = settings.chatTextScale,
+                onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
+            )
+        }
+    }
+}
+
+/** A title and subtitle with a segmented choice under them, inside a card. */
+@Composable
+private fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegment<T>>, selected: T, onSelect: (T) -> Unit) {
+    val c = OcTheme.colors
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    ) {
+        Column {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+        }
+        OcSegmentedControl(segments = choices, selected = selected, onSelect = onSelect)
+    }
+}
+
+@Composable
+private fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
+    Section(stringResource(R.string.settings_reset_section)) {
+        OcButton(
+            text = stringResource(R.string.settings_reset),
+            onClick = { onEvent(SettingsEvent.RequestReset) },
+            variant = OcButtonVariant.Secondary,
+            modifier = Modifier.fillMaxWidth().testTag("settings_reset_button"),
         )
     }
 }
@@ -373,6 +429,36 @@ private fun LiveActivitySection(settings: AppSettings, onEvent: (SettingsEvent) 
                 onCheckedChange = { onEvent(SettingsEvent.ShowToolDetailsChanged(it)) },
                 modifier = Modifier.testTag("settings_tool_details_switch"),
             )
+            OcDivider()
+            ChoiceRow(
+                title = stringResource(R.string.settings_output_lines),
+                subtitle = stringResource(R.string.settings_output_lines_sub),
+                choices = OUTPUT_LINE_CHOICES.map { OcSegment(it, it.toString(), "settings_output_lines_$it") },
+                selected = settings.outputPreviewLines,
+                onSelect = { onEvent(SettingsEvent.OutputPreviewLinesChanged(it)) },
+            )
+            if (settings.followRunningTools) {
+                OcDivider()
+                OcSwitchRow(
+                    title = stringResource(R.string.settings_keep_live_open),
+                    subtitle = stringResource(R.string.settings_keep_live_open_sub),
+                    checked = settings.keepLiveStepsOpen,
+                    onCheckedChange = { onEvent(SettingsEvent.KeepLiveStepsOpenChanged(it)) },
+                    modifier = Modifier.testTag("settings_keep_live_open_switch"),
+                )
+            }
+            if (settings.followRunningTools && settings.liveShell) {
+                OcDivider()
+                val speeds =
+                    listOf(R.string.settings_refresh_fastest, R.string.settings_refresh_fast, R.string.settings_refresh_normal, R.string.settings_refresh_slow)
+                ChoiceRow(
+                    title = stringResource(R.string.settings_live_interval),
+                    subtitle = stringResource(R.string.settings_live_interval_sub),
+                    choices = LIVE_INTERVAL_CHOICES.mapIndexed { i, ms -> OcSegment(ms, stringResource(speeds[i]), "settings_live_interval_$ms") },
+                    selected = settings.liveOutputIntervalMs,
+                    onSelect = { onEvent(SettingsEvent.LiveOutputIntervalChanged(it)) },
+                )
+            }
         }
     }
 }
