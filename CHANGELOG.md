@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/beppe2880/opencode-mobile/compare/v0.8.0...v0.9.0) (2026-10-24)
+
+
+### Features
+
+* **chat:** Follow the agent's work live ([#72](https://github.com/beppe2880/opencode-mobile/issues/72)) ([9d25372](https://github.com/beppe2880/opencode-mobile/commit/9d2537289366fe62fe2f768983d95386c07350c4))
+
 ## [0.8.0](https://github.com/beppe2880/opencode-mobile/compare/v0.7.0...v0.8.0) (2026-10-22)
 
 
