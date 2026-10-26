@@ -17,6 +17,9 @@ internal interface ListCache {
 
     suspend fun write(serverId: String, key: String, json: String)
 
+    /** Removes a deleted session from every cached directory list of [serverId]. */
+    suspend fun removeSession(serverId: String, sessionId: String)
+
     /** Forgets every list of [serverId], e.g. when the server is removed. */
     suspend fun clearServer(serverId: String)
 
@@ -28,6 +31,7 @@ internal interface ListCache {
         val None: ListCache = object : ListCache {
             override suspend fun read(serverId: String, key: String): String? = null
             override suspend fun write(serverId: String, key: String, json: String) = Unit
+            override suspend fun removeSession(serverId: String, sessionId: String) = Unit
             override suspend fun clearServer(serverId: String) = Unit
         }
     }
@@ -46,6 +50,9 @@ internal abstract class ListCacheDao {
 
     @Query("SELECT json FROM list_cache WHERE serverId = :serverId AND `key` = :key")
     abstract suspend fun read(serverId: String, key: String): String?
+
+    @Query("SELECT * FROM list_cache WHERE serverId = :serverId AND `key` LIKE 'sessions:%'")
+    abstract suspend fun sessionLists(serverId: String): List<ListCacheEntity>
 
     @Upsert
     abstract suspend fun upsert(entity: ListCacheEntity)
@@ -89,6 +96,20 @@ internal class RoomListCache(
         try {
             dao.write(ListCacheEntity(serverId, key, json, clock()), keepLists)
         } catch (_: SQLiteException) {
+        }
+    }
+
+    override suspend fun removeSession(serverId: String, sessionId: String) {
+        try {
+            dao.sessionLists(serverId).forEach { entity ->
+                val sessions = SessionListCodec.decodeSessions(entity.json) ?: return@forEach
+                val remaining = sessions.filterNot { it.id == sessionId }
+                if (remaining.size != sessions.size) {
+                    dao.upsert(entity.copy(json = SessionListCodec.encodeSessions(remaining)))
+                }
+            }
+        } catch (_: SQLiteException) {
+            // Cache invalidation is best effort; the next successful list refresh rewrites it.
         }
     }
 

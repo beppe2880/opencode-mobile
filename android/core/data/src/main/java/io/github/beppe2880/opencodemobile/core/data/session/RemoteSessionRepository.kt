@@ -107,6 +107,7 @@ internal class RemoteSessionRepository(
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionRemove(sessionId) }
+        lists.removeSession(profile.id, sessionId)
         seen.remove(profile.id to sessionId)
     }
 

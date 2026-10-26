@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data
 
 import io.github.beppe2880.opencodemobile.core.data.cache.InMemoryListCache
+import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
@@ -62,6 +63,36 @@ class SessionListCacheTest {
         server.enqueue(MockResponse().setResponseCode(500))
 
         assertTrue(repository.list().isFailure)
+        assertEquals(loaded, repository.cachedList("s1"))
+    }
+
+    @Test
+    fun `deleting a session removes it from every saved list of that server`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        server.enqueue(MockResponse().setBody(fixture("session_list.json")))
+        val loaded = repository.list().getOrThrow()
+        server.enqueue(MockResponse().setBody(fixture("session_list.json")))
+        repository.list(directory = "/tmp/other").getOrThrow()
+        lists.write("s2", ListCache.sessionsKey(null), lists.lists.getValue("s1" to ListCache.sessionsKey(null)))
+        val deletedId = loaded.single().id
+        server.enqueue(MockResponse().setResponseCode(204))
+
+        repository.delete(deletedId).getOrThrow()
+
+        assertTrue(repository.cachedList("s1")?.isEmpty() == true)
+        assertTrue(repository.cachedList("s1", "/tmp/other")?.isEmpty() == true)
+        assertEquals(loaded, repository.cachedList("s2"))
+        assertNull(repository.cached(deletedId))
+    }
+
+    @Test
+    fun `a failed delete keeps the saved lists`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        server.enqueue(MockResponse().setBody(fixture("session_list.json")))
+        val loaded = repository.list().getOrThrow()
+        server.enqueue(MockResponse().setResponseCode(500))
+
+        assertTrue(repository.delete(loaded.single().id).isFailure)
         assertEquals(loaded, repository.cachedList("s1"))
     }
 
