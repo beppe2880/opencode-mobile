@@ -16,11 +16,11 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +40,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.text.relativeTime
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -55,20 +56,11 @@ internal fun SessionRow(
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
-    // Ask for confirmation without settling into the dismissed state: the box springs back
-    // on its own, so a cancelled delete leaves the row fully settled and swipeable again.
-    // The saved state never reaches EndToStart either, which stops it from replaying the
-    // delete request when the row is recomposed after scrolling out of view.
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart) {
-                currentOnDelete()
-                false
-            } else {
-                true
-            }
-        },
-    )
+    // Only a settled swipe asks for confirmation (onDismiss reacts to the settled value, so a
+    // drag crossing back does not cancel anything), then the row slides back: a cancelled
+    // delete leaves it in place and swipeable again.
+    val dismissState = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
     val renameLabel = stringResource(R.string.sessions_rename)
     val deleteLabel = stringResource(R.string.sessions_delete)
     val runningLabel = stringResource(R.string.sessions_running_a11y)
@@ -76,6 +68,10 @@ internal fun SessionRow(
         state = dismissState,
         enableDismissFromStartToEnd = false,
         modifier = modifier,
+        onDismiss = {
+            currentOnDelete()
+            scope.launch { dismissState.reset() }
+        },
         backgroundContent = {
             Box(
                 modifier = Modifier.fillMaxSize().background(c.danger.bg).padding(horizontal = OcSpacing.xl),
