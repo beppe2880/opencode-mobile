@@ -194,6 +194,46 @@ class ConnectViewModelTest {
 
         assertEquals("  s3cret ", vm.state.value.secret)
     }
+
+    @Test
+    fun `password is submitted exactly as typed`() = runTest(main.testDispatcher) {
+        val password = "  correct secret\t"
+        val vm = ConnectViewModel(repo, discovery)
+        vm.onEvent(ConnectEvent.UrlChanged("localhost:4096"))
+        vm.onEvent(ConnectEvent.MethodChanged(AuthMethod.Password))
+        vm.onEvent(ConnectEvent.SecretChanged(password))
+        assertEquals(password, vm.state.value.secret)
+        vm.onEvent(ConnectEvent.Submit)
+        advanceUntilIdle()
+
+        assertEquals(password, repo.addedPasswords.single())
+        assertEquals(ConnectEffect.Connected, vm.effect.first())
+    }
+
+    @Test
+    fun `connection probe preserves password whitespace`() = runTest(main.testDispatcher) {
+        val password = "  "
+        val vm = ConnectViewModel(repo, discovery)
+        vm.onEvent(ConnectEvent.UrlChanged("localhost:4096"))
+        vm.onEvent(ConnectEvent.MethodChanged(AuthMethod.Password))
+        vm.onEvent(ConnectEvent.SecretChanged(password))
+        vm.onEvent(ConnectEvent.TestConnection)
+        advanceUntilIdle()
+
+        assertEquals(password, repo.probedPasswords.single())
+        assertEquals(ProbeResult.Reachable("2.0.27"), vm.state.value.probe)
+    }
+
+    @Test
+    fun `pairing code is still trimmed`() = runTest(main.testDispatcher) {
+        val vm = ConnectViewModel(repo, discovery)
+        vm.onEvent(ConnectEvent.UrlChanged("localhost:4096"))
+        vm.onEvent(ConnectEvent.SecretChanged("  ABC123\n"))
+        vm.onEvent(ConnectEvent.Submit)
+        advanceUntilIdle()
+
+        assertEquals("http://localhost:4096" to "ABC123", repo.paired.single())
+    }
 }
 
 private class FakeDiscovery : ServerDiscovery {
@@ -214,12 +254,15 @@ private class FakeServerRepository : ServerRepository {
     var addResult: Result<ServerProfile> = Result.success(profile)
     val paired = mutableListOf<Pair<String, String>>()
     val activated = mutableListOf<String>()
+    val addedPasswords = mutableListOf<String>()
+    val probedPasswords = mutableListOf<String?>()
 
     /** Per-address probe results; a null value never answers (suspends past the timeout). */
     var probeByUrl: Map<String, Result<ServerInfo>?>? = null
     var qrTarget: ConnectTarget? = null
 
     override suspend fun probe(baseUrl: String, password: String?): Result<ServerInfo> {
+        probedPasswords += password
         val byUrl = probeByUrl ?: return probeResult
         return byUrl[baseUrl] ?: awaitCancellation()
     }
@@ -227,7 +270,10 @@ private class FakeServerRepository : ServerRepository {
         paired += baseUrl to code
         return Result.success(profile)
     }
-    override suspend fun addWithPassword(baseUrl: String, password: String, name: String?) = addResult
+    override suspend fun addWithPassword(baseUrl: String, password: String, name: String?): Result<ServerProfile> {
+        addedPasswords += password
+        return addResult
+    }
     override suspend fun activate(serverId: String) {
         activated += serverId
     }

@@ -176,7 +176,7 @@ class ConnectViewModel(
     private fun testConnection() {
         val base = validatedUrl() ?: return
         val state = currentState
-        val password = state.secret.takeIf { state.method == AuthMethod.Password && it.isNotBlank() }
+        val password = state.secret.takeIf { state.method == AuthMethod.Password && it.isNotEmpty() }
         probeJob?.cancel()
         updateState { it.copy(url = base, probing = true, probe = null, submitError = null) }
         probeJob = viewModelScope.launch {
@@ -195,7 +195,8 @@ class ConnectViewModel(
         if (currentState.submitting) return
         val base = validatedUrl()
         val state = currentState
-        if (state.secret.isBlank()) {
+        val secretMissing = if (state.method == AuthMethod.PairingCode) state.secret.isBlank() else state.secret.isEmpty()
+        if (secretMissing) {
             updateState {
                 it.copy(
                     secretError = UiText.Res(
@@ -204,7 +205,7 @@ class ConnectViewModel(
                 )
             }
         }
-        if (base == null || state.secret.isBlank()) return
+        if (base == null || secretMissing) return
         probeJob?.cancel()
         updateState { it.copy(url = base, submitting = true, probing = false, submitError = null) }
         viewModelScope.launch {
