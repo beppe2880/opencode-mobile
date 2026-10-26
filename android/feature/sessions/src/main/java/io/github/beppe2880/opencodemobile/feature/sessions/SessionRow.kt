@@ -20,7 +20,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -56,13 +55,20 @@ internal fun SessionRow(
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
-    val dismissState = rememberSwipeToDismissBoxState()
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            currentOnDelete()
-            dismissState.reset()
-        }
-    }
+    // Ask for confirmation without settling into the dismissed state: the box springs back
+    // on its own, so a cancelled delete leaves the row fully settled and swipeable again.
+    // The saved state never reaches EndToStart either, which stops it from replaying the
+    // delete request when the row is recomposed after scrolling out of view.
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value == SwipeToDismissBoxValue.EndToStart) {
+                currentOnDelete()
+                false
+            } else {
+                true
+            }
+        },
+    )
     val renameLabel = stringResource(R.string.sessions_rename)
     val deleteLabel = stringResource(R.string.sessions_delete)
     val runningLabel = stringResource(R.string.sessions_running_a11y)
