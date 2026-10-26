@@ -289,6 +289,4 @@ private class FakeServerRepository : ServerRepository {
         }
         return ConnectTarget.Url(if ("://" in text) text.trimEnd('/') else "http://${text.trimEnd('/')}")
     }
-
-
 }
