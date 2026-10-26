@@ -195,6 +195,17 @@ class ConnectViewModelTest {
     }
 
     @Test
+    fun `a pasted password loses only its line breaks`() = runTest(main.testDispatcher) {
+        val vm = ConnectViewModel(repo, discovery)
+        advanceUntilIdle()
+
+        vm.onEvent(ConnectEvent.MethodChanged(AuthMethod.Password))
+        vm.onEvent(ConnectEvent.SecretChanged("  s3cret \r\n"))
+
+        assertEquals("  s3cret ", vm.state.value.secret)
+    }
+
+    @Test
     fun `password is submitted exactly as typed`() = runTest(main.testDispatcher) {
         val password = "  correct secret\t"
         val vm = ConnectViewModel(repo, discovery)

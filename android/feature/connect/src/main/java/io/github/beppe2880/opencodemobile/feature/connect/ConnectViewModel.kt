@@ -58,8 +58,8 @@ class ConnectViewModel(
         when (event) {
             is ConnectEvent.UrlChanged -> onUrlChanged(event.value)
             is ConnectEvent.SecretChanged -> updateState {
-                // Pairing codes tolerate stray whitespace; passwords are sent verbatim.
-                val secret = if (it.method == AuthMethod.Password) event.value else event.value.trim()
+                // Pairing codes tolerate stray whitespace; passwords keep spaces but lose pasted line breaks.
+                val secret = if (it.method == AuthMethod.Password) event.value.trim('\r', '\n') else event.value.trim()
                 it.copy(secret = secret, secretError = null, submitError = null)
             }
             is ConnectEvent.MethodChanged -> updateState {
