@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data.events
 
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
+import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -38,6 +39,8 @@ import kotlin.random.Random
  * (re)connect emits [ServerEvent.Connected] so screens reload. A 401 sets
  * [ConnectionState.Unauthorized] and stops retrying until the active server, its address or
  * its secret changes (or the stream restarts, for example when the app returns to the foreground).
+ * A session deleted elsewhere also leaves the server's saved session lists, so it does not come
+ * back from [lists] at the next start.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class SseEventRepository(
@@ -49,6 +52,7 @@ internal class SseEventRepository(
     private val backoff: Backoff = Backoff(),
     stopTimeoutMillis: Long = 5_000,
     private val readTimeoutMillis: Long = OpenCodeClient.STREAM_READ_TIMEOUT_MILLIS,
+    private val lists: ListCache = ListCache.None,
 ) : EventRepository {
 
     private val _connection = MutableStateFlow(ConnectionState.Disconnected)
@@ -102,7 +106,9 @@ internal class SseEventRepository(
                 _connection.value = ConnectionState.Connected
                 emit(ServerEvent.Connected)
             }
-            event.toDomain()?.takeUnless { it == ServerEvent.Connected }?.let { emit(it) }
+            val mapped = event.toDomain()?.takeUnless { it == ServerEvent.Connected } ?: return@collect
+            if (mapped is ServerEvent.SessionChanged && mapped.deleted) lists.removeSession(server.id, mapped.sessionId)
+            emit(mapped)
         }
     }
 

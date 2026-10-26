@@ -80,7 +80,7 @@ val dataModule = module {
     }
     single<ServerDiscovery> { LanServerDiscovery(androidContext().getSystemService(ConnectivityManager::class.java)) }
     single<NetworkMonitor> { ConnectivityNetworkMonitor(androidContext().getSystemService(ConnectivityManager::class.java)) }
-    single<EventRepository> { SseEventRepository(get(), get(), get(), get(), get(AppScope)) }
+    single<EventRepository> { SseEventRepository(get(), get(), get(), get(), get(AppScope), lists = get()) }
     single<SessionRepository> { RemoteSessionRepository(get(), get()) }
     single<ChatRepository> { RemoteChatRepository(get(), get()) }
     single<CatalogRepository> { RemoteCatalogRepository(get()) }

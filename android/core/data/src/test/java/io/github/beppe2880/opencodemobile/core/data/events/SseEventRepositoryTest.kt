@@ -1,8 +1,13 @@
 package io.github.beppe2880.opencodemobile.core.data.events
 
 import io.github.beppe2880.opencodemobile.core.data.TestGraph
+import io.github.beppe2880.opencodemobile.core.data.cache.InMemoryListCache
+import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
+import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
+import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -54,6 +59,7 @@ class SseEventRepositoryTest {
     private fun repository(
         backoff: Backoff = Backoff(initialMillis = 1, maxMillis = 1),
         readTimeoutMillis: Long = OpenCodeClient.STREAM_READ_TIMEOUT_MILLIS,
+        lists: ListCache = ListCache.None,
     ) = SseEventRepository(
         servers = graph.servers,
         clients = graph.clients,
@@ -67,6 +73,7 @@ class SseEventRepositoryTest {
         backoff = backoff,
         stopTimeoutMillis = 0,
         readTimeoutMillis = readTimeoutMillis,
+        lists = lists,
     )
 
     private val connectedEvent = "data: {\"id\":\"e0\",\"type\":\"server.connected\",\"data\":{}}\n\n"
@@ -106,6 +113,39 @@ class SseEventRepositoryTest {
         )
         assertEquals(3, server.requestCount)
     }
+
+    @Test
+    fun `a session deleted elsewhere leaves the saved lists of its server`() = runBlocking {
+        val lists = InMemoryListCache()
+        val saved = SessionListCodec.encodeSessions(listOf(session("ses_gone"), session("ses_kept")))
+        lists.write("s1", ListCache.sessionsKey(null), saved)
+        lists.write("s1", ListCache.sessionsKey("/tmp/other"), saved)
+        lists.write("s2", ListCache.sessionsKey(null), saved)
+        server.enqueue(
+            MockResponse()
+                .setHeader("Content-Type", "text/event-stream")
+                .setBody(
+                    connectedEvent +
+                        "data: {\"id\":\"e_del\",\"created\":1,\"type\":\"session.deleted\"," +
+                        "\"data\":{\"sessionID\":\"ses_gone\"},\"durable\":{\"aggregateID\":\"ses_gone\",\"seq\":2,\"version\":2}}\n\n" +
+                        ": heartbeat\n\n".repeat(10_000),
+                )
+                .throttleBody(1024, 1, TimeUnit.SECONDS),
+        )
+
+        val events = withTimeout(5_000) { repository(lists = lists).events.take(2).toList() }
+
+        assertEquals(ServerEvent.SessionChanged("ses_gone", deleted = true), events.last())
+        val kept = listOf("ses_kept")
+        assertEquals(kept, SessionListCodec.decodeSessions(lists.lists.getValue("s1" to ListCache.sessionsKey(null)))?.map { it.id })
+        assertEquals(kept, SessionListCodec.decodeSessions(lists.lists.getValue("s1" to ListCache.sessionsKey("/tmp/other")))?.map { it.id })
+        assertEquals(saved, lists.lists.getValue("s2" to ListCache.sessionsKey(null)))
+    }
+
+    private fun session(id: String) = Session(
+        id = id, parentId = null, projectId = "p", title = id, directory = "/tmp", agent = null, model = null,
+        cost = 0.0, tokens = TokenUsage(), outcome = null, createdAt = 1, updatedAt = 1, archivedAt = null,
+    )
 
     /** A stream that delivers `server.connected` and then stays open for a long time. */
     private fun openStream() = MockResponse()
