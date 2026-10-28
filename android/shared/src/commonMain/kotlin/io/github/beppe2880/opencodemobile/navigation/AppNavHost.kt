@@ -47,6 +47,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
+import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -222,7 +223,14 @@ private fun SessionsListDetail(
 ) {
     val settingsRepository = koinInject<SettingsRepository>()
     val appSettings by settingsRepository.settings.collectAsStateWithLifecycle()
+    val activeServerId = koinInject<ServerRepository>().activeServer.collectAsStateWithLifecycle().value?.id
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
+    // The server [selected] belongs to: after switching servers the chat pane starts empty.
+    var selectedServerId by rememberSaveable { mutableStateOf<String?>(null) }
+    val select: (String?) -> Unit = {
+        selected = it
+        selectedServerId = activeServerId
+    }
     var listHidden by rememberSaveable { mutableStateOf(false) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth || !appSettings.splitView) {
@@ -249,12 +257,13 @@ private fun SessionsListDetail(
             val scope = rememberCoroutineScope()
             val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
             val density = LocalDensity.current
+            val current = selected?.takeIf { selectedServerId == activeServerId }
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
-                    onOpenChat = { selected = it },
+                    onOpenChat = select,
                     onOpenSettings = onOpenSettings,
-                    selectedSessionId = selected,
+                    selectedSessionId = current,
                     openNewSession = openNewSession,
                     onNewSessionOpened = {
                         listHidden = false
@@ -263,16 +272,15 @@ private fun SessionsListDetail(
                     modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
-                val current = selected
                 if (current != null) {
                     ChatRoute(
                         sessionId = current,
-                        onBack = { selected = null },
+                        onBack = { select(null) },
                         showBack = false,
                         onOpenSession = onOpenChatFullScreen,
                         onOpenTerminal = onOpenTerminal,
                         onOpenFile = onOpenFile,
-                        onSwitchSession = { selected = it },
+                        onSwitchSession = select,
                         modifier = Modifier.weight(1f),
                     )
                 } else {
