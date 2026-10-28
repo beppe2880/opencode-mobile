@@ -107,9 +107,9 @@
     <string name="settings_notifications">Notifiche</string>
     <string name="settings_terminal">Terminale</string>
     <string name="settings_terminal_keyboard">Apri la tastiera</string>
-    <string name="settings_terminal_fullscreen">Apri a schermo intero</string>
-    <string name="settings_terminal_fullscreen_sub">Nasconde la barra del titolo e le barre di sistema; il pulsante sulla barra dei tasti o Indietro esce dallo schermo intero</string>
     <string name="settings_terminal_keyboard_sub">Mostra la tastiera a schermo non appena si apre il terminale</string>
+    <string name="settings_terminal_fullscreen">Schermo intero all'apertura</string>
+    <string name="settings_terminal_fullscreen_sub">Apre il terminale nascondendo la barra del titolo e quella di sistema. Il pulsante sulla barra dei tasti o Indietro esce dallo schermo intero.</string>
     <string name="settings_session_notifications">Notifiche delle sessioni</string>
     <string name="settings_session_notifications_sub">Mentre le sessioni sono in corso, resta connessa in background e ti avvisa quando una aspetta una risposta o finisce</string>
     <string name="settings_notify_permissions">Richieste di permesso</string>

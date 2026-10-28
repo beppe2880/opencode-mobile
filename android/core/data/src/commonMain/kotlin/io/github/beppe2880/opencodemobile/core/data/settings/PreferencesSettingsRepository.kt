@@ -55,7 +55,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         val keys = next.terminalKeys
         if (keys == null) prefs.remove(KEY_TERMINAL_KEYS) else prefs.putString(KEY_TERMINAL_KEYS, Json.encodeToString(KeyRows, keys))
         prefs.putBoolean(KEY_TERMINAL_KEYBOARD, next.terminalOpenKeyboard)
-        prefs.putBoolean(KEY_TERMINAL_FULLSCREEN, next.terminalFullscreen)
+        prefs.putBoolean(KEY_TERMINAL_FULLSCREEN, next.terminalFullscreenByDefault)
         prefs.putBoolean(KEY_SPLIT_VIEW, next.splitView)
         prefs.putBoolean(KEY_LIST_PANE_HANDLE, next.listPaneHandle)
         val fraction = next.listPaneFraction
@@ -94,7 +94,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             notifyFinished = prefs.getBoolean(KEY_NOTIFY_FINISHED, defaults.notifyFinished),
             notificationsIntroShown = prefs.getBoolean(KEY_NOTIFICATIONS_INTRO, defaults.notificationsIntroShown),
             terminalOpenKeyboard = prefs.getBoolean(KEY_TERMINAL_KEYBOARD, defaults.terminalOpenKeyboard),
-            terminalFullscreen = prefs.getBoolean(KEY_TERMINAL_FULLSCREEN, defaults.terminalFullscreen),
+            terminalFullscreenByDefault = prefs.getBoolean(KEY_TERMINAL_FULLSCREEN, defaults.terminalFullscreenByDefault),
             splitView = prefs.getBoolean(KEY_SPLIT_VIEW, defaults.splitView),
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },

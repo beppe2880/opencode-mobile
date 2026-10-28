@@ -37,7 +37,7 @@ class TerminalViewModel(
 
     init {
         open()
-        updateState { it.copy(fullscreen = settings.settings.value.terminalFullscreen) }
+        updateState { it.copy(fullscreen = settings.settings.value.terminalFullscreenByDefault) }
         viewModelScope.launch {
             settings.settings.map { BarKeys.fromSettings(it.terminalKeys) to it.terminalOpenKeyboard }.distinctUntilChanged()
                 .collect { (rows, openKeyboard) -> updateState { it.copy(keyRows = rows, openKeyboard = openKeyboard) } }

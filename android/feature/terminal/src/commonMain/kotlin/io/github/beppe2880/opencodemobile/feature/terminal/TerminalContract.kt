@@ -15,7 +15,7 @@ data class TerminalState(
     val keyRows: List<List<BarKey>> = BarKeys.Default,
     /** Entering the terminal shows the on-screen keyboard (setting). */
     val openKeyboard: Boolean = true,
-    /** Title bar and system bars hidden; starts from the setting, toggled on the screen. */
+    /** Title bar and system bars hidden; starts from the terminalFullscreenByDefault setting. */
     val fullscreen: Boolean = false,
     /** Modifiers of the key bar, also applied to keys typed on the keyboard. */
     val modifiers: Map<TermModifier, ModifierState> = emptyMap(),

@@ -443,15 +443,15 @@ private fun TerminalSection(settings: AppSettings, onEvent: (SettingsEvent) -> U
                 title = stringResource(Res.string.settings_terminal_keyboard),
                 subtitle = stringResource(Res.string.settings_terminal_keyboard_sub),
                 checked = settings.terminalOpenKeyboard,
-                onCheckedChange = { onEvent(SettingsEvent.TerminalKeyboardChanged(it)) },
+                onCheckedChange = { onEvent(SettingsEvent.TerminalOpenKeyboardChanged(it)) },
                 modifier = Modifier.testTag("settings_terminal_keyboard_switch"),
             )
             OcDivider()
             OcSwitchRow(
                 title = stringResource(Res.string.settings_terminal_fullscreen),
                 subtitle = stringResource(Res.string.settings_terminal_fullscreen_sub),
-                checked = settings.terminalFullscreen,
-                onCheckedChange = { onEvent(SettingsEvent.TerminalFullscreenChanged(it)) },
+                checked = settings.terminalFullscreenByDefault,
+                onCheckedChange = { onEvent(SettingsEvent.TerminalFullscreenByDefaultChanged(it)) },
                 modifier = Modifier.testTag("settings_terminal_fullscreen_switch"),
             )
         }

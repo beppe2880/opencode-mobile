@@ -113,9 +113,9 @@
     <string name="settings_notifications">Уведомления</string>
     <string name="settings_terminal">Терминал</string>
     <string name="settings_terminal_keyboard">Открывать клавиатуру</string>
+    <string name="settings_terminal_keyboard_sub">Показывать экранную клавиатуру сразу при открытии терминала</string>
     <string name="settings_terminal_fullscreen">Открывать на весь экран</string>
     <string name="settings_terminal_fullscreen_sub">Скрывает заголовок и системные панели; кнопка на панели клавиш или «Назад» выходят из полноэкранного режима</string>
-    <string name="settings_terminal_keyboard_sub">Показывать экранную клавиатуру сразу при открытии терминала</string>
     <string name="settings_session_notifications">Уведомления о сессиях</string>
     <string name="settings_session_notifications_sub">Пока выполняются сессии, оставаться на связи в фоне и сообщать, когда сессия ждёт ответа или завершается</string>
     <string name="settings_notify_permissions">Запросы разрешений</string>
