@@ -76,7 +76,7 @@ android {
         debug {
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
-            // `-PfakeData=true` runs the UI on in-memory sample repositories (see src/debug).
+            // `-PfakeData=true` starts directly in the offline demo.
             buildConfigField("boolean", "USE_FAKE_DATA", (project.findProperty("fakeData") == "true").toString())
             resValue("string", "app_name", "OpenCode Mobile Dev")
         }
@@ -115,7 +115,7 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":shared"))
     // Link parsing for the in-memory fake data module.
-    debugImplementation(project(":core:network"))
+    implementation(project(":core:network"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

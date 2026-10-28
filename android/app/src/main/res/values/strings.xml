@@ -44,4 +44,6 @@
     <string name="widget_preview_server">My server · 1 running</string>
     <string name="widget_preview_session">Fix the login redirect</string>
     <string name="widget_preview_session_2">Add dark mode to settings</string>
+    <string name="app_demo_label">Demo · Scripted responses</string>
+    <string name="app_demo_exit">Exit demo</string>
 </resources>

@@ -99,6 +99,7 @@ import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_subm
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_subtitle
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_test
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_title
+import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_try_demo
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_url_label
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_url_placeholder
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_warning_public_http
@@ -113,6 +114,7 @@ fun ConnectScreen(
     modifier: Modifier = Modifier,
     showBack: Boolean = false,
     onBack: () -> Unit = {},
+    onTryDemo: (() -> Unit)? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     secretFocusRequester: FocusRequester = remember { FocusRequester() },
 ) {
@@ -149,6 +151,14 @@ fun ConnectScreen(
                     )
                 }
                 Hero(addMode = showBack)
+                if (onTryDemo != null) {
+                    OcButton(
+                        text = stringResource(Res.string.connect_try_demo),
+                        onClick = onTryDemo,
+                        enabled = !state.busy,
+                        modifier = Modifier.fillMaxWidth().testTag("connect_try_demo"),
+                    )
+                }
                 if (state.discovering || state.newDiscovered.isNotEmpty()) {
                     DiscoveredServers(
                         urls = state.newDiscovered,

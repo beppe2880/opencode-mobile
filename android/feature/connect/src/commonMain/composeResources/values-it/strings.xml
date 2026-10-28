@@ -40,4 +40,5 @@
     <string name="connect_open_settings">Apri impostazioni</string>
     <string name="connect_camera_unavailable">La fotocamera non è disponibile su questo dispositivo.</string>
     <string name="connect_warning_public_http">Questo indirizzo sembra pubblico e usa HTTP senza cifratura: la password viaggerebbe in chiaro su internet. Meglio la rete locale, una VPN o HTTPS.</string>
+    <string name="connect_try_demo">Prova senza server</string>
 </resources>

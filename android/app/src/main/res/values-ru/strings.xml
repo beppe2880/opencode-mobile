@@ -47,4 +47,6 @@
     <string name="widget_preview_server">Мой сервер · 1 запущен</string>
     <string name="widget_preview_session">Исправить перенаправление при входе</string>
     <string name="widget_preview_session_2">Добавить тёмную тему в настройки</string>
+    <string name="app_demo_label">Демо · Имитация ответов</string>
+    <string name="app_demo_exit">Выйти из демо</string>
 </resources>

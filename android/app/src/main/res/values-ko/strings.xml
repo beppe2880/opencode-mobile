@@ -41,4 +41,6 @@
     <string name="widget_preview_server">내 서버 · 실행 중 1개</string>
     <string name="widget_preview_session">로그인 리디렉션 수정</string>
     <string name="widget_preview_session_2">설정에 다크 모드 추가</string>
+    <string name="app_demo_label">데모 · 모의 응답</string>
+    <string name="app_demo_exit">데모 종료</string>
 </resources>

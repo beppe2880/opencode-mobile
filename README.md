@@ -72,6 +72,10 @@ SHA-256 checksum of every APK.
 
 ## Connect to your server
 
+Want a preview first? Tap **Try without a server** on the connect screen to explore
+sample sessions, scripted replies and settings offline. **Exit demo** returns to your
+real servers; demo changes are discarded and never affect your saved data.
+
 1. On the computer running OpenCode, run:
 
    ```bash
@@ -102,7 +106,7 @@ Requirements: JDK 21 and the Android SDK (compile SDK 37).
 git clone <this repository>
 cd opencode-mobile/android
 ./gradlew :app:installDebug                    # needs a connected device or emulator
-./gradlew :app:installDebug -PfakeData=true    # runs on sample data, no server needed
+./gradlew :app:installDebug -PfakeData=true    # opens the offline demo on launch
 ```
 
 On an emulator the app finds the host's server at `http://10.0.2.2:4096` by itself; pair it

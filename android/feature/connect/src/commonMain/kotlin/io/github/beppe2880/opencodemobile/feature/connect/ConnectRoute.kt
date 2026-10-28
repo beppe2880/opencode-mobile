@@ -20,6 +20,7 @@ fun ConnectRoute(
     modifier: Modifier = Modifier,
     showBack: Boolean = false,
     onBack: () -> Unit = {},
+    onTryDemo: (() -> Unit)? = null,
 ) {
     val viewModel: ConnectViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -47,6 +48,7 @@ fun ConnectRoute(
         modifier = modifier,
         showBack = showBack,
         onBack = onBack,
+        onTryDemo = onTryDemo,
         snackbarHostState = snackbar,
         secretFocusRequester = focus,
     )

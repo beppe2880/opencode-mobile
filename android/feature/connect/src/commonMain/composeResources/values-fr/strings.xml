@@ -40,4 +40,5 @@
     <string name="connect_open_settings">Ouvrir les paramètres</string>
     <string name="connect_camera_unavailable">La caméra n’est pas disponible sur cet appareil.</string>
     <string name="connect_warning_public_http">Cette adresse semble publique et utilise HTTP sans chiffrement : le mot de passe circulerait en clair sur Internet. Préférez votre réseau local, un VPN ou HTTPS.</string>
+    <string name="connect_try_demo">Essayer sans serveur</string>
 </resources>

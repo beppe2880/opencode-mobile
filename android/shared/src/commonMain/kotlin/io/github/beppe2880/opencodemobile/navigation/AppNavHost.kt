@@ -113,6 +113,9 @@ fun AppNavHost(
     /** Opens the new session sheet over the session list (widget button). */
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
+    onTryDemo: (() -> Unit)? = null,
+    onConnectServer: (() -> Unit)? = null,
+    isDemo: Boolean = false,
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -148,6 +151,7 @@ fun AppNavHost(
         composable<ConnectDestination> { entry ->
             val args = entry.toRoute<ConnectDestination>()
             ConnectRoute(
+                onTryDemo = onTryDemo,
                 showBack = args.addServer,
                 onBack = { navController.popBackStack() },
                 onConnected = {
@@ -189,8 +193,9 @@ fun AppNavHost(
         }
         composable<SettingsDestination> {
             SettingsRoute(
+                allowSystemNotifications = !isDemo,
                 onBack = { navController.popBackStack() },
-                onAddServer = { navController.navigate(ConnectDestination(addServer = true)) },
+                onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
             )
         }

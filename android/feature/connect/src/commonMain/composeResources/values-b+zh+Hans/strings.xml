@@ -40,4 +40,5 @@
     <string name="connect_open_settings">打开设置</string>
     <string name="connect_camera_unavailable">此设备的相机不可用。</string>
     <string name="connect_warning_public_http">此地址看起来是公网地址，且使用未加密的 HTTP：密码会以明文经过互联网传输。建议使用局域网、VPN 或 HTTPS。</string>
+    <string name="connect_try_demo">无需服务器即可试用</string>
 </resources>

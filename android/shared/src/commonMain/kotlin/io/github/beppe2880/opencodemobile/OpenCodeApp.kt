@@ -29,6 +29,7 @@ fun OpenCodeApp(
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
     onDarkThemeChange: (Boolean) -> Unit = {},
+    onTryDemo: (() -> Unit)? = null,
     overlay: @Composable (AppSettings) -> Unit = {},
 ) {
     val settings = koinInject<SettingsRepository>()
@@ -43,6 +44,7 @@ fun OpenCodeApp(
             // Choosing the start screen needs the saved servers, read off the main thread.
             if (loaded) {
                 AppNavHost(
+                    onTryDemo = onTryDemo,
                     hasActiveServer = activeServer != null,
                     openSessionId = openSessionId,
                     onSessionOpened = onSessionOpened,

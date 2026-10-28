@@ -40,4 +40,5 @@
     <string name="connect_open_settings">設定を開く</string>
     <string name="connect_camera_unavailable">この端末ではカメラを利用できません。</string>
     <string name="connect_warning_public_http">このアドレスは公開アドレスのようで、暗号化されていない HTTP を使っています。パスワードが暗号化されずにインターネットを通ります。LAN、VPN、または HTTPS を使ってください。</string>
+    <string name="connect_try_demo">サーバーなしで試す</string>
 </resources>

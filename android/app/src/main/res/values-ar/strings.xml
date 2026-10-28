@@ -51,4 +51,6 @@
     <string name="widget_preview_server">خادمي · جلسة جارية واحدة</string>
     <string name="widget_preview_session">إصلاح إعادة توجيه تسجيل الدخول</string>
     <string name="widget_preview_session_2">إضافة الوضع الداكن إلى الإعدادات</string>
+    <string name="app_demo_label">عرض تجريبي · ردود محاكاة</string>
+    <string name="app_demo_exit">إنهاء العرض</string>
 </resources>

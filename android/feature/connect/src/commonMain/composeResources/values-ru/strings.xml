@@ -40,4 +40,5 @@
     <string name="connect_open_settings">Открыть настройки</string>
     <string name="connect_camera_unavailable">Камера недоступна на этом устройстве.</string>
     <string name="connect_warning_public_http">Этот адрес похож на публичный и использует HTTP без шифрования: пароль будет передаваться через интернет в открытом виде. Лучше используйте локальную сеть, VPN или HTTPS.</string>
+    <string name="connect_try_demo">Попробовать без сервера</string>
 </resources>

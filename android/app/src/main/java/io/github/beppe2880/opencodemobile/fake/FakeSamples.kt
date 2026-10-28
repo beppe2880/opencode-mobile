@@ -5,7 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
 
-/** Sample diffs, questions and shell output for the fake data layer. */
+/** Sample diffs, questions and shell output shared by the demo and debug builds. */
 internal object FakeSamples {
 
     val checkoutForm = Form(

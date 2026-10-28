@@ -41,4 +41,6 @@
     <string name="widget_preview_server">マイサーバー · 実行中 1 件</string>
     <string name="widget_preview_session">ログインのリダイレクトを修正</string>
     <string name="widget_preview_session_2">設定にダークモードを追加</string>
+    <string name="app_demo_label">デモ · 模擬応答</string>
+    <string name="app_demo_exit">デモを終了</string>
 </resources>

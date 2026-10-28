@@ -14,7 +14,9 @@ import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DailyActivity
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.FileContent
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
+import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
@@ -52,6 +54,7 @@ import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,16 +65,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 import java.time.Instant
 import java.time.ZoneId
 
 /**
  * In-memory data layer with realistic sample data for UI work on the emulator without a
- * server. Prompts stream a scripted reply through [FakeEvents] so live states can be inspected.
- * Enable with `./gradlew :app:installDebug -PfakeData=true`.
+ * server. Used by the runtime demo in every build; `-PfakeData=true` opens it on launch.
+ * Prompts stream a scripted reply through [FakeEvents] so live states can be inspected.
  */
 val fakeDataModule = module {
-    single(AppScope) { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single(AppScope) { CoroutineScope(SupervisorJob() + Dispatchers.Default) } onClose { it?.cancel() }
     single { FakeStore() }
     single<ServerRepository> { FakeServers() }
     single<ServerDiscovery> {
@@ -85,7 +89,7 @@ val fakeDataModule = module {
     single { FakeEvents() }
     single<EventRepository> { get<FakeEvents>() }
     single<SessionRepository> { FakeSessions(get(), get()) }
-    single<ChatRepository> { FakeChat(get(), get()) }
+    single<ChatRepository> { FakeChat(get(), get(), get(AppScope)) }
     single<CatalogRepository> { FakeCatalog() }
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
@@ -97,6 +101,14 @@ val fakeDataModule = module {
             override suspend fun setConnected(directory: String, name: String, connected: Boolean): Result<Unit> {
                 servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
                 return Result.success(Unit)
+            }
+        }
+    }
+    single<FileRepository> {
+        object : FileRepository {
+            override suspend fun read(directory: String, path: String): Result<FileContent> {
+                val text = "// Demo file: $path\n\nfun main() = println(\"Hello from the demo\")\n"
+                return Result.success(FileContent.Text(text, text.toByteArray().size.toLong(), false))
             }
         }
     }
@@ -307,9 +319,8 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
     }
 }
 
-internal class FakeChat(private val store: FakeStore, private val events: FakeEvents) : ChatRepository {
-    private val demo = DotfilesDemo(store, events)
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+internal class FakeChat(private val store: FakeStore, private val events: FakeEvents, private val scope: CoroutineScope) : ChatRepository {
+    private val demo = DotfilesDemo(store, events, scope)
 
     override suspend fun messages(sessionId: String): Result<List<Message>> {
         delay(LATENCY)
@@ -480,7 +491,7 @@ internal class FakeTerminals : TerminalRepository {
 
     override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate> = flow {
         emit(TerminalUpdate.Link(TerminalLink.Connected))
-        emit(TerminalUpdate.Output("\u001b[32m~/${directory.substringAfterLast('/')}\u001b[0m $ "))
+        emit(TerminalUpdate.Output("Demo terminal: input is echoed, commands are not executed.\r\n\u001b[32m~/${directory.substringAfterLast('/')}\u001b[0m $ "))
         input.collect { bytes -> emit(TerminalUpdate.Output(bytes.decodeToString().replace("\r", "\r\n$ "))) }
     }
 }

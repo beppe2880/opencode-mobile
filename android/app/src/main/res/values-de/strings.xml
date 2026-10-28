@@ -43,4 +43,6 @@
     <string name="widget_preview_server">Mein Server · 1 laufend</string>
     <string name="widget_preview_session">Login-Weiterleitung reparieren</string>
     <string name="widget_preview_session_2">Dunklen Modus zu den Einstellungen hinzufügen</string>
+    <string name="app_demo_label">Demo · Simulierte Antworten</string>
+    <string name="app_demo_exit">Demo verlassen</string>
 </resources>
