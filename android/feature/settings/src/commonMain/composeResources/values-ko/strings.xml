@@ -104,6 +104,8 @@
     <string name="settings_notifications">알림</string>
     <string name="settings_terminal">터미널</string>
     <string name="settings_terminal_keyboard">키보드 열기</string>
+    <string name="settings_terminal_fullscreen">전체 화면으로 열기</string>
+    <string name="settings_terminal_fullscreen_sub">제목 표시줄과 시스템 표시줄을 숨깁니다. 키 바의 버튼이나 뒤로 가기로 전체 화면을 종료합니다</string>
     <string name="settings_terminal_keyboard_sub">터미널 화면이 열리면 바로 화면 키보드를 표시합니다</string>
     <string name="settings_session_notifications">세션 알림</string>
     <string name="settings_session_notifications_sub">세션이 실행되는 동안 백그라운드에서 연결을 유지하고, 응답을 기다리거나 완료되면 알려 줍니다</string>

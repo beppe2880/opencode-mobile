@@ -104,6 +104,8 @@
     <string name="settings_notifications">通知</string>
     <string name="settings_terminal">终端</string>
     <string name="settings_terminal_keyboard">打开键盘</string>
+    <string name="settings_terminal_fullscreen">在全屏中打开</string>
+    <string name="settings_terminal_fullscreen_sub">隐藏标题栏和系统栏；按键栏上的按钮或返回键可退出全屏</string>
     <string name="settings_terminal_keyboard_sub">打开终端时立即显示屏幕键盘</string>
     <string name="settings_session_notifications">会话通知</string>
     <string name="settings_session_notifications_sub">会话运行期间在后台保持连接，并在会话等待回复或完成时通知你</string>

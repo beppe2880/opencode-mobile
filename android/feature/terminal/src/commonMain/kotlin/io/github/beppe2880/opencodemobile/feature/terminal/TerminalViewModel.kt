@@ -37,6 +37,7 @@ class TerminalViewModel(
 
     init {
         open()
+        updateState { it.copy(fullscreen = settings.settings.value.terminalFullscreen) }
         viewModelScope.launch {
             settings.settings.map { BarKeys.fromSettings(it.terminalKeys) to it.terminalOpenKeyboard }.distinctUntilChanged()
                 .collect { (rows, openKeyboard) -> updateState { it.copy(keyRows = rows, openKeyboard = openKeyboard) } }
@@ -62,6 +63,7 @@ class TerminalViewModel(
             is TerminalEvent.SaveKeys -> saveKeys(BarKeys.toSettings(event.rows))
             TerminalEvent.ResetKeys -> saveKeys(null)
             TerminalEvent.Retry -> open()
+            is TerminalEvent.Fullscreen -> updateState { it.copy(fullscreen = event.enabled) }
             TerminalEvent.Restart -> {
                 surface.reset()
                 open()

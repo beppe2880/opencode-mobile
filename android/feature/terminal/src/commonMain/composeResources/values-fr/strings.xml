@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">Annuler</string>
     <string name="terminal_keys_reset">Rétablir les valeurs par défaut</string>
     <string name="terminal_keys_done">OK</string>
+    <string name="terminal_fullscreen">Plein écran</string>
+    <string name="terminal_fullscreen_exit">Quitter le plein écran</string>
 </resources>

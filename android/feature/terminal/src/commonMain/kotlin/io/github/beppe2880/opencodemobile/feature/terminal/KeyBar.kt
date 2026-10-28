@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.FullscreenExit
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.Res
+import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_fullscreen_exit
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_key_backspace
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_key_down
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_key_end
@@ -60,6 +62,8 @@ internal fun KeyBar(
     onPress: (BarKey) -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
+    fullscreen: Boolean = false,
+    onExitFullscreen: () -> Unit = {},
 ) {
     val c = OcTheme.colors
     Column(modifier.fillMaxWidth().background(c.bgBase)) {
@@ -84,6 +88,14 @@ internal fun KeyBar(
                         }
                     }
                 }
+            }
+            if (fullscreen) {
+                OcIconButton(
+                    icon = Icons.Outlined.FullscreenExit,
+                    contentDescription = stringResource(Res.string.terminal_fullscreen_exit),
+                    onClick = onExitFullscreen,
+                    modifier = Modifier.testTag("terminal_fullscreen_exit_button"),
+                )
             }
             OcIconButton(
                 icon = Icons.Outlined.Edit,

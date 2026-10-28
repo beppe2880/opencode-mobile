@@ -7,15 +7,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -37,6 +41,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.platform.rememberTextClipboard
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -48,6 +53,7 @@ import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_cl
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_close_title
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_error_title
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_exited
+import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_fullscreen
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_new
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_reconnecting
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_title
@@ -67,34 +73,17 @@ fun TerminalScreen(
     val clipboard = rememberTextClipboard()
     val scope = rememberCoroutineScope()
 
+    SystemBarsHidden(state.fullscreen)
+    OcBackHandler(enabled = state.fullscreen) { onEvent(TerminalEvent.Fullscreen(false)) }
+
     Scaffold(
         modifier = modifier,
         containerColor = c.bgDeep,
         contentWindowInsets = WindowInsets(0),
         topBar = {
-            OcTopBar(
-                title = state.title.ifEmpty { stringResource(Res.string.terminal_title) },
-                subtitle = state.directory,
-                leading = {
-                    OcIconButton(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = stringResource(UiRes.string.oc_back),
-                        onClick = { onEvent(TerminalEvent.Back) },
-                        modifier = Modifier.testTag("terminal_back_button"),
-                    )
-                },
-                titleAccessory = {
-                    if (state.error == null && state.link in Waiting) OcSpinner(Modifier.testTag("terminal_connecting"))
-                },
-                actions = {
-                    OcIconButton(
-                        icon = Icons.Outlined.DeleteOutline,
-                        contentDescription = stringResource(Res.string.terminal_close),
-                        onClick = { onEvent(TerminalEvent.AskClose) },
-                        modifier = Modifier.testTag("terminal_close_button"),
-                    )
-                },
-            )
+            if (!state.fullscreen) {
+                TopBar(state, onEvent)
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
@@ -103,6 +92,8 @@ fun TerminalScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .consumeWindowInsets(padding)
+                // Without the title bar: keep clear of cutouts and of a status bar still shown (iOS).
+                .then(if (state.fullscreen) Modifier.windowInsetsPadding(WindowInsets.displayCutout.union(WindowInsets.statusBars)) else Modifier)
                 .imePadding(),
         ) {
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -133,6 +124,8 @@ fun TerminalScreen(
                     }
                 },
                 onEdit = { onEvent(TerminalEvent.EditKeys(true)) },
+                fullscreen = state.fullscreen,
+                onExitFullscreen = { onEvent(TerminalEvent.Fullscreen(false)) },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }
@@ -158,6 +151,39 @@ fun TerminalScreen(
             testTagPrefix = "terminal_close",
         )
     }
+}
+
+@Composable
+private fun TopBar(state: TerminalState, onEvent: (TerminalEvent) -> Unit) {
+    OcTopBar(
+        title = state.title.ifEmpty { stringResource(Res.string.terminal_title) },
+        subtitle = state.directory,
+        leading = {
+            OcIconButton(
+                icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = stringResource(UiRes.string.oc_back),
+                onClick = { onEvent(TerminalEvent.Back) },
+                modifier = Modifier.testTag("terminal_back_button"),
+            )
+        },
+        titleAccessory = {
+            if (state.error == null && state.link in Waiting) OcSpinner(Modifier.testTag("terminal_connecting"))
+        },
+        actions = {
+            OcIconButton(
+                icon = Icons.Outlined.Fullscreen,
+                contentDescription = stringResource(Res.string.terminal_fullscreen),
+                onClick = { onEvent(TerminalEvent.Fullscreen(true)) },
+                modifier = Modifier.testTag("terminal_fullscreen_button"),
+            )
+            OcIconButton(
+                icon = Icons.Outlined.DeleteOutline,
+                contentDescription = stringResource(Res.string.terminal_close),
+                onClick = { onEvent(TerminalEvent.AskClose) },
+                modifier = Modifier.testTag("terminal_close_button"),
+            )
+        },
+    )
 }
 
 private val Waiting = setOf(TerminalLink.Connecting, TerminalLink.Reconnecting)

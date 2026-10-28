@@ -107,6 +107,8 @@
     <string name="settings_notifications">Notificações</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_terminal_keyboard">Abrir o teclado</string>
+    <string name="settings_terminal_fullscreen">Abrir em tela cheia</string>
+    <string name="settings_terminal_fullscreen_sub">Oculta a barra de título e as barras do sistema; o botão na barra de teclas ou Voltar sai da tela cheia</string>
     <string name="settings_terminal_keyboard_sub">Mostrar o teclado na tela assim que o terminal abrir</string>
     <string name="settings_session_notifications">Notificações de sessões</string>
     <string name="settings_session_notifications_sub">Enquanto houver sessões em andamento, fica conectado em segundo plano e avisa quando uma espera uma resposta ou termina</string>

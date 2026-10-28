@@ -107,6 +107,8 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_terminal_keyboard">Open the keyboard</string>
+    <string name="settings_terminal_fullscreen">Open in full screen</string>
+    <string name="settings_terminal_fullscreen_sub">Hide the title bar and the system bars; the button on the key bar or Back leaves full screen</string>
     <string name="settings_terminal_keyboard_sub">Show the on-screen keyboard as soon as the terminal opens</string>
     <string name="settings_session_notifications">Session notifications</string>
     <string name="settings_session_notifications_sub">While sessions run, stay connected in the background and notify you when one needs an answer or finishes</string>

@@ -49,6 +49,7 @@ sealed interface SettingsEvent {
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalKeyboardChanged(val enabled: Boolean) : SettingsEvent
+    data class TerminalFullscreenChanged(val enabled: Boolean) : SettingsEvent
     data class SplitViewChanged(val enabled: Boolean) : SettingsEvent
     data class ListPaneFractionChanged(val fraction: Float) : SettingsEvent
     data class ListPaneHandleChanged(val enabled: Boolean) : SettingsEvent

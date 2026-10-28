@@ -333,6 +333,8 @@ data class AppSettings(
     val terminalKeys: List<List<String>>? = null,
     /** Opening the terminal also shows the on-screen keyboard. */
     val terminalOpenKeyboard: Boolean = true,
+    /** The terminal opens in full screen, without the title bar and the system bars. */
+    val terminalFullscreen: Boolean = false,
     /** On wide screens (unfolded foldables, tablets) the open chat is shown next to the session list. */
     val splitView: Boolean = true,
     /** Share of the window width taken by the session list beside the chat; null for the default. */

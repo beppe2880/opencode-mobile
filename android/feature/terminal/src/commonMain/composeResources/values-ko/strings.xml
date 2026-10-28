@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">취소</string>
     <string name="terminal_keys_reset">기본값으로 재설정</string>
     <string name="terminal_keys_done">완료</string>
+    <string name="terminal_fullscreen">전체 화면</string>
+    <string name="terminal_fullscreen_exit">전체 화면 종료</string>
 </resources>

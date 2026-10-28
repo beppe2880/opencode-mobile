@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">Отмена</string>
     <string name="terminal_keys_reset">Сбросить по умолчанию</string>
     <string name="terminal_keys_done">Готово</string>
+    <string name="terminal_fullscreen">Полноэкранный режим</string>
+    <string name="terminal_fullscreen_exit">Выйти из полноэкранного режима</string>
 </resources>

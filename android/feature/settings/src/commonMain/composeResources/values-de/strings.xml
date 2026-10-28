@@ -107,6 +107,8 @@
     <string name="settings_notifications">Benachrichtigungen</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_terminal_keyboard">Tastatur öffnen</string>
+    <string name="settings_terminal_fullscreen">Im Vollbild öffnen</string>
+    <string name="settings_terminal_fullscreen_sub">Blendet die Titelleiste und die Systemleisten aus; die Schaltfläche in der Tastenleiste oder Zurück beendet das Vollbild</string>
     <string name="settings_terminal_keyboard_sub">Bildschirmtastatur anzeigen, sobald das Terminal geöffnet wird</string>
     <string name="settings_session_notifications">Sitzungsbenachrichtigungen</string>
     <string name="settings_session_notifications_sub">Solange Sitzungen laufen, im Hintergrund verbunden bleiben und benachrichtigen, wenn eine auf eine Antwort wartet oder fertig ist</string>

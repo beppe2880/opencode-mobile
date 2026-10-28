@@ -104,6 +104,8 @@
     <string name="settings_notifications">通知</string>
     <string name="settings_terminal">ターミナル</string>
     <string name="settings_terminal_keyboard">キーボードを開く</string>
+    <string name="settings_terminal_fullscreen">全画面で開く</string>
+    <string name="settings_terminal_fullscreen_sub">タイトルバーとシステムバーを隠します。キーバーのボタンまたは戻るで全画面を終了します</string>
     <string name="settings_terminal_keyboard_sub">ターミナルを開いたときに画面キーボードをすぐに表示します</string>
     <string name="settings_session_notifications">セッションの通知</string>
     <string name="settings_session_notifications_sub">セッションの実行中はバックグラウンドで接続を保ち、応答待ちや完了のときに通知します</string>
