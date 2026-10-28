@@ -22,7 +22,8 @@ AI-generated descriptions may be closed. -->
 ### Platforms tested
 
 <!-- Most code is shared, so a change usually reaches both apps. Tick what you ran it on; if
-you could only test one platform, say so and a maintainer will check the other. -->
+you could only test one platform, also tick the third box and a maintainer will check the
+other one. Changes outside the apps tick only the last box. -->
 
 - [ ] Android (device or emulator: )
 - [ ] iOS (device or simulator: )

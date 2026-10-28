@@ -66,6 +66,12 @@
 - name: "needs:info"
   color: "e99695"
   description: Waiting for more information
+- name: "needs:ios-check"
+  color: "fbca04"
+  description: Tested on Android only; check on iOS before merging
+- name: "needs:android-check"
+  color: "fbca04"
+  description: Tested on iOS only; check on Android before merging
 
 # release-please (release.yml)
 - name: "autorelease: pending"
