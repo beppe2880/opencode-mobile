@@ -17,6 +17,30 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Where you saw the problem.
+      multiple: true
+      options:
+        - Android
+        - iOS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: other-platform
+    attributes:
+      label: Other platform
+      description: Does the same happen in the app on the other platform?
+      options:
+        - Not checked (I only use one platform)
+        - Checked, it happens there too
+        - Checked, it does not happen there
+    validations:
+      required: true
+
   - type: textarea
     id: steps
     attributes:
@@ -49,8 +73,8 @@ body:
   - type: input
     id: device
     attributes:
-      label: Device and Android version
-      placeholder: e.g. Pixel 8, Android 16
+      label: Device and OS version
+      placeholder: e.g. Pixel 8, Android 16 or iPhone 15, iOS 18
     validations:
       required: true
 

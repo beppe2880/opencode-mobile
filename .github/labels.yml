@@ -28,6 +28,14 @@
   color: "ffffff"
   description: Will not be worked on
 
+# Platforms, set from the issue forms (issue-standards.yml)
+- name: "platform:android"
+  color: "3ddc84"
+  description: Affects the Android app
+- name: "platform:ios"
+  color: "999999"
+  description: Affects the iOS app
+
 # Never marked stale (stale.yml)
 - name: confirmed
   color: "0e8a16"
@@ -58,6 +66,12 @@
 - name: "needs:info"
   color: "e99695"
   description: Waiting for more information
+- name: "needs:ios-check"
+  color: "fbca04"
+  description: Tested on Android only; check on iOS before merging
+- name: "needs:android-check"
+  color: "fbca04"
+  description: Tested on iOS only; check on Android before merging
 
 # release-please (release.yml)
 - name: "autorelease: pending"

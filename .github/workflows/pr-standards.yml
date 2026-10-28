@@ -2,7 +2,8 @@ name: PR Standards
 
 # Labels pull requests that miss the title format or the template, explains how to fix them
 # in a single comment, and clears the labels once fixed. compliance-close.yml closes the ones
-# still not fixed after 72 hours.
+# still not fixed after 72 hours. For every author, "Platforms tested" sets needs:ios-check or
+# needs:android-check while only one platform is ticked.
 
 on:
   pull_request_target:
@@ -25,15 +26,18 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const exempt = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association)
-              || pr.user.type === 'Bot';
-            if (exempt) {
-              core.info(`Skipping: ${pr.user.login} (${pr.author_association})`);
+            if (pr.user.type === 'Bot') {
+              core.info(`Skipping bot: ${pr.user.login}`);
               return;
             }
-
             const repo = { owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number };
-            const titleOk = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: [A-Z].+/.test(pr.title);
+            async function setLabel(name, on) {
+              if (on) {
+                await github.rest.issues.addLabels({ ...repo, labels: [name] });
+              } else {
+                await github.rest.issues.removeLabel({ ...repo, name }).catch(() => {});
+              }
+            }
 
             // The template's free-text answers, without HTML comments and placeholders.
             const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '');
@@ -41,9 +45,35 @@ jobs:
               const match = body.match(new RegExp(`###\\s*${heading}[^\\n]*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i'));
               return match ? match[1].trim() : null;
             };
+
+            // "Platforms tested": the boxes ticked, and whether they make sense together.
+            const platforms = section('Platforms tested');
+            const ticked = (label) => platforms !== null && new RegExp(`- \\[x\\]\\s*${label}`, 'i').test(platforms);
+            const android = ticked('Android');
+            const ios = ticked('iOS');
+            const oneOnly = ticked('Only tested on one platform');
+            const noApps = ticked('Does not affect the apps');
+            const platformsAnswered = android || ios || noApps;
+            const platformsConsistent = !(noApps && (android || ios || oneOnly))
+              && !(oneOnly && android && ios)
+              && !(oneOnly && !android && !ios);
+            // A maintainer ticks the other platform after checking it, which clears the label.
+            if (platforms !== null) {
+              await setLabel('needs:ios-check', platformsConsistent && android && !ios);
+              await setLabel('needs:android-check', platformsConsistent && ios && !android);
+            }
+
+            const exempt = ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association);
+            if (exempt) {
+              core.info(`Skipping the rest: ${pr.user.login} (${pr.author_association})`);
+              return;
+            }
+
+            const titleOk = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: [A-Z].+/.test(pr.title);
             const what = section('What does this PR do');
             const how = section('How did you verify');
-            const templateOk = what !== null && how !== null && what.length >= 20 && how.length >= 10;
+            const templateOk = what !== null && how !== null && what.length >= 20 && how.length >= 10
+              && platformsAnswered && platformsConsistent;
 
             const problems = [];
             if (!titleOk) problems.push(
@@ -52,16 +82,10 @@ jobs:
             );
             if (!templateOk) problems.push(
               '- **Description**: fill in the pull request template, at least ' +
-              '"What does this PR do?" and "How did you verify your code works?".'
+              '"What does this PR do?", "How did you verify your code works?" and "Platforms tested". ' +
+              'In "Platforms tested" tick the platforms you ran the change on, plus "Only tested on one platform" ' +
+              'if you could not run the other one, or only "Does not affect the apps".'
             );
-
-            async function setLabel(name, on) {
-              if (on) {
-                await github.rest.issues.addLabels({ ...repo, labels: [name] });
-              } else {
-                await github.rest.issues.removeLabel({ ...repo, name }).catch(() => {});
-              }
-            }
             await setLabel('needs:title', !titleOk);
             await setLabel('needs:template', !templateOk);
             await setLabel('needs:compliance', problems.length > 0);
