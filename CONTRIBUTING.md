@@ -96,6 +96,9 @@ Optional scopes: `chat`, `sessions`, `connect`, `settings`, `ui`, `data`, `netwo
 
 - Fill in the template: what changed, how you verified it, screenshots for UI changes
   (light and dark theme).
+- Say which platforms you tested on. Most code is shared, so a change usually reaches both the
+  Android and the iOS app; if you could only run one of them, tick "Only tested on one
+  platform" and a maintainer will check the other.
 - Keep each pull request to one change; no unrelated edits.
 - CI must pass: formatting, unit tests, lint, debug build and the generated API check.
 - [CodeRabbit](https://coderabbit.ai) reviews every pull request automatically. Its comments

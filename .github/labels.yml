@@ -28,6 +28,14 @@
   color: "ffffff"
   description: Will not be worked on
 
+# Platforms, set from the issue forms (issue-standards.yml)
+- name: "platform:android"
+  color: "3ddc84"
+  description: Affects the Android app
+- name: "platform:ios"
+  color: "999999"
+  description: Affects the iOS app
+
 # Never marked stale (stale.yml)
 - name: confirmed
   color: "0e8a16"

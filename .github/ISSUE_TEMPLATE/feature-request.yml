@@ -18,6 +18,18 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which app the request is about. Most features are shared by both.
+      options:
+        - Both
+        - Android only
+        - iOS only
+    validations:
+      required: true
+
   - type: textarea
     id: proposal
     attributes:

@@ -43,7 +43,9 @@ jobs:
             };
             const what = section('What does this PR do');
             const how = section('How did you verify');
-            const templateOk = what !== null && how !== null && what.length >= 20 && how.length >= 10;
+            const platforms = section('Platforms tested');
+            const platformsOk = platforms !== null && /- \[x\]/i.test(platforms);
+            const templateOk = what !== null && how !== null && what.length >= 20 && how.length >= 10 && platformsOk;
 
             const problems = [];
             if (!titleOk) problems.push(
@@ -52,7 +54,8 @@ jobs:
             );
             if (!templateOk) problems.push(
               '- **Description**: fill in the pull request template, at least ' +
-              '"What does this PR do?" and "How did you verify your code works?".'
+              '"What does this PR do?", "How did you verify your code works?" and "Platforms tested" ' +
+              '(tick the platforms you ran it on, or that the other one still needs checking).'
             );
 
             async function setLabel(name, on) {
