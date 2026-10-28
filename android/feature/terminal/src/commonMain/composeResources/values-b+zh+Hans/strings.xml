@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">取消</string>
     <string name="terminal_keys_reset">恢复默认</string>
     <string name="terminal_keys_done">完成</string>
+    <string name="terminal_fullscreen">全屏</string>
+    <string name="terminal_fullscreen_exit">退出全屏</string>
 </resources>

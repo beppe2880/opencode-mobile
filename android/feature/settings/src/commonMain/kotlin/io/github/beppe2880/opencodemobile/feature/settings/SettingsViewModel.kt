@@ -70,7 +70,8 @@ class SettingsViewModel(
             is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
             is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
             is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
-            is SettingsEvent.TerminalKeyboardChanged -> update { it.copy(terminalOpenKeyboard = event.enabled) }
+            is SettingsEvent.TerminalOpenKeyboardChanged -> update { it.copy(terminalOpenKeyboard = event.enabled) }
+            is SettingsEvent.TerminalFullscreenByDefaultChanged -> update { it.copy(terminalFullscreenByDefault = event.enabled) }
             is SettingsEvent.SplitViewChanged -> update { it.copy(splitView = event.enabled) }
             is SettingsEvent.ListPaneFractionChanged -> update { it.copy(listPaneFraction = event.fraction) }
             is SettingsEvent.ListPaneHandleChanged -> update { it.copy(listPaneHandle = event.enabled) }

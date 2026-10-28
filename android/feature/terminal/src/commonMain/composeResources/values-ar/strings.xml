@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">إلغاء</string>
     <string name="terminal_keys_reset">استعادة الافتراضي</string>
     <string name="terminal_keys_done">تم</string>
+    <string name="terminal_fullscreen">ملء الشاشة</string>
+    <string name="terminal_fullscreen_exit">الخروج من ملء الشاشة</string>
 </resources>

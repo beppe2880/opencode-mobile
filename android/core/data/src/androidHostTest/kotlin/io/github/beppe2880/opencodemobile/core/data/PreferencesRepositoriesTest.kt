@@ -27,6 +27,7 @@ class PreferencesRepositoriesTest {
             keepLiveStepsOpen = true,
             chatTextScale = 1.15f,
             terminalOpenKeyboard = false,
+            terminalFullscreenByDefault = true,
             splitView = false,
             listPaneFraction = 0.35f,
             listPaneHandle = false,
