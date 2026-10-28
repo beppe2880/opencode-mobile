@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
@@ -192,6 +193,7 @@ fun SessionsScreen(
                                 onSwipeDelete = { onEvent(SessionsEvent.RequestDelete(session)) },
                                 modifier = Modifier.animateItem(),
                                 compact = compact,
+                                work = state.work[session.id] ?: RunningWork(),
                             )
                         }
                     }

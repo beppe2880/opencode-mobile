@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
@@ -39,6 +40,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import io.github.beppe2880.opencodemobile.core.domain.loadRunningWork
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -67,6 +69,105 @@ class ChatViewModelTest {
     private val drafts = FakeDrafts()
     private val scroll = ScrollMemory()
     private val mcps = FakeMcps()
+
+    @Test
+    fun `running commands are attributed by shell id never by shared directory`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val root = sessions.get("s1").getOrThrow()
+        chat.transcript = listOf(
+            Message.Assistant(
+                "a1", 1, "build", model,
+                listOf(
+                    Part.Tool("call", "shell", ToolStatus.Completed, "{}", metadata = mapOf("shellID" to "owned")),
+                ),
+            ),
+        )
+        chat.runningCommands = listOf(
+            RunningCommand("owned", "build", "/repo", 1),
+            RunningCommand("other", "test", "/repo", 1, sessionId = "s2"),
+            RunningCommand("unknown", "watch", "/repo", 1),
+        )
+        val result = loadRunningWork(listOf(root), sessions, chat).getOrThrow()
+        assertEquals(listOf("owned"), result.sessions["s1"]!!.commands.map { it.id })
+        assertEquals(listOf("unknown"), result.unassigned.map { it.id })
+        chat.runningFailure = OpenCodeError.Unreachable("offline")
+        assertTrue(loadRunningWork(listOf(root), sessions, chat).getOrThrow().errors["s1"] is OpenCodeError.Unreachable)
+    }
+
+    @Test
+    fun `missing project does not hide running commands of another project`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val root = sessions.get("s1").getOrThrow()
+        val missing = root.copy(id = "s2", directory = "/deleted")
+        chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
+        chat.failedDirectory = "/deleted"
+        val result = loadRunningWork(listOf(missing, root), sessions, chat).getOrThrow()
+        assertEquals(listOf("shell"), result.sessions["s1"]!!.commands.map { it.id })
+        assertEquals(setOf("s2"), result.errors.keys)
+    }
+
+    @Test
+    fun `running child survives idle parent and disappears on execution ended`() = runTest(main.testDispatcher) {
+        val child = FakeSessions(model).get("s1").getOrThrow().copy(id = "child", parentId = "s1", agent = "scout")
+        val sessions = FakeSessions(model, others = listOf(child)).apply { activeIds = setOf("child") }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertFalse(vm.state.value.running)
+        assertEquals(listOf("child"), vm.state.value.work.agents.map { it.session.id })
+        sessions.activeIds = emptySet()
+        events.flow.emit(ServerEvent.ExecutionEnded("child", SessionOutcome.Succeeded))
+        runCurrent()
+        assertTrue(vm.state.value.work.isEmpty)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `running polling stops off screen and output is read only with sheet open`() = runTest(main.testDispatcher) {
+        chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(1, chat.runningReads)
+        assertTrue(chat.tailReads.isEmpty())
+        vm.onEvent(ChatEvent.RunningSheet(true))
+        runCurrent()
+        assertEquals(listOf("shell"), chat.tailReads)
+        assertEquals("last line", vm.state.value.workOutput["shell"])
+        vm.onEvent(ChatEvent.Visible(false))
+        val reads = chat.runningReads
+        advanceTimeBy(20_000)
+        runCurrent()
+        assertEquals(reads, chat.runningReads)
+    }
+
+    @Test
+    fun `stop command is deduplicated and failed stop retains command`() = runTest(main.testDispatcher) {
+        chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        val gate = CompletableDeferred<Unit>()
+        chat.stopGate = gate
+        chat.stopResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        vm.onEvent(ChatEvent.StopCommand("shell"))
+        vm.onEvent(ChatEvent.StopCommand("shell"))
+        runCurrent()
+        assertEquals(listOf("shell"), chat.stops)
+        assertEquals(setOf("shell"), vm.state.value.stoppingCommands)
+        gate.complete(Unit)
+        runCurrent()
+        assertEquals(1, vm.state.value.work.commands.size)
+        assertTrue(vm.state.value.stoppingCommands.isEmpty())
+        chat.stopResult = Result.success(Unit)
+        vm.onEvent(ChatEvent.StopCommand("shell"))
+        runCurrent()
+        assertTrue(vm.state.value.work.commands.isEmpty())
+        vm.onEvent(ChatEvent.Visible(false))
+    }
 
     @Test
     fun `MCP menu and slash open the same project panel without prompting`() = runTest(main.testDispatcher) {
@@ -1068,7 +1169,7 @@ private class FakeSessions(
     var loaded: CompletableDeferred<Unit>? = null
     override suspend fun get(sessionId: String): Result<Session> {
         loaded?.await()
-        return Result.success(session)
+        return Result.success(others.firstOrNull { it.id == sessionId } ?: session)
     }
     override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
@@ -1085,6 +1186,29 @@ private class FakeSessions(
 }
 
 private class FakeChat(var transcript: List<Message>) : ChatRepository {
+    var runningCommands: List<RunningCommand> = emptyList()
+    var runningFailure: Throwable? = null
+    var failedDirectory: String? = null
+    var runningReads = 0
+    val tailReads = mutableListOf<String>()
+    val stops = mutableListOf<String>()
+    var stopGate: CompletableDeferred<Unit>? = null
+    var stopResult: Result<Unit> = Result.success(Unit)
+    override suspend fun runningShells(directory: String): Result<List<RunningCommand>> {
+        runningReads++
+        if (directory == failedDirectory) return Result.failure(OpenCodeError.NotFound("missing"))
+        return runningFailure?.let { Result.failure(it) } ?: Result.success(runningCommands.filter { it.directory == directory })
+    }
+    override suspend fun shellTail(directory: String, shellId: String): Result<String> {
+        tailReads += shellId
+        return Result.success("last line")
+    }
+    override suspend fun stopShell(directory: String, shellId: String): Result<Unit> {
+        stops += shellId
+        stopGate?.await()
+        if (stopResult.isSuccess) runningCommands = runningCommands.filterNot { it.id == shellId }
+        return stopResult
+    }
     var promptResult: Result<Unit> = Result.success(Unit)
     var switchResult: Result<Unit> = Result.success(Unit)
     val prompts = mutableListOf<Pair<String, PromptDelivery>>()

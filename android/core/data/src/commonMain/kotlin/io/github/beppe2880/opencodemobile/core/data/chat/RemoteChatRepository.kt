@@ -32,6 +32,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.network.MessageCodec
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
@@ -47,6 +48,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 /**
  * Chat operations on the active server. Transcripts are mirrored in [cache]; [maxMessages]
@@ -267,6 +270,32 @@ internal class RemoteChatRepository(
         val api = clients.active().shells
         val page = awaitBody { api.shellOutput(shellId, locationDirectory = directory, cursor = cursor.toString()) }.data
         ShellOutput(page.output.orEmpty(), page.cursor)
+    }
+
+    override suspend fun runningShells(directory: String): Result<List<RunningCommand>> = resultOf {
+        val api = clients.active().shells
+        awaitBody { api.shellList(locationDirectory = directory) }.data.map { shell ->
+            RunningCommand(
+                id = shell.id,
+                command = shell.command.orEmpty(),
+                directory = directory,
+                startedAt = shell.time.started.toLong(),
+                sessionId = (shell.metadata["sessionID"] as? JsonPrimitive)?.contentOrNull,
+            )
+        }
+    }
+
+    override suspend fun stopShell(directory: String, shellId: String): Result<Unit> = resultOf {
+        val api = clients.active().shells
+        awaitSuccess { api.shellRemove(shellId, locationDirectory = directory) }
+    }
+
+    override suspend fun shellTail(directory: String, shellId: String): Result<String> = resultOf {
+        val api = clients.active().shells
+        val size = awaitBody { api.shellOutput(shellId, locationDirectory = directory, limit = "1") }.data.propertySize
+        awaitBody {
+            api.shellOutput(shellId, locationDirectory = directory, cursor = (size - 8_192).coerceAtLeast(0).toString(), limit = "8192")
+        }.data.output.orEmpty().lineSequence().toList().takeLast(12).joinToString("\n")
     }
 
     override suspend fun shell(sessionId: String, command: String): Result<Unit> = resultOf {

@@ -138,4 +138,11 @@
     <string name="chat_mcps_needs_auth">인증 필요</string>
     <string name="chat_mcps_auth_hint">컴퓨터의 OpenCode에서 로그인한 후 여기에서 새로고침하세요.</string>
     <string name="chat_untitled">제목 없는 세션</string>
+    <string name="chat_running_empty">실행 중인 하위 에이전트나 명령이 없습니다</string>
+    <string name="chat_running_error">실행 중인 작업을 새로 고칠 수 없습니다</string>
+    <string name="chat_running_unassigned">이 프로젝트의 다른 명령</string>
+    <string name="chat_running_unassigned_hint">이 명령들은 알려진 세션 소유자가 없습니다.</string>
+    <string name="chat_running_no_output">아직 출력이 없습니다</string>
+    <string name="chat_running_elapsed">경과 시간: %1$s</string>
+    <string name="chat_running_refresh">실행 중인 작업 새로 고침</string>
 </resources>

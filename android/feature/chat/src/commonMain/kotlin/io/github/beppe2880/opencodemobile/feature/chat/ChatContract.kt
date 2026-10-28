@@ -16,6 +16,8 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 @Immutable
@@ -97,6 +99,14 @@ data class ChatState(
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
     val mcps: McpPanel? = null,
+    val work: RunningWork = RunningWork(),
+    val unassignedCommands: List<RunningCommand> = emptyList(),
+    val workOpen: Boolean = false,
+    val workLoading: Boolean = true,
+    val workError: UiText? = null,
+    val workOutput: Map<String, String> = emptyMap(),
+    val workOutputErrors: Map<String, UiText> = emptyMap(),
+    val stoppingCommands: Set<String> = emptySet(),
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -151,6 +161,10 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
         ?: ModelLabel(ref.id, ref.providerId)
 
 sealed interface ChatEvent {
+    data class Visible(val visible: Boolean) : ChatEvent
+    data class RunningSheet(val open: Boolean) : ChatEvent
+    data object RefreshRunning : ChatEvent
+    data class StopCommand(val id: String) : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent

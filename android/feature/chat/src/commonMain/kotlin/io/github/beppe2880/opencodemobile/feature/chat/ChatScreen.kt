@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -48,7 +49,9 @@ import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_running
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
+import io.github.beppe2880.opencodemobile.core.ui.text.runningSummary
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_open
@@ -84,15 +87,26 @@ fun ChatScreen(
         containerColor = c.bgBase,
         contentWindowInsets = WindowInsets(0),
         topBar = {
-            ChatTopBar(
-                state,
-                showBack,
-                onBack = { onEvent(ChatEvent.Back) },
-                onContext = { contextOpen = true },
-                onChanges = { onEvent(ChatEvent.OpenChanges) },
-                onTerminal = { onEvent(ChatEvent.OpenTerminal) },
-                onMcps = { onEvent(ChatEvent.OpenMcps) },
-            )
+            Column {
+                ChatTopBar(
+                    state,
+                    showBack,
+                    onBack = { onEvent(ChatEvent.Back) },
+                    onContext = { contextOpen = true },
+                    onChanges = { onEvent(ChatEvent.OpenChanges) },
+                    onTerminal = { onEvent(ChatEvent.OpenTerminal) },
+                    onMcps = { onEvent(ChatEvent.OpenMcps) },
+                    onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
+                )
+                if (!state.work.isEmpty || state.running) {
+                    TextButton(
+                        onClick = { onEvent(ChatEvent.RunningSheet(true)) },
+                        modifier = Modifier.fillMaxWidth().testTag("chat_running_button"),
+                    ) {
+                        Text(runningSummary(state.work, state.running), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
@@ -152,6 +166,7 @@ fun ChatScreen(
     }
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
+    if (state.workOpen) RunningSheet(state, onEvent)
     if (contextOpen) {
         ContextSheet(
             context = state.context,
@@ -171,6 +186,7 @@ private fun ChatTopBar(
     onChanges: () -> Unit,
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
+    onRunning: () -> Unit,
 ) {
     val c = OcTheme.colors
     var menuOpen by remember { mutableStateOf(false) }
@@ -221,6 +237,14 @@ private fun ChatTopBar(
                     containerColor = c.bgBase,
                     modifier = Modifier.exposeTestTags(),
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(UiRes.string.oc_running)) },
+                        onClick = {
+                            menuOpen = false
+                            onRunning()
+                        },
+                        modifier = Modifier.testTag("chat_running_menu_item"),
+                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.chat_mcps)) },
                         onClick = {

@@ -22,4 +22,8 @@
     <string name="oc_models_variant">Рассуждение</string>
     <string name="oc_models_variant_default">По умолчанию</string>
     <string name="oc_models_empty">Нет моделей по вашему запросу</string>
+    <string name="oc_running">Выполняется</string>
+    <string name="oc_working">Работает</string>
+    <string name="oc_running_agents">Субагенты: %1$d</string>
+    <string name="oc_running_commands">Команды: %1$d</string>
 </resources>
