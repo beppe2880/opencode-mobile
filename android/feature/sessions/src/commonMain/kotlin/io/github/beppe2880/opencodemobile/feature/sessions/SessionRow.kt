@@ -31,12 +31,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.text.relativeTime
+import io.github.beppe2880.opencodemobile.core.ui.text.runningSummary
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
@@ -44,7 +46,6 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_de
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
-import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -62,6 +63,7 @@ internal fun SessionRow(
     modifier: Modifier = Modifier,
     /** A narrow list (beside the chat): the time moves under the title so the title keeps the width. */
     compact: Boolean = false,
+    work: RunningWork = RunningWork(),
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -72,7 +74,7 @@ internal fun SessionRow(
     val scope = rememberCoroutineScope()
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
-    val runningLabel = stringResource(Res.string.sessions_running_a11y)
+    val runningLabel = runningSummary(work, running)
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
@@ -96,7 +98,7 @@ internal fun SessionRow(
                 .background(if (selected) c.layer02 else c.bgBase)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
                 .semantics {
-                    if (running) stateDescription = runningLabel
+                    if (running || !work.isEmpty) stateDescription = runningLabel
                     customActions = listOf(
                         CustomAccessibilityAction(renameLabel) { onLongClick(); true },
                         CustomAccessibilityAction(deleteLabel) { onSwipeDelete(); true },
@@ -127,6 +129,16 @@ internal fun SessionRow(
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     OutcomeBadge(session.outcome, running)
+                }
+                if (running || !work.isEmpty) {
+                    Text(
+                        runningLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = c.info.fg,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag("session_work_${session.id}"),
+                    )
                 }
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {

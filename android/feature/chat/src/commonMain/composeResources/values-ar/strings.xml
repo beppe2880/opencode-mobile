@@ -168,4 +168,11 @@
     <string name="chat_mcps_needs_auth">المصادقة مطلوبة</string>
     <string name="chat_mcps_auth_hint">سجّل الدخول من OpenCode على الكمبيوتر ثم حدّث هنا.</string>
     <string name="chat_untitled">جلسة بلا عنوان</string>
+    <string name="chat_running_empty">لا توجد وكلاء فرعيون أو أوامر قيد التشغيل</string>
+    <string name="chat_running_error">تعذر تحديث الأعمال قيد التشغيل</string>
+    <string name="chat_running_unassigned">أوامر أخرى في هذا المشروع</string>
+    <string name="chat_running_unassigned_hint">هذه الأوامر ليس لها مالك جلسة معروف.</string>
+    <string name="chat_running_no_output">لا يوجد خرج بعد</string>
+    <string name="chat_running_elapsed">المدة المنقضية: %1$s</string>
+    <string name="chat_running_refresh">تحديث الأعمال قيد التشغيل</string>
 </resources>

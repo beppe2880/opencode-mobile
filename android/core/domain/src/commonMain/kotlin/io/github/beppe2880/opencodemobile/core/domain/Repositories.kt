@@ -199,6 +199,14 @@ interface ChatRepository {
     suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> =
         Result.success(ShellOutput("", cursor))
 
+    suspend fun runningShells(directory: String): Result<List<RunningCommand>> = Result.success(emptyList())
+
+    /** Bounded tail, including output written before this screen opened. */
+    suspend fun shellTail(directory: String, shellId: String): Result<String> = shellOutput(directory, shellId, 0).map { it.text.takeLast(8_192) }
+
+    suspend fun stopShell(directory: String, shellId: String): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Stopping shell commands is not available"))
+
     /** Prompts sent but not delivered yet, oldest first. */
     suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
 

@@ -138,4 +138,11 @@
     <string name="chat_mcps_needs_auth">認証が必要です</string>
     <string name="chat_mcps_auth_hint">パソコンの OpenCode でログインしてから、ここで更新してください。</string>
     <string name="chat_untitled">無題のセッション</string>
+    <string name="chat_running_empty">実行中のサブエージェントやコマンドはありません</string>
+    <string name="chat_running_error">実行中の作業を更新できませんでした</string>
+    <string name="chat_running_unassigned">このプロジェクトの他のコマンド</string>
+    <string name="chat_running_unassigned_hint">これらのコマンドには既知のセッション所有者がありません。</string>
+    <string name="chat_running_no_output">まだ出力がありません</string>
+    <string name="chat_running_elapsed">経過時間: %1$s</string>
+    <string name="chat_running_refresh">実行中の作業を更新</string>
 </resources>

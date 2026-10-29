@@ -156,4 +156,11 @@
     <string name="chat_mcps_needs_auth">Требуется авторизация</string>
     <string name="chat_mcps_auth_hint">Войдите через OpenCode на компьютере, затем обновите здесь.</string>
     <string name="chat_untitled">Сессия без названия</string>
+    <string name="chat_running_empty">Субагенты и команды не выполняются</string>
+    <string name="chat_running_error">Не удалось обновить выполняемые задачи</string>
+    <string name="chat_running_unassigned">Другие команды в этом проекте</string>
+    <string name="chat_running_unassigned_hint">Для этих команд не известен владелец сеанса.</string>
+    <string name="chat_running_no_output">Вывода пока нет</string>
+    <string name="chat_running_elapsed">Прошло: %1$s</string>
+    <string name="chat_running_refresh">Обновить выполняемые задачи</string>
 </resources>

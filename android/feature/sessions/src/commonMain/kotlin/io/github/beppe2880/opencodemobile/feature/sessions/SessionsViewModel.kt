@@ -9,6 +9,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.loadRunningWork
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
@@ -40,6 +41,9 @@ class SessionsViewModel(
     private var projectsJob: Job? = null
     private var debounceJob: Job? = null
     private var sessionList: List<Session> = emptyList()
+    private var workVisible = false
+    private var workPoll: Job? = null
+    private var workJob: Job? = null
 
     /** The saved server shown; its cached lists are shown before each server answers. */
     private var serverId: String? = null
@@ -71,6 +75,17 @@ class SessionsViewModel(
 
     override fun onEvent(event: SessionsEvent) {
         when (event) {
+            is SessionsEvent.Visible -> {
+                workVisible = event.visible
+                workPoll?.cancel()
+                workJob?.cancel()
+                workPoll = if (event.visible) viewModelScope.launch {
+                    while (true) {
+                        refreshRunning()
+                        delay(5_000)
+                    }
+                } else null
+            }
             SessionsEvent.Refresh -> {
                 load(initial = currentState.groups.isEmpty(), pull = currentState.groups.isNotEmpty())
                 loadProjects()
@@ -113,6 +128,7 @@ class SessionsViewModel(
         loadJob?.cancel()
         projectsJob?.cancel()
         debounceJob?.cancel()
+        workJob?.cancel()
         sessionList = emptyList()
         updateState {
             it.copy(
@@ -121,6 +137,7 @@ class SessionsViewModel(
                 directoryFilter = id?.let(filters::get),
                 groups = emptyList(),
                 running = emptySet(),
+                work = emptyMap(),
                 loading = id != null,
                 refreshing = false,
                 error = null,
@@ -137,6 +154,9 @@ class SessionsViewModel(
     }
 
     private fun onServerEvent(event: ServerEvent) {
+        if (event == ServerEvent.Connected || event is ServerEvent.ExecutionStarted || event is ServerEvent.ExecutionEnded ||
+            event is ServerEvent.ToolProgress || event is ServerEvent.ToolSucceeded
+        ) refreshRunning()
         when (event) {
             ServerEvent.Connected -> load(initial = false)
             is ServerEvent.ExecutionStarted -> updateState { it.copy(running = it.running + event.sessionId) }
@@ -153,6 +173,16 @@ class SessionsViewModel(
                 }
             }
             else -> Unit
+        }
+    }
+
+    private fun refreshRunning() {
+        if (!workVisible || serverId == null || sessionList.isEmpty() || workJob?.isActive == true) return
+        val server = serverId
+        workJob = viewModelScope.launch {
+            loadRunningWork(sessionList, sessions, chat).onSuccess { snapshot ->
+                if (serverId == server) updateState { it.copy(work = snapshot.sessions.filterKeys { id -> id !in snapshot.errors }) }
+            }
         }
     }
 
@@ -189,6 +219,7 @@ class SessionsViewModel(
                     }
                     fillNewSessionDirectory()
                     prefetch(list)
+                    refreshRunning()
                 },
                 onFailure = { error ->
                     updateState { it.copy(loading = false, refreshing = false, error = if (it.groups.isEmpty()) error.toUiText() else null) }

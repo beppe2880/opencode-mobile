@@ -22,4 +22,8 @@
     <string name="oc_models_variant">Reasoning</string>
     <string name="oc_models_variant_default">Default</string>
     <string name="oc_models_empty">No models match your search</string>
+    <string name="oc_running">Running</string>
+    <string name="oc_working">Working</string>
+    <string name="oc_running_agents">Subagents: %1$d</string>
+    <string name="oc_running_commands">Commands: %1$d</string>
 </resources>
