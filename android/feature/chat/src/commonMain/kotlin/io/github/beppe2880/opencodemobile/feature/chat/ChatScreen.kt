@@ -98,12 +98,12 @@ fun ChatScreen(
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
-                if (!state.work.isEmpty || state.running) {
+                if (!state.work.isEmpty) {
                     TextButton(
                         onClick = { onEvent(ChatEvent.RunningSheet(true)) },
                         modifier = Modifier.fillMaxWidth().testTag("chat_running_button"),
                     ) {
-                        Text(runningSummary(state.work, state.running), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(runningSummary(state.work), maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
