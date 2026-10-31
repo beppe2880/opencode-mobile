@@ -14,18 +14,18 @@ import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import platform.darwin.dispatch_get_global_queue
 
 /**
- * [NetworkMonitor] backed by `NWPathMonitor`: reports each time the path becomes usable again
- * after being unusable. The first update (the current path) is not reported.
+ * [NetworkMonitor] backed by `NWPathMonitor`: emits the first path update (the current state)
+ * and every usable/unusable change after it.
  */
 internal class PathNetworkMonitor : NetworkMonitor {
-    override val networkAvailable: Flow<Unit> = callbackFlow {
+    override val connected: Flow<Boolean> = callbackFlow {
         val monitor = nw_path_monitor_create()
-        var first = true
         var satisfied = false
+        var announced = false
         nw_path_monitor_set_update_handler(monitor) { path ->
             val now = nw_path_get_status(path) == nw_path_status_satisfied
-            if (!first && now && !satisfied) trySend(Unit)
-            first = false
+            if (!announced || now != satisfied) trySend(now)
+            announced = true
             satisfied = now
         }
         nw_path_monitor_set_queue(monitor, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u))

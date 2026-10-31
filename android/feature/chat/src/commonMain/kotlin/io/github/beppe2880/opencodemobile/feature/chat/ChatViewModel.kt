@@ -47,7 +47,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
@@ -131,6 +133,9 @@ class ChatViewModel(
     private var inRepository: Boolean? = null
     private var branch: VcsBranch? = null
     private var changedFiles: Int = 0
+
+    /** Shell readers wait on it before every read, so a hidden chat makes no output requests. */
+    private val chatVisible = MutableStateFlow(true)
 
     /** First message of a staged revert; it and everything after are hidden. */
     private var revertMessageId: String? = null
@@ -793,6 +798,10 @@ class ChatViewModel(
         }
     }
 
+    fun setChatVisible(visible: Boolean) {
+        chatVisible.value = visible
+    }
+
     /**
      * The server streams a `bash` tool's output only to its shell, not to the event stream:
      * while the tool runs, its shell output is read every [liveOutputIntervalMs] (setting).
@@ -809,6 +818,7 @@ class ChatViewModel(
             val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
                 var cursor = 0L
                 while (true) {
+                    chatVisible.first { it }
                     val directory = currentState.directory
                     chat.shellOutput(directory, shellId, cursor).onSuccess { page ->
                         if (page.text.isNotEmpty()) {

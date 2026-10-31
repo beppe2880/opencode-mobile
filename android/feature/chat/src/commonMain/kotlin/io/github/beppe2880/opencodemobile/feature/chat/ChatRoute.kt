@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
@@ -39,6 +40,11 @@ fun ChatRoute(
     onOpenFile: (directory: String, path: String) -> Unit = { _, _ -> },
 ) {
     val viewModel: ChatViewModel = koinViewModel(key = "chat-$sessionId") { parametersOf(sessionId) }
+    // Live shell output follows only the visible chat; suspended readers keep their cursor.
+    LifecycleResumeEffect(viewModel) {
+        viewModel.setChatVisible(true)
+        onPauseOrDispose { viewModel.setChatVisible(false) }
+    }
     val state by viewModel.state.collectAsStateWithLifecycle()
     LifecycleStartEffect(viewModel) {
         viewModel.onEvent(ChatEvent.Visible(true))

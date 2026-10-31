@@ -14,7 +14,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,8 +27,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.random.Random
 
 /**
@@ -73,27 +70,32 @@ internal class SseEventRepository(
             .shareIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis))
 
     private fun reconnecting(server: ServerProfile): Flow<ServerEvent> = channelFlow {
-        // Conflated: several network changes during one wait cut it only once.
-        val networkBack = Channel<Unit>(Channel.CONFLATED)
-        launch { network.networkAvailable.collect { networkBack.trySend(Unit) } }
+        // The gate collapses several network changes during one wait into the latest state.
+        val gate = NetworkGate(network)
+        gate.start(this)
         var attempt = 0
-        while (true) {
-            _connection.value = if (attempt == 0) ConnectionState.Connecting else ConnectionState.Reconnecting
-            val failure = try {
-                connectOnce(server, onOpen = { attempt = 0 }).collect { send(it) }
-                null
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                e
+        try {
+            while (true) {
+                gate.waitToAttempt()
+                _connection.value = if (attempt == 0) ConnectionState.Connecting else ConnectionState.Reconnecting
+                val failure = try {
+                    connectOnce(server, onOpen = { attempt = 0 }).collect { send(it) }
+                    null
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    e
+                }
+                if (failure is OpenCodeError.Unauthorized) {
+                    _connection.value = ConnectionState.Unauthorized
+                    awaitCancellation()
+                }
+                // Any other failure, or the server closing the stream, schedules the next attempt.
+                _connection.value = ConnectionState.Reconnecting
+                gate.waitAfterFailure(backoff.delayMillis(attempt++))
             }
-            if (failure is OpenCodeError.Unauthorized) {
-                _connection.value = ConnectionState.Unauthorized
-                awaitCancellation()
-            }
-            // Any other failure, or the server closing the stream, schedules the next attempt.
-            _connection.value = ConnectionState.Reconnecting
-            withTimeoutOrNull(backoff.delayMillis(attempt++)) { networkBack.receive() }
+        } finally {
+            gate.stop()
         }
     }.onCompletion { _connection.value = ConnectionState.Disconnected }
 

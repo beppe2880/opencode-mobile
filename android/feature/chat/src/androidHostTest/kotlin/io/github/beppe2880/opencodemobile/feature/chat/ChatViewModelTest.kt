@@ -1216,6 +1216,33 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `shell output pauses while the chat is hidden and resumes from the cursor`() = runTest(main.testDispatcher) {
+        val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        chat.shellPages += listOf("line 1\n", "line 2\n")
+        val vm = vm()
+        runCurrent()
+
+        assertEquals(1, chat.shellReads.size)
+        vm.setChatVisible(false)
+        val readsWhenHidden = chat.shellReads.size
+        advanceTimeBy(2_000)
+        runCurrent()
+        assertEquals(readsWhenHidden, chat.shellReads.size)
+
+        vm.setChatVisible(true)
+        runCurrent()
+        advanceTimeBy(700)
+        runCurrent()
+        assertEquals(listOf(0L, 7L), chat.shellReads.take(2).map { it.second })
+        assertEquals("line 1\nline 2\n", vm.tool("c1").output)
+
+        // The tool ends, so the reading stops and the test can finish.
+        events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "", emptyMap(), 9))
+        runCurrent()
+    }
+
+    @Test
     fun `running tools are not followed when the setting is off`() = runTest(main.testDispatcher) {
         settings.settings.value = AppSettings(followRunningTools = false)
         val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
