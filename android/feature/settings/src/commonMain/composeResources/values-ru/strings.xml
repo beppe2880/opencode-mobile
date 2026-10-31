@@ -131,9 +131,11 @@
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Недоступно</string>
     <string name="settings_check_updates">Проверять обновления</string>
-    <string name="settings_check_updates_sub">При открытии приложения, не чаще раза в день, искать новую версию на GitHub и показывать уведомление</string>
+    <string name="settings_check_updates_sub">При открытии приложения, не чаще раза в день, проверять наличие новой версии и показывать уведомление</string>
     <string name="update_available">Доступна версия %1$s</string>
     <string name="update_view">Открыть</string>
+    <string name="update_release_notes">Что нового</string>
+    <string name="update_install">Обновить</string>
     <string name="update_dismiss">Скрыть</string>
     <string name="settings_split_view">Чат рядом со списком</string>
     <string name="settings_split_view_sub">На широких экранах показывать открытый чат рядом со списком сессий. Перетащите ручку разделителя, чтобы изменить размер списка.</string>

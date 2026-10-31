@@ -125,9 +125,11 @@
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Indisponible</string>
     <string name="settings_check_updates">Rechercher les mises à jour</string>
-    <string name="settings_check_updates_sub">À l'ouverture de l'application, au plus une fois par jour, recherche une nouvelle version sur GitHub et affiche un avis</string>
+    <string name="settings_check_updates_sub">À l'ouverture de l'application, au plus une fois par jour, recherche une nouvelle version et affiche un avis</string>
     <string name="update_available">La version %1$s est disponible</string>
     <string name="update_view">Voir</string>
+    <string name="update_release_notes">Notes de version</string>
+    <string name="update_install">Mettre à jour</string>
     <string name="update_dismiss">Ignorer</string>
     <string name="settings_split_view">Chat à côté de la liste</string>
     <string name="settings_split_view_sub">Sur grand écran, afficher le chat ouvert à côté de la liste des sessions. Faites glisser la poignée du séparateur pour redimensionner la liste.</string>
