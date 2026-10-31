@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
@@ -48,6 +49,9 @@ data class SessionsState(
     val directoryFilter: String? = null,
     val groups: List<SessionGroup> = emptyList(),
     val running: Set<String> = emptySet(),
+    val work: Map<String, RunningWork> = emptyMap(),
+    /** Rows show running subagents and commands (setting). */
+    val showRunningWork: Boolean = true,
     val loading: Boolean = true,
     val refreshing: Boolean = false,
     val error: UiText? = null,
@@ -61,6 +65,7 @@ data class SessionsState(
 }
 
 sealed interface SessionsEvent {
+    data class Visible(val visible: Boolean) : SessionsEvent
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent

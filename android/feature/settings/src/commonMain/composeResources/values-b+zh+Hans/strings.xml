@@ -63,6 +63,10 @@
     <string name="settings_reset_message">所有选项都将恢复默认值。已保存的服务器、草稿和终端按键会保留。</string>
     <string name="settings_reset_confirm">重置</string>
     <string name="settings_full_commands_sub">在工具行中自动换行显示长命令和路径，而不是截断</string>
+    <string name="settings_running_in_list">在会话列表中显示运行中的工作</string>
+    <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
+    <string name="settings_confirm_stop">停止命令前需确认</string>
+    <string name="settings_confirm_stop_sub">从“运行中”面板停止后台命令前进行询问</string>
     <string name="settings_show_cost">显示费用</string>
     <string name="settings_show_cost_sub">在回复下方显示每轮的美元费用</string>
     <string name="settings_header_line">聊天标题栏</string>

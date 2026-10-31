@@ -47,7 +47,9 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
     }
 
     fun create(baseUrl: String, credentials: BasicCredentials?): OpenCodeClient {
+        val clock = ServerClock()
         val http = baseHttp.config {
+            install(serverClockPlugin(clock))
             if (credentials != null) defaultRequest { header(HttpHeaders.Authorization, credentials.header) }
             if (debugLogging) {
                 install(Logging) {
@@ -59,7 +61,7 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
                 }
             }
         }
-        return OpenCodeClient(baseUrl, http)
+        return OpenCodeClient(baseUrl, http, clock)
     }
 
     /** Exchanges a single-use pairing [code] for a session token. Never logged: the URL holds the code. */

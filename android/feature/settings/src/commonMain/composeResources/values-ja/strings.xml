@@ -63,6 +63,10 @@
     <string name="settings_reset_message">すべての項目が初期値に戻ります。保存済みのサーバー、下書き、ターミナルのキーは保持されます。</string>
     <string name="settings_reset_confirm">リセット</string>
     <string name="settings_full_commands_sub">ツール行で長いコマンドやパスを切り捨てず、折り返して表示</string>
+    <string name="settings_running_in_list">セッション一覧に実行中の作業を表示</string>
+    <string name="settings_running_in_list_sub">各セッションの下に、実行中のサブエージェントとバックグラウンドコマンドの数を表示</string>
+    <string name="settings_confirm_stop">コマンドを停止する前に確認</string>
+    <string name="settings_confirm_stop_sub">実行中シートからバックグラウンドコマンドを停止する前に確認します</string>
     <string name="settings_show_cost">費用を表示</string>
     <string name="settings_show_cost_sub">各ターンの費用をドルで返信の下に表示</string>
     <string name="settings_header_line">チャットのヘッダー行</string>

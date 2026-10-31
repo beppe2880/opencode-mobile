@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Ogni opzione torna al valore predefinito. Server salvati, bozze e tasti del terminale vengono mantenuti.</string>
     <string name="settings_reset_confirm">Ripristina</string>
     <string name="settings_full_commands_sub">Manda a capo comandi e percorsi lunghi nelle righe degli strumenti invece di troncarli</string>
+    <string name="settings_running_in_list">Mostra il lavoro in corso nell'elenco sessioni</string>
+    <string name="settings_running_in_list_sub">Conta i sottoagenti e i comandi in background sotto ogni sessione</string>
+    <string name="settings_confirm_stop">Conferma prima di interrompere i comandi</string>
+    <string name="settings_confirm_stop_sub">Chiedi conferma prima di interrompere un comando in background dal pannello In esecuzione</string>
     <string name="settings_show_cost">Mostra costo</string>
     <string name="settings_show_cost_sub">Mostra sotto la risposta il costo in dollari di ogni turno</string>
     <string name="settings_header_line">Riga di intestazione della chat</string>

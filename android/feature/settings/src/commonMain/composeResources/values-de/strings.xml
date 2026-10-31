@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Jede Option wird auf ihren Standardwert zurückgesetzt. Gespeicherte Server, Entwürfe und Terminal-Tasten bleiben erhalten.</string>
     <string name="settings_reset_confirm">Zurücksetzen</string>
     <string name="settings_full_commands_sub">Lange Befehle und Pfade in Werkzeugzeilen umbrechen, statt sie abzuschneiden</string>
+    <string name="settings_running_in_list">Laufende Arbeit in der Sitzungsliste anzeigen</string>
+    <string name="settings_running_in_list_sub">Laufende Subagenten und Hintergrundbefehle unter jeder Sitzung zählen</string>
+    <string name="settings_confirm_stop">Vor dem Beenden von Befehlen bestätigen</string>
+    <string name="settings_confirm_stop_sub">Vor dem Beenden eines Hintergrundbefehls aus dem Blatt „Laufend“ nachfragen</string>
     <string name="settings_show_cost">Kosten anzeigen</string>
     <string name="settings_show_cost_sub">Kosten jedes Durchlaufs in Dollar unter der Antwort anzeigen</string>
     <string name="settings_header_line">Kopfzeile des Chats</string>

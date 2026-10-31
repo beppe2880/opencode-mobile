@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
 import io.github.beppe2880.opencodemobile.core.ui.text.asString
@@ -26,6 +27,10 @@ fun SessionsRoute(
 ) {
     val viewModel: SessionsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    LifecycleStartEffect(viewModel) {
+        viewModel.onEvent(SessionsEvent.Visible(true))
+        onStopOrDispose { viewModel.onEvent(SessionsEvent.Visible(false)) }
+    }
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(openNewSession) {

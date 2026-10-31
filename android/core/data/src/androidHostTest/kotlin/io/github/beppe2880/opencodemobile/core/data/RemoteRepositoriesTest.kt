@@ -46,6 +46,42 @@ class RemoteRepositoriesTest {
         """{"id":"msg_$index","time":{"created":$index},"type":"user","text":"prompt $index"}"""
 
     @Test
+    fun `running shell mapping keeps owner and location and stop targets that shell`() = runBlocking {
+        val chat = RemoteChatRepository(graph.clients, InMemoryMessageCache())
+        server.enqueue(
+            json(
+                """
+            {"data":[{"id":"sh_test","status":"running","command":"build","cwd":"/repo/sub",
+            "shell":"sh","file":"/output","metadata":{"sessionID":"ses_1"},"time":{"started":1000}}]}
+                """.trimIndent(),
+            ),
+        )
+        val command = chat.runningShells("/repo").getOrThrow().single()
+        assertEquals("ses_1", command.sessionId)
+        assertEquals("/repo", command.directory)
+        assertEquals(1000L, command.startedAt)
+        assertEquals("/repo", server.takeRequest().requestUrl!!.queryParameter("location[directory]"))
+        server.enqueue(MockResponse().setResponseCode(204))
+        chat.stopShell(command.directory, command.id).getOrThrow()
+        val stop = server.takeRequest()
+        assertEquals("DELETE", stop.method)
+        assertEquals("/api/shell/sh_test", stop.requestUrl!!.encodedPath)
+        assertEquals("/repo", stop.requestUrl!!.queryParameter("location[directory]"))
+    }
+
+    @Test
+    fun `output tail seeks near end instead of downloading old output`() = runBlocking {
+        val chat = RemoteChatRepository(graph.clients, InMemoryMessageCache())
+        server.enqueue(json("""{"data":{"output":"a","cursor":1,"size":1000000,"truncated":true}}"""))
+        server.enqueue(json("""{"data":{"output":"recent output","cursor":1000000,"size":1000000,"truncated":false}}"""))
+        assertEquals("recent output", chat.shellTail("/repo", "sh_test").getOrThrow())
+        assertEquals("1", server.takeRequest().requestUrl!!.queryParameter("limit"))
+        val tail = server.takeRequest().requestUrl!!
+        assertEquals("991808", tail.queryParameter("cursor"))
+        assertEquals("8192", tail.queryParameter("limit"))
+    }
+
+    @Test
     fun `a new session loads its newest page first and older pages on demand`() = runBlocking {
         val chat = RemoteChatRepository(graph.clients, InMemoryMessageCache())
         val newest = (254 downTo 205).joinToString(",") { userMessage(it) }

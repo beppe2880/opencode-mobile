@@ -22,4 +22,8 @@
     <string name="oc_models_variant">推理</string>
     <string name="oc_models_variant_default">默认</string>
     <string name="oc_models_empty">没有符合搜索条件的模型</string>
+    <string name="oc_running">运行中</string>
+    <string name="oc_working">工作中</string>
+    <string name="oc_running_agents">子代理：%1$d</string>
+    <string name="oc_running_commands">命令：%1$d</string>
 </resources>

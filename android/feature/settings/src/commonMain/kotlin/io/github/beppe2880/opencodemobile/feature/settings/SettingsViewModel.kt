@@ -85,6 +85,8 @@ class SettingsViewModel(
             is SettingsEvent.HeaderOpensChanged -> update { it.copy(headerOpens = event.scope) }
             is SettingsEvent.ChatHeaderStyleChanged -> update { it.copy(chatHeaderStyle = event.style) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
+            is SettingsEvent.RunningInListChanged -> update { it.copy(showRunningWorkInList = event.enabled) }
+            is SettingsEvent.ConfirmStopChanged -> update { it.copy(confirmStopCommand = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }
             is SettingsEvent.SelectionApplyChanged -> update { it.copy(selectionApply = event.apply) }

@@ -211,6 +211,20 @@ interface ChatRepository {
     suspend fun shellOutput(directory: String, shellId: String, cursor: Long): Result<ShellOutput> =
         Result.success(ShellOutput("", cursor))
 
+    suspend fun runningShells(directory: String): Result<List<RunningCommand>> = Result.success(emptyList())
+
+    /**
+     * Milliseconds the active server's clock is ahead of this device (negative when behind), so
+     * server timestamps can be compared with the device clock; 0 while unknown.
+     */
+    fun serverClockOffsetMs(): Long = 0L
+
+    /** Bounded tail, including output written before this screen opened. */
+    suspend fun shellTail(directory: String, shellId: String): Result<String> = shellOutput(directory, shellId, 0).map { it.text.takeLast(8_192) }
+
+    suspend fun stopShell(directory: String, shellId: String): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Stopping shell commands is not available"))
+
     /** Prompts sent but not delivered yet, oldest first. */
     suspend fun inbox(sessionId: String): Result<List<QueuedPrompt>> = Result.success(emptyList())
 
@@ -363,6 +377,10 @@ data class AppSettings(
     val chatHeaderStyle: ChatHeaderStyle = ChatHeaderStyle.Icons,
     /** Changes opened by tapping the header line: [ChangesScope.Folder] or [ChangesScope.Session]. */
     val headerOpens: ChangesScope = ChangesScope.Folder,
+    /** Session rows show what runs in the background (subagents, commands); refreshed while the list is visible. */
+    val showRunningWorkInList: Boolean = true,
+    /** Stopping a background command from the Running sheet asks first. */
+    val confirmStopCommand: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */

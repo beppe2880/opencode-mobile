@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Cada opção volta ao padrão. Servidores salvos, rascunhos e teclas do terminal são mantidos.</string>
     <string name="settings_reset_confirm">Redefinir</string>
     <string name="settings_full_commands_sub">Quebrar em várias linhas os comandos e caminhos longos nas linhas de ferramentas em vez de cortá-los</string>
+    <string name="settings_running_in_list">Mostrar trabalho em andamento na lista de sessões</string>
+    <string name="settings_running_in_list_sub">Contar subagentes e comandos em segundo plano em cada sessão</string>
+    <string name="settings_confirm_stop">Confirmar antes de parar comandos</string>
+    <string name="settings_confirm_stop_sub">Perguntar antes de parar um comando em segundo plano na folha Em execução</string>
     <string name="settings_show_cost">Mostrar custo</string>
     <string name="settings_show_cost_sub">Mostrar o custo em dólares de cada turno abaixo da resposta</string>
     <string name="settings_header_line">Linha do cabeçalho do chat</string>

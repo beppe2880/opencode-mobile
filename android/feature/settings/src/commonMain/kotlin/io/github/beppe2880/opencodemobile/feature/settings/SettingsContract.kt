@@ -76,6 +76,8 @@ sealed interface SettingsEvent {
     data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
     data class ChatHeaderStyleChanged(val style: ChatHeaderStyle) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
+    data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
+    data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent

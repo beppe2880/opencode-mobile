@@ -166,4 +166,13 @@
     <string name="chat_mcps_needs_auth">Authentication required</string>
     <string name="chat_mcps_auth_hint">Sign in from OpenCode on your computer, then refresh here.</string>
     <string name="chat_untitled">Untitled session</string>
+    <string name="chat_running_empty">No subagents or commands running</string>
+    <string name="chat_running_error">Could not refresh running work</string>
+    <string name="chat_running_unassigned">Other commands in this project</string>
+    <string name="chat_running_unassigned_hint">These commands have no known session owner.</string>
+    <string name="chat_running_no_output">No output yet</string>
+    <string name="chat_running_elapsed">Elapsed: %1$s</string>
+    <string name="chat_running_refresh">Refresh running work</string>
+    <string name="chat_running_stop_title">Stop this command?</string>
+    <string name="chat_running_stop_message">%1$s\n\nThe command is ended and its output is no longer available.</string>
 </resources>

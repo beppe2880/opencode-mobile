@@ -22,4 +22,8 @@
     <string name="oc_models_variant">추론</string>
     <string name="oc_models_variant_default">기본값</string>
     <string name="oc_models_empty">검색 조건에 맞는 모델이 없습니다</string>
+    <string name="oc_running">실행 중</string>
+    <string name="oc_working">작업 중</string>
+    <string name="oc_running_agents">하위 에이전트: %1$d</string>
+    <string name="oc_running_commands">명령: %1$d</string>
 </resources>

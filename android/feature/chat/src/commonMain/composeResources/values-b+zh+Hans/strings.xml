@@ -157,4 +157,13 @@
     <string name="chat_mcps_needs_auth">需要身份验证</string>
     <string name="chat_mcps_auth_hint">请在电脑上的 OpenCode 中登录，然后在此刷新。</string>
     <string name="chat_untitled">未命名会话</string>
+    <string name="chat_running_empty">没有正在运行的子代理或命令</string>
+    <string name="chat_running_error">无法刷新运行中的任务</string>
+    <string name="chat_running_unassigned">此项目中的其他命令</string>
+    <string name="chat_running_unassigned_hint">这些命令没有已知的会话所有者。</string>
+    <string name="chat_running_no_output">暂无输出</string>
+    <string name="chat_running_elapsed">已用时：%1$s</string>
+    <string name="chat_running_refresh">刷新运行中的任务</string>
+    <string name="chat_running_stop_title">停止此命令？</string>
+    <string name="chat_running_stop_message">%1$s\n\n命令将被结束，其输出将不再可用。</string>
 </resources>
