@@ -31,6 +31,7 @@ class PreferencesRepositoriesTest {
             splitView = false,
             listPaneFraction = 0.35f,
             listPaneHandle = false,
+            backShowsList = false,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 

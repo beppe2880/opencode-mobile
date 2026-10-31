@@ -131,4 +131,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">Divider handle</string>
     <string name="settings_list_handle_sub">Show the arrow on the divider to hide the list or drag it to resize</string>
+    <string name="settings_back_shows_list">Back shows the hidden list</string>
+    <string name="settings_back_shows_list_sub">When the session list is hidden, Back shows it again instead of leaving the app</string>
 </resources>
