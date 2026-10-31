@@ -36,6 +36,10 @@ data class ChatState(
     val stopping: Boolean = false,
     val permissions: List<PermissionRequest> = emptyList(),
     val replyingPermission: String? = null,
+    /** Permission requests start folded into a bar (setting). */
+    val permissionsCollapsedByDefault: Boolean = false,
+    /** Requests whose folding differs from [permissionsCollapsedByDefault] (see [isPermissionCollapsed]). */
+    val toggledPermissions: Set<String> = emptySet(),
     val agents: List<Agent> = emptyList(),
     val models: List<ModelInfo> = emptyList(),
     val recentModels: List<ModelRef> = emptyList(),
@@ -68,8 +72,10 @@ data class ChatState(
     val forms: List<Form> = emptyList(),
     val formAnswers: Map<String, FormAnswer> = emptyMap(),
     val submittingForm: Boolean = false,
-    /** The first question shows as a one-line bar; its answers are kept. */
-    val formCollapsed: Boolean = false,
+    /** Questions start folded into a bar (setting); folding keeps [formAnswers]. */
+    val questionsCollapsedByDefault: Boolean = false,
+    /** Questions whose folding differs from [questionsCollapsedByDefault] (see [isFormCollapsed]). */
+    val toggledForms: Set<String> = emptySet(),
     /** Messages hidden by a staged revert; 0 when none. */
     val revertedCount: Int = 0,
     val reverting: Boolean = false,
@@ -112,6 +118,10 @@ data class ChatState(
     val modelLabel: ModelLabel? get() = model?.let(models::labelFor)
 
     fun isExpanded(key: String, defaultExpanded: Boolean = false): Boolean = (key in toggled) != defaultExpanded
+
+    fun isPermissionCollapsed(requestId: String): Boolean = (requestId in toggledPermissions) != permissionsCollapsedByDefault
+
+    fun isFormCollapsed(formId: String): Boolean = (formId in toggledForms) != questionsCollapsedByDefault
 }
 
 data class SessionPeek(val id: String, val title: String)
@@ -187,6 +197,9 @@ sealed interface ChatEvent {
     /** Reasoning level of the current model; null is its default. */
     data class SelectVariant(val variant: String?) : ChatEvent
     data class ReplyPermission(val requestId: String, val decision: PermissionDecision) : ChatEvent
+
+    /** Folds a permission card into a bar or opens it again; nothing is sent to the server. */
+    data class CollapsePermission(val requestId: String, val collapsed: Boolean) : ChatEvent
     data object Back : ChatEvent
 
     /** Files read from the system pickers, ready to send. */
@@ -209,7 +222,7 @@ sealed interface ChatEvent {
     data object DismissForm : ChatEvent
 
     /** Folds the question card into a bar or opens it again; nothing is sent to the server. */
-    data class CollapseForm(val collapsed: Boolean) : ChatEvent
+    data class CollapseForm(val formId: String, val collapsed: Boolean) : ChatEvent
 
     /** Undo [messageId] and everything after it; its text returns to the composer. */
     data class Revert(val messageId: String) : ChatEvent

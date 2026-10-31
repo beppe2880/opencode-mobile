@@ -6,10 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
@@ -31,7 +33,10 @@ class FormCardTest {
         id = "f1",
         sessionId = "s1",
         title = "Which storage should the cache use?",
-        fields = listOf(FormField.Text("choice", required = true, options = listOf(FormOption("room", "Room"), FormOption("file", "File")))),
+        fields = listOf(
+            FormField.Text("choice", required = true, options = listOf(FormOption("room", "Room"), FormOption("file", "File"))),
+            FormField.Number("size", title = "Cache size"),
+        ),
     )
     private var collapsed by mutableStateOf(false)
     private var answers by mutableStateOf<Map<String, FormAnswer>>(emptyMap())
@@ -82,5 +87,17 @@ class FormCardTest {
         compose.onNodeWithTag("form_collapsed_bar").performTouchInput { swipeUp() }
         compose.onNodeWithTag("form_collapse_button").assertIsDisplayed()
         assertEquals(0, submits + dismisses)
+    }
+
+    @Test
+    fun partiallyTypedNumberComesBackExactlyAsTypedAfterFolding() {
+        showCard()
+        compose.onNodeWithTag("form_number_size").performTextInput("3.")
+        compose.onNodeWithTag("form_collapse_button").performClick()
+        compose.onNodeWithTag("form_number_size").assertDoesNotExist()
+
+        compose.onNodeWithTag("form_collapsed_bar").performClick()
+        compose.onNodeWithTag("form_number_size").assert(hasText("3.")).assert(hasText("3.0").not())
+        assertEquals(FormAnswer.Number(3.0), answers["size"])
     }
 }

@@ -85,6 +85,7 @@ class SettingsViewModel(
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }
             is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
             is SettingsEvent.QuestionsCollapsedChanged -> update { it.copy(questionsCollapsed = event.enabled) }
+            is SettingsEvent.PermissionsCollapsedChanged -> update { it.copy(permissionsCollapsed = event.enabled) }
             is SettingsEvent.NotificationsChanged -> when {
                 !event.enabled || currentState.notificationsAllowed -> update { it.copy(notifications = event.enabled) }
                 else -> {

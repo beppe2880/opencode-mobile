@@ -103,6 +103,8 @@ internal fun BottomArea(
                 request = request,
                 pendingCount = state.permissions.size,
                 replying = state.replyingPermission == request.id,
+                collapsed = state.isPermissionCollapsed(request.id),
+                onCollapse = { onEvent(ChatEvent.CollapsePermission(request.id, it)) },
                 onReply = { onEvent(ChatEvent.ReplyPermission(request.id, it)) },
             )
         }
@@ -113,8 +115,8 @@ internal fun BottomArea(
                     answers = state.formAnswers,
                     pendingCount = state.forms.size,
                     submitting = state.submittingForm,
-                    collapsed = state.formCollapsed,
-                    onCollapse = { onEvent(ChatEvent.CollapseForm(it)) },
+                    collapsed = state.isFormCollapsed(form.id),
+                    onCollapse = { onEvent(ChatEvent.CollapseForm(form.id, it)) },
                     onAnswer = { key, answer -> onEvent(ChatEvent.FormAnswerChanged(key, answer)) },
                     onSubmit = { onEvent(ChatEvent.SubmitForm) },
                     onDismiss = { onEvent(ChatEvent.DismissForm) },

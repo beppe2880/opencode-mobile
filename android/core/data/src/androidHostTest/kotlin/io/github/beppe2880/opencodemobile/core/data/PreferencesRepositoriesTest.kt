@@ -22,6 +22,7 @@ class PreferencesRepositoriesTest {
             showCost = false,
             groupActivity = false,
             questionsCollapsed = true,
+            permissionsCollapsed = true,
             terminalKeys = keys,
             outputPreviewLines = 24,
             liveOutputIntervalMs = 3_000,

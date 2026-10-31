@@ -65,6 +65,7 @@ sealed interface SettingsEvent {
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
     data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
+    data class PermissionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent

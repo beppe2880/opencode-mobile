@@ -2,11 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -16,15 +12,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.ExpandLess
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,14 +28,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -59,7 +51,6 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
-import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSwitchRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -97,6 +88,8 @@ internal fun FormCard(
 ) {
     val c = OcTheme.colors
     val collapse by rememberUpdatedState(onCollapse)
+    // Keeps the fields' own state (a number typed as "3.", scroll) while the card is folded.
+    val saved = rememberSaveableStateHolder()
     OcCard(
         modifier = modifier
             .fillMaxWidth()
@@ -110,7 +103,9 @@ internal fun FormCard(
         if (collapsed) {
             CollapsedForm(form, pendingCount, onExpand = { collapse(false) })
         } else {
-            ExpandedForm(form, answers, pendingCount, submitting, { collapse(true) }, onAnswer, onSubmit, onDismiss)
+            saved.SaveableStateProvider(form.id) {
+                ExpandedForm(form, answers, pendingCount, submitting, { collapse(true) }, onAnswer, onSubmit, onDismiss)
+            }
         }
     }
 }
@@ -131,37 +126,19 @@ private fun ExpandedForm(
         Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.md),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
-        // Handle and header: a swipe down folds the card into a bar.
-        Column(Modifier.fillMaxWidth().verticalSwipe(onSwipeDown = onCollapse).testTag("form_header")) {
-            Box(
-                Modifier
-                    .padding(top = OcSpacing.xs)
-                    .size(width = 32.dp, height = 4.dp)
-                    .background(c.borderStrong, CircleShape)
-                    .align(Alignment.CenterHorizontally)
-                    .testTag("form_drag_handle"),
+        PendingCardHeader("form", stringResource(Res.string.chat_form_collapse), onCollapse) {
+            Icon(Icons.Outlined.HelpOutline, null, tint = c.info.fg, modifier = Modifier.size(18.dp))
+            Text(
+                stringResource(Res.string.chat_form_title),
+                style = MaterialTheme.typography.labelMedium,
+                color = c.textMuted,
+                modifier = Modifier.weight(1f),
             )
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-                Icon(Icons.Outlined.HelpOutline, null, tint = c.info.fg, modifier = Modifier.size(18.dp))
+            if (pendingCount > 1) {
                 Text(
-                    stringResource(Res.string.chat_form_title),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = c.textMuted,
-                    modifier = Modifier.weight(1f),
-                )
-                if (pendingCount > 1) {
-                    Text(
-                        pluralStringResource(Res.plurals.chat_form_more, pendingCount - 1, pendingCount - 1),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = c.textFaint,
-                    )
-                }
-                OcIconButton(
-                    icon = Icons.Outlined.ExpandMore,
-                    contentDescription = stringResource(Res.string.chat_form_collapse),
-                    onClick = onCollapse,
-                    tint = c.iconMuted,
-                    modifier = Modifier.testTag("form_collapse_button"),
+                    pluralStringResource(Res.plurals.chat_form_more, pendingCount - 1, pendingCount - 1),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = c.textFaint,
                 )
             }
         }
@@ -198,23 +175,18 @@ private fun ExpandedForm(
     }
 }
 
-/** The folded card: the question on one line; a tap or a swipe up opens it again. */
+/** The folded card: the question on one line. */
 @Composable
 private fun CollapsedForm(form: Form, pendingCount: Int, onExpand: () -> Unit) {
     val c = OcTheme.colors
-    val expandLabel = stringResource(Res.string.chat_form_expand)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable(onClickLabel = expandLabel, role = Role.Button, onClick = onExpand)
-            .verticalSwipe(onSwipeUp = onExpand)
-            .padding(start = OcSpacing.md, end = OcSpacing.sm)
-            .testTag("form_collapsed_bar"),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    PendingCardBar(
+        tagPrefix = "form",
+        icon = Icons.Outlined.HelpOutline,
+        iconTint = c.info.fg,
+        iconDescription = stringResource(Res.string.chat_form_title),
+        expandLabel = stringResource(Res.string.chat_form_expand),
+        onExpand = onExpand,
     ) {
-        Icon(Icons.Outlined.HelpOutline, stringResource(Res.string.chat_form_title), tint = c.info.fg, modifier = Modifier.size(18.dp))
         Text(
             form.title,
             style = MaterialTheme.typography.bodyMedium,
@@ -230,33 +202,8 @@ private fun CollapsedForm(form: Form, pendingCount: Int, onExpand: () -> Unit) {
                 color = c.textFaint,
             )
         }
-        Icon(Icons.Outlined.ExpandLess, null, tint = c.iconMuted, modifier = Modifier.size(20.dp))
     }
 }
-
-/**
- * Calls [onSwipeDown] or [onSwipeUp] once a vertical drag ends past a short distance. The
- * gesture is not restarted on recomposition, so the callbacks must read current state.
- */
-private fun Modifier.verticalSwipe(onSwipeDown: (() -> Unit)? = null, onSwipeUp: (() -> Unit)? = null): Modifier =
-    pointerInput(Unit) {
-        val threshold = SwipeThreshold.toPx()
-        var total = 0f
-        detectVerticalDragGestures(
-            onDragStart = { total = 0f },
-            onDragEnd = {
-                when {
-                    total > threshold -> onSwipeDown?.invoke()
-                    total < -threshold -> onSwipeUp?.invoke()
-                }
-            },
-        ) { change, amount ->
-            change.consume()
-            total += amount
-        }
-    }
-
-private val SwipeThreshold = 24.dp
 
 @Composable
 private fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (FormAnswer?) -> Unit) {

@@ -69,6 +69,8 @@
     <string name="chat_permission_once">Allow once</string>
     <string name="chat_permission_always">Always</string>
     <string name="chat_permission_reject">Reject</string>
+    <string name="chat_permission_collapse">Collapse permission request</string>
+    <string name="chat_permission_expand">Expand permission request</string>
     <string name="chat_offline">Offline · reconnecting</string>
     <string name="chat_unauthorized">The server rejected the saved credentials · pair this server again</string>
     <string name="chat_shell_exit">exit %1$s</string>

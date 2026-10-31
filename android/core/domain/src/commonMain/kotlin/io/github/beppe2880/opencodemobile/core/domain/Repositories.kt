@@ -315,6 +315,8 @@ data class AppSettings(
     val groupActivity: Boolean = true,
     /** A question from the agent first shows as a one-line bar above the composer instead of the full card. */
     val questionsCollapsed: Boolean = false,
+    /** A permission request first shows as a one-line bar above the composer instead of the full card. */
+    val permissionsCollapsed: Boolean = false,
     /**
      * While sessions run, keep the connection in the background and notify when one needs an
      * answer or finishes. Only works once the notification permission is granted.
