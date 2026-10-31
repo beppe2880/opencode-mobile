@@ -24,12 +24,12 @@
     <string name="chat_thought_for">Ragionato per %1$s</string>
     <string name="chat_thought">Ragionamento</string>
     <plurals name="chat_thoughts_count">
-        <item quantity="one">%1$d pensiero</item>
-        <item quantity="other">%1$d pensieri</item>
+        <item quantity="one">%1$d ragionamento</item>
+        <item quantity="other">%1$d ragionamenti</item>
     </plurals>
     <plurals name="chat_thought_times">
-        <item quantity="one">Pensato %1$d volta</item>
-        <item quantity="other">Pensato %1$d volte</item>
+        <item quantity="one">Ragionato %1$d volta</item>
+        <item quantity="other">Ragionato %1$d volte</item>
     </plurals>
     <string name="chat_working">Al lavoro…</string>
     <string name="chat_used_tools">Usati</string>
