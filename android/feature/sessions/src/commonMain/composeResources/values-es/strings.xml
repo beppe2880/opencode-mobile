@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">Reconectando…</string>
     <string name="sessions_connection_disconnected">Sin conexión</string>
     <string name="sessions_connection_unauthorized">Acceso caducado · vuelve a vincular</string>
+    <string name="sessions_demo_server">Demo</string>
+    <string name="sessions_demo_status">Sesiones de ejemplo · sin servidor</string>
     <string name="sessions_rename">Renombrar</string>
     <string name="sessions_delete">Eliminar</string>
     <string name="sessions_rename_title">Renombrar sesión</string>

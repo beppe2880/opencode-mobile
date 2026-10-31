@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">Переподключение…</string>
     <string name="sessions_connection_disconnected">Нет подключения</string>
     <string name="sessions_connection_unauthorized">Доступ истёк · подключите заново</string>
+    <string name="sessions_demo_server">Демо</string>
+    <string name="sessions_demo_status">Примеры сессий · без сервера</string>
     <string name="sessions_rename">Переименовать</string>
     <string name="sessions_delete">Удалить</string>
     <string name="sessions_rename_title">Переименовать сессию</string>

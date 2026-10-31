@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">جارٍ إعادة الاتصال…</string>
     <string name="sessions_connection_disconnected">غير متصل</string>
     <string name="sessions_connection_unauthorized">انتهت صلاحية الدخول · أعد الإقران</string>
+    <string name="sessions_demo_server">تجريبي</string>
+    <string name="sessions_demo_status">جلسات تجريبية · بدون خادم</string>
     <string name="sessions_rename">إعادة تسمية</string>
     <string name="sessions_delete">حذف</string>
     <string name="sessions_rename_title">إعادة تسمية الجلسة</string>

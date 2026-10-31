@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">再接続中…</string>
     <string name="sessions_connection_disconnected">オフライン</string>
     <string name="sessions_connection_unauthorized">認証の期限切れ · 再ペアリング</string>
+    <string name="sessions_demo_server">デモ</string>
+    <string name="sessions_demo_status">サンプルセッション · サーバーなし</string>
     <string name="sessions_rename">名前を変更</string>
     <string name="sessions_delete">削除</string>
     <string name="sessions_rename_title">セッション名を変更</string>

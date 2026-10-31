@@ -167,4 +167,6 @@
     <string name="settings_list_handle_sub">구분선에 화살표를 표시해 목록을 숨기거나, 끌어서 크기를 조정합니다</string>
     <string name="settings_back_shows_list">뒤로 가기로 숨긴 목록 표시</string>
     <string name="settings_back_shows_list_sub">세션 목록이 숨겨져 있으면 뒤로 가기가 앱을 종료하는 대신 목록을 다시 표시합니다</string>
+    <string name="settings_demo_server">데모</string>
+    <string name="settings_demo_server_hint">샘플 세션 · 서버 없음</string>
 </resources>

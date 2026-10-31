@@ -167,4 +167,6 @@
     <string name="settings_list_handle_sub">仕切り線の矢印を表示して一覧を隠すか、ドラッグして幅を変更します</string>
     <string name="settings_back_shows_list">戻るで非表示の一覧を表示</string>
     <string name="settings_back_shows_list_sub">セッション一覧が非表示のとき、戻るでアプリを終了せずに一覧を再表示します</string>
+    <string name="settings_demo_server">デモ</string>
+    <string name="settings_demo_server_hint">サンプルセッション · サーバーなし</string>
 </resources>

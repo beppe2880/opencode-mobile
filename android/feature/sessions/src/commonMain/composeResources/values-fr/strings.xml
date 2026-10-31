@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">Reconnexion…</string>
     <string name="sessions_connection_disconnected">Hors ligne</string>
     <string name="sessions_connection_unauthorized">Accès expiré · associez à nouveau</string>
+    <string name="sessions_demo_server">Démo</string>
+    <string name="sessions_demo_status">Sessions d'exemple · aucun serveur</string>
     <string name="sessions_rename">Renommer</string>
     <string name="sessions_delete">Supprimer</string>
     <string name="sessions_rename_title">Renommer la session</string>

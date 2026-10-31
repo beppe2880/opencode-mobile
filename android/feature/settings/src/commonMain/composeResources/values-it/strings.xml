@@ -170,4 +170,6 @@
     <string name="settings_list_handle_sub">Mostra la freccia sul divisore per nascondere l'elenco o trascinarla per ridimensionarlo</string>
     <string name="settings_back_shows_list">Indietro mostra l'elenco nascosto</string>
     <string name="settings_back_shows_list_sub">Quando l'elenco delle sessioni è nascosto, Indietro lo mostra di nuovo invece di chiudere l'app</string>
+    <string name="settings_demo_server">Demo</string>
+    <string name="settings_demo_server_hint">Sessioni di esempio · nessun server</string>
 </resources>

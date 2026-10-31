@@ -41,4 +41,5 @@
     <string name="connect_camera_unavailable">الكاميرا غير متاحة على هذا الجهاز.</string>
     <string name="connect_warning_public_http">يبدو أن هذا العنوان عام ويستخدم HTTP دون تشفير: ستنتقل كلمة المرور عبر الإنترنت دون حماية. يُفضَّل استخدام شبكتك المحلية أو VPN أو HTTPS.</string>
     <string name="connect_try_demo">التجربة بدون خادم</string>
+    <string name="connect_try_demo_hint">لا يوجد خادم بعد؟ تصفّح الجلسات التجريبية. لا يغادر شيء هاتفك.</string>
 </resources>
