@@ -40,6 +40,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
@@ -89,6 +91,17 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_folder
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_session
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
@@ -142,8 +155,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_branch
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_branch_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning
@@ -508,13 +519,37 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 modifier = Modifier.testTag("settings_show_cost_switch"),
             )
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_show_branch),
-                subtitle = stringResource(Res.string.settings_show_branch_sub),
-                checked = settings.showBranch,
-                onCheckedChange = { onEvent(SettingsEvent.ShowBranchChanged(it)) },
-                modifier = Modifier.testTag("settings_show_branch_switch"),
+            ChoiceRow(
+                title = stringResource(Res.string.settings_header_line),
+                subtitle = stringResource(
+                    when (settings.chatHeaderLine) {
+                        ChatHeaderLine.FolderBranchFiles -> Res.string.settings_header_line_all_sub
+                        ChatHeaderLine.BranchFiles -> Res.string.settings_header_line_branch_sub
+                        ChatHeaderLine.Folder -> Res.string.settings_header_line_folder_sub
+                    },
+                ),
+                choices = listOf(
+                    OcSegment(ChatHeaderLine.FolderBranchFiles, stringResource(Res.string.settings_header_line_all), "settings_header_line_all"),
+                    OcSegment(ChatHeaderLine.BranchFiles, stringResource(Res.string.settings_header_line_branch), "settings_header_line_branch"),
+                    OcSegment(ChatHeaderLine.Folder, stringResource(Res.string.settings_header_line_folder), "settings_header_line_folder"),
+                ),
+                selected = settings.chatHeaderLine,
+                onSelect = { onEvent(SettingsEvent.ChatHeaderLineChanged(it)) },
             )
+            // A folder path alone is not a line to tap.
+            if (settings.chatHeaderLine != ChatHeaderLine.Folder) {
+                OcDivider()
+                ChoiceRow(
+                    title = stringResource(Res.string.settings_header_opens),
+                    subtitle = stringResource(Res.string.settings_header_opens_sub),
+                    choices = listOf(
+                        OcSegment(ChangesScope.Folder, stringResource(Res.string.settings_header_opens_folder), "settings_header_opens_folder"),
+                        OcSegment(ChangesScope.Session, stringResource(Res.string.settings_header_opens_session), "settings_header_opens_session"),
+                    ),
+                    selected = settings.headerOpens,
+                    onSelect = { onEvent(SettingsEvent.HeaderOpensChanged(it)) },
+                )
+            }
             OcDivider()
             OcSwitchRow(
                 title = stringResource(Res.string.settings_swipe_chats),

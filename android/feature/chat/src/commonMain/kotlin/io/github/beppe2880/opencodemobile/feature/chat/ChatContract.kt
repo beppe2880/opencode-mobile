@@ -99,6 +99,8 @@ data class ChatState(
     val mcps: McpPanel? = null,
     /** The branch line under the title; null while unknown, empty or turned off (setting). */
     val vcs: VcsLine? = null,
+    /** The folder is a repository: the changes sheet offers its uncommitted changes. */
+    val folderChanges: Boolean = false,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -117,11 +119,26 @@ data class ChatState(
 data class SessionPeek(val id: String, val title: String)
 
 /**
- * The project's [branch] (null on a detached HEAD) and its [files] with uncommitted changes.
- * Outside a repository there is no branch and [files] only counts what the agent edited
- * ([agentEdits]): changes made by shell commands are not known.
+ * The project's [folder] name (null when the setting leaves it out), [branch] (null on a
+ * detached HEAD) and its [files] with uncommitted changes. Outside a repository there is no
+ * branch and [files] only counts what the agent edited ([agentEdits]): changes made by shell
+ * commands are not known.
  */
-data class VcsLine(val branch: String?, val files: Int, val agentEdits: Boolean = false)
+data class VcsLine(val folder: String?, val branch: String?, val files: Int, val agentEdits: Boolean = false)
+
+/** The header line split where it may shrink: the [folder] name first, then the [detail]. */
+internal data class VcsText(val folder: String?, val detail: String)
+
+/**
+ * [filesLabel] is the formatted file count, null for none; a repository without a branch shows
+ * [detached] instead of it.
+ */
+internal fun VcsLine.text(detached: String, filesLabel: String?): VcsText =
+    VcsText(folder, listOfNotNull(branch ?: detached.takeUnless { agentEdits }, filesLabel).joinToString(" · "))
+
+/** The last segment of [directory], `/` or `\\` separated; the directory itself when it has none. */
+internal fun folderName(directory: String): String =
+    directory.trimEnd('/', '\\').substringAfterLast('/').substringAfterLast('\\').ifEmpty { directory }
 
 data class McpPanel(
     val servers: List<McpServer>? = null,
@@ -223,6 +240,9 @@ sealed interface ChatEvent {
     data class Fork(val messageId: String) : ChatEvent
 
     data object OpenChanges : ChatEvent
+
+    /** The header line was tapped: opens the folder or the session changes (setting). */
+    data object OpenHeaderChanges : ChatEvent
     data object OpenMcps : ChatEvent
     data object CloseMcps : ChatEvent
     data object RefreshMcps : ChatEvent

@@ -105,7 +105,8 @@ val fakeDataModule = module {
     single<VcsRepository> {
         object : VcsRepository {
             override suspend fun branch(directory: String) = Result.success(VcsBranch("main", "main"))
-            override suspend fun changedFiles(directory: String) = Result.success(listOf("README.md", "src/App.kt"))
+            override suspend fun changedFiles(directory: String) = Result.success(FakeSamples.diffs(directory).map { it.path })
+            override suspend fun workingChanges(directory: String) = Result.success(FakeSamples.diffs(directory))
         }
     }
 }

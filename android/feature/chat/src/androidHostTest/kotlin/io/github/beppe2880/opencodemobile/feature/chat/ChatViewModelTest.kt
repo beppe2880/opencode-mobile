@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
@@ -236,23 +237,61 @@ class ChatViewModelTest {
         ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, vcs, clock = { 42 })
 
     @Test
-    fun `the branch line shows the branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
+    fun `the header line shows folder, branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
-        assertEquals(VcsLine("main", 2), vm.state.value.vcs)
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+        assertTrue(vm.state.value.folderChanges)
         assertEquals(listOf("/repo"), vcs.branchRequests)
 
         vcs.files = listOf("a.kt")
         events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
         events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded))
         advanceUntilIdle()
-        assertEquals(VcsLine("main", 1), vm.state.value.vcs)
+        assertEquals(VcsLine("repo", "main", 1), vm.state.value.vcs)
         // Both events settle into one read.
         assertEquals(2, vcs.statusRequests)
+    }
 
-        vm.onEvent(ChatEvent.OpenChanges)
+    @Test
+    fun `tapping the header line opens the folder changes, which match its count`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val diffs = listOf(
+            FileDiff("a.kt", "modified", 1, 1, "@@ -1 +1 @@"),
+            FileDiff("new.kt", "added", 2, 0, "@@ -0,0 +1,2 @@"),
+            FileDiff("c.kt", "deleted", 0, 3, ""),
+        )
+        vcs.diffs = diffs
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesPanel(ChangesScope.Folder, diffs, loading = false), vm.state.value.changes)
+        assertEquals(listOf("/repo"), vcs.diffRequests)
+        assertTrue(chat.changesRequests.isEmpty())
+        assertEquals(3, vm.state.value.vcs?.files)
+
+        // Session and turn scopes are unchanged.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Session))
+        advanceUntilIdle()
+        assertEquals(listOf(ChangesScope.Session), chat.changesRequests)
+
+        // A step reloads the open folder scope.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Folder))
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(3, vcs.diffRequests.size)
+    }
+
+    @Test
+    fun `the header line can open the session changes instead`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(headerOpens = ChangesScope.Session)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
         advanceUntilIdle()
         assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+        assertTrue(vcs.diffRequests.isEmpty())
     }
 
     @Test
@@ -266,12 +305,12 @@ class ChatViewModelTest {
         vcs.files = emptyList()
         events.flow.emit(ServerEvent.BranchChanged("/repo", "feature"))
         advanceUntilIdle()
-        assertEquals(VcsLine("feature", 0), vm.state.value.vcs)
+        assertEquals(VcsLine("repo", "feature", 0), vm.state.value.vcs)
         assertEquals(1, vcs.branchRequests.size)
     }
 
     @Test
-    fun `outside a repository only files the agent edited are counted`() = runTest(main.testDispatcher) {
+    fun `outside a repository only files the agent edited are counted and the session opens`() = runTest(main.testDispatcher) {
         vcs.branch = null
         val edit = Part.Tool(
             "c1", "edit", ToolStatus.Completed, "{}",
@@ -281,30 +320,51 @@ class ChatViewModelTest {
         val vm = vm()
         advanceUntilIdle()
         assertNull(vm.state.value.vcs)
+        assertFalse(vm.state.value.folderChanges)
         assertEquals(0, vcs.statusRequests)
 
         chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(edit, again), completedAt = 6)
         events.flow.emit(ServerEvent.StepEnded("s1", "a1", "stop", 0.0, TokenUsage(), 0))
         advanceUntilIdle()
-        assertEquals(VcsLine(null, 2, agentEdits = true), vm.state.value.vcs)
+        assertEquals(VcsLine("repo", null, 2, agentEdits = true), vm.state.value.vcs)
         assertEquals(0, vcs.statusRequests)
+
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
     }
 
     @Test
-    fun `the branch line is hidden and not fetched when turned off`() = runTest(main.testDispatcher) {
-        settings.settings.value = AppSettings(showBranch = false)
+    fun `the header line content follows the setting`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
         val vm = vm()
         advanceUntilIdle()
         assertNull(vm.state.value.vcs)
         assertTrue(vcs.branchRequests.isEmpty())
 
-        settings.settings.value = AppSettings(showBranch = true)
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.BranchFiles)
         advanceUntilIdle()
-        assertEquals(VcsLine("main", 2), vm.state.value.vcs)
+        assertEquals(VcsLine(null, "main", 2), vm.state.value.vcs)
 
-        settings.settings.value = AppSettings(showBranch = false)
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.FolderBranchFiles)
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
         advanceUntilIdle()
         assertNull(vm.state.value.vcs)
+    }
+
+    @Test
+    fun `the changes button finds out whether the folder can be shown even without the header line`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenChanges)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.folderChanges)
+        assertNull(vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
     }
 
     @Test
@@ -1350,6 +1410,12 @@ private class FakeVcs : VcsRepository {
     override suspend fun changedFiles(directory: String): Result<List<String>> {
         statusRequests++
         return Result.success(files)
+    }
+    var diffs: List<FileDiff> = emptyList()
+    val diffRequests = mutableListOf<String>()
+    override suspend fun workingChanges(directory: String): Result<List<FileDiff>> {
+        diffRequests += directory
+        return Result.success(diffs)
     }
 }
 

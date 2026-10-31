@@ -50,10 +50,12 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_empty
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_empty_folder
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_empty_session
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_empty_turn
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_files
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_folder
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_last_turn
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_session
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_collapsed
@@ -65,7 +67,7 @@ import org.jetbrains.compose.resources.stringResource
 /** Files with fewer changes than this open expanded. */
 private const val EXPANDED_FILES = 3
 
-/** Files the session changed, each expandable to its diff, for the last turn or the whole session. */
+/** Changed files, each expandable to its diff: of the last turn, the whole session or the folder's working copy. */
 @Composable
 internal fun ChangesSheet(state: ChatState, panel: ChangesPanel, onEvent: (ChatEvent) -> Unit) {
     val c = OcTheme.colors
@@ -95,9 +97,12 @@ internal fun ChangesSheet(state: ChatState, panel: ChangesPanel, onEvent: (ChatE
                         }
                     }
                     OcSegmentedControl(
-                        segments = listOf(
+                        segments = listOfNotNull(
                             OcSegment(ChangesScope.Session, stringResource(Res.string.chat_changes_session), "chat_changes_scope_session"),
                             OcSegment(ChangesScope.LastTurn, stringResource(Res.string.chat_changes_last_turn), "chat_changes_scope_turn"),
+                            // Every uncommitted change of the folder, whoever made it.
+                            OcSegment(ChangesScope.Folder, stringResource(Res.string.chat_changes_folder), "chat_changes_scope_folder")
+                                .takeIf { state.folderChanges || panel.scope == ChangesScope.Folder },
                         ),
                         selected = panel.scope,
                         onSelect = { onEvent(ChatEvent.LoadChanges(it)) },
@@ -128,7 +133,11 @@ internal fun ChangesSheet(state: ChatState, panel: ChangesPanel, onEvent: (ChatE
                         icon = Icons.Outlined.FolderOpen,
                         title = stringResource(Res.string.chat_changes_empty),
                         message = stringResource(
-                            if (panel.scope == ChangesScope.LastTurn) Res.string.chat_changes_empty_turn else Res.string.chat_changes_empty_session,
+                            when (panel.scope) {
+                                ChangesScope.LastTurn -> Res.string.chat_changes_empty_turn
+                                ChangesScope.Session -> Res.string.chat_changes_empty_session
+                                ChangesScope.Folder -> Res.string.chat_changes_empty_folder
+                            },
                         ),
                         modifier = Modifier.testTag("chat_changes_empty"),
                     )

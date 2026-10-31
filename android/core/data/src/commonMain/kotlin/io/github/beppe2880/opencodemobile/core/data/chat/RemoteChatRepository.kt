@@ -371,11 +371,14 @@ internal class RemoteChatRepository(
      */
     override suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> = resultOf {
         val api = clients.active().sessions
-        val range = if (scope == ChangesScope.Session) {
-            val first = firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.ASC) ?: return@resultOf emptyList()
-            first to firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.DESC)
-        } else {
-            null
+        val range = when (scope) {
+            ChangesScope.Session -> {
+                val first = firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.ASC) ?: return@resultOf emptyList()
+                first to firstUserMessage(sessionId, SessionApi.OrderSessionMessageList.DESC)
+            }
+            ChangesScope.LastTurn -> null
+            // The folder is not the session's: VcsRepository.workingChanges reads it.
+            ChangesScope.Folder -> throw IllegalArgumentException("Folder changes are read from the VCS")
         }
         awaitBody { api.sessionDiff(sessionId, from = range?.first, to = range?.second, context = DIFF_CONTEXT_LINES.toString()) }
             .data.map { it.toDomain() }

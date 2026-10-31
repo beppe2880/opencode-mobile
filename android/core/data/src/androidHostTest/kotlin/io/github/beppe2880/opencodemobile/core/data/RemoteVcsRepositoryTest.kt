@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data
 
 import io.github.beppe2880.opencodemobile.core.data.vcs.RemoteVcsRepository
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import kotlinx.coroutines.runBlocking
@@ -62,6 +63,22 @@ class RemoteVcsRepositoryTest {
         assertEquals(listOf("a.kt", "b.kt"), vcs.changedFiles("/repo").getOrThrow())
         val url = server.takeRequest().requestUrl!!
         assertEquals("/api/vcs/status", url.encodedPath)
+        assertEquals("/repo", url.queryParameter("location[directory]"))
+    }
+
+    @Test
+    fun `working changes are the diff of the working copy`() = runBlocking {
+        server.enqueue(
+            MockResponse().setBody(
+                """{"location":{"directory":"/repo"},"data":[
+                    {"file":"a.kt","patch":"@@ -1 +1 @@\n-a\n+b","additions":1,"deletions":1,"status":"modified"}
+                ]}""",
+            ),
+        )
+        assertEquals(listOf(FileDiff("a.kt", "modified", 1, 1, "@@ -1 +1 @@\n-a\n+b")), vcs.workingChanges("/repo").getOrThrow())
+        val url = server.takeRequest().requestUrl!!
+        assertEquals("/api/vcs/diff", url.encodedPath)
+        assertEquals("working", url.queryParameter("mode"))
         assertEquals("/repo", url.queryParameter("location[directory]"))
     }
 

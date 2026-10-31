@@ -35,10 +35,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
@@ -96,6 +100,7 @@ fun ChatScreen(
                 onBack = { onEvent(ChatEvent.Back) },
                 onContext = { contextOpen = true },
                 onChanges = { onEvent(ChatEvent.OpenChanges) },
+                onHeaderChanges = { onEvent(ChatEvent.OpenHeaderChanges) },
                 onTerminal = { onEvent(ChatEvent.OpenTerminal) },
                 onMcps = { onEvent(ChatEvent.OpenMcps) },
             )
@@ -175,6 +180,7 @@ private fun ChatTopBar(
     onBack: () -> Unit,
     onContext: () -> Unit,
     onChanges: () -> Unit,
+    onHeaderChanges: () -> Unit,
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
 ) {
@@ -184,7 +190,7 @@ private fun ChatTopBar(
         // Blank until the session is known, then a placeholder until the server names it.
         title = state.title.ifBlank { if (state.directory.isEmpty()) " " else stringResource(Res.string.chat_untitled) },
         subtitle = state.directory.takeIf { it.isNotEmpty() },
-        subtitleContent = state.vcs?.let { line -> { VcsSubtitle(line, onChanges) } },
+        subtitleContent = state.vcs?.let { line -> { VcsSubtitle(line, onHeaderChanges) } },
         leading = if (showBack) {
             {
                 OcIconButton(
@@ -243,7 +249,10 @@ private fun ChatTopBar(
     )
 }
 
-/** "branch · 3 files changed" under the title; opens the changes sheet. */
+/**
+ * "folder · branch · 3 files changed" under the title; opens the changes sheet. On narrow
+ * screens the folder name shrinks first so the branch stays readable.
+ */
 @Composable
 private fun VcsSubtitle(line: VcsLine, onClick: () -> Unit) {
     val files = when {
@@ -251,17 +260,69 @@ private fun VcsSubtitle(line: VcsLine, onClick: () -> Unit) {
         line.agentEdits -> pluralStringResource(Res.plurals.chat_vcs_files_edited, line.files, line.files)
         else -> pluralStringResource(Res.plurals.chat_changes_files, line.files, line.files)
     }
-    val branch = line.branch ?: stringResource(Res.string.chat_vcs_detached).takeUnless { line.agentEdits }
-    Text(
-        text = listOfNotNull(branch, files).joinToString(" · "),
-        style = MaterialTheme.typography.bodySmall,
-        color = OcTheme.colors.textMuted,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier
-            .clickable(onClickLabel = stringResource(Res.string.chat_changes_open), role = Role.Button, onClick = onClick)
-            .testTag("chat_vcs_line"),
+    val text = line.text(stringResource(Res.string.chat_vcs_detached), files)
+    val style = MaterialTheme.typography.bodySmall
+    val color = OcTheme.colors.textMuted
+    // The 56dp top bar has no room for a 48dp target: the changes button is the full-size alternative.
+    val modifier = Modifier
+        .clickable(onClickLabel = stringResource(Res.string.chat_changes_open), role = Role.Button, onClick = onClick)
+        .testTag("chat_vcs_line")
+    val part: @Composable (String) -> Unit = { Text(it, style = style, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+    if (text.folder == null) {
+        Box(modifier) { part(text.detail) }
+        return
+    }
+    ShrinkFirstRow(
+        first = { part(text.folder) },
+        separator = { part(" · ") },
+        second = { part(text.detail) },
+        firstMinWidth = FOLDER_MIN_WIDTH,
+        modifier = modifier,
     )
+}
+
+/** Width the folder name keeps, when it is that long; below it the folder is left out. */
+private val FOLDER_MIN_WIDTH = 56.dp
+
+/**
+ * [first], [separator] and [second] on one line. When they do not fit, [first] shrinks down to
+ * [firstMinWidth] (or its own width when shorter); with even less room it is left out with the
+ * separator, and only then [second] shrinks.
+ */
+@Composable
+private fun ShrinkFirstRow(
+    first: @Composable () -> Unit,
+    separator: @Composable () -> Unit,
+    second: @Composable () -> Unit,
+    firstMinWidth: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Layout(contents = listOf(first, separator, second), modifier = modifier) { (firsts, separators, seconds), constraints ->
+        val loose = constraints.copy(minWidth = 0)
+        val total = if (constraints.hasBoundedWidth) constraints.maxWidth else Constraints.Infinity
+        val height = constraints.maxHeight
+        val firstWidth = firsts.single().maxIntrinsicWidth(height)
+        val separatorWidth = separators.single().maxIntrinsicWidth(height)
+        val secondWidth = seconds.single().maxIntrinsicWidth(height)
+        val keepFirst = minOf(firstWidth, firstMinWidth.roundToPx()) + separatorWidth + secondWidth <= total
+        val placeables = if (keepFirst) {
+            val firstMax = (total - separatorWidth - secondWidth).coerceAtLeast(0)
+            listOf(
+                firsts.single().measure(loose.copy(maxWidth = minOf(firstWidth, firstMax))),
+                separators.single().measure(loose),
+                seconds.single().measure(loose),
+            )
+        } else {
+            listOf(seconds.single().measure(loose))
+        }
+        layout(placeables.sumOf { it.width }, placeables.maxOf { it.height }) {
+            var x = 0
+            placeables.forEach {
+                it.placeRelative(x, 0)
+                x += it.width
+            }
+        }
+    }
 }
 
 private fun previewState(running: Boolean = false) = ChatState(
@@ -277,7 +338,7 @@ private fun previewState(running: Boolean = false) = ChatState(
     running = running,
     draft = if (running) "Also add tests" else "",
     permissions = if (running) listOf(SampleData.permission) else emptyList(),
-    vcs = VcsLine("feat/vcs-header", files = if (running) 3 else 0),
+    vcs = VcsLine("opencode-mobile", "feat/vcs-header", files = if (running) 3 else 0),
 )
 
 @PreviewLightDark

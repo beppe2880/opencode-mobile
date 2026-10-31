@@ -2,6 +2,8 @@ package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 
@@ -60,7 +62,8 @@ sealed interface SettingsEvent {
     data object RequestReset : SettingsEvent
     data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
-    data class ShowBranchChanged(val enabled: Boolean) : SettingsEvent
+    data class ChatHeaderLineChanged(val line: ChatHeaderLine) : SettingsEvent
+    data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent

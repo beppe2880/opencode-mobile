@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
@@ -92,7 +93,11 @@ class ChatViewModel(
     private val liveJobs = HashMap<String, Job>()
     private var liveOutputIntervalMs: Long = settings.settings.value.liveOutputIntervalMs
 
-    private var showBranch: Boolean = settings.settings.value.showBranch
+    private var headerLine: ChatHeaderLine = settings.settings.value.chatHeaderLine
+    private var headerOpens: ChangesScope = settings.settings.value.headerOpens
+
+    /** The header line shows the branch and the changed files, which are then kept up to date. */
+    private val vcsInHeader: Boolean get() = headerLine != ChatHeaderLine.Folder
 
     /** Whether the project is in a repository; null until known. */
     private var inRepository: Boolean? = null
@@ -120,9 +125,10 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
-                val branchTurnedOn = s.showBranch && !showBranch
-                showBranch = s.showBranch
-                if (branchTurnedOn) refreshBranch()
+                val vcsTurnedOn = s.chatHeaderLine != ChatHeaderLine.Folder && !vcsInHeader
+                headerLine = s.chatHeaderLine
+                headerOpens = s.headerOpens
+                if (vcsTurnedOn) refreshBranch()
                 updateState {
                     it.copy(
                         expandToolsByDefault = s.expandToolsByDefault,
@@ -193,7 +199,14 @@ class ChatViewModel(
             is ChatEvent.Revert -> revert(event.messageId)
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
-            ChatEvent.OpenChanges -> loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+            ChatEvent.OpenChanges -> {
+                loadChanges(currentState.changes?.scope ?: ChangesScope.Session)
+                // Offers the folder's changes once it is known to be a repository.
+                if (inRepository == null) refreshBranch(force = true)
+            }
+            ChatEvent.OpenHeaderChanges -> loadChanges(
+                if (headerOpens == ChangesScope.Folder && inRepository == true) ChangesScope.Folder else ChangesScope.Session,
+            )
             ChatEvent.OpenMcps -> {
                 updateState { it.copy(mcps = it.mcps ?: McpPanel(changing = changingMcps.toSet())) }
                 refreshMcps()
@@ -963,16 +976,21 @@ class ChatViewModel(
         return SessionPeek(id, sessions.cached(id)?.title.orEmpty())
     }
 
-    /** Reads the branch of the project, then its changed files; nothing while the line is off. */
-    private fun refreshBranch() {
+    /**
+     * Reads the branch of the project, then its changed files for the header. Without them in
+     * the header nothing is asked unless [force]d by the changes sheet, which needs to know
+     * whether the folder is a repository.
+     */
+    private fun refreshBranch(force: Boolean = false) {
         val directory = currentState.directory
-        if (!showBranch || directory.isEmpty()) return
+        if ((!vcsInHeader && !force) || directory.isEmpty()) return
         branchJob?.cancel()
         branchJob = viewModelScope.launch {
             vcs.branch(directory).onSuccess { found ->
                 inRepository = found != null
                 branch = found
-                if (found != null) loadChangedFiles(directory) else showVcs()
+                updateState { it.copy(folderChanges = found != null) }
+                if (found != null && vcsInHeader) loadChangedFiles(directory) else showVcs()
             }
         }
     }
@@ -980,7 +998,7 @@ class ChatViewModel(
     /** Files change with every step: re-read once the step settles. Not needed outside a repository. */
     private fun refreshChangedFiles() {
         val directory = currentState.directory
-        if (!showBranch || inRepository != true || directory.isEmpty()) return
+        if (!vcsInHeader || inRepository != true || directory.isEmpty()) return
         changedJob?.cancel()
         changedJob = viewModelScope.launch {
             delay(RELOAD_DEBOUNCE_MS)
@@ -996,21 +1014,25 @@ class ChatViewModel(
     }
 
     private fun onBranchChanged(event: ServerEvent.BranchChanged) {
-        if (!showBranch || event.directory != currentState.directory) return
+        if (event.directory != currentState.directory) return
         if (inRepository != true) return refreshBranch()
         branch = branch?.copy(current = event.branch) ?: VcsBranch(event.branch, null)
         showVcs()
         // Another branch has another working copy.
         refreshChangedFiles()
+        currentState.changes?.takeIf { it.scope == ChangesScope.Folder }?.let { loadChanges(it.scope) }
     }
 
     private fun showVcs() = updateState { it.copy(vcs = vcsLine(visibleMessages())) }
 
-    private fun vcsLine(visible: List<Message>): VcsLine? = when {
-        !showBranch -> null
-        inRepository == true -> VcsLine(branch?.current, changedFiles).takeIf { it.branch != null || it.files > 0 }
-        inRepository == false -> agentEditedFiles(visible).takeIf { it > 0 }?.let { VcsLine(null, it, agentEdits = true) }
-        else -> null
+    private fun vcsLine(visible: List<Message>): VcsLine? {
+        if (!vcsInHeader) return null
+        val folder = folderName(currentState.directory).takeIf { headerLine == ChatHeaderLine.FolderBranchFiles }
+        return when (inRepository) {
+            true -> VcsLine(folder, branch?.current, changedFiles)
+            false -> agentEditedFiles(visible).takeIf { it > 0 }?.let { VcsLine(folder, null, it, agentEdits = true) }
+            null -> null
+        }
     }
 
     /** Distinct files the agent's edit, write and patch tools changed. */
@@ -1139,8 +1161,19 @@ class ChatViewModel(
             val kept = s.changes?.takeIf { it.scope == scope }?.files
             s.copy(changes = ChangesPanel(scope, files = kept, loading = true))
         }
+        val directory = currentState.directory
         changesJob = viewModelScope.launch {
-            val result = chat.changes(sessionId, scope)
+            val result = if (scope == ChangesScope.Folder) {
+                vcs.workingChanges(directory).onSuccess { files ->
+                    // Read together with the header count: both show the same files.
+                    if (vcsInHeader && inRepository == true) {
+                        changedFiles = files.size
+                        showVcs()
+                    }
+                }
+            } else {
+                chat.changes(sessionId, scope)
+            }
             updateState { s ->
                 val panel = s.changes ?: return@updateState s
                 s.copy(

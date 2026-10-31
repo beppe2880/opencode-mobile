@@ -9,4 +9,7 @@ interface VcsRepository {
 
     /** Files with uncommitted changes in [directory]'s working copy; empty without a repository. */
     suspend fun changedFiles(directory: String): Result<List<String>>
+
+    /** The uncommitted changes of [directory] with unified diffs, like [changedFiles]; empty without a repository. */
+    suspend fun workingChanges(directory: String): Result<List<FileDiff>>
 }

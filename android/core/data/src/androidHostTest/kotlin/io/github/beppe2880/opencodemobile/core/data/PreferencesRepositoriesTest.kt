@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftReposi
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -20,7 +22,8 @@ class PreferencesRepositoriesTest {
         val changed = AppSettings(
             theme = ThemeMode.Dark,
             showCost = false,
-            showBranch = false,
+            chatHeaderLine = ChatHeaderLine.BranchFiles,
+            headerOpens = ChangesScope.Session,
             groupActivity = false,
             terminalKeys = keys,
             outputPreviewLines = 24,
@@ -48,6 +51,9 @@ class PreferencesRepositoriesTest {
             .putInt("output_preview_lines", 7)
             .putLong("live_output_interval_ms", 1)
             .putFloat("chat_text_scale", 4f)
+            .putString("chat_header_line", "Everything")
+            // Only the folder and the session can be opened from the header.
+            .putString("chat_header_opens", "LastTurn")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value

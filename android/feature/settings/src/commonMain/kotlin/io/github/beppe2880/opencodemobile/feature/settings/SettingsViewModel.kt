@@ -80,7 +80,8 @@ class SettingsViewModel(
             is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }
             is SettingsEvent.ChatTextScaleChanged -> update { it.copy(chatTextScale = event.scale) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
-            is SettingsEvent.ShowBranchChanged -> update { it.copy(showBranch = event.enabled) }
+            is SettingsEvent.ChatHeaderLineChanged -> update { it.copy(chatHeaderLine = event.line) }
+            is SettingsEvent.HeaderOpensChanged -> update { it.copy(headerOpens = event.scope) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }

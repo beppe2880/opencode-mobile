@@ -44,6 +44,8 @@
     <string name="chat_terminal_open">Open terminal</string>
     <string name="chat_changes_session">Whole session</string>
     <string name="chat_changes_last_turn">Last turn</string>
+    <string name="chat_changes_folder">Folder</string>
+    <string name="chat_changes_empty_folder">This folder has no uncommitted changes.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d file changed</item>
         <item quantity="other">%1$d files changed</item>
