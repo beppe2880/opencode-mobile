@@ -69,6 +69,8 @@
     <string name="chat_permission_once">Autoriser une fois</string>
     <string name="chat_permission_always">Toujours</string>
     <string name="chat_permission_reject">Refuser</string>
+    <string name="chat_permission_collapse">Réduire la demande d'autorisation</string>
+    <string name="chat_permission_expand">Développer la demande d'autorisation</string>
     <string name="chat_offline">Hors ligne · reconnexion</string>
     <string name="chat_unauthorized">Le serveur a refusé les identifiants enregistrés · associez à nouveau le serveur</string>
     <string name="chat_shell_exit">sortie %1$s</string>
@@ -120,6 +122,8 @@
     <string name="chat_form_title">Question de l’agent</string>
     <string name="chat_form_submit">Envoyer la réponse</string>
     <string name="chat_form_dismiss">Ignorer</string>
+    <string name="chat_form_collapse">Réduire la question</string>
+    <string name="chat_form_expand">Développer la question</string>
     <string name="chat_form_other">Autre réponse</string>
     <string name="chat_form_open_link">Ouvrir le lien</string>
     <plurals name="chat_form_more">

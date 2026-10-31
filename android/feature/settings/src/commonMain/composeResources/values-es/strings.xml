@@ -69,6 +69,10 @@
     <string name="settings_swipe_chats_sub">Desliza a izquierda o derecha en un chat para abrir la sesión siguiente o anterior de la lista</string>
     <string name="settings_group_activity">Agrupar razonamiento y herramientas</string>
     <string name="settings_group_activity_sub">Mostrar razonamientos y llamadas a herramientas consecutivos en una sola fila</string>
+    <string name="settings_questions_collapsed">Mostrar preguntas contraídas</string>
+    <string name="settings_questions_collapsed_sub">Las preguntas del agente aparecen como una barra de una línea sobre el redactor; toca para responder</string>
+    <string name="settings_permissions_collapsed">Mostrar solicitudes de permiso contraídas</string>
+    <string name="settings_permissions_collapsed_sub">Las solicitudes de permiso aparecen como una barra de una línea sobre el redactor; toca para responder</string>
     <string name="settings_agent_outline">Borde del color del agente</string>
     <string name="settings_agent_outline_sub">Delinear el cuadro del mensaje con el color del agente seleccionado</string>
     <string name="settings_dictation">Entrada de voz</string>

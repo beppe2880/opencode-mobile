@@ -69,6 +69,8 @@
     <string name="chat_permission_once">Einmal erlauben</string>
     <string name="chat_permission_always">Immer</string>
     <string name="chat_permission_reject">Ablehnen</string>
+    <string name="chat_permission_collapse">Berechtigungsanfrage einklappen</string>
+    <string name="chat_permission_expand">Berechtigungsanfrage aufklappen</string>
     <string name="chat_offline">Offline · Verbindung wird wiederhergestellt</string>
     <string name="chat_unauthorized">Der Server hat die gespeicherten Zugangsdaten abgelehnt · kopple den Server neu</string>
     <string name="chat_shell_exit">Exit %1$s</string>
@@ -120,6 +122,8 @@
     <string name="chat_form_title">Frage des Agenten</string>
     <string name="chat_form_submit">Antwort senden</string>
     <string name="chat_form_dismiss">Verwerfen</string>
+    <string name="chat_form_collapse">Frage einklappen</string>
+    <string name="chat_form_expand">Frage aufklappen</string>
     <string name="chat_form_other">Andere Antwort</string>
     <string name="chat_form_open_link">Link öffnen</string>
     <plurals name="chat_form_more">

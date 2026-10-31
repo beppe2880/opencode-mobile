@@ -77,6 +77,8 @@
     <string name="chat_permission_once">Разрешить один раз</string>
     <string name="chat_permission_always">Всегда</string>
     <string name="chat_permission_reject">Отклонить</string>
+    <string name="chat_permission_collapse">Свернуть запрос разрешения</string>
+    <string name="chat_permission_expand">Развернуть запрос разрешения</string>
     <string name="chat_offline">Нет подключения · переподключение</string>
     <string name="chat_unauthorized">Сервер отклонил сохранённые учётные данные · подключите сервер заново</string>
     <string name="chat_shell_exit">код выхода %1$s</string>
@@ -130,6 +132,8 @@
     <string name="chat_form_title">Вопрос от агента</string>
     <string name="chat_form_submit">Отправить ответ</string>
     <string name="chat_form_dismiss">Отклонить</string>
+    <string name="chat_form_collapse">Свернуть вопрос</string>
+    <string name="chat_form_expand">Развернуть вопрос</string>
     <string name="chat_form_other">Другой ответ</string>
     <string name="chat_form_open_link">Открыть ссылку</string>
     <plurals name="chat_form_more">

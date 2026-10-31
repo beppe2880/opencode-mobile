@@ -69,6 +69,10 @@
     <string name="settings_swipe_chats_sub">اسحب يمينًا أو يسارًا في المحادثة لفتح الجلسة التالية أو السابقة في القائمة</string>
     <string name="settings_group_activity">تجميع التفكير والأدوات</string>
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
+    <string name="settings_questions_collapsed">عرض الأسئلة مطوية</string>
+    <string name="settings_questions_collapsed_sub">تظهر أسئلة الوكيل كشريط من سطر واحد فوق حقل الكتابة؛ انقر عليه للإجابة</string>
+    <string name="settings_permissions_collapsed">عرض طلبات الأذونات مطوية</string>
+    <string name="settings_permissions_collapsed_sub">تظهر طلبات الأذونات كشريط من سطر واحد فوق حقل الكتابة؛ انقر عليه للرد</string>
     <string name="settings_agent_outline">إطار بلون الوكيل</string>
     <string name="settings_agent_outline_sub">تحديد مربع الرسالة بلون الوكيل المختار</string>
     <string name="settings_dictation">الإدخال الصوتي</string>

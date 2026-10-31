@@ -65,6 +65,8 @@
     <string name="chat_permission_once">今回のみ許可</string>
     <string name="chat_permission_always">常に許可</string>
     <string name="chat_permission_reject">拒否</string>
+    <string name="chat_permission_collapse">権限のリクエストを折りたたむ</string>
+    <string name="chat_permission_expand">権限のリクエストを展開</string>
     <string name="chat_offline">オフライン · 再接続中</string>
     <string name="chat_unauthorized">保存された認証情報がサーバーに拒否されました · サーバーを再度ペアリングしてください</string>
     <string name="chat_shell_exit">終了コード %1$s</string>
@@ -115,6 +117,8 @@
     <string name="chat_form_title">エージェントからの質問</string>
     <string name="chat_form_submit">回答を送信</string>
     <string name="chat_form_dismiss">閉じる</string>
+    <string name="chat_form_collapse">質問を折りたたむ</string>
+    <string name="chat_form_expand">質問を展開</string>
     <string name="chat_form_other">別の回答</string>
     <string name="chat_form_open_link">リンクを開く</string>
     <plurals name="chat_form_more">

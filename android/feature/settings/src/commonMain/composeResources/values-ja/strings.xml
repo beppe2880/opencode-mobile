@@ -69,6 +69,10 @@
     <string name="settings_swipe_chats_sub">チャットを左右にスワイプして一覧の次または前のセッションを開く</string>
     <string name="settings_group_activity">思考とツールをまとめる</string>
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
+    <string name="settings_questions_collapsed">質問を折りたたんで表示</string>
+    <string name="settings_questions_collapsed_sub">エージェントからの質問は入力欄の上に1行のバーとして表示されます。タップして回答します</string>
+    <string name="settings_permissions_collapsed">権限のリクエストを折りたたんで表示</string>
+    <string name="settings_permissions_collapsed_sub">権限のリクエストは入力欄の上に1行のバーとして表示されます。タップして応答します</string>
     <string name="settings_agent_outline">エージェント色の枠線</string>
     <string name="settings_agent_outline_sub">選択したエージェントの色で入力欄を囲む</string>
     <string name="settings_dictation">音声入力</string>
