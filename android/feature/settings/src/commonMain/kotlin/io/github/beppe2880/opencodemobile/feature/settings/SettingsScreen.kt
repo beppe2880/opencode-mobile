@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
@@ -102,6 +103,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_he
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_folder
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_session
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
@@ -536,8 +544,26 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 selected = settings.chatHeaderLine,
                 onSelect = { onEvent(SettingsEvent.ChatHeaderLineChanged(it)) },
             )
-            // A folder path alone is not a line to tap.
+            // A folder path alone has no style and is not a line to tap.
             if (settings.chatHeaderLine != ChatHeaderLine.Folder) {
+                OcDivider()
+                ChoiceRow(
+                    title = stringResource(Res.string.settings_header_style),
+                    subtitle = stringResource(
+                        when (settings.chatHeaderStyle) {
+                            ChatHeaderStyle.Icons -> Res.string.settings_header_style_icons_sub
+                            ChatHeaderStyle.Short -> Res.string.settings_header_style_short_sub
+                            ChatHeaderStyle.Full -> Res.string.settings_header_style_full_sub
+                        },
+                    ),
+                    choices = listOf(
+                        OcSegment(ChatHeaderStyle.Icons, stringResource(Res.string.settings_header_style_icons), "settings_header_style_icons"),
+                        OcSegment(ChatHeaderStyle.Short, stringResource(Res.string.settings_header_style_short), "settings_header_style_short"),
+                        OcSegment(ChatHeaderStyle.Full, stringResource(Res.string.settings_header_style_full), "settings_header_style_full"),
+                    ),
+                    selected = settings.chatHeaderStyle,
+                    onSelect = { onEvent(SettingsEvent.ChatHeaderStyleChanged(it)) },
+                )
                 OcDivider()
                 ChoiceRow(
                     title = stringResource(Res.string.settings_header_opens),

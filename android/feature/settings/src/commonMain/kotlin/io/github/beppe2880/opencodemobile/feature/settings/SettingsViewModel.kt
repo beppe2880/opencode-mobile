@@ -82,6 +82,7 @@ class SettingsViewModel(
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
             is SettingsEvent.ChatHeaderLineChanged -> update { it.copy(chatHeaderLine = event.line) }
             is SettingsEvent.HeaderOpensChanged -> update { it.copy(headerOpens = event.scope) }
+            is SettingsEvent.ChatHeaderStyleChanged -> update { it.copy(chatHeaderStyle = event.style) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }

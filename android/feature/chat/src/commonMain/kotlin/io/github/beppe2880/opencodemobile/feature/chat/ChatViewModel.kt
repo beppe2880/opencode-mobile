@@ -142,6 +142,7 @@ class ChatViewModel(
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,
                         dictation = s.dictation,
+                        headerStyle = s.chatHeaderStyle,
                     )
                 }
                 rebuild()

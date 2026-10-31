@@ -281,6 +281,9 @@ enum class ThemeMode { System, Light, Dark }
  */
 enum class ChatHeaderLine { FolderBranchFiles, BranchFiles, Folder }
 
+/** Icons before the folder, branch and count; or the same as short ("4 files") or full words ("4 files changed"). */
+enum class ChatHeaderStyle { Icons, Short, Full }
+
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
@@ -323,6 +326,8 @@ data class AppSettings(
     val showCost: Boolean = true,
     /** What the line under the chat title shows. */
     val chatHeaderLine: ChatHeaderLine = ChatHeaderLine.FolderBranchFiles,
+    /** How the header line is written: icons, short or full words. */
+    val chatHeaderStyle: ChatHeaderStyle = ChatHeaderStyle.Icons,
     /** Changes opened by tapping the header line: [ChangesScope.Folder] or [ChangesScope.Session]. */
     val headerOpens: ChangesScope = ChangesScope.Folder,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
