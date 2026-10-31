@@ -156,6 +156,21 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `opening a subagent session closes the running sheet`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        vm.onEvent(ChatEvent.RunningSheet(true))
+        runCurrent()
+        assertTrue(vm.state.value.workOpen)
+
+        vm.onEvent(ChatEvent.OpenSession("child"))
+        assertFalse(vm.state.value.workOpen)
+        assertEquals(ChatEffect.OpenSession("child"), vm.effect.first())
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
     fun `stop command is deduplicated and failed stop retains command`() = runTest(main.testDispatcher) {
         settings.settings.value = AppSettings(confirmStopCommand = false)
         chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
