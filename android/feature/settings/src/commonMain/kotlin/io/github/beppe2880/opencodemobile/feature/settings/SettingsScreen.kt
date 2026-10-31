@@ -78,6 +78,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_api_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_appearance
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
@@ -410,6 +412,16 @@ private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) ->
                         onCheckedChange = { onEvent(SettingsEvent.ListPaneHandleChanged(it)) },
                         modifier = Modifier.testTag("settings_list_handle_switch"),
                     )
+                    if (settings.listPaneHandle) {
+                        OcDivider()
+                        OcSwitchRow(
+                            title = stringResource(Res.string.settings_back_shows_list),
+                            subtitle = stringResource(Res.string.settings_back_shows_list_sub),
+                            checked = settings.backShowsList,
+                            onCheckedChange = { onEvent(SettingsEvent.BackShowsListChanged(it)) },
+                            modifier = Modifier.testTag("settings_back_shows_list_switch"),
+                        )
+                    }
                 }
             }
         }

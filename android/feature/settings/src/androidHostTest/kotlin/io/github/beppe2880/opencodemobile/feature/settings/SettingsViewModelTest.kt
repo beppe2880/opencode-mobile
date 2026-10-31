@@ -66,6 +66,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
+        vm.onEvent(SettingsEvent.BackShowsListChanged(false))
         advanceUntilIdle()
 
         assertEquals(
@@ -92,6 +93,7 @@ class SettingsViewModelTest {
                 agentColorOutline = false,
                 dictation = false,
                 groupActivity = false,
+                backShowsList = false,
             ),
             settings.settings.value,
         )

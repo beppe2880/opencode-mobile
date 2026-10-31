@@ -341,6 +341,8 @@ data class AppSettings(
     val listPaneFraction: Float? = null,
     /** With [splitView]: a handle on the divider hides the list or resizes it by dragging. */
     val listPaneHandle: Boolean = true,
+    /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
+    val backShowsList: Boolean = true,
 )
 
 /** Share of the window width the session list can be given from Settings. */

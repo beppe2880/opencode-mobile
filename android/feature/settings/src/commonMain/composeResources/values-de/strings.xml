@@ -131,4 +131,6 @@
     <string name="settings_list_width_value">%1$d %</string>
     <string name="settings_list_handle">Trenner-Griff</string>
     <string name="settings_list_handle_sub">Pfeil am Trenner anzeigen, um die Liste auszublenden, oder ziehen, um sie in der Größe anzupassen</string>
+    <string name="settings_back_shows_list">Zurück zeigt die ausgeblendete Liste</string>
+    <string name="settings_back_shows_list_sub">Ist die Sitzungsliste ausgeblendet, zeigt Zurück sie wieder an, statt die App zu verlassen</string>
 </resources>

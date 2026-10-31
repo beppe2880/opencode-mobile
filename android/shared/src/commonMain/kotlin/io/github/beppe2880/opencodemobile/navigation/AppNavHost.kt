@@ -50,6 +50,7 @@ import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
@@ -210,7 +211,8 @@ fun AppNavHost(
 /**
  * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
  * side by side. Tapping the handle on the divider hides the list to give the chat the whole
- * width; dragging it resizes the list, and the share of the width is saved.
+ * width; dragging it resizes the list, and the share of the width is saved. Back shows a hidden
+ * list again (unless turned off in Settings) before it leaves the app.
  */
 @Composable
 private fun SessionsListDetail(
@@ -258,6 +260,8 @@ private fun SessionsListDetail(
             val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
             val density = LocalDensity.current
             val current = selected?.takeIf { selectedServerId == activeServerId }
+            // Registered before the panes, so handlers inside the chat still get Back first.
+            OcBackHandler(enabled = hidden && appSettings.backShowsList) { listHidden = false }
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
