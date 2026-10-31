@@ -44,10 +44,28 @@
     <string name="chat_terminal_open">Abrir terminal</string>
     <string name="chat_changes_session">Sesión completa</string>
     <string name="chat_changes_last_turn">Último turno</string>
+    <string name="chat_changes_folder">Carpeta</string>
+    <string name="chat_changes_empty_folder">Esta carpeta no tiene cambios sin confirmar.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d archivo modificado</item>
         <item quantity="other">%1$d archivos modificados</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d archivo editado por el agente</item>
+        <item quantity="other">%1$d archivos editados por el agente</item>
+    </plurals>
+    <string name="chat_vcs_detached">HEAD desvinculado</string>
+    <string name="chat_vcs_detached_short">desvinculado</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d archivo</item>
+        <item quantity="other">%1$d archivos</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d edición del agente</item>
+        <item quantity="other">%1$d ediciones del agente</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Carpeta %1$s</string>
+    <string name="chat_vcs_branch_description">Rama %1$s</string>
     <string name="chat_changes_empty">No hay archivos modificados</string>
     <string name="chat_changes_empty_session">El agente no ha editado ningún archivo en esta sesión.</string>
     <string name="chat_changes_empty_turn">El agente no editó ningún archivo en el último turno.</string>
