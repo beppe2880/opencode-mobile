@@ -67,7 +67,8 @@ fun UpdateNotice(state: UpdateNoticeState, onEvent: (UpdateNoticeEvent) -> Unit,
             stringResource(Res.string.update_available, release.version),
             style = MaterialTheme.typography.bodyMedium,
             color = c.textBase,
-            modifier = Modifier.weight(1f).padding(horizontal = OcSpacing.sm),
+            // Vertical padding only shows when large text wraps above the 48 dp buttons.
+            modifier = Modifier.weight(1f).padding(horizontal = OcSpacing.sm, vertical = OcSpacing.sm),
         )
         OcButton(
             text = stringResource(Res.string.update_view),
