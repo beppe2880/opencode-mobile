@@ -21,6 +21,8 @@ fun SessionsRoute(
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
     banner: @Composable () -> Unit = {},
+    /** The offline demo: sample sessions, no server behind them. */
+    demo: Boolean = false,
 ) {
     val viewModel: SessionsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -48,5 +50,6 @@ fun SessionsRoute(
         selectedSessionId = selectedSessionId,
         snackbarHostState = snackbar,
         banner = banner,
+        demo = demo,
     )
 }

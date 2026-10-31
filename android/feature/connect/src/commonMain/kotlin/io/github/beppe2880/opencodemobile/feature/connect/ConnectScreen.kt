@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.outlined.Wifi
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -100,6 +102,7 @@ import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_subt
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_test
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_title
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_try_demo
+import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_try_demo_hint
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_url_label
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_url_placeholder
 import io.github.beppe2880.opencodemobile.feature.connect.resources.connect_warning_public_http
@@ -151,14 +154,6 @@ fun ConnectScreen(
                     )
                 }
                 Hero(addMode = showBack)
-                if (onTryDemo != null) {
-                    OcButton(
-                        text = stringResource(Res.string.connect_try_demo),
-                        onClick = onTryDemo,
-                        enabled = !state.busy,
-                        modifier = Modifier.fillMaxWidth().testTag("connect_try_demo"),
-                    )
-                }
                 if (state.discovering || state.newDiscovered.isNotEmpty()) {
                     DiscoveredServers(
                         urls = state.newDiscovered,
@@ -174,6 +169,7 @@ fun ConnectScreen(
                 if (state.servers.isNotEmpty()) {
                     SavedServers(state.servers, state.activeServerId, onSelect = { onEvent(ConnectEvent.SelectServer(it)) })
                 }
+                if (onTryDemo != null) TryDemo(onClick = onTryDemo, enabled = !state.busy)
             }
         }
         if (state.scannerOpen) {
@@ -203,6 +199,31 @@ private fun Hero(addMode: Boolean) {
             text = stringResource(Res.string.connect_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = c.textMuted,
+        )
+    }
+}
+
+/** A quiet way in for people without a server yet, below every way to connect one. */
+@Composable
+private fun TryDemo(onClick: () -> Unit, enabled: Boolean) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = OcSpacing.md),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        Text(
+            text = stringResource(Res.string.connect_try_demo_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = OcTheme.colors.textMuted,
+            textAlign = TextAlign.Center,
+        )
+        OcButton(
+            text = stringResource(Res.string.connect_try_demo),
+            onClick = onClick,
+            enabled = enabled,
+            variant = OcButtonVariant.Ghost,
+            leadingIcon = Icons.Outlined.Science,
+            modifier = Modifier.testTag("connect_try_demo"),
         )
     }
 }

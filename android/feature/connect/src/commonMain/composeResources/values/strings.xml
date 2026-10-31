@@ -43,4 +43,5 @@
     <string name="connect_camera_unavailable">The camera is not available on this device.</string>
     <string name="connect_warning_public_http">This address looks public and uses plain HTTP: the password would travel unencrypted over the internet. Prefer your LAN, a VPN or HTTPS.</string>
     <string name="connect_try_demo">Try without a server</string>
+    <string name="connect_try_demo_hint">No server yet? Look around with sample sessions. Nothing leaves your phone.</string>
 </resources>

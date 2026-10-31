@@ -34,7 +34,7 @@ internal object FakeSamples {
                 "Changes not staged for commit:\n\tmodified:   src/cart/Cart.kt\n\tmodified:   src/cart/Coupon.kt"
         "ls" -> "README.md\nbuild.gradle.kts\nsettings.gradle.kts\nsrc"
         "pwd" -> "/home/user/code/shop"
-        else -> "ok"
+        else -> "Demo: commands are not run."
     }
 
     /** Counts come from the patch, like the server does. */

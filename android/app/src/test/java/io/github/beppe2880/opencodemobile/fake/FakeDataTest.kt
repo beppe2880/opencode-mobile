@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.domain.Message
+import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -32,7 +33,9 @@ class FakeDataTest {
         testScheduler.advanceTimeBy(15_000)
         val messages = chat.messages(session.id).getOrThrow()
         assertTrue(messages.any { it is Message.User && it.text == "Hello demo" })
-        assertTrue(messages.any { it is Message.Assistant })
+        val reply = messages.filterIsInstance<Message.Assistant>().flatMap { it.parts }.filterIsInstance<Part.Text>().joinToString { it.text }
+        assertTrue("This is the demo" in reply)
+        assertFalse("fake" in reply.lowercase())
         assertFalse(session.id in store.running)
     }
 }
