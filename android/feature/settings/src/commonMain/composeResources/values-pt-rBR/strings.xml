@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">Deslize para a esquerda ou direita em uma conversa para abrir a próxima sessão ou a anterior na lista</string>
     <string name="settings_group_activity">Agrupar raciocínio e ferramentas</string>
     <string name="settings_group_activity_sub">Mostrar raciocínios e chamadas de ferramentas consecutivos em uma única linha</string>
+    <string name="settings_group_thoughts">Agrupar raciocínios consecutivos</string>
+    <string name="settings_group_thoughts_sub">Mostrar raciocínios seguidos em uma única linha, também durante o raciocínio</string>
     <string name="settings_questions_collapsed">Mostrar perguntas recolhidas</string>
     <string name="settings_questions_collapsed_sub">As perguntas do agente aparecem como uma barra de uma linha acima do campo de mensagem; toque nela para responder</string>
     <string name="settings_permissions_collapsed">Mostrar solicitações de permissão recolhidas</string>
