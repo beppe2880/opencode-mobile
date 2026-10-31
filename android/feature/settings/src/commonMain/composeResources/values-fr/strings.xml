@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">Utiliser la couleur de l’agent sélectionné pour le contour du champ de message</string>
     <string name="settings_dictation">Saisie vocale</string>
     <string name="settings_dictation_sub">Bouton micro dans le champ de message, utilisant la reconnaissance vocale du téléphone</string>
+    <string name="settings_selection_apply">Appliquer les changements d'agent et de modèle</string>
+    <string name="settings_selection_apply_sub">Lorsqu'un agent, un modèle ou un niveau de raisonnement choisi dans un chat est envoyé au serveur : avec le message suivant, ou dès qu'il est choisi</string>
+    <string name="settings_selection_apply_next">Message suivant</string>
+    <string name="settings_selection_apply_now">Maintenant</string>
+    <string name="settings_new_chat_model">Modèle pour les nouveaux chats</string>
+    <string name="settings_new_chat_model_sub">Utilisé quand aucun modèle n'est choisi : celui configuré pour l'agent ou sur le serveur, sinon le dernier utilisé ; ou laisser le serveur décider</string>
+    <string name="settings_new_chat_model_last">Dernier utilisé</string>
+    <string name="settings_new_chat_model_server">Défaut serveur</string>
     <string name="settings_usage">Statistiques d'utilisation</string>
     <string name="settings_usage_sub">Coût, jetons et activité sur ce serveur</string>
     <string name="usage_title">Utilisation</string>

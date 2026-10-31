@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">選択したエージェントの色で入力欄を囲む</string>
     <string name="settings_dictation">音声入力</string>
     <string name="settings_dictation_sub">入力欄のマイクボタン。端末の音声認識を使用します</string>
+    <string name="settings_selection_apply">エージェントとモデルの変更を適用</string>
+    <string name="settings_selection_apply_sub">チャットで選んだエージェント、モデル、推論レベルをサーバーに送信するタイミング：次のメッセージで、または選択した時点で</string>
+    <string name="settings_selection_apply_next">次のメッセージ</string>
+    <string name="settings_selection_apply_now">すぐに</string>
+    <string name="settings_new_chat_model">新しいチャットのモデル</string>
+    <string name="settings_new_chat_model_sub">モデルが選択されていないときに使用：エージェントまたはサーバーに設定されたモデル、なければ最後に使用したモデル。またはサーバーに任せます</string>
+    <string name="settings_new_chat_model_last">前回使用</string>
+    <string name="settings_new_chat_model_server">サーバーの既定</string>
     <string name="settings_usage">利用統計</string>
     <string name="settings_usage_sub">このサーバーのコスト、トークン、アクティビティ</string>
     <string name="usage_title">利用状況</string>

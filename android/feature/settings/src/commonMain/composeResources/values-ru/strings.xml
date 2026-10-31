@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
     <string name="settings_dictation">Голосовой ввод</string>
     <string name="settings_dictation_sub">Кнопка микрофона в поле сообщения, использует распознавание речи телефона</string>
+    <string name="settings_selection_apply">Применять смену агента и модели</string>
+    <string name="settings_selection_apply_sub">Когда выбранные в чате агент, модель или уровень рассуждения отправляются на сервер: со следующим сообщением или сразу после выбора</string>
+    <string name="settings_selection_apply_next">Следующее сообщение</string>
+    <string name="settings_selection_apply_now">Сейчас</string>
+    <string name="settings_new_chat_model">Модель для новых чатов</string>
+    <string name="settings_new_chat_model_sub">Используется, когда модель не выбрана: настроенная для агента или на сервере, иначе последняя использованная; или оставить выбор серверу</string>
+    <string name="settings_new_chat_model_last">Последняя</string>
+    <string name="settings_new_chat_model_server">По умолчанию</string>
     <string name="settings_usage">Статистика использования</string>
     <string name="settings_usage_sub">Стоимость, токены и активность на этом сервере</string>
     <string name="usage_title">Использование</string>

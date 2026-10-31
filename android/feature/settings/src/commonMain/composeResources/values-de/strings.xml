@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
     <string name="settings_dictation">Spracheingabe</string>
     <string name="settings_dictation_sub">Mikrofon-Taste im Nachrichtenfeld, nutzt die Spracherkennung des Telefons</string>
+    <string name="settings_selection_apply">Agent- und Modelländerungen übernehmen</string>
+    <string name="settings_selection_apply_sub">Wenn ein in einem Chat gewählter Agent, Modell oder Denkaufwand an den Server gesendet wird: mit der nächsten Nachricht oder sofort nach der Auswahl</string>
+    <string name="settings_selection_apply_next">Nächste Nachricht</string>
+    <string name="settings_selection_apply_now">Sofort</string>
+    <string name="settings_new_chat_model">Modell für neue Chats</string>
+    <string name="settings_new_chat_model_sub">Wird verwendet, wenn kein Modell gewählt ist: das für den Agenten oder auf dem Server konfigurierte, sonst das zuletzt verwendete; oder dem Server überlassen</string>
+    <string name="settings_new_chat_model_last">Zuletzt verwendet</string>
+    <string name="settings_new_chat_model_server">Server-Standard</string>
     <string name="settings_usage">Nutzungsstatistik</string>
     <string name="settings_usage_sub">Kosten, Token und Aktivität auf diesem Server</string>
     <string name="usage_title">Nutzung</string>

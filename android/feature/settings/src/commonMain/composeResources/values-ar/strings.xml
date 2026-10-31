@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">تحديد مربع الرسالة بلون الوكيل المختار</string>
     <string name="settings_dictation">الإدخال الصوتي</string>
     <string name="settings_dictation_sub">زر الميكروفون في مربع الرسالة، باستخدام التعرف على الكلام في الهاتف</string>
+    <string name="settings_selection_apply">تطبيق تغييرات الوكيل والنموذج</string>
+    <string name="settings_selection_apply_sub">عند إرسال الوكيل أو النموذج أو مستوى الاستدلال المختار في الدردشة إلى الخادم: مع الرسالة التالية، أو فور اختياره</string>
+    <string name="settings_selection_apply_next">الرسالة التالية</string>
+    <string name="settings_selection_apply_now">فورًا</string>
+    <string name="settings_new_chat_model">النموذج للدردشات الجديدة</string>
+    <string name="settings_new_chat_model_sub">يُستخدم عند عدم اختيار نموذج: النموذج المضبوط للوكيل أو على الخادم، وإلا آخر نموذج استُخدم؛ أو اترك الأمر للخادم</string>
+    <string name="settings_new_chat_model_last">آخر مستخدم</string>
+    <string name="settings_new_chat_model_server">افتراضي الخادم</string>
     <string name="settings_usage">إحصاءات الاستخدام</string>
     <string name="settings_usage_sub">التكلفة والرموز والنشاط على هذا الخادم</string>
     <string name="usage_title">الاستخدام</string>

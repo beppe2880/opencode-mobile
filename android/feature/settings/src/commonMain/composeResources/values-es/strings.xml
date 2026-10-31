@@ -73,6 +73,14 @@
     <string name="settings_agent_outline_sub">Delinear el cuadro del mensaje con el color del agente seleccionado</string>
     <string name="settings_dictation">Entrada de voz</string>
     <string name="settings_dictation_sub">Botón del micrófono en el cuadro del mensaje, usando el reconocimiento de voz del teléfono</string>
+    <string name="settings_selection_apply">Aplicar cambios de agente y modelo</string>
+    <string name="settings_selection_apply_sub">Cuando un agente, modelo o nivel de razonamiento elegido en un chat se envía al servidor: con el siguiente mensaje, o en cuanto se elige</string>
+    <string name="settings_selection_apply_next">Próximo mensaje</string>
+    <string name="settings_selection_apply_now">Ahora</string>
+    <string name="settings_new_chat_model">Modelo para chats nuevos</string>
+    <string name="settings_new_chat_model_sub">Se usa cuando no se elige ningún modelo: el configurado para el agente o en el servidor; si no, el último usado; o déjalo al servidor</string>
+    <string name="settings_new_chat_model_last">Último usado</string>
+    <string name="settings_new_chat_model_server">Del servidor</string>
     <string name="settings_usage">Estadísticas de uso</string>
     <string name="settings_usage_sub">Coste, tokens y actividad en este servidor</string>
     <string name="usage_title">Uso</string>
