@@ -7,6 +7,8 @@ import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 data class UpdateNoticeState(
     /** The newer release to announce; null hides the banner. */
     val release: AppRelease? = null,
+    /** What the banner's button does for [release]. */
+    val action: UpdateAction? = null,
 )
 
 sealed interface UpdateNoticeEvent {

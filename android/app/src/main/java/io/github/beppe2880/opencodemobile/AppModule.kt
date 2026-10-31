@@ -5,6 +5,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.beppe2880.opencodemobile.api.OpenCodeApiVersion
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitorService
@@ -19,7 +20,11 @@ import org.koin.dsl.module
 private val AppVisible = named("AppVisible")
 
 val appModule = module {
-    includes(sharedModule(AppInfo(versionName = BuildConfig.VERSION_NAME, apiVersion = OpenCodeApiVersion.OPENCODE)))
+    includes(
+        sharedModule(
+            AppInfo(versionName = BuildConfig.VERSION_NAME, apiVersion = OpenCodeApiVersion.OPENCODE, updateTarget = UpdateTarget.Android),
+        ),
+    )
 
     single { AndroidMonitorNotifier(androidContext()) }
     // Whether a screen of the app is shown.

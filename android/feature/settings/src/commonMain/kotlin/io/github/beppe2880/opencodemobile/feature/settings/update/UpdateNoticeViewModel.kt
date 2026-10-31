@@ -21,7 +21,7 @@ class UpdateNoticeViewModel(
         viewModelScope.launch {
             settings.settings.map { it.checkForUpdates }.distinctUntilChanged().collectLatest { enabled ->
                 val release = if (enabled) updates.availableUpdate(appInfo.versionName) else null
-                updateState { it.copy(release = release) }
+                updateState { it.copy(release = release, action = release?.let(appInfo.updateTarget::actionFor)) }
             }
         }
     }
@@ -29,9 +29,9 @@ class UpdateNoticeViewModel(
     override fun onEvent(event: UpdateNoticeEvent) {
         val release = currentState.release ?: return
         when (event) {
-            UpdateNoticeEvent.Open -> sendEffect(UpdateNoticeEffect.OpenUrl(release.url))
+            UpdateNoticeEvent.Open -> currentState.action?.let { sendEffect(UpdateNoticeEffect.OpenUrl(it.url)) }
             UpdateNoticeEvent.Dismiss -> {
-                updateState { it.copy(release = null) }
+                updateState { it.copy(release = null, action = null) }
                 viewModelScope.launch { updates.dismiss(release) }
             }
         }

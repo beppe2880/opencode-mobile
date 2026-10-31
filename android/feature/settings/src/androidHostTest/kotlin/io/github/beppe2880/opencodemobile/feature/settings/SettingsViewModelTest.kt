@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -26,7 +27,7 @@ class SettingsViewModelTest {
 
     private val servers = FakeServers()
     private val settings = FakeSettings()
-    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27"))
+    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android))
 
     @Test
     fun `exposes servers, versions and settings`() = runTest(main.testDispatcher) {

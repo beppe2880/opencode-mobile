@@ -36,6 +36,9 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.datetime)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.ktx)

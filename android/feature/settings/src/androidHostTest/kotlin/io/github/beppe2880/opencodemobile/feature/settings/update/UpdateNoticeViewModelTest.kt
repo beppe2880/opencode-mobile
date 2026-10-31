@@ -22,7 +22,7 @@ class UpdateNoticeViewModelTest {
     private val updates = FakeUpdates(release)
     private val settings = FakeSettings()
 
-    private fun vm() = UpdateNoticeViewModel(updates, settings, AppInfo("0.9.0", "2.0.27"))
+    private fun vm(target: UpdateTarget = UpdateTarget.Android) = UpdateNoticeViewModel(updates, settings, AppInfo("0.9.0", "2.0.27", target))
 
     @Test
     fun `a newer release is shown and opens its page`() = runTest(main.testDispatcher) {
@@ -30,9 +30,20 @@ class UpdateNoticeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(release, vm.state.value.release)
+        assertEquals(UpdateActionKind.Download, vm.state.value.action?.kind)
         assertEquals(listOf("0.9.0"), updates.checkedWith)
         vm.onEvent(UpdateNoticeEvent.Open)
         assertEquals(UpdateNoticeEffect.OpenUrl(release.url), vm.effect.first())
+    }
+
+    @Test
+    fun `a store page is opened instead of the release when the platform has one`() = runTest(main.testDispatcher) {
+        val vm = vm(UpdateTarget(releaseHasDownload = false, storeUrl = "https://apps.apple.com/app/id1"))
+        advanceUntilIdle()
+
+        assertEquals(UpdateActionKind.Store, vm.state.value.action?.kind)
+        vm.onEvent(UpdateNoticeEvent.Open)
+        assertEquals(UpdateNoticeEffect.OpenUrl("https://apps.apple.com/app/id1"), vm.effect.first())
     }
 
     @Test
@@ -44,6 +55,7 @@ class UpdateNoticeViewModelTest {
         advanceUntilIdle()
 
         assertNull(vm.state.value.release)
+        assertNull(vm.state.value.action)
         assertEquals(listOf(release), updates.dismissed)
     }
 

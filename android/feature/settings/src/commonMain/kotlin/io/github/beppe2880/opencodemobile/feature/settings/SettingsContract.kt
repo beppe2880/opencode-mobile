@@ -4,9 +4,15 @@ import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
 /** Build information provided by the app module. */
-data class AppInfo(val versionName: String, val apiVersion: String)
+data class AppInfo(
+    val versionName: String,
+    val apiVersion: String,
+    /** Where this platform's app is updated from. */
+    val updateTarget: UpdateTarget,
+)
 
 @Immutable
 data class SettingsState(

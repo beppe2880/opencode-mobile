@@ -32,6 +32,8 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_available
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_dismiss
+import io.github.beppe2880.opencodemobile.feature.settings.resources.update_install
+import io.github.beppe2880.opencodemobile.feature.settings.resources.update_release_notes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_view
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -53,6 +55,7 @@ fun UpdateNoticeRoute(modifier: Modifier = Modifier) {
 @Composable
 fun UpdateNotice(state: UpdateNoticeState, onEvent: (UpdateNoticeEvent) -> Unit, modifier: Modifier = Modifier) {
     val release = state.release ?: return
+    val action = state.action ?: return
     val c = OcTheme.colors
     Row(
         modifier = modifier
@@ -71,7 +74,13 @@ fun UpdateNotice(state: UpdateNoticeState, onEvent: (UpdateNoticeEvent) -> Unit,
             modifier = Modifier.weight(1f).padding(horizontal = OcSpacing.sm, vertical = OcSpacing.sm),
         )
         OcButton(
-            text = stringResource(Res.string.update_view),
+            text = stringResource(
+                when (action.kind) {
+                    UpdateActionKind.Download -> Res.string.update_view
+                    UpdateActionKind.ReleaseNotes -> Res.string.update_release_notes
+                    UpdateActionKind.Store -> Res.string.update_install
+                },
+            ),
             onClick = { onEvent(UpdateNoticeEvent.Open) },
             variant = OcButtonVariant.Ghost,
             compact = true,
@@ -92,8 +101,9 @@ fun UpdateNotice(state: UpdateNoticeState, onEvent: (UpdateNoticeEvent) -> Unit,
 @Composable
 private fun UpdateNoticePreview() {
     OcTheme(darkTheme = androidx.compose.foundation.isSystemInDarkTheme()) {
+        val release = AppRelease("1.0.0", "https://github.com/beppe2880/opencode-mobile/releases/tag/v1.0.0")
         UpdateNotice(
-            state = UpdateNoticeState(AppRelease("1.0.0", "https://github.com/beppe2880/opencode-mobile/releases/tag/v1.0.0")),
+            state = UpdateNoticeState(release, UpdateTarget.Android.actionFor(release)),
             onEvent = {},
             modifier = Modifier.padding(OcSpacing.gutter),
         )
