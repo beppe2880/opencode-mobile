@@ -1,18 +1,17 @@
 package io.github.beppe2880.opencodemobile.core.data.update
 
-import com.russhwolf.settings.SharedPreferencesSettings
-import io.github.beppe2880.opencodemobile.core.data.InMemoryPreferences
+import com.russhwolf.settings.MapSettings
 import io.github.beppe2880.opencodemobile.core.data.update.GitHubUpdateRepository.Companion.CHECK_INTERVAL_MS
 import io.github.beppe2880.opencodemobile.core.domain.AppRelease
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
-import java.io.IOException
+import kotlinx.coroutines.test.runTest
+import kotlinx.io.IOException
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class GitHubUpdateRepositoryTest {
 
-    private val prefs = InMemoryPreferences()
+    private val prefs = MapSettings()
     private var now = 1_000_000L
     private var latest: AppRelease? = release("1.0.0")
     private var failing = false
@@ -24,14 +23,14 @@ class GitHubUpdateRepositoryTest {
             if (failing) throw IOException("offline")
             latest
         },
-        prefs = SharedPreferencesSettings(prefs),
+        prefs = prefs,
         now = { now },
     )
 
     private fun release(version: String) = AppRelease(version, "https://github.com/beppe2880/opencode-mobile/releases/tag/v$version")
 
     @Test
-    fun `github is asked at most once a day, also across restarts`() = runBlocking {
+    fun githubIsAskedAtMostOnceADayAlsoAcrossRestarts() = runTest {
         assertEquals(release("1.0.0"), repository().availableUpdate("0.9.0"))
         assertEquals(1, fetches)
 
@@ -47,7 +46,7 @@ class GitHubUpdateRepositoryTest {
     }
 
     @Test
-    fun `a clock moved back checks again`() = runBlocking {
+    fun aClockMovedBackChecksAgain() = runTest {
         val repository = repository()
         repository.availableUpdate("0.9.0")
         now -= 1
@@ -56,7 +55,7 @@ class GitHubUpdateRepositoryTest {
     }
 
     @Test
-    fun `a failed check is retried at the next launch and keeps the last release`() = runBlocking {
+    fun aFailedCheckIsRetriedAtTheNextLaunchAndKeepsTheLastRelease() = runTest {
         val repository = repository()
         repository.availableUpdate("0.9.0")
         now += CHECK_INTERVAL_MS
@@ -75,7 +74,7 @@ class GitHubUpdateRepositoryTest {
     }
 
     @Test
-    fun `only releases newer than the installed version are offered`() = runBlocking {
+    fun onlyReleasesNewerThanTheInstalledVersionAreOffered() = runTest {
         val repository = repository()
         assertNull(repository.availableUpdate("1.0.0"))
         assertNull(repository.availableUpdate("1.0.0-kmp"))
@@ -84,13 +83,13 @@ class GitHubUpdateRepositoryTest {
     }
 
     @Test
-    fun `builds without a version never ask github`() = runBlocking {
+    fun buildsWithoutAVersionNeverAskGithub() = runTest {
         assertNull(repository().availableUpdate("dev"))
         assertEquals(0, fetches)
     }
 
     @Test
-    fun `no published release clears the stored one`() = runBlocking {
+    fun noPublishedReleaseClearsTheStoredOne() = runTest {
         val repository = repository()
         repository.availableUpdate("0.9.0")
         latest = null
@@ -99,7 +98,7 @@ class GitHubUpdateRepositoryTest {
     }
 
     @Test
-    fun `a dismissed release stays hidden until a newer one`() = runBlocking {
+    fun aDismissedReleaseStaysHiddenUntilANewerOne() = runTest {
         val repository = repository()
         repository.dismiss(repository.availableUpdate("0.9.0")!!)
         assertNull(repository.availableUpdate("0.9.0"))

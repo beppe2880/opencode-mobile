@@ -9,6 +9,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -28,7 +29,17 @@ class GitHubReleases(
      * The latest published release, or null when there is none (no release yet, a draft or a
      * pre-release). Throws [IOException] when GitHub cannot be reached or does not answer.
      */
-    suspend fun latest(): AppRelease? {
+    suspend fun latest(): AppRelease? = try {
+        fetchLatest()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        // Only the kind of failure: the caller keeps the last known release.
+        logWarning(TAG, "Update check failed: ${e::class.simpleName}")
+        throw e
+    }
+
+    private suspend fun fetchLatest(): AppRelease? {
         val response = http.get(latestUrl) {
             header(HttpHeaders.Accept, "application/vnd.github+json")
             header(HttpHeaders.UserAgent, USER_AGENT)
@@ -61,6 +72,7 @@ class GitHubReleases(
         const val LATEST_RELEASE_URL = "https://api.github.com/repos/$REPOSITORY/releases/latest"
         const val RELEASES_PAGE = "https://github.com/$REPOSITORY/releases/"
         const val USER_AGENT = "opencode-mobile"
+        const val TAG = "GitHubReleases"
 
         val ReleaseJson = Json { ignoreUnknownKeys = true }
 

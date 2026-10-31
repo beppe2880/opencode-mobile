@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
@@ -27,7 +28,7 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
-    viewModel { UpdateNoticeViewModel(get(), get(), get()) }
+    viewModelOf(::UpdateNoticeViewModel)
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
     // Home screen widget: Glance on Android, WidgetKit on iOS.
