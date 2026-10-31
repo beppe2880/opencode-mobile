@@ -103,6 +103,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_thoughts
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_thoughts_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all_sub
@@ -564,6 +566,14 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.groupActivity,
                 onCheckedChange = { onEvent(SettingsEvent.GroupActivityChanged(it)) },
                 modifier = Modifier.testTag("settings_group_activity_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_group_thoughts),
+                subtitle = stringResource(Res.string.settings_group_thoughts_sub),
+                checked = settings.groupThoughts,
+                onCheckedChange = { onEvent(SettingsEvent.GroupThoughtsChanged(it)) },
+                modifier = Modifier.testTag("settings_group_thoughts_switch"),
             )
             OcDivider()
             OcSwitchRow(

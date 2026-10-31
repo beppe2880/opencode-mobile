@@ -228,6 +228,14 @@ internal fun Transcript(
                             modifier = rowModifier,
                             live = state.live,
                         )
+                        is ChatItem.Thoughts -> ThoughtsGroup(
+                            item = item,
+                            expanded = state.isExpanded("t:${item.key}"),
+                            isExpanded = isExpanded,
+                            onToggle = onToggle,
+                            modifier = rowModifier,
+                            live = state.live,
+                        )
                         is ChatItem.Tools -> ToolsGroup(
                             item = item,
                             directory = state.directory,

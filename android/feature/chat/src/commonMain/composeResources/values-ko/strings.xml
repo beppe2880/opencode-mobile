@@ -21,6 +21,12 @@
     <string name="chat_thinking">생각 중…</string>
     <string name="chat_thought_for">생각한 시간 %1$s</string>
     <string name="chat_thought">생각</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="other">생각 %1$d개</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="other">%1$d번 생각함</item>
+    </plurals>
     <string name="chat_working">작업 중…</string>
     <string name="chat_used_tools">사용함</string>
     <string name="chat_tool_running">실행 중</string>

@@ -59,6 +59,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
+        prefs.putBoolean(KEY_GROUP_THOUGHTS, next.groupThoughts)
         prefs.putBoolean(KEY_QUESTIONS_COLLAPSED, next.questionsCollapsed)
         prefs.putBoolean(KEY_PERMISSIONS_COLLAPSED, next.permissionsCollapsed)
         prefs.putBoolean(KEY_NOTIFICATIONS, next.notifications)
@@ -113,6 +114,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
                 ?: defaults.newChatModel,
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
+            groupThoughts = prefs.getBoolean(KEY_GROUP_THOUGHTS, defaults.groupThoughts),
             questionsCollapsed = prefs.getBoolean(KEY_QUESTIONS_COLLAPSED, defaults.questionsCollapsed),
             permissionsCollapsed = prefs.getBoolean(KEY_PERMISSIONS_COLLAPSED, defaults.permissionsCollapsed),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
@@ -165,6 +167,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_SELECTION_APPLY = "selection_apply"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_GROUP_ACTIVITY = "group_activity"
+        const val KEY_GROUP_THOUGHTS = "group_thoughts"
         const val KEY_QUESTIONS_COLLAPSED = "questions_collapsed"
         const val KEY_PERMISSIONS_COLLAPSED = "permissions_collapsed"
         const val KEY_NOTIFICATIONS = "notifications"

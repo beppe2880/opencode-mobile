@@ -231,6 +231,115 @@ class ChatItemsBuilderTest {
         assertEquals(listOf("u1", "a1/text-0"), items.map { it.key })
     }
 
+    private fun thought(ordinal: Int, start: Long, end: Long?, text: String = "t$ordinal", streaming: Boolean = false) =
+        Part.Reasoning(ordinal, text, streaming = streaming, startedAt = start, completedAt = end)
+
+    @Test
+    fun `consecutive thoughts collapse into one row when finished`() {
+        val messages = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant("a1", listOf(thought(0, 0, 20_000), Part.Text(0, ""), thought(1, 20_100, 40_000)), created = 100),
+            assistant("a2", listOf(thought(0, 41_000, 64_000), Part.Text(0, "done")), created = 41_000),
+        )
+
+        val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names, groupThoughts = true)
+
+        assertEquals(listOf("u1", "a1/reasoning-0", "a2/text-0", "footer-a2"), items.map { it.key })
+        val thoughts = items[1] as ChatItem.Thoughts
+        assertEquals(listOf("t0", "t1", "t0"), thoughts.thoughts.map { it.text })
+        assertEquals(62_900L, thoughts.durationMs)
+        assertTrue(!thoughts.streaming)
+    }
+
+    @Test
+    fun `a running run of thoughts stays one row and keeps its key while it grows`() {
+        val first = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant("a1", listOf(thought(0, 0, 20_000), thought(1, 20_100, null, text = "", streaming = true)), created = 100, completed = null),
+        )
+        val later = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant(
+                "a1",
+                listOf(thought(0, 0, 20_000), thought(1, 20_100, 39_000), thought(2, 39_100, null, text = "latest", streaming = true)),
+                created = 100,
+                completed = null,
+            ),
+        )
+
+        val before = ChatItemsBuilder.build(first, running = true, showReasoning = true, modelLabel = names, groupThoughts = true)
+        val after = ChatItemsBuilder.build(later, running = true, showReasoning = true, modelLabel = names, groupThoughts = true)
+
+        assertEquals(listOf("u1", "a1/reasoning-0"), before.map { it.key })
+        assertEquals(listOf("u1", "a1/reasoning-0"), after.map { it.key })
+        val thoughts = after[1] as ChatItem.Thoughts
+        assertTrue(thoughts.streaming)
+        assertEquals(3, thoughts.thoughts.size)
+        assertEquals("latest", thoughts.thoughts.last().text)
+        assertEquals(38_900L, thoughts.durationMs)
+    }
+
+    @Test
+    fun `tools split runs of thoughts and the activity row holds the grouped runs`() {
+        val messages = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant("a1", listOf(thought(0, 0, 5_000), thought(1, 5_100, 9_000), tool("1", "bash")), created = 100),
+            assistant("a2", listOf(thought(0, 10_000, 12_000), Part.Text(0, "done")), created = 10_000),
+        )
+
+        val grouped = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names, groupThoughts = true)
+        assertEquals(listOf("u1", "a1/reasoning-0", "tools-a1/1", "a2/reasoning-0", "a2/text-0", "footer-a2"), grouped.map { it.key })
+        assertTrue(grouped[1] is ChatItem.Thoughts)
+        assertTrue(grouped[3] is ChatItem.Reasoning)
+
+        val activity = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names, groupActivity = true, groupThoughts = true)
+        val row = activity[1] as ChatItem.Activity
+        assertEquals(3, row.entries.size)
+        assertTrue(row.entries[0] is ChatItem.Thoughts)
+        assertEquals(3, row.thoughts.size)
+        assertEquals(10_900L, row.thinkingMs)
+    }
+
+    @Test
+    fun `with grouping off every thought keeps its own row`() {
+        val messages = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant("a1", listOf(thought(0, 0, 5_000), thought(1, 5_100, 9_000), Part.Text(0, "done")), created = 100),
+        )
+
+        val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names, groupThoughts = false)
+
+        assertEquals(listOf("u1", "a1/reasoning-0", "a1/reasoning-1", "a1/text-0", "footer-a1"), items.map { it.key })
+    }
+
+    @Test
+    fun `empty thoughts and split summaries produce no row of their own`() {
+        // OpenAI summaries: the first part spans the thinking, the next lands milliseconds later.
+        val messages = listOf(
+            Message.User("u1", 0, "hi"),
+            assistant(
+                "a1",
+                listOf(
+                    thought(0, 0, 23_000, text = "**Planning**"),
+                    thought(1, 23_010, 23_030, text = "**Checking**"),
+                    thought(4, 23_031, 23_035, text = "**Checking**"),
+                    thought(2, 23_040, 23_050, text = ""),
+                    thought(3, 23_060, 42_000, text = "**Writing**"),
+                    Part.Text(0, "done"),
+                ),
+                created = 100,
+            ),
+        )
+
+        val items = ChatItemsBuilder.build(messages, running = false, showReasoning = true, modelLabel = names)
+
+        val rows = items.filterIsInstance<ChatItem.Reasoning>()
+        assertEquals(listOf("a1/reasoning-0", "a1/reasoning-3"), rows.map { it.key })
+        assertEquals("**Planning**\n\n**Checking**", rows[0].text)
+        assertEquals(23_024L, rows[0].durationMs)
+        assertEquals(18_940L, rows[1].durationMs)
+    }
+
     @Test
     fun `reasoning is hidden when disabled and timed when shown`() {
         val reasoning = Part.Reasoning(0, "think", startedAt = 10, completedAt = 2_010)

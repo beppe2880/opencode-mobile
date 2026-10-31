@@ -31,6 +31,22 @@
     <string name="chat_thinking">جارٍ التفكير…</string>
     <string name="chat_thought_for">فكّر لمدة %1$s</string>
     <string name="chat_thought">التفكير</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="zero">%1$d فكرة</item>
+        <item quantity="one">فكرة واحدة (%1$d)</item>
+        <item quantity="two">فكرتان (%1$d)</item>
+        <item quantity="few">%1$d أفكار</item>
+        <item quantity="many">%1$d فكرة</item>
+        <item quantity="other">%1$d فكرة</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="zero">فكّر %1$d مرة</item>
+        <item quantity="one">فكّر مرة واحدة (%1$d)</item>
+        <item quantity="two">فكّر مرتين (%1$d)</item>
+        <item quantity="few">فكّر %1$d مرات</item>
+        <item quantity="many">فكّر %1$d مرة</item>
+        <item quantity="other">فكّر %1$d مرة</item>
+    </plurals>
     <string name="chat_working">جارٍ العمل…</string>
     <string name="chat_used_tools">استخدم</string>
     <string name="chat_tool_running">قيد التشغيل</string>

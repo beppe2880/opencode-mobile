@@ -21,6 +21,12 @@
     <string name="chat_thinking">正在思考…</string>
     <string name="chat_thought_for">已思考 %1$s</string>
     <string name="chat_thought">思考</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="other">%1$d 条思考</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="other">已思考 %1$d 次</item>
+    </plurals>
     <string name="chat_working">正在工作…</string>
     <string name="chat_used_tools">已使用</string>
     <string name="chat_tool_running">运行中</string>
