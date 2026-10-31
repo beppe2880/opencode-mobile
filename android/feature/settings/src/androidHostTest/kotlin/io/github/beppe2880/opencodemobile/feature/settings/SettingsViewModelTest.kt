@@ -1,6 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -8,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -26,7 +30,7 @@ class SettingsViewModelTest {
 
     private val servers = FakeServers()
     private val settings = FakeSettings()
-    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27"))
+    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android))
 
     @Test
     fun `exposes servers, versions and settings`() = runTest(main.testDispatcher) {
@@ -48,6 +52,9 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ShowReasoningChanged(false))
         vm.onEvent(SettingsEvent.ExpandToolsChanged(true))
         vm.onEvent(SettingsEvent.ShowCostChanged(false))
+        vm.onEvent(SettingsEvent.ChatHeaderLineChanged(ChatHeaderLine.BranchFiles))
+        vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
+        vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
@@ -68,6 +75,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
+        vm.onEvent(SettingsEvent.CheckForUpdatesChanged(false))
+        vm.onEvent(SettingsEvent.BackShowsListChanged(false))
         advanceUntilIdle()
 
         assertEquals(
@@ -90,12 +99,17 @@ class SettingsViewModelTest {
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
                 showCost = false,
+                chatHeaderLine = ChatHeaderLine.BranchFiles,
+                headerOpens = ChangesScope.Session,
+                chatHeaderStyle = ChatHeaderStyle.Short,
                 swipeBetweenChats = false,
                 agentColorOutline = false,
                 dictation = false,
                 groupActivity = false,
                 questionsCollapsed = true,
                 permissionsCollapsed = true,
+                checkForUpdates = false,
+                backShowsList = false,
             ),
             settings.settings.value,
         )
@@ -226,7 +240,7 @@ private class FakeServers : ServerRepository {
     }
 }
 
-private class FakeSettings : SettingsRepository {
+internal class FakeSettings : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings())
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         settings.value = transform(settings.value)

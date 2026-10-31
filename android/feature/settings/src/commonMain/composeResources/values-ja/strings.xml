@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">ツール行で長いコマンドやパスを切り捨てず、折り返して表示</string>
     <string name="settings_show_cost">費用を表示</string>
     <string name="settings_show_cost_sub">各ターンの費用をドルで返信の下に表示</string>
+    <string name="settings_header_line">チャットのヘッダー行</string>
+    <string name="settings_header_line_all">すべて</string>
+    <string name="settings_header_line_branch">ブランチ</string>
+    <string name="settings_header_line_folder">フォルダ</string>
+    <string name="settings_header_line_all_sub">チャットタイトルの下にフォルダ、ブランチ、変更されたファイルを表示</string>
+    <string name="settings_header_line_branch_sub">チャットタイトルの下にブランチと変更されたファイルを表示</string>
+    <string name="settings_header_line_folder_sub">チャットタイトルの下にフォルダのパスだけを表示（Gitは確認しません）</string>
+    <string name="settings_header_style">ヘッダー行のスタイル</string>
+    <string name="settings_header_style_icons">アイコン</string>
+    <string name="settings_header_style_short">短縮</string>
+    <string name="settings_header_style_full">完全</string>
+    <string name="settings_header_style_icons_sub">フォルダ、ブランチ、変更ファイル数の前にアイコンを表示</string>
+    <string name="settings_header_style_short_sub">短い表記（例：「main · 4 件」）</string>
+    <string name="settings_header_style_full_sub">完全な表記（例：「main · 変更 4 件」）</string>
+    <string name="settings_header_opens">ヘッダー行をタップすると開くのは</string>
+    <string name="settings_header_opens_sub">シートで最初に表示する変更</string>
+    <string name="settings_header_opens_folder">フォルダの変更</string>
+    <string name="settings_header_opens_session">セッションの変更</string>
     <string name="settings_swipe_chats">スワイプでチャットを切り替え</string>
     <string name="settings_swipe_chats_sub">チャットを左右にスワイプして一覧の次または前のセッションを開く</string>
     <string name="settings_group_activity">思考とツールをまとめる</string>
@@ -125,6 +143,13 @@
     <string name="settings_server_version">サーバーのバージョン</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">利用不可</string>
+    <string name="settings_check_updates">アップデートを確認</string>
+    <string name="settings_check_updates_sub">アプリの起動時に、1日1回まで新しいバージョンを確認し、通知を表示します</string>
+    <string name="update_available">バージョン %1$s が利用可能です</string>
+    <string name="update_view">表示</string>
+    <string name="update_release_notes">リリースノート</string>
+    <string name="update_install">アップデート</string>
+    <string name="update_dismiss">閉じる</string>
     <string name="settings_split_view">チャットをリストの横に表示</string>
     <string name="settings_split_view_sub">横長の画面では、開いているチャットをセッション一覧の横に表示します。仕切り線のハンドルをドラッグして一覧の幅を変更できます。</string>
     <string name="settings_list_width">セッション一覧の幅</string>
@@ -132,4 +157,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">仕切り線のハンドル</string>
     <string name="settings_list_handle_sub">仕切り線の矢印を表示して一覧を隠すか、ドラッグして幅を変更します</string>
+    <string name="settings_back_shows_list">戻るで非表示の一覧を表示</string>
+    <string name="settings_back_shows_list_sub">セッション一覧が非表示のとき、戻るでアプリを終了せずに一覧を再表示します</string>
 </resources>

@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">Renvoyer à la ligne les commandes et chemins longs dans les lignes d’outils au lieu de les tronquer</string>
     <string name="settings_show_cost">Afficher le coût</string>
     <string name="settings_show_cost_sub">Afficher le coût en dollars de chaque tour sous la réponse</string>
+    <string name="settings_header_line">Ligne d'en-tête du chat</string>
+    <string name="settings_header_line_all">Tout</string>
+    <string name="settings_header_line_branch">Branche</string>
+    <string name="settings_header_line_folder">Dossier</string>
+    <string name="settings_header_line_all_sub">Dossier, branche et fichiers modifiés sous le titre du chat</string>
+    <string name="settings_header_line_branch_sub">Branche et fichiers modifiés sous le titre du chat</string>
+    <string name="settings_header_line_folder_sub">Seulement le chemin du dossier sous le titre du chat, sans interroger Git</string>
+    <string name="settings_header_style">Style de la ligne d'en-tête</string>
+    <string name="settings_header_style_icons">Icônes</string>
+    <string name="settings_header_style_short">Court</string>
+    <string name="settings_header_style_full">Complet</string>
+    <string name="settings_header_style_icons_sub">Icônes avant le dossier, la branche et le nombre de fichiers modifiés</string>
+    <string name="settings_header_style_short_sub">Mots courts, par exemple « main · 4 fichiers »</string>
+    <string name="settings_header_style_full_sub">Mots complets, par exemple « main · 4 fichiers modifiés »</string>
+    <string name="settings_header_opens">Appuyer sur la ligne d'en-tête ouvre</string>
+    <string name="settings_header_opens_sub">Les modifications affichées en premier dans la feuille</string>
+    <string name="settings_header_opens_folder">Modifications du dossier</string>
+    <string name="settings_header_opens_session">Modifications de la session</string>
     <string name="settings_swipe_chats">Balayer entre les discussions</string>
     <string name="settings_swipe_chats_sub">Balayez une discussion à gauche ou à droite pour ouvrir la session suivante ou précédente de la liste</string>
     <string name="settings_group_activity">Regrouper réflexion et outils</string>
@@ -128,6 +146,13 @@
     <string name="settings_server_version">Version du serveur</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Indisponible</string>
+    <string name="settings_check_updates">Rechercher les mises à jour</string>
+    <string name="settings_check_updates_sub">À l'ouverture de l'application, au plus une fois par jour, recherche une nouvelle version et affiche un avis</string>
+    <string name="update_available">La version %1$s est disponible</string>
+    <string name="update_view">Voir</string>
+    <string name="update_release_notes">Notes de version</string>
+    <string name="update_install">Mettre à jour</string>
+    <string name="update_dismiss">Ignorer</string>
     <string name="settings_split_view">Chat à côté de la liste</string>
     <string name="settings_split_view_sub">Sur grand écran, afficher le chat ouvert à côté de la liste des sessions. Faites glisser la poignée du séparateur pour redimensionner la liste.</string>
     <string name="settings_list_width">Largeur de la liste des sessions</string>
@@ -135,4 +160,6 @@
     <string name="settings_list_width_value">%1$d %</string>
     <string name="settings_list_handle">Poignée du séparateur</string>
     <string name="settings_list_handle_sub">Afficher la flèche sur le séparateur pour masquer la liste, ou le faire glisser pour la redimensionner</string>
+    <string name="settings_back_shows_list">Retour affiche la liste masquée</string>
+    <string name="settings_back_shows_list_sub">Lorsque la liste des sessions est masquée, Retour la réaffiche au lieu de quitter l'application</string>
 </resources>

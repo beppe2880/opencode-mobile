@@ -56,6 +56,8 @@
     <string name="chat_terminal_open">فتح الطرفية</string>
     <string name="chat_changes_session">الجلسة كاملة</string>
     <string name="chat_changes_last_turn">الدورة الأخيرة</string>
+    <string name="chat_changes_folder">المجلد</string>
+    <string name="chat_changes_empty_folder">لا توجد تغييرات غير مُلتزَم بها في هذا المجلد.</string>
     <plurals name="chat_changes_files">
         <item quantity="zero">لم يُعدَّل أي ملف (%1$d)</item>
         <item quantity="one">عُدِّل ملف واحد (%1$d)</item>
@@ -64,6 +66,34 @@
         <item quantity="many">عُدِّل %1$d ملفًا</item>
         <item quantity="other">عُدِّل %1$d ملف</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="zero">لم يُعدّل الوكيل أي ملف (%1$d)</item>
+        <item quantity="one">ملف واحد عدّله الوكيل (%1$d)</item>
+        <item quantity="two">ملفان عدّلهما الوكيل (%1$d)</item>
+        <item quantity="few">%1$d ملفات عدّلها الوكيل</item>
+        <item quantity="many">%1$d ملفًا عدّلها الوكيل</item>
+        <item quantity="other">%1$d ملف عدّله الوكيل</item>
+    </plurals>
+    <string name="chat_vcs_detached">HEAD منفصل</string>
+    <string name="chat_vcs_detached_short">منفصل</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="zero">لا ملفات (%1$d)</item>
+        <item quantity="one">ملف واحد (%1$d)</item>
+        <item quantity="two">ملفان (%1$d)</item>
+        <item quantity="few">%1$d ملفات</item>
+        <item quantity="many">%1$d ملفًا</item>
+        <item quantity="other">%1$d ملف</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="zero">لا تعديلات (%1$d)</item>
+        <item quantity="one">تعديل واحد (%1$d)</item>
+        <item quantity="two">تعديلان (%1$d)</item>
+        <item quantity="few">%1$d تعديلات</item>
+        <item quantity="many">%1$d تعديلًا</item>
+        <item quantity="other">%1$d تعديل</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">المجلد %1$s</string>
+    <string name="chat_vcs_branch_description">الفرع %1$s</string>
     <string name="chat_changes_empty">لا توجد ملفات معدّلة</string>
     <string name="chat_changes_empty_session">لم يُعدِّل الوكيل أي ملف في هذه الجلسة.</string>
     <string name="chat_changes_empty_turn">لم يُعدِّل الوكيل أي ملف في الدورة الأخيرة.</string>

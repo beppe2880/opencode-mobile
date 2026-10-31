@@ -41,9 +41,24 @@
     <string name="chat_terminal_open">터미널 열기</string>
     <string name="chat_changes_session">전체 세션</string>
     <string name="chat_changes_last_turn">마지막 턴</string>
+    <string name="chat_changes_folder">폴더</string>
+    <string name="chat_changes_empty_folder">이 폴더에는 커밋되지 않은 변경 사항이 없습니다.</string>
     <plurals name="chat_changes_files">
         <item quantity="other">파일 %1$d개 변경됨</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="other">에이전트가 편집한 파일 %1$d개</item>
+    </plurals>
+    <string name="chat_vcs_detached">분리된 HEAD</string>
+    <string name="chat_vcs_detached_short">분리됨</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="other">파일 %1$d개</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="other">에이전트 편집 %1$d회</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">폴더 %1$s</string>
+    <string name="chat_vcs_branch_description">브랜치 %1$s</string>
     <string name="chat_changes_empty">변경된 파일 없음</string>
     <string name="chat_changes_empty_session">이 세션에서 에이전트가 편집한 파일이 없습니다.</string>
     <string name="chat_changes_empty_turn">마지막 턴에서 에이전트가 편집한 파일이 없습니다.</string>

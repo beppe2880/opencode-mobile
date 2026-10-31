@@ -46,6 +46,11 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.androidx.sqlite.bundled)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.multiplatform.settings.test)
+        }
         getByName("androidHostTest").dependencies {
             implementation(project(":core:testing"))
             implementation(libs.junit)

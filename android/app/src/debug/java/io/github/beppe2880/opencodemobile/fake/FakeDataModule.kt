@@ -4,6 +4,7 @@ package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.core.domain.Agent
+import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
@@ -46,7 +47,10 @@ import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
+import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
+import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -90,6 +94,12 @@ val fakeDataModule = module {
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
     single<TerminalRepository> { FakeTerminals() }
+    single<UpdateRepository> {
+        object : UpdateRepository {
+            override suspend fun availableUpdate(installedVersion: String): AppRelease? = null
+            override suspend fun dismiss(release: AppRelease) = Unit
+        }
+    }
     single<McpRepository> {
         object : McpRepository {
             private var servers = listOf(McpServer("demo", McpStatus.Connected))
@@ -98,6 +108,13 @@ val fakeDataModule = module {
                 servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
                 return Result.success(Unit)
             }
+        }
+    }
+    single<VcsRepository> {
+        object : VcsRepository {
+            override suspend fun branch(directory: String) = Result.success(VcsBranch("main", "main"))
+            override suspend fun changedFiles(directory: String) = Result.success(FakeSamples.diffs(directory).map { it.path })
+            override suspend fun workingChanges(directory: String) = Result.success(FakeSamples.diffs(directory))
         }
     }
 }

@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.api.OpenCodeApiVersion
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.core.data.di.dataModule
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import io.github.beppe2880.opencodemobile.widget.WidgetSnapshots
 import org.koin.core.context.startKoin
 import platform.Foundation.NSBundle
@@ -23,7 +24,8 @@ private var koinStarted = false
 fun MainViewController(reloadWidgets: () -> Unit): UIViewController {
     if (!koinStarted) {
         val version = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: "dev"
-        val koin = startKoin { modules(dataModule, sharedModule(AppInfo(versionName = version, apiVersion = OpenCodeApiVersion.OPENCODE))) }.koin
+        val appInfo = AppInfo(versionName = version, apiVersion = OpenCodeApiVersion.OPENCODE, updateTarget = UpdateTarget.Ios)
+        val koin = startKoin { modules(dataModule, sharedModule(appInfo)) }.koin
         WidgetSnapshots(koin.get(), koin.get(), koin.get(), koin.get(), reloadWidgets).start(koin.get(AppScope))
         koinStarted = true
     }

@@ -131,8 +131,11 @@ data class ShellOutput(val text: String, val cursor: Long)
 /** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
 data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
 
-/** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
-enum class ChangesScope { LastTurn, Session }
+/**
+ * Range of file changes: a session's newest turn, every turn from its first prompt, or all
+ * uncommitted changes of its folder ([Folder], read through [VcsRepository.workingChanges]).
+ */
+enum class ChangesScope { LastTurn, Session, Folder }
 
 interface McpRepository {
     suspend fun list(directory: String): Result<List<McpServer>>
@@ -248,7 +251,11 @@ interface ChatRepository {
     /** Makes a staged revert permanent (done before sending a new prompt). */
     suspend fun commitRevert(sessionId: String): Result<Unit> = Result.success(Unit)
 
-    /** Files the session changed in [scope], with unified diffs; empty before the first prompt. */
+    /**
+     * Files the session changed in [scope], with unified diffs; empty before the first prompt.
+     * [ChangesScope.Folder] is not the session's: it is read with [VcsRepository.workingChanges]
+     * and fails here.
+     */
     suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> = Result.success(emptyList())
 }
 
@@ -267,6 +274,18 @@ interface CatalogRepository {
 }
 
 enum class ThemeMode { System, Light, Dark }
+
+/**
+ * The line under the chat title: the folder name, the Git branch and the changed files; only
+ * the branch and files; or only the folder's full path, without asking the server anything.
+ */
+enum class ChatHeaderLine { FolderBranchFiles, BranchFiles, Folder }
+
+/** Icons before the folder, branch and count; or the same as short ("4 files") or full words ("4 files changed"). */
+enum class ChatHeaderStyle { Icons, Short, Full }
+
+/** Scopes the chat header line can open. */
+val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
 val OUTPUT_LINE_CHOICES = listOf(6, 12, 24, 50)
 val LIVE_INTERVAL_CHOICES = listOf(300L, 700L, 1_500L, 3_000L)
@@ -305,6 +324,12 @@ data class AppSettings(
     val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
+    /** What the line under the chat title shows. */
+    val chatHeaderLine: ChatHeaderLine = ChatHeaderLine.FolderBranchFiles,
+    /** How the header line is written: icons, short or full words. */
+    val chatHeaderStyle: ChatHeaderStyle = ChatHeaderStyle.Icons,
+    /** Changes opened by tapping the header line: [ChangesScope.Folder] or [ChangesScope.Session]. */
+    val headerOpens: ChangesScope = ChangesScope.Folder,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */
@@ -345,6 +370,10 @@ data class AppSettings(
     val listPaneFraction: Float? = null,
     /** With [splitView]: a handle on the divider hides the list or resizes it by dragging. */
     val listPaneHandle: Boolean = true,
+    /** At launch, at most once a day, look for a newer release of the app on GitHub. */
+    val checkForUpdates: Boolean = true,
+    /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
+    val backShowsList: Boolean = true,
 )
 
 /** Share of the window width the session list can be given from Settings. */
