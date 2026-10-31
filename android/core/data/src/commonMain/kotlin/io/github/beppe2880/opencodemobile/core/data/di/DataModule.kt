@@ -76,7 +76,7 @@ val dataModule = module {
     single<SessionRepository> { RemoteSessionRepository(get(), get()) }
     single<ChatRepository> { RemoteChatRepository(get(), get()) }
     single<CatalogRepository> { RemoteCatalogRepository(get()) }
-    single<TerminalRepository> { RemoteTerminalRepository(get()) }
+    single<TerminalRepository> { RemoteTerminalRepository(get(), network = get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
     single<McpRepository> { RemoteMcpRepository(get()) }
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }

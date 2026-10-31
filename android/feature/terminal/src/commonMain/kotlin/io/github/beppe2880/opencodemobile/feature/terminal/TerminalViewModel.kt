@@ -28,6 +28,12 @@ class TerminalViewModel(
 
     private val input = Channel<ByteArray>(Channel.UNLIMITED)
     private val size = MutableStateFlow<Pair<Int, Int>?>(null)
+    private val terminalVisible = MutableStateFlow(true)
+
+    /** The attach reader waits on it before every connection, so a hidden terminal talks to the server only to resume. */
+    fun setTerminalVisible(visible: Boolean) {
+        terminalVisible.value = visible
+    }
 
     /** The screen the shell draws on; kept here so it survives configuration changes. */
     val surface = WebSurface(send = { input.trySend(it) }, onResize = ::onResize, onModifiersUsed = ::clearTransients)
@@ -94,7 +100,7 @@ class TerminalViewModel(
                 }
             }
             try {
-                terminals.attach(directory, terminal.id, input.receiveAsFlow()).collect { update ->
+                terminals.attach(directory, terminal.id, input.receiveAsFlow(), terminalVisible).collect { update ->
                     when (update) {
                         is TerminalUpdate.Output -> surface.write(update.text)
                         is TerminalUpdate.Link -> onLink(update.state)

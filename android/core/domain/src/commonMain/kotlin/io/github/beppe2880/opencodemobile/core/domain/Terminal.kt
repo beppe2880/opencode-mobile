@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 /** A pseudo-terminal running on the server in a project folder. */
 data class TerminalInfo(
@@ -32,6 +33,13 @@ interface TerminalRepository {
      * Streams the terminal while collected, sending each [input] chunk as typed. Starts with the
      * output the server kept, reconnects after drops without replaying it again, and ends after
      * [TerminalLink.Exited] once the shell is gone. Fails with [OpenCodeError.Unauthorized].
+     * While [visible] is false the connection is closed instead of kept alive; collecting again
+     * resumes from the last cursor.
      */
-    fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate>
+    fun attach(
+        directory: String,
+        terminalId: String,
+        input: Flow<ByteArray>,
+        visible: Flow<Boolean> = flowOf(true),
+    ): Flow<TerminalUpdate>
 }
