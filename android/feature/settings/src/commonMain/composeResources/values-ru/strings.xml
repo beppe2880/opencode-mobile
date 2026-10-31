@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">Переносить длинные команды и пути на несколько строк в строках инструментов вместо обрезки</string>
     <string name="settings_show_cost">Показывать стоимость</string>
     <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>
+    <string name="settings_header_line">Строка заголовка чата</string>
+    <string name="settings_header_line_all">Все</string>
+    <string name="settings_header_line_branch">Ветка</string>
+    <string name="settings_header_line_folder">Папка</string>
+    <string name="settings_header_line_all_sub">Папка, ветка и изменённые файлы под названием чата</string>
+    <string name="settings_header_line_branch_sub">Ветка и изменённые файлы под названием чата</string>
+    <string name="settings_header_line_folder_sub">Только путь к папке под названием чата, без проверки Git</string>
+    <string name="settings_header_style">Стиль строки заголовка</string>
+    <string name="settings_header_style_icons">Значки</string>
+    <string name="settings_header_style_short">Кратко</string>
+    <string name="settings_header_style_full">Полно</string>
+    <string name="settings_header_style_icons_sub">Значки перед папкой, веткой и количеством изменённых файлов</string>
+    <string name="settings_header_style_short_sub">Короткие слова, например «main · 4 файла»</string>
+    <string name="settings_header_style_full_sub">Полные слова, например «main · 4 изменённых файла»</string>
+    <string name="settings_header_opens">Нажатие на строку заголовка открывает</string>
+    <string name="settings_header_opens_sub">Какие изменения панель показывает первыми</string>
+    <string name="settings_header_opens_folder">Изменения папки</string>
+    <string name="settings_header_opens_session">Изменения сессии</string>
     <string name="settings_swipe_chats">Перелистывать чаты</string>
     <string name="settings_swipe_chats_sub">Смахните в чате влево или вправо, чтобы открыть следующую или предыдущую сессию в списке</string>
     <string name="settings_group_activity">Группировать рассуждения и инструменты</string>
@@ -144,4 +162,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">Ручка разделителя</string>
     <string name="settings_list_handle_sub">Показывать стрелку на разделителе, чтобы скрыть список, или перетаскивать его для изменения размера</string>
+    <string name="settings_back_shows_list">«Назад» показывает скрытый список</string>
+    <string name="settings_back_shows_list_sub">Когда список сессий скрыт, «Назад» снова показывает его вместо выхода из приложения</string>
 </resources>

@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">Quebrar em várias linhas os comandos e caminhos longos nas linhas de ferramentas em vez de cortá-los</string>
     <string name="settings_show_cost">Mostrar custo</string>
     <string name="settings_show_cost_sub">Mostrar o custo em dólares de cada turno abaixo da resposta</string>
+    <string name="settings_header_line">Linha do cabeçalho do chat</string>
+    <string name="settings_header_line_all">Tudo</string>
+    <string name="settings_header_line_branch">Branch</string>
+    <string name="settings_header_line_folder">Pasta</string>
+    <string name="settings_header_line_all_sub">Pasta, branch e arquivos alterados abaixo do título do chat</string>
+    <string name="settings_header_line_branch_sub">Branch e arquivos alterados abaixo do título do chat</string>
+    <string name="settings_header_line_folder_sub">Apenas o caminho da pasta abaixo do título do chat, sem consultar o Git</string>
+    <string name="settings_header_style">Estilo da linha do cabeçalho</string>
+    <string name="settings_header_style_icons">Ícones</string>
+    <string name="settings_header_style_short">Curto</string>
+    <string name="settings_header_style_full">Completo</string>
+    <string name="settings_header_style_icons_sub">Ícones antes da pasta, do branch e do número de arquivos alterados</string>
+    <string name="settings_header_style_short_sub">Palavras curtas, por exemplo “main · 4 arquivos”</string>
+    <string name="settings_header_style_full_sub">Palavras completas, por exemplo “main · 4 arquivos alterados”</string>
+    <string name="settings_header_opens">Tocar na linha do cabeçalho abre</string>
+    <string name="settings_header_opens_sub">Quais alterações a folha mostra primeiro</string>
+    <string name="settings_header_opens_folder">Alterações da pasta</string>
+    <string name="settings_header_opens_session">Alterações da sessão</string>
     <string name="settings_swipe_chats">Deslizar entre conversas</string>
     <string name="settings_swipe_chats_sub">Deslize para a esquerda ou direita em uma conversa para abrir a próxima sessão ou a anterior na lista</string>
     <string name="settings_group_activity">Agrupar raciocínio e ferramentas</string>
@@ -138,4 +156,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">Alça do divisor</string>
     <string name="settings_list_handle_sub">Mostrar a seta no divisor para ocultar a lista ou arrastá-lo para redimensionar</string>
+    <string name="settings_back_shows_list">Voltar mostra a lista oculta</string>
+    <string name="settings_back_shows_list_sub">Quando a lista de sessões está oculta, Voltar a mostra novamente em vez de sair do app</string>
 </resources>

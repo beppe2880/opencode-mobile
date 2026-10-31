@@ -36,6 +36,9 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         getByName("androidHostTest").dependencies {
             implementation(project(":core:testing"))
             implementation(libs.okhttp.mockwebserver)

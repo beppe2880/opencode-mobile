@@ -2,6 +2,9 @@ package io.github.beppe2880.opencodemobile.core.data.settings
 
 import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.HEADER_OPENS_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -43,6 +46,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
         prefs.putBoolean(KEY_SHOW_COST, next.showCost)
+        prefs.putString(KEY_HEADER_LINE, next.chatHeaderLine.name)
+        prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
+        prefs.putString(KEY_HEADER_STYLE, next.chatHeaderStyle.name)
         prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
@@ -58,6 +64,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_TERMINAL_FULLSCREEN, next.terminalFullscreenByDefault)
         prefs.putBoolean(KEY_SPLIT_VIEW, next.splitView)
         prefs.putBoolean(KEY_LIST_PANE_HANDLE, next.listPaneHandle)
+        prefs.putBoolean(KEY_BACK_SHOWS_LIST, next.backShowsList)
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
         prefs.putBoolean(KEY_CHECK_UPDATES, next.checkForUpdates)
@@ -85,6 +92,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
+            chatHeaderLine = ChatHeaderLine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_LINE) } ?: defaults.chatHeaderLine,
+            chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
+            headerOpens = HEADER_OPENS_CHOICES.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_OPENS) } ?: defaults.headerOpens,
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
@@ -99,6 +109,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             splitView = prefs.getBoolean(KEY_SPLIT_VIEW, defaults.splitView),
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
             checkForUpdates = prefs.getBoolean(KEY_CHECK_UPDATES, defaults.checkForUpdates),
+            backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -127,6 +138,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
         const val KEY_SHOW_COST = "show_cost"
+        const val KEY_HEADER_LINE = "chat_header_line"
+        const val KEY_HEADER_OPENS = "chat_header_opens"
+        const val KEY_HEADER_STYLE = "chat_header_style"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
@@ -143,6 +157,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIST_PANE_FRACTION = "list_pane_fraction"
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
+        const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }

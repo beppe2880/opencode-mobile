@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">Lange Befehle und Pfade in Werkzeugzeilen umbrechen, statt sie abzuschneiden</string>
     <string name="settings_show_cost">Kosten anzeigen</string>
     <string name="settings_show_cost_sub">Kosten jedes Durchlaufs in Dollar unter der Antwort anzeigen</string>
+    <string name="settings_header_line">Kopfzeile des Chats</string>
+    <string name="settings_header_line_all">Alle</string>
+    <string name="settings_header_line_branch">Branch</string>
+    <string name="settings_header_line_folder">Ordner</string>
+    <string name="settings_header_line_all_sub">Ordner, Branch und geänderte Dateien unter dem Chat-Titel</string>
+    <string name="settings_header_line_branch_sub">Branch und geänderte Dateien unter dem Chat-Titel</string>
+    <string name="settings_header_line_folder_sub">Nur der Ordnerpfad unter dem Chat-Titel, ohne Git abzufragen</string>
+    <string name="settings_header_style">Stil der Kopfzeile</string>
+    <string name="settings_header_style_icons">Symbole</string>
+    <string name="settings_header_style_short">Kurz</string>
+    <string name="settings_header_style_full">Voll</string>
+    <string name="settings_header_style_icons_sub">Symbole vor Ordner, Branch und Anzahl geänderter Dateien</string>
+    <string name="settings_header_style_short_sub">Kurze Wörter, zum Beispiel „main · 4 Dateien“</string>
+    <string name="settings_header_style_full_sub">Volle Wörter, zum Beispiel „main · 4 Dateien geändert“</string>
+    <string name="settings_header_opens">Tippen auf die Kopfzeile öffnet</string>
+    <string name="settings_header_opens_sub">Welche Änderungen das Blatt zuerst zeigt</string>
+    <string name="settings_header_opens_folder">Änderungen im Ordner</string>
+    <string name="settings_header_opens_session">Änderungen der Sitzung</string>
     <string name="settings_swipe_chats">Zwischen Chats wischen</string>
     <string name="settings_swipe_chats_sub">Wische im Chat nach links oder rechts, um die nächste oder vorherige Sitzung der Liste zu öffnen</string>
     <string name="settings_group_activity">Denkprozess und Werkzeuge gruppieren</string>
@@ -138,4 +156,6 @@
     <string name="settings_list_width_value">%1$d %</string>
     <string name="settings_list_handle">Trenner-Griff</string>
     <string name="settings_list_handle_sub">Pfeil am Trenner anzeigen, um die Liste auszublenden, oder ziehen, um sie in der Größe anzupassen</string>
+    <string name="settings_back_shows_list">Zurück zeigt die ausgeblendete Liste</string>
+    <string name="settings_back_shows_list_sub">Ist die Sitzungsliste ausgeblendet, zeigt Zurück sie wieder an, statt die App zu verlassen</string>
 </resources>

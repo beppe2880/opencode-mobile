@@ -65,6 +65,24 @@
     <string name="settings_full_commands_sub">التفاف الأوامر والمسارات الطويلة على عدة أسطر في صفوف الأدوات بدلًا من قطعها</string>
     <string name="settings_show_cost">إظهار التكلفة</string>
     <string name="settings_show_cost_sub">عرض تكلفة كل جولة بالدولار أسفل الرد</string>
+    <string name="settings_header_line">سطر رأس المحادثة</string>
+    <string name="settings_header_line_all">الكل</string>
+    <string name="settings_header_line_branch">الفرع</string>
+    <string name="settings_header_line_folder">المجلد</string>
+    <string name="settings_header_line_all_sub">المجلد والفرع والملفات المعدّلة أسفل عنوان المحادثة</string>
+    <string name="settings_header_line_branch_sub">الفرع والملفات المعدّلة أسفل عنوان المحادثة</string>
+    <string name="settings_header_line_folder_sub">مسار المجلد فقط أسفل عنوان المحادثة، دون فحص Git</string>
+    <string name="settings_header_style">نمط سطر الرأس</string>
+    <string name="settings_header_style_icons">أيقونات</string>
+    <string name="settings_header_style_short">مختصر</string>
+    <string name="settings_header_style_full">كامل</string>
+    <string name="settings_header_style_icons_sub">أيقونات قبل المجلد والفرع وعدد الملفات المعدّلة</string>
+    <string name="settings_header_style_short_sub">كلمات مختصرة، مثلًا “main · 4 ملفات”</string>
+    <string name="settings_header_style_full_sub">كلمات كاملة، مثلًا “main · 4 ملفات معدّلة”</string>
+    <string name="settings_header_opens">النقر على سطر الرأس يفتح</string>
+    <string name="settings_header_opens_sub">التغييرات التي تعرضها الورقة أولًا</string>
+    <string name="settings_header_opens_folder">تغييرات المجلد</string>
+    <string name="settings_header_opens_session">تغييرات الجلسة</string>
     <string name="settings_swipe_chats">السحب بين المحادثات</string>
     <string name="settings_swipe_chats_sub">اسحب يمينًا أو يسارًا في المحادثة لفتح الجلسة التالية أو السابقة في القائمة</string>
     <string name="settings_group_activity">تجميع التفكير والأدوات</string>
@@ -150,4 +168,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">مقبض الفاصل</string>
     <string name="settings_list_handle_sub">أظهر السهم على الفاصل لإخفاء القائمة، أو اسحبه لتغيير حجمها</string>
+    <string name="settings_back_shows_list">زر الرجوع يُظهر القائمة المخفية</string>
+    <string name="settings_back_shows_list_sub">عند إخفاء قائمة الجلسات، يعيد زر الرجوع إظهارها بدلًا من مغادرة التطبيق</string>
 </resources>
