@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -173,7 +174,7 @@ fun AppNavHost(
         composable<SessionsDestination> {
             SessionsListDetail(
                 demo = isDemo,
-                onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
+                onOpenChatFullScreen = navController::openChat,
                 onOpenSettings = { navController.navigate(SettingsDestination) },
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
@@ -186,7 +187,7 @@ fun AppNavHost(
             ChatRoute(
                 sessionId = args.sessionId,
                 onBack = { navController.popBackStack() },
-                onOpenSession = { navController.navigate(ChatDestination(it)) },
+                onOpenSession = navController::openChat,
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
                 onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
                 onSwitchSession = {
@@ -216,6 +217,16 @@ fun AppNavHost(
             FileViewerRoute(directory = args.directory, path = args.path, onBack = { navController.popBackStack() })
         }
     }
+}
+
+/**
+ * Pushes the chat of [sessionId] unless it is already on top: a repeated tap (or a second
+ * effect delivered during the transition) would otherwise stack it twice, needing an extra Back.
+ */
+private fun NavController.openChat(sessionId: String) {
+    val top = currentBackStackEntry
+    if (top?.destination?.hasRoute<ChatDestination>() == true && top.toRoute<ChatDestination>().sessionId == sessionId) return
+    navigate(ChatDestination(sessionId))
 }
 
 /**

@@ -220,7 +220,11 @@ class ChatViewModel(
             ChatEvent.Stop -> stop()
             ChatEvent.MoveToBackground -> moveToBackground()
             ChatEvent.Compact -> compact()
-            is ChatEvent.OpenSession -> sendEffect(ChatEffect.OpenSession(event.sessionId))
+            is ChatEvent.OpenSession -> {
+                // Otherwise the Running sheet is still open on return, and the first Back only closes it.
+                updateState { it.copy(workOpen = false) }
+                sendEffect(ChatEffect.OpenSession(event.sessionId))
+            }
             is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
             is ChatEvent.SwitchSession -> sendEffect(ChatEffect.SwitchSession(event.sessionId))
             ChatEvent.LoadOlder -> loadOlder()
