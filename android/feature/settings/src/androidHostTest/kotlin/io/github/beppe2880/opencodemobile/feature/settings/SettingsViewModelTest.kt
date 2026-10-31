@@ -66,6 +66,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
+        vm.onEvent(SettingsEvent.CheckForUpdatesChanged(false))
         advanceUntilIdle()
 
         assertEquals(
@@ -92,6 +93,7 @@ class SettingsViewModelTest {
                 agentColorOutline = false,
                 dictation = false,
                 groupActivity = false,
+                checkForUpdates = false,
             ),
             settings.settings.value,
         )
@@ -222,7 +224,7 @@ private class FakeServers : ServerRepository {
     }
 }
 
-private class FakeSettings : SettingsRepository {
+internal class FakeSettings : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings())
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         settings.value = transform(settings.value)

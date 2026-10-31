@@ -4,6 +4,7 @@ package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.core.domain.Agent
+import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
@@ -46,6 +47,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
+import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
@@ -90,6 +92,12 @@ val fakeDataModule = module {
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
     single<TerminalRepository> { FakeTerminals() }
+    single<UpdateRepository> {
+        object : UpdateRepository {
+            override suspend fun availableUpdate(installedVersion: String): AppRelease? = null
+            override suspend fun dismiss(release: AppRelease) = Unit
+        }
+    }
     single<McpRepository> {
         object : McpRepository {
             private var servers = listOf(McpServer("demo", McpStatus.Connected))

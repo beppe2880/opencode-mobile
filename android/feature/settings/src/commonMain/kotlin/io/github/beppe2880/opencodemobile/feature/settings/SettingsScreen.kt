@@ -78,6 +78,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_api_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_appearance
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
@@ -221,7 +223,7 @@ fun SettingsScreen(
                 if (showNotifications) item(key = "notifications") { NotificationsSection(state, onEvent) }
                 item(key = "terminal") { TerminalSection(state.settings, onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
-                item(key = "about") { AboutSection(state) }
+                item(key = "about") { AboutSection(state, onEvent) }
             }
         }
     }
@@ -688,7 +690,7 @@ private fun NotificationsSection(state: SettingsState, onEvent: (SettingsEvent) 
 }
 
 @Composable
-private fun AboutSection(state: SettingsState) {
+private fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_about)) {
         OcCard {
@@ -707,6 +709,14 @@ private fun AboutSection(state: SettingsState) {
             )
             OcDivider()
             AboutRow(stringResource(Res.string.settings_api_version), state.apiVersion)
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_check_updates),
+                subtitle = stringResource(Res.string.settings_check_updates_sub),
+                checked = state.settings.checkForUpdates,
+                onCheckedChange = { onEvent(SettingsEvent.CheckForUpdatesChanged(it)) },
+                modifier = Modifier.testTag("settings_check_updates_switch"),
+            )
         }
     }
 }

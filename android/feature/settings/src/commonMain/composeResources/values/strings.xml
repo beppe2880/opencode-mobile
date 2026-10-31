@@ -124,6 +124,11 @@
     <string name="settings_server_version">Server version</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">Unavailable</string>
+    <string name="settings_check_updates">Check for updates</string>
+    <string name="settings_check_updates_sub">When the app opens, at most once a day, look on GitHub for a new version and show a notice</string>
+    <string name="update_available">Version %1$s is available</string>
+    <string name="update_view">View</string>
+    <string name="update_dismiss">Dismiss</string>
     <string name="settings_split_view">Chat beside the list</string>
     <string name="settings_split_view_sub">On wide screens, show the open chat next to the session list. Drag the handle on the divider to resize the list.</string>
     <string name="settings_list_width">Session list width</string>

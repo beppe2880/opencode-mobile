@@ -60,6 +60,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_LIST_PANE_HANDLE, next.listPaneHandle)
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
+        prefs.putBoolean(KEY_CHECK_UPDATES, next.checkForUpdates)
     }
 
     private fun read(): AppSettings {
@@ -97,6 +98,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             terminalFullscreenByDefault = prefs.getBoolean(KEY_TERMINAL_FULLSCREEN, defaults.terminalFullscreenByDefault),
             splitView = prefs.getBoolean(KEY_SPLIT_VIEW, defaults.splitView),
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
+            checkForUpdates = prefs.getBoolean(KEY_CHECK_UPDATES, defaults.checkForUpdates),
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -140,6 +142,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_SPLIT_VIEW = "split_view"
         const val KEY_LIST_PANE_FRACTION = "list_pane_fraction"
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
+        const val KEY_CHECK_UPDATES = "check_for_updates"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }
