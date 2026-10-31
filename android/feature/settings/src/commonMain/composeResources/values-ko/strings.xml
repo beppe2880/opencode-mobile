@@ -121,6 +121,11 @@
     <string name="settings_server_version">서버 버전</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">사용 불가</string>
+    <string name="settings_check_updates">업데이트 확인</string>
+    <string name="settings_check_updates_sub">앱을 열 때 하루에 최대 한 번 GitHub에서 새 버전을 찾아 알림을 표시합니다</string>
+    <string name="update_available">버전 %1$s 사용 가능</string>
+    <string name="update_view">보기</string>
+    <string name="update_dismiss">닫기</string>
     <string name="settings_split_view">목록 옆에 채팅 표시</string>
     <string name="settings_split_view_sub">넓은 화면에서 열린 채팅을 세션 목록 옆에 표시합니다. 구분선의 핸들을 끌어 목록 크기를 조정하세요.</string>
     <string name="settings_list_width">세션 목록 너비</string>

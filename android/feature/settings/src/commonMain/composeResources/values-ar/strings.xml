@@ -136,6 +136,11 @@
     <string name="settings_server_version">إصدار الخادم</string>
     <string name="settings_api_version">واجهة OpenCode API</string>
     <string name="settings_unknown">غير متاح</string>
+    <string name="settings_check_updates">التحقق من التحديثات</string>
+    <string name="settings_check_updates_sub">عند فتح التطبيق، وبحد أقصى مرة واحدة يوميًا، يبحث عن إصدار جديد على GitHub ويعرض إشعارًا</string>
+    <string name="update_available">الإصدار %1$s متاح</string>
+    <string name="update_view">عرض</string>
+    <string name="update_dismiss">تجاهل</string>
     <string name="settings_split_view">الدردشة بجانب القائمة</string>
     <string name="settings_split_view_sub">على الشاشات العريضة، اعرض الدردشة المفتوحة بجانب قائمة الجلسات. اسحب مقبض الفاصل لتغيير حجم القائمة.</string>
     <string name="settings_list_width">عرض قائمة الجلسات</string>

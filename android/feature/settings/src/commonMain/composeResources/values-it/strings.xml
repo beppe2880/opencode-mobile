@@ -124,6 +124,11 @@
     <string name="settings_server_version">Versione server</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Non disponibile</string>
+    <string name="settings_check_updates">Controlla aggiornamenti</string>
+    <string name="settings_check_updates_sub">All'apertura dell'app, al massimo una volta al giorno, cerca su GitHub una nuova versione e mostra un avviso</string>
+    <string name="update_available">È disponibile la versione %1$s</string>
+    <string name="update_view">Visualizza</string>
+    <string name="update_dismiss">Ignora</string>
     <string name="settings_split_view">Chat accanto all'elenco</string>
     <string name="settings_split_view_sub">Sugli schermi larghi mostra la chat aperta accanto all'elenco delle sessioni. Trascina la maniglia sul divisore per cambiarne la larghezza.</string>
     <string name="settings_list_width">Larghezza dell'elenco</string>
