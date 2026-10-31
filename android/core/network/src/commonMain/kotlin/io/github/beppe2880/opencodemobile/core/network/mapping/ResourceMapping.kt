@@ -16,6 +16,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import io.github.beppe2880.opencodemobile.api.models.ModelInfo as ApiModelInfo
+import io.github.beppe2880.opencodemobile.api.models.ModelRef as ApiModelRef
 import io.github.beppe2880.opencodemobile.api.models.PermissionRequest as ApiPermissionRequest
 import io.github.beppe2880.opencodemobile.api.models.Project as ApiProject
 import io.github.beppe2880.opencodemobile.api.models.ServerInfo as ApiServerInfo
@@ -76,14 +77,14 @@ fun List<ConfigModelEntry>.configuredModel(): ModelRef? {
         is JsonPrimitive -> model.contentOrNull?.let { text ->
             val providerId = text.substringBefore('/', missingDelimiterValue = "")
             val rest = text.substringAfter('/')
-            ModelRef(id = rest.substringBefore('#'), providerId = providerId, variant = rest.substringAfter('#', "").ifEmpty { null })
-                .takeIf { providerId.isNotEmpty() && it.id.isNotEmpty() }
+            ApiModelRef(id = rest.substringBefore('#'), providerID = providerId, variant = rest.substringAfter('#', "").ifEmpty { null })
+                .takeIf { providerId.isNotEmpty() && it.id.isNotEmpty() }?.toDomain()
         }
         is JsonObject -> {
             val providerId = (model["providerID"] as? JsonPrimitive)?.contentOrNull
             val id = (model["model"] as? JsonPrimitive)?.contentOrNull
             if (providerId.isNullOrEmpty() || id.isNullOrEmpty()) null
-            else ModelRef(id = id, providerId = providerId, variant = (model["variant"] as? JsonPrimitive)?.contentOrNull)
+            else ApiModelRef(id = id, providerID = providerId, variant = (model["variant"] as? JsonPrimitive)?.contentOrNull).toDomain()
         }
         else -> null
     }

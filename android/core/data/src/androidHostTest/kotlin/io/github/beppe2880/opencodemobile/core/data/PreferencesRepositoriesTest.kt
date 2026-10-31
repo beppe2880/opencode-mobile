@@ -104,4 +104,20 @@ class PreferencesRepositoriesTest {
         PreferencesRecentModelRepository.clearServer(SharedPreferencesSettings(prefs), "s1")
         assertEquals(emptyList<ModelRef>(), recents.recent())
     }
+
+    @Test
+    fun `corrupt or malformed recent models read as none`() {
+        val prefs = InMemoryPreferences()
+        val store = FakeServerStore(StoredServers(listOf(profile("s1", "http://a")), activeId = "s1"))
+        val recents = PreferencesRecentModelRepository(SharedPreferencesSettings(prefs), TestGraph(store).clients)
+
+        prefs.edit().putString("recent_models/s1", "not json").commit()
+        assertEquals(emptyList<ModelRef>(), recents.recent())
+
+        prefs.edit().putString("recent_models/s1", "[[\"anthropic\"],[null,\"x\",null],[\"anthropic\",\"haiku\",null]]").commit()
+        assertEquals(listOf(ModelRef("haiku", "anthropic")), recents.recent())
+
+        recents.used(ModelRef("opus", "anthropic"))
+        assertEquals(listOf(ModelRef("opus", "anthropic"), ModelRef("haiku", "anthropic")), recents.recent())
+    }
 }
