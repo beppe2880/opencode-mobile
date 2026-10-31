@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
@@ -41,6 +42,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -70,6 +73,7 @@ class ChatViewModelTest {
     private val scroll = ScrollMemory()
     private val mcps = FakeMcps()
     private val recents = FakeRecents()
+    private val vcs = FakeVcs()
 
     @Test
     fun `MCP menu and slash open the same project panel without prompting`() = runTest(main.testDispatcher) {
@@ -233,7 +237,138 @@ class ChatViewModelTest {
     }
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, clock = { 42 })
+
+    @Test
+    fun `the header line shows folder, branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+        assertTrue(vm.state.value.folderChanges)
+        assertEquals(listOf("/repo"), vcs.branchRequests)
+
+        vcs.files = listOf("a.kt")
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 1), vm.state.value.vcs)
+        // Both events settle into one read.
+        assertEquals(2, vcs.statusRequests)
+    }
+
+    @Test
+    fun `tapping the header line opens the folder changes, which match its count`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val diffs = listOf(
+            FileDiff("a.kt", "modified", 1, 1, "@@ -1 +1 @@"),
+            FileDiff("new.kt", "added", 2, 0, "@@ -0,0 +1,2 @@"),
+            FileDiff("c.kt", "deleted", 0, 3, ""),
+        )
+        vcs.diffs = diffs
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesPanel(ChangesScope.Folder, diffs, loading = false), vm.state.value.changes)
+        assertEquals(listOf("/repo"), vcs.diffRequests)
+        assertTrue(chat.changesRequests.isEmpty())
+        assertEquals(3, vm.state.value.vcs?.files)
+
+        // Session and turn scopes are unchanged.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Session))
+        advanceUntilIdle()
+        assertEquals(listOf(ChangesScope.Session), chat.changesRequests)
+
+        // A step reloads the open folder scope.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Folder))
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(3, vcs.diffRequests.size)
+    }
+
+    @Test
+    fun `the header line can open the session changes instead`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(headerOpens = ChangesScope.Session)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+        assertTrue(vcs.diffRequests.isEmpty())
+    }
+
+    @Test
+    fun `branch switches of this project arrive from the event stream`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.BranchChanged("/other", "feature"))
+        advanceUntilIdle()
+        assertEquals("main", vm.state.value.vcs?.branch)
+
+        vcs.files = emptyList()
+        events.flow.emit(ServerEvent.BranchChanged("/repo", "feature"))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "feature", 0), vm.state.value.vcs)
+        assertEquals(1, vcs.branchRequests.size)
+    }
+
+    @Test
+    fun `outside a repository only files the agent edited are counted and the session opens`() = runTest(main.testDispatcher) {
+        vcs.branch = null
+        val edit = Part.Tool(
+            "c1", "edit", ToolStatus.Completed, "{}",
+            diffs = listOf(FileDiff("a.kt", null, 1, 0, ""), FileDiff("b.kt", null, 1, 0, "")),
+        )
+        val again = Part.Tool("c2", "write", ToolStatus.Completed, "{}", diffs = listOf(FileDiff("a.kt", null, 1, 0, "")))
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertFalse(vm.state.value.folderChanges)
+        assertEquals(0, vcs.statusRequests)
+
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(edit, again), completedAt = 6)
+        events.flow.emit(ServerEvent.StepEnded("s1", "a1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", null, 2, agentEdits = true), vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+    }
+
+    @Test
+    fun `the header line content follows the setting`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertTrue(vcs.branchRequests.isEmpty())
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.BranchFiles)
+        advanceUntilIdle()
+        assertEquals(VcsLine(null, "main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.FolderBranchFiles)
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+    }
+
+    @Test
+    fun `the changes button finds out whether the folder can be shown even without the header line`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenChanges)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.folderChanges)
+        assertNull(vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+    }
 
     @Test
     fun `the microphone follows the voice input setting`() = runTest(main.testDispatcher) {
@@ -623,6 +758,84 @@ class ChatViewModelTest {
             chat.formReplies,
         )
         assertTrue(vm.state.value.forms.isEmpty())
+    }
+
+    @Test
+    fun `collapsing a question keeps its answers and tells the server nothing`() = runTest(main.testDispatcher) {
+        chat.forms = listOf(Form("f1", "s1", "Which storage?", listOf(FormField.Text("choice", required = true))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.FormAnswerChanged("choice", FormAnswer.Text("room")))
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+        assertEquals("f1", vm.state.value.forms.single().id)
+        assertTrue(chat.formReplies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+    }
+
+    @Test
+    fun `collapsing a permission request never replies to it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", true))
+        events.flow.emit(ServerEvent.PermissionChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertEquals("p1", vm.state.value.permissions.single().id)
+        assertTrue(chat.replies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(chat.replies.isEmpty())
+    }
+
+    @Test
+    fun `permission requests start collapsed when the setting says so, each folding on its own`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(permissionsCollapsed = true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+    }
+
+    @Test
+    fun `each new question starts collapsed or open as the setting says`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(questionsCollapsed = true)
+        chat.forms = listOf(Form("f1", "s1", "First?", listOf(FormField.Toggle("ok"))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        settings.settings.value = AppSettings(questionsCollapsed = false)
+        chat.forms = listOf(Form("f2", "s1", "Second?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        // Folding one question does not fold the next one.
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        chat.forms = listOf(Form("f3", "s1", "Third?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals("f3", vm.state.value.forms.single().id)
     }
 
     @Test
@@ -1497,6 +1710,27 @@ private class FakeRecents : RecentModelRepository {
     override fun used(model: ModelRef) {
         models.removeAll { it.key == model.key }
         models.add(0, model)
+    }
+}
+
+private class FakeVcs : VcsRepository {
+    var branch: VcsBranch? = VcsBranch("main", "main")
+    var files = listOf("a.kt", "b.kt")
+    val branchRequests = mutableListOf<String>()
+    var statusRequests = 0
+    override suspend fun branch(directory: String): Result<VcsBranch?> {
+        branchRequests += directory
+        return Result.success(branch)
+    }
+    override suspend fun changedFiles(directory: String): Result<List<String>> {
+        statusRequests++
+        return Result.success(files)
+    }
+    var diffs: List<FileDiff> = emptyList()
+    val diffRequests = mutableListOf<String>()
+    override suspend fun workingChanges(directory: String): Result<List<FileDiff>> {
+        diffRequests += directory
+        return Result.success(diffs)
     }
 }
 

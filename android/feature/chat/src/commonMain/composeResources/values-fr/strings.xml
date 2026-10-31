@@ -44,10 +44,28 @@
     <string name="chat_terminal_open">Ouvrir le terminal</string>
     <string name="chat_changes_session">Session entière</string>
     <string name="chat_changes_last_turn">Dernier tour</string>
+    <string name="chat_changes_folder">Dossier</string>
+    <string name="chat_changes_empty_folder">Ce dossier ne contient aucune modification non validée.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d fichier modifié</item>
         <item quantity="other">%1$d fichiers modifiés</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d fichier modifié par l'agent</item>
+        <item quantity="other">%1$d fichiers modifiés par l'agent</item>
+    </plurals>
+    <string name="chat_vcs_detached">HEAD détaché</string>
+    <string name="chat_vcs_detached_short">détaché</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d fichier</item>
+        <item quantity="other">%1$d fichiers</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d modification de l'agent</item>
+        <item quantity="other">%1$d modifications de l'agent</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Dossier %1$s</string>
+    <string name="chat_vcs_branch_description">Branche %1$s</string>
     <string name="chat_changes_empty">Aucun fichier modifié</string>
     <string name="chat_changes_empty_session">L'agent n'a modifié aucun fichier dans cette session.</string>
     <string name="chat_changes_empty_turn">L'agent n'a modifié aucun fichier au cours du dernier tour.</string>
@@ -69,6 +87,8 @@
     <string name="chat_permission_once">Autoriser une fois</string>
     <string name="chat_permission_always">Toujours</string>
     <string name="chat_permission_reject">Refuser</string>
+    <string name="chat_permission_collapse">Réduire la demande d'autorisation</string>
+    <string name="chat_permission_expand">Développer la demande d'autorisation</string>
     <string name="chat_offline">Hors ligne · reconnexion</string>
     <string name="chat_unauthorized">Le serveur a refusé les identifiants enregistrés · associez à nouveau le serveur</string>
     <string name="chat_shell_exit">sortie %1$s</string>
@@ -120,6 +140,8 @@
     <string name="chat_form_title">Question de l’agent</string>
     <string name="chat_form_submit">Envoyer la réponse</string>
     <string name="chat_form_dismiss">Ignorer</string>
+    <string name="chat_form_collapse">Réduire la question</string>
+    <string name="chat_form_expand">Développer la question</string>
     <string name="chat_form_other">Autre réponse</string>
     <string name="chat_form_open_link">Ouvrir le lien</string>
     <plurals name="chat_form_more">

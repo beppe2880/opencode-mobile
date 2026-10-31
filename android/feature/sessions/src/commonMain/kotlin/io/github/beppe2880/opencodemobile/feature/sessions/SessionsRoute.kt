@@ -20,6 +20,7 @@ fun SessionsRoute(
     /** Opens the new session sheet once, for a shortcut outside the app such as the widget. */
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
+    banner: @Composable () -> Unit = {},
 ) {
     val viewModel: SessionsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -46,5 +47,6 @@ fun SessionsRoute(
         modifier = modifier,
         selectedSessionId = selectedSessionId,
         snackbarHostState = snackbar,
+        banner = banner,
     )
 }

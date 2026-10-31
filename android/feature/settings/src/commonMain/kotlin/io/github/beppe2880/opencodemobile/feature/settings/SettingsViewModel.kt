@@ -75,17 +75,23 @@ class SettingsViewModel(
             is SettingsEvent.SplitViewChanged -> update { it.copy(splitView = event.enabled) }
             is SettingsEvent.ListPaneFractionChanged -> update { it.copy(listPaneFraction = event.fraction) }
             is SettingsEvent.ListPaneHandleChanged -> update { it.copy(listPaneHandle = event.enabled) }
+            is SettingsEvent.BackShowsListChanged -> update { it.copy(backShowsList = event.enabled) }
             is SettingsEvent.OutputPreviewLinesChanged -> update { it.copy(outputPreviewLines = event.lines) }
             is SettingsEvent.LiveOutputIntervalChanged -> update { it.copy(liveOutputIntervalMs = event.millis) }
             is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }
             is SettingsEvent.ChatTextScaleChanged -> update { it.copy(chatTextScale = event.scale) }
             is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
+            is SettingsEvent.ChatHeaderLineChanged -> update { it.copy(chatHeaderLine = event.line) }
+            is SettingsEvent.HeaderOpensChanged -> update { it.copy(headerOpens = event.scope) }
+            is SettingsEvent.ChatHeaderStyleChanged -> update { it.copy(chatHeaderStyle = event.style) }
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }
             is SettingsEvent.SelectionApplyChanged -> update { it.copy(selectionApply = event.apply) }
             is SettingsEvent.NewChatModelChanged -> update { it.copy(newChatModel = event.model) }
             is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
+            is SettingsEvent.QuestionsCollapsedChanged -> update { it.copy(questionsCollapsed = event.enabled) }
+            is SettingsEvent.PermissionsCollapsedChanged -> update { it.copy(permissionsCollapsed = event.enabled) }
             is SettingsEvent.NotificationsChanged -> when {
                 !event.enabled || currentState.notificationsAllowed -> update { it.copy(notifications = event.enabled) }
                 else -> {
@@ -99,6 +105,7 @@ class SettingsViewModel(
             is SettingsEvent.NotifyPermissionsChanged -> update { it.copy(notifyPermissions = event.enabled) }
             is SettingsEvent.NotifyQuestionsChanged -> update { it.copy(notifyQuestions = event.enabled) }
             is SettingsEvent.NotifyFinishedChanged -> update { it.copy(notifyFinished = event.enabled) }
+            is SettingsEvent.CheckForUpdatesChanged -> update { it.copy(checkForUpdates = event.enabled) }
             is SettingsEvent.NotificationAccess -> {
                 updateState {
                     it.copy(

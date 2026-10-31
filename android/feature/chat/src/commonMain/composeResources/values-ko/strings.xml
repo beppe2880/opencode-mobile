@@ -41,9 +41,24 @@
     <string name="chat_terminal_open">터미널 열기</string>
     <string name="chat_changes_session">전체 세션</string>
     <string name="chat_changes_last_turn">마지막 턴</string>
+    <string name="chat_changes_folder">폴더</string>
+    <string name="chat_changes_empty_folder">이 폴더에는 커밋되지 않은 변경 사항이 없습니다.</string>
     <plurals name="chat_changes_files">
         <item quantity="other">파일 %1$d개 변경됨</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="other">에이전트가 편집한 파일 %1$d개</item>
+    </plurals>
+    <string name="chat_vcs_detached">분리된 HEAD</string>
+    <string name="chat_vcs_detached_short">분리됨</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="other">파일 %1$d개</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="other">에이전트 편집 %1$d회</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">폴더 %1$s</string>
+    <string name="chat_vcs_branch_description">브랜치 %1$s</string>
     <string name="chat_changes_empty">변경된 파일 없음</string>
     <string name="chat_changes_empty_session">이 세션에서 에이전트가 편집한 파일이 없습니다.</string>
     <string name="chat_changes_empty_turn">마지막 턴에서 에이전트가 편집한 파일이 없습니다.</string>
@@ -65,6 +80,8 @@
     <string name="chat_permission_once">한 번 허용</string>
     <string name="chat_permission_always">항상 허용</string>
     <string name="chat_permission_reject">거부</string>
+    <string name="chat_permission_collapse">권한 요청 접기</string>
+    <string name="chat_permission_expand">권한 요청 펼치기</string>
     <string name="chat_offline">오프라인 · 다시 연결 중</string>
     <string name="chat_unauthorized">서버가 저장된 자격 증명을 거부했습니다 · 서버를 다시 페어링하세요</string>
     <string name="chat_shell_exit">종료 코드 %1$s</string>
@@ -115,6 +132,8 @@
     <string name="chat_form_title">에이전트의 질문</string>
     <string name="chat_form_submit">답변 보내기</string>
     <string name="chat_form_dismiss">닫기</string>
+    <string name="chat_form_collapse">질문 접기</string>
+    <string name="chat_form_expand">질문 펼치기</string>
     <string name="chat_form_other">다른 답변</string>
     <string name="chat_form_open_link">링크 열기</string>
     <plurals name="chat_form_more">

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +39,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
@@ -53,7 +57,9 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_collapse
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_dismiss
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_expand
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_more
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_open_link
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_other
@@ -62,75 +68,139 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_form_title
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Pinned above the composer while the agent waits for the user to answer a question. */
+/**
+ * Pinned above the composer while the agent waits for the user to answer a question.
+ * [collapsed] folds it into a one-line bar so the transcript stays readable; the answers are
+ * kept by the caller and nothing is sent to the server until Send or Dismiss.
+ */
 @Composable
 internal fun FormCard(
     form: Form,
     answers: Map<String, FormAnswer>,
     pendingCount: Int,
     submitting: Boolean,
+    collapsed: Boolean,
+    onCollapse: (Boolean) -> Unit,
     onAnswer: (String, FormAnswer?) -> Unit,
     onSubmit: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val c = OcTheme.colors
+    val collapse by rememberUpdatedState(onCollapse)
+    // Keeps the fields' own state (a number typed as "3.", scroll) while the card is folded.
+    val saved = rememberSaveableStateHolder()
     OcCard(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag("form_card"),
         color = if (c.isDark) c.layer01 else c.info.bg,
         borderColor = c.info.border,
         shape = RoundedCornerShape(OcRadius.xl),
     ) {
-        Column(Modifier.padding(OcSpacing.md), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-                Icon(Icons.Outlined.HelpOutline, null, tint = c.info.fg, modifier = Modifier.size(18.dp))
+        if (collapsed) {
+            CollapsedForm(form, pendingCount, onExpand = { collapse(false) })
+        } else {
+            saved.SaveableStateProvider(form.id) {
+                ExpandedForm(form, answers, pendingCount, submitting, { collapse(true) }, onAnswer, onSubmit, onDismiss)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpandedForm(
+    form: Form,
+    answers: Map<String, FormAnswer>,
+    pendingCount: Int,
+    submitting: Boolean,
+    onCollapse: () -> Unit,
+    onAnswer: (String, FormAnswer?) -> Unit,
+    onSubmit: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val c = OcTheme.colors
+    Column(
+        Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    ) {
+        PendingCardHeader("form", stringResource(Res.string.chat_form_collapse), onCollapse) {
+            Icon(Icons.Outlined.HelpOutline, null, tint = c.info.fg, modifier = Modifier.size(18.dp))
+            Text(
+                stringResource(Res.string.chat_form_title),
+                style = MaterialTheme.typography.labelMedium,
+                color = c.textMuted,
+                modifier = Modifier.weight(1f),
+            )
+            if (pendingCount > 1) {
                 Text(
-                    stringResource(Res.string.chat_form_title),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = c.textMuted,
-                    modifier = Modifier.weight(1f),
-                )
-                if (pendingCount > 1) {
-                    Text(
-                        pluralStringResource(Res.plurals.chat_form_more, pendingCount - 1, pendingCount - 1),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = c.textFaint,
-                    )
-                }
-            }
-            Text(form.title, style = MaterialTheme.typography.titleSmall, color = c.textBase)
-            Column(
-                modifier = Modifier
-                    .heightIn(max = 320.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(OcSpacing.md),
-            ) {
-                form.fields.filter { it.isVisible(answers) }.forEach { field ->
-                    FormFieldInput(field, answers[field.key], onAnswer = { onAnswer(field.key, it) })
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-                OcButton(
-                    text = stringResource(Res.string.chat_form_dismiss),
-                    onClick = onDismiss,
-                    variant = OcButtonVariant.Secondary,
-                    enabled = !submitting,
-                    compact = true,
-                    modifier = Modifier.weight(1f).testTag("form_dismiss_button"),
-                )
-                OcButton(
-                    text = stringResource(Res.string.chat_form_submit),
-                    onClick = onSubmit,
-                    variant = OcButtonVariant.Inverse,
-                    enabled = form.isComplete(answers),
-                    loading = submitting,
-                    compact = true,
-                    modifier = Modifier.weight(1.4f).testTag("form_submit_button"),
+                    pluralStringResource(Res.plurals.chat_form_more, pendingCount - 1, pendingCount - 1),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = c.textFaint,
                 )
             }
+        }
+        Text(form.title, style = MaterialTheme.typography.titleSmall, color = c.textBase)
+        Column(
+            modifier = Modifier
+                .heightIn(max = 320.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(OcSpacing.md),
+        ) {
+            form.fields.filter { it.isVisible(answers) }.forEach { field ->
+                FormFieldInput(field, answers[field.key], onAnswer = { onAnswer(field.key, it) })
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
+            OcButton(
+                text = stringResource(Res.string.chat_form_dismiss),
+                onClick = onDismiss,
+                variant = OcButtonVariant.Secondary,
+                enabled = !submitting,
+                compact = true,
+                modifier = Modifier.weight(1f).testTag("form_dismiss_button"),
+            )
+            OcButton(
+                text = stringResource(Res.string.chat_form_submit),
+                onClick = onSubmit,
+                variant = OcButtonVariant.Inverse,
+                enabled = form.isComplete(answers),
+                loading = submitting,
+                compact = true,
+                modifier = Modifier.weight(1.4f).testTag("form_submit_button"),
+            )
+        }
+    }
+}
+
+/** The folded card: the question on one line. */
+@Composable
+private fun CollapsedForm(form: Form, pendingCount: Int, onExpand: () -> Unit) {
+    val c = OcTheme.colors
+    PendingCardBar(
+        tagPrefix = "form",
+        icon = Icons.Outlined.HelpOutline,
+        iconTint = c.info.fg,
+        iconDescription = stringResource(Res.string.chat_form_title),
+        expandLabel = stringResource(Res.string.chat_form_expand),
+        onExpand = onExpand,
+    ) {
+        Text(
+            form.title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = c.textBase,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        if (pendingCount > 1) {
+            Text(
+                pluralStringResource(Res.plurals.chat_form_more, pendingCount - 1, pendingCount - 1),
+                style = MaterialTheme.typography.labelSmall,
+                color = c.textFaint,
+            )
         }
     }
 }

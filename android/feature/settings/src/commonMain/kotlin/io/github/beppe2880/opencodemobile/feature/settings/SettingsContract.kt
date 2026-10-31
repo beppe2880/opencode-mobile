@@ -2,13 +2,22 @@ package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
 /** Build information provided by the app module. */
-data class AppInfo(val versionName: String, val apiVersion: String)
+data class AppInfo(
+    val versionName: String,
+    val apiVersion: String,
+    /** Where this platform's app is updated from. */
+    val updateTarget: UpdateTarget,
+)
 
 @Immutable
 data class SettingsState(
@@ -55,6 +64,7 @@ sealed interface SettingsEvent {
     data class SplitViewChanged(val enabled: Boolean) : SettingsEvent
     data class ListPaneFractionChanged(val fraction: Float) : SettingsEvent
     data class ListPaneHandleChanged(val enabled: Boolean) : SettingsEvent
+    data class BackShowsListChanged(val enabled: Boolean) : SettingsEvent
     data class OutputPreviewLinesChanged(val lines: Int) : SettingsEvent
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent
@@ -62,16 +72,22 @@ sealed interface SettingsEvent {
     data object RequestReset : SettingsEvent
     data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
+    data class ChatHeaderLineChanged(val line: ChatHeaderLine) : SettingsEvent
+    data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
+    data class ChatHeaderStyleChanged(val style: ChatHeaderStyle) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
+    data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
+    data class PermissionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
+    data class CheckForUpdatesChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent

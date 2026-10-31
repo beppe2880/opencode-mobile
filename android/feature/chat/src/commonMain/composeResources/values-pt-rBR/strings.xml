@@ -44,10 +44,28 @@
     <string name="chat_terminal_open">Abrir terminal</string>
     <string name="chat_changes_session">Sessão inteira</string>
     <string name="chat_changes_last_turn">Último turno</string>
+    <string name="chat_changes_folder">Pasta</string>
+    <string name="chat_changes_empty_folder">Esta pasta não tem alterações não confirmadas.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d arquivo alterado</item>
         <item quantity="other">%1$d arquivos alterados</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d arquivo editado pelo agente</item>
+        <item quantity="other">%1$d arquivos editados pelo agente</item>
+    </plurals>
+    <string name="chat_vcs_detached">HEAD destacado</string>
+    <string name="chat_vcs_detached_short">destacado</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d arquivo</item>
+        <item quantity="other">%1$d arquivos</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d edição do agente</item>
+        <item quantity="other">%1$d edições do agente</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Pasta %1$s</string>
+    <string name="chat_vcs_branch_description">Ramo %1$s</string>
     <string name="chat_changes_empty">Nenhum arquivo alterado</string>
     <string name="chat_changes_empty_session">O agente não editou nenhum arquivo nesta sessão.</string>
     <string name="chat_changes_empty_turn">O agente não editou nenhum arquivo no último turno.</string>
@@ -69,6 +87,8 @@
     <string name="chat_permission_once">Permitir uma vez</string>
     <string name="chat_permission_always">Sempre</string>
     <string name="chat_permission_reject">Recusar</string>
+    <string name="chat_permission_collapse">Recolher solicitação de permissão</string>
+    <string name="chat_permission_expand">Expandir solicitação de permissão</string>
     <string name="chat_offline">Offline · reconectando</string>
     <string name="chat_unauthorized">O servidor recusou as credenciais salvas · pareie o servidor novamente</string>
     <string name="chat_shell_exit">saída %1$s</string>
@@ -120,6 +140,8 @@
     <string name="chat_form_title">Pergunta do agente</string>
     <string name="chat_form_submit">Enviar resposta</string>
     <string name="chat_form_dismiss">Dispensar</string>
+    <string name="chat_form_collapse">Recolher pergunta</string>
+    <string name="chat_form_expand">Expandir pergunta</string>
     <string name="chat_form_other">Outra resposta</string>
     <string name="chat_form_open_link">Abrir link</string>
     <plurals name="chat_form_more">

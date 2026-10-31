@@ -40,6 +40,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
@@ -80,6 +83,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_api_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_appearance
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
@@ -91,6 +98,24 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_folder
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_session
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
@@ -126,6 +151,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ou
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_password
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_permissions_collapsed
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_permissions_collapsed_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fast
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
@@ -231,7 +260,7 @@ fun SettingsScreen(
                 if (showNotifications) item(key = "notifications") { NotificationsSection(state, onEvent) }
                 item(key = "terminal") { TerminalSection(state.settings, onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
-                item(key = "about") { AboutSection(state) }
+                item(key = "about") { AboutSection(state, onEvent) }
             }
         }
     }
@@ -420,6 +449,16 @@ private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) ->
                         onCheckedChange = { onEvent(SettingsEvent.ListPaneHandleChanged(it)) },
                         modifier = Modifier.testTag("settings_list_handle_switch"),
                     )
+                    if (settings.listPaneHandle) {
+                        OcDivider()
+                        OcSwitchRow(
+                            title = stringResource(Res.string.settings_back_shows_list),
+                            subtitle = stringResource(Res.string.settings_back_shows_list_sub),
+                            checked = settings.backShowsList,
+                            onCheckedChange = { onEvent(SettingsEvent.BackShowsListChanged(it)) },
+                            modifier = Modifier.testTag("settings_back_shows_list_switch"),
+                        )
+                    }
                 }
             }
         }
@@ -516,6 +555,56 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 modifier = Modifier.testTag("settings_show_cost_switch"),
             )
             OcDivider()
+            ChoiceRow(
+                title = stringResource(Res.string.settings_header_line),
+                subtitle = stringResource(
+                    when (settings.chatHeaderLine) {
+                        ChatHeaderLine.FolderBranchFiles -> Res.string.settings_header_line_all_sub
+                        ChatHeaderLine.BranchFiles -> Res.string.settings_header_line_branch_sub
+                        ChatHeaderLine.Folder -> Res.string.settings_header_line_folder_sub
+                    },
+                ),
+                choices = listOf(
+                    OcSegment(ChatHeaderLine.FolderBranchFiles, stringResource(Res.string.settings_header_line_all), "settings_header_line_all"),
+                    OcSegment(ChatHeaderLine.BranchFiles, stringResource(Res.string.settings_header_line_branch), "settings_header_line_branch"),
+                    OcSegment(ChatHeaderLine.Folder, stringResource(Res.string.settings_header_line_folder), "settings_header_line_folder"),
+                ),
+                selected = settings.chatHeaderLine,
+                onSelect = { onEvent(SettingsEvent.ChatHeaderLineChanged(it)) },
+            )
+            // A folder path alone has no style and is not a line to tap.
+            if (settings.chatHeaderLine != ChatHeaderLine.Folder) {
+                OcDivider()
+                ChoiceRow(
+                    title = stringResource(Res.string.settings_header_style),
+                    subtitle = stringResource(
+                        when (settings.chatHeaderStyle) {
+                            ChatHeaderStyle.Icons -> Res.string.settings_header_style_icons_sub
+                            ChatHeaderStyle.Short -> Res.string.settings_header_style_short_sub
+                            ChatHeaderStyle.Full -> Res.string.settings_header_style_full_sub
+                        },
+                    ),
+                    choices = listOf(
+                        OcSegment(ChatHeaderStyle.Icons, stringResource(Res.string.settings_header_style_icons), "settings_header_style_icons"),
+                        OcSegment(ChatHeaderStyle.Short, stringResource(Res.string.settings_header_style_short), "settings_header_style_short"),
+                        OcSegment(ChatHeaderStyle.Full, stringResource(Res.string.settings_header_style_full), "settings_header_style_full"),
+                    ),
+                    selected = settings.chatHeaderStyle,
+                    onSelect = { onEvent(SettingsEvent.ChatHeaderStyleChanged(it)) },
+                )
+                OcDivider()
+                ChoiceRow(
+                    title = stringResource(Res.string.settings_header_opens),
+                    subtitle = stringResource(Res.string.settings_header_opens_sub),
+                    choices = listOf(
+                        OcSegment(ChangesScope.Folder, stringResource(Res.string.settings_header_opens_folder), "settings_header_opens_folder"),
+                        OcSegment(ChangesScope.Session, stringResource(Res.string.settings_header_opens_session), "settings_header_opens_session"),
+                    ),
+                    selected = settings.headerOpens,
+                    onSelect = { onEvent(SettingsEvent.HeaderOpensChanged(it)) },
+                )
+            }
+            OcDivider()
             OcSwitchRow(
                 title = stringResource(Res.string.settings_swipe_chats),
                 subtitle = stringResource(Res.string.settings_swipe_chats_sub),
@@ -530,6 +619,22 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.agentColorOutline,
                 onCheckedChange = { onEvent(SettingsEvent.AgentColorOutlineChanged(it)) },
                 modifier = Modifier.testTag("settings_agent_outline_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_questions_collapsed),
+                subtitle = stringResource(Res.string.settings_questions_collapsed_sub),
+                checked = settings.questionsCollapsed,
+                onCheckedChange = { onEvent(SettingsEvent.QuestionsCollapsedChanged(it)) },
+                modifier = Modifier.testTag("settings_questions_collapsed_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_permissions_collapsed),
+                subtitle = stringResource(Res.string.settings_permissions_collapsed_sub),
+                checked = settings.permissionsCollapsed,
+                onCheckedChange = { onEvent(SettingsEvent.PermissionsCollapsedChanged(it)) },
+                modifier = Modifier.testTag("settings_permissions_collapsed_switch"),
             )
             OcDivider()
             OcSwitchRow(
@@ -720,7 +825,7 @@ private fun NotificationsSection(state: SettingsState, onEvent: (SettingsEvent) 
 }
 
 @Composable
-private fun AboutSection(state: SettingsState) {
+private fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_about)) {
         OcCard {
@@ -739,6 +844,14 @@ private fun AboutSection(state: SettingsState) {
             )
             OcDivider()
             AboutRow(stringResource(Res.string.settings_api_version), state.apiVersion)
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_check_updates),
+                subtitle = stringResource(Res.string.settings_check_updates_sub),
+                checked = state.settings.checkForUpdates,
+                onCheckedChange = { onEvent(SettingsEvent.CheckForUpdatesChanged(it)) },
+                modifier = Modifier.testTag("settings_check_updates_switch"),
+            )
         }
     }
 }

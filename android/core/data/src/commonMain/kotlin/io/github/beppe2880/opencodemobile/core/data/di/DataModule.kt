@@ -18,6 +18,8 @@ import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepositor
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepository
+import io.github.beppe2880.opencodemobile.core.data.update.GitHubUpdateRepository
+import io.github.beppe2880.opencodemobile.core.data.vcs.RemoteVcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
@@ -29,6 +31,9 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
+import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
+import io.github.beppe2880.opencodemobile.core.network.GitHubReleases
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -85,7 +90,12 @@ val dataModule = module {
     single<TerminalRepository> { RemoteTerminalRepository(get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
     single<McpRepository> { RemoteMcpRepository(get()) }
+    single<VcsRepository> { RemoteVcsRepository(get()) }
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
+    single<UpdateRepository> {
+        val releases = GitHubReleases()
+        GitHubUpdateRepository(releases::latest, get(SettingsStore))
+    }
 }
