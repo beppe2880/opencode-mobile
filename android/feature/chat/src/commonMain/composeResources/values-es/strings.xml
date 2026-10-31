@@ -23,6 +23,14 @@
     <string name="chat_thinking">Pensando…</string>
     <string name="chat_thought_for">Pensó durante %1$s</string>
     <string name="chat_thought">Razonamiento</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="one">%1$d pensamiento</item>
+        <item quantity="other">%1$d pensamientos</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="one">Pensó %1$d vez</item>
+        <item quantity="other">Pensó %1$d veces</item>
+    </plurals>
     <string name="chat_working">Trabajando…</string>
     <string name="chat_used_tools">Usó</string>
     <string name="chat_tool_running">En ejecución</string>

@@ -71,6 +71,7 @@ class ChatViewModel(
     private var messages: List<Message> = emptyList()
     private var showReasoning: Boolean = settings.settings.value.showReasoning
     private var groupActivity: Boolean = settings.settings.value.groupActivity
+    private var groupThoughts: Boolean = settings.settings.value.groupThoughts
     private var reloadJob: Job? = null
     private var olderJob: Job? = null
     private var previewJob: Job? = null
@@ -154,6 +155,7 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
+                groupThoughts = s.groupThoughts
                 selectionApply = s.selectionApply
                 confirmStop = s.confirmStopCommand
                 val vcsTurnedOn = s.chatHeaderLine != ChatHeaderLine.Folder && !vcsInHeader
@@ -846,7 +848,14 @@ class ChatViewModel(
         val queuedIds = state.queued.mapTo(HashSet()) { it.id }
         val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
         followShells(shown)
-        val items = ChatItemsBuilder.build(withLiveOutput(withImages(shown)), state.running, showReasoning, state.models::labelFor, groupActivity)
+        val items = ChatItemsBuilder.build(
+            withLiveOutput(withImages(shown)),
+            state.running,
+            showReasoning,
+            state.models::labelFor,
+            groupActivity,
+            groupThoughts,
+        )
         val backgroundable = BackgroundableWork.find(visible)?.takeIf { it.key !in movedToBackground }
         val compactions = visible.filterIsInstance<Message.Notice>()
             .filter { it.kind == NoticeKind.Compacting || it.kind == NoticeKind.Compaction }

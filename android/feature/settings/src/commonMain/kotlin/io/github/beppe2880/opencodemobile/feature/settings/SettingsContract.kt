@@ -83,6 +83,7 @@ sealed interface SettingsEvent {
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
+    data class GroupThoughtsChanged(val enabled: Boolean) : SettingsEvent
     data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class PermissionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent

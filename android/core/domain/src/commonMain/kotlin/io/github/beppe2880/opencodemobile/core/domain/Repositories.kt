@@ -393,6 +393,8 @@ data class AppSettings(
     val newChatModel: NewChatModel = NewChatModel.LastUsed,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
+    /** Thoughts that follow each other with nothing in between collapse into one row, also while running. */
+    val groupThoughts: Boolean = true,
     /** A question from the agent first shows as a one-line bar above the composer instead of the full card. */
     val questionsCollapsed: Boolean = false,
     /** A permission request first shows as a one-line bar above the composer instead of the full card. */

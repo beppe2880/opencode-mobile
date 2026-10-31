@@ -62,6 +62,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
+        vm.onEvent(SettingsEvent.GroupThoughtsChanged(false))
         vm.onEvent(SettingsEvent.QuestionsCollapsedChanged(true))
         vm.onEvent(SettingsEvent.PermissionsCollapsedChanged(true))
         vm.onEvent(SettingsEvent.DictationChanged(false))
@@ -116,6 +117,7 @@ class SettingsViewModelTest {
                 selectionApply = SelectionApply.Immediately,
                 newChatModel = NewChatModel.ServerDefault,
                 groupActivity = false,
+                groupThoughts = false,
                 questionsCollapsed = true,
                 permissionsCollapsed = true,
                 checkForUpdates = false,

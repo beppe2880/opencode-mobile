@@ -27,6 +27,18 @@
     <string name="chat_thinking">Размышляет…</string>
     <string name="chat_thought_for">Размышлял %1$s</string>
     <string name="chat_thought">Рассуждение</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="one">%1$d мысль</item>
+        <item quantity="few">%1$d мысли</item>
+        <item quantity="many">%1$d мыслей</item>
+        <item quantity="other">%1$d мысли</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="one">Размышлял %1$d раз</item>
+        <item quantity="few">Размышлял %1$d раза</item>
+        <item quantity="many">Размышлял %1$d раз</item>
+        <item quantity="other">Размышлял %1$d раза</item>
+    </plurals>
     <string name="chat_working">Работает…</string>
     <string name="chat_used_tools">Использовано</string>
     <string name="chat_tool_running">Выполняется</string>

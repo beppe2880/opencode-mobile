@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">Смахните в чате влево или вправо, чтобы открыть следующую или предыдущую сессию в списке</string>
     <string name="settings_group_activity">Группировать рассуждения и инструменты</string>
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
+    <string name="settings_group_thoughts">Группировать идущие подряд рассуждения</string>
+    <string name="settings_group_thoughts_sub">Показывать идущие подряд рассуждения одной строкой, в том числе во время размышления</string>
     <string name="settings_questions_collapsed">Показывать вопросы свёрнутыми</string>
     <string name="settings_questions_collapsed_sub">Вопросы агента появляются в виде однострочной полосы над полем ввода; нажмите на неё, чтобы ответить</string>
     <string name="settings_permissions_collapsed">Показывать запросы разрешений свёрнутыми</string>

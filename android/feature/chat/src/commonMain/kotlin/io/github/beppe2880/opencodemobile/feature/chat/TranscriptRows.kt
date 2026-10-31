@@ -73,6 +73,8 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_shell_exit
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thinking
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thought
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thought_for
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thought_times
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thoughts_count
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_working
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -224,17 +226,86 @@ internal fun ReasoningBlock(
         }
         // Summarized thinking only arrives at the end: no empty box while it streams.
         AnimatedVisibility(visible = open && item.text.isNotBlank()) {
-            Text(
-                text = item.text,
-                style = MaterialTheme.typography.bodySmall,
-                color = c.textMuted,
-                modifier = Modifier
-                    .padding(start = OcSpacing.xs, top = OcSpacing.xs)
-                    .background(c.layer01, RoundedCornerShape(OcRadius.md))
-                    .padding(OcSpacing.md),
-            )
+            ThoughtText(item.text)
         }
     }
+}
+
+/**
+ * "Thinking… · 6 thoughts · 2m 4s" while running, "Thought 6 times · 2m 4s" once done;
+ * expands into the individual thoughts. Folded, it follows only the latest thought live.
+ */
+@Composable
+internal fun ThoughtsGroup(
+    item: ChatItem.Thoughts,
+    expanded: Boolean,
+    isExpanded: (String) -> Boolean,
+    onToggle: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    live: LiveFollow? = null,
+) {
+    val c = OcTheme.colors
+    val count = item.thoughts.size
+    val label = buildList {
+        if (item.streaming) {
+            add(stringResource(Res.string.chat_thinking))
+            add(pluralStringResource(Res.plurals.chat_thoughts_count, count, count))
+        } else {
+            add(pluralStringResource(Res.plurals.chat_thought_times, count, count))
+        }
+        if (item.durationMs >= 1_000) add(formatDuration(item.durationMs))
+    }.joinToString(" · ")
+    val latest = item.thoughts.last()
+    val followLatest = !expanded && live?.thinking == true && latest.streaming && latest.text.isNotBlank()
+    Column(modifier = modifier.fillMaxWidth()) {
+        DisclosureRow(
+            expanded = expanded,
+            onToggle = { onToggle("t:${item.key}") },
+            testTag = "chat_thoughts_${item.key}",
+        ) {
+            Text(
+                label,
+                style = MaterialTheme.typography.bodySmall,
+                color = c.textMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (item.streaming) OcSpinner(size = 10.dp)
+        }
+        AnimatedVisibility(visible = followLatest) {
+            ThoughtText(latest.text)
+        }
+        AnimatedVisibility(visible = expanded) {
+            Column(
+                modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                item.thoughts.forEach { thought ->
+                    ReasoningBlock(
+                        item = thought,
+                        expanded = isExpanded("r:${thought.key}"),
+                        onToggle = { onToggle("r:${thought.key}") },
+                        live = live,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThoughtText(text: String) {
+    val c = OcTheme.colors
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = c.textMuted,
+        modifier = Modifier
+            .padding(start = OcSpacing.xs, top = OcSpacing.xs)
+            .background(c.layer01, RoundedCornerShape(OcRadius.md))
+            .padding(OcSpacing.md),
+    )
 }
 
 /** A collapsible summary row with a chevron that turns when [expanded]. */

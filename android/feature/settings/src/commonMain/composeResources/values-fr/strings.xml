@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">Balayez une discussion à gauche ou à droite pour ouvrir la session suivante ou précédente de la liste</string>
     <string name="settings_group_activity">Regrouper réflexion et outils</string>
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
+    <string name="settings_group_thoughts">Regrouper les réflexions consécutives</string>
+    <string name="settings_group_thoughts_sub">Afficher les réflexions qui se suivent sur une seule ligne, y compris pendant la réflexion</string>
     <string name="settings_questions_collapsed">Afficher les questions réduites</string>
     <string name="settings_questions_collapsed_sub">Les questions de l'agent apparaissent sous forme de barre d'une ligne au-dessus de la zone de saisie ; touchez-la pour répondre</string>
     <string name="settings_permissions_collapsed">Afficher les demandes d'autorisation réduites</string>

@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">チャットを左右にスワイプして一覧の次または前のセッションを開く</string>
     <string name="settings_group_activity">思考とツールをまとめる</string>
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
+    <string name="settings_group_thoughts">連続する思考をまとめる</string>
+    <string name="settings_group_thoughts_sub">連続する思考を1つの行にまとめて表示します。思考中も同様です</string>
     <string name="settings_questions_collapsed">質問を折りたたんで表示</string>
     <string name="settings_questions_collapsed_sub">エージェントからの質問は入力欄の上に1行のバーとして表示されます。タップして回答します</string>
     <string name="settings_permissions_collapsed">権限のリクエストを折りたたんで表示</string>

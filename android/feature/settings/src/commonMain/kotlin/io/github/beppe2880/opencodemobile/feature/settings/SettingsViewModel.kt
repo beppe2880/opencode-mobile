@@ -92,6 +92,7 @@ class SettingsViewModel(
             is SettingsEvent.SelectionApplyChanged -> update { it.copy(selectionApply = event.apply) }
             is SettingsEvent.NewChatModelChanged -> update { it.copy(newChatModel = event.model) }
             is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
+            is SettingsEvent.GroupThoughtsChanged -> update { it.copy(groupThoughts = event.enabled) }
             is SettingsEvent.QuestionsCollapsedChanged -> update { it.copy(questionsCollapsed = event.enabled) }
             is SettingsEvent.PermissionsCollapsedChanged -> update { it.copy(permissionsCollapsed = event.enabled) }
             is SettingsEvent.NotificationsChanged -> when {

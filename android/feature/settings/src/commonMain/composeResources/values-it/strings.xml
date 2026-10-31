@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente della lista</string>
     <string name="settings_group_activity">Raggruppa ragionamento e strumenti</string>
     <string name="settings_group_activity_sub">Mostra in un'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
+    <string name="settings_group_thoughts">Raggruppa ragionamenti consecutivi</string>
+    <string name="settings_group_thoughts_sub">Mostra in una sola riga i ragionamenti che si susseguono, anche mentre si sta ragionando</string>
     <string name="settings_questions_collapsed">Mostra domande compresse</string>
     <string name="settings_questions_collapsed_sub">Le domande dell'agente si aprono come una barra di una riga sopra il riquadro di scrittura; toccala per rispondere</string>
     <string name="settings_permissions_collapsed">Mostra richieste di permesso compresse</string>

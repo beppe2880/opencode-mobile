@@ -91,6 +91,8 @@
     <string name="settings_swipe_chats_sub">اسحب يمينًا أو يسارًا في المحادثة لفتح الجلسة التالية أو السابقة في القائمة</string>
     <string name="settings_group_activity">تجميع التفكير والأدوات</string>
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
+    <string name="settings_group_thoughts">تجميع التفكير المتتابع</string>
+    <string name="settings_group_thoughts_sub">عرض التفكير المتتابع في صف واحد، حتى أثناء التفكير</string>
     <string name="settings_questions_collapsed">عرض الأسئلة مطوية</string>
     <string name="settings_questions_collapsed_sub">تظهر أسئلة الوكيل كشريط من سطر واحد فوق حقل الكتابة؛ انقر عليه للإجابة</string>
     <string name="settings_permissions_collapsed">عرض طلبات الأذونات مطوية</string>
