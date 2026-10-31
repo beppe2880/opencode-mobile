@@ -1147,21 +1147,48 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `shell commands and commands apply the pending selection first`() = runTest(main.testDispatcher) {
+    fun `shell commands and queued prompts keep the selection pending, the next steered prompt applies it`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
+        val sonnet = ModelRef("sonnet", "anthropic")
         vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(sonnet))
         vm.onEvent(ChatEvent.DraftChanged("!ls"))
         vm.onEvent(ChatEvent.Send)
         advanceUntilIdle()
-        assertEquals(listOf("agent:build", "shell:ls"), chat.calls)
+        assertEquals(listOf("shell:ls"), chat.calls)
 
-        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
         vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Queue))
+        vm.onEvent(ChatEvent.DraftChanged("later"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/review later"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("shell:ls", "prompt:later", "command:review"), chat.calls)
+        assertEquals("build", vm.state.value.agent)
+        assertEquals(sonnet, vm.state.value.model)
+
+        vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Steer))
         vm.onEvent(ChatEvent.DraftChanged("/review now"))
         vm.onEvent(ChatEvent.Send)
         advanceUntilIdle()
-        assertEquals(listOf("agent:build", "shell:ls", "model:anthropic/sonnet/null", "command:review"), chat.calls)
+        assertEquals(listOf("agent:build", "model:anthropic/sonnet/null", "command:review"), chat.calls.drop(3))
+    }
+
+    @Test
+    fun `a queued prompt still commits a staged revert without applying the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Revert("u1"))
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Queue))
+        vm.onEvent(ChatEvent.DraftChanged("instead"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("commit", "prompt:instead"), chat.calls)
+        assertEquals("build", vm.state.value.agent)
     }
 
     @Test

@@ -9,7 +9,9 @@ import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
+import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
+import io.github.beppe2880.opencodemobile.core.network.mapping.configuredModel
 import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -50,6 +52,11 @@ internal class RemoteCatalogRepository(
                 .sortedByDescending { it.releasedAt }
         }
     }
+
+    override suspend fun configuredModel(directory: String?): Result<ModelRef?> = remembered("config-model", directory) {
+        val api = clients.active().config
+        listOf(awaitBody { api.configGet(locationDirectory = directory) }.configuredModel())
+    }.map { it.single() }
 
     override suspend fun commands(directory: String?): Result<List<Command>> = remembered("commands", directory) {
         val api = clients.active().commands

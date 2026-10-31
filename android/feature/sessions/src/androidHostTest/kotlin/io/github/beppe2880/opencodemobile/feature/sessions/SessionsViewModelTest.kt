@@ -274,13 +274,18 @@ class SessionsViewModelTest {
     private val sonnet = ModelRef("sonnet", "anthropic", "high")
     private val opus = ModelRef("opus", "anthropic")
 
-    private fun withModels() {
+    private val gpt = ModelRef("gpt", "openai", "low")
+
+    private fun withModels(configured: Result<ModelRef?> = Result.success(null)) {
         catalog = FakeCatalog(
+            configured = configured,
             agents = listOf(
                 Agent("build", "build", null, AgentMode.Primary, hidden = false, color = null),
                 Agent("plan", "plan", null, AgentMode.Primary, hidden = false, color = null, model = opus),
             ),
-            models = listOf(haiku, sonnet, opus).map { ModelInfo(it.copy(variant = null), it.id, "anthropic", null, 1, true, emptyList(), 0, true, "active") },
+            models = listOf(haiku, sonnet, opus, gpt).map {
+                ModelInfo(it.copy(variant = null), it.id, "anthropic", null, 1, true, emptyList(), 0, true, "active")
+            },
         )
     }
 
@@ -288,6 +293,56 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.StartNewSession)
         advanceUntilIdle()
         return vm.state.value.newSession!!
+    }
+
+    @Test
+    fun `the model configured on the server comes before the last used one`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(gpt))
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(gpt, newSession(vm).defaultModel)
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(gpt, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `the agent's configured model comes before the one configured on the server`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(gpt))
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionAgent("plan"))
+        assertEquals(opus, vm.state.value.newSession!!.effectiveModel)
+        vm.onEvent(SessionsEvent.NewSessionAgent("build"))
+        assertEquals(gpt, vm.state.value.newSession!!.effectiveModel)
+    }
+
+    @Test
+    fun `a configured model that is not available, or a config that cannot be read, is skipped`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(ModelRef("gone", "openai")))
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(haiku, newSession(vm).defaultModel)
+
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        withModels(configured = Result.failure(OpenCodeError.Unreachable("down")))
+        val failing = vm()
+        advanceUntilIdle()
+        assertEquals(haiku, newSession(failing).defaultModel)
+        failing.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(haiku, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `without a configured model or history the server decides`() = runTest(main.testDispatcher) {
+        withModels()
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(null, newSession(vm).defaultModel)
     }
 
     @Test
@@ -429,7 +484,9 @@ private class FakeCatalog(
         Agent("title", "title", null, AgentMode.Primary, hidden = true, color = null),
     ),
     private val models: List<ModelInfo> = emptyList(),
+    private val configured: Result<ModelRef?> = Result.success(null),
 ) : CatalogRepository {
+    override suspend fun configuredModel(directory: String?): Result<ModelRef?> = configured
     override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(agents)
     override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(models)
 }

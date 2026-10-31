@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -305,13 +306,17 @@ class SessionsViewModel(
         updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = recent)) }
         viewModelScope.launch {
             val dir = directory.ifBlank { null }
+            // A config that cannot be read only skips its step.
+            val configuredRequest = async { catalog.configuredModel(dir).getOrNull() }
             val agents = catalog.agents(dir).getOrDefault(emptyList()).selectablePrimary()
             val models = catalog.models(dir).getOrDefault(emptyList())
+            val configured = configuredRequest.await()
             updateNew { new ->
                 withDefaultModel(
                     new.copy(
                         agents = agents,
                         models = models,
+                        configuredModel = configured,
                         agent = new.agent ?: agents.firstOrNull { it.id == "build" }?.id ?: agents.firstOrNull()?.id,
                     ),
                 )
@@ -321,13 +326,13 @@ class SessionsViewModel(
 
     /**
      * The model the new chat gets when none is picked, like OpenCode Desktop: the agent's
-     * configured one, then the last one used that is still available. "Server default" in
+     * configured one, the server's configured one, then the last one used; each only when available. "Server default" in
      * Settings leaves it to the server.
      */
     private fun withDefaultModel(new: NewSessionState): NewSessionState {
         if (settings.settings.value.newChatModel == NewChatModel.ServerDefault) return new.copy(defaultModel = null)
         val agent = new.agents.firstOrNull { it.id == new.agent }
-        return new.copy(defaultModel = newChatModel(agent, new.models, new.recentModels))
+        return new.copy(defaultModel = newChatModel(agent, new.configuredModel, new.models, new.recentModels))
     }
 
     /**

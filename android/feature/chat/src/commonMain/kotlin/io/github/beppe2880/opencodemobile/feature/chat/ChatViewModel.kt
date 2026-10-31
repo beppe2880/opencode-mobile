@@ -729,7 +729,8 @@ class ChatViewModel(
         sendEffect(ChatEffect.PromptSent)
         viewModelScope.launch {
             var committed = revert == null
-            val result = prepareSend(revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } }).fold(
+            val settle: (suspend () -> Result<Unit>)? = revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } }
+            val result = prepareSend(apply = delivery == PromptDelivery.Steer, settle).fold(
                 onSuccess = {
                     if (command != null) chat.command(sessionId, command, arguments, delivery, attachments)
                     else chat.prompt(sessionId, text, delivery, attachments)
@@ -772,7 +773,8 @@ class ChatViewModel(
         sendEffect(ChatEffect.PromptSent)
         viewModelScope.launch {
             var committed = revert == null
-            val ready = prepareSend(revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } })
+            // Like OpenCode Desktop, a shell command runs with the session's selection.
+            val ready = prepareSend(apply = false, revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } })
             // The server answers when the command exits; the composer is free again at once.
             updateState { it.copy(sending = false) }
             ready.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
@@ -1112,12 +1114,16 @@ class ChatViewModel(
     }
 
     /**
-     * Applies the selection picked in the composer right before a prompt or shell command, in
-     * OpenCode Desktop's order: the agent, then [settle] when given (committing a staged revert,
-     * which would otherwise delete the model switch), then the model. What was applied stops
-     * being pending, so after a failure only the rest is applied on the next try.
+     * Runs before a prompt, command or shell command. When [apply] is set, the selection picked
+     * in the composer is applied in OpenCode Desktop's order: the agent, then [settle] when
+     * given (committing a staged revert, which would otherwise delete the model switch), then
+     * the model. What was applied stops being pending, so after a failure only the rest is
+     * applied on the next try. Like Desktop, only a steered prompt or command applies it: a
+     * queued one must not reconfigure the work it waits behind, and a shell command runs with
+     * the session's selection, so the choice stays pending for the next steered prompt.
      */
-    private suspend fun prepareSend(settle: (suspend () -> Result<Unit>)?): Result<Unit> {
+    private suspend fun prepareSend(apply: Boolean, settle: (suspend () -> Result<Unit>)?): Result<Unit> {
+        if (!apply) return settle?.invoke() ?: Result.success(Unit)
         pendingAgent?.let { agent ->
             chat.switchAgent(sessionId, agent).onFailure { return Result.failure(it) }
             sessionSelection(agent, null)

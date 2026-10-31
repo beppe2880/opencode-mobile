@@ -23,6 +23,8 @@ data class NewSessionState(
     /** Models last used on this device, then those of the most recently updated sessions; listed first in the picker. */
     val recentModels: List<ModelRef> = emptyList(),
     val agent: String? = null,
+    /** Set explicitly in the server configuration; null when not set or not readable. */
+    val configuredModel: ModelRef? = null,
     /** Picked by the user; null when not picked. */
     val model: ModelRef? = null,
     /** The model used when none is picked (Settings: model for new chats); null lets the server decide. */

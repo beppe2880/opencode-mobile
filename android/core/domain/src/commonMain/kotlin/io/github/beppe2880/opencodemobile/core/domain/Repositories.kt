@@ -268,6 +268,12 @@ interface CatalogRepository {
     /** Enabled models, newest release first. */
     suspend fun models(directory: String?): Result<List<ModelInfo>>
 
+    /**
+     * The model set explicitly in the server configuration (`opencode.json` "model") for
+     * [directory]; null when none is set. Not the server's implicit fallback.
+     */
+    suspend fun configuredModel(directory: String?): Result<ModelRef?> = Result.success(null)
+
     /** Slash commands available in [directory]. */
     suspend fun commands(directory: String?): Result<List<Command>> = Result.success(emptyList())
 

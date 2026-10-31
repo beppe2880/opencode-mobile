@@ -18,12 +18,12 @@ const val RECENT_MODELS = 5
 
 /**
  * The model a new chat starts with when none was picked, in OpenCode Desktop's order: the
- * agent's configured model, then the most recently used model still [available]. Null lets
- * the server choose (its configured default, or its own fallback).
+ * agent's configured model, the global [configured] one, then the most recently used model;
+ * each only when it is [available]. Null lets the server choose its own fallback.
  */
-fun newChatModel(agent: Agent?, available: List<ModelInfo>, recent: List<ModelRef>): ModelRef? {
+fun newChatModel(agent: Agent?, configured: ModelRef?, available: List<ModelInfo>, recent: List<ModelRef>): ModelRef? {
     val keys = available.mapTo(HashSet()) { it.ref.key }
-    return (listOfNotNull(agent?.model) + recent).firstOrNull { it.key in keys }
+    return (listOfNotNull(agent?.model, configured) + recent).firstOrNull { it.key in keys }
 }
 
 data class TokenUsage(
