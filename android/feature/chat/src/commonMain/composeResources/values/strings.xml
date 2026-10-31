@@ -120,6 +120,8 @@
     <string name="chat_form_title">Question from the agent</string>
     <string name="chat_form_submit">Send answer</string>
     <string name="chat_form_dismiss">Dismiss</string>
+    <string name="chat_form_collapse">Collapse question</string>
+    <string name="chat_form_expand">Expand question</string>
     <string name="chat_form_other">Other answer</string>
     <string name="chat_form_open_link">Open link</string>
     <plurals name="chat_form_more">

@@ -21,6 +21,7 @@ class PreferencesRepositoriesTest {
             theme = ThemeMode.Dark,
             showCost = false,
             groupActivity = false,
+            questionsCollapsed = true,
             terminalKeys = keys,
             outputPreviewLines = 24,
             liveOutputIntervalMs = 3_000,

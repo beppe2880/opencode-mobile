@@ -69,6 +69,8 @@
     <string name="settings_swipe_chats_sub">Swipe left or right on a chat to open the next or previous session in the list</string>
     <string name="settings_group_activity">Group thinking and tools</string>
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
+    <string name="settings_questions_collapsed">Show questions collapsed</string>
+    <string name="settings_questions_collapsed_sub">Questions from the agent start as a one-line bar above the composer; tap it to answer</string>
     <string name="settings_agent_outline">Agent color outline</string>
     <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
     <string name="settings_dictation">Voice input</string>

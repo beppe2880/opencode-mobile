@@ -61,6 +61,7 @@ class ChatViewModel(
     private var messages: List<Message> = emptyList()
     private var showReasoning: Boolean = settings.settings.value.showReasoning
     private var groupActivity: Boolean = settings.settings.value.groupActivity
+    private var questionsCollapsed: Boolean = settings.settings.value.questionsCollapsed
     private var reloadJob: Job? = null
     private var olderJob: Job? = null
     private var previewJob: Job? = null
@@ -108,6 +109,7 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
+                questionsCollapsed = s.questionsCollapsed
                 updateState {
                     it.copy(
                         expandToolsByDefault = s.expandToolsByDefault,
@@ -175,6 +177,7 @@ class ChatViewModel(
             }
             ChatEvent.SubmitForm -> submitForm()
             ChatEvent.DismissForm -> dismissForm()
+            is ChatEvent.CollapseForm -> updateState { it.copy(formCollapsed = event.collapsed) }
             is ChatEvent.Revert -> revert(event.messageId)
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
@@ -491,11 +494,14 @@ class ChatViewModel(
         viewModelScope.launch { chat.forms(sessionId).onSuccess(::showForms) }
     }
 
-    /** Shows [forms]; answers restart from the defaults when the first form changes. */
+    /** Shows [forms]; answers and folding restart from the defaults when the first form changes. */
     private fun showForms(forms: List<Form>) = updateState { s ->
         val first = forms.firstOrNull()
-        val answers = if (first?.id == s.forms.firstOrNull()?.id) s.formAnswers else first?.initialAnswers().orEmpty()
-        s.copy(forms = forms, formAnswers = answers)
+        if (first?.id == s.forms.firstOrNull()?.id) {
+            s.copy(forms = forms)
+        } else {
+            s.copy(forms = forms, formAnswers = first?.initialAnswers().orEmpty(), formCollapsed = questionsCollapsed)
+        }
     }
 
     private fun submitForm() {

@@ -113,6 +113,8 @@ internal fun BottomArea(
                     answers = state.formAnswers,
                     pendingCount = state.forms.size,
                     submitting = state.submittingForm,
+                    collapsed = state.formCollapsed,
+                    onCollapse = { onEvent(ChatEvent.CollapseForm(it)) },
                     onAnswer = { key, answer -> onEvent(ChatEvent.FormAnswerChanged(key, answer)) },
                     onSubmit = { onEvent(ChatEvent.SubmitForm) },
                     onDismiss = { onEvent(ChatEvent.DismissForm) },

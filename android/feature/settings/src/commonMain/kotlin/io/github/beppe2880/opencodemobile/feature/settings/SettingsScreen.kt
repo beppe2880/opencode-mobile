@@ -120,6 +120,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ou
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_password
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fast
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
@@ -520,6 +522,14 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.agentColorOutline,
                 onCheckedChange = { onEvent(SettingsEvent.AgentColorOutlineChanged(it)) },
                 modifier = Modifier.testTag("settings_agent_outline_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_questions_collapsed),
+                subtitle = stringResource(Res.string.settings_questions_collapsed_sub),
+                checked = settings.questionsCollapsed,
+                onCheckedChange = { onEvent(SettingsEvent.QuestionsCollapsedChanged(it)) },
+                modifier = Modifier.testTag("settings_questions_collapsed_switch"),
             )
             OcDivider()
             OcSwitchRow(

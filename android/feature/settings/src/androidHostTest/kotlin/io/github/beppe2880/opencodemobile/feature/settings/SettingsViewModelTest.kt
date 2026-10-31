@@ -51,6 +51,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
+        vm.onEvent(SettingsEvent.QuestionsCollapsedChanged(true))
         vm.onEvent(SettingsEvent.DictationChanged(false))
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
@@ -92,6 +93,7 @@ class SettingsViewModelTest {
                 agentColorOutline = false,
                 dictation = false,
                 groupActivity = false,
+                questionsCollapsed = true,
             ),
             settings.settings.value,
         )

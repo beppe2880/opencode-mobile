@@ -68,6 +68,8 @@ data class ChatState(
     val forms: List<Form> = emptyList(),
     val formAnswers: Map<String, FormAnswer> = emptyMap(),
     val submittingForm: Boolean = false,
+    /** The first question shows as a one-line bar; its answers are kept. */
+    val formCollapsed: Boolean = false,
     /** Messages hidden by a staged revert; 0 when none. */
     val revertedCount: Int = 0,
     val reverting: Boolean = false,
@@ -205,6 +207,9 @@ sealed interface ChatEvent {
     data class FormAnswerChanged(val key: String, val answer: FormAnswer?) : ChatEvent
     data object SubmitForm : ChatEvent
     data object DismissForm : ChatEvent
+
+    /** Folds the question card into a bar or opens it again; nothing is sent to the server. */
+    data class CollapseForm(val collapsed: Boolean) : ChatEvent
 
     /** Undo [messageId] and everything after it; its text returns to the composer. */
     data class Revert(val messageId: String) : ChatEvent

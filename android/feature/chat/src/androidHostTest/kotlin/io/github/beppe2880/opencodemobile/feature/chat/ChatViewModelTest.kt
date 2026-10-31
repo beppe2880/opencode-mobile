@@ -623,6 +623,52 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `collapsing a question keeps its answers and tells the server nothing`() = runTest(main.testDispatcher) {
+        chat.forms = listOf(Form("f1", "s1", "Which storage?", listOf(FormField.Text("choice", required = true))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.formCollapsed)
+
+        vm.onEvent(ChatEvent.FormAnswerChanged("choice", FormAnswer.Text("room")))
+        vm.onEvent(ChatEvent.CollapseForm(true))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.formCollapsed)
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+        assertEquals("f1", vm.state.value.forms.single().id)
+        assertTrue(chat.formReplies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapseForm(false))
+        assertFalse(vm.state.value.formCollapsed)
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+    }
+
+    @Test
+    fun `each new question starts collapsed or open as the setting says`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(questionsCollapsed = true)
+        chat.forms = listOf(Form("f1", "s1", "First?", listOf(FormField.Toggle("ok"))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.formCollapsed)
+
+        vm.onEvent(ChatEvent.CollapseForm(false))
+        settings.settings.value = AppSettings(questionsCollapsed = false)
+        chat.forms = listOf(Form("f2", "s1", "Second?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.formCollapsed)
+
+        // Folding one question does not fold the next one.
+        vm.onEvent(ChatEvent.CollapseForm(true))
+        chat.forms = listOf(Form("f3", "s1", "Third?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.formCollapsed)
+        assertEquals("f3", vm.state.value.forms.single().id)
+    }
+
+    @Test
     fun `form events refresh the pending questions`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
