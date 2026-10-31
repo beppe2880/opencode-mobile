@@ -139,6 +139,13 @@
     <string name="settings_server_version">服务器版本</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">不可用</string>
+    <string name="settings_check_updates">检查更新</string>
+    <string name="settings_check_updates_sub">应用启动时（每天最多一次）检查是否有新版本并显示提示</string>
+    <string name="update_available">版本 %1$s 可用</string>
+    <string name="update_view">查看</string>
+    <string name="update_release_notes">更新说明</string>
+    <string name="update_install">更新</string>
+    <string name="update_dismiss">关闭</string>
     <string name="settings_split_view">聊天与列表并排</string>
     <string name="settings_split_view_sub">在宽屏上，将打开的聊天显示在会话列表旁边。拖动分隔线上的手柄可调整列表大小。</string>
     <string name="settings_list_width">会话列表宽度</string>

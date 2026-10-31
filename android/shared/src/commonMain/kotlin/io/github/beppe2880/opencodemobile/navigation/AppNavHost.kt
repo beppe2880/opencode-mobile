@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,12 +53,14 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
@@ -241,6 +244,7 @@ private fun SessionsListDetail(
                 onOpenSettings = onOpenSettings,
                 openNewSession = openNewSession,
                 onNewSessionOpened = onNewSessionOpened,
+                banner = { UpdateBanner() },
             )
         } else {
             val windowWidth = maxWidth
@@ -274,6 +278,7 @@ private fun SessionsListDetail(
                         onNewSessionOpened()
                     },
                     modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
+                    banner = { UpdateBanner() },
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
                 if (current != null) {
@@ -360,3 +365,9 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
 }
 
 private val HandleWidth = 24.dp
+
+/** The notice of a new app release, at the top of the session list. */
+@Composable
+private fun UpdateBanner() {
+    UpdateNoticeRoute(Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md))
+}

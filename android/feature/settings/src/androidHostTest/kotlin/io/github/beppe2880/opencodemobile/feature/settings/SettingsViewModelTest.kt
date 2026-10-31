@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -29,7 +30,7 @@ class SettingsViewModelTest {
 
     private val servers = FakeServers()
     private val settings = FakeSettings()
-    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27"))
+    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android))
 
     @Test
     fun `exposes servers, versions and settings`() = runTest(main.testDispatcher) {
@@ -72,6 +73,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
+        vm.onEvent(SettingsEvent.CheckForUpdatesChanged(false))
         vm.onEvent(SettingsEvent.BackShowsListChanged(false))
         advanceUntilIdle()
 
@@ -102,6 +104,7 @@ class SettingsViewModelTest {
                 agentColorOutline = false,
                 dictation = false,
                 groupActivity = false,
+                checkForUpdates = false,
                 backShowsList = false,
             ),
             settings.settings.value,
@@ -233,7 +236,7 @@ private class FakeServers : ServerRepository {
     }
 }
 
-private class FakeSettings : SettingsRepository {
+internal class FakeSettings : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings())
     override suspend fun update(transform: (AppSettings) -> AppSettings) {
         settings.value = transform(settings.value)

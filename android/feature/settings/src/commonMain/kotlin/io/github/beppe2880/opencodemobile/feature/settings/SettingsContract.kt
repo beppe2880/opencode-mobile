@@ -7,9 +7,15 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
 /** Build information provided by the app module. */
-data class AppInfo(val versionName: String, val apiVersion: String)
+data class AppInfo(
+    val versionName: String,
+    val apiVersion: String,
+    /** Where this platform's app is updated from. */
+    val updateTarget: UpdateTarget,
+)
 
 @Immutable
 data class SettingsState(
@@ -75,6 +81,7 @@ sealed interface SettingsEvent {
     data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
+    data class CheckForUpdatesChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent
