@@ -1,10 +1,14 @@
 package io.github.beppe2880.opencodemobile.core.data
 
 import com.russhwolf.settings.SharedPreferencesSettings
+import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentModelRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -31,6 +35,8 @@ class PreferencesRepositoriesTest {
             splitView = false,
             listPaneFraction = 0.35f,
             listPaneHandle = false,
+            selectionApply = SelectionApply.Immediately,
+            newChatModel = NewChatModel.ServerDefault,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -47,6 +53,7 @@ class PreferencesRepositoriesTest {
             .putInt("output_preview_lines", 7)
             .putLong("live_output_interval_ms", 1)
             .putFloat("chat_text_scale", 4f)
+            .putString("selection_apply", "Later")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
@@ -73,5 +80,28 @@ class PreferencesRepositoriesTest {
 
         drafts.save("ses_1", "  ")
         assertFalse(prefs.values.keys.any { it.endsWith("ses_1") })
+    }
+
+    @Test
+    fun `recent models are kept per server, newest first, and cleared with the server`() {
+        val prefs = InMemoryPreferences()
+        val store = FakeServerStore(StoredServers(listOf(profile("s1", "http://a"), profile("s2", "http://b")), activeId = "s1"))
+        val recents = PreferencesRecentModelRepository(SharedPreferencesSettings(prefs), TestGraph(store).clients)
+        val haiku = ModelRef("haiku", "anthropic")
+        val sonnet = ModelRef("sonnet", "anthropic", "high")
+
+        recents.used(haiku)
+        recents.used(sonnet)
+        recents.used(haiku.copy(variant = "low"))
+        assertEquals(listOf(haiku.copy(variant = "low"), sonnet), recents.recent())
+
+        val other = PreferencesRecentModelRepository(
+            SharedPreferencesSettings(prefs),
+            TestGraph(FakeServerStore(store.stored.copy(activeId = "s2"))).clients,
+        )
+        assertEquals(emptyList<ModelRef>(), other.recent())
+
+        PreferencesRecentModelRepository.clearServer(SharedPreferencesSettings(prefs), "s1")
+        assertEquals(emptyList<ModelRef>(), recents.recent())
     }
 }

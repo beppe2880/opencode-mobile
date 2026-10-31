@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomMessageCache
+import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentModelRepository
 import io.github.beppe2880.opencodemobile.core.data.catalog.RemoteCatalogRepository
 import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
@@ -23,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -61,6 +63,7 @@ val dataModule = module {
         val messages = get<MessageCache>()
         val lists = get<ListCache>()
         val drafts = get<Settings>(DraftsStore)
+        val settings = get<Settings>(SettingsStore)
         StoredServerRepository(
             store = get(),
             factory = get(),
@@ -68,7 +71,10 @@ val dataModule = module {
             onRemoved = { serverId ->
                 messages.clearServer(serverId)
                 lists.clearServer(serverId)
-                withContext(Dispatchers.IO) { PreferencesDraftRepository.clearServer(drafts, serverId) }
+                withContext(Dispatchers.IO) {
+                    PreferencesDraftRepository.clearServer(drafts, serverId)
+                    PreferencesRecentModelRepository.clearServer(settings, serverId)
+                }
             },
         )
     }
@@ -81,4 +87,5 @@ val dataModule = module {
     single<McpRepository> { RemoteMcpRepository(get()) }
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
+    single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
 }

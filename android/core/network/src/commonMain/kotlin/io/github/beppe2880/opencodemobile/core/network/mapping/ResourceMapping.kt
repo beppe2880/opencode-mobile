@@ -57,6 +57,7 @@ fun AgentInfo.toDomain(): Agent = Agent(
     },
     hidden = hidden,
     color = color,
+    model = model?.toDomain(),
 )
 
 /** [providerNames] maps provider IDs to display names; unknown providers keep their ID. */

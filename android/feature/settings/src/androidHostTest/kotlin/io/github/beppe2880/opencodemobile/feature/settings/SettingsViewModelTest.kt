@@ -2,6 +2,8 @@ package io.github.beppe2880.opencodemobile.feature.settings
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
@@ -66,6 +68,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
+        vm.onEvent(SettingsEvent.SelectionApplyChanged(SelectionApply.Immediately))
+        vm.onEvent(SettingsEvent.NewChatModelChanged(NewChatModel.ServerDefault))
         advanceUntilIdle()
 
         assertEquals(
@@ -91,6 +95,8 @@ class SettingsViewModelTest {
                 swipeBetweenChats = false,
                 agentColorOutline = false,
                 dictation = false,
+                selectionApply = SelectionApply.Immediately,
+                newChatModel = NewChatModel.ServerDefault,
                 groupActivity = false,
             ),
             settings.settings.value,

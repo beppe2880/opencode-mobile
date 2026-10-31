@@ -2,6 +2,8 @@ package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 
@@ -63,6 +65,8 @@ sealed interface SettingsEvent {
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
+    data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
+    data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent

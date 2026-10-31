@@ -83,6 +83,8 @@ class SettingsViewModel(
             is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
             is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
             is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }
+            is SettingsEvent.SelectionApplyChanged -> update { it.copy(selectionApply = event.apply) }
+            is SettingsEvent.NewChatModelChanged -> update { it.copy(newChatModel = event.model) }
             is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
             is SettingsEvent.NotificationsChanged -> when {
                 !event.enabled || currentState.notificationsAllowed -> update { it.copy(notifications = event.enabled) }

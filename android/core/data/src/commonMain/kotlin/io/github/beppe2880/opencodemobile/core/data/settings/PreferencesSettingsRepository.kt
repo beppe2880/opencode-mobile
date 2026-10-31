@@ -3,7 +3,9 @@ package io.github.beppe2880.opencodemobile.core.data.settings
 import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
@@ -46,6 +48,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
+        prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
+        prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
         prefs.putBoolean(KEY_NOTIFICATIONS, next.notifications)
         prefs.putBoolean(KEY_NOTIFY_PERMISSIONS, next.notifyPermissions)
@@ -87,6 +91,10 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
+            selectionApply = SelectionApply.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SELECTION_APPLY) }
+                ?: defaults.selectionApply,
+            newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
+                ?: defaults.newChatModel,
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
             notifyPermissions = prefs.getBoolean(KEY_NOTIFY_PERMISSIONS, defaults.notifyPermissions),
@@ -128,6 +136,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
+        const val KEY_SELECTION_APPLY = "selection_apply"
+        const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_GROUP_ACTIVITY = "group_activity"
         const val KEY_NOTIFICATIONS = "notifications"
         const val KEY_NOTIFY_PERMISSIONS = "notify_permissions"
