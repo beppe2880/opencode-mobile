@@ -44,10 +44,28 @@
     <string name="chat_terminal_open">Terminal öffnen</string>
     <string name="chat_changes_session">Gesamte Sitzung</string>
     <string name="chat_changes_last_turn">Letzter Durchlauf</string>
+    <string name="chat_changes_folder">Ordner</string>
+    <string name="chat_changes_empty_folder">Dieser Ordner hat keine nicht committeten Änderungen.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d geänderte Datei</item>
         <item quantity="other">%1$d geänderte Dateien</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d Datei vom Agenten bearbeitet</item>
+        <item quantity="other">%1$d Dateien vom Agenten bearbeitet</item>
+    </plurals>
+    <string name="chat_vcs_detached">Losgelöster HEAD</string>
+    <string name="chat_vcs_detached_short">losgelöst</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d Datei</item>
+        <item quantity="other">%1$d Dateien</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d Agenten-Änderung</item>
+        <item quantity="other">%1$d Agenten-Änderungen</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Ordner %1$s</string>
+    <string name="chat_vcs_branch_description">Branch %1$s</string>
     <string name="chat_changes_empty">Keine geänderten Dateien</string>
     <string name="chat_changes_empty_session">Der Agent hat in dieser Sitzung keine Datei bearbeitet.</string>
     <string name="chat_changes_empty_turn">Der Agent hat im letzten Durchlauf keine Datei bearbeitet.</string>

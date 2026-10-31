@@ -41,6 +41,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         getByName("androidHostTest").dependencies {
             implementation(project(":core:testing"))
             implementation(libs.junit)

@@ -1,6 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -48,6 +51,9 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ShowReasoningChanged(false))
         vm.onEvent(SettingsEvent.ExpandToolsChanged(true))
         vm.onEvent(SettingsEvent.ShowCostChanged(false))
+        vm.onEvent(SettingsEvent.ChatHeaderLineChanged(ChatHeaderLine.BranchFiles))
+        vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
+        vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
@@ -89,6 +95,9 @@ class SettingsViewModelTest {
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
                 showCost = false,
+                chatHeaderLine = ChatHeaderLine.BranchFiles,
+                headerOpens = ChangesScope.Session,
+                chatHeaderStyle = ChatHeaderStyle.Short,
                 swipeBetweenChats = false,
                 agentColorOutline = false,
                 dictation = false,

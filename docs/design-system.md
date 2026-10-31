@@ -92,7 +92,7 @@ control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
 | `OcConfirmDialog`, `OcTextInputDialog` | Destructive confirmations and rename flows. |
 | `OcBottomSheet` | Modal sheet with token colors, starts below the status bar. |
 | `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section. |
-| `OcTopBar` | 56dp bar with optional back button, title accessory (status dot) and actions; owns the status bar inset. |
+| `OcTopBar` | 56dp bar with optional back button, title accessory (status dot), subtitle or custom subtitle content, and actions; owns the status bar inset. |
 | `OcLogo` | Canvas-drawn OpenCode-style mark. |
 | `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. |
 | `Modifier.exposeTestTags()` | Applies `testTagsAsResourceId` inside popups, dialogs and sheets (separate composition roots). |

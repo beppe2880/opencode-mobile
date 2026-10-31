@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
@@ -97,6 +98,12 @@ data class ChatState(
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
     val mcps: McpPanel? = null,
+    /** The branch line under the title; null while unknown, empty or turned off (setting). */
+    val vcs: VcsLine? = null,
+    /** How the header line is written (setting). */
+    val headerStyle: ChatHeaderStyle = ChatHeaderStyle.Icons,
+    /** The folder is a repository: the changes sheet offers its uncommitted changes. */
+    val folderChanges: Boolean = false,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -113,6 +120,75 @@ data class ChatState(
 }
 
 data class SessionPeek(val id: String, val title: String)
+
+/**
+ * The project's [folder] name (null when the setting leaves it out), [branch] (null on a
+ * detached HEAD) and its [files] with uncommitted changes. Outside a repository there is no
+ * branch and [files] only counts what the agent edited ([agentEdits]): changes made by shell
+ * commands are not known.
+ */
+data class VcsLine(val folder: String?, val branch: String?, val files: Int, val agentEdits: Boolean = false)
+
+/** The icon before a part of the header line in the [ChatHeaderStyle.Icons] style. */
+internal enum class VcsIcon { Folder, Branch, Changes, Edits }
+
+/** One part of the header line: [icon] (only in the icons style) and its [text]. */
+internal data class VcsPart(val icon: VcsIcon?, val text: String)
+
+/** The header line split where it may shrink: the [folder] first, then the [rest]. */
+internal data class VcsText(val folder: VcsPart?, val rest: List<VcsPart>)
+
+/**
+ * The words of the header line, resolved for its file count: the count alone ([count]),
+ * short ("4 files", "4 agent edits") and full ("4 files changed", "4 files edited by the
+ * agent"); [folderDescription] and [branchDescription] name the parts for screen readers.
+ */
+internal data class VcsStrings(
+    val detached: String,
+    val detachedShort: String,
+    val count: String,
+    val filesShort: String,
+    val filesFull: String,
+    val editsShort: String,
+    val editsFull: String,
+    val folderDescription: String,
+    val branchDescription: String,
+)
+
+/** The header line in [style]; outside a repository there is no branch, only the agent's edits. */
+internal fun VcsLine.text(style: ChatHeaderStyle, strings: VcsStrings): VcsText {
+    val icons = style == ChatHeaderStyle.Icons
+    val branchText = when {
+        agentEdits -> null
+        branch != null -> branch
+        style == ChatHeaderStyle.Full -> strings.detached
+        else -> strings.detachedShort
+    }
+    val filesText = when {
+        files == 0 -> null
+        icons -> strings.count
+        style == ChatHeaderStyle.Short -> if (agentEdits) strings.editsShort else strings.filesShort
+        else -> if (agentEdits) strings.editsFull else strings.filesFull
+    }
+    return VcsText(
+        folder = folder?.let { VcsPart(VcsIcon.Folder.takeIf { icons }, it) },
+        rest = listOfNotNull(
+            branchText?.let { VcsPart(VcsIcon.Branch.takeIf { icons }, it) },
+            filesText?.let { VcsPart((if (agentEdits) VcsIcon.Edits else VcsIcon.Changes).takeIf { icons }, it) },
+        ),
+    )
+}
+
+/** One sentence for screen readers, the same in every style: "Folder app, Branch main, 4 files changed". */
+internal fun VcsLine.description(strings: VcsStrings): String = listOfNotNull(
+    strings.folderDescription.takeIf { folder != null },
+    strings.branchDescription.takeUnless { agentEdits },
+    (if (agentEdits) strings.editsFull else strings.filesFull).takeIf { files > 0 },
+).joinToString(", ")
+
+/** The last segment of [directory], `/` or `\\` separated; the directory itself when it has none. */
+internal fun folderName(directory: String): String =
+    directory.trimEnd('/', '\\').substringAfterLast('/').substringAfterLast('\\').ifEmpty { directory }
 
 data class McpPanel(
     val servers: List<McpServer>? = null,
@@ -214,6 +290,9 @@ sealed interface ChatEvent {
     data class Fork(val messageId: String) : ChatEvent
 
     data object OpenChanges : ChatEvent
+
+    /** The header line was tapped: opens the folder or the session changes (setting). */
+    data object OpenHeaderChanges : ChatEvent
     data object OpenMcps : ChatEvent
     data object CloseMcps : ChatEvent
     data object RefreshMcps : ChatEvent

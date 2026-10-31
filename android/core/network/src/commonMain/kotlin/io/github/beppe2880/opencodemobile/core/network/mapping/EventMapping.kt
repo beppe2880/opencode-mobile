@@ -9,6 +9,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     is OpenCodeEvent.ServerconnectedWrapper -> ServerEvent.Connected
     is OpenCodeEvent.McpstatuschangedWrapper -> ServerEvent.McpsChanged
+    is OpenCodeEvent.VcsbranchupdatedWrapper -> ServerEvent.BranchChanged(value.location?.directory, value.data.branch)
 
     is OpenCodeEvent.SessioncreatedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     // A fork is a new session, announced with this event instead of session.created.
