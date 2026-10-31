@@ -22,4 +22,8 @@
     <string name="oc_models_variant">Razonamiento</string>
     <string name="oc_models_variant_default">Predeterminado</string>
     <string name="oc_models_empty">No hay modelos que coincidan con tu búsqueda</string>
+    <string name="oc_running">En ejecución</string>
+    <string name="oc_working">Trabajando</string>
+    <string name="oc_running_agents">Subagentes: %1$d</string>
+    <string name="oc_running_commands">Comandos: %1$d</string>
 </resources>

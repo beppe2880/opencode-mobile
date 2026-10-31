@@ -58,6 +58,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
         vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
+        vm.onEvent(SettingsEvent.RunningInListChanged(false))
+        vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
         vm.onEvent(SettingsEvent.QuestionsCollapsedChanged(true))
@@ -107,6 +109,8 @@ class SettingsViewModelTest {
                 headerOpens = ChangesScope.Session,
                 chatHeaderStyle = ChatHeaderStyle.Short,
                 swipeBetweenChats = false,
+                showRunningWorkInList = false,
+                confirmStopCommand = false,
                 agentColorOutline = false,
                 dictation = false,
                 selectionApply = SelectionApply.Immediately,

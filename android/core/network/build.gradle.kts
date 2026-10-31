@@ -29,6 +29,7 @@ kotlin {
             implementation(libs.ktor.client.logging)
             api(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.atomicfu)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)

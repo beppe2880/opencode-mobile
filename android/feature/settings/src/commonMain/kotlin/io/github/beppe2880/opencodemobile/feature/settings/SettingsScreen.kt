@@ -87,6 +87,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ba
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
@@ -170,6 +172,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_re
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_message
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_section
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_save
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_next
@@ -611,6 +615,22 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.swipeBetweenChats,
                 onCheckedChange = { onEvent(SettingsEvent.SwipeBetweenChatsChanged(it)) },
                 modifier = Modifier.testTag("settings_swipe_chats_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_running_in_list),
+                subtitle = stringResource(Res.string.settings_running_in_list_sub),
+                checked = settings.showRunningWorkInList,
+                onCheckedChange = { onEvent(SettingsEvent.RunningInListChanged(it)) },
+                modifier = Modifier.testTag("settings_running_in_list_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_confirm_stop),
+                subtitle = stringResource(Res.string.settings_confirm_stop_sub),
+                checked = settings.confirmStopCommand,
+                onCheckedChange = { onEvent(SettingsEvent.ConfirmStopChanged(it)) },
+                modifier = Modifier.testTag("settings_confirm_stop_switch"),
             )
             OcDivider()
             OcSwitchRow(

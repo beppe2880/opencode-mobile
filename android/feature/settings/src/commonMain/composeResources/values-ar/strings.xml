@@ -63,6 +63,10 @@
     <string name="settings_reset_message">تعود كل الخيارات إلى قيمها الافتراضية. تُحفظ الخوادم المحفوظة والمسودات ومفاتيح الطرفية.</string>
     <string name="settings_reset_confirm">إعادة ضبط</string>
     <string name="settings_full_commands_sub">التفاف الأوامر والمسارات الطويلة على عدة أسطر في صفوف الأدوات بدلًا من قطعها</string>
+    <string name="settings_running_in_list">إظهار الأعمال قيد التشغيل في قائمة الجلسات</string>
+    <string name="settings_running_in_list_sub">عرض عدد الوكلاء الفرعيين والأوامر الخلفية قيد التشغيل أسفل كل جلسة</string>
+    <string name="settings_confirm_stop">تأكيد قبل إيقاف الأوامر</string>
+    <string name="settings_confirm_stop_sub">اطلب التأكيد قبل إيقاف أمر خلفي من ورقة قيد التشغيل</string>
     <string name="settings_show_cost">إظهار التكلفة</string>
     <string name="settings_show_cost_sub">عرض تكلفة كل جولة بالدولار أسفل الرد</string>
     <string name="settings_header_line">سطر رأس المحادثة</string>

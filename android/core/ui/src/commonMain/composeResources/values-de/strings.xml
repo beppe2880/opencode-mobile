@@ -22,4 +22,8 @@
     <string name="oc_models_variant">Denkmodus</string>
     <string name="oc_models_variant_default">Standard</string>
     <string name="oc_models_empty">Keine Modelle für diese Suche gefunden</string>
+    <string name="oc_running">Läuft</string>
+    <string name="oc_working">Arbeitet</string>
+    <string name="oc_running_agents">Subagenten: %1$d</string>
+    <string name="oc_running_commands">Befehle: %1$d</string>
 </resources>

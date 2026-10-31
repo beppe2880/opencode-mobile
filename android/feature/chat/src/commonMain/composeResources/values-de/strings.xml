@@ -166,4 +166,13 @@
     <string name="chat_mcps_needs_auth">Authentifizierung erforderlich</string>
     <string name="chat_mcps_auth_hint">Melde dich in OpenCode auf deinem Computer an und aktualisiere hier.</string>
     <string name="chat_untitled">Unbenannte Sitzung</string>
+    <string name="chat_running_empty">Keine Subagenten oder Befehle aktiv</string>
+    <string name="chat_running_error">Laufende Vorgänge konnten nicht aktualisiert werden</string>
+    <string name="chat_running_unassigned">Andere Befehle in diesem Projekt</string>
+    <string name="chat_running_unassigned_hint">Für diese Befehle ist kein Sitzungsbesitzer bekannt.</string>
+    <string name="chat_running_no_output">Noch keine Ausgabe</string>
+    <string name="chat_running_elapsed">Verstrichen: %1$s</string>
+    <string name="chat_running_refresh">Laufende Vorgänge aktualisieren</string>
+    <string name="chat_running_stop_title">Diesen Befehl beenden?</string>
+    <string name="chat_running_stop_message">%1$s\n\nDer Befehl wird beendet und seine Ausgabe ist nicht mehr verfügbar.</string>
 </resources>

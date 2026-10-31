@@ -54,6 +54,8 @@ import kotlinx.serialization.json.longOrNull
 class OpenCodeClient internal constructor(
     val baseUrl: String,
     private val http: HttpClient,
+    /** Offset of the server clock, from this client's responses. */
+    val clock: ServerClock = ServerClock(),
 ) {
     val server: ServerApi = ServerApi(baseUrl, http)
     val sessions: SessionApi = SessionApi(baseUrl, http)

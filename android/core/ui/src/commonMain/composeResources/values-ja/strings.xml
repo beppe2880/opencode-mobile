@@ -22,4 +22,8 @@
     <string name="oc_models_variant">推論</string>
     <string name="oc_models_variant_default">デフォルト</string>
     <string name="oc_models_empty">検索条件に一致するモデルがありません</string>
+    <string name="oc_running">実行中</string>
+    <string name="oc_working">作業中</string>
+    <string name="oc_running_agents">サブエージェント: %1$d</string>
+    <string name="oc_running_commands">コマンド: %1$d</string>
 </resources>

@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -410,6 +411,55 @@ class SessionsViewModelTest {
         assertEquals(listOf<ModelRef?>(null), sessions.createdModels)
     }
 
+    @Test
+    fun `running work is counted every 15 s while visible without reading transcripts`() = runTest(main.testDispatcher) {
+        chat.commands = listOf(RunningCommand("sh", "watch", "/p/today", 1, sessionId = "today"))
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(0, chat.shellReads)
+        vm.onEvent(SessionsEvent.Visible(true))
+        runCurrent()
+        val first = chat.shellReads
+        assertEquals(1, vm.state.value.work["today"]?.commands?.size)
+        advanceTimeBy(14_000)
+        runCurrent()
+        assertEquals(first, chat.shellReads)
+        advanceTimeBy(1_100)
+        runCurrent()
+        assertEquals(2 * first, chat.shellReads)
+        assertEquals(0, chat.messageReads)
+
+        vm.onEvent(SessionsEvent.Visible(false))
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertEquals(2 * first, chat.shellReads)
+    }
+
+    @Test
+    fun `a project that cannot be read keeps its counts and the setting turns counting off`() = runTest(main.testDispatcher) {
+        chat.commands = listOf(RunningCommand("sh", "watch", "/p/today", 1, sessionId = "today"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.Visible(true))
+        runCurrent()
+        assertEquals(1, vm.state.value.work["today"]?.commands?.size)
+
+        chat.failing = setOf("/p/today")
+        advanceTimeBy(15_100)
+        runCurrent()
+        assertEquals(1, vm.state.value.work["today"]?.commands?.size)
+
+        settings.settings.value = AppSettings(showRunningWorkInList = false)
+        runCurrent()
+        assertFalse(vm.state.value.showRunningWork)
+        assertTrue(vm.state.value.work.isEmpty())
+        val reads = chat.shellReads
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertEquals(reads, chat.shellReads)
+        vm.onEvent(SessionsEvent.Visible(false))
+    }
+
     private fun session(id: String, updated: Long) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
         agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = null,
@@ -460,7 +510,19 @@ private class FakeChat : ChatRepository {
     override suspend fun prefetch(sessionIds: List<String>, lastMessages: Int) {
         prefetched += sessionIds to lastMessages
     }
-    override suspend fun messages(sessionId: String): Result<List<Message>> = Result.success(emptyList())
+    var commands: List<RunningCommand> = emptyList()
+    var failing: Set<String> = emptySet()
+    var shellReads = 0
+    var messageReads = 0
+    override suspend fun runningShells(directory: String): Result<List<RunningCommand>> {
+        shellReads++
+        if (directory in failing) return Result.failure(OpenCodeError.Unreachable("offline"))
+        return Result.success(commands.filter { it.directory == directory })
+    }
+    override suspend fun messages(sessionId: String): Result<List<Message>> {
+        messageReads++
+        return Result.success(emptyList())
+    }
     override suspend fun prompt(sessionId: String, text: String, delivery: PromptDelivery, attachments: List<PromptAttachment>) =
         Result.success(Unit)
     override suspend fun interrupt(sessionId: String) = Result.success(Unit)

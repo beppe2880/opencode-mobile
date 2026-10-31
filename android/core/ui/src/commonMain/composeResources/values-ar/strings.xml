@@ -22,4 +22,8 @@
     <string name="oc_models_variant">الاستدلال</string>
     <string name="oc_models_variant_default">الافتراضي</string>
     <string name="oc_models_empty">لا توجد نماذج تطابق بحثك</string>
+    <string name="oc_running">قيد التشغيل</string>
+    <string name="oc_working">قيد العمل</string>
+    <string name="oc_running_agents">الوكلاء الفرعيون: %1$d</string>
+    <string name="oc_running_commands">الأوامر: %1$d</string>
 </resources>

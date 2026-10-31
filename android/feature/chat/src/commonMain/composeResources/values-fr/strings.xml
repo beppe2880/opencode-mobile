@@ -166,4 +166,13 @@
     <string name="chat_mcps_needs_auth">Authentification requise</string>
     <string name="chat_mcps_auth_hint">Connectez-vous depuis OpenCode sur votre ordinateur, puis actualisez ici.</string>
     <string name="chat_untitled">Session sans titre</string>
+    <string name="chat_running_empty">Aucun sous-agent ni commande en cours</string>
+    <string name="chat_running_error">Impossible d'actualiser les tâches en cours</string>
+    <string name="chat_running_unassigned">Autres commandes de ce projet</string>
+    <string name="chat_running_unassigned_hint">Ces commandes n'ont pas de propriétaire de session connu.</string>
+    <string name="chat_running_no_output">Aucune sortie pour le moment</string>
+    <string name="chat_running_elapsed">Écoulé : %1$s</string>
+    <string name="chat_running_refresh">Actualiser les tâches en cours</string>
+    <string name="chat_running_stop_title">Arrêter cette commande ?</string>
+    <string name="chat_running_stop_message">%1$s\n\nLa commande est arrêtée et sa sortie n’est plus disponible.</string>
 </resources>
