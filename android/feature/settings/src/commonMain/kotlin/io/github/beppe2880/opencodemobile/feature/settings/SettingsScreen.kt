@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.QueryStats
+import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -90,6 +91,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ch
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server_hint
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools
@@ -225,6 +228,8 @@ fun SettingsScreen(
     onEvent: (SettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
     showNotifications: Boolean = notificationsSupported,
+    /** The offline demo: one demo entry instead of the saved servers. */
+    demo: Boolean = false,
 ) {
     val c = OcTheme.colors
     Scaffold(
@@ -256,7 +261,7 @@ fun SettingsScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
             ) {
-                item(key = "servers") { ServersSection(state, onEvent) }
+                item(key = "servers") { ServersSection(state, onEvent, demo) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings, onEvent) }
                 item(key = "conversation") { ConversationSection(state.settings, onEvent) }
@@ -317,13 +322,23 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
+private fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_servers)) {
         OcCard {
-            state.servers.forEach { server ->
-                ServerRow(server, active = server.id == state.activeServerId, onEvent = onEvent)
+            if (demo) {
+                OcListRow(
+                    title = stringResource(Res.string.settings_demo_server),
+                    subtitle = stringResource(Res.string.settings_demo_server_hint),
+                    leading = { Icon(Icons.Outlined.Science, null, tint = c.iconMuted, modifier = Modifier.size(20.dp)) },
+                    modifier = Modifier.testTag("settings_demo_server"),
+                )
                 OcDivider()
+            } else {
+                state.servers.forEach { server ->
+                    ServerRow(server, active = server.id == state.activeServerId, onEvent = onEvent)
+                    OcDivider()
+                }
             }
             OcListRow(
                 title = stringResource(Res.string.settings_add_server),

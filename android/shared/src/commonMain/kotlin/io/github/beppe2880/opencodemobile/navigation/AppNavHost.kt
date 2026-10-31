@@ -117,6 +117,9 @@ fun AppNavHost(
     /** Opens the new session sheet over the session list (widget button). */
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
+    onTryDemo: (() -> Unit)? = null,
+    onConnectServer: (() -> Unit)? = null,
+    isDemo: Boolean = false,
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -152,6 +155,8 @@ fun AppNavHost(
         composable<ConnectDestination> { entry ->
             val args = entry.toRoute<ConnectDestination>()
             ConnectRoute(
+                // Only for a first connection: "Add server" from Settings is for real servers.
+                onTryDemo = onTryDemo.takeUnless { args.addServer },
                 showBack = args.addServer,
                 onBack = { navController.popBackStack() },
                 onConnected = {
@@ -167,6 +172,7 @@ fun AppNavHost(
         }
         composable<SessionsDestination> {
             SessionsListDetail(
+                demo = isDemo,
                 onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
                 onOpenSettings = { navController.navigate(SettingsDestination) },
                 openNewSession = pendingNewSession,
@@ -193,8 +199,9 @@ fun AppNavHost(
         }
         composable<SettingsDestination> {
             SettingsRoute(
+                demo = isDemo,
                 onBack = { navController.popBackStack() },
-                onAddServer = { navController.navigate(ConnectDestination(addServer = true)) },
+                onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
             )
         }
@@ -219,6 +226,7 @@ fun AppNavHost(
  */
 @Composable
 private fun SessionsListDetail(
+    demo: Boolean,
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenTerminal: (String) -> Unit,
@@ -245,6 +253,7 @@ private fun SessionsListDetail(
                 openNewSession = openNewSession,
                 onNewSessionOpened = onNewSessionOpened,
                 banner = { UpdateBanner() },
+                demo = demo,
             )
         } else {
             val windowWidth = maxWidth
@@ -279,6 +288,7 @@ private fun SessionsListDetail(
                     },
                     modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
                     banner = { UpdateBanner() },
+                    demo = demo,
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
                 if (current != null) {

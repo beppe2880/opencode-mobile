@@ -180,4 +180,6 @@
     <string name="settings_list_handle_sub">Показывать стрелку на разделителе, чтобы скрыть список, или перетаскивать его для изменения размера</string>
     <string name="settings_back_shows_list">«Назад» показывает скрытый список</string>
     <string name="settings_back_shows_list_sub">Когда список сессий скрыт, «Назад» снова показывает его вместо выхода из приложения</string>
+    <string name="settings_demo_server">Демо</string>
+    <string name="settings_demo_server_hint">Примеры сессий · без сервера</string>
 </resources>

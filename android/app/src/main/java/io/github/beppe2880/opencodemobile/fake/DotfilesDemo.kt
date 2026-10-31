@@ -16,8 +16,6 @@ import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -26,8 +24,7 @@ import kotlinx.coroutines.launch
  * permission, then edits files, asks a question, asks a second permission and finishes.
  * The script restarts with the app process.
  */
-internal class DotfilesDemo(private val store: FakeStore, private val events: FakeEvents) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+internal class DotfilesDemo(private val store: FakeStore, private val events: FakeEvents, private val scope: CoroutineScope) {
     private val answered = mutableSetOf<String>()
 
     /** Handles replies that belong to the script; false for anything else. */

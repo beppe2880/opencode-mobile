@@ -186,4 +186,6 @@
     <string name="settings_list_handle_sub">أظهر السهم على الفاصل لإخفاء القائمة، أو اسحبه لتغيير حجمها</string>
     <string name="settings_back_shows_list">زر الرجوع يُظهر القائمة المخفية</string>
     <string name="settings_back_shows_list_sub">عند إخفاء قائمة الجلسات، يعيد زر الرجوع إظهارها بدلًا من مغادرة التطبيق</string>
+    <string name="settings_demo_server">تجريبي</string>
+    <string name="settings_demo_server_hint">جلسات تجريبية · بدون خادم</string>
 </resources>

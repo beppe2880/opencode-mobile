@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">Verbindung wird wiederhergestellt…</string>
     <string name="sessions_connection_disconnected">Offline</string>
     <string name="sessions_connection_unauthorized">Anmeldung abgelaufen · neu koppeln</string>
+    <string name="sessions_demo_server">Demo</string>
+    <string name="sessions_demo_status">Beispielsitzungen · kein Server</string>
     <string name="sessions_rename">Umbenennen</string>
     <string name="sessions_delete">Löschen</string>
     <string name="sessions_rename_title">Sitzung umbenennen</string>

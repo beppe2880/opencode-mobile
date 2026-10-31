@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">Reconnecting…</string>
     <string name="sessions_connection_disconnected">Offline</string>
     <string name="sessions_connection_unauthorized">Sign-in expired · pair again</string>
+    <string name="sessions_demo_server">Demo</string>
+    <string name="sessions_demo_status">Sample sessions · no server</string>
     <string name="sessions_rename">Rename</string>
     <string name="sessions_delete">Delete</string>
     <string name="sessions_rename_title">Rename session</string>

@@ -14,6 +14,8 @@ fun SettingsRoute(
     onAddServer: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenUsage: () -> Unit = {},
+    /** The offline demo: no real servers, and notification access is simulated. */
+    demo: Boolean = false,
 ) {
     val viewModel: SettingsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -22,7 +24,7 @@ fun SettingsRoute(
     }
     // The user can change notification access in the system settings at any time.
     LifecycleResumeEffect(Unit) {
-        viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = notifications.allowed()))
+        viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = demo || notifications.allowed()))
         onPauseOrDispose { }
     }
     CollectEffect(viewModel.effect) { effect ->
@@ -30,9 +32,10 @@ fun SettingsRoute(
             SettingsEffect.NavigateBack -> onBack()
             SettingsEffect.OpenConnect -> onAddServer()
             SettingsEffect.OpenUsage -> onOpenUsage()
-            SettingsEffect.RequestNotificationPermission -> notifications.request()
-            SettingsEffect.OpenNotificationSettings -> notifications.openSettings()
+            SettingsEffect.RequestNotificationPermission ->
+                if (!demo) notifications.request() else viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = true))
+            SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()
         }
     }
-    SettingsScreen(state = state, onEvent = viewModel::onEvent, modifier = modifier)
+    SettingsScreen(state = state, onEvent = viewModel::onEvent, modifier = modifier, demo = demo)
 }

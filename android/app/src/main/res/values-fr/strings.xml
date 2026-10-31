@@ -44,4 +44,6 @@
     <string name="widget_preview_server">Mon serveur · 1 en cours</string>
     <string name="widget_preview_session">Corriger la redirection de connexion</string>
     <string name="widget_preview_session_2">Ajouter le mode sombre aux paramètres</string>
+    <string name="app_demo_label">Démo · Réponses simulées</string>
+    <string name="app_demo_exit">Quitter la démo</string>
 </resources>

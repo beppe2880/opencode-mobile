@@ -5,7 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
 
-/** Sample diffs, questions and shell output for the fake data layer. */
+/** Sample diffs, questions and shell output shared by the demo and debug builds. */
 internal object FakeSamples {
 
     val checkoutForm = Form(
@@ -34,7 +34,7 @@ internal object FakeSamples {
                 "Changes not staged for commit:\n\tmodified:   src/cart/Cart.kt\n\tmodified:   src/cart/Coupon.kt"
         "ls" -> "README.md\nbuild.gradle.kts\nsettings.gradle.kts\nsrc"
         "pwd" -> "/home/user/code/shop"
-        else -> "ok"
+        else -> "Demo: commands are not run."
     }
 
     /** Counts come from the patch, like the server does. */

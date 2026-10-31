@@ -174,4 +174,6 @@
     <string name="settings_list_handle_sub">Mostrar a seta no divisor para ocultar a lista ou arrastá-lo para redimensionar</string>
     <string name="settings_back_shows_list">Voltar mostra a lista oculta</string>
     <string name="settings_back_shows_list_sub">Quando a lista de sessões está oculta, Voltar a mostra novamente em vez de sair do app</string>
+    <string name="settings_demo_server">Demo</string>
+    <string name="settings_demo_server_hint">Sessões de exemplo · sem servidor</string>
 </resources>

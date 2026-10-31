@@ -88,6 +88,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_co
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_demo_server
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_demo_status
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_title
@@ -121,6 +123,8 @@ fun SessionsScreen(
     nowProvider: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     /** Drawn above the list header, such as the app update notice; may draw nothing. */
     banner: @Composable () -> Unit = {},
+    /** The offline demo: the top bar names it instead of showing a connection. */
+    demo: Boolean = false,
 ) {
     val c = OcTheme.colors
     val now by produceState(nowProvider()) {
@@ -133,7 +137,7 @@ fun SessionsScreen(
         modifier = modifier,
         containerColor = c.bgBase,
         contentWindowInsets = WindowInsets(0),
-        topBar = { SessionsTopBar(state, onEvent) },
+        topBar = { SessionsTopBar(state, onEvent, demo) },
         snackbarHost = { SnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(WindowInsets.navigationBars)) },
         floatingActionButton = {
             if (!state.isEmpty || state.query.isNotEmpty() || state.directoryFilter != null) {
@@ -214,7 +218,7 @@ fun SessionsScreen(
 }
 
 @Composable
-private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Unit, demo: Boolean) {
     val c = OcTheme.colors
     val (label, color) = when (state.connection) {
         ConnectionState.Connected -> Res.string.sessions_connection_connected to c.success.fg
@@ -224,9 +228,9 @@ private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Uni
         ConnectionState.Unauthorized -> Res.string.sessions_connection_unauthorized to c.danger.fg
     }
     OcTopBar(
-        title = state.serverName.ifEmpty { stringResource(Res.string.sessions_title_fallback) },
-        subtitle = stringResource(label),
-        titleAccessory = { OcStatusDot(color, Modifier.testTag("sessions_connection_indicator")) },
+        title = if (demo) stringResource(Res.string.sessions_demo_server) else state.serverName.ifEmpty { stringResource(Res.string.sessions_title_fallback) },
+        subtitle = stringResource(if (demo) Res.string.sessions_demo_status else label),
+        titleAccessory = { if (!demo) OcStatusDot(color, Modifier.testTag("sessions_connection_indicator")) },
         actions = {
             OcIconButton(
                 icon = Icons.Outlined.Settings,

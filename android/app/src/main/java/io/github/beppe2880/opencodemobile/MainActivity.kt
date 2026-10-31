@@ -9,7 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
@@ -17,6 +22,9 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
+import io.github.beppe2880.opencodemobile.fake.DemoData
+import io.github.beppe2880.opencodemobile.fake.DemoHost
 import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
@@ -25,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     private val servers: ServerRepository by inject()
     private val settings: SettingsRepository by inject()
+    private val demoData: DemoData by viewModels()
 
     /** Session to open, from a tapped notification or widget; cleared once navigated. */
     private val sessionToOpen = MutableStateFlow<String?>(null)
@@ -39,20 +48,37 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) readIntent(intent)
         keepSplashUntilLoaded()
         setContent {
+            var demo by rememberSaveable { mutableStateOf(BuildConfig.USE_FAKE_DATA) }
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val newSession by newSessionRequested.collectAsStateWithLifecycle()
-            OpenCodeApp(
-                modifier = Modifier.semantics { testTagsAsResourceId = true },
-                openSessionId = openSession,
-                onSessionOpened = { sessionToOpen.value = null },
-                openNewSession = newSession,
-                onNewSessionOpened = { newSessionRequested.value = false },
-                onDarkThemeChange = { dark ->
-                    val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
-                    enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
-                },
-                overlay = { appSettings -> if (!appSettings.notificationsIntroShown) NotificationsIntro(settings) },
-            )
+            val appSettings by settings.settings.collectAsStateWithLifecycle()
+            if (demo) {
+                DemoHost(
+                    container = demoData.container(applicationContext),
+                    onExit = {
+                        demoData.close()
+                        demo = false
+                    },
+                    realDarkTheme = appSettings.theme.isDark(),
+                    modifier = Modifier.semantics { testTagsAsResourceId = true },
+                )
+            } else {
+                key("real") {
+                    OpenCodeApp(
+                        onTryDemo = { demo = true },
+                        modifier = Modifier.semantics { testTagsAsResourceId = true },
+                        openSessionId = openSession,
+                        onSessionOpened = { sessionToOpen.value = null },
+                        openNewSession = newSession,
+                        onNewSessionOpened = { newSessionRequested.value = false },
+                        onDarkThemeChange = { dark ->
+                            val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark }
+                            enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                        },
+                        overlay = { appSettings -> if (!appSettings.notificationsIntroShown) NotificationsIntro(settings) },
+                    )
+                }
+            }
         }
     }
 

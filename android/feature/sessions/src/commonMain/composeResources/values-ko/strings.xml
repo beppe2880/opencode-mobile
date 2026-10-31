@@ -22,6 +22,8 @@
     <string name="sessions_connection_reconnecting">다시 연결 중…</string>
     <string name="sessions_connection_disconnected">오프라인</string>
     <string name="sessions_connection_unauthorized">로그인 만료 · 다시 페어링</string>
+    <string name="sessions_demo_server">데모</string>
+    <string name="sessions_demo_status">샘플 세션 · 서버 없음</string>
     <string name="sessions_rename">이름 변경</string>
     <string name="sessions_delete">삭제</string>
     <string name="sessions_rename_title">세션 이름 변경</string>

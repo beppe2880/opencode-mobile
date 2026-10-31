@@ -41,4 +41,6 @@
     <string name="widget_preview_server">我的服务器 · 1 个运行中</string>
     <string name="widget_preview_session">修复登录重定向</string>
     <string name="widget_preview_session_2">在设置中添加深色模式</string>
+    <string name="app_demo_label">演示 · 模拟回复</string>
+    <string name="app_demo_exit">退出演示</string>
 </resources>

@@ -44,4 +44,6 @@
     <string name="widget_preview_server">Il mio server · 1 in esecuzione</string>
     <string name="widget_preview_session">Correggi il reindirizzamento del login</string>
     <string name="widget_preview_session_2">Aggiungi la modalità scura alle impostazioni</string>
+    <string name="app_demo_label">Demo · Risposte simulate</string>
+    <string name="app_demo_exit">Esci dalla demo</string>
 </resources>
