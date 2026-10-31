@@ -119,6 +119,8 @@ fun SessionsScreen(
     selectedSessionId: String? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     nowProvider: () -> Long = { Clock.System.now().toEpochMilliseconds() },
+    /** Drawn above the list header, such as the app update notice; may draw nothing. */
+    banner: @Composable () -> Unit = {},
 ) {
     val c = OcTheme.colors
     val now by produceState(nowProvider()) {
@@ -166,7 +168,14 @@ fun SessionsScreen(
                 modifier = Modifier.fillMaxSize().onSizeChanged { listWidthPx = it.width }.testTag("sessions_list"),
                 contentPadding = PaddingValues(bottom = 96.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
             ) {
-                item(key = "header", contentType = "header") { ListHeader(state, onEvent) }
+                item(key = "header", contentType = "header") {
+                    // In the first item: a banner appearing later pushes the list down instead
+                    // of opening above the scroll position.
+                    Column {
+                        banner()
+                        ListHeader(state, onEvent)
+                    }
+                }
                 when {
                     state.loading -> skeletonItems()
                     state.error != null -> item(key = "error") {

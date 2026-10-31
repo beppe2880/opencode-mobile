@@ -70,7 +70,7 @@ internal fun NewSessionSheet(
         if (state.pickingModel) {
             OcModelPicker(
                 models = state.models,
-                selected = state.model,
+                selected = state.effectiveModel,
                 recent = state.recentModels,
                 onSelect = { onEvent(SessionsEvent.NewSessionModel(it)) },
                 onBack = { onEvent(SessionsEvent.NewSessionModelPicker(false)) },
@@ -157,10 +157,11 @@ private fun NewSessionForm(state: NewSessionState, projects: List<Project>, onEv
             )
         }
         Label(stringResource(Res.string.sessions_new_model))
-        val selectedModel = state.model?.let { ref -> state.models.firstOrNull { it.ref.key == ref.key } }
+        val model = state.effectiveModel
+        val selectedModel = model?.let { ref -> state.models.firstOrNull { it.ref.key == ref.key } }
         OcChip(
-            text = selectedModel?.name ?: state.model?.id ?: stringResource(Res.string.sessions_new_model_default),
-            secondaryText = selectedModel?.providerName ?: state.model?.providerId,
+            text = selectedModel?.name ?: model?.id ?: stringResource(Res.string.sessions_new_model_default),
+            secondaryText = selectedModel?.providerName ?: model?.providerId,
             onClick = { onEvent(SessionsEvent.NewSessionModelPicker(true)) },
             trailingIcon = Icons.Outlined.ExpandMore,
             modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_model"),

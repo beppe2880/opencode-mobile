@@ -123,6 +123,15 @@ interface DraftRepository {
     fun save(sessionId: String, text: String)
 }
 
+/** Models this device sent prompts with on the active server, kept on the device. */
+interface RecentModelRepository {
+    /** Most recently used first, at most [RECENT_MODELS]. */
+    fun recent(): List<ModelRef>
+
+    /** A prompt was sent with [model]: it moves to the front. */
+    fun used(model: ModelRef)
+}
+
 enum class PromptDelivery { Steer, Queue }
 
 /** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
@@ -131,8 +140,11 @@ data class ShellOutput(val text: String, val cursor: Long)
 /** A prompt waiting in the session inbox: [Queue]d ones run after the current work ends. */
 data class QueuedPrompt(val id: String, val text: String, val delivery: PromptDelivery, val createdAt: Long)
 
-/** Range of a session's file changes: its newest turn, or every turn from the first prompt. */
-enum class ChangesScope { LastTurn, Session }
+/**
+ * Range of file changes: a session's newest turn, every turn from its first prompt, or all
+ * uncommitted changes of its folder ([Folder], read through [VcsRepository.workingChanges]).
+ */
+enum class ChangesScope { LastTurn, Session, Folder }
 
 interface McpRepository {
     suspend fun list(directory: String): Result<List<McpServer>>
@@ -256,7 +268,11 @@ interface ChatRepository {
     /** Makes a staged revert permanent (done before sending a new prompt). */
     suspend fun commitRevert(sessionId: String): Result<Unit> = Result.success(Unit)
 
-    /** Files the session changed in [scope], with unified diffs; empty before the first prompt. */
+    /**
+     * Files the session changed in [scope], with unified diffs; empty before the first prompt.
+     * [ChangesScope.Folder] is not the session's: it is read with [VcsRepository.workingChanges]
+     * and fails here.
+     */
     suspend fun changes(sessionId: String, scope: ChangesScope): Result<List<FileDiff>> = Result.success(emptyList())
 }
 
@@ -267,6 +283,12 @@ interface CatalogRepository {
     /** Enabled models, newest release first. */
     suspend fun models(directory: String?): Result<List<ModelInfo>>
 
+    /**
+     * The model set explicitly in the server configuration (`opencode.json` "model") for
+     * [directory]; null when none is set. Not the server's implicit fallback.
+     */
+    suspend fun configuredModel(directory: String?): Result<ModelRef?> = Result.success(null)
+
     /** Slash commands available in [directory]. */
     suspend fun commands(directory: String?): Result<List<Command>> = Result.success(emptyList())
 
@@ -275,6 +297,36 @@ interface CatalogRepository {
 }
 
 enum class ThemeMode { System, Light, Dark }
+
+/** When an agent, model or reasoning level picked in a chat reaches the server. */
+enum class SelectionApply {
+    /** Kept in the composer and applied right before the next prompt, like the OpenCode TUI. */
+    NextMessage,
+
+    /** Sent to the session as soon as it is picked. */
+    Immediately,
+}
+
+/** The model a new chat starts with when none is picked. */
+enum class NewChatModel {
+    /** The agent's configured model, else the last one used that is still available. */
+    LastUsed,
+
+    /** None: the server decides. */
+    ServerDefault,
+}
+
+/**
+ * The line under the chat title: the folder name, the Git branch and the changed files; only
+ * the branch and files; or only the folder's full path, without asking the server anything.
+ */
+enum class ChatHeaderLine { FolderBranchFiles, BranchFiles, Folder }
+
+/** Icons before the folder, branch and count; or the same as short ("4 files") or full words ("4 files changed"). */
+enum class ChatHeaderStyle { Icons, Short, Full }
+
+/** Scopes the chat header line can open. */
+val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
 val OUTPUT_LINE_CHOICES = listOf(6, 12, 24, 50)
 val LIVE_INTERVAL_CHOICES = listOf(300L, 700L, 1_500L, 3_000L)
@@ -313,14 +365,28 @@ data class AppSettings(
     val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
+    /** What the line under the chat title shows. */
+    val chatHeaderLine: ChatHeaderLine = ChatHeaderLine.FolderBranchFiles,
+    /** How the header line is written: icons, short or full words. */
+    val chatHeaderStyle: ChatHeaderStyle = ChatHeaderStyle.Icons,
+    /** Changes opened by tapping the header line: [ChangesScope.Folder] or [ChangesScope.Session]. */
+    val headerOpens: ChangesScope = ChangesScope.Folder,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */
     val dictation: Boolean = true,
+    /** When agent and model changes in a chat reach the server. */
+    val selectionApply: SelectionApply = SelectionApply.NextMessage,
+    /** The model a new chat starts with. */
+    val newChatModel: NewChatModel = NewChatModel.LastUsed,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
+    /** A question from the agent first shows as a one-line bar above the composer instead of the full card. */
+    val questionsCollapsed: Boolean = false,
+    /** A permission request first shows as a one-line bar above the composer instead of the full card. */
+    val permissionsCollapsed: Boolean = false,
     /**
      * While sessions run, keep the connection in the background and notify when one needs an
      * answer or finishes. Only works once the notification permission is granted.
@@ -349,6 +415,10 @@ data class AppSettings(
     val listPaneFraction: Float? = null,
     /** With [splitView]: a handle on the divider hides the list or resizes it by dragging. */
     val listPaneHandle: Boolean = true,
+    /** At launch, at most once a day, look for a newer release of the app on GitHub. */
+    val checkForUpdates: Boolean = true,
+    /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
+    val backShowsList: Boolean = true,
 )
 
 /** Share of the window width the session list can be given from Settings. */

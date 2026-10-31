@@ -44,10 +44,28 @@
     <string name="chat_terminal_open">Open terminal</string>
     <string name="chat_changes_session">Whole session</string>
     <string name="chat_changes_last_turn">Last turn</string>
+    <string name="chat_changes_folder">Folder</string>
+    <string name="chat_changes_empty_folder">This folder has no uncommitted changes.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">%1$d file changed</item>
         <item quantity="other">%1$d files changed</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d file edited by the agent</item>
+        <item quantity="other">%1$d files edited by the agent</item>
+    </plurals>
+    <string name="chat_vcs_detached">Detached HEAD</string>
+    <string name="chat_vcs_detached_short">detached</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d agent edit</item>
+        <item quantity="other">%1$d agent edits</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Folder %1$s</string>
+    <string name="chat_vcs_branch_description">Branch %1$s</string>
     <string name="chat_changes_empty">No changed files</string>
     <string name="chat_changes_empty_session">The agent has not edited any file in this session.</string>
     <string name="chat_changes_empty_turn">The agent did not edit any file in the last turn.</string>
@@ -69,6 +87,8 @@
     <string name="chat_permission_once">Allow once</string>
     <string name="chat_permission_always">Always</string>
     <string name="chat_permission_reject">Reject</string>
+    <string name="chat_permission_collapse">Collapse permission request</string>
+    <string name="chat_permission_expand">Expand permission request</string>
     <string name="chat_offline">Offline · reconnecting</string>
     <string name="chat_unauthorized">The server rejected the saved credentials · pair this server again</string>
     <string name="chat_shell_exit">exit %1$s</string>
@@ -120,6 +140,8 @@
     <string name="chat_form_title">Question from the agent</string>
     <string name="chat_form_submit">Send answer</string>
     <string name="chat_form_dismiss">Dismiss</string>
+    <string name="chat_form_collapse">Collapse question</string>
+    <string name="chat_form_expand">Expand question</string>
     <string name="chat_form_other">Other answer</string>
     <string name="chat_form_open_link">Open link</string>
     <plurals name="chat_form_more">

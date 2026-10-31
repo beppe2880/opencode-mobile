@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.sessions
 
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AgentMode
+import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
@@ -10,12 +11,14 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -23,6 +26,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
@@ -30,6 +34,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -63,8 +68,11 @@ class SessionsViewModelTest {
     private val events = FakeEventRepository()
     private val chat = FakeChat()
     private val servers = FakeServers()
+    private val settings = FakeSettings()
+    private val recents = FakeRecents()
+    private var catalog = FakeCatalog()
 
-    private fun vm() = SessionsViewModel(sessions, FakeCatalog(), events, servers, chat, clock = { now }, zone = zone)
+    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, clock = { now }, zone = zone)
 
     private fun SessionsState.ids() = groups.flatMap { g -> g.sessions.map { it.id } }
 
@@ -262,6 +270,146 @@ class SessionsViewModelTest {
         assertEquals("/tmp/x", vm.state.value.newSession!!.directory)
     }
 
+    private val haiku = ModelRef("haiku", "anthropic")
+    private val sonnet = ModelRef("sonnet", "anthropic", "high")
+    private val opus = ModelRef("opus", "anthropic")
+
+    private val gpt = ModelRef("gpt", "openai", "low")
+
+    private fun withModels(configured: Result<ModelRef?> = Result.success(null)) {
+        catalog = FakeCatalog(
+            configured = configured,
+            agents = listOf(
+                Agent("build", "build", null, AgentMode.Primary, hidden = false, color = null),
+                Agent("plan", "plan", null, AgentMode.Primary, hidden = false, color = null, model = opus),
+            ),
+            models = listOf(haiku, sonnet, opus, gpt).map {
+                ModelInfo(it.copy(variant = null), it.id, "anthropic", null, 1, true, emptyList(), 0, true, "active")
+            },
+        )
+    }
+
+    private fun TestScope.newSession(vm: SessionsViewModel): NewSessionState {
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+        return vm.state.value.newSession!!
+    }
+
+    @Test
+    fun `the model configured on the server comes before the last used one`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(gpt))
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(gpt, newSession(vm).defaultModel)
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(gpt, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `the agent's configured model comes before the one configured on the server`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(gpt))
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionAgent("plan"))
+        assertEquals(opus, vm.state.value.newSession!!.effectiveModel)
+        vm.onEvent(SessionsEvent.NewSessionAgent("build"))
+        assertEquals(gpt, vm.state.value.newSession!!.effectiveModel)
+    }
+
+    @Test
+    fun `a configured model that is not available, or a config that cannot be read, is skipped`() = runTest(main.testDispatcher) {
+        withModels(configured = Result.success(ModelRef("gone", "openai")))
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(haiku, newSession(vm).defaultModel)
+
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        withModels(configured = Result.failure(OpenCodeError.Unreachable("down")))
+        val failing = vm()
+        advanceUntilIdle()
+        assertEquals(haiku, newSession(failing).defaultModel)
+        failing.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(haiku, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `without a configured model or history the server decides`() = runTest(main.testDispatcher) {
+        withModels()
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(null, newSession(vm).defaultModel)
+    }
+
+    @Test
+    fun `a new chat starts with the last used model that is still available`() = runTest(main.testDispatcher) {
+        withModels()
+        recents.models += listOf(ModelRef("removed", "anthropic"), sonnet, haiku)
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(sonnet, newSession(vm).defaultModel)
+
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(sonnet, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `the agent's configured model comes before the last used one, a picked model before both`() = runTest(main.testDispatcher) {
+        withModels()
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionAgent("plan"))
+        assertEquals(opus, vm.state.value.newSession!!.effectiveModel)
+        vm.onEvent(SessionsEvent.NewSessionAgent("build"))
+        assertEquals(haiku, vm.state.value.newSession!!.effectiveModel)
+
+        vm.onEvent(SessionsEvent.NewSessionModel(sonnet))
+        vm.onEvent(SessionsEvent.NewSessionAgent("plan"))
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(sonnet, sessions.createdModels.single())
+    }
+
+    @Test
+    fun `without history on this device the models of recent sessions are used, else the server decides`() = runTest(main.testDispatcher) {
+        withModels()
+        sessions.listResult = Result.success(listOf(session("a", now - hour).copy(model = haiku), session("b", now)))
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(haiku, newSession(vm).defaultModel)
+
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        sessions.listResult = Result.success(listOf(session("b", now)))
+        vm.onEvent(SessionsEvent.Refresh)
+        advanceUntilIdle()
+        assertEquals(null, newSession(vm).defaultModel)
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(listOf<ModelRef?>(null), sessions.createdModels)
+    }
+
+    @Test
+    fun `with the server default setting a new chat leaves the model to the server`() = runTest(main.testDispatcher) {
+        withModels()
+        settings.settings.value = AppSettings(newChatModel = NewChatModel.ServerDefault)
+        recents.models += haiku
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionAgent("plan"))
+        assertEquals(null, vm.state.value.newSession!!.effectiveModel)
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertEquals(listOf<ModelRef?>(null), sessions.createdModels)
+    }
+
     private fun session(id: String, updated: Long) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
         agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = null,
@@ -275,6 +423,7 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var lastSearch: String? = null
     var lastDirectory: String? = null
     val created = mutableListOf<String>()
+    val createdModels = mutableListOf<ModelRef?>()
     val storedLists = mutableMapOf<Pair<String, String?>, List<Session>>()
     val storedProjects = mutableMapOf<String, List<Project>>()
 
@@ -293,6 +442,7 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     override suspend fun get(sessionId: String): Result<Session> = Result.failure(OpenCodeError.NotFound(sessionId))
     override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
         created += directory
+        createdModels += model
         return listResult.map { it.first().copy(id = "new", directory = directory) }
     }
     override suspend fun rename(sessionId: String, title: String): Result<Unit> = Result.success(Unit)
@@ -327,15 +477,34 @@ private class FakeEventRepository : EventRepository {
     override val events = flow
 }
 
-private class FakeCatalog : CatalogRepository {
-    override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(
-        listOf(
-            Agent("build", "build", null, AgentMode.Primary, hidden = false, color = null),
-            Agent("explore", "explore", null, AgentMode.Subagent, hidden = false, color = null),
-            Agent("title", "title", null, AgentMode.Primary, hidden = true, color = null),
-        ),
-    )
-    override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(emptyList())
+private class FakeCatalog(
+    private val agents: List<Agent> = listOf(
+        Agent("build", "build", null, AgentMode.Primary, hidden = false, color = null),
+        Agent("explore", "explore", null, AgentMode.Subagent, hidden = false, color = null),
+        Agent("title", "title", null, AgentMode.Primary, hidden = true, color = null),
+    ),
+    private val models: List<ModelInfo> = emptyList(),
+    private val configured: Result<ModelRef?> = Result.success(null),
+) : CatalogRepository {
+    override suspend fun configuredModel(directory: String?): Result<ModelRef?> = configured
+    override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(agents)
+    override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(models)
+}
+
+private class FakeSettings : SettingsRepository {
+    override val settings = MutableStateFlow(AppSettings())
+    override suspend fun update(transform: (AppSettings) -> AppSettings) {
+        settings.value = transform(settings.value)
+    }
+}
+
+private class FakeRecents : RecentModelRepository {
+    val models = mutableListOf<ModelRef>()
+    override fun recent(): List<ModelRef> = models.toList()
+    override fun used(model: ModelRef) {
+        models.removeAll { it.key == model.key }
+        models.add(0, model)
+    }
 }
 
 private class FakeServers : ServerRepository {

@@ -50,12 +50,36 @@
     <string name="chat_terminal_open">Открыть терминал</string>
     <string name="chat_changes_session">Вся сессия</string>
     <string name="chat_changes_last_turn">Последний ход</string>
+    <string name="chat_changes_folder">Папка</string>
+    <string name="chat_changes_empty_folder">В этой папке нет незафиксированных изменений.</string>
     <plurals name="chat_changes_files">
         <item quantity="one">Изменён %1$d файл</item>
         <item quantity="few">Изменено %1$d файла</item>
         <item quantity="many">Изменено %1$d файлов</item>
         <item quantity="other">Изменено %1$d файла</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d файл, изменённый агентом</item>
+        <item quantity="few">%1$d файла, изменённых агентом</item>
+        <item quantity="many">%1$d файлов, изменённых агентом</item>
+        <item quantity="other">%1$d файла, изменённых агентом</item>
+    </plurals>
+    <string name="chat_vcs_detached">Отсоединённый HEAD</string>
+    <string name="chat_vcs_detached_short">отсоединён</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файла</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="one">%1$d правка агента</item>
+        <item quantity="few">%1$d правки агента</item>
+        <item quantity="many">%1$d правок агента</item>
+        <item quantity="other">%1$d правки агента</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">Папка %1$s</string>
+    <string name="chat_vcs_branch_description">Ветка %1$s</string>
     <string name="chat_changes_empty">Нет изменённых файлов</string>
     <string name="chat_changes_empty_session">Агент не изменил ни одного файла в этой сессии.</string>
     <string name="chat_changes_empty_turn">Агент не изменил ни одного файла в последнем ходе.</string>
@@ -77,6 +101,8 @@
     <string name="chat_permission_once">Разрешить один раз</string>
     <string name="chat_permission_always">Всегда</string>
     <string name="chat_permission_reject">Отклонить</string>
+    <string name="chat_permission_collapse">Свернуть запрос разрешения</string>
+    <string name="chat_permission_expand">Развернуть запрос разрешения</string>
     <string name="chat_offline">Нет подключения · переподключение</string>
     <string name="chat_unauthorized">Сервер отклонил сохранённые учётные данные · подключите сервер заново</string>
     <string name="chat_shell_exit">код выхода %1$s</string>
@@ -130,6 +156,8 @@
     <string name="chat_form_title">Вопрос от агента</string>
     <string name="chat_form_submit">Отправить ответ</string>
     <string name="chat_form_dismiss">Отклонить</string>
+    <string name="chat_form_collapse">Свернуть вопрос</string>
+    <string name="chat_form_expand">Развернуть вопрос</string>
     <string name="chat_form_other">Другой ответ</string>
     <string name="chat_form_open_link">Открыть ссылку</string>
     <plurals name="chat_form_more">

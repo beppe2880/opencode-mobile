@@ -9,6 +9,9 @@ sealed interface ServerEvent {
 
     data object McpsChanged : ServerEvent
 
+    /** The project in [directory] switched to [branch] (null: detached HEAD). */
+    data class BranchChanged(val directory: String?, val branch: String?) : ServerEvent
+
     sealed interface SessionScoped : ServerEvent {
         val sessionId: String
     }

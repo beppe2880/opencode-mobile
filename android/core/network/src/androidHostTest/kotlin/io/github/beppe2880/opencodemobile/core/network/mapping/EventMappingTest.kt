@@ -33,6 +33,12 @@ class EventMappingTest {
     }
 
     @Test
+    fun `a branch switch carries its project directory`() {
+        val payload = """{"id":"evt_3","created":1,"type":"vcs.branch.updated","location":{"directory":"/repo"},"data":{"branch":"feat"}}"""
+        assertEquals(ServerEvent.BranchChanged("/repo", "feat"), decodeEvent(payload)?.toDomain())
+    }
+
+    @Test
     fun `a fork announces the new session`() {
         val payload = """{"id":"evt_2","created":1,"type":"session.forked","durable":{"aggregateID":"ses_new","seq":0,"version":2},""" +
             """"data":{"sessionID":"ses_new","parentID":"ses_old","boundary":{"type":"through","messageID":"msg_1"}}}"""

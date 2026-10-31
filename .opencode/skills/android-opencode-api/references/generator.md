@@ -12,6 +12,10 @@
    - Patches known server/schema mismatches (`server.connected` has no `created`).
    - Deduplicates repeated tags (generator validation fails otherwise).
 2. `tools/api-gen/src/prepare-spec.ts`
+   - Keeps only `GET /api/config` of the `config` area and narrows its response to
+     `{ type, info: { model } }` (`ConfigModelEntry`), since the app reads only the global
+     model; the full config schema would add dozens of classes and change shared models.
+     `model` (string or object) is raw JSON, mapped in `ResourceMapping.configuredModel()`.
    - `anyOf` unions whose members share a constant (`type`, `status`, `_tag`,
      `kind`) become `oneOf` + `discriminator`, so the generator emits sealed
      interfaces instead of one flattened class with every field required.

@@ -213,6 +213,31 @@ class RemoteRepositoriesTest {
         assertEquals(2, server.requestCount)
     }
 
+    @Test
+    fun `the configured model is read from the last config document that sets one and cached`() = runBlocking {
+        val catalog = RemoteCatalogRepository(graph.clients)
+        server.enqueue(
+            json(
+                """[{"type":"document","path":"/g/opencode.json","info":{"model":"openai/gpt-5","theme":"x"}},""" +
+                    """{"type":"document","path":"/p/opencode.json",""" +
+                    """"info":{"model":{"providerID":"anthropic","model":"claude-haiku-4-5","variant":"high"}}},""" +
+                    """{"type":"document","path":"/p/.opencode/opencode.json","info":{"agent":{}}},""" +
+                    """{"type":"directory","path":"/p/.opencode"}]""",
+            ),
+        )
+        assertEquals(ModelRef("claude-haiku-4-5", "anthropic", "high"), catalog.configuredModel("/p").getOrThrow())
+        assertEquals(ModelRef("claude-haiku-4-5", "anthropic", "high"), catalog.configuredModel("/p").getOrThrow())
+        assertEquals(1, server.requestCount)
+        assertEquals("/api/config?location%5Bdirectory%5D=%2Fp", server.takeRequest().path)
+
+        server.enqueue(json("""[{"type":"document","path":"/g/opencode.json","info":{"model":"openai/gpt-5#low"}}]"""))
+        assertEquals(ModelRef("gpt-5", "openai", "low"), catalog.configuredModel("/q").getOrThrow())
+        server.enqueue(json("""[{"type":"document","path":"/g/opencode.json","info":{}},{"type":"directory","path":"/g"}]"""))
+        assertEquals(null, catalog.configuredModel("/r").getOrThrow())
+        server.enqueue(MockResponse().setResponseCode(500))
+        assertTrue(catalog.configuredModel("/s").isFailure)
+    }
+
     private fun assistant(id: String, created: Int, completed: Int?) =
         """{"id":"$id","time":{"created":$created${completed?.let { ",\"completed\":$it" }.orEmpty()}},"type":"assistant",""" +
             """"agent":"build","model":{"id":"m","providerID":"p"},"content":[]}"""

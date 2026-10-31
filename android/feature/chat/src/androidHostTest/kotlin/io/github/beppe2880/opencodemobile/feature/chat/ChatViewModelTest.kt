@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
@@ -31,7 +32,9 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
@@ -40,6 +43,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.loadRunningWork
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
@@ -69,6 +74,8 @@ class ChatViewModelTest {
     private val drafts = FakeDrafts()
     private val scroll = ScrollMemory()
     private val mcps = FakeMcps()
+    private val recents = FakeRecents()
+    private val vcs = FakeVcs()
 
     @Test
     fun `running commands are attributed by shell id never by shared directory`() = runTest(main.testDispatcher) {
@@ -331,7 +338,138 @@ class ChatViewModelTest {
     }
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, clock = { 42 })
+
+    @Test
+    fun `the header line shows folder, branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+        assertTrue(vm.state.value.folderChanges)
+        assertEquals(listOf("/repo"), vcs.branchRequests)
+
+        vcs.files = listOf("a.kt")
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 1), vm.state.value.vcs)
+        // Both events settle into one read.
+        assertEquals(2, vcs.statusRequests)
+    }
+
+    @Test
+    fun `tapping the header line opens the folder changes, which match its count`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val diffs = listOf(
+            FileDiff("a.kt", "modified", 1, 1, "@@ -1 +1 @@"),
+            FileDiff("new.kt", "added", 2, 0, "@@ -0,0 +1,2 @@"),
+            FileDiff("c.kt", "deleted", 0, 3, ""),
+        )
+        vcs.diffs = diffs
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesPanel(ChangesScope.Folder, diffs, loading = false), vm.state.value.changes)
+        assertEquals(listOf("/repo"), vcs.diffRequests)
+        assertTrue(chat.changesRequests.isEmpty())
+        assertEquals(3, vm.state.value.vcs?.files)
+
+        // Session and turn scopes are unchanged.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Session))
+        advanceUntilIdle()
+        assertEquals(listOf(ChangesScope.Session), chat.changesRequests)
+
+        // A step reloads the open folder scope.
+        vm.onEvent(ChatEvent.LoadChanges(ChangesScope.Folder))
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(3, vcs.diffRequests.size)
+    }
+
+    @Test
+    fun `the header line can open the session changes instead`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(headerOpens = ChangesScope.Session)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+        assertTrue(vcs.diffRequests.isEmpty())
+    }
+
+    @Test
+    fun `branch switches of this project arrive from the event stream`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.BranchChanged("/other", "feature"))
+        advanceUntilIdle()
+        assertEquals("main", vm.state.value.vcs?.branch)
+
+        vcs.files = emptyList()
+        events.flow.emit(ServerEvent.BranchChanged("/repo", "feature"))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "feature", 0), vm.state.value.vcs)
+        assertEquals(1, vcs.branchRequests.size)
+    }
+
+    @Test
+    fun `outside a repository only files the agent edited are counted and the session opens`() = runTest(main.testDispatcher) {
+        vcs.branch = null
+        val edit = Part.Tool(
+            "c1", "edit", ToolStatus.Completed, "{}",
+            diffs = listOf(FileDiff("a.kt", null, 1, 0, ""), FileDiff("b.kt", null, 1, 0, "")),
+        )
+        val again = Part.Tool("c2", "write", ToolStatus.Completed, "{}", diffs = listOf(FileDiff("a.kt", null, 1, 0, "")))
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertFalse(vm.state.value.folderChanges)
+        assertEquals(0, vcs.statusRequests)
+
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(edit, again), completedAt = 6)
+        events.flow.emit(ServerEvent.StepEnded("s1", "a1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", null, 2, agentEdits = true), vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+
+        vm.onEvent(ChatEvent.OpenHeaderChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+    }
+
+    @Test
+    fun `the header line content follows the setting`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertTrue(vcs.branchRequests.isEmpty())
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.BranchFiles)
+        advanceUntilIdle()
+        assertEquals(VcsLine(null, "main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.FolderBranchFiles)
+        advanceUntilIdle()
+        assertEquals(VcsLine("repo", "main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+    }
+
+    @Test
+    fun `the changes button finds out whether the folder can be shown even without the header line`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatHeaderLine = ChatHeaderLine.Folder)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.OpenChanges)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.folderChanges)
+        assertNull(vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+    }
 
     @Test
     fun `the microphone follows the voice input setting`() = runTest(main.testDispatcher) {
@@ -469,7 +607,7 @@ class ChatViewModelTest {
         assertEquals("plan", state.agent)
         assertEquals(ModelLabel("Claude Haiku", "Anthropic"), state.modelLabel)
         assertEquals(listOf("u1"), state.items.map { it.key })
-        assertEquals(listOf("build", "plan"), state.agents.map { it.id })
+        assertEquals(listOf("build", "plan", "review"), state.agents.map { it.id })
         assertEquals(1, state.permissions.size)
     }
 
@@ -721,6 +859,84 @@ class ChatViewModelTest {
             chat.formReplies,
         )
         assertTrue(vm.state.value.forms.isEmpty())
+    }
+
+    @Test
+    fun `collapsing a question keeps its answers and tells the server nothing`() = runTest(main.testDispatcher) {
+        chat.forms = listOf(Form("f1", "s1", "Which storage?", listOf(FormField.Text("choice", required = true))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.FormAnswerChanged("choice", FormAnswer.Text("room")))
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+        assertEquals("f1", vm.state.value.forms.single().id)
+        assertTrue(chat.formReplies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+    }
+
+    @Test
+    fun `collapsing a permission request never replies to it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", true))
+        events.flow.emit(ServerEvent.PermissionChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertEquals("p1", vm.state.value.permissions.single().id)
+        assertTrue(chat.replies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(chat.replies.isEmpty())
+    }
+
+    @Test
+    fun `permission requests start collapsed when the setting says so, each folding on its own`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(permissionsCollapsed = true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+    }
+
+    @Test
+    fun `each new question starts collapsed or open as the setting says`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(questionsCollapsed = true)
+        chat.forms = listOf(Form("f1", "s1", "First?", listOf(FormField.Toggle("ok"))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        settings.settings.value = AppSettings(questionsCollapsed = false)
+        chat.forms = listOf(Form("f2", "s1", "Second?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        // Folding one question does not fold the next one.
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        chat.forms = listOf(Form("f3", "s1", "Third?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals("f3", vm.state.value.forms.single().id)
     }
 
     @Test
@@ -1110,7 +1326,8 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `variants switch the reasoning level and a new model starts from its default`() = runTest(main.testDispatcher) {
+    fun `immediately, variants switch the reasoning level and a new model starts from its default`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(selectionApply = SelectionApply.Immediately)
         val vm = vm()
         advanceUntilIdle()
 
@@ -1144,7 +1361,8 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `model switch failure rolls back`() = runTest(main.testDispatcher) {
+    fun `immediately, a model switch failure rolls back`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(selectionApply = SelectionApply.Immediately)
         chat.switchResult = Result.failure(OpenCodeError.Server(500, null, "no"))
         val vm = vm()
         advanceUntilIdle()
@@ -1152,6 +1370,213 @@ class ChatViewModelTest {
         assertEquals("other", vm.state.value.model?.id)
         advanceUntilIdle()
         assertEquals("haiku", vm.state.value.model?.id)
+    }
+
+    @Test
+    fun `picked agent, model and variant stay local until the next prompt applies them in order`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val sonnet = ModelRef("sonnet", "anthropic")
+
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(sonnet))
+        vm.onEvent(ChatEvent.SelectVariant("high"))
+        advanceUntilIdle()
+        assertTrue(chat.calls.isEmpty())
+        assertEquals("build", vm.state.value.agent)
+        assertEquals(sonnet.copy(variant = "high"), vm.state.value.model)
+        // Picking does not reorder the recent models; sending does.
+        assertEquals(model.key, vm.state.value.recentModels.first().key)
+
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("agent:build", "model:anthropic/sonnet/high", "prompt:go"), chat.calls)
+        assertEquals(listOf(sonnet.copy(variant = "high")), recents.models)
+        assertEquals(sonnet.key, vm.state.value.recentModels.first().key)
+
+        // Applied: the next prompt switches nothing.
+        vm.onEvent(ChatEvent.DraftChanged("again"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals("prompt:again", chat.calls.last())
+        assertEquals(4, chat.calls.size)
+    }
+
+    @Test
+    fun `picking the session's own agent and model again leaves nothing to apply`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectAgent("plan"))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
+        vm.onEvent(ChatEvent.SelectModel(model))
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("prompt:go"), chat.calls)
+    }
+
+    @Test
+    fun `server events do not overwrite a pending selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val sonnet = ModelRef("sonnet", "anthropic")
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(sonnet))
+
+        events.flow.emit(ServerEvent.StepStarted("s1", "a9", "plan", ModelRef("opus", "anthropic"), 1))
+        events.flow.emit(ServerEvent.SessionChanged("s1", deleted = false))
+        advanceUntilIdle()
+        assertEquals("build", vm.state.value.agent)
+        assertEquals(sonnet, vm.state.value.model)
+    }
+
+    @Test
+    fun `a failed switch keeps the prompt and the selection for the next try`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val sonnet = ModelRef("sonnet", "anthropic")
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(sonnet))
+        chat.agentResult = Result.success(Unit)
+        chat.switchResult = Result.failure(OpenCodeError.Server(500, null, "no"))
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        vm.effect.first { it is ChatEffect.ShowMessage }
+        assertEquals("go", vm.state.value.draft)
+        assertEquals("build", vm.state.value.agent)
+        assertEquals(sonnet, vm.state.value.model)
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(recents.models.isEmpty())
+
+        chat.switchResult = Result.success(Unit)
+        chat.agentResult = Result.failure(OpenCodeError.Server(500, null, "unexpected"))
+        chat.calls.clear()
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        // The agent was switched by the first try: only the model is left.
+        assertEquals(listOf("model:anthropic/sonnet/null", "prompt:go"), chat.calls)
+    }
+
+    @Test
+    fun `shell commands and queued prompts keep the selection pending, the next steered prompt applies it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val sonnet = ModelRef("sonnet", "anthropic")
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(sonnet))
+        vm.onEvent(ChatEvent.DraftChanged("!ls"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("shell:ls"), chat.calls)
+
+        vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Queue))
+        vm.onEvent(ChatEvent.DraftChanged("later"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/review later"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("shell:ls", "prompt:later", "command:review"), chat.calls)
+        assertEquals("build", vm.state.value.agent)
+        assertEquals(sonnet, vm.state.value.model)
+
+        vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Steer))
+        vm.onEvent(ChatEvent.DraftChanged("/review now"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("agent:build", "model:anthropic/sonnet/null", "command:review"), chat.calls.drop(3))
+    }
+
+    @Test
+    fun `a queued prompt still commits a staged revert without applying the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Revert("u1"))
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Queue))
+        vm.onEvent(ChatEvent.DraftChanged("instead"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("commit", "prompt:instead"), chat.calls)
+        assertEquals("build", vm.state.value.agent)
+    }
+
+    @Test
+    fun `a staged revert is committed between the agent and the model switch`() = runTest(main.testDispatcher) {
+        chat.serverPrompts = listOf(Message.User("u1", 0, "hello"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Revert("u1"))
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
+        vm.onEvent(ChatEvent.DraftChanged("instead"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("agent:build", "commit", "model:anthropic/sonnet/null", "prompt:instead"), chat.calls)
+    }
+
+    @Test
+    fun `an agent with a configured model brings it unless a model was picked`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("review"))
+        assertEquals(ModelRef("sonnet", "anthropic", "high"), vm.state.value.model)
+        vm.onEvent(ChatEvent.SelectAgent("plan"))
+        assertEquals(model, vm.state.value.model)
+
+        val picked = ModelRef("haiku", "anthropic", "low")
+        vm.onEvent(ChatEvent.SelectVariant("low"))
+        vm.onEvent(ChatEvent.SelectAgent("review"))
+        assertEquals(picked, vm.state.value.model)
+    }
+
+    @Test
+    fun `leaving without sending shows the session's real selection next time`() = runTest(main.testDispatcher) {
+        val first = vm()
+        advanceUntilIdle()
+        first.onEvent(ChatEvent.SelectAgent("build"))
+        first.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
+
+        val reopened = vm()
+        advanceUntilIdle()
+        assertEquals("plan", reopened.state.value.agent)
+        assertEquals(model, reopened.state.value.model)
+        assertTrue(chat.calls.isEmpty())
+    }
+
+    @Test
+    fun `a pick made after switching to immediately replaces a pending one`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        settings.settings.value = AppSettings(selectionApply = SelectionApply.Immediately)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("plan"))
+        advanceUntilIdle()
+        assertEquals("plan", vm.state.value.agent)
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("agent:plan", "prompt:go"), chat.calls)
+    }
+
+    @Test
+    fun `immediately, picking an agent switches the session at once`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(selectionApply = SelectionApply.Immediately)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SelectAgent("build"))
+        advanceUntilIdle()
+        assertEquals(listOf("agent:build"), chat.calls)
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("agent:build", "prompt:go"), chat.calls)
     }
 }
 
@@ -1251,6 +1676,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         attachments: List<PromptAttachment>,
     ): Result<Unit> {
         prompts += text to delivery
+        calls += "prompt:$text"
         sentAttachments += attachments
         return promptResult
     }
@@ -1269,6 +1695,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         attachments: List<PromptAttachment>,
     ): Result<Unit> {
         commands += name to arguments
+        calls += "command:$name"
         return Result.success(Unit)
     }
     override suspend fun forms(sessionId: String) = Result.success(forms)
@@ -1295,6 +1722,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     var commitResult: Result<Unit> = Result.success(Unit)
     override suspend fun commitRevert(sessionId: String): Result<Unit> {
         commits++
+        calls += "commit"
         return commitResult
     }
     var inbox: List<QueuedPrompt> = emptyList()
@@ -1322,6 +1750,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     }
     override suspend fun shell(sessionId: String, command: String): Result<Unit> {
         shells += command
+        calls += "shell:$command"
         return shellResult
     }
     val changesByScope = mutableMapOf<ChangesScope, Result<List<FileDiff>>>()
@@ -1331,10 +1760,18 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         return changesByScope[scope] ?: Result.success(emptyList())
     }
     override suspend fun interrupt(sessionId: String) = Result.success(Unit)
-    override suspend fun switchAgent(sessionId: String, agent: String) = switchResult
+
+    /** Server requests in order: `agent:x`, `model:p/m/variant`, `prompt:text`, `shell:cmd`, `command:x`, `commit`. */
+    val calls = mutableListOf<String>()
+    var agentResult: Result<Unit>? = null
+    override suspend fun switchAgent(sessionId: String, agent: String): Result<Unit> {
+        calls += "agent:$agent"
+        return agentResult ?: switchResult
+    }
     val switched = mutableListOf<ModelRef>()
     override suspend fun switchModel(sessionId: String, model: ModelRef): Result<Unit> {
         switched += model
+        calls += "model:${model.key}/${model.variant}"
         return switchResult
     }
     override suspend fun permissions(sessionId: String) = Result.success(permissions)
@@ -1351,10 +1788,14 @@ private class FakeCatalog(private val model: ModelRef) : CatalogRepository {
             Agent("build", "build", null, AgentMode.Primary, false, null),
             Agent("plan", "plan", null, AgentMode.All, false, null),
             Agent("explore", "explore", null, AgentMode.Subagent, false, null),
+            Agent("review", "review", null, AgentMode.Primary, false, null, model = ModelRef("sonnet", "anthropic", "high")),
         ),
     )
     override suspend fun models(directory: String?) = Result.success(
-        listOf(ModelInfo(model, "Claude Haiku", "anthropic", null, 200_000, true, emptyList(), 0, true, "active", "Anthropic")),
+        listOf(
+            ModelInfo(model, "Claude Haiku", "anthropic", null, 200_000, true, emptyList(), 0, true, "active", "Anthropic"),
+            ModelInfo(ModelRef("sonnet", "anthropic"), "Claude Sonnet", "anthropic", null, 200_000, true, listOf("high"), 0, true, "active", "Anthropic"),
+        ),
     )
     override suspend fun commands(directory: String?) = Result.success(listOf(Command("review", "Review changes")))
     override suspend fun findFiles(directory: String, query: String) =
@@ -1384,6 +1825,36 @@ private class FakeMcps : McpRepository {
         changeFailure?.let { return Result.failure(it) }
         servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
         return Result.success(Unit)
+    }
+}
+
+private class FakeRecents : RecentModelRepository {
+    val models = mutableListOf<ModelRef>()
+    override fun recent(): List<ModelRef> = models.toList()
+    override fun used(model: ModelRef) {
+        models.removeAll { it.key == model.key }
+        models.add(0, model)
+    }
+}
+
+private class FakeVcs : VcsRepository {
+    var branch: VcsBranch? = VcsBranch("main", "main")
+    var files = listOf("a.kt", "b.kt")
+    val branchRequests = mutableListOf<String>()
+    var statusRequests = 0
+    override suspend fun branch(directory: String): Result<VcsBranch?> {
+        branchRequests += directory
+        return Result.success(branch)
+    }
+    override suspend fun changedFiles(directory: String): Result<List<String>> {
+        statusRequests++
+        return Result.success(files)
+    }
+    var diffs: List<FileDiff> = emptyList()
+    val diffRequests = mutableListOf<String>()
+    override suspend fun workingChanges(directory: String): Result<List<FileDiff>> {
+        diffRequests += directory
+        return Result.success(diffs)
     }
 }
 
