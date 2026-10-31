@@ -128,4 +128,6 @@
     <string name="settings_list_width_value">%1$d%</string>
     <string name="settings_list_handle">分隔线手柄</string>
     <string name="settings_list_handle_sub">在分隔线上显示箭头以隐藏列表，或拖动以调整大小</string>
+    <string name="settings_back_shows_list">返回键显示隐藏的列表</string>
+    <string name="settings_back_shows_list_sub">会话列表隐藏时，返回键会重新显示它，而不是退出应用</string>
 </resources>
