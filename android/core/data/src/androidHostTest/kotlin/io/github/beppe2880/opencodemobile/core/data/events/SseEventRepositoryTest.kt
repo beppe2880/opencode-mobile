@@ -258,7 +258,7 @@ class SseEventRepositoryTest {
     fun `no connection is attempted while offline`() = runBlocking {
         networkSignals.value = false
         repository = repository()
-        server.enqueue(stream("ses_1"))
+        server.enqueue(stream("ses_1", open = true))
         val collecting = repository.events.launchIn(scope)
 
         withTimeout(5_000) { networkSignals.subscriptionCount.first { it > 0 } }
