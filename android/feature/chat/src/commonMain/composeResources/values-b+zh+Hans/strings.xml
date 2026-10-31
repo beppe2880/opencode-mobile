@@ -164,4 +164,6 @@
     <string name="chat_running_no_output">暂无输出</string>
     <string name="chat_running_elapsed">已用时：%1$s</string>
     <string name="chat_running_refresh">刷新运行中的任务</string>
+    <string name="chat_running_stop_title">停止此命令？</string>
+    <string name="chat_running_stop_message">%1$s\n\n命令将被结束，其输出将不再可用。</string>
 </resources>

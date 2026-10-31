@@ -164,4 +164,6 @@
     <string name="chat_running_no_output">아직 출력이 없습니다</string>
     <string name="chat_running_elapsed">경과 시간: %1$s</string>
     <string name="chat_running_refresh">실행 중인 작업 새로 고침</string>
+    <string name="chat_running_stop_title">이 명령을 중지할까요?</string>
+    <string name="chat_running_stop_message">%1$s\n\n명령이 종료되며 출력은 더 이상 볼 수 없습니다.</string>
 </resources>

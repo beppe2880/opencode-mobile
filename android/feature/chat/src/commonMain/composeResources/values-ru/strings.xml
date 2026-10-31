@@ -191,4 +191,6 @@
     <string name="chat_running_no_output">Вывода пока нет</string>
     <string name="chat_running_elapsed">Прошло: %1$s</string>
     <string name="chat_running_refresh">Обновить выполняемые задачи</string>
+    <string name="chat_running_stop_title">Остановить эту команду?</string>
+    <string name="chat_running_stop_message">%1$s\n\nКоманда завершается, и её вывод больше не доступен.</string>
 </resources>

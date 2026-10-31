@@ -173,4 +173,6 @@
     <string name="chat_running_no_output">Noch keine Ausgabe</string>
     <string name="chat_running_elapsed">Verstrichen: %1$s</string>
     <string name="chat_running_refresh">Laufende Vorgänge aktualisieren</string>
+    <string name="chat_running_stop_title">Diesen Befehl beenden?</string>
+    <string name="chat_running_stop_message">%1$s\n\nDer Befehl wird beendet und seine Ausgabe ist nicht mehr verfügbar.</string>
 </resources>

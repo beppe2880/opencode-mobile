@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Каждый параметр вернётся к значению по умолчанию. Сохранённые серверы, черновики и клавиши терминала сохранятся.</string>
     <string name="settings_reset_confirm">Сбросить</string>
     <string name="settings_full_commands_sub">Переносить длинные команды и пути на несколько строк в строках инструментов вместо обрезки</string>
+    <string name="settings_running_in_list">Показывать текущую работу в списке сессий</string>
+    <string name="settings_running_in_list_sub">Считать выполняемых субагентов и фоновые команды под каждой сессией</string>
+    <string name="settings_confirm_stop">Подтверждать остановку команд</string>
+    <string name="settings_confirm_stop_sub">Спрашивать перед остановкой фоновой команды из панели «Выполняется»</string>
     <string name="settings_show_cost">Показывать стоимость</string>
     <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>
     <string name="settings_header_line">Строка заголовка чата</string>

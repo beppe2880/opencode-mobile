@@ -173,4 +173,6 @@
     <string name="chat_running_no_output">Ainda sem saída</string>
     <string name="chat_running_elapsed">Decorrido: %1$s</string>
     <string name="chat_running_refresh">Atualizar trabalho em execução</string>
+    <string name="chat_running_stop_title">Parar este comando?</string>
+    <string name="chat_running_stop_message">%1$s\n\nO comando é encerrado e sua saída não está mais disponível.</string>
 </resources>

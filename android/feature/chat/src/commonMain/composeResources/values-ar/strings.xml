@@ -209,4 +209,6 @@
     <string name="chat_running_no_output">لا يوجد خرج بعد</string>
     <string name="chat_running_elapsed">المدة المنقضية: %1$s</string>
     <string name="chat_running_refresh">تحديث الأعمال قيد التشغيل</string>
+    <string name="chat_running_stop_title">هل تريد إيقاف هذا الأمر؟</string>
+    <string name="chat_running_stop_message">%1$s\n\nسيتم إنهاء الأمر ولن يكون خرجه متاحاً بعد الآن.</string>
 </resources>

@@ -173,4 +173,6 @@
     <string name="chat_running_no_output">Aucune sortie pour le moment</string>
     <string name="chat_running_elapsed">Écoulé : %1$s</string>
     <string name="chat_running_refresh">Actualiser les tâches en cours</string>
+    <string name="chat_running_stop_title">Arrêter cette commande ?</string>
+    <string name="chat_running_stop_message">%1$s\n\nLa commande est arrêtée et sa sortie n’est plus disponible.</string>
 </resources>

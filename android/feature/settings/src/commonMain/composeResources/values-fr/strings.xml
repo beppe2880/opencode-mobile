@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Chaque option revient à sa valeur par défaut. Les serveurs enregistrés, brouillons et touches du terminal sont conservés.</string>
     <string name="settings_reset_confirm">Réinitialiser</string>
     <string name="settings_full_commands_sub">Renvoyer à la ligne les commandes et chemins longs dans les lignes d’outils au lieu de les tronquer</string>
+    <string name="settings_running_in_list">Afficher le travail en cours dans la liste des sessions</string>
+    <string name="settings_running_in_list_sub">Compter les sous-agents et les commandes en arrière-plan sous chaque session</string>
+    <string name="settings_confirm_stop">Confirmer avant d’arrêter les commandes</string>
+    <string name="settings_confirm_stop_sub">Demander confirmation avant d’arrêter une commande en arrière-plan depuis la feuille En cours</string>
     <string name="settings_show_cost">Afficher le coût</string>
     <string name="settings_show_cost_sub">Afficher le coût en dollars de chaque tour sous la réponse</string>
     <string name="settings_header_line">Ligne d'en-tête du chat</string>
