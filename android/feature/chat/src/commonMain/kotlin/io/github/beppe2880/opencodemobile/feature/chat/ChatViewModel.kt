@@ -142,6 +142,8 @@ class ChatViewModel(
                         swipeEnabled = s.swipeBetweenChats,
                         agentColorOutline = s.agentColorOutline,
                         dictation = s.dictation,
+                        permissionsCollapsedByDefault = s.permissionsCollapsed,
+                        questionsCollapsedByDefault = s.questionsCollapsed,
                         headerStyle = s.chatHeaderStyle,
                     )
                 }
@@ -179,6 +181,9 @@ class ChatViewModel(
             is ChatEvent.SelectModel -> selectModel(event.model)
             is ChatEvent.SelectVariant -> selectVariant(event.variant)
             is ChatEvent.ReplyPermission -> reply(event.requestId, event.decision)
+            is ChatEvent.CollapsePermission -> updateState { s ->
+                s.copy(toggledPermissions = s.toggledPermissions.toggle(event.requestId, event.collapsed != s.permissionsCollapsedByDefault))
+            }
             ChatEvent.Back -> sendEffect(ChatEffect.NavigateBack)
             is ChatEvent.AddAttachments -> updateState { s -> s.copy(attachments = (s.attachments + event.attachments).distinctBy { it.uri }) }
             is ChatEvent.RemoveAttachment -> updateState { s -> s.copy(attachments = s.attachments.filterNot { it.uri == event.uri }) }
@@ -197,6 +202,9 @@ class ChatViewModel(
             }
             ChatEvent.SubmitForm -> submitForm()
             ChatEvent.DismissForm -> dismissForm()
+            is ChatEvent.CollapseForm -> updateState { s ->
+                s.copy(toggledForms = s.toggledForms.toggle(event.formId, event.collapsed != s.questionsCollapsedByDefault))
+            }
             is ChatEvent.Revert -> revert(event.messageId)
             ChatEvent.RestoreRevert -> restoreRevert()
             is ChatEvent.Fork -> fork(event.messageId)
@@ -1219,3 +1227,5 @@ class ChatViewModel(
         const val NEIGHBOR_MESSAGES = 50
     }
 }
+
+private fun Set<String>.toggle(id: String, present: Boolean): Set<String> = if (present) this + id else this - id

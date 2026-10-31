@@ -115,6 +115,8 @@
     <string name="chat_permission_once">السماح مرة واحدة</string>
     <string name="chat_permission_always">دائمًا</string>
     <string name="chat_permission_reject">رفض</string>
+    <string name="chat_permission_collapse">طيّ طلب الإذن</string>
+    <string name="chat_permission_expand">توسيع طلب الإذن</string>
     <string name="chat_offline">غير متصل · جارٍ إعادة الاتصال</string>
     <string name="chat_unauthorized">رفض الخادم بيانات الاعتماد المحفوظة · أعد إقران الخادم</string>
     <string name="chat_shell_exit">رمز الخروج %1$s</string>
@@ -170,6 +172,8 @@
     <string name="chat_form_title">سؤال من الوكيل</string>
     <string name="chat_form_submit">إرسال الإجابة</string>
     <string name="chat_form_dismiss">تجاهل</string>
+    <string name="chat_form_collapse">طيّ السؤال</string>
+    <string name="chat_form_expand">توسيع السؤال</string>
     <string name="chat_form_other">إجابة أخرى</string>
     <string name="chat_form_open_link">فتح الرابط</string>
     <plurals name="chat_form_more">

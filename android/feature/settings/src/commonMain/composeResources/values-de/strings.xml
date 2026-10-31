@@ -87,6 +87,10 @@
     <string name="settings_swipe_chats_sub">Wische im Chat nach links oder rechts, um die nächste oder vorherige Sitzung der Liste zu öffnen</string>
     <string name="settings_group_activity">Denkprozess und Werkzeuge gruppieren</string>
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
+    <string name="settings_questions_collapsed">Fragen eingeklappt anzeigen</string>
+    <string name="settings_questions_collapsed_sub">Fragen des Agenten erscheinen als einzeilige Leiste über dem Eingabefeld; tippen, um zu antworten</string>
+    <string name="settings_permissions_collapsed">Berechtigungsanfragen eingeklappt anzeigen</string>
+    <string name="settings_permissions_collapsed_sub">Berechtigungsanfragen erscheinen als einzeilige Leiste über dem Eingabefeld; tippen, um zu antworten</string>
     <string name="settings_agent_outline">Umrandung in Agentenfarbe</string>
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
     <string name="settings_dictation">Spracheingabe</string>

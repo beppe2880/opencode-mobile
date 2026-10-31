@@ -27,6 +27,8 @@ class PreferencesRepositoriesTest {
             chatHeaderStyle = ChatHeaderStyle.Full,
             headerOpens = ChangesScope.Session,
             groupActivity = false,
+            questionsCollapsed = true,
+            permissionsCollapsed = true,
             terminalKeys = keys,
             outputPreviewLines = 24,
             liveOutputIntervalMs = 3_000,

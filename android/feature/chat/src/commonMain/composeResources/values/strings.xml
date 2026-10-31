@@ -87,6 +87,8 @@
     <string name="chat_permission_once">Allow once</string>
     <string name="chat_permission_always">Always</string>
     <string name="chat_permission_reject">Reject</string>
+    <string name="chat_permission_collapse">Collapse permission request</string>
+    <string name="chat_permission_expand">Expand permission request</string>
     <string name="chat_offline">Offline · reconnecting</string>
     <string name="chat_unauthorized">The server rejected the saved credentials · pair this server again</string>
     <string name="chat_shell_exit">exit %1$s</string>
@@ -138,6 +140,8 @@
     <string name="chat_form_title">Question from the agent</string>
     <string name="chat_form_submit">Send answer</string>
     <string name="chat_form_dismiss">Dismiss</string>
+    <string name="chat_form_collapse">Collapse question</string>
+    <string name="chat_form_expand">Expand question</string>
     <string name="chat_form_other">Other answer</string>
     <string name="chat_form_open_link">Open link</string>
     <plurals name="chat_form_more">

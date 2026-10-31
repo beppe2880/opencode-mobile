@@ -758,6 +758,84 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `collapsing a question keeps its answers and tells the server nothing`() = runTest(main.testDispatcher) {
+        chat.forms = listOf(Form("f1", "s1", "Which storage?", listOf(FormField.Text("choice", required = true))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.FormAnswerChanged("choice", FormAnswer.Text("room")))
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+        assertEquals("f1", vm.state.value.forms.single().id)
+        assertTrue(chat.formReplies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals(mapOf("choice" to FormAnswer.Text("room")), vm.state.value.formAnswers)
+    }
+
+    @Test
+    fun `collapsing a permission request never replies to it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", true))
+        events.flow.emit(ServerEvent.PermissionChanged("s1"))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertEquals("p1", vm.state.value.permissions.single().id)
+        assertTrue(chat.replies.isEmpty())
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(chat.replies.isEmpty())
+    }
+
+    @Test
+    fun `permission requests start collapsed when the setting says so, each folding on its own`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(permissionsCollapsed = true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+
+        vm.onEvent(ChatEvent.CollapsePermission("p1", false))
+        assertFalse(vm.state.value.isPermissionCollapsed("p1"))
+        assertTrue(vm.state.value.isPermissionCollapsed("p2"))
+    }
+
+    @Test
+    fun `each new question starts collapsed or open as the setting says`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(questionsCollapsed = true)
+        chat.forms = listOf(Form("f1", "s1", "First?", listOf(FormField.Toggle("ok"))))
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, false))
+        settings.settings.value = AppSettings(questionsCollapsed = false)
+        chat.forms = listOf(Form("f2", "s1", "Second?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+
+        // Folding one question does not fold the next one.
+        vm.onEvent(ChatEvent.CollapseForm(vm.state.value.forms.single().id, true))
+        chat.forms = listOf(Form("f3", "s1", "Third?", listOf(FormField.Toggle("ok"))))
+        events.flow.emit(ServerEvent.FormsChanged("s1"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.isFormCollapsed(vm.state.value.forms.single().id))
+        assertEquals("f3", vm.state.value.forms.single().id)
+    }
+
+    @Test
     fun `form events refresh the pending questions`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()

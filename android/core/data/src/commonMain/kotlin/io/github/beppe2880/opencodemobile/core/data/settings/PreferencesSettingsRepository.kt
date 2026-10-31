@@ -53,6 +53,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
+        prefs.putBoolean(KEY_QUESTIONS_COLLAPSED, next.questionsCollapsed)
+        prefs.putBoolean(KEY_PERMISSIONS_COLLAPSED, next.permissionsCollapsed)
         prefs.putBoolean(KEY_NOTIFICATIONS, next.notifications)
         prefs.putBoolean(KEY_NOTIFY_PERMISSIONS, next.notifyPermissions)
         prefs.putBoolean(KEY_NOTIFY_QUESTIONS, next.notifyQuestions)
@@ -99,6 +101,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
+            questionsCollapsed = prefs.getBoolean(KEY_QUESTIONS_COLLAPSED, defaults.questionsCollapsed),
+            permissionsCollapsed = prefs.getBoolean(KEY_PERMISSIONS_COLLAPSED, defaults.permissionsCollapsed),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
             notifyPermissions = prefs.getBoolean(KEY_NOTIFY_PERMISSIONS, defaults.notifyPermissions),
             notifyQuestions = prefs.getBoolean(KEY_NOTIFY_QUESTIONS, defaults.notifyQuestions),
@@ -145,6 +149,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
         const val KEY_GROUP_ACTIVITY = "group_activity"
+        const val KEY_QUESTIONS_COLLAPSED = "questions_collapsed"
+        const val KEY_PERMISSIONS_COLLAPSED = "permissions_collapsed"
         const val KEY_NOTIFICATIONS = "notifications"
         const val KEY_NOTIFY_PERMISSIONS = "notify_permissions"
         const val KEY_NOTIFY_QUESTIONS = "notify_questions"

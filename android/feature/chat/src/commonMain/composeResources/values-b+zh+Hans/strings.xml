@@ -80,6 +80,8 @@
     <string name="chat_permission_once">允许一次</string>
     <string name="chat_permission_always">始终允许</string>
     <string name="chat_permission_reject">拒绝</string>
+    <string name="chat_permission_collapse">收起权限请求</string>
+    <string name="chat_permission_expand">展开权限请求</string>
     <string name="chat_offline">离线 · 正在重新连接</string>
     <string name="chat_unauthorized">服务器拒绝了已保存的凭据 · 请重新配对此服务器</string>
     <string name="chat_shell_exit">退出码 %1$s</string>
@@ -130,6 +132,8 @@
     <string name="chat_form_title">智能体提问</string>
     <string name="chat_form_submit">发送回答</string>
     <string name="chat_form_dismiss">忽略</string>
+    <string name="chat_form_collapse">收起问题</string>
+    <string name="chat_form_expand">展开问题</string>
     <string name="chat_form_other">其他回答</string>
     <string name="chat_form_open_link">打开链接</string>
     <plurals name="chat_form_more">

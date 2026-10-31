@@ -87,6 +87,10 @@
     <string name="settings_swipe_chats_sub">在聊天中左右滑动，打开列表中的下一个或上一个会话</string>
     <string name="settings_group_activity">合并思考和工具</string>
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
+    <string name="settings_questions_collapsed">折叠显示问题</string>
+    <string name="settings_questions_collapsed_sub">智能体的问题会以单行条显示在输入框上方；点击即可回答</string>
+    <string name="settings_permissions_collapsed">折叠显示权限请求</string>
+    <string name="settings_permissions_collapsed_sub">权限请求会以单行条显示在输入框上方；点击即可回复</string>
     <string name="settings_agent_outline">智能体颜色边框</string>
     <string name="settings_agent_outline_sub">使用所选智能体的颜色描绘消息框边框</string>
     <string name="settings_dictation">语音输入</string>

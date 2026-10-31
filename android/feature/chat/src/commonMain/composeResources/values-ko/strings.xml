@@ -80,6 +80,8 @@
     <string name="chat_permission_once">한 번 허용</string>
     <string name="chat_permission_always">항상 허용</string>
     <string name="chat_permission_reject">거부</string>
+    <string name="chat_permission_collapse">권한 요청 접기</string>
+    <string name="chat_permission_expand">권한 요청 펼치기</string>
     <string name="chat_offline">오프라인 · 다시 연결 중</string>
     <string name="chat_unauthorized">서버가 저장된 자격 증명을 거부했습니다 · 서버를 다시 페어링하세요</string>
     <string name="chat_shell_exit">종료 코드 %1$s</string>
@@ -130,6 +132,8 @@
     <string name="chat_form_title">에이전트의 질문</string>
     <string name="chat_form_submit">답변 보내기</string>
     <string name="chat_form_dismiss">닫기</string>
+    <string name="chat_form_collapse">질문 접기</string>
+    <string name="chat_form_expand">질문 펼치기</string>
     <string name="chat_form_other">다른 답변</string>
     <string name="chat_form_open_link">링크 열기</string>
     <plurals name="chat_form_more">
