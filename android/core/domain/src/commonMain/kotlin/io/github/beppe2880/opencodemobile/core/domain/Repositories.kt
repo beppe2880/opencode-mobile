@@ -123,6 +123,15 @@ interface DraftRepository {
     fun save(sessionId: String, text: String)
 }
 
+/** Models this device sent prompts with on the active server, kept on the device. */
+interface RecentModelRepository {
+    /** Most recently used first, at most [RECENT_MODELS]. */
+    fun recent(): List<ModelRef>
+
+    /** A prompt was sent with [model]: it moves to the front. */
+    fun used(model: ModelRef)
+}
+
 enum class PromptDelivery { Steer, Queue }
 
 /** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
@@ -266,6 +275,12 @@ interface CatalogRepository {
     /** Enabled models, newest release first. */
     suspend fun models(directory: String?): Result<List<ModelInfo>>
 
+    /**
+     * The model set explicitly in the server configuration (`opencode.json` "model") for
+     * [directory]; null when none is set. Not the server's implicit fallback.
+     */
+    suspend fun configuredModel(directory: String?): Result<ModelRef?> = Result.success(null)
+
     /** Slash commands available in [directory]. */
     suspend fun commands(directory: String?): Result<List<Command>> = Result.success(emptyList())
 
@@ -274,6 +289,24 @@ interface CatalogRepository {
 }
 
 enum class ThemeMode { System, Light, Dark }
+
+/** When an agent, model or reasoning level picked in a chat reaches the server. */
+enum class SelectionApply {
+    /** Kept in the composer and applied right before the next prompt, like the OpenCode TUI. */
+    NextMessage,
+
+    /** Sent to the session as soon as it is picked. */
+    Immediately,
+}
+
+/** The model a new chat starts with when none is picked. */
+enum class NewChatModel {
+    /** The agent's configured model, else the last one used that is still available. */
+    LastUsed,
+
+    /** None: the server decides. */
+    ServerDefault,
+}
 
 /**
  * The line under the chat title: the folder name, the Git branch and the changed files; only
@@ -336,6 +369,10 @@ data class AppSettings(
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */
     val dictation: Boolean = true,
+    /** When agent and model changes in a chat reach the server. */
+    val selectionApply: SelectionApply = SelectionApply.NextMessage,
+    /** The model a new chat starts with. */
+    val newChatModel: NewChatModel = NewChatModel.LastUsed,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
     /** A question from the agent first shows as a one-line bar above the composer instead of the full card. */

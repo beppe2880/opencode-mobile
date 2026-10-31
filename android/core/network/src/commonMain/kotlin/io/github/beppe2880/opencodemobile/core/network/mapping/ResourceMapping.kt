@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.network.mapping
 
 import io.github.beppe2880.opencodemobile.api.models.AgentInfo
+import io.github.beppe2880.opencodemobile.api.models.ConfigModelEntry
 import io.github.beppe2880.opencodemobile.api.models.SessionInfo
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AgentMode
@@ -10,7 +11,12 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import io.github.beppe2880.opencodemobile.api.models.ModelInfo as ApiModelInfo
+import io.github.beppe2880.opencodemobile.api.models.ModelRef as ApiModelRef
 import io.github.beppe2880.opencodemobile.api.models.PermissionRequest as ApiPermissionRequest
 import io.github.beppe2880.opencodemobile.api.models.Project as ApiProject
 import io.github.beppe2880.opencodemobile.api.models.ServerInfo as ApiServerInfo
@@ -57,7 +63,32 @@ fun AgentInfo.toDomain(): Agent = Agent(
     },
     hidden = hidden,
     color = color,
+    model = model?.toDomain(),
 )
+
+/**
+ * The `model` set explicitly in the server configuration, like OpenCode Desktop: the last
+ * config document that sets one wins. It is written `provider/model` (optionally `#variant`)
+ * or as `{ providerID, model, variant }`. Null when no document sets it.
+ */
+fun List<ConfigModelEntry>.configuredModel(): ModelRef? {
+    val model = lastOrNull { it.type == "document" && it.info?.model.let { m -> m != null && m !is JsonNull } }?.info?.model ?: return null
+    return when (model) {
+        is JsonPrimitive -> model.contentOrNull?.let { text ->
+            val providerId = text.substringBefore('/', missingDelimiterValue = "")
+            val rest = text.substringAfter('/')
+            ApiModelRef(id = rest.substringBefore('#'), providerID = providerId, variant = rest.substringAfter('#', "").ifEmpty { null })
+                .takeIf { providerId.isNotEmpty() && it.id.isNotEmpty() }?.toDomain()
+        }
+        is JsonObject -> {
+            val providerId = (model["providerID"] as? JsonPrimitive)?.contentOrNull
+            val id = (model["model"] as? JsonPrimitive)?.contentOrNull
+            if (providerId.isNullOrEmpty() || id.isNullOrEmpty()) null
+            else ApiModelRef(id = id, providerID = providerId, variant = (model["variant"] as? JsonPrimitive)?.contentOrNull).toDomain()
+        }
+        else -> null
+    }
+}
 
 /** [providerNames] maps provider IDs to display names; unknown providers keep their ID. */
 fun ApiModelInfo.toDomain(providerNames: Map<String, String> = emptyMap()): DomainModelInfo {

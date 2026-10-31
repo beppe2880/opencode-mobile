@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.core.network
 
 import io.github.beppe2880.opencodemobile.api.apis.AgentApi
 import io.github.beppe2880.opencodemobile.api.apis.CommandApi
+import io.github.beppe2880.opencodemobile.api.apis.ConfigApi
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
 import io.github.beppe2880.opencodemobile.api.apis.McpApi
 import io.github.beppe2880.opencodemobile.api.apis.ModelApi
@@ -62,6 +63,7 @@ class OpenCodeClient internal constructor(
     val providers: ProviderApi = ProviderApi(baseUrl, http)
     val projects: ProjectApi = ProjectApi(baseUrl, http)
     val commands: CommandApi = CommandApi(baseUrl, http)
+    val config: ConfigApi = ConfigApi(baseUrl, http)
     val mcps: McpApi = McpApi(baseUrl, http)
     val files: FilesystemApi = FilesystemApi(baseUrl, http)
     val pty: PtyApi = PtyApi(baseUrl, http)

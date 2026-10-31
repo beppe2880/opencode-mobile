@@ -95,6 +95,14 @@
     <string name="settings_agent_outline_sub">Contornar a caixa de mensagem com a cor do agente selecionado</string>
     <string name="settings_dictation">Entrada de voz</string>
     <string name="settings_dictation_sub">Botão do microfone na caixa de mensagem, usando o reconhecimento de voz do telefone</string>
+    <string name="settings_selection_apply">Aplicar mudanças de agente e modelo</string>
+    <string name="settings_selection_apply_sub">Quando um agente, modelo ou nível de raciocínio escolhido em um chat é enviado ao servidor: com a próxima mensagem, ou assim que for escolhido</string>
+    <string name="settings_selection_apply_next">Próxima mensagem</string>
+    <string name="settings_selection_apply_now">Agora</string>
+    <string name="settings_new_chat_model">Modelo para novos chats</string>
+    <string name="settings_new_chat_model_sub">Usado quando nenhum modelo é escolhido: o configurado para o agente ou no servidor; senão, o último usado; ou deixar com o servidor</string>
+    <string name="settings_new_chat_model_last">Último usado</string>
+    <string name="settings_new_chat_model_server">Padrão do servidor</string>
     <string name="settings_usage">Estatísticas de uso</string>
     <string name="settings_usage_sub">Custo, tokens e atividade neste servidor</string>
     <string name="usage_title">Uso</string>

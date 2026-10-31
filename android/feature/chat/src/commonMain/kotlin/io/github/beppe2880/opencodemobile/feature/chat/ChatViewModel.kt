@@ -18,6 +18,8 @@ import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -58,6 +60,7 @@ class ChatViewModel(
     private val images: ImageMemory,
     private val scroll: ScrollMemory,
     private val mcps: McpRepository,
+    private val recents: RecentModelRepository,
     private val vcs: VcsRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
@@ -81,6 +84,21 @@ class ChatViewModel(
 
     /** Models of the most recently updated sessions, across every project. */
     private var recentFromSessions: List<ModelRef> = emptyList()
+
+    /** The session's agent and model as the server last reported them. */
+    private var sessionAgent: String? = null
+    private var sessionModel: ModelRef? = null
+
+    /**
+     * Picked in the composer but not sent to the server yet ([SelectionApply.NextMessage]):
+     * applied right before the next prompt. Null when it matches the session.
+     */
+    private var pendingAgent: String? = null
+    private var pendingModel: ModelRef? = null
+
+    /** [pendingModel] was picked by the user rather than taken from the picked agent's configuration. */
+    private var modelPicked = false
+    private var selectionApply: SelectionApply = settings.settings.value.selectionApply
 
     /** Completed compactions when `/compact` was requested; null when none is pending. */
     private var compactRequestedWith: Int? = null
@@ -112,7 +130,8 @@ class ChatViewModel(
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
             revertMessageId = s.revertMessageId
-            updateState { it.copy(title = s.title, directory = s.directory, agent = s.agent, model = s.model) }
+            updateState { it.copy(title = s.title, directory = s.directory) }
+            sessionSelection(s.agent, s.model)
         }
         drafts.load(sessionId).takeIf { it.isNotEmpty() }?.let { text -> updateState { it.copy(draft = text) } }
         updateState { it.copy(previousSession = neighbor(-1), nextSession = neighbor(+1)) }
@@ -125,6 +144,7 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
+                selectionApply = s.selectionApply
                 val vcsTurnedOn = s.chatHeaderLine != ChatHeaderLine.Folder && !vcsInHeader
                 headerLine = s.chatHeaderLine
                 headerOpens = s.headerOpens
@@ -266,20 +286,18 @@ class ChatViewModel(
             val activeIds = active.await().getOrNull()
             val permissionList = perms.await().getOrNull()
             val queuedList = inbox.await().getOrNull()?.queuedOnly()
+            sessionSelection(s.agent ?: lastAssistant?.agent, s.model ?: lastAssistant?.model)
             updateState {
-                val model = s.model ?: lastAssistant?.model ?: it.model
                 it.copy(
                     title = s.title,
                     directory = s.directory,
-                    agent = s.agent ?: lastAssistant?.agent ?: it.agent,
-                    model = model,
                     running = activeIds?.contains(sessionId) ?: it.running,
                     // Stop only asks the server to interrupt. If its ExecutionEnded was lost with
                     // the connection, a fresh server view must not leave the button disabled.
                     stopping = if (activeIds != null) false else it.stopping,
                     permissions = permissionList ?: it.permissions,
                     queued = queuedList ?: it.queued,
-                    recentModels = recentModels(model),
+                    recentModels = recentModels(),
                     loading = false,
                     synced = true,
                     error = null,
@@ -355,13 +373,8 @@ class ChatViewModel(
         if (cached.isEmpty() || messages.isNotEmpty()) return
         messages = cached
         val lastAssistant = cached.lastOrNull { it is Message.Assistant } as? Message.Assistant
-        updateState {
-            it.copy(
-                agent = it.agent ?: lastAssistant?.agent,
-                model = it.model ?: lastAssistant?.model,
-                loading = false,
-            )
-        }
+        sessionSelection(sessionAgent ?: lastAssistant?.agent, sessionModel ?: lastAssistant?.model)
+        updateState { it.copy(loading = false) }
         rebuild()
     }
 
@@ -435,7 +448,8 @@ class ChatViewModel(
             } else {
                 viewModelScope.launch {
                     sessions.get(sessionId).onSuccess { s ->
-                        updateState { it.copy(title = s.title, agent = s.agent ?: it.agent, model = s.model ?: it.model) }
+                        updateState { it.copy(title = s.title) }
+                        sessionSelection(s.agent, s.model)
                     }
                 }
             }
@@ -453,7 +467,8 @@ class ChatViewModel(
             }
             is ServerEvent.StepStarted -> {
                 applyEvent(event)
-                updateState { it.copy(running = true, agent = event.agent, model = event.model) }
+                updateState { it.copy(running = true) }
+                sessionSelection(event.agent, event.model)
             }
             is ServerEvent.StepEnded -> {
                 applyEvent(event)
@@ -725,10 +740,15 @@ class ChatViewModel(
         }
     }
 
-    /** The current model, then the models of recently updated sessions, then this transcript's. */
-    private fun recentModels(current: ModelRef? = currentState.model): List<ModelRef> {
+    /**
+     * The session's model, then those this device sent prompts with, then the models of recently
+     * updated sessions, then this transcript's. A model picked but not sent yet does not move up.
+     */
+    private fun recentModels(): List<ModelRef> {
         val fromTranscript = messages.asReversed().filterIsInstance<Message.Assistant>().map { it.model }
-        return (listOfNotNull(current) + recentFromSessions + fromTranscript).distinctBy { it.key }.take(RECENT_MODELS)
+        return (listOfNotNull(sessionModel) + recents.recent() + recentFromSessions + fromTranscript)
+            .distinctBy { it.key }
+            .take(RECENT_MODELS)
     }
 
     private fun send() {
@@ -757,8 +777,9 @@ class ChatViewModel(
         rebuild()
         sendEffect(ChatEffect.PromptSent)
         viewModelScope.launch {
-            val committed = if (revert != null) chat.commitRevert(sessionId) else Result.success(Unit)
-            val result = committed.fold(
+            var committed = revert == null
+            val settle: (suspend () -> Result<Unit>)? = revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } }
+            val result = prepareSend(apply = delivery == PromptDelivery.Steer, settle).fold(
                 onSuccess = {
                     if (command != null) chat.command(sessionId, command, arguments, delivery, attachments)
                     else chat.prompt(sessionId, text, delivery, attachments)
@@ -767,13 +788,14 @@ class ChatViewModel(
             )
             result.fold(
                 onSuccess = {
+                    sent()
                     updateState { it.copy(sending = false, running = true) }
                     rebuild()
                     scheduleReload()
                 },
                 onFailure = { error ->
                     messages = messages.filterNot { it.id == local.id }
-                    if (revert != null && committed.isFailure) restoreReverted(revert, reverted)
+                    if (revert != null && !committed) restoreReverted(revert, reverted)
                     updateState {
                         it.copy(
                             sending = false,
@@ -799,13 +821,15 @@ class ChatViewModel(
         rebuild()
         sendEffect(ChatEffect.PromptSent)
         viewModelScope.launch {
-            val committed = if (revert != null) chat.commitRevert(sessionId) else Result.success(Unit)
+            var committed = revert == null
+            // Like OpenCode Desktop, a shell command runs with the session's selection.
+            val ready = prepareSend(apply = false, revert?.let { { chat.commitRevert(sessionId).onSuccess { committed = true } } })
             // The server answers when the command exits; the composer is free again at once.
             updateState { it.copy(sending = false) }
-            committed.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
+            ready.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
                 onSuccess = { scheduleReload() },
                 onFailure = { error ->
-                    if (revert != null && committed.isFailure) restoreReverted(revert, reverted)
+                    if (revert != null && !committed) restoreReverted(revert, reverted)
                     rebuild()
                     updateState { if (it.draft.isEmpty()) it.copy(draft = draft) else it }
                     sendEffect(ChatEffect.ShowMessage(error.toUiText()))
@@ -1128,15 +1152,33 @@ class ChatViewModel(
     }
 
     private fun selectAgent(agent: String) {
-        val previous = currentState.agent
-        if (agent == previous) return
-        updateState { it.copy(agent = agent) }
+        if (agent == currentState.agent) return
+        if (selectionApply == SelectionApply.NextMessage) {
+            pendingAgent = agent.takeIf { it != sessionAgent }
+            // Like OpenCode Desktop, an agent with a configured model brings it along unless one was picked.
+            if (!modelPicked) {
+                pendingModel = configuredModel(agent)?.takeIf { pendingAgent != null && it != sessionModel }
+            }
+            showSelection()
+            return
+        }
+        // A choice left pending before the setting changed gives way to this one.
+        pendingAgent = null
+        val previous = sessionAgent
+        sessionSelection(agent, null)
         viewModelScope.launch {
             chat.switchAgent(sessionId, agent).onFailure { error ->
-                updateState { it.copy(agent = previous) }
+                if (sessionAgent == agent) sessionAgent = previous
+                showSelection()
                 sendEffect(ChatEffect.ShowMessage(error.toUiText()))
             }
         }
+    }
+
+    /** The model [agent] is configured with on the server, when it is available. */
+    private fun configuredModel(agent: String): ModelRef? {
+        val model = currentState.agents.firstOrNull { it.id == agent }?.model ?: return null
+        return model.takeIf { currentState.models.any { it.ref.key == model.key } }
     }
 
     private fun selectModel(model: ModelRef) {
@@ -1153,14 +1195,69 @@ class ChatViewModel(
     }
 
     private fun switchModel(model: ModelRef) {
-        val previous = currentState.model
-        updateState { it.copy(model = model, recentModels = (listOf(model) + it.recentModels).distinctBy { m -> m.key }) }
+        if (selectionApply == SelectionApply.NextMessage) {
+            pendingModel = model.takeIf { it != sessionModel }
+            modelPicked = pendingModel != null
+            showSelection()
+            return
+        }
+        pendingModel = null
+        val previous = sessionModel
+        sessionSelection(null, model)
         viewModelScope.launch {
             chat.switchModel(sessionId, model).onFailure { error ->
-                updateState { it.copy(model = previous) }
+                if (sessionModel == model) sessionModel = previous
+                showSelection()
                 sendEffect(ChatEffect.ShowMessage(error.toUiText()))
             }
         }
+    }
+
+    /**
+     * The agent and model reported by the server; null keeps what was known. A selection picked
+     * but not sent yet stays shown over them.
+     */
+    private fun sessionSelection(agent: String?, model: ModelRef?) {
+        if (agent != null) sessionAgent = agent
+        if (model != null) sessionModel = model
+        if (pendingAgent == sessionAgent) pendingAgent = null
+        if (pendingModel == sessionModel) pendingModel = null
+        showSelection()
+    }
+
+    /** Shows the agent and model the next prompt will use. */
+    private fun showSelection() {
+        if (pendingModel == null) modelPicked = false
+        updateState { it.copy(agent = pendingAgent ?: sessionAgent, model = pendingModel ?: sessionModel) }
+    }
+
+    /**
+     * Runs before a prompt, command or shell command. When [apply] is set, the selection picked
+     * in the composer is applied in OpenCode Desktop's order: the agent, then [settle] when
+     * given (committing a staged revert, which would otherwise delete the model switch), then
+     * the model. What was applied stops being pending, so after a failure only the rest is
+     * applied on the next try. Like Desktop, only a steered prompt or command applies it: a
+     * queued one must not reconfigure the work it waits behind, and a shell command runs with
+     * the session's selection, so the choice stays pending for the next steered prompt.
+     */
+    private suspend fun prepareSend(apply: Boolean, settle: (suspend () -> Result<Unit>)?): Result<Unit> {
+        if (!apply) return settle?.invoke() ?: Result.success(Unit)
+        pendingAgent?.let { agent ->
+            chat.switchAgent(sessionId, agent).onFailure { return Result.failure(it) }
+            sessionSelection(agent, null)
+        }
+        settle?.invoke()?.onFailure { return Result.failure(it) }
+        pendingModel?.let { model ->
+            chat.switchModel(sessionId, model).onFailure { return Result.failure(it) }
+            sessionSelection(null, model)
+        }
+        return Result.success(Unit)
+    }
+
+    /** A prompt went out: its model becomes the most recently used one. */
+    private fun sent() {
+        sessionModel?.let(recents::used)
+        updateState { it.copy(recentModels = recentModels()) }
     }
 
     /** Loads [scope] into the changes sheet; files of the same scope stay shown while it reloads. */

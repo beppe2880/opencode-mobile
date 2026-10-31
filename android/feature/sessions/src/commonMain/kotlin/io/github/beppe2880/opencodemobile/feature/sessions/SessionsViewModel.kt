@@ -4,16 +4,22 @@ import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -32,6 +38,8 @@ class SessionsViewModel(
     private val events: EventRepository,
     servers: ServerRepository,
     private val chat: ChatRepository,
+    private val settings: SettingsRepository,
+    private val recents: RecentModelRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -96,7 +104,7 @@ class SessionsViewModel(
             SessionsEvent.StartNewSession -> startNewSession()
             SessionsEvent.DismissNewSession -> updateState { it.copy(newSession = null) }
             is SessionsEvent.NewSessionDirectory -> updateNew { it.copy(directory = event.directory, customDirectory = event.custom, error = null) }
-            is SessionsEvent.NewSessionAgent -> updateNew { it.copy(agent = event.agent) }
+            is SessionsEvent.NewSessionAgent -> updateNew { withDefaultModel(it.copy(agent = event.agent)) }
             is SessionsEvent.NewSessionModelPicker -> updateNew { it.copy(pickingModel = event.open) }
             is SessionsEvent.NewSessionModel -> updateNew { it.copy(model = event.model, pickingModel = false) }
             SessionsEvent.CreateSession -> create()
@@ -294,19 +302,37 @@ class SessionsViewModel(
             ?: sessionList.firstOrNull()?.directory
             ?: state.projects.firstOrNull()?.directory
             ?: ""
-        updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = sessionList.recentModels())) }
+        val recent = (recents.recent() + sessionList.recentModels()).distinctBy { it.key }.take(RECENT_MODELS)
+        updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = recent)) }
         viewModelScope.launch {
             val dir = directory.ifBlank { null }
+            // A config that cannot be read only skips its step.
+            val configuredRequest = async { catalog.configuredModel(dir).getOrNull() }
             val agents = catalog.agents(dir).getOrDefault(emptyList()).selectablePrimary()
             val models = catalog.models(dir).getOrDefault(emptyList())
+            val configured = configuredRequest.await()
             updateNew { new ->
-                new.copy(
-                    agents = agents,
-                    models = models,
-                    agent = new.agent ?: agents.firstOrNull { it.id == "build" }?.id ?: agents.firstOrNull()?.id,
+                withDefaultModel(
+                    new.copy(
+                        agents = agents,
+                        models = models,
+                        configuredModel = configured,
+                        agent = new.agent ?: agents.firstOrNull { it.id == "build" }?.id ?: agents.firstOrNull()?.id,
+                    ),
                 )
             }
         }
+    }
+
+    /**
+     * The model the new chat gets when none is picked, like OpenCode Desktop: the agent's
+     * configured one, the server's configured one, then the last one used; each only when available. "Server default" in
+     * Settings leaves it to the server.
+     */
+    private fun withDefaultModel(new: NewSessionState): NewSessionState {
+        if (settings.settings.value.newChatModel == NewChatModel.ServerDefault) return new.copy(defaultModel = null)
+        val agent = new.agents.firstOrNull { it.id == new.agent }
+        return new.copy(defaultModel = newChatModel(agent, new.configuredModel, new.models, new.recentModels))
     }
 
     /**
@@ -328,7 +354,7 @@ class SessionsViewModel(
         if (!new.canCreate) return
         updateNew { it.copy(creating = true, error = null) }
         viewModelScope.launch {
-            sessions.create(new.directory.trim(), new.agent, new.model).fold(
+            sessions.create(new.directory.trim(), new.agent, new.effectiveModel).fold(
                 onSuccess = { session ->
                     updateState { it.copy(newSession = null) }
                     sendEffect(SessionsEffect.OpenChat(session.id))

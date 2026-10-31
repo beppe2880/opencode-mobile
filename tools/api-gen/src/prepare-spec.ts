@@ -7,8 +7,11 @@
 const KEEP_TAGS = new Set([
   "server", "location", "agent", "session", "model", "project", "form", "permission",
   "filesystem", "command", "skill", "event", "shell", "worktree", "vcs", "pty", "reference",
-  "provider", "mcp",
+  "provider", "mcp", "config",
 ])
+
+/** Config operations used by the app; the rest of the `config` area stays out. */
+const KEEP_CONFIG_PATHS = new Set(["/api/config"])
 
 const refName = (ref: string) => ref.split("/").pop()!
 
@@ -23,6 +26,32 @@ function walk(node: any, visit: (node: any) => void) {
 export function prepareSpec(spec: any): string {
   const components = spec.components.schemas
   const resolve = (schema: any): any => (schema?.$ref ? resolve(components[refName(schema.$ref)]) : schema)
+
+  // 0. The app reads only the global `model` of each config document (new chats start with it,
+  //    like OpenCode Desktop). The full config schema would generate dozens of classes and change
+  //    shared ones, so `GET /api/config` is narrowed to `{ type, info: { model } }`; `model` is a
+  //    "provider/model" string or a `{ providerID, model, variant }` object, kept as raw JSON.
+  for (const [path, item] of Object.entries<any>(spec.paths)) {
+    if (KEEP_CONFIG_PATHS.has(path)) continue
+    for (const method of Object.keys(item)) if (item[method].tags?.includes("config")) delete item[method]
+    if (Object.keys(item).length === 0) delete spec.paths[path]
+  }
+  const configGet = spec.paths["/api/config"]?.get
+  if (configGet) {
+    components["ConfigModelEntry"] = {
+      type: "object",
+      properties: {
+        type: { type: "string" },
+        info: { $ref: "#/components/schemas/ConfigModelInfo" },
+      },
+      required: ["type"],
+    }
+    components["ConfigModelInfo"] = { type: "object", properties: { model: {} } }
+    configGet.responses["200"].content["application/json"].schema = {
+      type: "array",
+      items: { $ref: "#/components/schemas/ConfigModelEntry" },
+    }
+  }
 
   // 1. anyOf unions whose members share a constant property become oneOf + discriminator,
   //    so the generator emits a sealed interface instead of one flattened class.

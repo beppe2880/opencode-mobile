@@ -47,7 +47,9 @@ import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
@@ -134,6 +136,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_li
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_shell_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_thinking
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_thinking_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_new_chat_model
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_new_chat_model_last
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_new_chat_model_server
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_new_chat_model_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_finished
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_finished_sub
@@ -165,6 +171,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_re
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_section
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_reset_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_save
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_next
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_now
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_actions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_servers
@@ -633,6 +643,28 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.dictation,
                 onCheckedChange = { onEvent(SettingsEvent.DictationChanged(it)) },
                 modifier = Modifier.testTag("settings_dictation_switch"),
+            )
+            OcDivider()
+            ChoiceRow(
+                title = stringResource(Res.string.settings_selection_apply),
+                subtitle = stringResource(Res.string.settings_selection_apply_sub),
+                choices = listOf(
+                    OcSegment(SelectionApply.NextMessage, stringResource(Res.string.settings_selection_apply_next), "settings_selection_apply_next"),
+                    OcSegment(SelectionApply.Immediately, stringResource(Res.string.settings_selection_apply_now), "settings_selection_apply_now"),
+                ),
+                selected = settings.selectionApply,
+                onSelect = { onEvent(SettingsEvent.SelectionApplyChanged(it)) },
+            )
+            OcDivider()
+            ChoiceRow(
+                title = stringResource(Res.string.settings_new_chat_model),
+                subtitle = stringResource(Res.string.settings_new_chat_model_sub),
+                choices = listOf(
+                    OcSegment(NewChatModel.LastUsed, stringResource(Res.string.settings_new_chat_model_last), "settings_new_chat_model_last"),
+                    OcSegment(NewChatModel.ServerDefault, stringResource(Res.string.settings_new_chat_model_server), "settings_new_chat_model_server"),
+                ),
+                selected = settings.newChatModel,
+                onSelect = { onEvent(SettingsEvent.NewChatModelChanged(it)) },
             )
         }
     }

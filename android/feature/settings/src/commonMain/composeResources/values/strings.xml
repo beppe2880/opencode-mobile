@@ -95,6 +95,14 @@
     <string name="settings_agent_outline_sub">Outline the message box in the color of the selected agent</string>
     <string name="settings_dictation">Voice input</string>
     <string name="settings_dictation_sub">Microphone button in the message box, using the phone's speech recognition</string>
+    <string name="settings_selection_apply">Apply agent and model changes</string>
+    <string name="settings_selection_apply_sub">When an agent, model or reasoning level picked in a chat is sent to the server: with the next message, or as soon as it is picked</string>
+    <string name="settings_selection_apply_next">Next message</string>
+    <string name="settings_selection_apply_now">Immediately</string>
+    <string name="settings_new_chat_model">Model for new chats</string>
+    <string name="settings_new_chat_model_sub">Used when no model is picked: the model configured for the agent or on the server, else the last one used; or leave it to the server</string>
+    <string name="settings_new_chat_model_last">Last used</string>
+    <string name="settings_new_chat_model_server">Server default</string>
     <string name="settings_usage">Usage statistics</string>
     <string name="settings_usage_sub">Cost, tokens and activity on this server</string>
     <string name="usage_title">Usage</string>

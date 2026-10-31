@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
+import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
@@ -76,6 +78,8 @@ sealed interface SettingsEvent {
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
+    data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
+    data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
     data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class PermissionsCollapsedChanged(val enabled: Boolean) : SettingsEvent

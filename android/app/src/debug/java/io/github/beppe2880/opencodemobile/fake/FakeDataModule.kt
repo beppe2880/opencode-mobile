@@ -32,6 +32,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
@@ -93,6 +94,7 @@ val fakeDataModule = module {
     single<CatalogRepository> { FakeCatalog() }
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
+    single<RecentModelRepository> { FakeRecentModels() }
     single<TerminalRepository> { FakeTerminals() }
     single<UpdateRepository> {
         object : UpdateRepository {
@@ -475,6 +477,14 @@ internal class FakeDrafts : DraftRepository {
     override fun load(sessionId: String): String = drafts[sessionId].orEmpty()
     override fun save(sessionId: String, text: String) {
         if (text.isBlank()) drafts -= sessionId else drafts[sessionId] = text
+    }
+}
+
+internal class FakeRecentModels : RecentModelRepository {
+    private var models = emptyList<ModelRef>()
+    override fun recent(): List<ModelRef> = models
+    override fun used(model: ModelRef) {
+        models = (listOf(model) + models).distinctBy { it.key }
     }
 }
 

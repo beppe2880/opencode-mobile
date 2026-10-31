@@ -95,6 +95,14 @@
     <string name="settings_agent_outline_sub">使用所选智能体的颜色描绘消息框边框</string>
     <string name="settings_dictation">语音输入</string>
     <string name="settings_dictation_sub">消息框中的麦克风按钮，使用手机的语音识别</string>
+    <string name="settings_selection_apply">应用智能体和模型更改</string>
+    <string name="settings_selection_apply_sub">在聊天中选择的智能体、模型或推理级别发送到服务器时：在下一条消息时，或在选择后立即</string>
+    <string name="settings_selection_apply_next">下条消息</string>
+    <string name="settings_selection_apply_now">立即</string>
+    <string name="settings_new_chat_model">新聊天的模型</string>
+    <string name="settings_new_chat_model_sub">未选择模型时使用：为智能体或服务器配置的模型，否则使用上次使用的模型；或交由服务器决定</string>
+    <string name="settings_new_chat_model_last">上次使用</string>
+    <string name="settings_new_chat_model_server">服务器默认</string>
     <string name="settings_usage">用量统计</string>
     <string name="settings_usage_sub">本服务器上的费用、token 和活动</string>
     <string name="usage_title">用量</string>
