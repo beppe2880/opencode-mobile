@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.api.apis.PtyApi
 import io.github.beppe2880.opencodemobile.api.apis.ServerApi
 import io.github.beppe2880.opencodemobile.api.apis.SessionApi
 import io.github.beppe2880.opencodemobile.api.apis.ShellApi
+import io.github.beppe2880.opencodemobile.api.apis.VcsApi
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEvent
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEventSerializer
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -65,6 +66,7 @@ class OpenCodeClient internal constructor(
     val files: FilesystemApi = FilesystemApi(baseUrl, http)
     val pty: PtyApi = PtyApi(baseUrl, http)
     val shells: ShellApi = ShellApi(baseUrl, http)
+    val vcs: VcsApi = VcsApi(baseUrl, http)
 
     /**
      * Cold WebSocket stream of PTY [ptyId], authenticated like every other call. The server

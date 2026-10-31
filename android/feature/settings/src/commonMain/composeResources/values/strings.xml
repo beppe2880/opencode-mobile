@@ -65,6 +65,8 @@
     <string name="settings_full_commands_sub">Wrap long commands and paths in tool rows instead of cutting them off</string>
     <string name="settings_show_cost">Show cost</string>
     <string name="settings_show_cost_sub">Show the cost in dollars of each turn below the reply</string>
+    <string name="settings_show_branch">Show branch in chat header</string>
+    <string name="settings_show_branch_sub">Show the Git branch and how many files are changed under the chat title</string>
     <string name="settings_swipe_chats">Swipe between chats</string>
     <string name="settings_swipe_chats_sub">Swipe left or right on a chat to open the next or previous session in the list</string>
     <string name="settings_group_activity">Group thinking and tools</string>

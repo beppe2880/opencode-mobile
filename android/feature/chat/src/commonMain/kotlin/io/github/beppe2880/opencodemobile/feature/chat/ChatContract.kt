@@ -97,6 +97,8 @@ data class ChatState(
     /** The sheet of files the session changed; null while closed. */
     val changes: ChangesPanel? = null,
     val mcps: McpPanel? = null,
+    /** The branch line under the title; null while unknown, empty or turned off (setting). */
+    val vcs: VcsLine? = null,
 ) {
     val uploads: List<PromptAttachment> get() = attachments.filter { it.mention == null }
 
@@ -113,6 +115,13 @@ data class ChatState(
 }
 
 data class SessionPeek(val id: String, val title: String)
+
+/**
+ * The project's [branch] (null on a detached HEAD) and its [files] with uncommitted changes.
+ * Outside a repository there is no branch and [files] only counts what the agent edited
+ * ([agentEdits]): changes made by shell commands are not known.
+ */
+data class VcsLine(val branch: String?, val files: Int, val agentEdits: Boolean = false)
 
 data class McpPanel(
     val servers: List<McpServer>? = null,

@@ -60,6 +60,7 @@ sealed interface SettingsEvent {
     data object RequestReset : SettingsEvent
     data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
+    data class ShowBranchChanged(val enabled: Boolean) : SettingsEvent
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent

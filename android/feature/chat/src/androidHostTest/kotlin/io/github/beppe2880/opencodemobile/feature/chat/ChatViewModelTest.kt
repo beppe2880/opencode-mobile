@@ -39,6 +39,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -67,6 +69,7 @@ class ChatViewModelTest {
     private val drafts = FakeDrafts()
     private val scroll = ScrollMemory()
     private val mcps = FakeMcps()
+    private val vcs = FakeVcs()
 
     @Test
     fun `MCP menu and slash open the same project panel without prompting`() = runTest(main.testDispatcher) {
@@ -230,7 +233,79 @@ class ChatViewModelTest {
     }
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, vcs, clock = { 42 })
+
+    @Test
+    fun `the branch line shows the branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(VcsLine("main", 2), vm.state.value.vcs)
+        assertEquals(listOf("/repo"), vcs.branchRequests)
+
+        vcs.files = listOf("a.kt")
+        events.flow.emit(ServerEvent.StepEnded("s1", "m1", "stop", 0.0, TokenUsage(), 0))
+        events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded))
+        advanceUntilIdle()
+        assertEquals(VcsLine("main", 1), vm.state.value.vcs)
+        // Both events settle into one read.
+        assertEquals(2, vcs.statusRequests)
+
+        vm.onEvent(ChatEvent.OpenChanges)
+        advanceUntilIdle()
+        assertEquals(ChangesScope.Session, vm.state.value.changes?.scope)
+    }
+
+    @Test
+    fun `branch switches of this project arrive from the event stream`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.BranchChanged("/other", "feature"))
+        advanceUntilIdle()
+        assertEquals("main", vm.state.value.vcs?.branch)
+
+        vcs.files = emptyList()
+        events.flow.emit(ServerEvent.BranchChanged("/repo", "feature"))
+        advanceUntilIdle()
+        assertEquals(VcsLine("feature", 0), vm.state.value.vcs)
+        assertEquals(1, vcs.branchRequests.size)
+    }
+
+    @Test
+    fun `outside a repository only files the agent edited are counted`() = runTest(main.testDispatcher) {
+        vcs.branch = null
+        val edit = Part.Tool(
+            "c1", "edit", ToolStatus.Completed, "{}",
+            diffs = listOf(FileDiff("a.kt", null, 1, 0, ""), FileDiff("b.kt", null, 1, 0, "")),
+        )
+        val again = Part.Tool("c2", "write", ToolStatus.Completed, "{}", diffs = listOf(FileDiff("a.kt", null, 1, 0, "")))
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(edit, again), completedAt = 6)
+        events.flow.emit(ServerEvent.StepEnded("s1", "a1", "stop", 0.0, TokenUsage(), 0))
+        advanceUntilIdle()
+        assertEquals(VcsLine(null, 2, agentEdits = true), vm.state.value.vcs)
+        assertEquals(0, vcs.statusRequests)
+    }
+
+    @Test
+    fun `the branch line is hidden and not fetched when turned off`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(showBranch = false)
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+        assertTrue(vcs.branchRequests.isEmpty())
+
+        settings.settings.value = AppSettings(showBranch = true)
+        advanceUntilIdle()
+        assertEquals(VcsLine("main", 2), vm.state.value.vcs)
+
+        settings.settings.value = AppSettings(showBranch = false)
+        advanceUntilIdle()
+        assertNull(vm.state.value.vcs)
+    }
 
     @Test
     fun `the microphone follows the voice input setting`() = runTest(main.testDispatcher) {
@@ -1260,6 +1335,21 @@ private class FakeMcps : McpRepository {
         changeFailure?.let { return Result.failure(it) }
         servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
         return Result.success(Unit)
+    }
+}
+
+private class FakeVcs : VcsRepository {
+    var branch: VcsBranch? = VcsBranch("main", "main")
+    var files = listOf("a.kt", "b.kt")
+    val branchRequests = mutableListOf<String>()
+    var statusRequests = 0
+    override suspend fun branch(directory: String): Result<VcsBranch?> {
+        branchRequests += directory
+        return Result.success(branch)
+    }
+    override suspend fun changedFiles(directory: String): Result<List<String>> {
+        statusRequests++
+        return Result.success(files)
     }
 }
 

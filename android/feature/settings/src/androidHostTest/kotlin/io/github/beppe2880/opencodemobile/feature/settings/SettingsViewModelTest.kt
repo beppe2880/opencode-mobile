@@ -48,6 +48,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ShowReasoningChanged(false))
         vm.onEvent(SettingsEvent.ExpandToolsChanged(true))
         vm.onEvent(SettingsEvent.ShowCostChanged(false))
+        vm.onEvent(SettingsEvent.ShowBranchChanged(false))
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
@@ -88,6 +89,7 @@ class SettingsViewModelTest {
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
                 showCost = false,
+                showBranch = false,
                 swipeBetweenChats = false,
                 agentColorOutline = false,
                 dictation = false,

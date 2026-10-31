@@ -43,6 +43,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
         prefs.putBoolean(KEY_SHOW_COST, next.showCost)
+        prefs.putBoolean(KEY_SHOW_BRANCH, next.showBranch)
         prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
@@ -84,6 +85,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
+            showBranch = prefs.getBoolean(KEY_SHOW_BRANCH, defaults.showBranch),
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
@@ -125,6 +127,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
         const val KEY_SHOW_COST = "show_cost"
+        const val KEY_SHOW_BRANCH = "show_branch"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"

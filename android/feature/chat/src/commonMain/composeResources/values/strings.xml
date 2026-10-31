@@ -48,6 +48,11 @@
         <item quantity="one">%1$d file changed</item>
         <item quantity="other">%1$d files changed</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="one">%1$d file edited by the agent</item>
+        <item quantity="other">%1$d files edited by the agent</item>
+    </plurals>
+    <string name="chat_vcs_detached">Detached HEAD</string>
     <string name="chat_changes_empty">No changed files</string>
     <string name="chat_changes_empty_session">The agent has not edited any file in this session.</string>
     <string name="chat_changes_empty_turn">The agent did not edit any file in the last turn.</string>

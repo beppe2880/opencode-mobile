@@ -20,6 +20,7 @@ class PreferencesRepositoriesTest {
         val changed = AppSettings(
             theme = ThemeMode.Dark,
             showCost = false,
+            showBranch = false,
             groupActivity = false,
             terminalKeys = keys,
             outputPreviewLines = 24,

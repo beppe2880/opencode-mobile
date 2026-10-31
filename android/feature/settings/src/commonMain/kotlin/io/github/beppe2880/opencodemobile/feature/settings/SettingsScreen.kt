@@ -142,6 +142,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_branch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_branch_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning
@@ -504,6 +506,14 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 checked = settings.showCost,
                 onCheckedChange = { onEvent(SettingsEvent.ShowCostChanged(it)) },
                 modifier = Modifier.testTag("settings_show_cost_switch"),
+            )
+            OcDivider()
+            OcSwitchRow(
+                title = stringResource(Res.string.settings_show_branch),
+                subtitle = stringResource(Res.string.settings_show_branch_sub),
+                checked = settings.showBranch,
+                onCheckedChange = { onEvent(SettingsEvent.ShowBranchChanged(it)) },
+                modifier = Modifier.testTag("settings_show_branch_switch"),
             )
             OcDivider()
             OcSwitchRow(

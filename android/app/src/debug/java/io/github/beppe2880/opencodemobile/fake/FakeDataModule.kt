@@ -47,6 +47,8 @@ import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
+import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
+import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -98,6 +100,12 @@ val fakeDataModule = module {
                 servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
                 return Result.success(Unit)
             }
+        }
+    }
+    single<VcsRepository> {
+        object : VcsRepository {
+            override suspend fun branch(directory: String) = Result.success(VcsBranch("main", "main"))
+            override suspend fun changedFiles(directory: String) = Result.success(listOf("README.md", "src/App.kt"))
         }
     }
 }

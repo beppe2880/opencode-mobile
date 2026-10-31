@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
@@ -51,6 +53,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_files
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_title
@@ -59,6 +62,9 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_detached
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_files_edited
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
@@ -178,6 +184,7 @@ private fun ChatTopBar(
         // Blank until the session is known, then a placeholder until the server names it.
         title = state.title.ifBlank { if (state.directory.isEmpty()) " " else stringResource(Res.string.chat_untitled) },
         subtitle = state.directory.takeIf { it.isNotEmpty() },
+        subtitleContent = state.vcs?.let { line -> { VcsSubtitle(line, onChanges) } },
         leading = if (showBack) {
             {
                 OcIconButton(
@@ -236,6 +243,27 @@ private fun ChatTopBar(
     )
 }
 
+/** "branch · 3 files changed" under the title; opens the changes sheet. */
+@Composable
+private fun VcsSubtitle(line: VcsLine, onClick: () -> Unit) {
+    val files = when {
+        line.files == 0 -> null
+        line.agentEdits -> pluralStringResource(Res.plurals.chat_vcs_files_edited, line.files, line.files)
+        else -> pluralStringResource(Res.plurals.chat_changes_files, line.files, line.files)
+    }
+    val branch = line.branch ?: stringResource(Res.string.chat_vcs_detached).takeUnless { line.agentEdits }
+    Text(
+        text = listOfNotNull(branch, files).joinToString(" · "),
+        style = MaterialTheme.typography.bodySmall,
+        color = OcTheme.colors.textMuted,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .clickable(onClickLabel = stringResource(Res.string.chat_changes_open), role = Role.Button, onClick = onClick)
+            .testTag("chat_vcs_line"),
+    )
+}
+
 private fun previewState(running: Boolean = false) = ChatState(
     sessionId = "ses_1",
     title = "Native Android client for OpenCode",
@@ -249,6 +277,7 @@ private fun previewState(running: Boolean = false) = ChatState(
     running = running,
     draft = if (running) "Also add tests" else "",
     permissions = if (running) listOf(SampleData.permission) else emptyList(),
+    vcs = VcsLine("feat/vcs-header", files = if (running) 3 else 0),
 )
 
 @PreviewLightDark

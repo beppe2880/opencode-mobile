@@ -305,6 +305,8 @@ data class AppSettings(
     val showFullCommands: Boolean = false,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
+    /** The chat header shows the project's branch and how many files are changed. */
+    val showBranch: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */
