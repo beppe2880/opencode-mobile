@@ -87,7 +87,7 @@ class LiveServerTest {
                 override val isVisible = MutableStateFlow(true)
             },
             object : NetworkMonitor {
-                override val networkAvailable = emptyFlow<Unit>()
+                override val connected = emptyFlow<Boolean>()
             },
             scope,
         )
