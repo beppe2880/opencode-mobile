@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.outlined.Difference
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -35,7 +37,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -60,7 +61,9 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
+import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
@@ -132,14 +135,7 @@ fun ChatScreen(
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
-                if (!state.work.isEmpty) {
-                    TextButton(
-                        onClick = { onEvent(ChatEvent.RunningSheet(true)) },
-                        modifier = Modifier.fillMaxWidth().testTag("chat_running_button"),
-                    ) {
-                        Text(runningSummary(state.work), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    }
-                }
+                if (!state.work.isEmpty) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -351,6 +347,46 @@ private fun VcsSubtitle(line: VcsLine, style: ChatHeaderStyle, onClick: () -> Un
 }
 
 private const val SEPARATOR = " · "
+
+/**
+ * "2 subagents · 1 command" under the header, written like the header line ([style]: counts after
+ * icons, or words); opens the Running sheet. Like the header line it is a compact target: the
+ * "Running" menu item is the full-size alternative.
+ */
+@Composable
+private fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
+    val c = OcTheme.colors
+    val textStyle = MaterialTheme.typography.bodySmall
+    val iconSize = with(LocalDensity.current) { textStyle.fontSize.toDp() }
+    val summary = runningSummary(work)
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("chat_running_button")
+                .clickable(onClickLabel = stringResource(UiRes.string.oc_running), role = Role.Button, onClick = onClick)
+                .clearAndSetSemantics { contentDescription = summary }
+                .heightIn(min = 32.dp)
+                .padding(horizontal = OcSpacing.gutter, vertical = OcSpacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
+        ) {
+            OcPulsingDot(c.info.fg)
+            if (style == ChatHeaderStyle.Icons) {
+                for ((icon, count) in listOf(Icons.Outlined.SmartToy to work.agents.size, Icons.Outlined.Terminal to work.commands.size)) {
+                    if (count == 0) continue
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xxs)) {
+                        Icon(icon, contentDescription = null, tint = c.textMuted, modifier = Modifier.size(iconSize))
+                        Text(formatInteger(count.toLong()), style = textStyle, color = c.textMuted, maxLines = 1)
+                    }
+                }
+            } else {
+                Text(summary, style = textStyle, color = c.textMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+        OcDivider()
+    }
+}
 
 @Composable
 private fun VcsPartView(part: VcsPart, style: TextStyle, color: Color, iconSize: Dp) {

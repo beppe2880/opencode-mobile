@@ -116,6 +116,10 @@ data class ChatState(
     val workOutput: Map<String, String> = emptyMap(),
     val workOutputErrors: Map<String, UiText> = emptyMap(),
     val stoppingCommands: Set<String> = emptySet(),
+    /** The command whose Stop waits for confirmation; null when none. */
+    val confirmingStop: String? = null,
+    /** Server clock minus device clock, for elapsed times of server timestamps. */
+    val clockOffsetMs: Long = 0L,
     /** The branch line under the title; null while unknown, empty or turned off (setting). */
     val vcs: VcsLine? = null,
     /** How the header line is written (setting). */
@@ -253,6 +257,8 @@ sealed interface ChatEvent {
     data class RunningSheet(val open: Boolean) : ChatEvent
     data object RefreshRunning : ChatEvent
     data class StopCommand(val id: String) : ChatEvent
+    data object ConfirmStopCommand : ChatEvent
+    data object DismissStopCommand : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent

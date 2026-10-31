@@ -46,6 +46,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_de
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -63,7 +64,8 @@ internal fun SessionRow(
     modifier: Modifier = Modifier,
     /** A narrow list (beside the chat): the time moves under the title so the title keeps the width. */
     compact: Boolean = false,
-    work: RunningWork = RunningWork(),
+    /** What runs under the session; null when the setting hides running work (only the dot shows). */
+    work: RunningWork? = RunningWork(),
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -74,7 +76,8 @@ internal fun SessionRow(
     val scope = rememberCoroutineScope()
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
-    val runningLabel = runningSummary(work, running)
+    val runningLabel = if (work == null) stringResource(Res.string.sessions_running_a11y) else runningSummary(work, running)
+    val showsWork = work != null && (running || !work.isEmpty)
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
@@ -98,7 +101,7 @@ internal fun SessionRow(
                 .background(if (selected) c.layer02 else c.bgBase)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
                 .semantics {
-                    if (running || !work.isEmpty) stateDescription = runningLabel
+                    if (running || showsWork) stateDescription = runningLabel
                     customActions = listOf(
                         CustomAccessibilityAction(renameLabel) { onLongClick(); true },
                         CustomAccessibilityAction(deleteLabel) { onSwipeDelete(); true },
@@ -130,7 +133,7 @@ internal fun SessionRow(
                     )
                     OutcomeBadge(session.outcome, running)
                 }
-                if (running || !work.isEmpty) {
+                if (showsWork) {
                     Text(
                         runningLabel,
                         style = MaterialTheme.typography.bodySmall,

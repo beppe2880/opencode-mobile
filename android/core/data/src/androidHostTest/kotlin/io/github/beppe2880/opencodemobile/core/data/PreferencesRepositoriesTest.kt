@@ -31,6 +31,8 @@ class PreferencesRepositoriesTest {
             chatHeaderStyle = ChatHeaderStyle.Full,
             headerOpens = ChangesScope.Session,
             groupActivity = false,
+            showRunningWorkInList = false,
+            confirmStopCommand = false,
             questionsCollapsed = true,
             permissionsCollapsed = true,
             terminalKeys = keys,

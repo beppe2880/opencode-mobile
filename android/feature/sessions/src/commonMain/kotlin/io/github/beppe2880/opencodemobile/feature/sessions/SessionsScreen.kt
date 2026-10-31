@@ -202,7 +202,7 @@ fun SessionsScreen(
                                 onSwipeDelete = { onEvent(SessionsEvent.RequestDelete(session)) },
                                 modifier = Modifier.animateItem(),
                                 compact = compact,
-                                work = state.work[session.id] ?: RunningWork(),
+                                work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
                             )
                         }
                     }

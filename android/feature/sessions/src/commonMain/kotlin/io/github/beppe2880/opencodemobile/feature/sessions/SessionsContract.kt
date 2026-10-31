@@ -50,6 +50,8 @@ data class SessionsState(
     val groups: List<SessionGroup> = emptyList(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
+    /** Rows show running subagents and commands (setting). */
+    val showRunningWork: Boolean = true,
     val loading: Boolean = true,
     val refreshing: Boolean = false,
     val error: UiText? = null,

@@ -8,12 +8,12 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
+import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
-import io.github.beppe2880.opencodemobile.core.domain.loadRunningWork
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -52,6 +52,9 @@ class SessionsViewModel(
     private var workVisible = false
     private var workPoll: Job? = null
     private var workJob: Job? = null
+    private var workEventJob: Job? = null
+    private val runningWork = RunningWorkLoader(sessions, chat)
+    private val showRunningWork: Boolean get() = settings.settings.value.showRunningWorkInList
 
     /** The saved server shown; its cached lists are shown before each server answers. */
     private var serverId: String? = null
@@ -74,6 +77,12 @@ class SessionsViewModel(
         }
         viewModelScope.launch { events.events.collect(::onServerEvent) }
         viewModelScope.launch {
+            settings.settings.map { it.showRunningWorkInList }.distinctUntilChanged().collect { enabled ->
+                updateState { it.copy(showRunningWork = enabled, work = if (enabled) it.work else emptyMap()) }
+                restartRunningPoll()
+            }
+        }
+        viewModelScope.launch {
             // The order shown (filters included) is the one a chat swipes through.
             state.map { s -> s.groups.flatMap { group -> group.sessions.map { it.id } } }
                 .distinctUntilChanged()
@@ -85,14 +94,7 @@ class SessionsViewModel(
         when (event) {
             is SessionsEvent.Visible -> {
                 workVisible = event.visible
-                workPoll?.cancel()
-                workJob?.cancel()
-                workPoll = if (event.visible) viewModelScope.launch {
-                    while (true) {
-                        refreshRunning()
-                        delay(5_000)
-                    }
-                } else null
+                restartRunningPoll()
             }
             SessionsEvent.Refresh -> {
                 load(initial = currentState.groups.isEmpty(), pull = currentState.groups.isNotEmpty())
@@ -162,9 +164,10 @@ class SessionsViewModel(
     }
 
     private fun onServerEvent(event: ServerEvent) {
-        if (event == ServerEvent.Connected || event is ServerEvent.ExecutionStarted || event is ServerEvent.ExecutionEnded ||
-            event is ServerEvent.ToolProgress || event is ServerEvent.ToolSucceeded
-        ) refreshRunning()
+        // Subagents start and end with executions; commands are found by the poll.
+        if (event == ServerEvent.Connected || event is ServerEvent.ExecutionStarted || event is ServerEvent.ExecutionEnded) {
+            requestRunningRefresh()
+        }
         when (event) {
             ServerEvent.Connected -> load(initial = false)
             is ServerEvent.ExecutionStarted -> updateState { it.copy(running = it.running + event.sessionId) }
@@ -184,12 +187,47 @@ class SessionsViewModel(
         }
     }
 
+    /** Polls running work only while the list is visible and the setting is on. */
+    private fun restartRunningPoll() {
+        workPoll?.cancel()
+        workJob?.cancel()
+        workEventJob?.cancel()
+        workPoll = if (workVisible && showRunningWork) {
+            viewModelScope.launch {
+                while (true) {
+                    refreshRunning()
+                    delay(RUNNING_POLL_MS)
+                }
+            }
+        } else {
+            null
+        }
+    }
+
+    /** Bursts of events (several subagents starting) cause one refresh. */
+    private fun requestRunningRefresh() {
+        if (!workVisible || !showRunningWork || workEventJob?.isActive == true) return
+        workEventJob = viewModelScope.launch {
+            delay(RUNNING_EVENT_DEBOUNCE_MS)
+            refreshRunning()
+        }
+    }
+
+    /**
+     * Counts only: no transcripts are read. A session whose project could not be read keeps
+     * its previous counts; a failure of the whole refresh keeps everything shown.
+     */
     private fun refreshRunning() {
-        if (!workVisible || serverId == null || sessionList.isEmpty() || workJob?.isActive == true) return
+        if (!workVisible || !showRunningWork || serverId == null || sessionList.isEmpty() || workJob?.isActive == true) return
         val server = serverId
+        val roots = sessionList
         workJob = viewModelScope.launch {
-            loadRunningWork(sessionList, sessions, chat).onSuccess { snapshot ->
-                if (serverId == server) updateState { it.copy(work = snapshot.sessions.filterKeys { id -> id !in snapshot.errors }) }
+            runningWork.load(roots).onSuccess { snapshot ->
+                if (serverId != server) return@onSuccess
+                updateState { state ->
+                    val work = snapshot.sessions.mapValues { (id, work) -> if (id in snapshot.errors) state.work[id] ?: work else work }
+                    state.copy(work = work.filterValues { !it.isEmpty })
+                }
             }
         }
     }
@@ -404,5 +442,7 @@ class SessionsViewModel(
         const val EVENT_DEBOUNCE_MS = 600L
         const val PREFETCH_SESSIONS = 5
         const val PREFETCH_MESSAGES = 2
+        const val RUNNING_POLL_MS = 15_000L
+        const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
     }
 }

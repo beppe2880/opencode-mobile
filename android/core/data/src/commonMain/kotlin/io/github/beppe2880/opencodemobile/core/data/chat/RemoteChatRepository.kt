@@ -285,6 +285,8 @@ internal class RemoteChatRepository(
         }
     }
 
+    override fun serverClockOffsetMs(): Long = if (clients.activeIdOrNull() == null) 0L else clients.active().clock.offsetMs
+
     override suspend fun stopShell(directory: String, shellId: String): Result<Unit> = resultOf {
         val api = clients.active().shells
         awaitSuccess { api.shellRemove(shellId, locationDirectory = directory) }

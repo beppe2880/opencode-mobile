@@ -173,4 +173,6 @@
     <string name="chat_running_no_output">No output yet</string>
     <string name="chat_running_elapsed">Elapsed: %1$s</string>
     <string name="chat_running_refresh">Refresh running work</string>
+    <string name="chat_running_stop_title">Stop this command?</string>
+    <string name="chat_running_stop_message">%1$s\n\nThe command is ended and its output is no longer available.</string>
 </resources>

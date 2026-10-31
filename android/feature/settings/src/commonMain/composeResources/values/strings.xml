@@ -63,6 +63,10 @@
     <string name="settings_reset_message">Every option goes back to its default. Saved servers, drafts and terminal keys are kept.</string>
     <string name="settings_reset_confirm">Reset</string>
     <string name="settings_full_commands_sub">Wrap long commands and paths in tool rows instead of cutting them off</string>
+    <string name="settings_running_in_list">Show running work in the session list</string>
+    <string name="settings_running_in_list_sub">Count running subagents and background commands under each session</string>
+    <string name="settings_confirm_stop">Confirm before stopping commands</string>
+    <string name="settings_confirm_stop_sub">Ask before stopping a background command from the Running sheet</string>
     <string name="settings_show_cost">Show cost</string>
     <string name="settings_show_cost_sub">Show the cost in dollars of each turn below the reply</string>
     <string name="settings_header_line">Chat header line</string>

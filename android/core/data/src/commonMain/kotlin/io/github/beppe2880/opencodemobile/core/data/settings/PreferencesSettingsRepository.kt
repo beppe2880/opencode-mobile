@@ -52,6 +52,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
         prefs.putString(KEY_HEADER_STYLE, next.chatHeaderStyle.name)
         prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
+        prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
+        prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
@@ -102,6 +104,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
             headerOpens = HEADER_OPENS_CHOICES.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_OPENS) } ?: defaults.headerOpens,
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
+            showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
+            confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             selectionApply = SelectionApply.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SELECTION_APPLY) }
@@ -154,6 +158,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_HEADER_OPENS = "chat_header_opens"
         const val KEY_HEADER_STYLE = "chat_header_style"
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
+        const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
+        const val KEY_CONFIRM_STOP = "confirm_stop_command"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
         const val KEY_SELECTION_APPLY = "selection_apply"

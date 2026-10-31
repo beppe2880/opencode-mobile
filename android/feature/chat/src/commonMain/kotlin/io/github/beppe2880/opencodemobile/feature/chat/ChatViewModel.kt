@@ -20,6 +20,7 @@ import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -30,9 +31,9 @@ import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
 import io.github.beppe2880.opencodemobile.core.domain.isComplete
-import io.github.beppe2880.opencodemobile.core.domain.loadRunningWork
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.domain.reply
+import io.github.beppe2880.opencodemobile.core.domain.shellOwners
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
@@ -76,7 +77,10 @@ class ChatViewModel(
     private var workPoll: Job? = null
     private var workVisible = false
     private var workJob: Job? = null
+    private var workEventJob: Job? = null
+    private val runningWork = RunningWorkLoader(sessions, chat)
     private val commandStops = mutableMapOf<String, Job>()
+    private var confirmStop: Boolean = settings.settings.value.confirmStopCommand
 
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
     private val imageRequests = HashSet<String>()
@@ -151,6 +155,7 @@ class ChatViewModel(
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
                 selectionApply = s.selectionApply
+                confirmStop = s.confirmStopCommand
                 val vcsTurnedOn = s.chatHeaderLine != ChatHeaderLine.Folder && !vcsInHeader
                 headerLine = s.chatHeaderLine
                 headerOpens = s.headerOpens
@@ -185,22 +190,24 @@ class ChatViewModel(
         when (event) {
             is ChatEvent.Visible -> {
                 workVisible = event.visible
-                workPoll?.cancel()
-                workJob?.cancel()
-                workPoll = if (event.visible) viewModelScope.launch {
-                    while (true) {
-                        refreshRunning()
-                        delay(5_000)
-                    }
-                } else null
+                restartRunningPoll()
             }
             is ChatEvent.RunningSheet -> {
                 updateState { it.copy(workOpen = event.open) }
-                workJob?.cancel()
-                refreshRunning()
+                restartRunningPoll()
             }
             ChatEvent.RefreshRunning -> refreshRunning()
-            is ChatEvent.StopCommand -> stopCommand(event.id)
+            is ChatEvent.StopCommand -> if (confirmStop) {
+                updateState { it.copy(confirmingStop = event.id) }
+            } else {
+                stopCommand(event.id)
+            }
+            ChatEvent.ConfirmStopCommand -> {
+                val id = currentState.confirmingStop
+                updateState { it.copy(confirmingStop = null) }
+                if (id != null) stopCommand(id)
+            }
+            ChatEvent.DismissStopCommand -> updateState { it.copy(confirmingStop = null) }
             ChatEvent.Retry -> loadAll()
             is ChatEvent.DraftChanged -> {
                 updateState { it.copy(draft = event.text) }
@@ -289,13 +296,15 @@ class ChatViewModel(
                 updateState { s -> s.copy(workLoading = false, workError = it.toUiText()) }
                 return@launch
             }
-            loadRunningWork(listOf(root), sessions, chat).fold(
+            // Commands started by this transcript's tools are owned through the messages already in memory.
+            runningWork.load(listOf(root), details = currentState.workOpen, shellOwners = shellOwners(sessionId, messages)).fold(
                 onSuccess = { snapshot ->
                     val work = snapshot.sessions[sessionId] ?: RunningWork()
                     val ids = (work.commands + snapshot.unassigned).map { it.id }.toSet()
                     updateState {
                         it.copy(
                             work = work,
+                            clockOffsetMs = chat.serverClockOffsetMs(),
                             unassignedCommands = snapshot.unassigned,
                             workLoading = false,
                             workError = snapshot.errors[sessionId]?.toUiText(),
@@ -322,6 +331,35 @@ class ChatViewModel(
                 },
                 onFailure = { error -> updateState { it.copy(workLoading = false, workError = error.toUiText()) } },
             )
+        }
+    }
+
+    /**
+     * Refreshes running work now, then while the chat is visible: often with the sheet open, so
+     * its output stays fresh, rarely otherwise, as events keep the summary current.
+     */
+    private fun restartRunningPoll() {
+        workPoll?.cancel()
+        workJob?.cancel()
+        workEventJob?.cancel()
+        workPoll = if (workVisible) {
+            viewModelScope.launch {
+                while (true) {
+                    refreshRunning()
+                    delay(if (currentState.workOpen) RUNNING_SHEET_POLL_MS else RUNNING_POLL_MS)
+                }
+            }
+        } else {
+            null
+        }
+    }
+
+    /** Streaming tools send many events: one refresh per burst. */
+    private fun requestRunningRefresh() {
+        if (!workVisible || workEventJob?.isActive == true) return
+        workEventJob = viewModelScope.launch {
+            delay(RUNNING_EVENT_DEBOUNCE_MS)
+            refreshRunning()
         }
     }
 
@@ -510,7 +548,9 @@ class ChatViewModel(
     private fun onServerEvent(event: ServerEvent) {
         if (event == ServerEvent.Connected || event is ServerEvent.ExecutionStarted || event is ServerEvent.ExecutionEnded ||
             event is ServerEvent.ToolProgress || event is ServerEvent.ToolSucceeded
-        ) refreshRunning()
+        ) {
+            requestRunningRefresh()
+        }
         if (event == ServerEvent.Connected) {
             loadAll()
             refreshMcps()
@@ -1412,6 +1452,9 @@ class ChatViewModel(
         const val SHELL_ENDED = "session.shell.ended"
         const val LOCAL_MATCH_WINDOW = 10
         const val SUGGEST_DEBOUNCE_MS = 150L
+        const val RUNNING_POLL_MS = 15_000L
+        const val RUNNING_SHEET_POLL_MS = 5_000L
+        const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
 
         /** Sessions scanned for recently used models. */
         const val RECENT_SESSIONS = 30
