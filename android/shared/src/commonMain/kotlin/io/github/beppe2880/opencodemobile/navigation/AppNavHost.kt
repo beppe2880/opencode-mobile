@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,15 +48,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
+import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
@@ -214,7 +219,8 @@ fun AppNavHost(
 /**
  * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
  * side by side. Tapping the handle on the divider hides the list to give the chat the whole
- * width; dragging it resizes the list, and the share of the width is saved.
+ * width; dragging it resizes the list, and the share of the width is saved. Back shows a hidden
+ * list again (unless turned off in Settings) before it leaves the app.
  */
 @Composable
 private fun SessionsListDetail(
@@ -227,7 +233,14 @@ private fun SessionsListDetail(
 ) {
     val settingsRepository = koinInject<SettingsRepository>()
     val appSettings by settingsRepository.settings.collectAsStateWithLifecycle()
+    val activeServerId = koinInject<ServerRepository>().activeServer.collectAsStateWithLifecycle().value?.id
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
+    // The server [selected] belongs to: after switching servers the chat pane starts empty.
+    var selectedServerId by rememberSaveable { mutableStateOf<String?>(null) }
+    val select: (String?) -> Unit = {
+        selected = it
+        selectedServerId = activeServerId
+    }
     var listHidden by rememberSaveable { mutableStateOf(false) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth || !appSettings.splitView) {
@@ -236,6 +249,7 @@ private fun SessionsListDetail(
                 onOpenSettings = onOpenSettings,
                 openNewSession = openNewSession,
                 onNewSessionOpened = onNewSessionOpened,
+                banner = { UpdateBanner() },
             )
         } else {
             val windowWidth = maxWidth
@@ -254,30 +268,33 @@ private fun SessionsListDetail(
             val scope = rememberCoroutineScope()
             val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
             val density = LocalDensity.current
+            val current = selected?.takeIf { selectedServerId == activeServerId }
+            // Registered before the panes, so handlers inside the chat still get Back first.
+            OcBackHandler(enabled = hidden && appSettings.backShowsList) { listHidden = false }
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
-                    onOpenChat = { selected = it },
+                    onOpenChat = select,
                     onOpenSettings = onOpenSettings,
-                    selectedSessionId = selected,
+                    selectedSessionId = current,
                     openNewSession = openNewSession,
                     onNewSessionOpened = {
                         listHidden = false
                         onNewSessionOpened()
                     },
                     modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
+                    banner = { UpdateBanner() },
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)
-                val current = selected
                 if (current != null) {
                     ChatRoute(
                         sessionId = current,
-                        onBack = { selected = null },
+                        onBack = { select(null) },
                         showBack = false,
                         onOpenSession = onOpenChatFullScreen,
                         onOpenTerminal = onOpenTerminal,
                         onOpenFile = onOpenFile,
-                        onSwitchSession = { selected = it },
+                        onSwitchSession = select,
                         modifier = Modifier.weight(1f),
                     )
                 } else {
@@ -353,3 +370,9 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
 }
 
 private val HandleWidth = 24.dp
+
+/** The notice of a new app release, at the top of the session list. */
+@Composable
+private fun UpdateBanner() {
+    UpdateNoticeRoute(Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md))
+}

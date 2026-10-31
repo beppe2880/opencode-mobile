@@ -163,13 +163,15 @@ fun <T> OcSegmentedControl(
 
 /**
  * Compact top bar, hairline bottom border. Consumes the status bar inset itself.
- * [title] and [subtitle] are single line; [leading] usually holds a back button.
+ * [title] and [subtitle] are single line; [subtitleContent], when set, replaces [subtitle].
+ * [leading] usually holds a back button.
  */
 @Composable
 fun OcTopBar(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    subtitleContent: (@Composable () -> Unit)? = null,
     leading: (@Composable () -> Unit)? = null,
     titleAccessory: (@Composable RowScope.() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
@@ -202,7 +204,9 @@ fun OcTopBar(
                     )
                     titleAccessory?.invoke(this)
                 }
-                if (subtitle != null) {
+                if (subtitleContent != null) {
+                    subtitleContent()
+                } else if (subtitle != null) {
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,

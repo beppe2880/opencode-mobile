@@ -19,6 +19,6 @@ body:
     id: context
     attributes:
       label: Setup
-      description: App and OpenCode versions, how the phone reaches the server (LAN, VPN, emulator).
+      description: Android or iOS, app and OpenCode versions, how the phone reaches the server (LAN, VPN, emulator or simulator).
     validations:
       required: false

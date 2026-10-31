@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">Cancel</string>
     <string name="terminal_keys_reset">Reset to default</string>
     <string name="terminal_keys_done">Done</string>
+    <string name="terminal_fullscreen">Full screen</string>
+    <string name="terminal_fullscreen_exit">Exit full screen</string>
 </resources>

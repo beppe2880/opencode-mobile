@@ -2,7 +2,8 @@ name: Issue Standards
 
 # Issues must come from a template (bug report, feature request or question) with the main
 # field filled in. Others get the needs:compliance label and one explanatory comment;
-# compliance-close.yml closes them after 72 hours.
+# compliance-close.yml closes them after 72 hours. The Platform field of the forms sets the
+# platform:android and platform:ios labels.
 
 on:
   issues:
@@ -22,11 +23,6 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
-            if (['OWNER', 'MEMBER', 'COLLABORATOR'].includes(issue.author_association) || issue.user.type === 'Bot') {
-              core.info(`Skipping: ${issue.user.login} (${issue.author_association})`);
-              return;
-            }
-
             const repo = { owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number };
             const body = issue.body || '';
             const field = (heading) => {
@@ -34,6 +30,20 @@ jobs:
               const value = match ? match[1].trim() : '';
               return value === '_No response_' ? '' : value;
             };
+
+            // Bug reports answer "Android, iOS"; feature requests "Both", "Android only" or "iOS only".
+            const platform = field('Platform');
+            if (platform) {
+              const labels = [];
+              if (/android|both/i.test(platform)) labels.push('platform:android');
+              if (/ios|both/i.test(platform)) labels.push('platform:ios');
+              if (labels.length) await github.rest.issues.addLabels({ ...repo, labels });
+            }
+
+            if (['OWNER', 'MEMBER', 'COLLABORATOR'].includes(issue.author_association) || issue.user.type === 'Bot') {
+              core.info(`Skipping: ${issue.user.login} (${issue.author_association})`);
+              return;
+            }
             // The required field of each issue form (.github/ISSUE_TEMPLATE).
             const main = field('What happened\\?') || field('Problem') || field('Question');
             const compliant = main.length >= 15;

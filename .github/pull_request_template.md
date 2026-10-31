@@ -19,6 +19,17 @@ AI-generated descriptions may be closed. -->
 
 <!-- Tests added or run, and the device or emulator you checked it on. -->
 
+### Platforms tested
+
+<!-- Most code is shared, so a change usually reaches both apps. Tick what you ran it on; if
+you could only test one platform, also tick the third box and a maintainer will check the
+other one. Changes outside the apps tick only the last box. -->
+
+- [ ] Android (device or emulator: )
+- [ ] iOS (device or simulator: )
+- [ ] Only tested on one platform: the other one still needs checking
+- [ ] Does not affect the apps (CI, docs, tooling)
+
 ### Screenshots or recordings
 
 <!-- Required for UI changes: light and dark theme. Hide server addresses and private sessions. -->

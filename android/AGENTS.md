@@ -120,10 +120,14 @@ Linking the `Shared` framework and building `../iosApp` need macOS with Xcode. F
 
 ```bash
 xcodebuild -project iosApp.xcodeproj -target iosApp -configuration Debug -sdk iphonesimulator \
-  -arch arm64 CODE_SIGNING_ALLOWED=NO build
+  -arch arm64 CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO build
 xcrun simctl install booted build/Debug-iphonesimulator/OpenCodeMobile.app
 xcrun simctl launch booted io.github.beppe2880.opencodemobile
 ```
+
+Ad-hoc signing embeds the entitlements the app needs at runtime: a build with
+`CODE_SIGNING_ALLOWED=NO` (enough for CI, which only compiles) cannot store the server
+password in the Keychain and fails to connect with error -34018.
 
 The Xcode build phase runs `./gradlew :shared:embedAndSignAppleFrameworkForXcode` (needs
 `JAVA_HOME`). Set `TEAM_ID` in `../iosApp/Configuration/Config.xcconfig` to sign for a device.

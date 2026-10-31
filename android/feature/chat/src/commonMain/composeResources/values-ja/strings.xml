@@ -41,9 +41,24 @@
     <string name="chat_terminal_open">ターミナルを開く</string>
     <string name="chat_changes_session">セッション全体</string>
     <string name="chat_changes_last_turn">直近のターン</string>
+    <string name="chat_changes_folder">フォルダ</string>
+    <string name="chat_changes_empty_folder">このフォルダにはコミットされていない変更がありません。</string>
     <plurals name="chat_changes_files">
         <item quantity="other">%1$d 個のファイルが変更されました</item>
     </plurals>
+    <plurals name="chat_vcs_files_edited">
+        <item quantity="other">エージェントが編集したファイル %1$d 件</item>
+    </plurals>
+    <string name="chat_vcs_detached">HEAD がデタッチ状態</string>
+    <string name="chat_vcs_detached_short">デタッチ</string>
+    <plurals name="chat_vcs_files_short">
+        <item quantity="other">%1$d 件</item>
+    </plurals>
+    <plurals name="chat_vcs_edits_short">
+        <item quantity="other">エージェントによる編集 %1$d 回</item>
+    </plurals>
+    <string name="chat_vcs_folder_description">フォルダ %1$s</string>
+    <string name="chat_vcs_branch_description">ブランチ %1$s</string>
     <string name="chat_changes_empty">変更されたファイルはありません</string>
     <string name="chat_changes_empty_session">このセッションでエージェントはファイルを編集していません。</string>
     <string name="chat_changes_empty_turn">直近のターンでエージェントはファイルを編集していません。</string>
@@ -65,6 +80,8 @@
     <string name="chat_permission_once">今回のみ許可</string>
     <string name="chat_permission_always">常に許可</string>
     <string name="chat_permission_reject">拒否</string>
+    <string name="chat_permission_collapse">権限のリクエストを折りたたむ</string>
+    <string name="chat_permission_expand">権限のリクエストを展開</string>
     <string name="chat_offline">オフライン · 再接続中</string>
     <string name="chat_unauthorized">保存された認証情報がサーバーに拒否されました · サーバーを再度ペアリングしてください</string>
     <string name="chat_shell_exit">終了コード %1$s</string>
@@ -115,6 +132,8 @@
     <string name="chat_form_title">エージェントからの質問</string>
     <string name="chat_form_submit">回答を送信</string>
     <string name="chat_form_dismiss">閉じる</string>
+    <string name="chat_form_collapse">質問を折りたたむ</string>
+    <string name="chat_form_expand">質問を展開</string>
     <string name="chat_form_other">別の回答</string>
     <string name="chat_form_open_link">リンクを開く</string>
     <plurals name="chat_form_more">

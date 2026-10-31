@@ -43,4 +43,6 @@
     <string name="terminal_keys_cancel">Cancelar</string>
     <string name="terminal_keys_reset">Restaurar padrão</string>
     <string name="terminal_keys_done">Concluído</string>
+    <string name="terminal_fullscreen">Tela cheia</string>
+    <string name="terminal_fullscreen_exit">Sair da tela cheia</string>
 </resources>

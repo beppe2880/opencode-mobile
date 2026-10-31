@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.notifications
 
 import androidx.annotation.VisibleForTesting
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
@@ -107,6 +108,10 @@ class SessionMonitor(
         // Requests that arrived while a screen was open are notified once the app leaves.
         scope.launch {
             visible.drop(1).filter { !it }.collect { (_running.value.keys + pendingSessions()).forEach { refresh(scope, it) } }
+        }
+        // An authorization failure invalidates the locally tracked running sessions.
+        scope.launch {
+            events.connection.filter { it == ConnectionState.Unauthorized }.collect { reset() }
         }
         events.events.collect { onEvent(scope, it) }
     }

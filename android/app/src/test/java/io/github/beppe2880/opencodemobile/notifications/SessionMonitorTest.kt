@@ -181,6 +181,21 @@ class SessionMonitorTest {
     }
 
     @Test
+    fun `authorization failure forgets running sessions and pending requests`() = runTest {
+        sessions.add(session("ses_a", "Fix the bug"))
+        val monitor = monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+
+        events.connection.value = ConnectionState.Unauthorized
+        runCurrent()
+
+        assertTrue(monitor.running.value.isEmpty())
+        assertEquals("cancel per_1", notifier.attention().last())
+    }
+
+    @Test
     fun `switching server forgets running sessions and pending requests`() = runTest {
         sessions.add(session("ses_a", "Fix the bug"))
         val monitor = monitor()
