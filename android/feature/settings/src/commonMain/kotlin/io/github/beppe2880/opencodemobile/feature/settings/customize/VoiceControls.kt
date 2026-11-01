@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -38,7 +39,6 @@ import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
-import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPasswordField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
@@ -306,26 +306,32 @@ private fun MenuRow(title: String, subtitle: String, value: String, tag: String,
     val c = OcTheme.colors
     var open by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth()) {
-        OcListRow(
-            title = title,
-            subtitle = subtitle,
-            onClick = { open = true },
-            trailing = {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
-                    if (loading) OcSpinner()
-                    Text(
-                        value,
-                        style = OcTheme.mono.codeSmall,
-                        color = c.textMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.MiddleEllipsis,
-                        modifier = Modifier.widthIn(max = 180.dp),
-                    )
-                    Icon(Icons.Outlined.ExpandMore, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(18.dp))
-                }
-            },
-            modifier = Modifier.testTag(tag),
-        )
+        // The value has a line of its own: model IDs are long.
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(role = Role.DropdownList, onClick = { open = true })
+                .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md)
+                .testTag(tag),
+            verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+        ) {
+            Column {
+                Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                Text(
+                    value,
+                    style = OcTheme.mono.codeSmall,
+                    color = c.textAccent,
+                    maxLines = 1,
+                    overflow = TextOverflow.MiddleEllipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Icon(Icons.Outlined.ExpandMore, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(18.dp))
+                if (loading) OcSpinner()
+            }
+        }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, containerColor = c.bgBase, modifier = Modifier.exposeTestTags()) {
             items.forEach { item ->
                 DropdownMenuItem(
