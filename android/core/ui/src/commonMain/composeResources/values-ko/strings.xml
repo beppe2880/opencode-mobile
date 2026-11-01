@@ -29,9 +29,15 @@
     <string name="oc_area_appearance">화면</string>
     <string name="oc_area_chat">채팅</string>
     <string name="oc_area_live">실시간 활동</string>
+    <string name="oc_area_composer">메시지 상자</string>
+    <string name="oc_area_sessions">세션</string>
     <string name="oc_area_terminal">터미널</string>
     <string name="oc_area_notifications">알림</string>
     <string name="oc_area_updates">업데이트</string>
+    <string name="oc_area_servers">서버</string>
+    <string name="oc_area_voice">음성 입력</string>
+    <string name="oc_area_sharing">공유</string>
+    <string name="oc_area_about">정보 및 초기화</string>
     <string name="oc_part_theme">테마</string>
     <string name="oc_part_text_size">글자 크기</string>
     <string name="oc_part_header">제목 및 헤더 줄</string>
@@ -63,6 +69,7 @@
     <string name="oc_part_notify_question">질문</string>
     <string name="oc_part_notify_finished">세션 완료</string>
     <string name="oc_part_update">업데이트 알림</string>
+    <string name="oc_part_share">공유 메뉴</string>
     <string name="oc_part_customize">사용자 지정</string>
     <string name="oc_shared_title">OpenCode에 공유됨</string>
     <plurals name="oc_shared_images">

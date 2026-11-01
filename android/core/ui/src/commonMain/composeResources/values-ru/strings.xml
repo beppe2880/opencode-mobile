@@ -29,9 +29,15 @@
     <string name="oc_area_appearance">Оформление</string>
     <string name="oc_area_chat">Чат</string>
     <string name="oc_area_live">Активность в реальном времени</string>
+    <string name="oc_area_composer">Поле сообщения</string>
+    <string name="oc_area_sessions">Сессии</string>
     <string name="oc_area_terminal">Терминал</string>
     <string name="oc_area_notifications">Уведомления</string>
     <string name="oc_area_updates">Обновления</string>
+    <string name="oc_area_servers">Серверы</string>
+    <string name="oc_area_voice">Голосовой ввод</string>
+    <string name="oc_area_sharing">Поделиться</string>
+    <string name="oc_area_about">О приложении и сброс</string>
     <string name="oc_part_theme">Тема</string>
     <string name="oc_part_text_size">Размер текста</string>
     <string name="oc_part_header">Заголовок и строка шапки</string>
@@ -63,6 +69,7 @@
     <string name="oc_part_notify_question">Вопрос</string>
     <string name="oc_part_notify_finished">Сессия завершена</string>
     <string name="oc_part_update">Уведомление об обновлении</string>
+    <string name="oc_part_share">Меню «Поделиться»</string>
     <string name="oc_part_customize">Настроить</string>
     <string name="oc_shared_title">Отправлено в OpenCode</string>
     <plurals name="oc_shared_images">

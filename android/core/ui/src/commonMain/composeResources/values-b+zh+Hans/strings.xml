@@ -29,9 +29,15 @@
     <string name="oc_area_appearance">外观</string>
     <string name="oc_area_chat">聊天</string>
     <string name="oc_area_live">实时活动</string>
+    <string name="oc_area_composer">消息框</string>
+    <string name="oc_area_sessions">会话</string>
     <string name="oc_area_terminal">终端</string>
     <string name="oc_area_notifications">通知</string>
     <string name="oc_area_updates">更新</string>
+    <string name="oc_area_servers">服务器</string>
+    <string name="oc_area_voice">语音输入</string>
+    <string name="oc_area_sharing">分享</string>
+    <string name="oc_area_about">关于和重置</string>
     <string name="oc_part_theme">主题</string>
     <string name="oc_part_text_size">文字大小</string>
     <string name="oc_part_header">标题和标题栏</string>
@@ -63,6 +69,7 @@
     <string name="oc_part_notify_question">问题</string>
     <string name="oc_part_notify_finished">会话已完成</string>
     <string name="oc_part_update">更新提示</string>
+    <string name="oc_part_share">分享菜单</string>
     <string name="oc_part_customize">自定义</string>
     <string name="oc_shared_title">已与 OpenCode 共享</string>
     <plurals name="oc_shared_images">
