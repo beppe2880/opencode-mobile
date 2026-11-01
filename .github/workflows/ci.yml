@@ -33,10 +33,11 @@ jobs:
       - name: Unit tests, lint and debug build
         working-directory: android
         run: ./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
-      - name: Compile shared code for iOS
-        # Kotlin/Native compiles iOS klibs on Linux too; only linking needs macOS.
+      - name: Compile shared code and common tests for iOS
+        # Kotlin/Native compiles iOS klibs on Linux too; only linking needs macOS. The tests catch
+        # names Kotlin/Native rejects (for example commas in backticked test names).
         working-directory: android
-        run: ./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64 --console=plain
+        run: ./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileTestKotlinIosSimulatorArm64 --console=plain
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

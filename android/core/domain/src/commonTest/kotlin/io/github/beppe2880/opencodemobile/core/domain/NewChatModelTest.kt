@@ -15,7 +15,7 @@ class NewChatModelTest {
     private fun agent(model: ModelRef?) = Agent("plan", "plan", null, AgentMode.Primary, hidden = false, color = null, model = model)
 
     @Test
-    fun `the agent's model, then the configured one, then the last used, each only when available`() {
+    fun `the agent model comes first then the configured one then the last used and each only when available`() {
         assertEquals(opus, newChatModel(agent(opus), gpt, available, listOf(haiku)))
         assertEquals(gpt, newChatModel(agent(null), gpt, available, listOf(haiku)))
         assertEquals(haiku, newChatModel(null, null, available, listOf(haiku)))
