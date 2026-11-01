@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">Il fornitore ha risposto con un errore: %1$s</string>
     <string name="settings_voice_language">Invia la lingua dell'app</string>
     <string name="settings_voice_language_sub">Indica al fornitore la lingua della registrazione, il che migliora la precisione; disattivato lascia che la lingua venga rilevata</string>
+    <string name="settings_voice_style">Stile di registrazione</string>
+    <string name="settings_voice_style_waveform">Forma d'onda</string>
+    <string name="settings_voice_style_compact">Compatto</string>
+    <string name="settings_voice_style_waveform_sub">Il riquadro di scrittura diventa il registratore: forma d'onda in tempo reale, durata, annulla e conferma</string>
+    <string name="settings_voice_style_compact_sub">Una piccola barra con la durata sopra il riquadro di scrittura; il microfono diventa il pulsante di stop</string>
+    <string name="settings_voice_hold">Tieni premuto per registrare</string>
+    <string name="settings_voice_hold_sub">Tieni premuto il microfono per registrare e rilascia per trascrivere; scorri via per annullare. Il tocco continua ad avviare e fermare</string>
     <string name="settings_selection_apply">Applica modifiche ad agente e modello</string>
     <string name="settings_selection_apply_sub">Quando un agente, un modello o un livello di ragionamento scelto in una chat viene inviato al server: con il messaggio successivo, oppure appena viene scelto</string>
     <string name="settings_selection_apply_next">Prossimo messaggio</string>

@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">Le fournisseur a répondu par une erreur : %1$s</string>
     <string name="settings_voice_language">Envoyer la langue de l'app</string>
     <string name="settings_voice_language_sub">Indique au fournisseur la langue de l'enregistrement, ce qui améliore la précision ; désactivé, il détecte la langue</string>
+    <string name="settings_voice_style">Style d'enregistrement</string>
+    <string name="settings_voice_style_waveform">Onde</string>
+    <string name="settings_voice_style_compact">Compact</string>
+    <string name="settings_voice_style_waveform_sub">Le champ de message devient l'enregistreur : onde en direct, durée, annuler et confirmer</string>
+    <string name="settings_voice_style_compact_sub">Une petite bande avec la durée au-dessus du champ de message ; le micro devient le bouton d'arrêt</string>
+    <string name="settings_voice_hold">Maintenir pour enregistrer</string>
+    <string name="settings_voice_hold_sub">Maintenez le micro pour enregistrer et relâchez pour transcrire ; glissez pour annuler. Un appui démarre et arrête toujours</string>
     <string name="settings_selection_apply">Appliquer les changements d'agent et de modèle</string>
     <string name="settings_selection_apply_sub">Lorsqu'un agent, un modèle ou un niveau de raisonnement choisi dans un chat est envoyé au serveur : avec le message suivant, ou dès qu'il est choisi</string>
     <string name="settings_selection_apply_next">Message suivant</string>

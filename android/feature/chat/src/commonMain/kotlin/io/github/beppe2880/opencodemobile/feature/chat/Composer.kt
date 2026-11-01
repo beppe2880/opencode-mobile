@@ -1,8 +1,21 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +54,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -67,6 +82,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
@@ -125,9 +141,34 @@ internal fun Composer(
     voice: VoiceInput? = null,
     onDictate: () -> Unit = {},
     onVoice: (VoiceInputEvent) -> Unit = {},
+    /** The microphone is held down to record (hold to record); release and slide go to [onVoice]. */
+    onHoldVoice: () -> Unit = {},
 ) {
     val c = OcTheme.colors
     val haptics = LocalHapticFeedback.current
+    val reducedMotion = rememberReducedMotion()
+    val cloud = voice?.cloud
+    // A light tick when a cloud recording starts and when it ends.
+    val recording = cloud is CloudVoicePhase.Recording
+    var wasRecording by remember { mutableStateOf(recording) }
+    LaunchedEffect(recording) {
+        if (recording != wasRecording) {
+            wasRecording = recording
+            haptics.performHapticFeedback(if (recording) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
+        }
+    }
+    // The time stays on the recorder while it turns into "Transcribing…".
+    var lastElapsed by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(cloud) { if (cloud is CloudVoicePhase.Recording) lastElapsed = cloud.elapsedMs }
+    val elapsedMs = (cloud as? CloudVoicePhase.Recording)?.elapsedMs ?: lastElapsed
+    val levels = voice?.levels
+    val level: () -> Float = remember(levels) { { levels?.value ?: 0f } }
+    var holdCancel by remember { mutableStateOf(false) }
+    val box = when {
+        voice?.inBox != true -> BoxMode.Editor
+        cloud is CloudVoicePhase.Recording -> if (cloud.held) BoxMode.Held else BoxMode.Recorder
+        else -> BoxMode.Transcribing
+    }
     // The outline takes the selected agent's color, like the agent dot in the selector.
     val agentColor by animateColorAsState(
         if (state.agentColorOutline) c.agents.forAgent(state.agent ?: state.agents.firstOrNull()?.id ?: "build") else c.borderStrong,
@@ -168,90 +209,158 @@ internal fun Composer(
                     onVoice(VoiceInputEvent.TranscriptInserted(pending.id))
                 }
             }
-            BasicTextField(
-                value = value,
-                onValueChange = {
-                    field = it
-                    if (it.text != state.draft) onEvent(ChatEvent.DraftChanged(it.text))
-                },
-                textStyle = MaterialTheme.typography.bodyMedium.copy(color = c.textBase),
-                cursorBrush = SolidColor(c.bgAccent),
-                minLines = 1,
-                maxLines = 6,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = OcSpacing.sm, top = OcSpacing.xs, bottom = OcSpacing.xs)
-                    .heightIn(min = 40.dp)
-                    .semantics { contentDescription = placeholder }
-                    .testTag("chat_composer_field"),
-                decorationBox = { inner ->
-                    Box(contentAlignment = Alignment.CenterStart) {
-                        if (state.draft.isEmpty()) {
-                            Text(placeholder, style = MaterialTheme.typography.bodyMedium, color = c.textFaint)
-                        }
-                        inner()
+            // With the waveform style the message box itself becomes the recorder, then a
+            // "Transcribing…" line, then the text again with the transcript at the cursor.
+            AnimatedContent(
+                targetState = box,
+                transitionSpec = { voiceBoxTransition(reducedMotion) },
+                label = "composer_box",
+            ) { mode ->
+                when (mode) {
+                    BoxMode.Editor -> {
+                        BasicTextField(
+                            value = value,
+                            onValueChange = {
+                                field = it
+                                if (it.text != state.draft) onEvent(ChatEvent.DraftChanged(it.text))
+                            },
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = c.textBase),
+                            cursorBrush = SolidColor(c.bgAccent),
+                            minLines = 1,
+                            maxLines = 6,
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = OcSpacing.sm, top = OcSpacing.xs, bottom = OcSpacing.xs)
+                                .heightIn(min = 40.dp)
+                                .semantics { contentDescription = placeholder }
+                                .testTag("chat_composer_field"),
+                            decorationBox = { inner ->
+                                Box(contentAlignment = Alignment.CenterStart) {
+                                    if (state.draft.isEmpty()) {
+                                        Text(placeholder, style = MaterialTheme.typography.bodyMedium, color = c.textFaint)
+                                    }
+                                    inner()
+                                }
+                            },
+                        )
                     }
-                },
-            )
-            val cloud = voice?.cloud
-            AnimatedVisibility(visible = cloud != null && cloud != CloudVoicePhase.Idle) {
+                    BoxMode.Held -> HeldRecorderBar(elapsedMs, level, reducedMotion, holdCancel)
+                    BoxMode.Recorder -> RecorderBar(
+                        elapsedMs = elapsedMs,
+                        level = level,
+                        reducedMotion = reducedMotion,
+                        onCancel = { onVoice(VoiceInputEvent.Cancel) },
+                        onConfirm = { onVoice(VoiceInputEvent.Stop) },
+                        modifier = Modifier.padding(end = OcSpacing.xs),
+                    )
+                    BoxMode.Transcribing -> TranscribingBar(onCancel = { onVoice(VoiceInputEvent.Cancel) }, modifier = Modifier.padding(end = OcSpacing.xs))
+                }
+            }
+            val strip = cloud != null && cloud != CloudVoicePhase.Idle && (voice.style == VoiceRecordingStyle.Compact || cloud is CloudVoicePhase.Failed)
+            AnimatedVisibility(visible = strip) {
                 if (cloud != null && cloud != CloudVoicePhase.Idle) VoiceStrip(cloud, voice.provider, onVoice)
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
-                // Selectors take only the space the stop/send buttons leave; on narrow phones the
-                // model chip shrinks and ellipsizes instead of pushing the buttons off screen.
-                Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-                ) {
-                    AttachButton(onAttachPhoto, onAttachFile)
-                    AgentSelector(state.agents, state.agent, onSelect = { onEvent(ChatEvent.SelectAgent(it)) })
-                    OcChip(
-                        text = (state.modelLabel?.name ?: stringResource(Res.string.chat_model)) +
-                            state.model?.variant?.let { " · $it" }.orEmpty(),
-                        secondaryText = state.modelLabel?.provider,
-                        onClick = { onEvent(ChatEvent.ModelSheet(true)) },
-                        leadingIcon = Icons.Outlined.AutoAwesome,
-                        trailingIcon = Icons.Outlined.ExpandMore,
-                        modifier = Modifier
-                            .weight(1f, fill = false)
-                            .widthIn(max = 280.dp)
-                            .editable(SettingsPart.SelectionTiming, LocalEditMode.current)
-                            .testTag("chat_model_selector"),
-                    )
-                }
-                if (voice != null) Box(Modifier.editable(SettingsPart.VoiceInput, LocalEditMode.current)) { MicButton(voice, onDictate) }
-                if (state.running) {
-                    OcRoundIconButton(
-                        icon = Icons.Filled.Stop,
-                        contentDescription = stringResource(Res.string.chat_stop),
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onEvent(ChatEvent.Stop)
-                        },
-                        enabled = !state.stopping,
-                        container = c.danger.bg,
-                        content = c.danger.fg,
-                        modifier = Modifier.testTag("chat_stop_button"),
-                    )
-                }
-                if (!state.running || state.draft.isNotBlank()) {
-                    OcRoundIconButton(
-                        icon = if (state.running) Icons.AutoMirrored.Outlined.Send else Icons.Outlined.ArrowUpward,
-                        contentDescription = stringResource(Res.string.chat_send),
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onEvent(ChatEvent.Send)
-                        },
-                        enabled = state.canSend,
-                        modifier = Modifier.testTag("chat_send_button"),
-                    )
+            // Hidden while the box records with a tap; kept while the microphone is held, it is under the finger.
+            AnimatedVisibility(visible = box == BoxMode.Editor || box == BoxMode.Held) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                    // Selectors take only the space the stop/send buttons leave; on narrow phones the
+                    // model chip shrinks and ellipsizes instead of pushing the buttons off screen.
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    ) {
+                        AttachButton(onAttachPhoto, onAttachFile)
+                        AgentSelector(state.agents, state.agent, onSelect = { onEvent(ChatEvent.SelectAgent(it)) })
+                        OcChip(
+                            text = (state.modelLabel?.name ?: stringResource(Res.string.chat_model)) +
+                                state.model?.variant?.let { " · $it" }.orEmpty(),
+                            secondaryText = state.modelLabel?.provider,
+                            onClick = { onEvent(ChatEvent.ModelSheet(true)) },
+                            leadingIcon = Icons.Outlined.AutoAwesome,
+                            trailingIcon = Icons.Outlined.ExpandMore,
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .widthIn(max = 280.dp)
+                                .editable(SettingsPart.SelectionTiming, LocalEditMode.current)
+                                .testTag("chat_model_selector"),
+                        )
+                    }
+                    if (voice != null) {
+                        Box(Modifier.editable(SettingsPart.VoiceInput, LocalEditMode.current)) {
+                            if (cloud != null && voice.holdToRecord) {
+                                HoldToRecordMic(
+                                    recording = recording,
+                                    transcribing = cloud == CloudVoicePhase.Transcribing,
+                                    levels = levels,
+                                    onTap = onDictate,
+                                    onHold = {
+                                        holdCancel = false
+                                        onHoldVoice()
+                                    },
+                                    onSlide = { cancel ->
+                                        holdCancel = cancel
+                                        if (cancel) haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    },
+                                    onRelease = { cancel ->
+                                        holdCancel = false
+                                        onVoice(if (cancel) VoiceInputEvent.Cancel else VoiceInputEvent.Stop)
+                                    },
+                                )
+                            } else {
+                                MicButton(voice, onDictate)
+                            }
+                        }
+                    }
+                    if (state.running) {
+                        OcRoundIconButton(
+                            icon = Icons.Filled.Stop,
+                            contentDescription = stringResource(Res.string.chat_stop),
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onEvent(ChatEvent.Stop)
+                            },
+                            enabled = !state.stopping,
+                            container = c.danger.bg,
+                            content = c.danger.fg,
+                            modifier = Modifier.testTag("chat_stop_button"),
+                        )
+                    }
+                    if (!state.running || state.draft.isNotBlank()) {
+                        OcRoundIconButton(
+                            icon = if (state.running) Icons.AutoMirrored.Outlined.Send else Icons.Outlined.ArrowUpward,
+                            contentDescription = stringResource(Res.string.chat_send),
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onEvent(ChatEvent.Send)
+                            },
+                            enabled = state.canSend,
+                            modifier = Modifier.testTag("chat_send_button"),
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+/** What the text area of the message box shows. */
+private enum class BoxMode { Editor, Recorder, Held, Transcribing }
+
+/**
+ * The text and the recorder replace each other with a short fade and scale; going from the
+ * recorder to "Transcribing…" the waveform shrinks into the line. Instant with reduced motion.
+ */
+private fun AnimatedContentTransitionScope<BoxMode>.voiceBoxTransition(reducedMotion: Boolean): ContentTransform {
+    if (reducedMotion) return (EnterTransition.None togetherWith ExitTransition.None).using(SizeTransform(clip = false) { _, _ -> snap() })
+    val enter = fadeIn(tween(220, delayMillis = 80)) + scaleIn(tween(220, delayMillis = 80), initialScale = 0.94f)
+    val exit = if (initialState == BoxMode.Recorder && targetState == BoxMode.Transcribing) {
+        fadeOut(tween(180)) + scaleOut(tween(220), targetScale = 0.4f)
+    } else {
+        fadeOut(tween(100))
+    }
+    return (enter togetherWith exit).using(SizeTransform(clip = false))
 }
 
 /** Starts or stops dictation; while listening it fills with the accent color and pulses with the voice. */
@@ -260,7 +369,8 @@ private fun MicButton(voice: VoiceInput, onClick: () -> Unit) {
     val c = OcTheme.colors
     val cloud = voice.cloud
     if (cloud is CloudVoicePhase.Recording) {
-        val scale by animateFloatAsState(1f + cloud.level * 0.15f, label = "mic_level")
+        // Read only while drawing: the level does not recompose the button.
+        val level = voice.levels?.collectAsState()
         OcRoundIconButton(
             icon = Icons.Filled.Stop,
             contentDescription = stringResource(Res.string.chat_voice_stop),
@@ -269,6 +379,7 @@ private fun MicButton(voice: VoiceInput, onClick: () -> Unit) {
             content = c.onAccent,
             modifier = Modifier
                 .graphicsLayer {
+                    val scale = 1f + (level?.value ?: 0f) * 0.15f
                     scaleX = scale
                     scaleY = scale
                 }

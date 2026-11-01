@@ -137,6 +137,12 @@
     <string name="chat_voice_retry">Reintentar</string>
     <string name="chat_voice_recording">Grabando %1$s</string>
     <string name="chat_voice_transcribing">Transcribiendo…</string>
+    <string name="chat_voice_recording_now">Grabando</string>
+    <string name="chat_voice_hold_hint">Suelta para transcribir, desliza para cancelar</string>
+    <string name="chat_voice_release_to_cancel">Suelta para cancelar</string>
+    <string name="chat_voice_hold_to_record">Mantén pulsado para grabar</string>
+    <string name="chat_voice_discarded">Grabación descartada</string>
+    <string name="chat_voice_undo">Deshacer</string>
     <string name="chat_voice_error_no_key">No hay clave de API para %1$s: añade una en Ajustes, Entrada de voz</string>
     <string name="chat_voice_error_address">La dirección de voz a texto no es válida: revísala en Ajustes, Entrada de voz</string>
     <string name="chat_voice_error_unauthorized">%1$s rechazó la clave de API: revísala en Ajustes, Entrada de voz</string>
@@ -206,6 +212,7 @@
     <string name="chat_preview_voice_off">No hay micrófono en el cuadro del mensaje</string>
     <string name="chat_preview_voice_system">El reconocimiento de voz del teléfono escribe las palabras mientras hablas</string>
     <string name="chat_preview_voice_cloud">Al detener, la grabación se envía a %1$s (%2$s) y el texto va al cuadro del mensaje para revisarlo</string>
+    <string name="chat_preview_voice_hold">Mantén pulsado el micrófono para grabar: suelta para transcribir, desliza para cancelar</string>
     <string name="chat_preview_selection_now">Elegido en el redactor: el chat cambia a ellos al instante</string>
     <string name="chat_preview_stop_asks">Detener un comando desde la hoja En ejecución pide confirmación primero</string>
     <string name="chat_preview_stop_direct">Detener un comando desde la hoja En ejecución lo termina al instante</string>

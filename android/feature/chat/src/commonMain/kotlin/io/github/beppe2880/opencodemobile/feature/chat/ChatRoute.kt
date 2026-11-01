@@ -1,7 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -20,7 +22,10 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -87,6 +92,15 @@ fun ChatRoute(
     CollectEffect(voiceModel.effect) { effect ->
         when (effect) {
             VoiceInputEffect.NoSpeech -> snackbar.showSnackbar(getString(Res.string.chat_dictation_no_speech))
+            // Its own coroutine: the snackbar stays while other effects arrive, and closes when undo is no longer possible.
+            VoiceInputEffect.Discarded -> scope.launch {
+                val message = getString(Res.string.chat_voice_discarded)
+                val undo = getString(Res.string.chat_voice_undo)
+                val result = withTimeoutOrNull(VOICE_UNDO_MS) {
+                    snackbar.showSnackbar(message, actionLabel = undo, duration = SnackbarDuration.Indefinite)
+                }
+                if (result == SnackbarResult.ActionPerformed) voiceModel.onEvent(VoiceInputEvent.Undo)
+            }
         }
     }
     // Asked on the first tap of the microphone; when denied, the keyboard's own voice typing still works.
@@ -96,6 +110,9 @@ fun ChatRoute(
         } else {
             scope.launch { snackbar.showSnackbar(getString(Res.string.chat_dictation_permission)) }
         }
+    }
+    val startCloud = { event: VoiceInputEvent ->
+        if (!voiceModel.needsPermission || micPermission.granted()) voiceModel.onEvent(event) else micPermission.request()
     }
 
     CollectEffect(viewModel.effect) { effect ->
@@ -131,10 +148,13 @@ fun ChatRoute(
                 val phase = voiceState.phase
                 VoiceInput(
                     listening = phase is CloudVoicePhase.Recording,
-                    level = (phase as? CloudVoicePhase.Recording)?.level ?: 0f,
+                    level = 0f,
                     cloud = phase,
                     provider = voiceState.provider.label,
                     transcript = voiceState.transcript,
+                    levels = voiceModel.level,
+                    style = voiceState.style,
+                    holdToRecord = voiceState.holdToRecord,
                 )
             }
             dictation.available -> VoiceInput(dictation.listening, dictation.level)
@@ -145,11 +165,7 @@ fun ChatRoute(
                 cloud -> when (voiceState.phase) {
                     is CloudVoicePhase.Recording -> voiceModel.onEvent(VoiceInputEvent.Stop)
                     CloudVoicePhase.Transcribing -> Unit
-                    else -> if (!voiceModel.needsPermission || micPermission.granted()) {
-                        voiceModel.onEvent(VoiceInputEvent.Start)
-                    } else {
-                        micPermission.request()
-                    }
+                    else -> startCloud(VoiceInputEvent.Start)
                 }
                 dictation.listening -> dictation.stop()
                 micPermission.granted() -> startDictation()
@@ -157,6 +173,8 @@ fun ChatRoute(
             }
         },
         onVoice = voiceModel::onEvent,
+        // Without the permission yet, the dialog takes the press: after it a tap records.
+        onHoldVoice = { startCloud(VoiceInputEvent.Hold) },
         showBack = showBack,
         snackbarHostState = snackbar,
         listState = listState,

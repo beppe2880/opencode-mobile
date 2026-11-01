@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.data.stt
 
+import io.github.beppe2880.opencodemobile.core.domain.VOICE_LEVEL_INTERVAL_MS
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
+import io.github.beppe2880.opencodemobile.core.domain.VoiceLevel
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.network.Wav
 import kotlinx.cinterop.ByteVar
@@ -11,6 +13,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
@@ -36,13 +41,17 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Records 16 kHz mono PCM with [AVAudioRecorder] into a temporary WAV file of the app, deleted
- * once the samples are read or the recording is cancelled.
+ * once the samples are read or the recording is cancelled. The level is the recorder's own
+ * metering (average power in dBFS), read every 40 ms.
  */
 @OptIn(ExperimentalForeignApi::class)
 internal class AvVoiceRecorder : VoiceRecorder {
     override val needsPermission: Boolean = true
 
-    override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (elapsedMs: Long, level: Float) -> Unit): VoiceClip {
+    private val _level = MutableStateFlow(0f)
+    override val level: StateFlow<Float> = _level.asStateFlow()
+
+    override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (elapsedMs: Long) -> Unit): VoiceClip {
         val session = AVAudioSession.sharedInstance()
         session.setCategory(AVAudioSessionCategoryRecord, AVAudioSessionModeDefault, AVAudioSessionCategoryOptionDuckOthers, null)
         session.setActive(true, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation, null)
@@ -63,8 +72,8 @@ internal class AvVoiceRecorder : VoiceRecorder {
             while (!stop.isCompleted && recorder.isRecording()) {
                 delay(PROGRESS_INTERVAL)
                 recorder.updateMeters()
-                val db = recorder.averagePowerForChannel(0u)
-                onProgress((recorder.currentTime * 1000).toLong(), ((db - MIN_DB) / (MAX_DB - MIN_DB)).coerceIn(0f, 1f))
+                _level.value = VoiceLevel.fromDecibels(recorder.averagePowerForChannel(0u))
+                onProgress((recorder.currentTime * 1000).toLong())
             }
             recorder.stop()
             val pcm = withContext(Dispatchers.IO) {
@@ -74,6 +83,7 @@ internal class AvVoiceRecorder : VoiceRecorder {
             }
             return VoiceClip(pcm, VoiceClip.SAMPLE_RATE)
         } finally {
+            _level.value = 0f
             if (recorder.isRecording()) recorder.stop()
             NSFileManager.defaultManager.removeItemAtURL(url, null)
             session.setActive(false, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation, null)
@@ -81,8 +91,6 @@ internal class AvVoiceRecorder : VoiceRecorder {
     }
 
     private companion object {
-        val PROGRESS_INTERVAL = 100.milliseconds
-        const val MIN_DB = -50f
-        const val MAX_DB = -10f
+        val PROGRESS_INTERVAL = VOICE_LEVEL_INTERVAL_MS.milliseconds
     }
 }

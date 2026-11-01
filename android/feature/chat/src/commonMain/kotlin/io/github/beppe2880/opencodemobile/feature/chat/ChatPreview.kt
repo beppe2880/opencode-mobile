@@ -40,6 +40,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCustomizable
@@ -61,11 +62,13 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_se
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_stop_asks
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_stop_direct
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_cloud
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_hold
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_off
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_system
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.TimeSource
 
 // Previews of the chat for Settings: sample data drawn by the real chat components with the
 // settings of [PartPreview]. Nothing in them reacts like the chat: the parts only report taps.
@@ -259,8 +262,22 @@ private fun VoicePreview(settings: AppSettings) {
             !settings.dictation -> Caption(Res.string.chat_preview_voice_off)
             settings.voiceEngine == VoiceEngine.System -> Caption(Res.string.chat_preview_voice_system)
             else -> {
-                VoiceStrip(CloudVoicePhase.Recording(elapsedMs = 7_000, level = 0.5f), settings.sttProvider.label, onVoice = {})
+                when (settings.voiceRecordingStyle) {
+                    VoiceRecordingStyle.Waveform -> {
+                        // A sample voice keeps the waveform moving.
+                        val start = remember { TimeSource.Monotonic.markNow() }
+                        RecorderBar(
+                            elapsedMs = 7_000,
+                            level = { previewLevel(start.elapsedNow().inWholeMilliseconds) },
+                            reducedMotion = rememberReducedMotion(),
+                            onCancel = {},
+                            onConfirm = {},
+                        )
+                    }
+                    VoiceRecordingStyle.Compact -> VoiceStrip(CloudVoicePhase.Recording(elapsedMs = 7_000), settings.sttProvider.label, onVoice = {})
+                }
                 Caption(Res.string.chat_preview_voice_cloud, settings.sttProvider.label, settings.sttModel())
+                if (settings.voiceHoldToRecord) Caption(Res.string.chat_preview_voice_hold)
             }
         }
     }

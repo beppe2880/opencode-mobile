@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">El proveedor respondió con un error: %1$s</string>
     <string name="settings_voice_language">Enviar el idioma de la app</string>
     <string name="settings_voice_language_sub">Indica al proveedor el idioma de la grabación, lo que mejora la precisión; desactivado deja que detecte el idioma</string>
+    <string name="settings_voice_style">Estilo de grabación</string>
+    <string name="settings_voice_style_waveform">Onda</string>
+    <string name="settings_voice_style_compact">Compacto</string>
+    <string name="settings_voice_style_waveform_sub">El cuadro del mensaje se convierte en grabadora: onda en vivo, tiempo, cancelar y confirmar</string>
+    <string name="settings_voice_style_compact_sub">Una tira pequeña con el tiempo sobre el cuadro del mensaje; el micrófono pasa a ser el botón de parar</string>
+    <string name="settings_voice_hold">Mantener para grabar</string>
+    <string name="settings_voice_hold_sub">Mantén pulsado el micrófono para grabar y suelta para transcribir; desliza para cancelar. Un toque sigue iniciando y deteniendo</string>
     <string name="settings_selection_apply">Aplicar cambios de agente y modelo</string>
     <string name="settings_selection_apply_sub">Cuando un agente, modelo o nivel de razonamiento elegido en un chat se envía al servidor: con el siguiente mensaje, o en cuanto se elige</string>
     <string name="settings_selection_apply_next">Próximo mensaje</string>

@@ -137,6 +137,12 @@
     <string name="chat_voice_retry">Retry</string>
     <string name="chat_voice_recording">Recording %1$s</string>
     <string name="chat_voice_transcribing">Transcribing…</string>
+    <string name="chat_voice_recording_now">Recording</string>
+    <string name="chat_voice_hold_hint">Release to transcribe, slide away to cancel</string>
+    <string name="chat_voice_release_to_cancel">Release to cancel</string>
+    <string name="chat_voice_hold_to_record">Hold to record</string>
+    <string name="chat_voice_discarded">Recording discarded</string>
+    <string name="chat_voice_undo">Undo</string>
     <string name="chat_voice_error_no_key">No API key for %1$s: add one in Settings, Voice input</string>
     <string name="chat_voice_error_address">The speech-to-text address is not valid: check it in Settings, Voice input</string>
     <string name="chat_voice_error_unauthorized">%1$s refused the API key: check it in Settings, Voice input</string>
@@ -206,6 +212,7 @@
     <string name="chat_preview_voice_off">No microphone in the message box</string>
     <string name="chat_preview_voice_system">The phone's speech recognition writes the words while you speak</string>
     <string name="chat_preview_voice_cloud">When you stop, the recording is sent to %1$s (%2$s) and the text goes into the message box to check</string>
+    <string name="chat_preview_voice_hold">Hold the microphone to record: release to transcribe, slide away to cancel</string>
     <string name="chat_preview_selection_now">Picked in the composer: the chat switches to them right away</string>
     <string name="chat_preview_stop_asks">Stopping a command from the Running sheet asks first</string>
     <string name="chat_preview_stop_direct">Stopping a command from the Running sheet ends it at once</string>

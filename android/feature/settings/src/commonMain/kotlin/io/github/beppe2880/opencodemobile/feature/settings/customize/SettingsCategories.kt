@@ -150,7 +150,14 @@ val SettingsArea.groups: List<OptionGroup>
             OptionGroup(null, listOf(SettingOption.Dictation, SettingOption.VoiceMode)),
             OptionGroup(
                 Res.string.settings_group_cloud,
-                listOf(SettingOption.VoiceProvider, SettingOption.VoiceModel, SettingOption.VoiceKey, SettingOption.VoiceLanguage),
+                listOf(
+                    SettingOption.VoiceProvider,
+                    SettingOption.VoiceModel,
+                    SettingOption.VoiceKey,
+                    SettingOption.VoiceLanguage,
+                    SettingOption.VoiceStyle,
+                    SettingOption.VoiceHold,
+                ),
             ),
         )
         SettingsArea.Sessions -> listOf(OptionGroup(null, listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)))

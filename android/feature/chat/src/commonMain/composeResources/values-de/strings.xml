@@ -137,6 +137,12 @@
     <string name="chat_voice_retry">Erneut versuchen</string>
     <string name="chat_voice_recording">Aufnahme %1$s</string>
     <string name="chat_voice_transcribing">Wird transkribiert…</string>
+    <string name="chat_voice_recording_now">Aufnahme läuft</string>
+    <string name="chat_voice_hold_hint">Loslassen zum Transkribieren, wegziehen zum Abbrechen</string>
+    <string name="chat_voice_release_to_cancel">Loslassen zum Abbrechen</string>
+    <string name="chat_voice_hold_to_record">Gedrückt halten zum Aufnehmen</string>
+    <string name="chat_voice_discarded">Aufnahme verworfen</string>
+    <string name="chat_voice_undo">Rückgängig</string>
     <string name="chat_voice_error_no_key">Kein API-Schlüssel für %1$s: füge einen in den Einstellungen unter Spracheingabe hinzu</string>
     <string name="chat_voice_error_address">Die Adresse für Sprache-zu-Text ist ungültig: prüfe sie in den Einstellungen unter Spracheingabe</string>
     <string name="chat_voice_error_unauthorized">%1$s hat den API-Schlüssel abgelehnt: prüfe ihn in den Einstellungen unter Spracheingabe</string>
@@ -206,6 +212,7 @@
     <string name="chat_preview_voice_off">Kein Mikrofon im Nachrichtenfeld</string>
     <string name="chat_preview_voice_system">Die Spracherkennung des Telefons schreibt die Wörter, während du sprichst</string>
     <string name="chat_preview_voice_cloud">Beim Stoppen wird die Aufnahme an %1$s (%2$s) gesendet, und der Text landet zur Kontrolle im Nachrichtenfeld</string>
+    <string name="chat_preview_voice_hold">Mikrofon gedrückt halten zum Aufnehmen: loslassen zum Transkribieren, wegziehen zum Abbrechen</string>
     <string name="chat_preview_selection_now">Im Eingabefeld gewählt: Der Chat wechselt sofort zu ihnen</string>
     <string name="chat_preview_stop_asks">Einen Befehl im Blatt Laufend zu stoppen, fragt zuerst nach</string>
     <string name="chat_preview_stop_direct">Einen Befehl im Blatt Laufend zu stoppen, beendet ihn sofort</string>

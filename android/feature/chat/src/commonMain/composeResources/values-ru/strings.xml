@@ -155,6 +155,12 @@
     <string name="chat_voice_retry">Повторить</string>
     <string name="chat_voice_recording">Запись %1$s</string>
     <string name="chat_voice_transcribing">Расшифровка…</string>
+    <string name="chat_voice_recording_now">Запись</string>
+    <string name="chat_voice_hold_hint">Отпустите, чтобы расшифровать, уведите в сторону, чтобы отменить</string>
+    <string name="chat_voice_release_to_cancel">Отпустите, чтобы отменить</string>
+    <string name="chat_voice_hold_to_record">Удерживайте, чтобы записать</string>
+    <string name="chat_voice_discarded">Запись удалена</string>
+    <string name="chat_voice_undo">Отменить</string>
     <string name="chat_voice_error_no_key">Нет ключа API для %1$s: добавьте его в Настройках, Голосовой ввод</string>
     <string name="chat_voice_error_address">Адрес для речи в текст некорректен: проверьте в Настройках, Голосовой ввод</string>
     <string name="chat_voice_error_unauthorized">%1$s отклонил ключ API: проверьте его в Настройках, Голосовой ввод</string>
@@ -228,6 +234,7 @@
     <string name="chat_preview_voice_off">В поле сообщения нет микрофона</string>
     <string name="chat_preview_voice_system">Распознавание речи телефона пишет слова, пока вы говорите</string>
     <string name="chat_preview_voice_cloud">При остановке запись отправляется в %1$s (%2$s), а текст попадает в поле сообщения для проверки</string>
+    <string name="chat_preview_voice_hold">Удерживайте микрофон для записи: отпустите, чтобы расшифровать, уведите в сторону, чтобы отменить</string>
     <string name="chat_preview_selection_now">Выбрано в поле ввода: чат сразу переключится на них</string>
     <string name="chat_preview_stop_asks">Остановка команды из листа «Выполняется» сначала запрашивает подтверждение</string>
     <string name="chat_preview_stop_direct">Остановка команды из листа «Выполняется» сразу её завершает</string>

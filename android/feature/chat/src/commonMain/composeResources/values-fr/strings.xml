@@ -137,6 +137,12 @@
     <string name="chat_voice_retry">Réessayer</string>
     <string name="chat_voice_recording">Enregistrement %1$s</string>
     <string name="chat_voice_transcribing">Transcription en cours…</string>
+    <string name="chat_voice_recording_now">Enregistrement</string>
+    <string name="chat_voice_hold_hint">Relâcher pour transcrire, glisser pour annuler</string>
+    <string name="chat_voice_release_to_cancel">Relâcher pour annuler</string>
+    <string name="chat_voice_hold_to_record">Maintenir pour enregistrer</string>
+    <string name="chat_voice_discarded">Enregistrement supprimé</string>
+    <string name="chat_voice_undo">Annuler</string>
     <string name="chat_voice_error_no_key">Aucune clé API pour %1$s : ajoutez-en une dans Réglages, Saisie vocale</string>
     <string name="chat_voice_error_address">L'adresse de transcription vocale n'est pas valide : vérifiez-la dans Réglages, Saisie vocale</string>
     <string name="chat_voice_error_unauthorized">%1$s a refusé la clé API : vérifiez-la dans Réglages, Saisie vocale</string>
@@ -206,6 +212,7 @@
     <string name="chat_preview_voice_off">Pas de micro dans le champ de message</string>
     <string name="chat_preview_voice_system">La reconnaissance vocale du téléphone écrit les mots pendant que vous parlez</string>
     <string name="chat_preview_voice_cloud">À l'arrêt, l'enregistrement est envoyé à %1$s (%2$s) et le texte va dans le champ de message pour vérification</string>
+    <string name="chat_preview_voice_hold">Maintenir le micro pour enregistrer : relâcher pour transcrire, glisser pour annuler</string>
     <string name="chat_preview_selection_now">Choisi dans le compositeur : le chat bascule vers eux immédiatement</string>
     <string name="chat_preview_stop_asks">Arrêter une commande depuis la feuille En cours demande d’abord confirmation</string>
     <string name="chat_preview_stop_direct">Arrêter une commande depuis la feuille En cours la termine immédiatement</string>

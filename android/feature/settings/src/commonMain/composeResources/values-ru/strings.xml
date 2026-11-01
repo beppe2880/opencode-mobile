@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">Провайдер ответил ошибкой: %1$s</string>
     <string name="settings_voice_language">Отправлять язык приложения</string>
     <string name="settings_voice_language_sub">Сообщает провайдеру язык записи, что повышает точность; если выключено, он определяет язык сам</string>
+    <string name="settings_voice_style">Стиль записи</string>
+    <string name="settings_voice_style_waveform">Волна</string>
+    <string name="settings_voice_style_compact">Компактный</string>
+    <string name="settings_voice_style_waveform_sub">Поле сообщения превращается в диктофон: живая волна, время, отмена и подтверждение</string>
+    <string name="settings_voice_style_compact_sub">Узкая полоска с временем над полем сообщения; микрофон становится кнопкой остановки</string>
+    <string name="settings_voice_hold">Удерживать для записи</string>
+    <string name="settings_voice_hold_sub">Удерживайте микрофон для записи и отпустите, чтобы расшифровать; уведите в сторону, чтобы отменить. Нажатие по-прежнему начинает и останавливает запись</string>
     <string name="settings_selection_apply">Применять смену агента и модели</string>
     <string name="settings_selection_apply_sub">Когда выбранные в чате агент, модель или уровень рассуждения отправляются на сервер: со следующим сообщением или сразу после выбора</string>
     <string name="settings_selection_apply_next">Следующее сообщение</string>

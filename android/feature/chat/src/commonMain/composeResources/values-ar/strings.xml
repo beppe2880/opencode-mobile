@@ -173,6 +173,12 @@
     <string name="chat_voice_retry">إعادة المحاولة</string>
     <string name="chat_voice_recording">جارٍ التسجيل %1$s</string>
     <string name="chat_voice_transcribing">جارٍ التفريغ…</string>
+    <string name="chat_voice_recording_now">جارٍ التسجيل</string>
+    <string name="chat_voice_hold_hint">أفلِت للتفريغ، واسحب بعيدًا للإلغاء</string>
+    <string name="chat_voice_release_to_cancel">أفلِت للإلغاء</string>
+    <string name="chat_voice_hold_to_record">اضغط مطولًا للتسجيل</string>
+    <string name="chat_voice_discarded">تم تجاهل التسجيل</string>
+    <string name="chat_voice_undo">تراجع</string>
     <string name="chat_voice_error_no_key">لا يوجد مفتاح API لـ %1$s: أضفه في الإعدادات، الإدخال الصوتي</string>
     <string name="chat_voice_error_address">عنوان التحويل من الكلام إلى نص غير صالح: تحقق منه في الإعدادات، الإدخال الصوتي</string>
     <string name="chat_voice_error_unauthorized">رفض %1$s مفتاح API: تحقق منه في الإعدادات، الإدخال الصوتي</string>
@@ -250,6 +256,7 @@
     <string name="chat_preview_voice_off">لا يوجد ميكروفون في مربع الرسالة</string>
     <string name="chat_preview_voice_system">التعرف على الكلام في الهاتف يكتب الكلمات أثناء التحدث</string>
     <string name="chat_preview_voice_cloud">عند الإيقاف يُرسل التسجيل إلى %1$s (%2$s) ويُدرج النص في مربع الرسالة لتراجعه</string>
+    <string name="chat_preview_voice_hold">اضغط مطولًا على الميكروفون للتسجيل: أفلِت للتفريغ، واسحب بعيدًا للإلغاء</string>
     <string name="chat_preview_selection_now">محدد في حقل الكتابة: تنتقل الدردشة إليها فوراً</string>
     <string name="chat_preview_stop_asks">إيقاف أمر من لائحة «قيد التشغيل» يطلب تأكيداً أولاً</string>
     <string name="chat_preview_stop_direct">إيقاف أمر من لائحة «قيد التشغيل» ينهيه فوراً</string>
