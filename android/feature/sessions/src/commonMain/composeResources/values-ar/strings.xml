@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">تُفتح الدردشة فوق القائمة، حتى على الشاشات العريضة</string>
     <string name="sessions_preview_back_list">الرجوع مع إخفاء القائمة يعرضها مجدداً</string>
     <string name="sessions_preview_back_leave">الرجوع مع إخفاء القائمة يغادر التطبيق</string>
+    <string name="sessions_share_sheet_hint">بعد إنشاء الجلسة، يبقى المحتوى المشارَك في مربع الرسالة جاهزًا للتعديل والإرسال.</string>
+    <string name="sessions_share_choose">انقر على محادثة لإضافة المحتوى المشارَك إلى مربع رسالتها، أو ابدأ جلسة جديدة.</string>
+    <string name="sessions_share_new">جلسة جديدة</string>
+    <string name="sessions_share_discard">تجاهل</string>
+    <string name="sessions_share_discarded">تم تجاهل المحتوى المشارَك</string>
+    <string name="sessions_preview_share_new">النصوص والروابط والصور المشارَكة من تطبيقات أخرى تفتح هذه اللوحة</string>
+    <string name="sessions_preview_share_choose">النصوص والروابط والصور المشارَكة من تطبيقات أخرى تطلب أولًا محادثة، أو تفتح هذه اللوحة</string>
+    <string name="sessions_preview_share_off">OpenCode غير موجود في قائمة المشاركة في التطبيقات الأخرى</string>
 </resources>

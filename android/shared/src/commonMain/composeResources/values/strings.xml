@@ -4,4 +4,6 @@
     <string name="app_select_session_message">Pick a session from the list or start a new one.</string>
     <string name="app_hide_sessions">Hide sessions</string>
     <string name="app_show_sessions">Show sessions</string>
+    <string name="app_share_needs_server">Connect to a server to start a session with the shared content. It waits here until then.</string>
+    <string name="app_share_discard">Discard</string>
 </resources>

@@ -65,4 +65,19 @@
     <string name="oc_part_notify_finished">Сессия завершена</string>
     <string name="oc_part_update">Уведомление об обновлении</string>
     <string name="oc_part_customize">Настроить</string>
+    <string name="oc_shared_title">Отправлено в OpenCode</string>
+    <plurals name="oc_shared_images">
+        <item quantity="one">%1$d изображение</item>
+        <item quantity="few">%1$d изображения</item>
+        <item quantity="many">%1$d изображений</item>
+        <item quantity="other">%1$d изображения</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="one">Не удалось добавить %1$d элемент</item>
+        <item quantity="few">Не удалось добавить %1$d элемента</item>
+        <item quantity="many">Не удалось добавить %1$d элементов</item>
+        <item quantity="other">Не удалось добавить %1$d элемента</item>
+    </plurals>
+    <string name="oc_share_nothing">Нечем поделиться: OpenCode принимает текст, ссылки и изображения</string>
+    <string name="oc_shared_truncated">Текст был слишком длинным и сокращён</string>
 </resources>

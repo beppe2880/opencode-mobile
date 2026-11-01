@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
@@ -60,6 +61,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
+        prefs.putBoolean(KEY_SHARE_MENU, next.showInShareMenu)
+        prefs.putString(KEY_SHARE_OPENS, next.shareOpens.name)
         prefs.putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
         prefs.putBoolean(KEY_GROUP_THOUGHTS, next.groupThoughts)
         prefs.putBoolean(KEY_QUESTIONS_COLLAPSED, next.questionsCollapsed)
@@ -121,6 +124,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
                 ?: defaults.selectionApply,
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
                 ?: defaults.newChatModel,
+            showInShareMenu = prefs.getBoolean(KEY_SHARE_MENU, defaults.showInShareMenu),
+            shareOpens = ShareOpens.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SHARE_OPENS) } ?: defaults.shareOpens,
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
             groupThoughts = prefs.getBoolean(KEY_GROUP_THOUGHTS, defaults.groupThoughts),
             questionsCollapsed = prefs.getBoolean(KEY_QUESTIONS_COLLAPSED, defaults.questionsCollapsed),
@@ -179,6 +184,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_DICTATION = "dictation"
         const val KEY_SELECTION_APPLY = "selection_apply"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
+        const val KEY_SHARE_MENU = "show_in_share_menu"
+        const val KEY_SHARE_OPENS = "share_opens"
         const val KEY_GROUP_ACTIVITY = "group_activity"
         const val KEY_GROUP_THOUGHTS = "group_thoughts"
         const val KEY_QUESTIONS_COLLAPSED = "questions_collapsed"

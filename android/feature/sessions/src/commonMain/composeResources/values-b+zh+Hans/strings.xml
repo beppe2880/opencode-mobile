@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">聊天在列表上方打开，宽屏上也是如此</string>
     <string name="sessions_preview_back_list">列表隐藏时按返回键会再次显示列表</string>
     <string name="sessions_preview_back_leave">列表隐藏时按返回键会退出应用</string>
+    <string name="sessions_share_sheet_hint">会话创建后，分享的内容会保留在消息框中，可编辑后发送。</string>
+    <string name="sessions_share_choose">点击一个聊天，将分享的内容添加到其消息框中，或新建会话。</string>
+    <string name="sessions_share_new">新建会话</string>
+    <string name="sessions_share_discard">丢弃</string>
+    <string name="sessions_share_discarded">已丢弃分享的内容</string>
+    <string name="sessions_preview_share_new">从其他应用分享的文本、链接和图片会打开此面板</string>
+    <string name="sessions_preview_share_choose">从其他应用分享的文本、链接和图片会先询问选择聊天，或打开此面板</string>
+    <string name="sessions_preview_share_off">OpenCode 不在其他应用的分享菜单中</string>
 </resources>

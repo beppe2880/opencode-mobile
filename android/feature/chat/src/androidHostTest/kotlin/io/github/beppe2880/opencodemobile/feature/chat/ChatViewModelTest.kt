@@ -26,6 +26,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.Part
+import io.github.beppe2880.opencodemobile.core.domain.PendingShare
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
@@ -41,6 +42,8 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
@@ -59,6 +62,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -73,6 +77,7 @@ class ChatViewModelTest {
     private val events = FakeEvents()
     private val settings = FakeSettings()
     private val drafts = FakeDrafts()
+    private val shares = FakeShares()
     private val scroll = ScrollMemory()
     private val mcps = FakeMcps()
     private val recents = FakeRecents()
@@ -463,7 +468,34 @@ class ChatViewModelTest {
     }
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, clock = { 42 })
+
+    @Test
+    fun `content shared to this chat goes into the composer after the draft`() = runTest(main.testDispatcher) {
+        val image = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        val shared = SharedContent(text = "https://github.com/o/r/issues/1", attachments = listOf(image))
+        drafts.save("s1", "half a thought")
+        shares.pending.value = PendingShare(1, shared, sessionId = "s1", serverId = "srv")
+        val vm = vm()
+        advanceUntilIdle()
+
+        assertEquals("half a thought\n\nhttps://github.com/o/r/issues/1", vm.state.value.draft)
+        assertEquals(listOf(image), vm.state.value.attachments)
+        assertEquals(null, shares.pending.value)
+        // Nothing is sent until the user does.
+        assertTrue(chat.prompts.isEmpty())
+
+        // A share for another chat, arriving while this one is open, stays for that chat.
+        shares.pending.value = PendingShare(2, SharedContent(text = "other"), sessionId = "s2", serverId = "srv")
+        advanceUntilIdle()
+        assertEquals("half a thought\n\nhttps://github.com/o/r/issues/1", vm.state.value.draft)
+        assertNotNull(shares.pending.value)
+
+        // One handed to this chat while it is open joins the composer too.
+        shares.pending.value = PendingShare(3, SharedContent(text = "more"), sessionId = "s1", serverId = "srv")
+        advanceUntilIdle()
+        assertTrue(vm.state.value.draft.endsWith("\n\nmore"))
+    }
 
     @Test
     fun `the header line shows folder, branch and changed files and follows step ends`() = runTest(main.testDispatcher) {
@@ -2094,6 +2126,21 @@ private class FakeVcs : VcsRepository {
     override suspend fun workingChanges(directory: String): Result<List<FileDiff>> {
         diffRequests += directory
         return Result.success(diffs)
+    }
+}
+
+private class FakeShares : ShareRepository {
+    override val pending = MutableStateFlow<PendingShare?>(null)
+    override suspend fun offer(content: SharedContent) {
+        pending.value = PendingShare(1, content)
+    }
+    override suspend fun assign(sessionId: String, serverId: String?) {
+        pending.value = pending.value?.copy(sessionId = sessionId, serverId = serverId)
+    }
+    override suspend fun take(sessionId: String): SharedContent? =
+        pending.value?.takeIf { it.sessionId == sessionId }?.content?.also { pending.value = null }
+    override suspend fun discard() {
+        pending.value = null
     }
 }
 

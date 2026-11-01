@@ -107,6 +107,13 @@
     <string name="settings_selection_apply_now">즉시</string>
     <string name="settings_new_chat_model">새 채팅의 모델</string>
     <string name="settings_new_chat_model_sub">모델을 선택하지 않았을 때 사용: 에이전트 또는 서버에 설정된 모델, 없으면 마지막으로 사용한 모델. 또는 서버에 맡기기</string>
+    <string name="settings_share_menu">공유 메뉴에 OpenCode 표시</string>
+    <string name="settings_share_menu_sub">다른 앱에서 OpenCode로 텍스트, 링크, 이미지를 공유해 세션을 시작할 수 있습니다</string>
+    <string name="settings_share_opens">공유 시 열기</string>
+    <string name="settings_share_opens_new">새 세션</string>
+    <string name="settings_share_opens_choose">채팅 선택</string>
+    <string name="settings_share_opens_sub">새 세션 시트. 공유된 내용이 첫 메시지에 들어가 편집할 수 있습니다</string>
+    <string name="settings_share_opens_choose_sub">세션 목록. 공유된 내용을 넣을 채팅을 고르거나 새로 시작합니다</string>
     <string name="settings_new_chat_model_last">마지막 사용</string>
     <string name="settings_new_chat_model_server">서버 기본값</string>
     <string name="settings_usage">사용 통계</string>

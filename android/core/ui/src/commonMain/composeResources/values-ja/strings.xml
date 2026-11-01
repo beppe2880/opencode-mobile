@@ -65,4 +65,13 @@
     <string name="oc_part_notify_finished">セッション完了</string>
     <string name="oc_part_update">アップデートの通知</string>
     <string name="oc_part_customize">カスタマイズ</string>
+    <string name="oc_shared_title">OpenCodeに共有されました</string>
+    <plurals name="oc_shared_images">
+        <item quantity="other">%1$d 件の画像</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="other">%1$d 件を追加できませんでした</item>
+    </plurals>
+    <string name="oc_share_nothing">共有するものがありません：OpenCodeはテキスト、リンク、画像を受け付けます</string>
+    <string name="oc_shared_truncated">テキストが長すぎたため短縮されました</string>
 </resources>

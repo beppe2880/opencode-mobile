@@ -4,4 +4,6 @@
     <string name="app_select_session_message">اختر جلسة من القائمة أو ابدأ جلسة جديدة.</string>
     <string name="app_hide_sessions">إخفاء الجلسات</string>
     <string name="app_show_sessions">إظهار الجلسات</string>
+    <string name="app_share_needs_server">اتصل بخادم لبدء جلسة بالمحتوى المشارَك. سيبقى المحتوى هنا حتى ذلك الحين.</string>
+    <string name="app_share_discard">تجاهل</string>
 </resources>

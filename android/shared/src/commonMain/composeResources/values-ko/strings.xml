@@ -4,4 +4,6 @@
     <string name="app_select_session_message">목록에서 세션을 선택하거나 새로 시작하세요.</string>
     <string name="app_hide_sessions">세션 숨기기</string>
     <string name="app_show_sessions">세션 표시</string>
+    <string name="app_share_needs_server">공유된 내용으로 세션을 시작하려면 서버에 연결하세요. 그때까지 여기서 대기합니다.</string>
+    <string name="app_share_discard">버리기</string>
 </resources>

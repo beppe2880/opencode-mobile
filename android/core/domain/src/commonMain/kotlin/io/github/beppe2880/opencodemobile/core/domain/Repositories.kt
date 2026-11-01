@@ -391,6 +391,10 @@ data class AppSettings(
     val selectionApply: SelectionApply = SelectionApply.NextMessage,
     /** The model a new chat starts with. */
     val newChatModel: NewChatModel = NewChatModel.LastUsed,
+    /** Other apps can share text, links and images to OpenCode (Android share menu). */
+    val showInShareMenu: Boolean = true,
+    /** With [showInShareMenu]: what a share opens. */
+    val shareOpens: ShareOpens = ShareOpens.NewSession,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
     /** Thoughts that follow each other with nothing in between collapse into one row, also while running. */

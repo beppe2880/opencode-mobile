@@ -107,6 +107,13 @@
     <string name="settings_selection_apply_now">Ahora</string>
     <string name="settings_new_chat_model">Modelo para chats nuevos</string>
     <string name="settings_new_chat_model_sub">Se usa cuando no se elige ningún modelo: el configurado para el agente o en el servidor; si no, el último usado; o déjalo al servidor</string>
+    <string name="settings_share_menu">Mostrar OpenCode en el menú de compartir</string>
+    <string name="settings_share_menu_sub">Otras apps pueden compartir texto, enlaces e imágenes con OpenCode para iniciar una sesión</string>
+    <string name="settings_share_opens">Al compartir se abre</string>
+    <string name="settings_share_opens_new">Nueva sesión</string>
+    <string name="settings_share_opens_choose">Elegir un chat</string>
+    <string name="settings_share_opens_sub">La hoja de nueva sesión; el contenido compartido va al primer mensaje, listo para editar</string>
+    <string name="settings_share_opens_choose_sub">La lista de sesiones, para elegir un chat para el contenido compartido o iniciar uno nuevo</string>
     <string name="settings_new_chat_model_last">Último usado</string>
     <string name="settings_new_chat_model_server">Del servidor</string>
     <string name="settings_usage">Estadísticas de uso</string>

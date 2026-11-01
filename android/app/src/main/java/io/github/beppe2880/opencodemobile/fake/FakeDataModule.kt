@@ -3,6 +3,8 @@
 package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
+import io.github.beppe2880.opencodemobile.core.data.share.MemoryShareStore
+import io.github.beppe2880.opencodemobile.core.data.share.StoredShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
@@ -45,6 +47,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalInfo
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
@@ -101,6 +104,8 @@ val fakeDataModule = module {
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
     single<RecentModelRepository> { FakeRecentModels() }
+    // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
+    single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }
     single<UpdateRepository> {
         object : UpdateRepository {

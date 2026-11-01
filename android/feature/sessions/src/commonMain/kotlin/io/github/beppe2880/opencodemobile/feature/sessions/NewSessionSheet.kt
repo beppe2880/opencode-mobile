@@ -39,13 +39,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcAgentChips
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSharedContent
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -61,6 +64,10 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ne
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_path_placeholder
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_show_all
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_choose
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discard
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_new
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_sheet_hint
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -113,6 +120,13 @@ internal fun NewSessionForm(
             color = c.textBase,
             modifier = Modifier.padding(horizontal = OcSpacing.lg),
         )
+        if (state.shared != null && inSheet) {
+            OcSharedContent(
+                content = state.shared,
+                message = stringResource(Res.string.sessions_share_sheet_hint),
+                modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_shared"),
+            )
+        }
         // The preview in Settings shows only what its setting changes: the model.
         if (inSheet) {
             Label(stringResource(Res.string.sessions_new_directory))
@@ -204,6 +218,33 @@ internal fun NewSessionForm(
 }
 
 private const val COLLAPSED_PROJECTS = 5
+
+/** Above the session list while a chat is picked for content shared from another app. */
+@Composable
+internal fun ShareChoice(content: SharedContent, onEvent: (SessionsEvent) -> Unit) {
+    OcSharedContent(
+        content = content,
+        message = stringResource(Res.string.sessions_share_choose),
+        modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).testTag("sessions_share_choice"),
+    ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm, Alignment.End)) {
+            OcButton(
+                text = stringResource(Res.string.sessions_share_discard),
+                onClick = { onEvent(SessionsEvent.DiscardShare) },
+                variant = OcButtonVariant.Ghost,
+                compact = true,
+                modifier = Modifier.testTag("sessions_share_discard"),
+            )
+            OcButton(
+                text = stringResource(Res.string.sessions_share_new),
+                onClick = { onEvent(SessionsEvent.StartNewSession) },
+                variant = OcButtonVariant.Secondary,
+                compact = true,
+                modifier = Modifier.testTag("sessions_share_new"),
+            )
+        }
+    }
+}
 
 @Composable
 private fun Label(text: String) {

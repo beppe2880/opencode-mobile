@@ -4,4 +4,6 @@
     <string name="app_select_session_message">Scegli una sessione dall'elenco o avviane una nuova.</string>
     <string name="app_hide_sessions">Nascondi le sessioni</string>
     <string name="app_show_sessions">Mostra le sessioni</string>
+    <string name="app_share_needs_server">Connettiti a un server per avviare una sessione con il contenuto condiviso. Fino ad allora resta qui in attesa.</string>
+    <string name="app_share_discard">Scarta</string>
 </resources>

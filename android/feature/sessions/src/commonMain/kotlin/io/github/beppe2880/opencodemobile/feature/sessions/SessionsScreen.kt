@@ -179,6 +179,7 @@ fun SessionsScreen(
                     // In the first item: a banner appearing later pushes the list down instead
                     // of opening above the scroll position.
                     Column {
+                        state.sharing?.let { ShareChoice(it, onEvent) }
                         banner()
                         ListHeader(state, onEvent)
                     }

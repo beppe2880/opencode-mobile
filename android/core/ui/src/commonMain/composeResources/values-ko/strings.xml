@@ -65,4 +65,13 @@
     <string name="oc_part_notify_finished">세션 완료</string>
     <string name="oc_part_update">업데이트 알림</string>
     <string name="oc_part_customize">사용자 지정</string>
+    <string name="oc_shared_title">OpenCode에 공유됨</string>
+    <plurals name="oc_shared_images">
+        <item quantity="other">이미지 %1$d개</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="other">%1$d개 항목을 추가할 수 없었습니다</item>
+    </plurals>
+    <string name="oc_share_nothing">공유할 항목이 없습니다: OpenCode는 텍스트, 링크, 이미지를 받습니다</string>
+    <string name="oc_shared_truncated">텍스트가 너무 길어 줄였습니다</string>
 </resources>

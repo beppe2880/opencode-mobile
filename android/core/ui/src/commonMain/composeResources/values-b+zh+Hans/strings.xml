@@ -65,4 +65,13 @@
     <string name="oc_part_notify_finished">会话已完成</string>
     <string name="oc_part_update">更新提示</string>
     <string name="oc_part_customize">自定义</string>
+    <string name="oc_shared_title">已与 OpenCode 共享</string>
+    <plurals name="oc_shared_images">
+        <item quantity="other">%1$d 张图片</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="other">%1$d 项无法添加</item>
+    </plurals>
+    <string name="oc_share_nothing">没有可共享的内容：OpenCode 支持文本、链接和图片</string>
+    <string name="oc_shared_truncated">文本过长，已被截短</string>
 </resources>

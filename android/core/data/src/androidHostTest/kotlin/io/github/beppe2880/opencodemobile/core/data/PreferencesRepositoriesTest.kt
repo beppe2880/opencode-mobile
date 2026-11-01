@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import kotlinx.coroutines.runBlocking
@@ -51,6 +52,8 @@ class PreferencesRepositoriesTest {
             selectionApply = SelectionApply.Immediately,
             newChatModel = NewChatModel.ServerDefault,
             updateNotice = UpdateNoticeStyle.Banner,
+            showInShareMenu = false,
+            shareOpens = ShareOpens.ChooseChat,
             backShowsList = false,
             showEditMarks = false,
             settingsStyle = SettingsStyle.Preview,
@@ -77,6 +80,7 @@ class PreferencesRepositoriesTest {
             // Only the folder and the session can be opened from the header.
             .putString("chat_header_opens", "LastTurn")
             .putString("settings_style", "Cards")
+            .putString("share_opens", "Ask")
             .putFloat("settings_preview_fraction", 3f)
             .putString("update_notice", "Popup")
             .commit()

@@ -4,6 +4,7 @@ import android.app.Application
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
+import io.github.beppe2880.opencodemobile.share.ShareMenuSwitch
 import io.github.beppe2880.opencodemobile.widget.WidgetUpdater
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -19,5 +20,6 @@ class OpenCodeApplication : Application() {
         // Idle until session notifications are enabled in Settings.
         koin.get<SessionMonitor>().start(koin.get(AppScope))
         koin.get<WidgetUpdater>().start(koin.get(AppScope))
+        koin.get<ShareMenuSwitch>().start(koin.get(AppScope))
     }
 }

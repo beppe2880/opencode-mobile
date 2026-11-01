@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">Le chat s’ouvre par-dessus la liste, y compris sur les grands écrans</string>
     <string name="sessions_preview_back_list">Retour avec la liste masquée l’affiche de nouveau</string>
     <string name="sessions_preview_back_leave">Retour avec la liste masquée quitte l’application</string>
+    <string name="sessions_share_sheet_hint">Une fois la session créée, le contenu partagé attend dans son champ de message, prêt à être modifié et envoyé.</string>
+    <string name="sessions_share_choose">Touchez un chat pour ajouter le contenu partagé à son champ de message, ou démarrez une nouvelle session.</string>
+    <string name="sessions_share_new">Nouvelle session</string>
+    <string name="sessions_share_discard">Ignorer</string>
+    <string name="sessions_share_discarded">Contenu partagé ignoré</string>
+    <string name="sessions_preview_share_new">Le texte, les liens et les images partagés depuis d’autres applications ouvrent cette feuille</string>
+    <string name="sessions_preview_share_choose">Le texte, les liens et les images partagés depuis d’autres applications demandent d’abord un chat, ou ouvrent cette feuille</string>
+    <string name="sessions_preview_share_off">OpenCode n’est pas dans le menu de partage des autres applications</string>
 </resources>

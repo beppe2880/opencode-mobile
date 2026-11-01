@@ -371,7 +371,7 @@ internal fun PartOptionsCard(
     inPreview: Boolean = true,
 ) {
     val c = OcTheme.colors
-    val options = part.options
+    val options = part.options.filter { it.supported }
     val shown = options.filter { it.appliesTo(state.settings, state.notificationsOn) }
     // The switch to turn on first: past the ones that do not apply themselves (live kinds before the interval).
     val needs = options.filterNot { it in shown }.mapNotNull { hidden ->

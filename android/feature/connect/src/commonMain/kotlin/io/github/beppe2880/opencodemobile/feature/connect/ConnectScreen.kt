@@ -118,6 +118,7 @@ fun ConnectScreen(
     showBack: Boolean = false,
     onBack: () -> Unit = {},
     onTryDemo: (() -> Unit)? = null,
+    banner: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     secretFocusRequester: FocusRequester = remember { FocusRequester() },
 ) {
@@ -153,6 +154,7 @@ fun ConnectScreen(
                         modifier = Modifier.padding(start = 0.dp).testTag("connect_back_button"),
                     )
                 }
+                banner()
                 Hero(addMode = showBack)
                 if (state.discovering || state.newDiscovered.isNotEmpty()) {
                     DiscoveredServers(

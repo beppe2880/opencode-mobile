@@ -93,6 +93,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOpti
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
 import io.github.beppe2880.opencodemobile.feature.settings.customize.descriptionRes
 import io.github.beppe2880.opencodemobile.feature.settings.customize.searchOptions
+import io.github.beppe2880.opencodemobile.feature.settings.customize.supported
 import io.github.beppe2880.opencodemobile.feature.settings.customize.titleRes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_about
@@ -335,7 +336,7 @@ private fun searchResults(query: String, areas: List<SettingsArea>): List<Settin
     val descriptions = SettingOption.entries.associateWith { option ->
         stringResource(option.descriptionRes) + " " + option.part.label() + " " + option.area.label()
     }
-    return searchOptions(query, { titles.getValue(it) }, { descriptions.getValue(it) }).filter { it.area in areas }
+    return searchOptions(query, { titles.getValue(it) }, { descriptions.getValue(it) }).filter { it.area in areas && it.supported }
 }
 
 @Composable

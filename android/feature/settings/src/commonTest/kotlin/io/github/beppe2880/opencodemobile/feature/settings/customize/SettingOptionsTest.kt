@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -41,8 +42,9 @@ class SettingOptionsTest {
     @Test
     fun optionsApplyOnlyWhenTheirSwitchIsOn() {
         val defaults = AppSettings()
-        // Out of the box every option has an effect.
-        assertTrue(SettingOption.entries.all { it.appliesTo(defaults) })
+        // Out of the box every option of this platform has an effect.
+        assertTrue(SettingOption.entries.filter { it.supported }.all { it.appliesTo(defaults) })
+        assertFalse(SettingOption.ShareOpens.appliesTo(AppSettings(showInShareMenu = false)))
         assertFalse(SettingOption.HeaderStyle.appliesTo(AppSettings(chatHeaderLine = ChatHeaderLine.Folder)))
         assertTrue(SettingOption.HeaderStyle.appliesTo(defaults))
         assertFalse(SettingOption.LiveThinking.appliesTo(AppSettings(followRunningTools = false)))
@@ -50,6 +52,15 @@ class SettingOptionsTest {
         assertFalse(SettingOption.BackShowsList.appliesTo(AppSettings(listPaneHandle = false)))
         assertFalse(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = false))
         assertTrue(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = true))
+    }
+
+    @Test
+    fun sharingIsSetWhereItsSheetIsAndOnlyWhereAppsCanShare() {
+        assertEquals(SettingsPart.NewChat, SettingOption.ShareMenu.part)
+        assertEquals(SettingOption.ShareMenu, SettingOption.ShareOpens.requires)
+        assertEquals(shareTargetSupported, SettingOption.ShareMenu.supported)
+        assertEquals(shareTargetSupported, SettingOption.ShareMenu.appliesTo(AppSettings()))
+        assertTrue(SettingOption.NewChatModel.supported)
     }
 
     @Test
