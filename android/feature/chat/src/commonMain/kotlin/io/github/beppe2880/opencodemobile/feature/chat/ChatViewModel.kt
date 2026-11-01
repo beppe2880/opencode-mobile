@@ -124,6 +124,7 @@ class ChatViewModel(
     /** What running shell tools have printed so far, by call id, and the jobs reading it. */
     private val liveOutput = HashMap<String, String>()
     private val liveJobs = HashMap<String, Job>()
+
     /** Shell of each followed tool, by call id: kept across reloads, which drop it from the metadata. */
     private val toolShells = HashMap<String, String>()
     private var liveOutputIntervalMs: Long = settings.settings.value.liveOutputIntervalMs
