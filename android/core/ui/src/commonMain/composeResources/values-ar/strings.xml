@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">أدوات أخرى قيد التنفيذ</string>
     <string name="oc_part_composer">المحرر وشريحة الوكيل</string>
     <string name="oc_part_selection">تغييرات الوكيل والنموذج</string>
+    <string name="oc_part_voice">الإدخال الصوتي</string>
     <string name="oc_part_new_chat">محادثة جديدة</string>
     <string name="oc_part_session_rows">صفوف الجلسات</string>
     <string name="oc_part_swipe">التنقل بالسحب بين المحادثات</string>

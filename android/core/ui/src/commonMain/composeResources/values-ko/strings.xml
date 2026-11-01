@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">기타 도구 실행 중</string>
     <string name="oc_part_composer">입력창 및 에이전트 칩</string>
     <string name="oc_part_selection">에이전트 및 모델 변경</string>
+    <string name="oc_part_voice">음성 입력</string>
     <string name="oc_part_new_chat">새 채팅</string>
     <string name="oc_part_session_rows">세션 행</string>
     <string name="oc_part_swipe">스와이프로 채팅 전환</string>

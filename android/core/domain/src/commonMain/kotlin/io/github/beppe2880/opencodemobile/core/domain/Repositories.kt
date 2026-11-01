@@ -387,6 +387,16 @@ data class AppSettings(
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */
     val dictation: Boolean = true,
+    /** With [dictation]: what turns the voice into text. */
+    val voiceEngine: VoiceEngine = VoiceEngine.System,
+    /** With [VoiceEngine.Cloud]: where the audio is sent; its API key is kept in secure storage, not here. */
+    val sttProvider: SttProvider = SttProvider.OpenRouter,
+    /** The model picked for each provider; a missing one uses the provider's default (see [sttModel]). */
+    val sttModels: Map<SttProvider, String> = emptyMap(),
+    /** Address of the [SttProvider.Custom] server, e.g. `http://192.168.1.10:8000/v1`. */
+    val sttBaseUrl: String = "",
+    /** With [VoiceEngine.Cloud]: the app language is sent as the language of the audio, otherwise the provider detects it. */
+    val sttLanguageHint: Boolean = true,
     /** When agent and model changes in a chat reach the server. */
     val selectionApply: SelectionApply = SelectionApply.NextMessage,
     /** The model a new chat starts with. */

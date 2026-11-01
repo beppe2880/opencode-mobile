@@ -39,6 +39,8 @@ import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCustomizable
 import io.github.beppe2880.opencodemobile.core.ui.components.PartPreview
@@ -58,6 +60,9 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_se
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_selection_now
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_stop_asks
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_stop_direct
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_cloud
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_off
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_preview_voice_system
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -188,6 +193,7 @@ fun ComposerPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     val c = OcTheme.colors
     Column(modifier.fillMaxWidth().padding(OcSpacing.sm).testTag("composer_preview"), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
         OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }
+        OcCustomizable(SettingsPart.VoiceInput, preview) { VoicePreview(preview.settings) }
         OcCustomizable(SettingsPart.SelectionTiming, preview) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
@@ -230,6 +236,21 @@ private fun PreviewComposer(state: ChatState) {
         onAttachFile = {},
         voice = if (state.dictation) VoiceInput(listening = false, level = 0f) else null,
     )
+}
+
+/** What the microphone does: off, the phone's recognizer, or a sample cloud recording with where it goes. */
+@Composable
+private fun VoicePreview(settings: AppSettings) {
+    Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+        when {
+            !settings.dictation -> Caption(Res.string.chat_preview_voice_off)
+            settings.voiceEngine == VoiceEngine.System -> Caption(Res.string.chat_preview_voice_system)
+            else -> {
+                VoiceStrip(CloudVoicePhase.Recording(elapsedMs = 7_000, level = 0.5f), settings.sttProvider.label, onVoice = {})
+                Caption(Res.string.chat_preview_voice_cloud, settings.sttProvider.label, settings.sttModel())
+            }
+        }
+    }
 }
 
 /** The transcript rows, each in the part it belongs to. */

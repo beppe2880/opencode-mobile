@@ -14,14 +14,47 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class PreferencesRepositoriesTest {
+
+    @Test
+    fun `voice input settings keep system dictation until changed and drop unknown values`() = runBlocking {
+        // An install from before cloud voice input has only the switch.
+        val old = InMemoryPreferences()
+        old.edit().putBoolean("dictation", false).commit()
+        val upgraded = PreferencesSettingsRepository(SharedPreferencesSettings(old)).settings.value
+        assertEquals(false, upgraded.dictation)
+        assertEquals(VoiceEngine.System, upgraded.voiceEngine)
+        assertEquals(SttProvider.OpenRouter, upgraded.sttProvider)
+        assertEquals("openai/whisper-large-v3-turbo", upgraded.sttModel())
+
+        val prefs = InMemoryPreferences()
+        prefs.edit()
+            .putString("voice_engine", "Neural")
+            .putString("stt_provider", "Deepgram")
+            .putString("stt_model_OpenAI", "   ")
+            .putString("stt_model_Groq", "whisper-large-v3")
+            .commit()
+        val read = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
+        assertEquals(VoiceEngine.System, read.voiceEngine)
+        assertEquals(SttProvider.OpenRouter, read.sttProvider)
+        assertEquals(mapOf(SttProvider.Groq to "whisper-large-v3"), read.sttModels)
+        assertEquals("gpt-4o-mini-transcribe", read.sttModel(SttProvider.OpenAI))
+
+        // Going back to a provider's default removes its stored model.
+        val repository = PreferencesSettingsRepository(SharedPreferencesSettings(prefs))
+        repository.update { it.copy(sttModels = emptyMap()) }
+        assertFalse(prefs.contains("stt_model_Groq"))
+    }
 
     @Test
     fun `settings survive a restart and missing keys keep their defaults`() = runBlocking {
@@ -58,6 +91,11 @@ class PreferencesRepositoriesTest {
             showEditMarks = false,
             settingsStyle = SettingsStyle.Preview,
             settingsPreviewFraction = 0.25f,
+            voiceEngine = VoiceEngine.Cloud,
+            sttProvider = SttProvider.Custom,
+            sttModels = mapOf(SttProvider.Groq to "whisper-large-v3", SttProvider.Custom to "Systran/faster-whisper-small"),
+            sttBaseUrl = "http://192.168.1.10:8000/v1",
+            sttLanguageHint = false,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 

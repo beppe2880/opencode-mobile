@@ -13,9 +13,12 @@ import io.github.beppe2880.opencodemobile.core.data.events.ProcessLifecycleVisib
 import io.github.beppe2880.opencodemobile.core.data.server.EncryptedServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.LanServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
+import io.github.beppe2880.opencodemobile.core.data.server.encryptedPreferences
 import io.github.beppe2880.opencodemobile.core.data.share.FileShareStore
 import io.github.beppe2880.opencodemobile.core.data.share.ShareStore
+import io.github.beppe2880.opencodemobile.core.data.stt.AudioRecordVoiceRecorder
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -36,4 +39,7 @@ internal actual val platformDataModule: Module = module {
     // What another app shared, until it is used: private and never backed up.
     single<ShareStore> { FileShareStore(File(androidContext().noBackupFilesDir, "share")) }
     single<Settings>(DraftsStore) { SharedPreferencesSettings(androidContext().getSharedPreferences("drafts", Context.MODE_PRIVATE)) }
+    // Speech-to-text API keys: encrypted with a Keystore key like the server passwords, never backed up.
+    single<Settings>(SttKeysStore) { SharedPreferencesSettings(encryptedPreferences(androidContext(), "opencode_stt_keys")) }
+    single<VoiceRecorder> { AudioRecordVoiceRecorder() }
 }

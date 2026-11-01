@@ -55,6 +55,9 @@ enum class SettingsPart(val area: SettingsArea) {
     /** The prompt field with the agent and model chips and the microphone. */
     ComposerBox(SettingsArea.Composer),
 
+    /** The microphone button: the phone's speech recognition or a cloud provider. */
+    VoiceInput(SettingsArea.Composer),
+
     /** When a picked agent or model reaches the server. */
     SelectionTiming(SettingsArea.Composer),
 

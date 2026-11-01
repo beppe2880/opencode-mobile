@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">Outras ferramentas em andamento</string>
     <string name="oc_part_composer">Compositor e chip do agente</string>
     <string name="oc_part_selection">Alterações de agente e modelo</string>
+    <string name="oc_part_voice">Entrada de voz</string>
     <string name="oc_part_new_chat">Nova conversa</string>
     <string name="oc_part_session_rows">Linhas de sessões</string>
     <string name="oc_part_swipe">Deslizar entre conversas</string>

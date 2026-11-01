@@ -12,9 +12,11 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +61,14 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
+        prefs.putString(KEY_VOICE_ENGINE, next.voiceEngine.name)
+        prefs.putString(KEY_STT_PROVIDER, next.sttProvider.name)
+        SttProvider.entries.forEach { provider ->
+            val model = next.sttModels[provider]?.trim()
+            if (model.isNullOrEmpty()) prefs.remove(KEY_STT_MODEL + provider.name) else prefs.putString(KEY_STT_MODEL + provider.name, model)
+        }
+        prefs.putString(KEY_STT_BASE_URL, next.sttBaseUrl)
+        prefs.putBoolean(KEY_STT_LANGUAGE, next.sttLanguageHint)
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_SHARE_MENU, next.showInShareMenu)
@@ -120,6 +130,13 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
+            voiceEngine = VoiceEngine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_VOICE_ENGINE) } ?: defaults.voiceEngine,
+            sttProvider = SttProvider.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_STT_PROVIDER) } ?: defaults.sttProvider,
+            sttModels = SttProvider.entries.mapNotNull { provider ->
+                prefs.getStringOrNull(KEY_STT_MODEL + provider.name)?.trim()?.takeIf { it.isNotEmpty() }?.let { provider to it }
+            }.toMap(),
+            sttBaseUrl = prefs.getString(KEY_STT_BASE_URL, defaults.sttBaseUrl),
+            sttLanguageHint = prefs.getBoolean(KEY_STT_LANGUAGE, defaults.sttLanguageHint),
             selectionApply = SelectionApply.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SELECTION_APPLY) }
                 ?: defaults.selectionApply,
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
@@ -182,6 +199,13 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
+        const val KEY_VOICE_ENGINE = "voice_engine"
+        const val KEY_STT_PROVIDER = "stt_provider"
+
+        /** Followed by the provider's name, one key per provider. */
+        const val KEY_STT_MODEL = "stt_model_"
+        const val KEY_STT_BASE_URL = "stt_base_url"
+        const val KEY_STT_LANGUAGE = "stt_language_hint"
         const val KEY_SELECTION_APPLY = "selection_apply"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_SHARE_MENU = "show_in_share_menu"

@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile
 import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ScrollMemory
+import io.github.beppe2880.opencodemobile.feature.chat.VoiceInputViewModel
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectViewModel
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerViewModel
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsViewModel
@@ -27,7 +28,8 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     single { ImageMemory() }
     single { ScrollMemory() }
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get()) }
+    viewModel { VoiceInputViewModel(get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
     // The update sheet is offered once per app run.
     single { UpdateSheetSession() }

@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">Autres outils en cours</string>
     <string name="oc_part_composer">Compositeur et puce d’agent</string>
     <string name="oc_part_selection">Changements d’agent et de modèle</string>
+    <string name="oc_part_voice">Saisie vocale</string>
     <string name="oc_part_new_chat">Nouveau chat</string>
     <string name="oc_part_session_rows">Lignes des sessions</string>
     <string name="oc_part_swipe">Balayer entre les discussions</string>

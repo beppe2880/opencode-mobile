@@ -12,8 +12,11 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
@@ -54,9 +57,24 @@ data class SettingsState(
     val running: Boolean = false,
     /** Text of the search field; options matching it replace the groups. */
     val query: String = "",
+    /** Speech-to-text providers with an API key saved on this device. */
+    val sttKeys: Set<SttProvider> = emptySet(),
+    /** The last "Test" of the cloud voice settings; null before one or after a change. */
+    val sttTest: SttTest? = null,
+    /** Models a provider listed when asked (OpenRouter); shown with the curated ones. */
+    val sttListedModels: Map<SttProvider, List<String>> = emptyMap(),
+    val sttModelsLoading: Boolean = false,
 ) {
     /** Notifications are on and the system lets the app post them. */
     val notificationsOn: Boolean get() = settings.notifications && notificationsAllowed
+}
+
+/** Outcome of the speech-to-text "Test" button. */
+sealed interface SttTest {
+    data object Running : SttTest
+    data object Passed : SttTest
+
+    data class Failed(val error: TranscriptionError) : SttTest
 }
 
 sealed interface SettingsEvent {
@@ -118,6 +136,19 @@ sealed interface SettingsEvent {
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
+    data class VoiceEngineChanged(val engine: VoiceEngine) : SettingsEvent
+    data class SttProviderChanged(val provider: SttProvider) : SettingsEvent
+
+    /** The model of the selected provider; blank goes back to its default. */
+    data class SttModelChanged(val model: String) : SettingsEvent
+    data class SttBaseUrlChanged(val url: String) : SettingsEvent
+    data class SttLanguageHintChanged(val enabled: Boolean) : SettingsEvent
+
+    /** Stores [key] for the selected provider in secure storage; the field is cleared by the UI. */
+    data class SaveSttKey(val key: String) : SettingsEvent
+    data object RemoveSttKey : SettingsEvent
+    data object TestStt : SettingsEvent
+    data object LoadSttModels : SettingsEvent
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class ShowInShareMenuChanged(val enabled: Boolean) : SettingsEvent

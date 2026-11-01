@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Mic
@@ -52,7 +53,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextRange
@@ -65,9 +68,13 @@ import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
@@ -90,6 +97,21 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_shell_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_shell_hint_in
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_steer
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_stop
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_cancel
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discard
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_address
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_microphone
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_network
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_no_key
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_provider
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_rate_limited
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_too_large
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_error_unauthorized
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_record
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_recording
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_retry
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_stop
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_transcribing
 import org.jetbrains.compose.resources.stringResource
 
 /** Bottom composer card: attachments, text input, agent + model selectors, send / stop. */
@@ -102,6 +124,7 @@ internal fun Composer(
     modifier: Modifier = Modifier,
     voice: VoiceInput? = null,
     onDictate: () -> Unit = {},
+    onVoice: (VoiceInputEvent) -> Unit = {},
 ) {
     val c = OcTheme.colors
     val haptics = LocalHapticFeedback.current
@@ -135,6 +158,16 @@ internal fun Composer(
             var field by remember { mutableStateOf(TextFieldValue(state.draft, TextRange(state.draft.length))) }
             val value = if (field.text == state.draft) field else TextFieldValue(state.draft, TextRange(state.draft.length))
             LaunchedEffect(value) { field = value }
+            // A cloud transcript goes where the cursor is, ready to edit; it is never sent by itself.
+            voice?.transcript?.let { pending ->
+                LaunchedEffect(pending.id) {
+                    val current = if (field.text == state.draft) field else TextFieldValue(state.draft, TextRange(state.draft.length))
+                    val (text, cursor) = insertSpoken(current.text, current.selection.min, current.selection.max, pending.text)
+                    field = TextFieldValue(text, TextRange(cursor))
+                    onEvent(ChatEvent.DraftChanged(text))
+                    onVoice(VoiceInputEvent.TranscriptInserted(pending.id))
+                }
+            }
             BasicTextField(
                 value = value,
                 onValueChange = {
@@ -161,6 +194,10 @@ internal fun Composer(
                     }
                 },
             )
+            val cloud = voice?.cloud
+            AnimatedVisibility(visible = cloud != null && cloud != CloudVoicePhase.Idle) {
+                if (cloud != null && cloud != CloudVoicePhase.Idle) VoiceStrip(cloud, voice.provider, onVoice)
+            }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                 // Selectors take only the space the stop/send buttons leave; on narrow phones the
                 // model chip shrinks and ellipsizes instead of pushing the buttons off screen.
@@ -185,7 +222,7 @@ internal fun Composer(
                             .testTag("chat_model_selector"),
                     )
                 }
-                if (voice != null) MicButton(voice, onDictate)
+                if (voice != null) Box(Modifier.editable(SettingsPart.VoiceInput, LocalEditMode.current)) { MicButton(voice, onDictate) }
                 if (state.running) {
                     OcRoundIconButton(
                         icon = Icons.Filled.Stop,
@@ -221,7 +258,32 @@ internal fun Composer(
 @Composable
 private fun MicButton(voice: VoiceInput, onClick: () -> Unit) {
     val c = OcTheme.colors
-    if (voice.listening) {
+    val cloud = voice.cloud
+    if (cloud is CloudVoicePhase.Recording) {
+        val scale by animateFloatAsState(1f + cloud.level * 0.15f, label = "mic_level")
+        OcRoundIconButton(
+            icon = Icons.Filled.Stop,
+            contentDescription = stringResource(Res.string.chat_voice_stop),
+            onClick = onClick,
+            container = c.bgAccent,
+            content = c.onAccent,
+            modifier = Modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                }
+                .testTag("chat_mic_button"),
+        )
+    } else if (cloud == CloudVoicePhase.Transcribing) {
+        // The strip above offers to cancel; a second recording waits for this one.
+        OcIconButton(
+            icon = Icons.Outlined.Mic,
+            contentDescription = stringResource(Res.string.chat_voice_transcribing),
+            onClick = {},
+            enabled = false,
+            modifier = Modifier.testTag("chat_mic_button"),
+        )
+    } else if (voice.listening) {
         val listening = stringResource(Res.string.chat_dictation_listening)
         val scale by animateFloatAsState(1f + voice.level * 0.15f, label = "mic_level")
         OcRoundIconButton(
@@ -241,11 +303,82 @@ private fun MicButton(voice: VoiceInput, onClick: () -> Unit) {
     } else {
         OcIconButton(
             icon = Icons.Outlined.Mic,
-            contentDescription = stringResource(Res.string.chat_dictation_start),
+            contentDescription = stringResource(if (cloud != null) Res.string.chat_voice_record else Res.string.chat_dictation_start),
             onClick = onClick,
             modifier = Modifier.testTag("chat_mic_button"),
         )
     }
+}
+
+/** What a cloud recording is doing: elapsed time and loudness, the wait for the provider, or what failed. */
+@Composable
+internal fun VoiceStrip(phase: CloudVoicePhase, provider: String, onVoice: (VoiceInputEvent) -> Unit) {
+    val c = OcTheme.colors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = OcSpacing.xs, top = OcSpacing.xs)
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .testTag("chat_voice_strip"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+    ) {
+        when (phase) {
+            is CloudVoicePhase.Recording -> {
+                OcPulsingDot(c.danger.fg)
+                Text(
+                    stringResource(Res.string.chat_voice_recording, formatElapsed(phase.elapsedMs)),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = c.textBase,
+                    modifier = Modifier.weight(1f).testTag("chat_voice_elapsed"),
+                )
+            }
+            CloudVoicePhase.Transcribing -> {
+                OcSpinner()
+                Text(
+                    stringResource(Res.string.chat_voice_transcribing),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = c.textMuted,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            is CloudVoicePhase.Failed -> {
+                Icon(Icons.Outlined.ErrorOutline, contentDescription = null, tint = c.danger.fg, modifier = Modifier.size(16.dp))
+                Text(
+                    voiceErrorText(phase, provider),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = c.danger.fg,
+                    modifier = Modifier.weight(1f).testTag("chat_voice_error"),
+                )
+                OcButton(
+                    text = stringResource(Res.string.chat_voice_retry),
+                    onClick = { onVoice(VoiceInputEvent.Retry) },
+                    variant = OcButtonVariant.Secondary,
+                    compact = true,
+                    modifier = Modifier.testTag("chat_voice_retry"),
+                )
+            }
+            CloudVoicePhase.Idle -> Unit
+        }
+        OcIconButton(
+            icon = Icons.Outlined.Close,
+            contentDescription = stringResource(if (phase is CloudVoicePhase.Failed) Res.string.chat_voice_discard else Res.string.chat_voice_cancel),
+            onClick = { onVoice(VoiceInputEvent.Cancel) },
+            modifier = Modifier.testTag("chat_voice_cancel"),
+        )
+    }
+}
+
+@Composable
+private fun voiceErrorText(failure: CloudVoicePhase.Failed, provider: String): String = when (failure.error) {
+    VoiceError.NoKey -> stringResource(Res.string.chat_voice_error_no_key, provider)
+    VoiceError.BadAddress -> stringResource(Res.string.chat_voice_error_address)
+    VoiceError.Unauthorized -> stringResource(Res.string.chat_voice_error_unauthorized, provider)
+    VoiceError.RateLimited -> stringResource(Res.string.chat_voice_error_rate_limited, provider)
+    VoiceError.TooLarge -> stringResource(Res.string.chat_voice_error_too_large, provider)
+    VoiceError.Network -> stringResource(Res.string.chat_voice_error_network, provider)
+    VoiceError.Provider -> stringResource(Res.string.chat_voice_error_provider, provider, failure.detail.orEmpty())
+    VoiceError.Microphone -> stringResource(Res.string.chat_voice_error_microphone)
 }
 
 /** Shown while the draft is a `!command`: it runs in the shell instead of going to the agent. */
