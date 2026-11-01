@@ -20,8 +20,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.After
@@ -87,7 +87,7 @@ class LiveServerTest {
                 override val isVisible = MutableStateFlow(true)
             },
             object : NetworkMonitor {
-                override val connected = emptyFlow<Boolean>()
+                override val connected = flowOf(true)
             },
             scope,
         )

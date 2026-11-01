@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepos
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -26,6 +28,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
@@ -176,6 +179,89 @@ class RemoteTerminalRepositoryTest {
         assertEquals("out:xyz", describeOne(updates.receive()))
         assertEquals("Exited", describeOne(updates.receive()))
         collector.cancel()
+        assertEquals(1, server.requestCount)
+    }
+
+    @Test
+    fun `a terminal shown while offline waits, looks disconnected and resumes from its cursor online`() = runBlocking {
+        val visible = MutableStateFlow(true)
+        val closed = CountDownLatch(1)
+        server.enqueue(
+            MockResponse().withWebSocketUpgrade(
+                object : WebSocketListener() {
+                    override fun onOpen(webSocket: WebSocket, response: Response) {
+                        webSocket.send(cursorFrame(3))
+                    }
+
+                    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                        webSocket.close(1000, null)
+                        closed.countDown()
+                    }
+
+                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = closed.countDown()
+                },
+            ),
+        )
+        server.enqueue(
+            socket({ ws ->
+                ws.send(cursorFrame(3))
+                ws.send("new")
+                ws.close(1000, null)
+            }),
+        )
+        val updates = Channel<TerminalUpdate>(Channel.UNLIMITED)
+        val collector = launch {
+            terminals.attach("/work", "pty_1", emptyFlow(), visible).collect { updates.send(it) }
+            updates.close()
+        }
+        assertEquals("Connecting", describeOne(updates.receive()))
+        assertEquals("Connected", describeOne(updates.receive()))
+
+        // Hidden first, then the network goes: the network was online when the loop last checked it.
+        visible.value = false
+        assertTrue(withContext(Dispatchers.IO) { closed.await(5, TimeUnit.SECONDS) })
+        // Lets the attach loop come back to its wait while still online.
+        delay(300)
+        network.state.value = false
+        visible.value = true
+        assertEquals("Reconnecting", describeOne(withTimeout(5_000) { updates.receive() }))
+        delay(500)
+        assertEquals(1, server.requestCount)
+
+        network.state.value = true
+        assertEquals("Connected", describeOne(withTimeout(5_000) { updates.receive() }))
+        assertEquals("out:new", describeOne(updates.receive()))
+        assertEquals("Exited", describeOne(updates.receive()))
+        collector.join()
+        server.takeRequest()
+        assertEquals("/api/pty/pty_1/connect?location%5Bdirectory%5D=%2Fwork&cursor=3", server.takeRequest().path)
+    }
+
+    @Test
+    fun `a network that returns while the terminal is hidden waits until it is shown`() = runBlocking {
+        val visible = MutableStateFlow(true)
+        network.state.value = false
+        server.enqueue(
+            socket({ ws ->
+                ws.send(cursorFrame(0))
+                ws.close(1000, null)
+            }),
+        )
+        val updates = Channel<TerminalUpdate>(Channel.UNLIMITED)
+        val collector = launch {
+            terminals.attach("/work", "pty_1", emptyFlow(), visible).collect { updates.send(it) }
+            updates.close()
+        }
+        assertEquals("Connecting", describeOne(updates.receive()))
+        visible.value = false
+        network.state.value = true
+        delay(500)
+        assertEquals(0, server.requestCount)
+
+        visible.value = true
+        assertEquals("Connected", describeOne(withTimeout(5_000) { updates.receive() }))
+        assertEquals("Exited", describeOne(updates.receive()))
+        collector.join()
         assertEquals(1, server.requestCount)
     }
 

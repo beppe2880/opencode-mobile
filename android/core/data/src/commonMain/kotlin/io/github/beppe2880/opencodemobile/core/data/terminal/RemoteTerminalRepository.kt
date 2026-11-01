@@ -21,6 +21,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
@@ -57,13 +59,22 @@ internal class RemoteTerminalRepository(
         // Absolute output position already shown; null until the first replay ends.
         var cursor: Long? = null
         var failures = 0
+        var link: TerminalLink? = null
+        suspend fun link(state: TerminalLink) {
+            if (state != link) send(TerminalUpdate.Link(state))
+            link = state
+        }
         val gate = NetworkGate(network)
         gate.start(this)
         try {
-            send(TerminalUpdate.Link(TerminalLink.Connecting))
+            link(TerminalLink.Connecting)
             while (true) {
-                gate.waitToAttempt()
-                visible.firstOrNull { it } ?: awaitCancellation()
+                // Both at once: the network can go while the terminal is hidden, and the other way round.
+                combine(visible, gate.connected, ::Pair).first { (shown, online) ->
+                    // Shown without a network: the old connection is gone, so do not look connected.
+                    if (shown && !online && cursor != null) link(TerminalLink.Reconnecting)
+                    shown && online
+                }
                 var hidden = false
                 var failure: Throwable? = null
                 val connection = launch {
@@ -73,7 +84,7 @@ internal class RemoteTerminalRepository(
                                 is PtyFrame.Cursor -> {
                                     cursor = frame.value
                                     failures = 0
-                                    send(TerminalUpdate.Link(TerminalLink.Connected))
+                                    link(TerminalLink.Connected)
                                 }
 
                                 is PtyFrame.Output -> {
@@ -99,20 +110,24 @@ internal class RemoteTerminalRepository(
                 }
                 connection.join()
                 watcher.cancel()
-                if (hidden) continue
+                if (hidden) {
+                    // Closed for hiding: the screen keeps its last state, the next one is sent again.
+                    link = null
+                    continue
+                }
                 if (failure == null) break
                 when (val error = failure.toOpenCodeError()) {
                     is OpenCodeError.NotFound -> break
                     is OpenCodeError.Unauthorized -> throw error
                     else -> {
-                        send(TerminalUpdate.Link(TerminalLink.Reconnecting))
+                        link(TerminalLink.Reconnecting)
                         visible.firstOrNull { it } ?: awaitCancellation()
                         gate.waitAfterFailure(retryDelaysMillis[minOf(failures, retryDelaysMillis.lastIndex)])
                         failures++
                     }
                 }
             }
-            send(TerminalUpdate.Link(TerminalLink.Exited))
+            link(TerminalLink.Exited)
         } finally {
             gate.stop()
         }
