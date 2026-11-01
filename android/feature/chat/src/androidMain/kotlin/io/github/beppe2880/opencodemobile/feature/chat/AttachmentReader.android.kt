@@ -145,8 +145,23 @@ fun readSharedImage(resolver: ContentResolver, uri: Uri): PromptAttachment? {
     // Whatever the other app's provider throws, the share only loses this image.
     return try {
         val type = resolver.getType(uri)
-        if (type == null || !type.lowercase().startsWith("image/")) null else AttachmentReader.read(resolver, uri)
+        if (type == null || !type.lowercase().startsWith("image/")) {
+            null
+        } else {
+            AttachmentReader.read(resolver, uri)?.let { it.copy(name = sharedFileName(it.name)) }
+        }
     } catch (_: RuntimeException) {
         null
     }
 }
+
+/** The display name another app gave a shared file, cut to a plain bounded file name. */
+internal fun sharedFileName(raw: String): String {
+    val name = raw.substringAfterLast('/').substringAfterLast('\\')
+        .filterNot { it.isISOControl() }
+        .trim()
+        .take(MAX_SHARED_NAME)
+    return name.ifEmpty { "image" }
+}
+
+private const val MAX_SHARED_NAME = 120

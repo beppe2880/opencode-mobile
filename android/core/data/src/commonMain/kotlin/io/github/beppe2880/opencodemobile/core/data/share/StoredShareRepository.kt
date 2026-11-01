@@ -42,7 +42,11 @@ class MemoryShareStore : ShareStore {
     }
 }
 
-/** The waiting share in memory, mirrored to [store] so it survives the app being stopped. */
+/**
+ * The waiting share in memory, mirrored to [store] so it survives the app being stopped.
+ * [scope] (the app scope) only reads the stored share once at start, so [pending] shows it
+ * without a caller; every change is a suspend call owned by its caller.
+ */
 class StoredShareRepository(
     private val store: ShareStore,
     scope: CoroutineScope,
