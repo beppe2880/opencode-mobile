@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">Agent is running</string>
     <string name="sessions_new_show_all">Show all %1$d projects</string>
     <string name="sessions_untitled">Untitled session</string>
+    <string name="sessions_preview_swipe_on">Swipe left or right in a chat to open the next or previous session</string>
+    <string name="sessions_preview_swipe_off">Off: go back to the list to open another session</string>
+    <string name="sessions_preview_wide">On unfolded foldables and tablets</string>
+    <string name="sessions_preview_split_off">The chat opens over the list, also on wide screens</string>
+    <string name="sessions_preview_back_list">Back with the list hidden shows it again</string>
+    <string name="sessions_preview_back_leave">Back with the list hidden leaves the app</string>
 </resources>

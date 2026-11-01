@@ -172,4 +172,12 @@
     <string name="chat_running_refresh">실행 중인 작업 새로 고침</string>
     <string name="chat_running_stop_title">이 명령을 중지할까요?</string>
     <string name="chat_running_stop_message">%1$s\n\n명령이 종료되며 출력은 더 이상 볼 수 없습니다.</string>
+    <string name="chat_preview_folds">실시간으로 따라간 단계는 답변이 끝나면 다시 접힙니다</string>
+    <string name="chat_preview_kept_open">실시간으로 따라간 단계는 답변 후에도 열린 상태로 유지됩니다</string>
+    <string name="chat_preview_not_followed">실행 중인 단계는 열기 전까지 접힌 상태로 유지됩니다</string>
+    <string name="chat_preview_refresh">%1$s마다 새 출력</string>
+    <string name="chat_preview_selection_next">입력창에서 선택: 다음 메시지를 보내면 채팅이 해당 항목으로 전환됩니다</string>
+    <string name="chat_preview_selection_now">입력창에서 선택: 채팅이 즉시 해당 항목으로 전환됩니다</string>
+    <string name="chat_preview_stop_asks">실행 중 시트에서 명령을 중지하면 먼저 확인합니다</string>
+    <string name="chat_preview_stop_direct">실행 중 시트에서 명령을 중지하면 즉시 종료됩니다</string>
 </resources>

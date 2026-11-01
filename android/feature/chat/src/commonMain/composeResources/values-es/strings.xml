@@ -183,4 +183,12 @@
     <string name="chat_running_refresh">Actualizar trabajo en ejecución</string>
     <string name="chat_running_stop_title">¿Detener este comando?</string>
     <string name="chat_running_stop_message">%1$s\n\nEl comando se termina y su salida ya no está disponible.</string>
+    <string name="chat_preview_folds">Los pasos seguidos en directo se pliegan al terminar la respuesta</string>
+    <string name="chat_preview_kept_open">Los pasos seguidos en directo quedan abiertos tras la respuesta</string>
+    <string name="chat_preview_not_followed">Los pasos en ejecución permanecen plegados hasta que los abras</string>
+    <string name="chat_preview_refresh">Nueva salida cada %1$s</string>
+    <string name="chat_preview_selection_next">Elegido en el redactor: el chat cambia a ellos al enviar el siguiente mensaje</string>
+    <string name="chat_preview_selection_now">Elegido en el redactor: el chat cambia a ellos al instante</string>
+    <string name="chat_preview_stop_asks">Detener un comando desde la hoja En ejecución pide confirmación primero</string>
+    <string name="chat_preview_stop_direct">Detener un comando desde la hoja En ejecución lo termina al instante</string>
 </resources>

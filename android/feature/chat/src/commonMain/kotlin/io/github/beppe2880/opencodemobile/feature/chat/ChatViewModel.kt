@@ -162,24 +162,7 @@ class ChatViewModel(
                 headerLine = s.chatHeaderLine
                 headerOpens = s.headerOpens
                 if (vcsTurnedOn) refreshBranch()
-                updateState {
-                    it.copy(
-                        expandToolsByDefault = s.expandToolsByDefault,
-                        live = LiveFollow.of(s),
-                        showFullCommands = s.showFullCommands,
-                        showToolDetails = s.showToolDetails,
-                        outputPreviewLines = s.outputPreviewLines,
-                        keepLiveStepsOpen = s.keepLiveStepsOpen,
-                        chatTextScale = s.chatTextScale,
-                        showCost = s.showCost,
-                        swipeEnabled = s.swipeBetweenChats,
-                        agentColorOutline = s.agentColorOutline,
-                        dictation = s.dictation,
-                        permissionsCollapsedByDefault = s.permissionsCollapsed,
-                        questionsCollapsedByDefault = s.questionsCollapsed,
-                        headerStyle = s.chatHeaderStyle,
-                    )
-                }
+                updateState { it.withSettings(s) }
                 rebuild()
             }
         }
@@ -1209,7 +1192,7 @@ class ChatViewModel(
 
     private fun vcsLine(visible: List<Message>): VcsLine? {
         if (!vcsInHeader) return null
-        val folder = folderName(currentState.directory).takeIf { headerLine == ChatHeaderLine.FolderBranchFiles }
+        val folder = headerFolder(headerLine, currentState.directory)
         return when (inRepository) {
             true -> VcsLine(folder, branch?.current, changedFiles)
             false -> agentEditedFiles(visible).takeIf { it > 0 }?.let { VcsLine(folder, null, it, agentEdits = true) }

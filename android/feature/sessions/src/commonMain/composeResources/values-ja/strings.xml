@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">エージェントが実行中です</string>
     <string name="sessions_new_show_all">全 %1$d 件のプロジェクトを表示</string>
     <string name="sessions_untitled">無題のセッション</string>
+    <string name="sessions_preview_swipe_on">チャットで左右にスワイプすると、次または前のセッションを開きます</string>
+    <string name="sessions_preview_swipe_off">オフ：リストに戻って別のセッションを開きます</string>
+    <string name="sessions_preview_wide">展開したフォルダブル端末とタブレットで</string>
+    <string name="sessions_preview_split_off">ワイド画面でも、チャットはリストの上に開きます</string>
+    <string name="sessions_preview_back_list">リストが非表示のときに戻るとリストが再表示されます</string>
+    <string name="sessions_preview_back_leave">リストが非表示のときに戻るとアプリを終了します</string>
 </resources>

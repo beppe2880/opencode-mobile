@@ -183,4 +183,12 @@
     <string name="chat_running_refresh">Laufende Vorgänge aktualisieren</string>
     <string name="chat_running_stop_title">Diesen Befehl beenden?</string>
     <string name="chat_running_stop_message">%1$s\n\nDer Befehl wird beendet und seine Ausgabe ist nicht mehr verfügbar.</string>
+    <string name="chat_preview_folds">Live verfolgte Schritte klappen am Ende der Antwort wieder zu</string>
+    <string name="chat_preview_kept_open">Live verfolgte Schritte bleiben nach der Antwort geöffnet</string>
+    <string name="chat_preview_not_followed">Laufende Schritte bleiben zugeklappt, bis du sie öffnest</string>
+    <string name="chat_preview_refresh">Neue Ausgabe alle %1$s</string>
+    <string name="chat_preview_selection_next">Im Eingabefeld gewählt: Der Chat wechselt zu ihnen, wenn du die nächste Nachricht sendest</string>
+    <string name="chat_preview_selection_now">Im Eingabefeld gewählt: Der Chat wechselt sofort zu ihnen</string>
+    <string name="chat_preview_stop_asks">Einen Befehl im Blatt Laufend zu stoppen, fragt zuerst nach</string>
+    <string name="chat_preview_stop_direct">Einen Befehl im Blatt Laufend zu stoppen, beendet ihn sofort</string>
 </resources>

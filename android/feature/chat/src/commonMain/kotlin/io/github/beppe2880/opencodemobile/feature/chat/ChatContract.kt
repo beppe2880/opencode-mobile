@@ -2,7 +2,9 @@ package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.Agent
+import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
+import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
@@ -144,6 +146,28 @@ data class ChatState(
 
     fun isFormCollapsed(formId: String): Boolean = (formId in toggledForms) != questionsCollapsedByDefault
 }
+
+/** The display settings of the chat; shared by the chat and its preview in Settings. */
+internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
+    expandToolsByDefault = s.expandToolsByDefault,
+    live = LiveFollow.of(s),
+    showFullCommands = s.showFullCommands,
+    showToolDetails = s.showToolDetails,
+    outputPreviewLines = s.outputPreviewLines,
+    keepLiveStepsOpen = s.keepLiveStepsOpen,
+    chatTextScale = s.chatTextScale,
+    showCost = s.showCost,
+    swipeEnabled = s.swipeBetweenChats,
+    agentColorOutline = s.agentColorOutline,
+    dictation = s.dictation,
+    permissionsCollapsedByDefault = s.permissionsCollapsed,
+    questionsCollapsedByDefault = s.questionsCollapsed,
+    headerStyle = s.chatHeaderStyle,
+)
+
+/** The folder name of the header line, when [line] includes it. */
+internal fun headerFolder(line: ChatHeaderLine, directory: String): String? =
+    folderName(directory).takeIf { line == ChatHeaderLine.FolderBranchFiles }
 
 data class SessionPeek(val id: String, val title: String)
 

@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">에이전트 실행 중</string>
     <string name="sessions_new_show_all">프로젝트 %1$d개 모두 보기</string>
     <string name="sessions_untitled">제목 없는 세션</string>
+    <string name="sessions_preview_swipe_on">채팅에서 왼쪽 또는 오른쪽으로 밀어 다음 또는 이전 세션을 엽니다</string>
+    <string name="sessions_preview_swipe_off">끔: 목록으로 돌아가 다른 세션을 엽니다</string>
+    <string name="sessions_preview_wide">펼친 폴더블 기기와 태블릿에서</string>
+    <string name="sessions_preview_split_off">넓은 화면에서도 채팅은 목록 위에 열립니다</string>
+    <string name="sessions_preview_back_list">목록이 숨겨진 상태에서 뒤로 가기를 누르면 목록이 다시 표시됩니다</string>
+    <string name="sessions_preview_back_leave">목록이 숨겨진 상태에서 뒤로 가기를 누르면 앱이 종료됩니다</string>
 </resources>

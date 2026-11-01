@@ -63,10 +63,13 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -178,6 +181,7 @@ internal fun Composer(
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .widthIn(max = 280.dp)
+                            .editable(SettingsPart.SelectionTiming, LocalEditMode.current)
                             .testTag("chat_model_selector"),
                     )
                 }
@@ -366,7 +370,7 @@ private fun AgentSelector(agents: List<Agent>, selected: String?, onSelect: (Str
                 }
             },
             dotColor = c.agents.forAgent(label),
-            modifier = Modifier.testTag("chat_agent_selector"),
+            modifier = Modifier.editable(SettingsPart.SelectionTiming, LocalEditMode.current).testTag("chat_agent_selector"),
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, containerColor = c.bgBase, modifier = Modifier.exposeTestTags()) {
             agents.forEach { agent ->

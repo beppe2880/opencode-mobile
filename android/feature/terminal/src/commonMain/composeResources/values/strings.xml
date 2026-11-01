@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Done</string>
     <string name="terminal_fullscreen">Full screen</string>
     <string name="terminal_fullscreen_exit">Exit full screen</string>
+    <string name="terminal_preview_fullscreen">Full screen: no title bar and no system bars</string>
+    <string name="terminal_preview_keyboard_on">The keyboard opens with the terminal</string>
+    <string name="terminal_preview_keyboard_off">The keyboard opens when you tap the terminal</string>
 </resources>

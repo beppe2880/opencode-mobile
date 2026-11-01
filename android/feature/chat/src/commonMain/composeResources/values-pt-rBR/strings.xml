@@ -183,4 +183,12 @@
     <string name="chat_running_refresh">Atualizar trabalho em execução</string>
     <string name="chat_running_stop_title">Parar este comando?</string>
     <string name="chat_running_stop_message">%1$s\n\nO comando é encerrado e sua saída não está mais disponível.</string>
+    <string name="chat_preview_folds">Passos acompanhados ao vivo são recolhidos quando a resposta termina</string>
+    <string name="chat_preview_kept_open">Passos acompanhados ao vivo permanecem abertos após a resposta</string>
+    <string name="chat_preview_not_followed">Passos em execução ficam recolhidos até você abri-los</string>
+    <string name="chat_preview_refresh">Nova saída a cada %1$s</string>
+    <string name="chat_preview_selection_next">Escolhido no compositor: o chat muda para eles quando você enviar a próxima mensagem</string>
+    <string name="chat_preview_selection_now">Escolhido no compositor: o chat muda para eles imediatamente</string>
+    <string name="chat_preview_stop_asks">Parar um comando pela folha Em execução pede confirmação primeiro</string>
+    <string name="chat_preview_stop_direct">Parar um comando pela folha Em execução o encerra imediatamente</string>
 </resources>

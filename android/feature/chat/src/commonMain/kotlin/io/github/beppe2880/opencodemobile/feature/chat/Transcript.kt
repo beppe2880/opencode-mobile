@@ -53,12 +53,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -182,7 +185,6 @@ internal fun Transcript(
         }
         if (state.synced) seenNewest = newest
     }
-    val defaultToolsExpanded = state.expandToolsByDefault
     // While the agent works, its newest tool group stays open between one tool and the next.
     val liveGroupKey = remember(state.items, state.running, state.live) {
         if (!state.running || state.live == null) null
@@ -192,13 +194,7 @@ internal fun Transcript(
     val followed = remember(state.sessionId) { mutableStateSetOf<String>() }
     LaunchedEffect(liveGroupKey) { liveGroupKey?.let(followed::add) }
     val keptOpen: (String) -> Boolean = { key -> state.keepLiveStepsOpen && key != liveGroupKey && key in followed }
-    val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
-    val onToggle: (String) -> Unit = { key -> onEvent(ChatEvent.Toggle(key)) }
-    val density = LocalDensity.current
-    CompositionLocalProvider(
-        LocalDensity provides Density(density.density, density.fontScale * state.chatTextScale),
-        LocalOutputLines provides state.outputPreviewLines,
-    ) {
+    TranscriptLocals(state) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 state = listState,
@@ -210,73 +206,17 @@ internal fun Transcript(
             ) {
                 olderHistory(state, onEvent)
                 items(state.items, key = { it.key }, contentType = { it::class }) { item ->
-                    val rowModifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter)
-                    when (item) {
-                        is ChatItem.User -> UserBubble(
-                            item = item,
-                            modifier = rowModifier,
-                            onLongPress = if (item.pending) null else { { actionsFor = item.key } },
-                            onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
-                            directory = state.directory,
-                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                        )
-                        is ChatItem.Text -> AssistantText(item, cache, rowModifier)
-                        is ChatItem.Reasoning -> ReasoningBlock(
-                            item = item,
-                            expanded = state.isExpanded("r:${item.key}"),
-                            onToggle = { onToggle("r:${item.key}") },
-                            modifier = rowModifier,
-                            live = state.live,
-                        )
-                        is ChatItem.Thoughts -> ThoughtsGroup(
-                            item = item,
-                            expanded = state.isExpanded("t:${item.key}"),
-                            isExpanded = isExpanded,
-                            onToggle = onToggle,
-                            modifier = rowModifier,
-                            live = state.live,
-                        )
-                        is ChatItem.Tools -> ToolsGroup(
-                            item = item,
-                            directory = state.directory,
-                            expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
-                            isExpanded = isExpanded,
-                            onToggle = onToggle,
-                            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                            modifier = rowModifier,
-                            live = state.live,
-                            fullCommands = state.showFullCommands,
-                            inLiveGroup = item.key == liveGroupKey,
-                            details = state.showToolDetails || keptOpen(item.key),
-                        )
-                        is ChatItem.Activity -> ActivityGroup(
-                            item = item,
-                            directory = state.directory,
-                            expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
-                            inLiveGroup = item.key == liveGroupKey,
-                            details = state.showToolDetails || keptOpen(item.key),
-                            defaultToolsExpanded = defaultToolsExpanded,
-                            isExpanded = isExpanded,
-                            onToggle = onToggle,
-                            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-                            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-                            modifier = rowModifier,
-                            live = state.live,
-                            fullCommands = state.showFullCommands,
-                        )
-                        is ChatItem.Error -> ErrorRow(item, rowModifier)
-                        is ChatItem.Notice -> NoticeRow(
-                            item = item,
-                            cache = cache,
-                            expanded = state.isExpanded("n:${item.key}"),
-                            onToggle = { onToggle("n:${item.key}") },
-                            modifier = rowModifier,
-                        )
-                        is ChatItem.Shell -> ShellBlock(item, rowModifier)
-                        is ChatItem.Footer -> TurnFooter(item, onCopy, rowModifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
-                        is ChatItem.Working -> WorkingRow(rowModifier)
-                    }
+                    TranscriptItem(
+                        item = item,
+                        state = state,
+                        onEvent = onEvent,
+                        onCopy = onCopy,
+                        cache = cache,
+                        modifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter),
+                        liveGroupKey = liveGroupKey,
+                        keptOpen = keptOpen,
+                        onUserActions = { actionsFor = it },
+                    )
                 }
             }
             AnimatedVisibility(
@@ -345,6 +285,106 @@ internal fun Transcript(
 internal suspend fun LazyListState.scrollToLatest() {
     val last = layoutInfo.totalItemsCount - 1
     if (last >= 0) scrollToItem(last, Int.MAX_VALUE)
+}
+
+/** The chat text size and the tool output length of the settings, for transcript rows. */
+@Composable
+internal fun TranscriptLocals(state: ChatState, content: @Composable () -> Unit) {
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(density.density, density.fontScale * state.chatTextScale),
+        LocalOutputLines provides state.outputPreviewLines,
+        content = content,
+    )
+}
+
+/**
+ * One transcript row as the settings in [state] show it. [liveGroupKey] is the group followed
+ * live, [keptOpen] tells the groups kept open after it; [onUserActions] opens a prompt's actions.
+ */
+@Composable
+internal fun TranscriptItem(
+    item: ChatItem,
+    state: ChatState,
+    onEvent: (ChatEvent) -> Unit,
+    onCopy: (String) -> Unit,
+    cache: MarkdownCache,
+    modifier: Modifier = Modifier,
+    liveGroupKey: String? = null,
+    keptOpen: (String) -> Boolean = { false },
+    onUserActions: ((String) -> Unit)? = null,
+) {
+    val defaultToolsExpanded = state.expandToolsByDefault
+    val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
+    // Rows show a part of the chat settings: the live demo's edit mode opens its options.
+    val modifier = item.part()?.let { modifier.editable(it, LocalEditMode.current) } ?: modifier
+    val onToggle: (String) -> Unit = { key -> onEvent(ChatEvent.Toggle(key)) }
+    when (item) {
+        is ChatItem.User -> UserBubble(
+            item = item,
+            modifier = modifier,
+            onLongPress = if (item.pending || onUserActions == null) null else { { onUserActions(item.key) } },
+            onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
+            directory = state.directory,
+            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+        )
+        is ChatItem.Text -> AssistantText(item, cache, modifier)
+        is ChatItem.Reasoning -> ReasoningBlock(
+            item = item,
+            expanded = state.isExpanded("r:${item.key}"),
+            onToggle = { onToggle("r:${item.key}") },
+            modifier = modifier,
+            live = state.live,
+        )
+        is ChatItem.Thoughts -> ThoughtsGroup(
+            item = item,
+            expanded = state.isExpanded("t:${item.key}"),
+            isExpanded = isExpanded,
+            onToggle = onToggle,
+            modifier = modifier,
+            live = state.live,
+        )
+        is ChatItem.Tools -> ToolsGroup(
+            item = item,
+            directory = state.directory,
+            expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+            isExpanded = isExpanded,
+            onToggle = onToggle,
+            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+            modifier = modifier,
+            live = state.live,
+            fullCommands = state.showFullCommands,
+            inLiveGroup = item.key == liveGroupKey,
+            details = state.showToolDetails || keptOpen(item.key),
+        )
+        is ChatItem.Activity -> ActivityGroup(
+            item = item,
+            directory = state.directory,
+            expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+            inLiveGroup = item.key == liveGroupKey,
+            details = state.showToolDetails || keptOpen(item.key),
+            defaultToolsExpanded = defaultToolsExpanded,
+            isExpanded = isExpanded,
+            onToggle = onToggle,
+            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+            modifier = modifier,
+            live = state.live,
+            fullCommands = state.showFullCommands,
+        )
+        is ChatItem.Error -> ErrorRow(item, modifier)
+        is ChatItem.Notice -> NoticeRow(
+            item = item,
+            cache = cache,
+            expanded = state.isExpanded("n:${item.key}"),
+            onToggle = { onToggle("n:${item.key}") },
+            modifier = modifier,
+        )
+        is ChatItem.Shell -> ShellBlock(item, modifier)
+        is ChatItem.Footer -> TurnFooter(item, onCopy, modifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
+        is ChatItem.Working -> WorkingRow(modifier)
+    }
 }
 
 private fun androidx.compose.foundation.lazy.LazyListScope.olderHistory(state: ChatState, onEvent: (ChatEvent) -> Unit) {

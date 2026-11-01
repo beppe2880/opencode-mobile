@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">完了</string>
     <string name="terminal_fullscreen">全画面表示</string>
     <string name="terminal_fullscreen_exit">全画面表示を終了</string>
+    <string name="terminal_preview_fullscreen">全画面表示：タイトルバーもシステムバーも表示しません</string>
+    <string name="terminal_preview_keyboard_on">キーボードはターミナルと一緒に開きます</string>
+    <string name="terminal_preview_keyboard_off">キーボードはターミナルをタップすると開きます</string>
 </resources>
