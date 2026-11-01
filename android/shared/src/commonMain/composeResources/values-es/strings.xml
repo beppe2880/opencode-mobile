@@ -4,4 +4,6 @@
     <string name="app_select_session_message">Elige una sesión de la lista o inicia una nueva.</string>
     <string name="app_hide_sessions">Ocultar sesiones</string>
     <string name="app_show_sessions">Mostrar sesiones</string>
+    <string name="app_share_needs_server">Conéctate a un servidor para iniciar una sesión con el contenido compartido. Hasta entonces, espera aquí.</string>
+    <string name="app_share_discard">Descartar</string>
 </resources>

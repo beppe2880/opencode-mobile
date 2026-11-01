@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">Der Chat öffnet sich über der Liste, auch auf breiten Bildschirmen</string>
     <string name="sessions_preview_back_list">Zurück bei ausgeblendeter Liste zeigt sie wieder an</string>
     <string name="sessions_preview_back_leave">Zurück bei ausgeblendeter Liste beendet die App</string>
+    <string name="sessions_share_sheet_hint">Sobald die Sitzung erstellt ist, wartet der geteilte Inhalt in ihrem Nachrichtenfeld, bereit zum Bearbeiten und Senden.</string>
+    <string name="sessions_share_choose">Tippe auf einen Chat, um den geteilten Inhalt in dessen Nachrichtenfeld einzufügen, oder starte eine neue Sitzung.</string>
+    <string name="sessions_share_new">Neue Sitzung</string>
+    <string name="sessions_share_discard">Verwerfen</string>
+    <string name="sessions_share_discarded">Geteilter Inhalt verworfen</string>
+    <string name="sessions_preview_share_new">Text, Links und Bilder aus anderen Apps öffnen dieses Blatt</string>
+    <string name="sessions_preview_share_choose">Text, Links und Bilder aus anderen Apps fragen zuerst nach einem Chat oder öffnen dieses Blatt</string>
+    <string name="sessions_preview_share_off">OpenCode ist nicht im Teilen-Menü anderer Apps</string>
 </resources>

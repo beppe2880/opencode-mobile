@@ -107,6 +107,13 @@
     <string name="settings_selection_apply_now">すぐに</string>
     <string name="settings_new_chat_model">新しいチャットのモデル</string>
     <string name="settings_new_chat_model_sub">モデルが選択されていないときに使用：エージェントまたはサーバーに設定されたモデル、なければ最後に使用したモデル。またはサーバーに任せます</string>
+    <string name="settings_share_menu">共有メニューにOpenCodeを表示</string>
+    <string name="settings_share_menu_sub">他のアプリからOpenCodeにテキスト、リンク、画像を共有して、セッションを開始できます</string>
+    <string name="settings_share_opens">共有時に開く画面</string>
+    <string name="settings_share_opens_new">新しいセッション</string>
+    <string name="settings_share_opens_choose">チャットを選択</string>
+    <string name="settings_share_opens_sub">新しいセッションのシート。共有内容は最初のメッセージに入り、編集できます</string>
+    <string name="settings_share_opens_choose_sub">セッション一覧。共有内容を入れるチャットを選ぶか、新しく開始します</string>
     <string name="settings_new_chat_model_last">前回使用</string>
     <string name="settings_new_chat_model_server">サーバーの既定</string>
     <string name="settings_usage">利用統計</string>

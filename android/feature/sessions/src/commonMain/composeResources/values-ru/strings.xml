@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">Чат открывается поверх списка, в том числе на широких экранах</string>
     <string name="sessions_preview_back_list">Кнопка «Назад» при скрытом списке снова его показывает</string>
     <string name="sessions_preview_back_leave">Кнопка «Назад» при скрытом списке закрывает приложение</string>
+    <string name="sessions_share_sheet_hint">После создания сессии общий контент будет ждать в поле сообщения, готовый к редактированию и отправке.</string>
+    <string name="sessions_share_choose">Нажмите на чат, чтобы добавить общий контент в его поле сообщения, или начните новую сессию.</string>
+    <string name="sessions_share_new">Новая сессия</string>
+    <string name="sessions_share_discard">Отклонить</string>
+    <string name="sessions_share_discarded">Общий контент отклонён</string>
+    <string name="sessions_preview_share_new">Текст, ссылки и изображения, отправленные из других приложений, открывают этот лист</string>
+    <string name="sessions_preview_share_choose">Текст, ссылки и изображения из других приложений сначала предлагают выбрать чат или открывают этот лист</string>
+    <string name="sessions_preview_share_off">OpenCode не отображается в меню «Поделиться» других приложений</string>
 </resources>

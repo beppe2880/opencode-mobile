@@ -65,4 +65,23 @@
     <string name="oc_part_notify_finished">انتهت الجلسة</string>
     <string name="oc_part_update">شريط التحديث</string>
     <string name="oc_part_customize">تخصيص</string>
+    <string name="oc_shared_title">تمت مشاركته مع OpenCode</string>
+    <plurals name="oc_shared_images">
+        <item quantity="zero">%1$d صورة</item>
+        <item quantity="one">%1$d صورة</item>
+        <item quantity="two">%1$d صورتان</item>
+        <item quantity="few">%1$d صور</item>
+        <item quantity="many">%1$d صورة</item>
+        <item quantity="other">%1$d صورة</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="zero">تعذّرت إضافة %1$d عنصر</item>
+        <item quantity="one">تعذّرت إضافة %1$d عنصر</item>
+        <item quantity="two">تعذّرت إضافة %1$d عنصرين</item>
+        <item quantity="few">تعذّرت إضافة %1$d عناصر</item>
+        <item quantity="many">تعذّرت إضافة %1$d عنصرًا</item>
+        <item quantity="other">تعذّرت إضافة %1$d عنصرًا</item>
+    </plurals>
+    <string name="oc_share_nothing">لا يوجد ما يمكن مشاركته: يقبل OpenCode النصوص والروابط والصور</string>
+    <string name="oc_shared_truncated">كان النص طويلًا جدًا فاختُصر</string>
 </resources>

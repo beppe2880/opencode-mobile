@@ -4,4 +4,6 @@
     <string name="app_select_session_message">Wähle eine Sitzung aus der Liste oder starte eine neue.</string>
     <string name="app_hide_sessions">Sitzungen ausblenden</string>
     <string name="app_show_sessions">Sitzungen anzeigen</string>
+    <string name="app_share_needs_server">Verbinde dich mit einem Server, um mit dem geteilten Inhalt eine Sitzung zu starten. Bis dahin wartet er hier.</string>
+    <string name="app_share_discard">Verwerfen</string>
 </resources>

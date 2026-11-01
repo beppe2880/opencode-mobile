@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">La chat si apre sopra l’elenco, anche sugli schermi larghi</string>
     <string name="sessions_preview_back_list">Indietro con l’elenco nascosto lo mostra di nuovo</string>
     <string name="sessions_preview_back_leave">Indietro con l’elenco nascosto chiude l’app</string>
+    <string name="sessions_share_sheet_hint">Dopo aver creato la sessione, il contenuto condiviso resta nella casella del messaggio, pronto da modificare e inviare.</string>
+    <string name="sessions_share_choose">Tocca una chat per aggiungere il contenuto condiviso alla sua casella del messaggio, oppure avvia una nuova sessione.</string>
+    <string name="sessions_share_new">Nuova sessione</string>
+    <string name="sessions_share_discard">Scarta</string>
+    <string name="sessions_share_discarded">Contenuto condiviso scartato</string>
+    <string name="sessions_preview_share_new">Testo, link e immagini condivisi da altre app aprono questo pannello</string>
+    <string name="sessions_preview_share_choose">Testo, link e immagini condivisi da altre app chiedono prima una chat, oppure aprono questo pannello</string>
+    <string name="sessions_preview_share_off">OpenCode non è nel menu di condivisione delle altre app</string>
 </resources>

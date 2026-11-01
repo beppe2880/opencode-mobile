@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">넓은 화면에서도 채팅은 목록 위에 열립니다</string>
     <string name="sessions_preview_back_list">목록이 숨겨진 상태에서 뒤로 가기를 누르면 목록이 다시 표시됩니다</string>
     <string name="sessions_preview_back_leave">목록이 숨겨진 상태에서 뒤로 가기를 누르면 앱이 종료됩니다</string>
+    <string name="sessions_share_sheet_hint">세션을 만들면 공유된 내용이 메시지 입력란에 대기하며, 편집하고 보낼 수 있습니다.</string>
+    <string name="sessions_share_choose">채팅을 탭하면 공유된 내용이 그 채팅의 메시지 입력란에 추가되고, 새 세션을 시작할 수도 있습니다.</string>
+    <string name="sessions_share_new">새 세션</string>
+    <string name="sessions_share_discard">버리기</string>
+    <string name="sessions_share_discarded">공유된 내용을 버렸습니다</string>
+    <string name="sessions_preview_share_new">다른 앱에서 공유한 텍스트, 링크, 이미지는 이 시트를 엽니다</string>
+    <string name="sessions_preview_share_choose">다른 앱에서 공유한 텍스트, 링크, 이미지는 먼저 채팅을 고르라고 묻거나 이 시트를 엽니다</string>
+    <string name="sessions_preview_share_off">OpenCode는 다른 앱의 공유 메뉴에 없습니다</string>
 </resources>

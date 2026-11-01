@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">ワイド画面でも、チャットはリストの上に開きます</string>
     <string name="sessions_preview_back_list">リストが非表示のときに戻るとリストが再表示されます</string>
     <string name="sessions_preview_back_leave">リストが非表示のときに戻るとアプリを終了します</string>
+    <string name="sessions_share_sheet_hint">セッションを作成すると、共有された内容がメッセージ欄で待機し、編集して送信できます。</string>
+    <string name="sessions_share_choose">チャットをタップすると共有内容をそのメッセージ欄に追加します。または新しいセッションを開始します。</string>
+    <string name="sessions_share_new">新しいセッション</string>
+    <string name="sessions_share_discard">破棄</string>
+    <string name="sessions_share_discarded">共有された内容を破棄しました</string>
+    <string name="sessions_preview_share_new">他のアプリから共有されたテキスト、リンク、画像はこのシートを開きます</string>
+    <string name="sessions_preview_share_choose">他のアプリから共有されたテキスト、リンク、画像は、まずチャットを選ぶよう求めるか、このシートを開きます</string>
+    <string name="sessions_preview_share_off">OpenCodeは他のアプリの共有メニューに表示されません</string>
 </resources>

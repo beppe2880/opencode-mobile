@@ -4,4 +4,6 @@
     <string name="app_select_session_message">从列表中选择会话或新建会话。</string>
     <string name="app_hide_sessions">隐藏会话</string>
     <string name="app_show_sessions">显示会话</string>
+    <string name="app_share_needs_server">连接服务器以使用分享的内容开始会话。在此之前，内容会保留在这里。</string>
+    <string name="app_share_discard">丢弃</string>
 </resources>

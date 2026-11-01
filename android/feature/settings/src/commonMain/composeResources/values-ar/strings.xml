@@ -107,6 +107,13 @@
     <string name="settings_selection_apply_now">فورًا</string>
     <string name="settings_new_chat_model">النموذج للدردشات الجديدة</string>
     <string name="settings_new_chat_model_sub">يُستخدم عند عدم اختيار نموذج: النموذج المضبوط للوكيل أو على الخادم، وإلا آخر نموذج استُخدم؛ أو اترك الأمر للخادم</string>
+    <string name="settings_share_menu">إظهار OpenCode في قائمة المشاركة</string>
+    <string name="settings_share_menu_sub">يمكن للتطبيقات الأخرى مشاركة النصوص والروابط والصور مع OpenCode لبدء جلسة</string>
+    <string name="settings_share_opens">عند المشاركة، يُفتح</string>
+    <string name="settings_share_opens_new">جلسة جديدة</string>
+    <string name="settings_share_opens_choose">اختيار محادثة</string>
+    <string name="settings_share_opens_sub">لوحة الجلسة الجديدة؛ يدخل المحتوى المشارَك في الرسالة الأولى، جاهزًا للتعديل</string>
+    <string name="settings_share_opens_choose_sub">قائمة الجلسات، لاختيار محادثة للمحتوى المشارَك أو بدء محادثة جديدة</string>
     <string name="settings_new_chat_model_last">آخر مستخدم</string>
     <string name="settings_new_chat_model_server">افتراضي الخادم</string>
     <string name="settings_usage">إحصاءات الاستخدام</string>
