@@ -177,7 +177,6 @@
     <string name="update_sheet_versions_description">From version %1$s to version %2$s</string>
     <string name="update_sheet_whats_new">What's new</string>
     <string name="update_sheet_version">Version %1$s</string>
-    <string name="update_sheet_no_notes">No details for this version</string>
     <string name="update_sheet_later">Later</string>
     <string name="update_sheet_skip">Skip this version</string>
     <string name="update_notes_features">Features</string>

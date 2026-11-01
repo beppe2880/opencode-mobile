@@ -24,7 +24,9 @@ class UpdateSheetSession {
 
 /**
  * Announces a newer release of the app as chosen in Settings: a sheet with what changed, once per
- * app start, or a banner. Nothing is checked while the notice is off.
+ * app start, or a banner. Nothing is checked while the notice is off. Without any release notes
+ * (a release saved by an older version of the app, or an empty body) the sheet would have nothing
+ * to show: the banner stands in until the next check brings them.
  */
 class UpdateNoticeViewModel(
     private val updates: UpdateRepository,
@@ -37,15 +39,20 @@ class UpdateNoticeViewModel(
         viewModelScope.launch {
             settings.settings.map { it.updateNotice }.distinctUntilChanged().collectLatest { style ->
                 val update = if (style == UpdateNoticeStyle.Off) null else updates.availableUpdate(appInfo.versionName)
-                val showSheet = update != null && style == UpdateNoticeStyle.Window && !session.shown
+                // Versions without notes are left out of the sheet.
+                val changes = update?.releases.orEmpty()
+                    .map { VersionChanges(it.version, ReleaseNotes.parse(it.notes)) }
+                    .filter { it.sections.isNotEmpty() }
+                val sheet = update != null && style == UpdateNoticeStyle.Window && changes.isNotEmpty()
+                val showSheet = sheet && !session.shown
                 if (showSheet) session.shown = true
                 updateState { state ->
                     state.copy(
                         release = update?.latest,
                         action = update?.latest?.let(appInfo.updateTarget::actionFor),
                         style = style,
-                        changes = update?.releases.orEmpty().map { VersionChanges(it.version, ReleaseNotes.parse(it.notes)) },
-                        sheetVisible = showSheet || (state.sheetVisible && update != null && style == UpdateNoticeStyle.Window),
+                        changes = changes,
+                        sheetVisible = showSheet || (state.sheetVisible && sheet),
                     )
                 }
             }

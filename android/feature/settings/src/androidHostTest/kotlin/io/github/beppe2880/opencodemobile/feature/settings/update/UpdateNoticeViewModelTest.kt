@@ -158,6 +158,43 @@ class UpdateNoticeViewModelTest {
     }
 
     @Test
+    fun `without notes the window falls back to the banner until the next check brings them`() = runTest(main.testDispatcher) {
+        // As saved by the former app: version and page only.
+        val bare = AppRelease(release.version, release.url)
+        updates.update = AppUpdate(bare, listOf(bare, older.copy(notes = "")))
+        val vm = vm()
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.sheetVisible)
+        assertTrue(vm.state.value.bannerVisible)
+        assertEquals(emptyList<VersionChanges>(), vm.state.value.changes)
+        assertFalse(session.shown)
+
+        // The next daily check, at a later start, stored the notes: the sheet shows, once.
+        updates.update = AppUpdate(release, listOf(release, older))
+        val nextStart = vm()
+        advanceUntilIdle()
+        assertTrue(nextStart.state.value.sheetVisible)
+        assertFalse(nextStart.state.value.bannerVisible)
+        nextStart.onEvent(UpdateNoticeEvent.Later)
+        assertFalse(nextStart.state.value.bannerVisible)
+        val again = vm()
+        advanceUntilIdle()
+        assertFalse(again.state.value.sheetVisible)
+        assertFalse(again.state.value.bannerVisible)
+    }
+
+    @Test
+    fun `versions without notes are left out of the sheet`() = runTest(main.testDispatcher) {
+        updates.update = AppUpdate(release, listOf(release, older.copy(notes = "Nothing structured here.")))
+        val vm = vm()
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.sheetVisible)
+        assertEquals(listOf("1.0.0"), vm.state.value.changes.map { it.version })
+    }
+
+    @Test
     fun `no update, as in the demo or offline before any check, shows nothing`() = runTest(main.testDispatcher) {
         val vm = UpdateNoticeViewModel(FakeUpdates(null), settings, AppInfo("0.9.0", "2.0.27", UpdateTarget.Android), session)
         advanceUntilIdle()
@@ -172,7 +209,7 @@ class UpdateNoticeViewModelTest {
     }
 }
 
-private class FakeUpdates(private val update: AppUpdate?) : UpdateRepository {
+private class FakeUpdates(var update: AppUpdate?) : UpdateRepository {
     val checkedWith = mutableListOf<String>()
     val dismissed = mutableListOf<AppRelease>()
 

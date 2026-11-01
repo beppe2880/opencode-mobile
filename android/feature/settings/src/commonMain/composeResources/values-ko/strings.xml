@@ -174,7 +174,6 @@
     <string name="update_sheet_versions_description">버전 %1$s에서 버전 %2$s(으)로</string>
     <string name="update_sheet_whats_new">새로운 기능</string>
     <string name="update_sheet_version">버전 %1$s</string>
-    <string name="update_sheet_no_notes">이 버전에 대한 세부 정보가 없습니다</string>
     <string name="update_sheet_later">나중에</string>
     <string name="update_sheet_skip">이 버전 건너뛰기</string>
     <string name="update_notes_features">기능</string>

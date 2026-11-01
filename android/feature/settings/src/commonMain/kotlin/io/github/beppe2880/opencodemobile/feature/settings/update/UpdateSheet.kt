@@ -53,7 +53,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.update_note
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_notes_fixes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_release_notes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_later
-import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_no_notes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_skip
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_version
@@ -141,7 +140,6 @@ fun UpdateSheetContent(
         ) {
             val several = state.changes.size > 1
             state.changes.forEach { changes -> VersionNotes(changes, showVersion = several) }
-            if (state.changes.isEmpty()) NoNotes()
         }
         // Marks where the notes scroll under the actions.
         OcDivider(Modifier.padding(top = OcSpacing.sm))
@@ -185,7 +183,6 @@ private fun VersionNotes(changes: VersionChanges, showVersion: Boolean) {
             modifier = Modifier.padding(top = OcSpacing.md).semantics { heading() },
         )
     }
-    if (changes.sections.isEmpty()) NoNotes()
     changes.sections.forEach { section ->
         val title = section.label()
         if (title.isNotEmpty()) {
@@ -218,16 +215,6 @@ private fun NoteRow(note: ReleaseNote) {
             modifier = Modifier.weight(1f),
         )
     }
-}
-
-@Composable
-private fun NoNotes() {
-    Text(
-        stringResource(Res.string.update_sheet_no_notes),
-        style = MaterialTheme.typography.bodySmall,
-        color = OcTheme.colors.textMuted,
-        modifier = Modifier.padding(top = OcSpacing.xs),
-    )
 }
 
 /** The heading of a group of notes: translated when it is a known one, as published otherwise. */

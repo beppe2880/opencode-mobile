@@ -174,7 +174,6 @@
     <string name="update_sheet_versions_description">从版本 %1$s 更新到版本 %2$s</string>
     <string name="update_sheet_whats_new">更新内容</string>
     <string name="update_sheet_version">版本 %1$s</string>
-    <string name="update_sheet_no_notes">此版本没有详细信息</string>
     <string name="update_sheet_later">稍后</string>
     <string name="update_sheet_skip">跳过此版本</string>
     <string name="update_notes_features">新功能</string>

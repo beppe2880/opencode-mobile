@@ -15,12 +15,15 @@ data class UpdateNoticeState(
     val style: UpdateNoticeStyle = UpdateNoticeStyle.Window,
     /** The version of this app. */
     val installedVersion: String = "",
-    /** What changed in each release since [installedVersion], newest first. */
+    /** What changed in each release since [installedVersion] that has notes, newest first. */
     val changes: List<VersionChanges> = emptyList(),
-    /** The sheet is open: at most once per app start, with [UpdateNoticeStyle.Window]. */
+    /** The sheet is open: at most once per app start, with [UpdateNoticeStyle.Window] and [changes] to show. */
     val sheetVisible: Boolean = false,
 ) {
-    val bannerVisible: Boolean get() = release != null && action != null && style == UpdateNoticeStyle.Banner
+    /** The banner, or in place of the window while no release has notes to show. */
+    val bannerVisible: Boolean
+        get() = release != null && action != null &&
+            (style == UpdateNoticeStyle.Banner || (style == UpdateNoticeStyle.Window && changes.isEmpty()))
 }
 
 /** The release notes of one version, read from its GitHub release. */

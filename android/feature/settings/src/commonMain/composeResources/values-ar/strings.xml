@@ -189,7 +189,6 @@
     <string name="update_sheet_versions_description">من الإصدار %1$s إلى الإصدار %2$s</string>
     <string name="update_sheet_whats_new">ما الجديد</string>
     <string name="update_sheet_version">الإصدار %1$s</string>
-    <string name="update_sheet_no_notes">لا توجد تفاصيل لهذا الإصدار</string>
     <string name="update_sheet_later">لاحقًا</string>
     <string name="update_sheet_skip">تخطي هذا الإصدار</string>
     <string name="update_notes_features">الميزات</string>

@@ -183,7 +183,6 @@
     <string name="update_sheet_versions_description">С версии %1$s до версии %2$s</string>
     <string name="update_sheet_whats_new">Что нового</string>
     <string name="update_sheet_version">Версия %1$s</string>
-    <string name="update_sheet_no_notes">Нет подробностей для этой версии</string>
     <string name="update_sheet_later">Позже</string>
     <string name="update_sheet_skip">Пропустить эту версию</string>
     <string name="update_notes_features">Новые функции</string>

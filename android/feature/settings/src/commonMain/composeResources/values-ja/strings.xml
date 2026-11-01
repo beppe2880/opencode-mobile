@@ -174,7 +174,6 @@
     <string name="update_sheet_versions_description">バージョン %1$s から %2$s へ</string>
     <string name="update_sheet_whats_new">新機能</string>
     <string name="update_sheet_version">バージョン %1$s</string>
-    <string name="update_sheet_no_notes">このバージョンの詳細はありません</string>
     <string name="update_sheet_later">あとで</string>
     <string name="update_sheet_skip">このバージョンをスキップ</string>
     <string name="update_notes_features">機能</string>
