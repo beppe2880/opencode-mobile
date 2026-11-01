@@ -1,0 +1,49 @@
+{
+  "data": [
+    {
+      "id": "msg_19846b6fd001dKS35bfSGaAqbO",
+      "time": {
+        "created": 1793556133640,
+        "streamed": 1793556134747
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "claude-haiku-4-5",
+        "providerID": "anthropic",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "tool",
+          "id": "toolu_011VK49E5rAcJEGeH7tHgxkQ",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "running",
+            "input": {
+              "command": "for i in $(seq 1 30); do echo line $i; sleep 1; done"
+            },
+            "metadata": {}
+          },
+          "time": {
+            "created": 1793556134529,
+            "ran": 1793556134739
+          }
+        }
+      ]
+    },
+    {
+      "id": "msg_19846b6e6001QiPHeVWYQCO2aY",
+      "time": {
+        "created": 1793556133621
+      },
+      "text": "Run this exact bash command once more with the bash tool, in the foreground: for i in $(seq 1 30); do echo line $i; sleep 1; done",
+      "type": "user"
+    }
+  ],
+  "cursor": {
+    "previous": "eyJpZCI6Im1zZ18xOTg0NmI2ZmQwMDFkS1MzNWJmU0dhQXFiTyIsIm9yZGVyIjoiZGVzYyIsImRpcmVjdGlvbiI6InByZXZpb3VzIn0",
+    "next": "eyJpZCI6Im1zZ18xOTg0MTRmMTIwMDFBMzA2OGU3TnN0RTJ2cCIsIm9yZGVyIjoiZGVzYyIsImRpcmVjdGlvbiI6Im5leHQifQ"
+  }
+}

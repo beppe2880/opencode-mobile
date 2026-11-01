@@ -1,0 +1,22 @@
+{
+  "location": {
+    "directory": "/home/user/project"
+  },
+  "data": [
+    {
+      "id": "sh_19846bb5a0016Hcm0TX7E0r087",
+      "status": "running",
+      "command": "for i in $(seq 1 30); do echo line $i; sleep 1; done",
+      "cwd": "/home/user/project",
+      "shell": "/bin/zsh",
+      "file": "/home/user/.local/share/opencode/shell/eaa803d9c060c666e115eedc65b06139bfb8a340/sh_19846bb5a0016Hcm0TX7E0r087.out",
+      "pid": 1030403,
+      "metadata": {
+        "sessionID": "ses_e67beca81ffe2jOx0y5gIe6nFA"
+      },
+      "time": {
+        "started": 1793556134746
+      }
+    }
+  ]
+}

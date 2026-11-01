@@ -124,6 +124,8 @@ class ChatViewModel(
     /** What running shell tools have printed so far, by call id, and the jobs reading it. */
     private val liveOutput = HashMap<String, String>()
     private val liveJobs = HashMap<String, Job>()
+    /** Shell of each followed tool, by call id: kept across reloads, which drop it from the metadata. */
+    private val toolShells = HashMap<String, String>()
     private var liveOutputIntervalMs: Long = settings.settings.value.liveOutputIntervalMs
 
     private var headerLine: ChatHeaderLine = settings.settings.value.chatHeaderLine
@@ -293,10 +295,12 @@ class ChatViewModel(
                 return@launch
             }
             // Commands started by this transcript's tools are owned through the messages already in memory.
-            runningWork.load(listOf(root), details = currentState.workOpen, shellOwners = shellOwners(sessionId, messages)).fold(
+            val owners = shellOwners(sessionId, messages) + toolShells.values.associateWith { sessionId }
+            runningWork.load(listOf(root), details = currentState.workOpen, shellOwners = owners).fold(
                 onSuccess = { snapshot ->
                     val work = snapshot.sessions[sessionId] ?: RunningWork()
                     val ids = (work.commands + snapshot.unassigned).map { it.id }.toSet()
+                    val newShells = work.commands.map { it.id } != currentState.work.commands.map { it.id }
                     updateState {
                         it.copy(
                             work = work,
@@ -308,6 +312,8 @@ class ChatViewModel(
                             workOutputErrors = it.workOutputErrors.filterKeys { id -> id in ids },
                         )
                     }
+                    // Running tools whose shell id the transcript lost can follow these shells.
+                    if (newShells) rebuild()
                     if (currentState.workOpen) {
                         for (command in work.commands + snapshot.unassigned) {
                             chat.shellTail(command.directory, command.id).fold(
@@ -797,13 +803,17 @@ class ChatViewModel(
     /**
      * The server streams a `bash` tool's output only to its shell, not to the event stream:
      * while the tool runs, its shell output is read every [liveOutputIntervalMs] (setting).
+     * The shell is found as described in [LiveShells].
      */
     private fun followShells(visible: List<Message>) {
         val running = if (currentState.live?.shell == true) runningShells(visible) else emptyMap()
-        (liveJobs.keys - running.keys).forEach { callId ->
+        // Ended, or now known to print to another shell.
+        liveJobs.keys.filter { running[it] != toolShells[it] }.forEach { callId ->
             liveJobs.remove(callId)?.cancel()
             liveOutput.remove(callId)
         }
+        toolShells.clear()
+        toolShells.putAll(running)
         running.forEach { (callId, shellId) ->
             if (callId in liveJobs) return@forEach
             // Registered before it starts: the first read can rebuild, and with it call this again.
@@ -828,14 +838,16 @@ class ChatViewModel(
         }
     }
 
-    /** Shell ids of the running `bash` tools, by call id. */
-    private fun runningShells(visible: List<Message>): Map<String, String> = visible.asSequence()
-        .filterIsInstance<Message.Assistant>()
-        .flatMap { it.parts }
-        .filterIsInstance<Part.Tool>()
-        .filter { it.status == ToolStatus.Running }
-        .mapNotNull { tool -> tool.metadata[SHELL_ID]?.let { tool.callId to it } }
-        .toMap()
+    /** Shell ids of the running `bash` tools, by call id; remembered, as a reload drops them from the metadata. */
+    private fun runningShells(visible: List<Message>): Map<String, String> {
+        val running = visible.asSequence()
+            .filterIsInstance<Message.Assistant>()
+            .flatMap { it.parts }
+            .filterIsInstance<Part.Tool>()
+            .filter { it.status == ToolStatus.Running }
+            .toList()
+        return LiveShells.match(sessionId, running, currentState.work.commands, toolShells)
+    }
 
     private fun rebuild() {
         val state = currentState
@@ -1458,7 +1470,6 @@ class ChatViewModel(
     private companion object {
         const val LOCAL_PREFIX = "local-"
         const val RELOAD_DEBOUNCE_MS = 400L
-        const val SHELL_ID = "shellID"
         const val SHELL_ENDED = "session.shell.ended"
         const val LOCAL_MATCH_WINDOW = 10
         const val SUGGEST_DEBOUNCE_MS = 150L

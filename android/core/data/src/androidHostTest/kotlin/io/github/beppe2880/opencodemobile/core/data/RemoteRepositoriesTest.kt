@@ -70,6 +70,17 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `a recorded running bash shell names its session and command`() = runBlocking {
+        val chat = RemoteChatRepository(graph.clients, InMemoryMessageCache())
+        server.enqueue(json(fixture("shell_running_list.json")))
+        val command = chat.runningShells("/home/user/project").getOrThrow().single()
+        assertEquals("sh_19846bb5a0016Hcm0TX7E0r087", command.id)
+        assertEquals("ses_e67beca81ffe2jOx0y5gIe6nFA", command.sessionId)
+        assertEquals("for i in \$(seq 1 30); do echo line \$i; sleep 1; done", command.command)
+        assertEquals(1793556134746L, command.startedAt)
+    }
+
+    @Test
     fun `output tail seeks near end instead of downloading old output`() = runBlocking {
         val chat = RemoteChatRepository(graph.clients, InMemoryMessageCache())
         server.enqueue(json("""{"data":{"output":"a","cursor":1,"size":1000000,"truncated":true}}"""))
