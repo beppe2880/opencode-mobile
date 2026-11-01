@@ -63,6 +63,6 @@
     <string name="oc_part_notify_permission">Demande de permission</string>
     <string name="oc_part_notify_question">Question</string>
     <string name="oc_part_notify_finished">Session terminée</string>
-    <string name="oc_part_update">Bannière de mise à jour</string>
+    <string name="oc_part_update">Notification de mise à jour</string>
     <string name="oc_part_customize">Personnaliser</string>
 </resources>

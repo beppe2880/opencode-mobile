@@ -63,6 +63,6 @@
     <string name="oc_part_notify_permission">Berechtigungsanfrage</string>
     <string name="oc_part_notify_question">Frage</string>
     <string name="oc_part_notify_finished">Sitzung beendet</string>
-    <string name="oc_part_update">Update-Banner</string>
+    <string name="oc_part_update">Update-Hinweis</string>
     <string name="oc_part_customize">Anpassen</string>
 </resources>
