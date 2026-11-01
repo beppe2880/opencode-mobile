@@ -2,7 +2,6 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
-import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
@@ -65,9 +64,8 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     UpdateNotice(listOf("updateNotice")),
     ;
 
-    /** The part whose options include this one first: where a search result opens. */
-    val part: SettingsPart get() = SettingsPart.entries.first { this in it.options }
-    val area: SettingsArea get() = part.area
+    /** The first part of its [area] that offers this option: where the Preview style opens it. */
+    val part: SettingsPart get() = SettingsPart.of(area).first { this in it.options }
 }
 
 /**
@@ -105,16 +103,18 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.RunningLine -> listOf(SettingOption.ConfirmStop)
         SettingsPart.LiveStep -> listOf(SettingOption.FollowRunning, SettingOption.KeepLiveOpen)
         SettingsPart.LiveThinking -> listOf(SettingOption.LiveThinking)
-        SettingsPart.LiveShell -> listOf(SettingOption.LiveShell, SettingOption.LiveInterval)
+        SettingsPart.LiveShell -> listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines)
         SettingsPart.LiveEdits -> listOf(SettingOption.LiveEdits)
         SettingsPart.LiveReads -> listOf(SettingOption.LiveReads)
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
         SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
         SettingsPart.VoiceInput -> VOICE_OPTIONS
         SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.AgentOutline)
-        // Sharing from other apps opens the new chat sheet.
+        // Sharing from other apps opens the new chat sheet: the live demo reaches sharing there.
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
-        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList)
+        SettingsPart.ShareTarget -> listOf(SettingOption.ShareMenu, SettingOption.ShareOpens)
+        // The running work the rows count, and stopping it.
+        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats)
         SettingsPart.SplitView -> listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList)
         SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard)

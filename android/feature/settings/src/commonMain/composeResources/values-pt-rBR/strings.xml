@@ -15,17 +15,14 @@
     <string name="settings_save">Salvar</string>
     <string name="settings_remove_title">Remover servidor?</string>
     <string name="settings_remove_message">“%1$s” e suas credenciais salvas serão removidos deste dispositivo. Você pode parear novamente depois.</string>
-    <string name="settings_appearance">Aparência</string>
     <string name="settings_theme">Tema</string>
     <string name="settings_theme_system">Sistema</string>
     <string name="settings_theme_light">Claro</string>
     <string name="settings_theme_dark">Escuro</string>
-    <string name="settings_conversation">Conversa</string>
     <string name="settings_show_reasoning">Mostrar raciocínio</string>
     <string name="settings_show_reasoning_sub">Exibir blocos recolhidos “Pensou por…” na conversa</string>
     <string name="settings_expand_tools">Expandir chamadas de ferramentas</string>
     <string name="settings_expand_tools_sub">Exibir ferramentas expandidas em vez de um resumo de uma linha</string>
-    <string name="settings_live_activity">Atividade ao vivo</string>
     <string name="settings_follow_running">Acompanhar trabalho em andamento</string>
     <string name="settings_follow_running_sub">Manter aberta a etapa atual do agente enquanto ele trabalha e recolhê-la quando a resposta terminar</string>
     <string name="settings_live_thinking">Raciocínio</string>
@@ -185,8 +182,6 @@
         <item quantity="one">%1$s etapa</item>
         <item quantity="other">%1$s etapas</item>
     </plurals>
-    <string name="settings_notifications">Notificações</string>
-    <string name="settings_terminal">Terminal</string>
     <string name="settings_terminal_keyboard">Abrir o teclado</string>
     <string name="settings_terminal_keyboard_sub">Mostrar o teclado na tela assim que o terminal abrir</string>
     <string name="settings_terminal_fullscreen">Abrir em tela cheia</string>
@@ -246,11 +241,7 @@
     <string name="settings_search_empty">Nenhuma configuração corresponde</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">Personalizar</string>
-    <string name="settings_area_appearance_sub">Tema e tamanho do texto</string>
-    <string name="settings_area_chat_sub">Cabeçalho, raciocínio, ferramentas, cartões e custo</string>
     <string name="settings_area_live_sub">O que fica aberto enquanto o agente trabalha</string>
-    <string name="settings_area_composer_sub">Cor do agente, modelos, entrada de voz</string>
-    <string name="settings_area_sessions_sub">Trabalho em andamento, deslizar, lista ao lado do chat</string>
     <string name="settings_area_terminal_sub">Barra de teclas, teclado e tela cheia</string>
     <string name="settings_area_notifications_sub">O que uma sessão em execução informa</string>
     <string name="settings_area_updates_sub">Novas versões do app</string>

@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
+import io.github.beppe2880.opencodemobile.feature.settings.customize.area
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -274,6 +275,37 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SelectPart(SettingsPart.LiveEdits))
         assertEquals(SettingsPart.LiveEdits, vm.state.value.selected)
         assertNull(vm.state.value.focus)
+    }
+
+    @Test
+    fun `a search result opens its category with the option in focus`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.QueryChanged("api key"))
+        vm.onEvent(SettingsEvent.OpenArea(SettingOption.VoiceKey.area, option = SettingOption.VoiceKey))
+        assertEquals(SettingsArea.VoiceInput, vm.state.value.area)
+        assertEquals(SettingsPart.VoiceInput, vm.state.value.selected)
+        assertEquals(SettingOption.VoiceKey, vm.state.value.focus)
+
+        // Back returns to the first page with the search kept; opening a category by its row has no focus.
+        vm.onEvent(SettingsEvent.Back)
+        assertNull(vm.state.value.area)
+        assertNull(vm.state.value.focus)
+        assertEquals("api key", vm.state.value.query)
+        vm.onEvent(SettingsEvent.OpenArea(SettingsArea.Servers))
+        assertEquals(SettingsArea.Servers, vm.state.value.area)
+        assertNull(vm.state.value.selected)
+        assertNull(vm.state.value.focus)
+    }
+
+    @Test
+    fun `a link opens its category first and Leave exits even with a category open`() = runTest(main.testDispatcher) {
+        val vm = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt, initialArea = SettingsArea.Composer)
+        assertEquals(SettingsArea.Composer, vm.state.value.area)
+        assertEquals(SettingsPart.ComposerBox, vm.state.value.selected)
+
+        vm.onEvent(SettingsEvent.Leave)
+        assertEquals(SettingsEffect.NavigateBack, vm.effect.first())
+        assertEquals(SettingsArea.Composer, vm.state.value.area)
     }
 
     @Test

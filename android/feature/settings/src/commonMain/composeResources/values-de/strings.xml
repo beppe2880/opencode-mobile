@@ -15,17 +15,14 @@
     <string name="settings_save">Speichern</string>
     <string name="settings_remove_title">Server entfernen?</string>
     <string name="settings_remove_message">„%1$s“ und die gespeicherten Zugangsdaten werden von diesem Gerät entfernt. Du kannst es später erneut koppeln.</string>
-    <string name="settings_appearance">Darstellung</string>
     <string name="settings_theme">Design</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Hell</string>
     <string name="settings_theme_dark">Dunkel</string>
-    <string name="settings_conversation">Unterhaltung</string>
     <string name="settings_show_reasoning">Denkprozess anzeigen</string>
     <string name="settings_show_reasoning_sub">Eingeklappte „Nachgedacht für…“-Blöcke im Verlauf anzeigen</string>
     <string name="settings_expand_tools">Werkzeugaufrufe aufklappen</string>
     <string name="settings_expand_tools_sub">Werkzeugzeilen aufgeklappt statt als einzeilige Zusammenfassung anzeigen</string>
-    <string name="settings_live_activity">Live-Aktivität</string>
     <string name="settings_follow_running">Laufende Arbeit verfolgen</string>
     <string name="settings_follow_running_sub">Den aktuellen Schritt des Agenten während der Arbeit geöffnet lassen und nach Abschluss der Antwort wieder einklappen</string>
     <string name="settings_live_thinking">Denkprozess</string>
@@ -185,8 +182,6 @@
         <item quantity="one">%1$s Schritt</item>
         <item quantity="other">%1$s Schritte</item>
     </plurals>
-    <string name="settings_notifications">Benachrichtigungen</string>
-    <string name="settings_terminal">Terminal</string>
     <string name="settings_terminal_keyboard">Tastatur öffnen</string>
     <string name="settings_terminal_keyboard_sub">Bildschirmtastatur anzeigen, sobald das Terminal geöffnet wird</string>
     <string name="settings_terminal_fullscreen">Im Vollbild öffnen</string>
@@ -246,11 +241,7 @@
     <string name="settings_search_empty">Keine Einstellung passt</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">Anpassen</string>
-    <string name="settings_area_appearance_sub">Design und Textgröße</string>
-    <string name="settings_area_chat_sub">Kopfzeile, Denkprozess, Werkzeuge, Karten und Kosten</string>
     <string name="settings_area_live_sub">Was offen bleibt, während der Agent arbeitet</string>
-    <string name="settings_area_composer_sub">Agentenfarbe, Modelle, Spracheingabe</string>
-    <string name="settings_area_sessions_sub">Laufende Arbeit, Wischen, Liste neben dem Chat</string>
     <string name="settings_area_terminal_sub">Tastenleiste, Tastatur und Vollbild</string>
     <string name="settings_area_notifications_sub">Was dir eine laufende Sitzung meldet</string>
     <string name="settings_area_updates_sub">Neue Versionen der App</string>

@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">Darstellung</string>
     <string name="oc_area_chat">Chat</string>
     <string name="oc_area_live">Live-Aktivität</string>
-    <string name="oc_area_composer">Eingabe und Modelle</string>
-    <string name="oc_area_sessions">Sitzungsliste</string>
     <string name="oc_area_terminal">Terminal</string>
     <string name="oc_area_notifications">Benachrichtigungen</string>
     <string name="oc_area_updates">Updates</string>

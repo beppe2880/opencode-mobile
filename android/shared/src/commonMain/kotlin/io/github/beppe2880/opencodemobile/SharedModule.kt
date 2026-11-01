@@ -29,7 +29,7 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     single { ScrollMemory() }
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get(), get()) }
+    viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }
     viewModel { UsageViewModel(get(), get()) }
     // The update sheet is offered once per app run.
     single { UpdateSheetSession() }

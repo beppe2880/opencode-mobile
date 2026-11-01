@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
 import io.github.beppe2880.opencodemobile.fake.DemoData
@@ -56,6 +57,8 @@ class MainActivity : ComponentActivity() {
             // The live demo of Settings: edit mode on the real settings, back to Settings on exit.
             var liveDemo by rememberSaveable { mutableStateOf(false) }
             var openSettings by rememberSaveable { mutableStateOf(false) }
+            // The category the live demo left for, by name; null for the first page of Settings.
+            var openSettingsArea by rememberSaveable { mutableStateOf<String?>(null) }
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val newSession by newSessionRequested.collectAsStateWithLifecycle()
             val appSettings by settings.settings.collectAsStateWithLifecycle()
@@ -79,6 +82,13 @@ class MainActivity : ComponentActivity() {
                         if (liveDemo) openSettings = true
                         liveDemo = false
                     },
+                    onOpenSettingsArea = { area ->
+                        demoData.close()
+                        demo = false
+                        openSettings = true
+                        openSettingsArea = area.name
+                        liveDemo = false
+                    },
                     edit = liveDemo,
                     realDarkTheme = appSettings.theme.isDark(),
                     modifier = Modifier.semantics { testTagsAsResourceId = true },
@@ -92,7 +102,11 @@ class MainActivity : ComponentActivity() {
                             demo = true
                         },
                         openSettings = openSettings,
-                        onSettingsOpened = { openSettings = false },
+                        openSettingsArea = SettingsArea.entries.firstOrNull { it.name == openSettingsArea },
+                        onSettingsOpened = {
+                            openSettings = false
+                            openSettingsArea = null
+                        },
                         modifier = Modifier.semantics { testTagsAsResourceId = true },
                         openSessionId = openSession,
                         onSessionOpened = { sessionToOpen.value = null },

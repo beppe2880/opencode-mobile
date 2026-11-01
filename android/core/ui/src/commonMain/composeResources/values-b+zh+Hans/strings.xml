@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">外观</string>
     <string name="oc_area_chat">聊天</string>
     <string name="oc_area_live">实时活动</string>
-    <string name="oc_area_composer">编辑器和模型</string>
-    <string name="oc_area_sessions">会话列表</string>
     <string name="oc_area_terminal">终端</string>
     <string name="oc_area_notifications">通知</string>
     <string name="oc_area_updates">更新</string>

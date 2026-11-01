@@ -14,8 +14,10 @@ import kotlin.test.assertTrue
 class SettingOptionsTest {
 
     @Test
-    fun everyAreaHasPartsAndEveryPartHasOptions() {
-        SettingsArea.entries.forEach { assertTrue(SettingsPart.of(it).isNotEmpty(), "$it has no parts") }
+    fun everyAreaWithOptionsHasPartsAndEveryPartHasOptions() {
+        // Servers and about have pages of their own but no options, so no preview.
+        SettingsArea.entries.filter { it.options.isNotEmpty() }.forEach { assertTrue(SettingsPart.of(it).isNotEmpty(), "$it has no parts") }
+        assertTrue(SettingsPart.of(SettingsArea.Servers).isEmpty() && SettingsPart.of(SettingsArea.About).isEmpty())
         SettingsPart.entries.forEach { assertTrue(it.options.isNotEmpty(), "$it has no options") }
     }
 
@@ -26,7 +28,8 @@ class SettingOptionsTest {
         assertEquals(SettingsArea.Appearance, SettingOption.TextSize.area)
         assertEquals(SettingsPart.Thoughts, SettingOption.GroupActivity.part)
         assertEquals(SettingsArea.LiveActivity, SettingOption.LiveInterval.area)
-        assertEquals(SettingsArea.Sessions, SettingOption.BackShowsList.area)
+        assertEquals(SettingsArea.Appearance, SettingOption.BackShowsList.area)
+        assertEquals(SettingsPart.SplitView, SettingOption.BackShowsList.part)
         assertEquals(SettingsArea.Terminal, SettingOption.TerminalKeys.area)
     }
 
@@ -35,9 +38,9 @@ class SettingOptionsTest {
         assertEquals(listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens), SettingsPart.Header.options)
         assertEquals(listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed), SettingsPart.PendingCards.options)
         assertEquals(listOf(SettingOption.AgentOutline, SettingOption.Dictation), SettingsPart.ComposerBox.options)
-        assertEquals(SettingsPart.ComposerBox, SettingOption.Dictation.part)
+        assertEquals(SettingsPart.VoiceInput, SettingOption.Dictation.part)
         assertEquals(SettingsPart.VoiceInput, SettingOption.VoiceKey.part)
-        assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval), SettingsPart.LiveShell.options)
+        assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines), SettingsPart.LiveShell.options)
         assertEquals(listOf(SettingOption.UpdateNotice), SettingsPart.UpdateNotice.options)
         assertTrue(SettingsPart.Activity.options.containsAll(SettingsPart.Thoughts.options + SettingsPart.Tools.options))
     }
@@ -63,8 +66,10 @@ class SettingOptionsTest {
     }
 
     @Test
-    fun sharingIsSetWhereItsSheetIsAndOnlyWhereAppsCanShare() {
-        assertEquals(SettingsPart.NewChat, SettingOption.ShareMenu.part)
+    fun sharingHasItsOwnCategoryIsReachedFromItsSheetAndOnlyWhereAppsCanShare() {
+        assertEquals(SettingsArea.Sharing, SettingOption.ShareMenu.area)
+        assertEquals(SettingsPart.ShareTarget, SettingOption.ShareMenu.part)
+        assertTrue(SettingOption.ShareOpens in SettingsPart.NewChat.options)
         assertEquals(SettingOption.ShareMenu, SettingOption.ShareOpens.requires)
         assertEquals(shareTargetSupported, SettingOption.ShareMenu.supported)
         assertEquals(shareTargetSupported, SettingOption.ShareMenu.appliesTo(AppSettings()))

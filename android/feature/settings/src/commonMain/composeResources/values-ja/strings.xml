@@ -15,17 +15,14 @@
     <string name="settings_save">保存</string>
     <string name="settings_remove_title">サーバーを削除しますか？</string>
     <string name="settings_remove_message">「%1$s」と保存された認証情報をこの端末から削除します。後で再度ペアリングできます。</string>
-    <string name="settings_appearance">外観</string>
     <string name="settings_theme">テーマ</string>
     <string name="settings_theme_system">システム</string>
     <string name="settings_theme_light">ライト</string>
     <string name="settings_theme_dark">ダーク</string>
-    <string name="settings_conversation">会話</string>
     <string name="settings_show_reasoning">思考過程を表示</string>
     <string name="settings_show_reasoning_sub">会話に折りたたまれた「思考時間…」ブロックを表示</string>
     <string name="settings_expand_tools">ツール呼び出しを展開</string>
     <string name="settings_expand_tools_sub">ツールの行を1行の要約ではなく展開して表示</string>
-    <string name="settings_live_activity">ライブアクティビティ</string>
     <string name="settings_follow_running">実行中の作業を追跡</string>
     <string name="settings_follow_running_sub">エージェントの作業中は現在のステップを展開したままにし、回答が終わったら折りたたむ</string>
     <string name="settings_live_thinking">思考</string>
@@ -182,8 +179,6 @@
     <plurals name="usage_model_steps">
         <item quantity="other">%1$s ステップ</item>
     </plurals>
-    <string name="settings_notifications">通知</string>
-    <string name="settings_terminal">ターミナル</string>
     <string name="settings_terminal_keyboard">キーボードを開く</string>
     <string name="settings_terminal_keyboard_sub">ターミナルを開いたときに画面キーボードをすぐに表示します</string>
     <string name="settings_terminal_fullscreen">全画面で開く</string>
@@ -243,11 +238,7 @@
     <string name="settings_search_empty">一致する設定がありません</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">カスタマイズ</string>
-    <string name="settings_area_appearance_sub">テーマとテキストサイズ</string>
-    <string name="settings_area_chat_sub">ヘッダー、思考、ツール、カード、費用</string>
     <string name="settings_area_live_sub">エージェントの作業中に開いたままにする内容</string>
-    <string name="settings_area_composer_sub">エージェントの色、モデル、音声入力</string>
-    <string name="settings_area_sessions_sub">実行中の作業、スワイプ、チャットの横の一覧</string>
     <string name="settings_area_terminal_sub">キーバー、キーボード、全画面</string>
     <string name="settings_area_notifications_sub">実行中のセッションからの通知内容</string>
     <string name="settings_area_updates_sub">アプリの新しいバージョン</string>

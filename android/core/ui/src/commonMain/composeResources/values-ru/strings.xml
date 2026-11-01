@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">Оформление</string>
     <string name="oc_area_chat">Чат</string>
     <string name="oc_area_live">Активность в реальном времени</string>
-    <string name="oc_area_composer">Композер и модели</string>
-    <string name="oc_area_sessions">Список сессий</string>
     <string name="oc_area_terminal">Терминал</string>
     <string name="oc_area_notifications">Уведомления</string>
     <string name="oc_area_updates">Обновления</string>

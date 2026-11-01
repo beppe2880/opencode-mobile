@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.R
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
@@ -47,6 +48,8 @@ fun DemoHost(
     modifier: Modifier = Modifier,
     /** The live demo of Settings: the real screens in edit mode, its own bar to leave. */
     edit: Boolean = false,
+    /** Leaves the live demo for a category page of Settings. */
+    onOpenSettingsArea: (SettingsArea) -> Unit = { onExit() },
 ) {
     val settings = remember(container) { container.koin.get<SettingsRepository>() }
     val preferences by settings.settings.collectAsStateWithLifecycle()
@@ -69,7 +72,7 @@ fun DemoHost(
                     .statusBarsPadding().consumeWindowInsets(WindowInsets.statusBars),
             ) {
                 if (edit) {
-                    LiveEditHost(onDone = onExit, modifier = Modifier.weight(1f)) {
+                    LiveEditHost(onDone = onExit, modifier = Modifier.weight(1f), onOpenArea = onOpenSettingsArea) {
                         AppNavHost(isDemo = true, hasActiveServer = true, onConnectServer = onExit)
                     }
                     return@Column

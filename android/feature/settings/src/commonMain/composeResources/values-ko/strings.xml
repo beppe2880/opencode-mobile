@@ -15,17 +15,14 @@
     <string name="settings_save">저장</string>
     <string name="settings_remove_title">서버를 제거할까요?</string>
     <string name="settings_remove_message">이 기기에서 “%1$s” 및 저장된 인증 정보가 제거됩니다. 나중에 다시 페어링할 수 있습니다.</string>
-    <string name="settings_appearance">화면</string>
     <string name="settings_theme">테마</string>
     <string name="settings_theme_system">시스템</string>
     <string name="settings_theme_light">라이트</string>
     <string name="settings_theme_dark">다크</string>
-    <string name="settings_conversation">대화</string>
     <string name="settings_show_reasoning">추론 표시</string>
     <string name="settings_show_reasoning_sub">대화에 접힌 “생각한 시간…” 블록 표시</string>
     <string name="settings_expand_tools">도구 호출 펼치기</string>
     <string name="settings_expand_tools_sub">한 줄 요약 대신 도구 행을 펼쳐서 표시</string>
-    <string name="settings_live_activity">실시간 활동</string>
     <string name="settings_follow_running">실행 중인 작업 따라가기</string>
     <string name="settings_follow_running_sub">에이전트가 작업하는 동안 현재 단계를 펼쳐 두고, 답변이 끝나면 다시 접기</string>
     <string name="settings_live_thinking">생각</string>
@@ -182,8 +179,6 @@
     <plurals name="usage_model_steps">
         <item quantity="other">%1$s 단계</item>
     </plurals>
-    <string name="settings_notifications">알림</string>
-    <string name="settings_terminal">터미널</string>
     <string name="settings_terminal_keyboard">키보드 열기</string>
     <string name="settings_terminal_keyboard_sub">터미널 화면이 열리면 바로 화면 키보드를 표시합니다</string>
     <string name="settings_terminal_fullscreen">전체 화면으로 열기</string>
@@ -243,11 +238,7 @@
     <string name="settings_search_empty">일치하는 설정이 없습니다</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">사용자 지정</string>
-    <string name="settings_area_appearance_sub">테마와 글자 크기</string>
-    <string name="settings_area_chat_sub">헤더, 생각, 도구, 카드 및 비용</string>
     <string name="settings_area_live_sub">에이전트가 작업하는 동안 열어 둘 항목</string>
-    <string name="settings_area_composer_sub">에이전트 색상, 모델, 음성 입력</string>
-    <string name="settings_area_sessions_sub">실행 중인 작업, 스와이프, 채팅 옆 목록</string>
     <string name="settings_area_terminal_sub">키 바, 키보드 및 전체 화면</string>
     <string name="settings_area_notifications_sub">실행 중인 세션이 알려 주는 내용</string>
     <string name="settings_area_updates_sub">앱의 새 버전</string>

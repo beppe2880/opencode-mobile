@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">外観</string>
     <string name="oc_area_chat">チャット</string>
     <string name="oc_area_live">ライブアクティビティ</string>
-    <string name="oc_area_composer">入力欄とモデル</string>
-    <string name="oc_area_sessions">セッション一覧</string>
     <string name="oc_area_terminal">ターミナル</string>
     <string name="oc_area_notifications">通知</string>
     <string name="oc_area_updates">アップデート</string>

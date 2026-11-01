@@ -15,17 +15,14 @@
     <string name="settings_save">保存</string>
     <string name="settings_remove_title">移除服务器？</string>
     <string name="settings_remove_message">将从此设备移除“%1$s”及其保存的凭据。稍后可以重新配对。</string>
-    <string name="settings_appearance">外观</string>
     <string name="settings_theme">主题</string>
     <string name="settings_theme_system">跟随系统</string>
     <string name="settings_theme_light">浅色</string>
     <string name="settings_theme_dark">深色</string>
-    <string name="settings_conversation">对话</string>
     <string name="settings_show_reasoning">显示推理</string>
     <string name="settings_show_reasoning_sub">在对话中显示折叠的“已思考…”区块</string>
     <string name="settings_expand_tools">展开工具调用</string>
     <string name="settings_expand_tools_sub">展开显示工具详情，而不是单行摘要</string>
-    <string name="settings_live_activity">实时活动</string>
     <string name="settings_follow_running">跟随运行中的工作</string>
     <string name="settings_follow_running_sub">智能体工作时保持当前步骤展开，回答结束后自动折叠</string>
     <string name="settings_live_thinking">思考</string>
@@ -182,8 +179,6 @@
     <plurals name="usage_model_steps">
         <item quantity="other">%1$s 步</item>
     </plurals>
-    <string name="settings_notifications">通知</string>
-    <string name="settings_terminal">终端</string>
     <string name="settings_terminal_keyboard">打开键盘</string>
     <string name="settings_terminal_keyboard_sub">打开终端时立即显示屏幕键盘</string>
     <string name="settings_terminal_fullscreen">在全屏中打开</string>
@@ -243,11 +238,7 @@
     <string name="settings_search_empty">没有匹配的设置</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">自定义</string>
-    <string name="settings_area_appearance_sub">主题和文字大小</string>
-    <string name="settings_area_chat_sub">标题栏、思考、工具、卡片和费用</string>
     <string name="settings_area_live_sub">智能体工作时保持展开的内容</string>
-    <string name="settings_area_composer_sub">智能体颜色、模型、语音输入</string>
-    <string name="settings_area_sessions_sub">运行中的工作、滑动、列表与聊天并排</string>
     <string name="settings_area_terminal_sub">按键栏、键盘和全屏</string>
     <string name="settings_area_notifications_sub">运行中的会话会通知你的内容</string>
     <string name="settings_area_updates_sub">应用的新版本</string>

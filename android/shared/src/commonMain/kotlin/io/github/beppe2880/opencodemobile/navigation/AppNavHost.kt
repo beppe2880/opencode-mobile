@@ -50,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
@@ -96,8 +97,9 @@ data object SessionsDestination
 @Serializable
 data class ChatDestination(val sessionId: String)
 
+/** Settings, on the first page or at the category named [area] (a [SettingsArea] name). */
 @Serializable
-data object SettingsDestination
+data class SettingsDestination(val area: String? = null)
 
 @Serializable
 data object UsageDestination
@@ -136,8 +138,9 @@ fun AppNavHost(
     isDemo: Boolean = false,
     /** Opens the offline demo in edit mode to change settings on the real screens; null where there is none. */
     onCustomizeInDemo: (() -> Unit)? = null,
-    /** Opens Settings over the session list once (back from the live demo). */
+    /** Opens Settings over the session list once (back from the live demo), at [openSettingsArea] if set. */
     openSettings: Boolean = false,
+    openSettingsArea: SettingsArea? = null,
     onSettingsOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
@@ -164,7 +167,7 @@ fun AppNavHost(
 
     LaunchedEffect(openSettings, hasActiveServer) {
         if (!openSettings || !hasActiveServer) return@LaunchedEffect
-        navController.navigate(SettingsDestination) {
+        navController.navigate(SettingsDestination(openSettingsArea?.name)) {
             popUpTo<SessionsDestination>()
         }
         onSettingsOpened()
@@ -217,7 +220,7 @@ fun AppNavHost(
             SessionsListDetail(
                 demo = isDemo,
                 onOpenChatFullScreen = navController::openChat,
-                onOpenSettings = { navController.navigate(SettingsDestination) },
+                onOpenSettings = { navController.navigate(SettingsDestination()) },
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
@@ -240,8 +243,10 @@ fun AppNavHost(
                 },
             )
         }
-        composable<SettingsDestination> {
+        composable<SettingsDestination> { entry ->
+            val area = entry.toRoute<SettingsDestination>().area
             SettingsRoute(
+                initialArea = SettingsArea.entries.firstOrNull { it.name == area },
                 demo = isDemo,
                 onBack = { navController.popBackStack() },
                 onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },

@@ -15,17 +15,14 @@
     <string name="settings_save">Сохранить</string>
     <string name="settings_remove_title">Удалить сервер?</string>
     <string name="settings_remove_message">«%1$s» и сохранённые учётные данные будут удалены с этого устройства. Позже можно выполнить сопряжение заново.</string>
-    <string name="settings_appearance">Оформление</string>
     <string name="settings_theme">Тема</string>
     <string name="settings_theme_system">Системная</string>
     <string name="settings_theme_light">Светлая</string>
     <string name="settings_theme_dark">Тёмная</string>
-    <string name="settings_conversation">Разговор</string>
     <string name="settings_show_reasoning">Показывать рассуждения</string>
     <string name="settings_show_reasoning_sub">Показывать свёрнутые блоки «Размышлял…» в истории</string>
     <string name="settings_expand_tools">Разворачивать вызовы инструментов</string>
     <string name="settings_expand_tools_sub">Показывать вызовы инструментов развёрнутыми вместо краткой строки</string>
-    <string name="settings_live_activity">Активность в реальном времени</string>
     <string name="settings_follow_running">Следить за текущей работой</string>
     <string name="settings_follow_running_sub">Держать текущий шаг агента развёрнутым, пока он работает, и сворачивать его по окончании ответа</string>
     <string name="settings_live_thinking">Рассуждения</string>
@@ -191,8 +188,6 @@
         <item quantity="many">%1$s шагов</item>
         <item quantity="other">%1$s шага</item>
     </plurals>
-    <string name="settings_notifications">Уведомления</string>
-    <string name="settings_terminal">Терминал</string>
     <string name="settings_terminal_keyboard">Открывать клавиатуру</string>
     <string name="settings_terminal_keyboard_sub">Показывать экранную клавиатуру сразу при открытии терминала</string>
     <string name="settings_terminal_fullscreen">Открывать на весь экран</string>
@@ -252,11 +247,7 @@
     <string name="settings_search_empty">Нет подходящих настроек</string>
     <string name="settings_search_result">%1$s › %2$s</string>
     <string name="settings_areas">Настроить</string>
-    <string name="settings_area_appearance_sub">Тема и размер текста</string>
-    <string name="settings_area_chat_sub">Заголовок, рассуждения, инструменты, карточки и стоимость</string>
     <string name="settings_area_live_sub">Что остаётся открытым, пока агент работает</string>
-    <string name="settings_area_composer_sub">Цвет агента, модели, голосовой ввод</string>
-    <string name="settings_area_sessions_sub">Текущая работа, свайпы, список рядом с чатом</string>
     <string name="settings_area_terminal_sub">Панель клавиш, клавиатура и полноэкранный режим</string>
     <string name="settings_area_notifications_sub">О чём сообщает выполняющаяся сессия</string>
     <string name="settings_area_updates_sub">Новые версии приложения</string>

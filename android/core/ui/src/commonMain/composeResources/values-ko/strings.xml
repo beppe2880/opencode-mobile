@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">화면</string>
     <string name="oc_area_chat">채팅</string>
     <string name="oc_area_live">실시간 활동</string>
-    <string name="oc_area_composer">입력창 및 모델</string>
-    <string name="oc_area_sessions">세션 목록</string>
     <string name="oc_area_terminal">터미널</string>
     <string name="oc_area_notifications">알림</string>
     <string name="oc_area_updates">업데이트</string>

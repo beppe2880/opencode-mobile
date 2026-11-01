@@ -29,8 +29,6 @@
     <string name="oc_area_appearance">المظهر</string>
     <string name="oc_area_chat">المحادثة</string>
     <string name="oc_area_live">النشاط المباشر</string>
-    <string name="oc_area_composer">المحرر والنماذج</string>
-    <string name="oc_area_sessions">قائمة الجلسات</string>
     <string name="oc_area_terminal">الطرفية</string>
     <string name="oc_area_notifications">الإشعارات</string>
     <string name="oc_area_updates">التحديثات</string>

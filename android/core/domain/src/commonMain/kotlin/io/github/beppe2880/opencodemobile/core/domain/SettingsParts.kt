@@ -3,16 +3,31 @@ package io.github.beppe2880.opencodemobile.core.domain
 /** How Settings opens: the classic list, or the groups of settings with their live previews. */
 enum class SettingsStyle { List, Preview }
 
-/** A group of settings with its own live preview in Settings, in the order Settings lists them. */
+/**
+ * A category of Settings, in the order Settings lists them: a page of the List style and, when it
+ * has [SettingsPart]s, a group with its own live preview in the Preview style. Only kept in
+ * memory, never saved, so entries can be added or reordered freely.
+ */
 enum class SettingsArea {
+    /** Saved servers and usage statistics; no options of its own. */
+    Servers,
     Appearance,
     Chat,
     LiveActivity,
+
+    /** The message box: agent outline, agent and model changes, the model of new chats. */
     Composer,
+    VoiceInput,
     Sessions,
-    Terminal,
+
+    /** Sharing from other apps to OpenCode (Android only). */
+    Sharing,
     Notifications,
+    Terminal,
     Updates,
+
+    /** Versions and resetting every setting; no options of its own. */
+    About,
 }
 
 /**
@@ -56,7 +71,7 @@ enum class SettingsPart(val area: SettingsArea) {
     ComposerBox(SettingsArea.Composer),
 
     /** The microphone button: the phone's speech recognition or a cloud provider. */
-    VoiceInput(SettingsArea.Composer),
+    VoiceInput(SettingsArea.VoiceInput),
 
     /** When a picked agent or model reaches the server. */
     SelectionTiming(SettingsArea.Composer),
@@ -64,10 +79,13 @@ enum class SettingsPart(val area: SettingsArea) {
     /** The model of the new chat sheet. */
     NewChat(SettingsArea.Composer),
     SessionRows(SettingsArea.Sessions),
-    SwipeChats(SettingsArea.Sessions),
+    SwipeChats(SettingsArea.Chat),
 
     /** The session list beside the chat on wide screens. */
-    SplitView(SettingsArea.Sessions),
+    SplitView(SettingsArea.Appearance),
+
+    /** OpenCode in the share menu of other apps, and what sharing opens. */
+    ShareTarget(SettingsArea.Sharing),
     KeyBar(SettingsArea.Terminal),
     TerminalKeyboard(SettingsArea.Terminal),
     TerminalFullscreen(SettingsArea.Terminal),
