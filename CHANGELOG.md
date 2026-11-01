@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.10.0](https://github.com/beppe2880/opencode-mobile/compare/v0.9.0...v0.10.0) (2026-11-01)
+
+
+### Features
+
+* Add a full screen mode to the terminal ([#99](https://github.com/beppe2880/opencode-mobile/issues/99)) ([d07f6f0](https://github.com/beppe2880/opencode-mobile/commit/d07f6f0b047d340c5506db53a8ad68eaf624a8d0))
+* Add an iOS app with Kotlin Multiplatform ([b1d72c7](https://github.com/beppe2880/opencode-mobile/commit/b1d72c7a38f78c674b92b6b9f2a3ba362411a03d))
+* **chat:** Apply agent and model changes with the next message and start new chats from the last used model ([#118](https://github.com/beppe2880/opencode-mobile/issues/118)) ([99e6c62](https://github.com/beppe2880/opencode-mobile/commit/99e6c62d3202cd7decc83672554a9139d9b2d245))
+* **chat:** Group consecutive thoughts into one row ([#124](https://github.com/beppe2880/opencode-mobile/issues/124)) ([2fc3f7b](https://github.com/beppe2880/opencode-mobile/commit/2fc3f7b6566d3d78f62a1cfc9201233a92e197ce))
+* **chat:** Let question and permission cards collapse to a bar ([#119](https://github.com/beppe2880/opencode-mobile/issues/119)) ([7385172](https://github.com/beppe2880/opencode-mobile/commit/7385172b67cacd9083b0ac881d9f3861af48b5c9))
+* **chat:** Show running subagents and background commands ([#105](https://github.com/beppe2880/opencode-mobile/issues/105)) ([581755e](https://github.com/beppe2880/opencode-mobile/commit/581755e73bf535a3f3bf81ed640ade658c0ecf05))
+* **chat:** Show the folder, branch and changed files in the chat header ([#120](https://github.com/beppe2880/opencode-mobile/issues/120)) ([54126a4](https://github.com/beppe2880/opencode-mobile/commit/54126a486101fd161d5cf403721d2c47ca6df3ae))
+* **connect:** Add an offline interactive demo ([#103](https://github.com/beppe2880/opencode-mobile/issues/103)) ([9ef7adb](https://github.com/beppe2880/opencode-mobile/commit/9ef7adba5b92c2b1146c708307125eb517a4b78b))
+* Hide the sessions list next to the chat on large screens ([e1d0713](https://github.com/beppe2880/opencode-mobile/commit/e1d07130ae69fd2a315afadaed6d4f447f04a66a))
+* Resize the session list and choose the split view in Settings ([cb22126](https://github.com/beppe2880/opencode-mobile/commit/cb22126d2fafcc1cfce931d04e849ef72fcc25c0))
+* **sessions:** Move the time under the title in a narrow session list ([841d49b](https://github.com/beppe2880/opencode-mobile/commit/841d49b3dfce2a359337c38596ba6d8766eeffc6))
+* **sessions:** Start a session from text, links and images shared by other apps ([#134](https://github.com/beppe2880/opencode-mobile/issues/134)) ([9c1a5ca](https://github.com/beppe2880/opencode-mobile/commit/9c1a5ca15240deeb9ce0d93f61d38d2cd88bec38))
+* **settings:** Change settings from a list, live previews or the demo ([#128](https://github.com/beppe2880/opencode-mobile/issues/128)) ([a2c9543](https://github.com/beppe2880/opencode-mobile/commit/a2c95439dbc1941ad6a4ab7f1b0c3ff8570645b6))
+* **settings:** Show an update sheet with the changelog when the app opens ([#132](https://github.com/beppe2880/opencode-mobile/issues/132)) ([82e6e0f](https://github.com/beppe2880/opencode-mobile/commit/82e6e0f933e7487cba3ac9a4ea367678413430e1))
+* Show a notice when a new release is available ([#117](https://github.com/beppe2880/opencode-mobile/issues/117)) ([72cf39f](https://github.com/beppe2880/opencode-mobile/commit/72cf39f82e48b01882673e7c082037d728b2e7da))
+* Show the list and the chat side by side on unfolded foldables ([cba1e02](https://github.com/beppe2880/opencode-mobile/commit/cba1e02aa03758d89b5ec7717647ddc26d715d48))
+* Side-by-side sessions and chat on foldables, resizable and configurable ([817a38e](https://github.com/beppe2880/opencode-mobile/commit/817a38e2506f10418e5324211fd31960a53f8249))
+
+
+### Bug fixes
+
+* **chat:** Return to the parent chat with one Back after opening a subagent ([#125](https://github.com/beppe2880/opencode-mobile/issues/125)) ([af2c344](https://github.com/beppe2880/opencode-mobile/commit/af2c3446ea0435025f59b0c12e1303798eb5d805))
+* **chat:** Show live shell output again with current servers ([#133](https://github.com/beppe2880/opencode-mobile/issues/133)) ([9437f7d](https://github.com/beppe2880/opencode-mobile/commit/9437f7d8f5d5f8b11d88594a1c070b8e6f056008))
+* Forget running sessions after an unauthorized event stream ([#114](https://github.com/beppe2880/opencode-mobile/issues/114)) ([d1af950](https://github.com/beppe2880/opencode-mobile/commit/d1af95032c5ecedad42f66a0a7768d47ae0d42af))
+* Pause hidden chat polling, hidden terminal traffic and offline reconnects ([#112](https://github.com/beppe2880/opencode-mobile/issues/112)) ([56a9e91](https://github.com/beppe2880/opencode-mobile/commit/56a9e916bb4d491d582f04b032914ceffaf25e4e))
+* **sessions:** Clear the chat pane after switching servers ([#100](https://github.com/beppe2880/opencode-mobile/issues/100)) ([10e0495](https://github.com/beppe2880/opencode-mobile/commit/10e04956266c33e7e9fa6a092505ca7751cf1896))
+* **sessions:** Show the hidden session list on Back ([#116](https://github.com/beppe2880/opencode-mobile/issues/116)) ([e545ca8](https://github.com/beppe2880/opencode-mobile/commit/e545ca813986d81f0ea78f35a6aff3d3a5e6742b))
+
+
+### Documentation
+
+* Sign iOS simulator builds ad hoc so the Keychain works ([#121](https://github.com/beppe2880/opencode-mobile/issues/121)) ([00e8640](https://github.com/beppe2880/opencode-mobile/commit/00e8640e6c288a5feccd45ff99fb69c8da863dce))
+
 ## [0.9.0](https://github.com/beppe2880/opencode-mobile/compare/v0.8.0...v0.9.0) (2026-10-27)
 
 
