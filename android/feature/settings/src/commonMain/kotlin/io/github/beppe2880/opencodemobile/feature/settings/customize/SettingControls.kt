@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
@@ -43,6 +44,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ba
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_cloud_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools_sub
@@ -162,6 +164,19 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_up
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_key
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_key_search
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_language
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_language_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_cloud
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_cloud_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_system
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_system_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider_sub
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
@@ -195,6 +210,11 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.LiveOther -> Res.string.settings_live_other
         SettingOption.AgentOutline -> Res.string.settings_agent_outline
         SettingOption.Dictation -> Res.string.settings_dictation
+        SettingOption.VoiceMode -> Res.string.settings_voice_mode
+        SettingOption.VoiceProvider -> Res.string.settings_voice_provider
+        SettingOption.VoiceModel -> Res.string.settings_voice_model
+        SettingOption.VoiceKey -> Res.string.settings_voice_key
+        SettingOption.VoiceLanguage -> Res.string.settings_voice_language
         SettingOption.SelectionApply -> Res.string.settings_selection_apply
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model
         SettingOption.ShareMenu -> Res.string.settings_share_menu
@@ -244,6 +264,11 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.LiveOther -> Res.string.settings_live_other_sub
         SettingOption.AgentOutline -> Res.string.settings_agent_outline_sub
         SettingOption.Dictation -> Res.string.settings_dictation_sub
+        SettingOption.VoiceMode -> Res.string.settings_voice_mode_cloud_sub
+        SettingOption.VoiceProvider -> Res.string.settings_voice_provider_sub
+        SettingOption.VoiceModel -> Res.string.settings_voice_model_sub
+        SettingOption.VoiceKey -> Res.string.settings_voice_key_search
+        SettingOption.VoiceLanguage -> Res.string.settings_voice_language_sub
         SettingOption.SelectionApply -> Res.string.settings_selection_apply_sub
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model_sub
         SettingOption.ShareMenu -> Res.string.settings_share_menu_sub
@@ -381,7 +406,30 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.LiveReads -> switch(settings.liveReads, SettingsEvent::LiveReadsChanged)()
         SettingOption.LiveOther -> switch(settings.liveOther, SettingsEvent::LiveOtherChanged)()
         SettingOption.AgentOutline -> switch(settings.agentColorOutline, SettingsEvent::AgentColorOutlineChanged)()
-        SettingOption.Dictation -> switch(settings.dictation, SettingsEvent::DictationChanged)()
+        SettingOption.Dictation -> switch(
+            settings.dictation,
+            SettingsEvent::DictationChanged,
+            if (settings.voiceEngine == VoiceEngine.Cloud) stringResource(Res.string.settings_dictation_cloud_sub) else subtitle,
+        )()
+        SettingOption.VoiceMode -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.voiceEngine) {
+                    VoiceEngine.System -> Res.string.settings_voice_mode_system_sub
+                    VoiceEngine.Cloud -> Res.string.settings_voice_mode_cloud_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(VoiceEngine.System, stringResource(Res.string.settings_voice_mode_system), "settings_voice_mode_system"),
+                OcSegment(VoiceEngine.Cloud, stringResource(Res.string.settings_voice_mode_cloud), "settings_voice_mode_cloud"),
+            ),
+            selected = settings.voiceEngine,
+            onSelect = { onEvent(SettingsEvent.VoiceEngineChanged(it)) },
+        )
+        SettingOption.VoiceProvider -> VoiceProviderControl(title, subtitle, state, onEvent, modifier)
+        SettingOption.VoiceModel -> VoiceModelControl(title, subtitle, state, onEvent, modifier)
+        SettingOption.VoiceKey -> VoiceKeyControl(title, state, onEvent, modifier)
+        SettingOption.VoiceLanguage -> switch(settings.sttLanguageHint, SettingsEvent::SttLanguageHintChanged)()
         SettingOption.SelectionApply -> ChoiceRow(
             title = title,
             subtitle = subtitle,
@@ -513,6 +561,11 @@ private val SettingOption.tag: String
         SettingOption.LiveOther -> "live_other"
         SettingOption.AgentOutline -> "agent_outline"
         SettingOption.Dictation -> "dictation"
+        SettingOption.VoiceMode -> "voice_mode"
+        SettingOption.VoiceProvider -> "voice_provider"
+        SettingOption.VoiceModel -> "voice_model"
+        SettingOption.VoiceKey -> "voice_key"
+        SettingOption.VoiceLanguage -> "voice_language"
         SettingOption.RunningInList -> "running_in_list"
         SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"

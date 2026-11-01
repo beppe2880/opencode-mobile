@@ -6,6 +6,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
+import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.reset
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import kotlinx.coroutines.Job
@@ -16,10 +18,12 @@ class SettingsViewModel(
     private val servers: ServerRepository,
     private val settings: SettingsRepository,
     appInfo: AppInfo,
+    private val stt: SpeechToTextRepository,
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
     SettingsState(appVersion = appInfo.versionName, apiVersion = appInfo.apiVersion, updateTarget = appInfo.updateTarget),
 ) {
     private var probeJob: Job? = null
+    private var sttJob: Job? = null
 
     /** The switch asked for the notification permission and turns on once it is granted. */
     private var awaitingPermission = false
@@ -27,6 +31,7 @@ class SettingsViewModel(
     init {
         viewModelScope.launch { servers.servers.collect { list -> updateState { it.copy(servers = list) } } }
         viewModelScope.launch { settings.settings.collect { s -> updateState { it.copy(settings = s) } } }
+        viewModelScope.launch { stt.savedKeys.collect { keys -> updateState { it.copy(sttKeys = keys) } } }
         viewModelScope.launch {
             servers.activeServer.distinctUntilChangedBy { it?.id }.collect { active ->
                 updateState { it.copy(activeServerId = active?.id) }
@@ -91,13 +96,62 @@ class SettingsViewModel(
                 if (event.allowed && awaitingPermission) update { it.copy(notifications = true) }
                 if (event.allowed || event.blocked) awaitingPermission = false
             }
+            is SettingsEvent.SaveSttKey -> {
+                val provider = settings.settings.value.sttProvider
+                clearSttTest()
+                viewModelScope.launch { stt.saveKey(provider, event.key) }
+            }
+            SettingsEvent.RemoveSttKey -> {
+                val provider = settings.settings.value.sttProvider
+                clearSttTest()
+                viewModelScope.launch { stt.removeKey(provider) }
+            }
+            SettingsEvent.TestStt -> {
+                sttJob?.cancel()
+                updateState { it.copy(sttTest = SttTest.Running) }
+                sttJob = viewModelScope.launch {
+                    val result = stt.test()
+                    updateState {
+                        it.copy(
+                            sttTest = result.exceptionOrNull()?.let { e ->
+                                SttTest.Failed(e as? TranscriptionError ?: TranscriptionError.Network(e))
+                            } ?: SttTest.Passed,
+                        )
+                    }
+                }
+            }
+            SettingsEvent.LoadSttModels -> {
+                val provider = settings.settings.value.sttProvider
+                if (currentState.sttModelsLoading) return
+                updateState { it.copy(sttModelsLoading = true) }
+                viewModelScope.launch {
+                    val models = stt.listModels(provider).getOrNull()
+                    updateState { state ->
+                        state.copy(
+                            sttModelsLoading = false,
+                            sttListedModels = if (models.isNullOrEmpty()) state.sttListedModels else state.sttListedModels + (provider to models),
+                        )
+                    }
+                }
+            }
             // Switches and choices of a single setting.
-            else -> update { it.updatedBy(event) ?: it }
+            else -> {
+                // A test speaks for the provider, address and model it was made with.
+                if (event is SettingsEvent.SttProviderChanged || event is SettingsEvent.SttModelChanged || event is SettingsEvent.SttBaseUrlChanged) {
+                    clearSttTest()
+                }
+                update { it.updatedBy(event) ?: it }
+            }
         }
     }
 
     private fun update(transform: (AppSettings) -> AppSettings) {
         viewModelScope.launch { settings.update(transform) }
+    }
+
+    private fun clearSttTest() {
+        sttJob?.cancel()
+        updateState { it.copy(sttTest = null) }
     }
 
     private fun closeArea() = updateState { it.copy(area = null, selected = null, focus = null) }

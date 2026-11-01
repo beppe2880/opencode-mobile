@@ -15,8 +15,14 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
+import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
@@ -38,7 +44,8 @@ class SettingsViewModelTest {
 
     private val servers = FakeServers()
     private val settings = FakeSettings()
-    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android))
+    private val stt = FakeStt()
+    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt)
 
     @Test
     fun `exposes servers, versions and settings`() = runTest(main.testDispatcher) {
@@ -313,6 +320,78 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `cloud voice choices are saved, a blank model goes back to the default`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.VoiceEngineChanged(VoiceEngine.Cloud))
+        vm.onEvent(SettingsEvent.SttProviderChanged(SttProvider.Custom))
+        vm.onEvent(SettingsEvent.SttBaseUrlChanged(" http://192.168.1.10:8000/v1 "))
+        vm.onEvent(SettingsEvent.SttModelChanged(" Systran/faster-whisper-small "))
+        vm.onEvent(SettingsEvent.SttLanguageHintChanged(false))
+        advanceUntilIdle()
+
+        val saved = settings.settings.value
+        assertEquals(VoiceEngine.Cloud, saved.voiceEngine)
+        assertEquals(SttProvider.Custom, saved.sttProvider)
+        assertEquals("http://192.168.1.10:8000/v1", saved.sttBaseUrl)
+        assertEquals(mapOf(SttProvider.Custom to "Systran/faster-whisper-small"), saved.sttModels)
+        assertFalse(saved.sttLanguageHint)
+
+        // Each provider keeps its own model.
+        vm.onEvent(SettingsEvent.SttProviderChanged(SttProvider.OpenAI))
+        vm.onEvent(SettingsEvent.SttModelChanged("whisper-1"))
+        vm.onEvent(SettingsEvent.SttModelChanged(""))
+        advanceUntilIdle()
+        assertEquals(mapOf(SttProvider.Custom to "Systran/faster-whisper-small"), settings.settings.value.sttModels)
+        assertEquals("gpt-4o-mini-transcribe", settings.settings.value.sttModel())
+    }
+
+    @Test
+    fun `api keys are saved for the chosen provider and only their presence is shown`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(voiceEngine = VoiceEngine.Cloud, sttProvider = SttProvider.Groq)
+        val vm = vm()
+        vm.onEvent(SettingsEvent.SaveSttKey("gsk-secret"))
+        advanceUntilIdle()
+
+        assertEquals(mapOf(SttProvider.Groq to "gsk-secret"), stt.keys)
+        assertEquals(setOf(SttProvider.Groq), vm.state.value.sttKeys)
+        assertFalse(vm.state.value.toString().contains("gsk-secret"))
+
+        vm.onEvent(SettingsEvent.RemoveSttKey)
+        advanceUntilIdle()
+        assertEquals(emptySet<SttProvider>(), vm.state.value.sttKeys)
+    }
+
+    @Test
+    fun `test reports success or the failure, and a change clears it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        stt.testResult = Result.failure(TranscriptionError.Unauthorized())
+        vm.onEvent(SettingsEvent.TestStt)
+        assertEquals(SttTest.Running, vm.state.value.sttTest)
+        advanceUntilIdle()
+        assertTrue((vm.state.value.sttTest as SttTest.Failed).error is TranscriptionError.Unauthorized)
+
+        stt.testResult = Result.success(Unit)
+        vm.onEvent(SettingsEvent.TestStt)
+        advanceUntilIdle()
+        assertEquals(SttTest.Passed, vm.state.value.sttTest)
+
+        vm.onEvent(SettingsEvent.SttModelChanged("openai/whisper-large-v3"))
+        advanceUntilIdle()
+        assertNull(vm.state.value.sttTest)
+    }
+
+    @Test
+    fun `models listed by the provider are kept per provider`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.LoadSttModels)
+        assertTrue(vm.state.value.sttModelsLoading)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.sttModelsLoading)
+        assertEquals(mapOf(SttProvider.OpenRouter to listOf("openai/whisper-1")), vm.state.value.sttListedModels)
+    }
+
+    @Test
     fun `add server opens connect`() = runTest(main.testDispatcher) {
         val vm = vm()
         vm.onEvent(SettingsEvent.AddServer)
@@ -336,6 +415,23 @@ private class FakeServers : ServerRepository {
     override suspend fun remove(serverId: String) {
         servers.value = servers.value.filterNot { it.id == serverId }
     }
+}
+
+internal class FakeStt : SpeechToTextRepository {
+    val keys = mutableMapOf<SttProvider, String>()
+    var testResult: Result<Unit> = Result.success(Unit)
+    override val savedKeys = MutableStateFlow<Set<SttProvider>>(emptySet())
+    override suspend fun saveKey(provider: SttProvider, key: String) {
+        keys[provider] = key
+        savedKeys.value = keys.keys.toSet()
+    }
+    override suspend fun removeKey(provider: SttProvider) {
+        keys.remove(provider)
+        savedKeys.value = keys.keys.toSet()
+    }
+    override suspend fun transcribe(clip: VoiceClip) = Result.success("")
+    override suspend fun test() = testResult
+    override suspend fun listModels(provider: SttProvider) = Result.success(listOf("openai/whisper-1"))
 }
 
 internal class FakeSettings : SettingsRepository {

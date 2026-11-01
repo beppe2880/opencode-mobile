@@ -34,6 +34,13 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.ConfirmStopChanged -> copy(confirmStopCommand = event.enabled)
     is SettingsEvent.AgentColorOutlineChanged -> copy(agentColorOutline = event.enabled)
     is SettingsEvent.DictationChanged -> copy(dictation = event.enabled)
+    is SettingsEvent.VoiceEngineChanged -> copy(voiceEngine = event.engine)
+    is SettingsEvent.SttProviderChanged -> copy(sttProvider = event.provider)
+    is SettingsEvent.SttModelChanged -> copy(
+        sttModels = if (event.model.isBlank()) sttModels - sttProvider else sttModels + (sttProvider to event.model.trim()),
+    )
+    is SettingsEvent.SttBaseUrlChanged -> copy(sttBaseUrl = event.url.trim())
+    is SettingsEvent.SttLanguageHintChanged -> copy(sttLanguageHint = event.enabled)
     is SettingsEvent.SelectionApplyChanged -> copy(selectionApply = event.apply)
     is SettingsEvent.NewChatModelChanged -> copy(newChatModel = event.model)
     is SettingsEvent.ShowInShareMenuChanged -> copy(showInShareMenu = event.enabled)

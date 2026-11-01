@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
 import io.github.beppe2880.opencodemobile.core.ui.platform.rememberTextClipboard
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_copied
@@ -75,10 +76,23 @@ fun ChatRoute(
             },
         )
     }
+    // Cloud voice input: one recording per chat, sent to the provider chosen in Settings.
+    val voiceModel: VoiceInputViewModel = koinViewModel(key = "voice-$sessionId")
+    val voiceState by voiceModel.state.collectAsStateWithLifecycle()
+    val cloud = voiceState.engine == VoiceEngine.Cloud
+    // Leaving the chat or the app ends the recording; what was said is still transcribed.
+    LifecycleStartEffect(voiceModel) {
+        onStopOrDispose { voiceModel.onEvent(VoiceInputEvent.Stop) }
+    }
+    CollectEffect(voiceModel.effect) { effect ->
+        when (effect) {
+            VoiceInputEffect.NoSpeech -> snackbar.showSnackbar(getString(Res.string.chat_dictation_no_speech))
+        }
+    }
     // Asked on the first tap of the microphone; when denied, the keyboard's own voice typing still works.
     val micPermission = rememberMicPermission { granted ->
         if (granted) {
-            startDictation()
+            if (cloud) voiceModel.onEvent(VoiceInputEvent.Start) else startDictation()
         } else {
             scope.launch { snackbar.showSnackbar(getString(Res.string.chat_dictation_permission)) }
         }
@@ -111,14 +125,38 @@ fun ChatRoute(
         modifier = modifier,
         onAttachPhoto = attachments::pickPhotos,
         onAttachFile = attachments::pickFiles,
-        voice = if (state.dictation && dictation.available) VoiceInput(dictation.listening, dictation.level) else null,
+        voice = when {
+            !state.dictation -> null
+            cloud -> {
+                val phase = voiceState.phase
+                VoiceInput(
+                    listening = phase is CloudVoicePhase.Recording,
+                    level = (phase as? CloudVoicePhase.Recording)?.level ?: 0f,
+                    cloud = phase,
+                    provider = voiceState.provider.label,
+                    transcript = voiceState.transcript,
+                )
+            }
+            dictation.available -> VoiceInput(dictation.listening, dictation.level)
+            else -> null
+        },
         onDictate = {
             when {
+                cloud -> when (voiceState.phase) {
+                    is CloudVoicePhase.Recording -> voiceModel.onEvent(VoiceInputEvent.Stop)
+                    CloudVoicePhase.Transcribing -> Unit
+                    else -> if (!voiceModel.needsPermission || micPermission.granted()) {
+                        voiceModel.onEvent(VoiceInputEvent.Start)
+                    } else {
+                        micPermission.request()
+                    }
+                }
                 dictation.listening -> dictation.stop()
                 micPermission.granted() -> startDictation()
                 else -> micPermission.request()
             }
         },
+        onVoice = voiceModel::onEvent,
         showBack = showBack,
         snackbarHostState = snackbar,
         listState = listState,

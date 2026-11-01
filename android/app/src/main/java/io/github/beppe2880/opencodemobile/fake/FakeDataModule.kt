@@ -48,6 +48,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalInfo
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
@@ -58,6 +59,7 @@ import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -138,6 +140,9 @@ val fakeDataModule = module {
             override suspend fun workingChanges(directory: String) = Result.success(FakeSamples.diffs(directory))
         }
     }
+    // Voice input never reaches a provider in the demo.
+    single<VoiceRecorder> { FakeVoiceRecorder() }
+    single<SpeechToTextRepository> { FakeSpeechToText() }
 }
 
 private const val LATENCY = 350L

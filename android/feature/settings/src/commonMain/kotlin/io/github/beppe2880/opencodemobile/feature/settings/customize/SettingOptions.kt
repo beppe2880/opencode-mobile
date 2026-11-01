@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 
 /**
@@ -37,6 +38,13 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     LiveOther(listOf("liveOther"), requires = FollowRunning),
     AgentOutline(listOf("agentColorOutline")),
     Dictation(listOf("dictation")),
+    VoiceMode(listOf("voiceEngine"), requires = Dictation),
+    VoiceProvider(listOf("sttProvider", "sttBaseUrl"), requires = VoiceMode),
+    VoiceModel(listOf("sttModels"), requires = VoiceMode),
+
+    /** The provider's API key, kept in secure storage rather than in the settings. */
+    VoiceKey(emptyList(), requires = VoiceMode),
+    VoiceLanguage(listOf("sttLanguageHint"), requires = VoiceMode),
     SelectionApply(listOf("selectionApply")),
     NewChatModel(listOf("newChatModel")),
     ShareMenu(listOf("showInShareMenu")),
@@ -102,6 +110,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.LiveReads -> listOf(SettingOption.LiveReads)
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
         SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
+        SettingsPart.VoiceInput -> VOICE_OPTIONS
         SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.AgentOutline)
         // Sharing from other apps opens the new chat sheet.
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
@@ -118,6 +127,16 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice)
     }
 
+/** The microphone and what turns the voice into text, in the order Settings lists them. */
+val VOICE_OPTIONS: List<SettingOption> = listOf(
+    SettingOption.Dictation,
+    SettingOption.VoiceMode,
+    SettingOption.VoiceProvider,
+    SettingOption.VoiceModel,
+    SettingOption.VoiceKey,
+    SettingOption.VoiceLanguage,
+)
+
 /**
  * Whether the option changes anything with [settings]: a folder path alone has no style and is
  * not a line to tap, and the kinds of a switched off feature are hidden. [notificationsOn] is the
@@ -132,6 +151,9 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ListWidth, SettingOption.ListHandle -> settings.splitView
     SettingOption.BackShowsList -> settings.splitView && settings.listPaneHandle
     SettingOption.NotifyPermissions, SettingOption.NotifyQuestions, SettingOption.NotifyFinished -> notificationsOn
+    SettingOption.VoiceMode -> settings.dictation
+    SettingOption.VoiceProvider, SettingOption.VoiceModel, SettingOption.VoiceKey, SettingOption.VoiceLanguage ->
+        settings.dictation && settings.voiceEngine == VoiceEngine.Cloud
     SettingOption.ShareMenu -> supported
     SettingOption.ShareOpens -> supported && settings.showInShareMenu
     else -> true
@@ -168,6 +190,7 @@ val EDIT_MODE_PARTS: List<SettingsPart> = listOf(
     SettingsPart.Footer,
     SettingsPart.PendingCards,
     SettingsPart.ComposerBox,
+    SettingsPart.VoiceInput,
     SettingsPart.SelectionTiming,
     SettingsPart.SessionRows,
     SettingsPart.NewChat,

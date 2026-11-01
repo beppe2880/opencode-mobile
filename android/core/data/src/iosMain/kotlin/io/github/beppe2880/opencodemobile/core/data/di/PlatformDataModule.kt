@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.core.data.di
 
+import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.data.cache.cacheDatabase
@@ -12,7 +13,9 @@ import io.github.beppe2880.opencodemobile.core.data.server.KeychainServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
 import io.github.beppe2880.opencodemobile.core.data.share.MemoryShareStore
 import io.github.beppe2880.opencodemobile.core.data.share.ShareStore
+import io.github.beppe2880.opencodemobile.core.data.stt.AvVoiceRecorder
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -31,4 +34,7 @@ internal actual val platformDataModule: Module = module {
     // Nothing can be shared to the iOS app yet (no share extension).
     single<ShareStore> { MemoryShareStore() }
     single<Settings>(DraftsStore) { NSUserDefaultsSettings(NSUserDefaults(suiteName = "drafts")) }
+    // Speech-to-text API keys, in this app's Keychain like the server passwords.
+    single<Settings>(SttKeysStore) { KeychainSettings(service = "io.github.beppe2880.opencodemobile.stt") }
+    single<VoiceRecorder> { AvVoiceRecorder() }
 }

@@ -76,6 +76,7 @@ internal fun BottomArea(
     onAttachFile: () -> Unit,
     voice: VoiceInput? = null,
     onDictate: () -> Unit = {},
+    onVoice: (VoiceInputEvent) -> Unit = {},
 ) {
     val c = OcTheme.colors
     val editMode = LocalEditMode.current
@@ -149,6 +150,7 @@ internal fun BottomArea(
             modifier = Modifier.editable(SettingsPart.ComposerBox, editMode),
             voice = voice,
             onDictate = onDictate,
+            onVoice = onVoice,
         )
     }
 }

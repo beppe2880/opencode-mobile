@@ -49,6 +49,38 @@ internal expect fun rememberMicPermission(onResult: (Boolean) -> Unit): MicPermi
 internal fun appendDictated(typed: String, spoken: String): String =
     if (typed.isBlank()) spoken else typed.trimEnd() + " " + spoken
 
-/** Voice input as the composer sees it; null hides the microphone. */
+/**
+ * Puts a transcript in place of the selection of [text] (or at the cursor), with a space on each
+ * side where a word would otherwise touch it; returns the new text and the cursor after it.
+ */
+internal fun insertSpoken(text: String, start: Int, end: Int, spoken: String): Pair<String, Int> {
+    val from = start.coerceIn(0, text.length)
+    val to = end.coerceIn(from, text.length)
+    val before = text.substring(0, from)
+    val after = text.substring(to)
+    val words = spoken.trim()
+    val lead = if (before.isNotEmpty() && !before.last().isWhitespace()) " " else ""
+    val trail = if (after.isNotEmpty() && !after.first().isWhitespace()) " " else ""
+    val inserted = lead + words + trail
+    return before + inserted + after to before.length + lead.length + words.length + trail.length
+}
+
+/** Elapsed recording time as `m:ss`. */
+internal fun formatElapsed(ms: Long): String {
+    val seconds = (ms / 1000).coerceAtLeast(0)
+    return "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
+}
+
+/**
+ * Voice input as the composer sees it; null hides the microphone. [cloud] is the state of a
+ * cloud recording, null with the system recognizer; [transcript] waits to be inserted at the
+ * cursor.
+ */
 @Immutable
-data class VoiceInput(val listening: Boolean, val level: Float)
+data class VoiceInput(
+    val listening: Boolean,
+    val level: Float,
+    val cloud: CloudVoicePhase? = null,
+    val provider: String = "",
+    val transcript: PendingTranscript? = null,
+)

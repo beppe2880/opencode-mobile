@@ -18,6 +18,8 @@ import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepositor
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.data.share.StoredShareRepository
+import io.github.beppe2880.opencodemobile.core.data.stt.CloudSpeechToTextRepository
+import io.github.beppe2880.opencodemobile.core.data.stt.appLanguage
 import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepository
 import io.github.beppe2880.opencodemobile.core.data.update.GitHubUpdateRepository
 import io.github.beppe2880.opencodemobile.core.data.vcs.RemoteVcsRepository
@@ -32,10 +34,12 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.network.GitHubReleases
+import io.github.beppe2880.opencodemobile.core.network.SpeechToTextClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -52,9 +56,13 @@ val AppScope = named("AppScope")
 internal val SettingsStore = named("settings")
 internal val DraftsStore = named("drafts")
 
+/** Qualifier of the secure store of speech-to-text API keys (EncryptedSharedPreferences / Keychain), never backed up. */
+internal val SttKeysStore = named("stt_keys")
+
 /**
  * Platform bindings: `OpenCodeClientFactory`, `ServerStore`, `CacheDatabase`, `AppVisibility`,
- * `ServerDiscovery`, `NetworkMonitor`, `ShareStore` and the [SettingsStore] / [DraftsStore] [Settings].
+ * `ServerDiscovery`, `NetworkMonitor`, `ShareStore`, `VoiceRecorder` and the [SettingsStore] /
+ * [DraftsStore] / [SttKeysStore] [Settings].
  */
 internal expect val platformDataModule: Module
 
@@ -97,6 +105,7 @@ val dataModule = module {
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }
+    single<SpeechToTextRepository> { CloudSpeechToTextRepository(get(SttKeysStore), get(), SpeechToTextClient(), ::appLanguage) }
     single<UpdateRepository> {
         val releases = GitHubReleases()
         GitHubUpdateRepository(releases::recent, get(SettingsStore))

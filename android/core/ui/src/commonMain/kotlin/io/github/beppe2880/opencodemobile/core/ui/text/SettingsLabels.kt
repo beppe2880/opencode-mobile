@@ -42,6 +42,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_theme
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_thoughts
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_tools
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_update
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_voice
 import org.jetbrains.compose.resources.stringResource
 
 /** The name of a group of settings, as Settings lists it. */
@@ -80,6 +81,7 @@ fun SettingsPart.label(): String = stringResource(
         SettingsPart.LiveReads -> Res.string.oc_part_live_reads
         SettingsPart.LiveOther -> Res.string.oc_part_live_other
         SettingsPart.ComposerBox -> Res.string.oc_part_composer
+        SettingsPart.VoiceInput -> Res.string.oc_part_voice
         SettingsPart.SelectionTiming -> Res.string.oc_part_selection
         SettingsPart.NewChat -> Res.string.oc_part_new_chat
         SettingsPart.SessionRows -> Res.string.oc_part_session_rows
