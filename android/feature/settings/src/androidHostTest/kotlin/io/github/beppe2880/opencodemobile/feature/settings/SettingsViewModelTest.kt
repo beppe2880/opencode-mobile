@@ -10,9 +10,12 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -224,6 +227,64 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ConfirmRename("  Laptop "))
         advanceUntilIdle()
         assertEquals("Laptop", vm.state.value.servers.first().name)
+    }
+
+    @Test
+    fun `an area opens at its first part and Back closes it before leaving`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.OpenArea(SettingsArea.Chat))
+        assertEquals(SettingsArea.Chat, vm.state.value.area)
+        assertEquals(SettingsPart.Header, vm.state.value.selected)
+
+        vm.onEvent(SettingsEvent.Back)
+        assertNull(vm.state.value.area)
+        assertNull(vm.state.value.selected)
+
+        vm.onEvent(SettingsEvent.Back)
+        assertEquals(SettingsEffect.NavigateBack, vm.effect.first())
+    }
+
+    @Test
+    fun `a search result opens its area at its part with the option in focus`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.QueryChanged("refresh"))
+        assertEquals("refresh", vm.state.value.query)
+
+        val option = SettingOption.LiveInterval
+        vm.onEvent(SettingsEvent.OpenArea(option.area, option.part, option))
+        assertEquals(SettingsArea.LiveActivity, vm.state.value.area)
+        assertEquals(SettingsPart.LiveShell, vm.state.value.selected)
+        assertEquals(option, vm.state.value.focus)
+
+        // Picking another part clears the focus.
+        vm.onEvent(SettingsEvent.SelectPart(SettingsPart.LiveEdits))
+        assertEquals(SettingsPart.LiveEdits, vm.state.value.selected)
+        assertNull(vm.state.value.focus)
+    }
+
+    @Test
+    fun `a part of another area opens that area`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.OpenArea(SettingsArea.Chat))
+        vm.onEvent(SettingsEvent.SelectPart(SettingsPart.ComposerBox))
+        assertEquals(SettingsArea.Composer, vm.state.value.area)
+        assertEquals(SettingsPart.ComposerBox, vm.state.value.selected)
+    }
+
+    @Test
+    fun `preview toggles, edit marks and the key bar reset`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(terminalKeys = listOf(listOf("esc")))
+        val vm = vm()
+        vm.onEvent(SettingsEvent.PreviewRunning(true))
+        assertTrue(vm.state.value.running)
+
+        vm.onEvent(SettingsEvent.EditMarksChanged(false))
+        vm.onEvent(SettingsEvent.ResetTerminalKeys)
+        advanceUntilIdle()
+
+        assertFalse(settings.settings.value.showEditMarks)
+        assertNull(settings.settings.value.terminalKeys)
+        assertFalse(vm.state.value.settings.showEditMarks)
     }
 
     @Test

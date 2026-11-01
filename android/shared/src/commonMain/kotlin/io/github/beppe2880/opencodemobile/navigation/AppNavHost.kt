@@ -56,13 +56,11 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.feature.chat.ChatPreview
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
-import io.github.beppe2880.opencodemobile.feature.settings.customize.CustomizeRoute
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
@@ -90,9 +88,6 @@ data object SettingsDestination
 
 @Serializable
 data object UsageDestination
-
-@Serializable
-data object CustomizeDestination
 
 @Serializable
 data class TerminalDestination(val directory: String)
@@ -209,20 +204,11 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
-                onOpenCustomizer = { navController.navigate(CustomizeDestination) },
+                preview = settingsPreviews,
             )
         }
         composable<UsageDestination> {
             UsageRoute(onBack = { navController.popBackStack() })
-        }
-        composable<CustomizeDestination> {
-            // Settings cannot depend on the chat: the app hands it the chat preview.
-            CustomizeRoute(
-                preview = { settings, marks, selected, onCustomize, modifier ->
-                    ChatPreview(settings = settings, onCustomize = onCustomize, modifier = modifier, marks = marks, selected = selected)
-                },
-                onBack = { navController.popBackStack() },
-            )
         }
         composable<TerminalDestination> { entry ->
             TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })

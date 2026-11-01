@@ -83,14 +83,24 @@ internal fun NewSessionSheet(
 }
 
 @Composable
-private fun NewSessionForm(state: NewSessionState, projects: List<Project>, onEvent: (SessionsEvent) -> Unit) {
+internal fun NewSessionForm(
+    state: NewSessionState,
+    projects: List<Project>,
+    onEvent: (SessionsEvent) -> Unit,
+    /** False for the preview in Settings: no own scrolling or insets, and no directories. */
+    inSheet: Boolean = true,
+) {
     val c = OcTheme.colors
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .windowInsetsPadding(WindowInsets.navigationBars)
+            .then(
+                if (inSheet) {
+                    Modifier.imePadding().verticalScroll(rememberScrollState()).windowInsetsPadding(WindowInsets.navigationBars)
+                } else {
+                    Modifier
+                },
+            )
             .padding(bottom = OcSpacing.lg),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
@@ -100,51 +110,54 @@ private fun NewSessionForm(state: NewSessionState, projects: List<Project>, onEv
             color = c.textBase,
             modifier = Modifier.padding(horizontal = OcSpacing.lg),
         )
-        Label(stringResource(Res.string.sessions_new_directory))
-        var showAll by rememberSaveable { mutableStateOf(false) }
-        val visible = if (showAll || projects.size <= COLLAPSED_PROJECTS) {
-            projects
-        } else {
-            (projects.take(COLLAPSED_PROJECTS) + projects.filter { it.directory == state.directory }).distinctBy { it.id }
-        }
-        visible.forEach { project ->
+        // The preview in Settings shows only what its setting changes: the model.
+        if (inSheet) {
+            Label(stringResource(Res.string.sessions_new_directory))
+            var showAll by rememberSaveable { mutableStateOf(false) }
+            val visible = if (showAll || projects.size <= COLLAPSED_PROJECTS) {
+                projects
+            } else {
+                (projects.take(COLLAPSED_PROJECTS) + projects.filter { it.directory == state.directory }).distinctBy { it.id }
+            }
+            visible.forEach { project ->
+                DirectoryOption(
+                    title = project.displayName,
+                    path = project.directory,
+                    selected = !state.customDirectory && state.directory == project.directory,
+                    onClick = { onEvent(SessionsEvent.NewSessionDirectory(project.directory, custom = false)) },
+                    modifier = Modifier.testTag("sessions_new_project_${project.id}"),
+                )
+            }
+            if (visible.size < projects.size) {
+                Text(
+                    text = stringResource(Res.string.sessions_new_show_all, projects.size),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = c.textAccent,
+                    modifier = Modifier
+                        .clickable(role = Role.Button) { showAll = true }
+                        .heightIn(min = 48.dp)
+                        .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md)
+                        .testTag("sessions_new_show_all"),
+                )
+            }
             DirectoryOption(
-                title = project.displayName,
-                path = project.directory,
-                selected = !state.customDirectory && state.directory == project.directory,
-                onClick = { onEvent(SessionsEvent.NewSessionDirectory(project.directory, custom = false)) },
-                modifier = Modifier.testTag("sessions_new_project_${project.id}"),
+                title = stringResource(Res.string.sessions_new_other_directory),
+                path = null,
+                selected = state.customDirectory || projects.none { it.directory == state.directory },
+                onClick = { onEvent(SessionsEvent.NewSessionDirectory(if (state.customDirectory) state.directory else "", custom = true)) },
+                modifier = Modifier.testTag("sessions_new_other_directory"),
             )
-        }
-        if (visible.size < projects.size) {
-            Text(
-                text = stringResource(Res.string.sessions_new_show_all, projects.size),
-                style = MaterialTheme.typography.labelLarge,
-                color = c.textAccent,
-                modifier = Modifier
-                    .clickable(role = Role.Button) { showAll = true }
-                    .heightIn(min = 48.dp)
-                    .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md)
-                    .testTag("sessions_new_show_all"),
-            )
-        }
-        DirectoryOption(
-            title = stringResource(Res.string.sessions_new_other_directory),
-            path = null,
-            selected = state.customDirectory || projects.none { it.directory == state.directory },
-            onClick = { onEvent(SessionsEvent.NewSessionDirectory(if (state.customDirectory) state.directory else "", custom = true)) },
-            modifier = Modifier.testTag("sessions_new_other_directory"),
-        )
-        if (state.customDirectory || projects.none { it.directory == state.directory }) {
-            OcTextField(
-                value = state.directory,
-                onValueChange = { onEvent(SessionsEvent.NewSessionDirectory(it, custom = true)) },
-                label = stringResource(Res.string.sessions_new_path_label),
-                placeholder = stringResource(Res.string.sessions_new_path_placeholder),
-                mono = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done, autoCorrectEnabled = false),
-                modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_path_field"),
-            )
+            if (state.customDirectory || projects.none { it.directory == state.directory }) {
+                OcTextField(
+                    value = state.directory,
+                    onValueChange = { onEvent(SessionsEvent.NewSessionDirectory(it, custom = true)) },
+                    label = stringResource(Res.string.sessions_new_path_label),
+                    placeholder = stringResource(Res.string.sessions_new_path_placeholder),
+                    mono = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done, autoCorrectEnabled = false),
+                    modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_path_field"),
+                )
+            }
         }
         if (state.agents.isNotEmpty()) {
             Label(stringResource(Res.string.sessions_new_agent))

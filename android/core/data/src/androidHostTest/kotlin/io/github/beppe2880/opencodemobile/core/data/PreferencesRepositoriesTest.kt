@@ -50,6 +50,7 @@ class PreferencesRepositoriesTest {
             newChatModel = NewChatModel.ServerDefault,
             checkForUpdates = false,
             backShowsList = false,
+            showEditMarks = false,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 

@@ -5,6 +5,10 @@ package io.github.beppe2880.opencodemobile.core.ui.sample
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.FileDiff
+import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.FormField
+import io.github.beppe2880.opencodemobile.core.domain.FormOption
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -12,6 +16,9 @@ import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
+import io.github.beppe2880.opencodemobile.core.domain.RunningAgent
+import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
+import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
@@ -176,6 +183,88 @@ object SampleData {
             tokens = TokenUsage(input = 11_000, output = 260),
         ),
     )
+
+    /** [customizeTranscript] while the agent is still at work: thinking done, the tests running. */
+    val customizeRunning: List<Message> = customizeTranscript.map { message ->
+        if (message !is Message.Assistant) return@map message
+        message.copy(
+            parts = message.parts.take(3).map { part ->
+                if (part is Part.Tool) part.copy(status = ToolStatus.Running, output = part.output?.lines()?.take(5)?.joinToString("\n"), completedAt = null) else part
+            },
+            completedAt = null,
+            finish = null,
+        )
+    }
+
+    /** A question from the agent, for the question card. */
+    val question = Form(
+        id = "form_1",
+        sessionId = "ses_3",
+        title = "Checkout redesign",
+        fields = listOf(
+            FormField.Text(
+                key = "layout",
+                title = "Which checkout layout should I plan for?",
+                required = true,
+                options = listOf(
+                    FormOption("single", "Single page", "Address, shipping and payment on one screen"),
+                    FormOption("steps", "Three steps", "Separate address, shipping and payment steps"),
+                ),
+                custom = true,
+            ),
+        ),
+    )
+
+    /** Work running in the background of a session: a subagent and a dev server. */
+    val runningWork = RunningWork(
+        agents = listOf(RunningAgent(sessions[2].copy(title = "Explore the cart module", agent = "explore"), NOW - 2 * MINUTE)),
+        commands = listOf(RunningCommand("cmd_1", "npm run dev", "/home/user/code/shop", NOW - 6 * MINUTE)),
+    )
+
+    /**
+     * One step of the agent at work, for each kind of running work the chat can follow: [kind]
+     * is the tool kind (or thinking); [lines] of shell output have arrived so far.
+     */
+    fun liveStep(kind: LiveKind, lines: Int = 3): List<Message> {
+        val start = NOW - MINUTE
+        val part: Part = when (kind) {
+            LiveKind.Thinking -> Part.Reasoning(0, "The coupon test expects 10% off 999 to give 900. Integer division rounds the discount down, so the bug is elsewhere…", streaming = true, startedAt = start)
+            LiveKind.Shell -> Part.Tool(
+                "call_l1",
+                "bash",
+                ToolStatus.Running,
+                """{"command":"./gradlew :cart:test","description":"Run the cart tests"}""",
+                output = (1..lines).joinToString("\n") { "CouponTest > case $it PASSED" },
+                startedAt = start,
+            )
+            LiveKind.Edit -> Part.Tool(
+                "call_l2",
+                "edit",
+                ToolStatus.Completed,
+                """{"filePath":"/home/user/code/shop/src/cart/Coupon.kt"}""",
+                output = "Edit applied",
+                startedAt = start,
+                completedAt = start + 400,
+                diffs = listOf(
+                    FileDiff(
+                        "src/cart/Coupon.kt",
+                        "modified",
+                        1,
+                        1,
+                        "@@ -15,1 +15,1 @@\n-    fun apply(subtotal: Long): Long = subtotal - (subtotal * percent + 99) / 100\n+    fun apply(subtotal: Long): Long = subtotal - subtotal * percent / 100",
+                    ),
+                ),
+            )
+            LiveKind.Read -> Part.Tool("call_l3", "grep", ToolStatus.Completed, """{"pattern":"fun apply","path":"src/cart"}""", output = "src/cart/Coupon.kt:15: fun apply(subtotal: Long)", startedAt = start, completedAt = start + 200)
+            LiveKind.Other -> Part.Tool("call_l4", "webfetch", ToolStatus.Completed, """{"url":"https://kotlinlang.org/docs/numbers.html"}""", output = "Integer division always rounds toward zero.", startedAt = start, completedAt = start + 900)
+        }
+        return listOf(
+            Message.User("msg_l_u_${kind.name}", start - 500, "Fix the coupon rounding."),
+            Message.Assistant("msg_l_a_${kind.name}", start, "build", haiku, listOf(part)),
+        )
+    }
+
+    enum class LiveKind { Thinking, Shell, Edit, Read, Other }
 
     val permission = PermissionRequest(
         id = "per_1",

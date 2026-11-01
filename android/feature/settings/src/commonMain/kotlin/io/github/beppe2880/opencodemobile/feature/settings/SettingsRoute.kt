@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
+import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreviewContent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -14,7 +15,8 @@ fun SettingsRoute(
     onAddServer: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenUsage: () -> Unit = {},
-    onOpenCustomizer: () -> Unit = {},
+    /** Draws the previews of the groups that show other screens (chat, sessions, terminal). */
+    preview: AreaPreviewContent = { _, _, _ -> },
     /** The offline demo: no real servers, and notification access is simulated. */
     demo: Boolean = false,
 ) {
@@ -33,11 +35,10 @@ fun SettingsRoute(
             SettingsEffect.NavigateBack -> onBack()
             SettingsEffect.OpenConnect -> onAddServer()
             SettingsEffect.OpenUsage -> onOpenUsage()
-            SettingsEffect.OpenCustomizer -> onOpenCustomizer()
             SettingsEffect.RequestNotificationPermission ->
                 if (!demo) notifications.request() else viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = true))
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()
         }
     }
-    SettingsScreen(state = state, onEvent = viewModel::onEvent, modifier = modifier, demo = demo)
+    SettingsScreen(state = state, onEvent = viewModel::onEvent, preview = preview, modifier = modifier, demo = demo)
 }

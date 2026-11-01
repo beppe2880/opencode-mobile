@@ -356,7 +356,7 @@ private const val SEPARATOR = " · "
  * "Running" menu item is the full-size alternative.
  */
 @Composable
-private fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
+internal fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
     val c = OcTheme.colors
     val textStyle = MaterialTheme.typography.bodySmall
     val iconSize = with(LocalDensity.current) { textStyle.fontSize.toDp() }

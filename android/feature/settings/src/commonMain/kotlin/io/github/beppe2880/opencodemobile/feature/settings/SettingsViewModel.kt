@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.reset
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -16,7 +17,7 @@ class SettingsViewModel(
     private val settings: SettingsRepository,
     appInfo: AppInfo,
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
-    SettingsState(appVersion = appInfo.versionName, apiVersion = appInfo.apiVersion),
+    SettingsState(appVersion = appInfo.versionName, apiVersion = appInfo.apiVersion, updateTarget = appInfo.updateTarget),
 ) {
     private var probeJob: Job? = null
 
@@ -36,10 +37,18 @@ class SettingsViewModel(
 
     override fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.Back -> sendEffect(SettingsEffect.NavigateBack)
+            SettingsEvent.Back -> if (currentState.area != null) closeArea() else sendEffect(SettingsEffect.NavigateBack)
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
             SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
-            SettingsEvent.OpenCustomizer -> sendEffect(SettingsEffect.OpenCustomizer)
+            is SettingsEvent.OpenArea -> updateState {
+                val part = event.part ?: event.option?.part ?: SettingsPart.of(event.area).first()
+                it.copy(area = event.area, selected = part, focus = event.option)
+            }
+            SettingsEvent.CloseArea -> closeArea()
+            // A part of another group (the composer in the chat) opens that group.
+            is SettingsEvent.SelectPart -> updateState { it.copy(area = event.part.area, selected = event.part, focus = null) }
+            is SettingsEvent.PreviewRunning -> updateState { it.copy(running = event.running) }
+            is SettingsEvent.QueryChanged -> updateState { it.copy(query = event.query) }
             is SettingsEvent.SelectServer -> viewModelScope.launch { servers.activate(event.serverId) }
             is SettingsEvent.RequestRename -> updateState { it.copy(renaming = event.server) }
             is SettingsEvent.RequestRemove -> updateState { it.copy(removing = event.server) }
@@ -90,6 +99,8 @@ class SettingsViewModel(
     private fun update(transform: (AppSettings) -> AppSettings) {
         viewModelScope.launch { settings.update(transform) }
     }
+
+    private fun closeArea() = updateState { it.copy(area = null, selected = null, focus = null) }
 
     private fun probe(server: ServerProfile?) {
         probeJob?.cancel()

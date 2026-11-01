@@ -77,6 +77,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
         prefs.putBoolean(KEY_CHECK_UPDATES, next.checkForUpdates)
+        prefs.putBoolean(KEY_EDIT_MARKS, next.showEditMarks)
     }
 
     private fun read(): AppSettings {
@@ -128,6 +129,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
             checkForUpdates = prefs.getBoolean(KEY_CHECK_UPDATES, defaults.checkForUpdates),
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
+            showEditMarks = prefs.getBoolean(KEY_EDIT_MARKS, defaults.showEditMarks),
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -183,6 +185,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
+        const val KEY_EDIT_MARKS = "settings_edit_marks"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }

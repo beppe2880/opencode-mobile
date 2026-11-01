@@ -431,6 +431,8 @@ data class AppSettings(
     val checkForUpdates: Boolean = true,
     /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
     val backShowsList: Boolean = true,
+    /** The previews in Settings outline the parts that can be tapped and mark them with a pencil. */
+    val showEditMarks: Boolean = true,
 )
 
 /** Share of the window width the session list can be given from Settings. */
