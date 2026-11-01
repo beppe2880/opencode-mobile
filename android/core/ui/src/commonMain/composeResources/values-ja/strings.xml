@@ -29,11 +29,15 @@
     <string name="oc_area_appearance">外観</string>
     <string name="oc_area_chat">チャット</string>
     <string name="oc_area_live">ライブアクティビティ</string>
-    <string name="oc_area_composer">入力欄とモデル</string>
-    <string name="oc_area_sessions">セッション一覧</string>
+    <string name="oc_area_composer">入力欄</string>
+    <string name="oc_area_sessions">セッション</string>
     <string name="oc_area_terminal">ターミナル</string>
     <string name="oc_area_notifications">通知</string>
     <string name="oc_area_updates">アップデート</string>
+    <string name="oc_area_servers">サーバー</string>
+    <string name="oc_area_voice">音声入力</string>
+    <string name="oc_area_sharing">共有</string>
+    <string name="oc_area_about">情報とリセット</string>
     <string name="oc_part_theme">テーマ</string>
     <string name="oc_part_text_size">文字サイズ</string>
     <string name="oc_part_header">タイトルとヘッダー行</string>
@@ -65,6 +69,7 @@
     <string name="oc_part_notify_question">質問</string>
     <string name="oc_part_notify_finished">セッション完了</string>
     <string name="oc_part_update">アップデートの通知</string>
+    <string name="oc_part_share">共有メニュー</string>
     <string name="oc_part_customize">カスタマイズ</string>
     <string name="oc_shared_title">OpenCodeに共有されました</string>
     <plurals name="oc_shared_images">

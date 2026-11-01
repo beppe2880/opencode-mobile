@@ -29,11 +29,15 @@
     <string name="oc_area_appearance">Aparência</string>
     <string name="oc_area_chat">Conversa</string>
     <string name="oc_area_live">Atividade ao vivo</string>
-    <string name="oc_area_composer">Compositor e modelos</string>
-    <string name="oc_area_sessions">Lista de sessões</string>
+    <string name="oc_area_composer">Caixa de mensagem</string>
+    <string name="oc_area_sessions">Sessões</string>
     <string name="oc_area_terminal">Terminal</string>
     <string name="oc_area_notifications">Notificações</string>
     <string name="oc_area_updates">Atualizações</string>
+    <string name="oc_area_servers">Servidores</string>
+    <string name="oc_area_voice">Entrada de voz</string>
+    <string name="oc_area_sharing">Compartilhamento</string>
+    <string name="oc_area_about">Sobre e redefinição</string>
     <string name="oc_part_theme">Tema</string>
     <string name="oc_part_text_size">Tamanho do texto</string>
     <string name="oc_part_header">Título e linha de cabeçalho</string>
@@ -65,6 +69,7 @@
     <string name="oc_part_notify_question">Pergunta</string>
     <string name="oc_part_notify_finished">Sessão concluída</string>
     <string name="oc_part_update">Aviso de atualização</string>
+    <string name="oc_part_share">Menu de compartilhamento</string>
     <string name="oc_part_customize">Personalizar</string>
     <string name="oc_shared_title">Compartilhado com o OpenCode</string>
     <plurals name="oc_shared_images">

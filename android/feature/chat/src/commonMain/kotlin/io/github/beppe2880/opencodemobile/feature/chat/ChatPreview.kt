@@ -189,14 +189,13 @@ fun LiveActivityPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     }
 }
 
-/** The composer with the agent outline and the microphone, and when a picked agent or model applies. */
+/** The composer with the agent outline, and when a picked agent or model applies. */
 @Composable
 fun ComposerPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     val state = remember(preview.settings) { previewChatState(preview.settings, running = false) }
     val c = OcTheme.colors
     Column(modifier.fillMaxWidth().padding(OcSpacing.sm).testTag("composer_preview"), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
         OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }
-        OcCustomizable(SettingsPart.VoiceInput, preview) { VoicePreview(preview.settings) }
         OcCustomizable(SettingsPart.SelectionTiming, preview) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
@@ -207,6 +206,20 @@ fun ComposerPreview(preview: PartPreview, modifier: Modifier = Modifier) {
                     if (preview.settings.selectionApply == SelectionApply.NextMessage) Res.string.chat_preview_selection_next
                     else Res.string.chat_preview_selection_now,
                 )
+            }
+        }
+    }
+}
+
+/** The composer with its microphone, and what turns the voice into text. */
+@Composable
+fun VoiceInputPreview(preview: PartPreview, modifier: Modifier = Modifier) {
+    val state = remember(preview.settings) { previewChatState(preview.settings, running = false) }
+    Column(modifier.fillMaxWidth().padding(OcSpacing.sm).testTag("voice_preview")) {
+        OcCustomizable(SettingsPart.VoiceInput, preview) {
+            Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
+                PreviewComposer(state)
+                VoicePreview(preview.settings)
             }
         }
     }

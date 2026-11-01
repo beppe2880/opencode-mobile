@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.components.EditMode
@@ -62,6 +63,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ed
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_edit_done
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_edit_hint
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_edit_mode
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_edit_more
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_use_hint
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_use_mode
 import io.github.beppe2880.opencodemobile.feature.settings.updatedBy
@@ -75,9 +77,15 @@ import org.koin.compose.koinInject
  * like Back, keeps working) and Use (the demo as usual), and Done leaves. The options dock above
  * the bar and push the screen up instead of covering it, so the edited part, which scrolls into
  * view, stays in sight while it changes. Changes are saved to the settings at once.
+ * [onOpenArea] leaves for the page of the edited part's category in Settings, with its other options.
  */
 @Composable
-fun LiveEditHost(onDone: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun LiveEditHost(
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier,
+    onOpenArea: ((SettingsArea) -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
     val repository = koinInject<SettingsRepository>()
     val settings by repository.settings.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -95,7 +103,7 @@ fun LiveEditHost(onDone: () -> Unit, modifier: Modifier = Modifier, content: @Co
                 }
             }
             AnimatedVisibility(visible = selected != null, enter = expandVertically(), exit = shrinkVertically()) {
-                selected?.let { part -> OptionsPanel(part, state, onEvent, onClose = { selected = null }, Modifier.heightIn(max = panelMax)) }
+                selected?.let { part -> OptionsPanel(part, state, onEvent, onClose = { selected = null }, onOpenArea, Modifier.heightIn(max = panelMax)) }
             }
             EditBar(
                 editing = editing,
@@ -113,7 +121,14 @@ fun LiveEditHost(onDone: () -> Unit, modifier: Modifier = Modifier, content: @Co
 private const val PANEL_SHARE = 0.4f
 
 @Composable
-private fun OptionsPanel(part: SettingsPart, state: SettingsState, onEvent: (SettingsEvent) -> Unit, onClose: () -> Unit, modifier: Modifier) {
+private fun OptionsPanel(
+    part: SettingsPart,
+    state: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
+    onClose: () -> Unit,
+    onOpenArea: ((SettingsArea) -> Unit)?,
+    modifier: Modifier,
+) {
     val c = OcTheme.colors
     Surface(
         modifier = modifier.fillMaxWidth().testTag("edit_options"),
@@ -142,6 +157,15 @@ private fun OptionsPanel(part: SettingsPart, state: SettingsState, onEvent: (Set
             }
             Column(Modifier.verticalScroll(rememberScrollState()).padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.md)) {
                 PartOptionsCard(part, state, onEvent, highlighted = false, inPreview = false)
+                if (onOpenArea != null) {
+                    OcButton(
+                        text = stringResource(Res.string.settings_edit_more, part.area.label()),
+                        onClick = { onOpenArea(part.area) },
+                        variant = OcButtonVariant.Ghost,
+                        compact = true,
+                        modifier = Modifier.padding(top = OcSpacing.xs).testTag("edit_options_more"),
+                    )
+                }
             }
         }
     }

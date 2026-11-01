@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
@@ -19,8 +20,16 @@ class SettingsViewModel(
     private val settings: SettingsRepository,
     appInfo: AppInfo,
     private val stt: SpeechToTextRepository,
+    /** The category to open first, from a link into Settings; null for the first page. */
+    initialArea: SettingsArea? = null,
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
-    SettingsState(appVersion = appInfo.versionName, apiVersion = appInfo.apiVersion, updateTarget = appInfo.updateTarget),
+    SettingsState(
+        appVersion = appInfo.versionName,
+        apiVersion = appInfo.apiVersion,
+        updateTarget = appInfo.updateTarget,
+        area = initialArea,
+        selected = initialArea?.let { SettingsPart.of(it).firstOrNull() },
+    ),
 ) {
     private var probeJob: Job? = null
     private var sttJob: Job? = null
@@ -43,10 +52,11 @@ class SettingsViewModel(
     override fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.Back -> if (currentState.area != null) closeArea() else sendEffect(SettingsEffect.NavigateBack)
+            SettingsEvent.Leave -> sendEffect(SettingsEffect.NavigateBack)
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
             SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
             is SettingsEvent.OpenArea -> updateState {
-                val part = event.part ?: event.option?.part ?: SettingsPart.of(event.area).first()
+                val part = event.part ?: event.option?.part ?: SettingsPart.of(event.area).firstOrNull()
                 it.copy(area = event.area, selected = part, focus = event.option)
             }
             SettingsEvent.CloseArea -> closeArea()
