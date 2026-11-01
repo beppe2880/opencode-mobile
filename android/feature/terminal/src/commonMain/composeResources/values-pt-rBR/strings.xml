@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Concluído</string>
     <string name="terminal_fullscreen">Tela cheia</string>
     <string name="terminal_fullscreen_exit">Sair da tela cheia</string>
+    <string name="terminal_preview_fullscreen">Tela cheia: sem barra de título e sem barras do sistema</string>
+    <string name="terminal_preview_keyboard_on">O teclado abre junto com o terminal</string>
+    <string name="terminal_preview_keyboard_off">O teclado abre quando você toca no terminal</string>
 </resources>

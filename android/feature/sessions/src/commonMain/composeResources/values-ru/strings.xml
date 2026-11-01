@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">Агент работает</string>
     <string name="sessions_new_show_all">Показать все проекты: %1$d</string>
     <string name="sessions_untitled">Сессия без названия</string>
+    <string name="sessions_preview_swipe_on">Проведите влево или вправо в чате, чтобы открыть следующую или предыдущую сессию</string>
+    <string name="sessions_preview_swipe_off">Выкл.: вернитесь к списку, чтобы открыть другую сессию</string>
+    <string name="sessions_preview_wide">На развернутых складных экранах и планшетах</string>
+    <string name="sessions_preview_split_off">Чат открывается поверх списка, в том числе на широких экранах</string>
+    <string name="sessions_preview_back_list">Кнопка «Назад» при скрытом списке снова его показывает</string>
+    <string name="sessions_preview_back_leave">Кнопка «Назад» при скрытом списке закрывает приложение</string>
 </resources>

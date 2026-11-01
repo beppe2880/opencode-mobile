@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">الوكيل قيد التشغيل</string>
     <string name="sessions_new_show_all">عرض كل المشاريع (%1$d)</string>
     <string name="sessions_untitled">جلسة بلا عنوان</string>
+    <string name="sessions_preview_swipe_on">اسحب يساراً أو يميناً داخل الدردشة لفتح الجلسة التالية أو السابقة</string>
+    <string name="sessions_preview_swipe_off">إيقاف: ارجع إلى القائمة لفتح جلسة أخرى</string>
+    <string name="sessions_preview_wide">على الشاشات القابلة للطي المفتوحة والأجهزة اللوحية</string>
+    <string name="sessions_preview_split_off">تُفتح الدردشة فوق القائمة، حتى على الشاشات العريضة</string>
+    <string name="sessions_preview_back_list">الرجوع مع إخفاء القائمة يعرضها مجدداً</string>
+    <string name="sessions_preview_back_leave">الرجوع مع إخفاء القائمة يغادر التطبيق</string>
 </resources>

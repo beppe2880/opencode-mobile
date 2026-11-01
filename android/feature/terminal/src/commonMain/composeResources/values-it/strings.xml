@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Fine</string>
     <string name="terminal_fullscreen">Schermo intero</string>
     <string name="terminal_fullscreen_exit">Esci dallo schermo intero</string>
+    <string name="terminal_preview_fullscreen">Schermo intero: niente barra del titolo e niente barre di sistema</string>
+    <string name="terminal_preview_keyboard_on">La tastiera si apre con il terminale</string>
+    <string name="terminal_preview_keyboard_off">La tastiera si apre quando tocchi il terminale</string>
 </resources>

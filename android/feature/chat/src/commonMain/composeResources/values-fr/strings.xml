@@ -183,4 +183,12 @@
     <string name="chat_running_refresh">Actualiser les tâches en cours</string>
     <string name="chat_running_stop_title">Arrêter cette commande ?</string>
     <string name="chat_running_stop_message">%1$s\n\nLa commande est arrêtée et sa sortie n’est plus disponible.</string>
+    <string name="chat_preview_folds">Les étapes suivies en direct se replient à la fin de la réponse</string>
+    <string name="chat_preview_kept_open">Les étapes suivies en direct restent ouvertes après la réponse</string>
+    <string name="chat_preview_not_followed">Les étapes en cours restent repliées jusqu’à ce que vous les ouvriez</string>
+    <string name="chat_preview_refresh">Nouvelle sortie toutes les %1$s</string>
+    <string name="chat_preview_selection_next">Choisi dans le compositeur : le chat bascule vers eux à l’envoi du message suivant</string>
+    <string name="chat_preview_selection_now">Choisi dans le compositeur : le chat bascule vers eux immédiatement</string>
+    <string name="chat_preview_stop_asks">Arrêter une commande depuis la feuille En cours demande d’abord confirmation</string>
+    <string name="chat_preview_stop_direct">Arrêter une commande depuis la feuille En cours la termine immédiatement</string>
 </resources>

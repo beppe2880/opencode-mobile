@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Fertig</string>
     <string name="terminal_fullscreen">Vollbild</string>
     <string name="terminal_fullscreen_exit">Vollbild beenden</string>
+    <string name="terminal_preview_fullscreen">Vollbild: keine Titelleiste und keine Systemleisten</string>
+    <string name="terminal_preview_keyboard_on">Die Tastatur öffnet sich mit dem Terminal</string>
+    <string name="terminal_preview_keyboard_off">Die Tastatur öffnet sich, wenn du das Terminal antippst</string>
 </resources>

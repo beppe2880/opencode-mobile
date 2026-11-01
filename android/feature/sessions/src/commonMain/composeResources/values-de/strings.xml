@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">Der Agent arbeitet</string>
     <string name="sessions_new_show_all">Alle %1$d Projekte anzeigen</string>
     <string name="sessions_untitled">Unbenannte Sitzung</string>
+    <string name="sessions_preview_swipe_on">Im Chat nach links oder rechts wischen, um die nächste oder vorherige Sitzung zu öffnen</string>
+    <string name="sessions_preview_swipe_off">Aus: Zur Liste zurückkehren, um eine andere Sitzung zu öffnen</string>
+    <string name="sessions_preview_wide">Auf aufgeklappten Foldables und Tablets</string>
+    <string name="sessions_preview_split_off">Der Chat öffnet sich über der Liste, auch auf breiten Bildschirmen</string>
+    <string name="sessions_preview_back_list">Zurück bei ausgeblendeter Liste zeigt sie wieder an</string>
+    <string name="sessions_preview_back_leave">Zurück bei ausgeblendeter Liste beendet die App</string>
 </resources>

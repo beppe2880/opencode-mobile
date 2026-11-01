@@ -183,4 +183,12 @@
     <string name="chat_running_refresh">Aggiorna attività in esecuzione</string>
     <string name="chat_running_stop_title">Interrompere questo comando?</string>
     <string name="chat_running_stop_message">%1$s\n\nIl comando viene terminato e il suo output non è più disponibile.</string>
+    <string name="chat_preview_folds">I passaggi seguiti in diretta si ripiegano alla fine della risposta</string>
+    <string name="chat_preview_kept_open">I passaggi seguiti in diretta restano aperti dopo la risposta</string>
+    <string name="chat_preview_not_followed">I passaggi in esecuzione restano ripiegati finché non li apri</string>
+    <string name="chat_preview_refresh">Nuovo output ogni %1$s</string>
+    <string name="chat_preview_selection_next">Scelto nel campo di scrittura: la chat passa a loro quando invii il messaggio successivo</string>
+    <string name="chat_preview_selection_now">Scelto nel campo di scrittura: la chat passa a loro subito</string>
+    <string name="chat_preview_stop_asks">Interrompere un comando dal foglio In esecuzione chiede prima conferma</string>
+    <string name="chat_preview_stop_direct">Interrompere un comando dal foglio In esecuzione lo termina subito</string>
 </resources>
