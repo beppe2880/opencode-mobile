@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">제공업체가 오류를 반환했습니다: %1$s</string>
     <string name="settings_voice_language">앱 언어 보내기</string>
     <string name="settings_voice_language_sub">녹음의 언어를 제공업체에 알려 정확도를 높입니다. 끄면 제공업체가 언어를 감지합니다</string>
+    <string name="settings_voice_style">녹음 스타일</string>
+    <string name="settings_voice_style_waveform">파형</string>
+    <string name="settings_voice_style_compact">간결</string>
+    <string name="settings_voice_style_waveform_sub">메시지 상자가 녹음기로 바뀝니다: 실시간 파형, 시간, 취소 및 확인</string>
+    <string name="settings_voice_style_compact_sub">메시지 상자 위에 시간이 표시되는 작은 띠; 마이크가 정지 버튼이 됩니다</string>
+    <string name="settings_voice_hold">길게 눌러 녹음</string>
+    <string name="settings_voice_hold_sub">마이크를 길게 눌러 녹음하고 손을 떼면 변환합니다. 밀어서 취소. 탭하면 여전히 시작과 중지가 됩니다</string>
     <string name="settings_selection_apply">에이전트 및 모델 변경 적용</string>
     <string name="settings_selection_apply_sub">채팅에서 선택한 에이전트, 모델 또는 추론 수준을 서버로 보낼 때: 다음 메시지부터 적용하거나 선택하는 즉시 적용</string>
     <string name="settings_selection_apply_next">다음 메시지</string>

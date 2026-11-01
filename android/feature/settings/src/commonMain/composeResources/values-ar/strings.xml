@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">ردّ المزود بخطأ: %1$s</string>
     <string name="settings_voice_language">إرسال لغة التطبيق</string>
     <string name="settings_voice_language_sub">يخبر المزود بلغة التسجيل، مما يحسّن الدقة؛ عند الإيقاف يكتشف المزود اللغة بنفسه</string>
+    <string name="settings_voice_style">نمط التسجيل</string>
+    <string name="settings_voice_style_waveform">الموجة</string>
+    <string name="settings_voice_style_compact">مضغوط</string>
+    <string name="settings_voice_style_waveform_sub">يتحول مربع الرسالة إلى مسجّل: موجة حية والوقت وزر الإلغاء والتأكيد</string>
+    <string name="settings_voice_style_compact_sub">شريط صغير يعرض الوقت فوق مربع الرسالة؛ يصبح الميكروفون زر الإيقاف</string>
+    <string name="settings_voice_hold">اضغط مطولًا للتسجيل</string>
+    <string name="settings_voice_hold_sub">اضغط مطولًا على الميكروفون للتسجيل وأفلِت للتفريغ؛ اسحب بعيدًا للإلغاء. النقر ما زال يبدأ ويوقف</string>
     <string name="settings_selection_apply">تطبيق تغييرات الوكيل والنموذج</string>
     <string name="settings_selection_apply_sub">عند إرسال الوكيل أو النموذج أو مستوى الاستدلال المختار في الدردشة إلى الخادم: مع الرسالة التالية، أو فور اختياره</string>
     <string name="settings_selection_apply_next">الرسالة التالية</string>

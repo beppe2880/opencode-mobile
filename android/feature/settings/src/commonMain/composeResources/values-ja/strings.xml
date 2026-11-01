@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">プロバイダーがエラーを返しました：%1$s</string>
     <string name="settings_voice_language">アプリの言語を送信</string>
     <string name="settings_voice_language_sub">録音の言語をプロバイダーに伝え、精度を高めます。オフの場合は言語を自動検出します</string>
+    <string name="settings_voice_style">録音スタイル</string>
+    <string name="settings_voice_style_waveform">波形</string>
+    <string name="settings_voice_style_compact">コンパクト</string>
+    <string name="settings_voice_style_waveform_sub">メッセージ欄が録音画面に変わります：リアルタイムの波形、時間、キャンセルと確定</string>
+    <string name="settings_voice_style_compact_sub">メッセージ欄の上に時間を表示する小さなバー。マイクが停止ボタンになります</string>
+    <string name="settings_voice_hold">長押しで録音</string>
+    <string name="settings_voice_hold_sub">マイクを長押しして録音し、離して文字起こし。スライドするとキャンセル。タップでも開始・停止できます</string>
     <string name="settings_selection_apply">エージェントとモデルの変更を適用</string>
     <string name="settings_selection_apply_sub">チャットで選んだエージェント、モデル、推論レベルをサーバーに送信するタイミング：次のメッセージで、または選択した時点で</string>
     <string name="settings_selection_apply_next">次のメッセージ</string>

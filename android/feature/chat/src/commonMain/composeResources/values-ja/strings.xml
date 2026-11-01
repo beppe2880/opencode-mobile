@@ -128,6 +128,12 @@
     <string name="chat_voice_retry">再試行</string>
     <string name="chat_voice_recording">録音中 %1$s</string>
     <string name="chat_voice_transcribing">文字起こし中…</string>
+    <string name="chat_voice_recording_now">録音中</string>
+    <string name="chat_voice_hold_hint">離して文字起こし、スライドしてキャンセル</string>
+    <string name="chat_voice_release_to_cancel">離してキャンセル</string>
+    <string name="chat_voice_hold_to_record">長押しで録音</string>
+    <string name="chat_voice_discarded">録音を破棄しました</string>
+    <string name="chat_voice_undo">元に戻す</string>
     <string name="chat_voice_error_no_key">%1$s のAPIキーがありません：設定の音声入力で追加してください</string>
     <string name="chat_voice_error_address">音声テキスト変換のアドレスが無効です：設定の音声入力で確認してください</string>
     <string name="chat_voice_error_unauthorized">%1$s がAPIキーを拒否しました：設定の音声入力で確認してください</string>
@@ -195,6 +201,7 @@
     <string name="chat_preview_voice_off">入力欄にマイクはありません</string>
     <string name="chat_preview_voice_system">端末の音声認識が、話している間に単語を入力します</string>
     <string name="chat_preview_voice_cloud">停止すると録音が %1$s（%2$s）に送信され、テキストが入力欄に入って確認できます</string>
+    <string name="chat_preview_voice_hold">マイクを長押しで録音：離して文字起こし、スライドしてキャンセル</string>
     <string name="chat_preview_selection_now">入力欄で選択：チャットはすぐにそれらに切り替わります</string>
     <string name="chat_preview_stop_asks">「実行中」シートからコマンドを停止すると、まず確認されます</string>
     <string name="chat_preview_stop_direct">「実行中」シートからコマンドを停止すると、すぐに終了します</string>

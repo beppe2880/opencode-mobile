@@ -137,6 +137,12 @@
     <string name="chat_voice_retry">Riprova</string>
     <string name="chat_voice_recording">Registrazione %1$s</string>
     <string name="chat_voice_transcribing">Trascrizione in corso…</string>
+    <string name="chat_voice_recording_now">Registrazione</string>
+    <string name="chat_voice_hold_hint">Rilascia per trascrivere, scorri via per annullare</string>
+    <string name="chat_voice_release_to_cancel">Rilascia per annullare</string>
+    <string name="chat_voice_hold_to_record">Tieni premuto per registrare</string>
+    <string name="chat_voice_discarded">Registrazione scartata</string>
+    <string name="chat_voice_undo">Annulla</string>
     <string name="chat_voice_error_no_key">Nessuna chiave API per %1$s: aggiungila in Impostazioni, Input vocale</string>
     <string name="chat_voice_error_address">L'indirizzo per la trascrizione vocale non è valido: controllalo in Impostazioni, Input vocale</string>
     <string name="chat_voice_error_unauthorized">%1$s ha rifiutato la chiave API: controllala in Impostazioni, Input vocale</string>
@@ -206,6 +212,7 @@
     <string name="chat_preview_voice_off">Nessun microfono nel riquadro di scrittura</string>
     <string name="chat_preview_voice_system">Il riconoscimento vocale del telefono scrive le parole mentre parli</string>
     <string name="chat_preview_voice_cloud">Quando ti fermi, la registrazione viene inviata a %1$s (%2$s) e il testo finisce nel riquadro di scrittura da controllare</string>
+    <string name="chat_preview_voice_hold">Tieni premuto il microfono per registrare: rilascia per trascrivere, scorri via per annullare</string>
     <string name="chat_preview_selection_now">Scelto nel campo di scrittura: la chat passa a loro subito</string>
     <string name="chat_preview_stop_asks">Interrompere un comando dal foglio In esecuzione chiede prima conferma</string>
     <string name="chat_preview_stop_direct">Interrompere un comando dal foglio In esecuzione lo termina subito</string>

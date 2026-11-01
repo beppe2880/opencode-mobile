@@ -128,6 +128,12 @@
     <string name="chat_voice_retry">重试</string>
     <string name="chat_voice_recording">正在录音 %1$s</string>
     <string name="chat_voice_transcribing">正在转写…</string>
+    <string name="chat_voice_recording_now">正在录音</string>
+    <string name="chat_voice_hold_hint">松开转写，滑开取消</string>
+    <string name="chat_voice_release_to_cancel">松开取消</string>
+    <string name="chat_voice_hold_to_record">按住录音</string>
+    <string name="chat_voice_discarded">录音已放弃</string>
+    <string name="chat_voice_undo">撤销</string>
     <string name="chat_voice_error_no_key">%1$s 没有 API 密钥：请在设置的语音输入中添加</string>
     <string name="chat_voice_error_address">语音转文字地址无效：请在设置的语音输入中检查</string>
     <string name="chat_voice_error_unauthorized">%1$s 拒绝了 API 密钥：请在设置的语音输入中检查</string>
@@ -195,6 +201,7 @@
     <string name="chat_preview_voice_off">消息框中没有麦克风</string>
     <string name="chat_preview_voice_system">手机的语音识别会在你说话时写入文字</string>
     <string name="chat_preview_voice_cloud">停止后，录音会发送到 %1$s（%2$s），文字会放入消息框供你检查</string>
+    <string name="chat_preview_voice_hold">按住麦克风录音：松开转写，滑开取消</string>
     <string name="chat_preview_selection_now">在输入框中选择：聊天立即切换到这些内容</string>
     <string name="chat_preview_stop_asks">从“运行中”面板停止命令前会先询问</string>
     <string name="chat_preview_stop_direct">从“运行中”面板停止命令会立即结束它</string>

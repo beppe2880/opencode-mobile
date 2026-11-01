@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">Der Anbieter hat mit einem Fehler geantwortet: %1$s</string>
     <string name="settings_voice_language">App-Sprache senden</string>
     <string name="settings_voice_language_sub">Teilt dem Anbieter die Sprache der Aufnahme mit, das verbessert die Genauigkeit; aus lässt ihn die Sprache erkennen</string>
+    <string name="settings_voice_style">Aufnahmestil</string>
+    <string name="settings_voice_style_waveform">Wellenform</string>
+    <string name="settings_voice_style_compact">Kompakt</string>
+    <string name="settings_voice_style_waveform_sub">Das Nachrichtenfeld wird zum Recorder: live Wellenform, Zeit, Abbrechen und Bestätigen</string>
+    <string name="settings_voice_style_compact_sub">Eine kleine Leiste mit der Zeit über dem Nachrichtenfeld; das Mikrofon wird zur Stopptaste</string>
+    <string name="settings_voice_hold">Gedrückt halten zum Aufnehmen</string>
+    <string name="settings_voice_hold_sub">Mikrofon gedrückt halten zum Aufnehmen und loslassen zum Transkribieren; wegziehen zum Abbrechen. Antippen startet und stoppt weiterhin</string>
     <string name="settings_selection_apply">Agent- und Modelländerungen übernehmen</string>
     <string name="settings_selection_apply_sub">Wenn ein in einem Chat gewählter Agent, Modell oder Denkaufwand an den Server gesendet wird: mit der nächsten Nachricht oder sofort nach der Auswahl</string>
     <string name="settings_selection_apply_next">Nächste Nachricht</string>

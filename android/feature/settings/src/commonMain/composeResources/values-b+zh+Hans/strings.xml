@@ -136,6 +136,13 @@
     <string name="settings_voice_test_provider">服务商返回错误：%1$s</string>
     <string name="settings_voice_language">发送应用语言</string>
     <string name="settings_voice_language_sub">告知服务商录音的语言，有助于提高准确度；关闭则由服务商自动检测语言</string>
+    <string name="settings_voice_style">录音样式</string>
+    <string name="settings_voice_style_waveform">波形</string>
+    <string name="settings_voice_style_compact">紧凑</string>
+    <string name="settings_voice_style_waveform_sub">消息框变为录音器：实时波形、时间、取消和确认</string>
+    <string name="settings_voice_style_compact_sub">消息框上方显示时间的小条；麦克风变为停止按钮</string>
+    <string name="settings_voice_hold">按住录音</string>
+    <string name="settings_voice_hold_sub">按住麦克风录音，松开即转写；滑开取消。轻点仍可开始和停止</string>
     <string name="settings_selection_apply">应用智能体和模型更改</string>
     <string name="settings_selection_apply_sub">在聊天中选择的智能体、模型或推理级别发送到服务器时：在下一条消息时，或在选择后立即</string>
     <string name="settings_selection_apply_next">下条消息</string>
