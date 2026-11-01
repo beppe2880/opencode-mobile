@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
@@ -48,6 +49,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -807,7 +809,8 @@ class ChatViewModel(
             val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
                 var cursor = 0L
                 while (true) {
-                    chatVisible.first { it }
+                    // Hidden, offline or with the server unreachable, a read cannot show anything.
+                    combine(chatVisible, events.connection) { shown, link -> shown && link == ConnectionState.Connected }.first { it }
                     val directory = currentState.directory
                     chat.shellOutput(directory, shellId, cursor).onSuccess { page ->
                         if (page.text.isNotEmpty()) {

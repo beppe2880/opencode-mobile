@@ -1258,6 +1258,32 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `shell output pauses while the server is unreachable and resumes from the cursor`() = runTest(main.testDispatcher) {
+        val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        chat.shellPages += listOf("line 1\n", "line 2\n")
+        val vm = vm()
+        runCurrent()
+        assertEquals(1, chat.shellReads.size)
+
+        events.connection.value = ConnectionState.Reconnecting
+        advanceTimeBy(700)
+        runCurrent()
+        val readsWhenOffline = chat.shellReads.size
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertEquals(readsWhenOffline, chat.shellReads.size)
+
+        events.connection.value = ConnectionState.Connected
+        runCurrent()
+        assertEquals(listOf(0L, 7L), chat.shellReads.take(2).map { it.second })
+        assertEquals("line 1\nline 2\n", vm.tool("c1").output)
+
+        events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "", emptyMap(), 9))
+        runCurrent()
+    }
+
+    @Test
     fun `running tools are not followed when the setting is off`() = runTest(main.testDispatcher) {
         settings.settings.value = AppSettings(followRunningTools = false)
         val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
@@ -1940,7 +1966,7 @@ private class FakeCatalog(private val model: ModelRef) : CatalogRepository {
 }
 
 private class FakeEvents : EventRepository {
-    override val connection: StateFlow<ConnectionState> = MutableStateFlow(ConnectionState.Connected)
+    override val connection = MutableStateFlow(ConnectionState.Connected)
     val flow = MutableSharedFlow<ServerEvent>(extraBufferCapacity = 64)
     override val events = flow
 }
