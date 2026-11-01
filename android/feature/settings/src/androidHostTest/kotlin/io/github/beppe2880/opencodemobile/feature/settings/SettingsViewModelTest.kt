@@ -22,6 +22,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
@@ -327,6 +328,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SttBaseUrlChanged(" http://192.168.1.10:8000/v1 "))
         vm.onEvent(SettingsEvent.SttModelChanged(" Systran/faster-whisper-small "))
         vm.onEvent(SettingsEvent.SttLanguageHintChanged(false))
+        vm.onEvent(SettingsEvent.VoiceRecordingStyleChanged(VoiceRecordingStyle.Compact))
+        vm.onEvent(SettingsEvent.VoiceHoldToRecordChanged(true))
         advanceUntilIdle()
 
         val saved = settings.settings.value
@@ -335,6 +338,8 @@ class SettingsViewModelTest {
         assertEquals("http://192.168.1.10:8000/v1", saved.sttBaseUrl)
         assertEquals(mapOf(SttProvider.Custom to "Systran/faster-whisper-small"), saved.sttModels)
         assertFalse(saved.sttLanguageHint)
+        assertEquals(VoiceRecordingStyle.Compact, saved.voiceRecordingStyle)
+        assertTrue(saved.voiceHoldToRecord)
 
         // Each provider keeps its own model.
         vm.onEvent(SettingsEvent.SttProviderChanged(SttProvider.OpenAI))

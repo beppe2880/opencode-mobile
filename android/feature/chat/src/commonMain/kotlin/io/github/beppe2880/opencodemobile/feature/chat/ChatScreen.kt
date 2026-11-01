@@ -115,6 +115,7 @@ fun ChatScreen(
     voice: VoiceInput? = null,
     onDictate: () -> Unit = {},
     onVoice: (VoiceInputEvent) -> Unit = {},
+    onHoldVoice: () -> Unit = {},
     showBack: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     listState: LazyListState = rememberLazyListState(),
@@ -180,7 +181,7 @@ fun ChatScreen(
                     }
                 }
             }
-            BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice)
+            BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
         }
     }
     if (state.modelSheetOpen) {

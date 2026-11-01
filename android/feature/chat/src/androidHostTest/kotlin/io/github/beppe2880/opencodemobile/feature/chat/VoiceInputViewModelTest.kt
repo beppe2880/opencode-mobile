@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -15,9 +16,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -56,7 +61,9 @@ class VoiceInputViewModelTest {
         advanceUntilIdle()
         recorder.progress(2_500, 0.6f)
         advanceUntilIdle()
-        assertEquals(CloudVoicePhase.Recording(2_500, 0.6f), vm.state.value.phase)
+        // The timer shows whole seconds; the level goes straight to the waveform.
+        assertEquals(CloudVoicePhase.Recording(2_000), vm.state.value.phase)
+        assertEquals(0.6f, vm.level.value)
 
         // A second tap while recording does not start another one.
         vm.onEvent(VoiceInputEvent.Start)
@@ -133,17 +140,54 @@ class VoiceInputViewModelTest {
     }
 
     @Test
-    fun `cancel drops the recording or the transcription in progress`() = runTest(main.testDispatcher) {
+    fun `cancel drops the recording at once and undo transcribes it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        val effects = mutableListOf<VoiceInputEffect>()
+        backgroundScope.launch { vm.effect.collect { effects += it } }
+        stt.answers += Result.success("keep this after all")
+
+        vm.onEvent(VoiceInputEvent.Start)
+        advanceUntilIdle()
+        recorder.progress(3_000, 0.5f)
+        vm.onEvent(VoiceInputEvent.Cancel)
+        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
+        // Not past the undo window.
+        runCurrent()
+        // The recorder stopped normally: the clip is kept for undo, nothing was sent.
+        assertFalse(recorder.cancelled)
+        assertTrue(stt.clips.isEmpty())
+        assertEquals(listOf<VoiceInputEffect>(VoiceInputEffect.Discarded), effects)
+
+        vm.onEvent(VoiceInputEvent.Undo)
+        advanceUntilIdle()
+        assertEquals("keep this after all", vm.state.value.transcript?.text)
+        assertEquals(3_000L, stt.clips.single().durationMs)
+
+        // Undo works once.
+        vm.onEvent(VoiceInputEvent.Undo)
+        advanceUntilIdle()
+        assertEquals(1, stt.clips.size)
+    }
+
+    @Test
+    fun `undo is possible only for a few seconds`() = runTest(main.testDispatcher) {
         val vm = vm()
         vm.onEvent(VoiceInputEvent.Start)
         advanceUntilIdle()
         recorder.progress(3_000, 0.5f)
         vm.onEvent(VoiceInputEvent.Cancel)
-        advanceUntilIdle()
-        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
-        assertTrue(recorder.cancelled)
-        assertTrue(stt.clips.isEmpty())
+        runCurrent()
+        advanceTimeBy(VOICE_UNDO_MS + 1)
 
+        vm.onEvent(VoiceInputEvent.Undo)
+        advanceUntilIdle()
+        assertTrue(stt.clips.isEmpty())
+        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
+    }
+
+    @Test
+    fun `cancel while transcribing can be undone too`() = runTest(main.testDispatcher) {
+        val vm = vm()
         stt.gate = CompletableDeferred()
         stt.answers += Result.success("never shown")
         vm.onEvent(VoiceInputEvent.Start)
@@ -154,13 +198,94 @@ class VoiceInputViewModelTest {
         assertEquals(CloudVoicePhase.Transcribing, vm.state.value.phase)
         vm.onEvent(VoiceInputEvent.Cancel)
         stt.gate!!.complete(Unit)
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
         assertNull(vm.state.value.transcript)
         // Nothing is left to retry.
         vm.onEvent(VoiceInputEvent.Retry)
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(1, stt.clips.size)
+
+        // The cancelled request never got its answer.
+        stt.answers.clear()
+        stt.answers += Result.success("second try")
+        vm.onEvent(VoiceInputEvent.Undo)
+        advanceUntilIdle()
+        assertEquals("second try", vm.state.value.transcript?.text)
+        assertSame(stt.clips[0], stt.clips[1])
+    }
+
+    @Test
+    fun `a new recording forgets the cancelled one`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(VoiceInputEvent.Start)
+        advanceUntilIdle()
+        recorder.progress(3_000, 0.5f)
+        vm.onEvent(VoiceInputEvent.Cancel)
+        runCurrent()
+
+        // Too short to send: back to idle, where undo would be possible.
+        vm.onEvent(VoiceInputEvent.Start)
+        runCurrent()
+        vm.onEvent(VoiceInputEvent.Stop)
+        runCurrent()
+        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
+        vm.onEvent(VoiceInputEvent.Undo)
+        advanceUntilIdle()
+        assertTrue(stt.clips.isEmpty())
+    }
+
+    @Test
+    fun `a too short cancelled recording is just dropped`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        val effects = mutableListOf<VoiceInputEffect>()
+        backgroundScope.launch { vm.effect.collect { effects += it } }
+        vm.onEvent(VoiceInputEvent.Start)
+        advanceUntilIdle()
+        recorder.progress(100, 0.5f)
+        vm.onEvent(VoiceInputEvent.Cancel)
+        advanceUntilIdle()
+        assertTrue(effects.isEmpty())
+    }
+
+    @Test
+    fun `holding the microphone records until released`() = runTest(main.testDispatcher) {
+        settings.settings.value = settings.settings.value.copy(voiceHoldToRecord = true, voiceRecordingStyle = VoiceRecordingStyle.Compact)
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.holdToRecord)
+        assertEquals(VoiceRecordingStyle.Compact, vm.state.value.style)
+        stt.answers += Result.success("held and released")
+
+        vm.onEvent(VoiceInputEvent.Hold)
+        advanceUntilIdle()
+        recorder.progress(1_500, 0.4f)
+        advanceUntilIdle()
+        assertEquals(CloudVoicePhase.Recording(1_000, held = true), vm.state.value.phase)
+
+        // Release.
+        vm.onEvent(VoiceInputEvent.Stop)
+        advanceUntilIdle()
+        assertEquals("held and released", vm.state.value.transcript?.text)
+    }
+
+    @Test
+    fun `sliding away while holding cancels`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        val effects = mutableListOf<VoiceInputEffect>()
+        backgroundScope.launch { vm.effect.collect { effects += it } }
+        vm.onEvent(VoiceInputEvent.Hold)
+        advanceUntilIdle()
+        recorder.progress(2_000, 0.4f)
+        vm.onEvent(VoiceInputEvent.Cancel)
+        advanceUntilIdle()
+        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
+        assertTrue(stt.clips.isEmpty())
+        assertEquals(listOf<VoiceInputEffect>(VoiceInputEffect.Discarded), effects)
+        // The release that ends the gesture changes nothing.
+        vm.onEvent(VoiceInputEvent.Stop)
+        advanceUntilIdle()
+        assertEquals(CloudVoicePhase.Idle, vm.state.value.phase)
     }
 
     @Test
@@ -205,18 +330,20 @@ class VoiceInputViewModelTest {
     /** Records "silence" whose length is the last reported progress, until stopped. */
     private class FakeRecorder : VoiceRecorder {
         override val needsPermission = true
+        override val level = MutableStateFlow(0f)
         var starts = 0
         var cancelled = false
         var failure: Exception? = null
-        private var report: ((Long, Float) -> Unit)? = null
+        private var report: ((Long) -> Unit)? = null
         private var elapsed = 0L
 
         fun progress(ms: Long, level: Float) {
             elapsed = ms
-            report?.invoke(ms, level)
+            this.level.value = level
+            report?.invoke(ms)
         }
 
-        override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (Long, Float) -> Unit): VoiceClip {
+        override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (Long) -> Unit): VoiceClip {
             starts++
             failure?.let { throw it }
             elapsed = 0
@@ -228,6 +355,7 @@ class VoiceInputViewModelTest {
                 throw e
             } finally {
                 report = null
+                level.value = 0f
             }
             return VoiceClip(ByteArray((elapsed * VoiceClip.SAMPLE_RATE / 1000 * 2).toInt()))
         }

@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,6 +70,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         }
         prefs.putString(KEY_STT_BASE_URL, next.sttBaseUrl)
         prefs.putBoolean(KEY_STT_LANGUAGE, next.sttLanguageHint)
+        prefs.putString(KEY_VOICE_STYLE, next.voiceRecordingStyle.name)
+        prefs.putBoolean(KEY_VOICE_HOLD, next.voiceHoldToRecord)
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_SHARE_MENU, next.showInShareMenu)
@@ -137,6 +140,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             }.toMap(),
             sttBaseUrl = prefs.getString(KEY_STT_BASE_URL, defaults.sttBaseUrl),
             sttLanguageHint = prefs.getBoolean(KEY_STT_LANGUAGE, defaults.sttLanguageHint),
+            voiceRecordingStyle = VoiceRecordingStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_VOICE_STYLE) }
+                ?: defaults.voiceRecordingStyle,
+            voiceHoldToRecord = prefs.getBoolean(KEY_VOICE_HOLD, defaults.voiceHoldToRecord),
             selectionApply = SelectionApply.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SELECTION_APPLY) }
                 ?: defaults.selectionApply,
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
@@ -206,6 +212,8 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_STT_MODEL = "stt_model_"
         const val KEY_STT_BASE_URL = "stt_base_url"
         const val KEY_STT_LANGUAGE = "stt_language_hint"
+        const val KEY_VOICE_STYLE = "voice_recording_style"
+        const val KEY_VOICE_HOLD = "voice_hold_to_record"
         const val KEY_SELECTION_APPLY = "selection_apply"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_SHARE_MENU = "show_in_share_menu"

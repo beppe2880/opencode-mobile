@@ -58,6 +58,8 @@ internal fun LazyListScope.settingsList(state: SettingsState, onEvent: (Settings
                 SettingOption.VoiceModel,
                 SettingOption.VoiceKey,
                 SettingOption.VoiceLanguage,
+                SettingOption.VoiceStyle,
+                SettingOption.VoiceHold,
                 SettingOption.SelectionApply,
                 SettingOption.NewChatModel,
                 SettingOption.ShareMenu,

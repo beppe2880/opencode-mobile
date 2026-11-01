@@ -2,6 +2,8 @@ package io.github.beppe2880.opencodemobile.core.domain
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.log10
+import kotlin.math.sqrt
 
 /** What turns the voice of the microphone button into text. */
 enum class VoiceEngine {
@@ -10,6 +12,15 @@ enum class VoiceEngine {
 
     /** A clip is recorded and sent to a cloud speech-to-text provider when the user stops. */
     Cloud,
+}
+
+/** How the message box shows a cloud recording. */
+enum class VoiceRecordingStyle {
+    /** The message box turns into the recorder: a live waveform, the time, cancel and confirm. */
+    Waveform,
+
+    /** A strip with the time above the message box, the microphone turns into a stop button. */
+    Compact,
 }
 
 /** How a provider takes the audio. */
@@ -92,6 +103,38 @@ sealed class TranscriptionError(message: String? = null, cause: Throwable? = nul
     class Provider(val status: Int, val detail: String?) : TranscriptionError("HTTP $status")
 }
 
+/** How often recorders measure the input level: about 25 times a second. */
+const val VOICE_LEVEL_INTERVAL_MS = 40L
+
+/**
+ * Input loudness as the UI shows it: decibels relative to full scale mapped linearly from
+ * [MIN_DB] (silence, 0) to [MAX_DB] (loud speech, 1).
+ */
+object VoiceLevel {
+    const val MIN_DB = -50f
+    const val MAX_DB = -10f
+
+    fun fromDecibels(db: Float): Float = if (db.isNaN()) 0f else ((db - MIN_DB) / (MAX_DB - MIN_DB)).coerceIn(0f, 1f)
+
+    /** RMS of a full-scale-relative amplitude (0 to 1). */
+    fun fromRms(rms: Double): Float = if (rms > 0) fromDecibels(20 * log10(rms).toFloat()) else 0f
+
+    /** Level of the first [length] bytes of 16-bit little-endian mono PCM. */
+    fun fromPcm16(bytes: ByteArray, length: Int = bytes.size): Float {
+        var sum = 0.0
+        var count = 0
+        var i = 0
+        val end = length.coerceAtMost(bytes.size)
+        while (i + 1 < end) {
+            val sample = ((bytes[i].toInt() and 0xFF) or (bytes[i + 1].toInt() shl 8)).toShort() / 32768.0
+            sum += sample * sample
+            count++
+            i += 2
+        }
+        return if (count == 0) 0f else fromRms(sqrt(sum / count))
+    }
+}
+
 /**
  * Microphone recording for cloud transcription. Platform implementations need the microphone
  * permission when [needsPermission].
@@ -100,11 +143,17 @@ interface VoiceRecorder {
     val needsPermission: Boolean
 
     /**
-     * Records until [stop] completes or [maxMs] is reached, reporting the elapsed time and the
-     * input loudness (0 to 1) about ten times a second, and returns the clip. Cancelling the call
-     * discards the recording. Throws when the microphone cannot be opened.
+     * Input level (0 to 1, see [VoiceLevel]) of the recording in progress, measured about every
+     * [VOICE_LEVEL_INTERVAL_MS]; 0 when not recording.
      */
-    suspend fun record(stop: Deferred<Unit>, maxMs: Long = MAX_VOICE_CLIP_MS, onProgress: (elapsedMs: Long, level: Float) -> Unit): VoiceClip
+    val level: StateFlow<Float>
+
+    /**
+     * Records until [stop] completes or [maxMs] is reached, reporting the elapsed time while
+     * [level] follows the voice, and returns the clip. Cancelling the call discards the
+     * recording. Throws when the microphone cannot be opened.
+     */
+    suspend fun record(stop: Deferred<Unit>, maxMs: Long = MAX_VOICE_CLIP_MS, onProgress: (elapsedMs: Long) -> Unit): VoiceClip
 }
 
 /** Cloud speech-to-text with the provider and model chosen in [AppSettings]. */

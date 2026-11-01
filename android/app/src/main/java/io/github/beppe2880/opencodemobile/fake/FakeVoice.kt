@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.fake
 
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
+import io.github.beppe2880.opencodemobile.core.domain.VOICE_LEVEL_INTERVAL_MS
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import kotlinx.coroutines.Deferred
@@ -9,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sin
 
@@ -20,19 +22,34 @@ import kotlin.math.sin
 internal class FakeVoiceRecorder : VoiceRecorder {
     override val needsPermission: Boolean = false
 
-    override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (elapsedMs: Long, level: Float) -> Unit): VoiceClip {
+    private val _level = MutableStateFlow(0f)
+    override val level: StateFlow<Float> = _level.asStateFlow()
+
+    override suspend fun record(stop: Deferred<Unit>, maxMs: Long, onProgress: (elapsedMs: Long) -> Unit): VoiceClip {
         var elapsed = 0L
-        while (!stop.isCompleted && elapsed < maxMs) {
-            delay(TICK)
-            elapsed += TICK
-            onProgress(elapsed, abs(sin(elapsed / 300.0)).toFloat() * 0.8f)
+        try {
+            while (!stop.isCompleted && elapsed < maxMs) {
+                delay(VOICE_LEVEL_INTERVAL_MS)
+                elapsed += VOICE_LEVEL_INTERVAL_MS
+                _level.value = syntheticLevel(elapsed)
+                onProgress(elapsed)
+            }
+        } finally {
+            _level.value = 0f
         }
         // Silent samples of the same length: only the duration matters to the demo.
         return VoiceClip(ByteArray((elapsed * VoiceClip.SAMPLE_RATE / 1000 * 2).toInt()))
     }
 
     private companion object {
-        const val TICK = 100L
+        /** Speech-like loudness: syllables (~5 Hz) inside words (~0.7 Hz), with short pauses. */
+        fun syntheticLevel(ms: Long): Float {
+            val t = ms / 1000.0
+            val word = sin(2 * PI * 0.7 * t)
+            if (word < -0.6) return 0.04f
+            val syllable = abs(sin(2 * PI * 2.6 * t + sin(t * 1.3)))
+            return (0.15 + 0.7 * syllable * (0.6 + 0.4 * abs(word))).toFloat().coerceIn(0f, 1f)
+        }
     }
 }
 

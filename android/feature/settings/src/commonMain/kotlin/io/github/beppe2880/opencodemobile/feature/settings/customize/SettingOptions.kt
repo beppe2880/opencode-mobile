@@ -45,6 +45,8 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     /** The provider's API key, kept in secure storage rather than in the settings. */
     VoiceKey(emptyList(), requires = VoiceMode),
     VoiceLanguage(listOf("sttLanguageHint"), requires = VoiceMode),
+    VoiceStyle(listOf("voiceRecordingStyle"), requires = VoiceMode),
+    VoiceHold(listOf("voiceHoldToRecord"), requires = VoiceMode),
     SelectionApply(listOf("selectionApply")),
     NewChatModel(listOf("newChatModel")),
     ShareMenu(listOf("showInShareMenu")),
@@ -135,6 +137,8 @@ val VOICE_OPTIONS: List<SettingOption> = listOf(
     SettingOption.VoiceModel,
     SettingOption.VoiceKey,
     SettingOption.VoiceLanguage,
+    SettingOption.VoiceStyle,
+    SettingOption.VoiceHold,
 )
 
 /**
@@ -152,7 +156,9 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.BackShowsList -> settings.splitView && settings.listPaneHandle
     SettingOption.NotifyPermissions, SettingOption.NotifyQuestions, SettingOption.NotifyFinished -> notificationsOn
     SettingOption.VoiceMode -> settings.dictation
-    SettingOption.VoiceProvider, SettingOption.VoiceModel, SettingOption.VoiceKey, SettingOption.VoiceLanguage ->
+    SettingOption.VoiceProvider, SettingOption.VoiceModel, SettingOption.VoiceKey, SettingOption.VoiceLanguage,
+    SettingOption.VoiceStyle, SettingOption.VoiceHold,
+    ->
         settings.dictation && settings.voiceEngine == VoiceEngine.Cloud
     SettingOption.ShareMenu -> supported
     SettingOption.ShareOpens -> supported && settings.showInShareMenu

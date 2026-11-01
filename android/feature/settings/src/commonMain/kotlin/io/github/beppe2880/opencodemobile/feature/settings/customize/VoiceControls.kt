@@ -34,17 +34,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPasswordField
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.feature.settings.ChoiceRow
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsEvent
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.SttTest
@@ -63,6 +67,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_vo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model_default
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model_load
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model_other
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_compact
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_compact_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_waveform
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_waveform_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_test
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_test_address
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_test_network
@@ -296,6 +304,26 @@ private fun TestOutcome(test: SttTest?) {
         )
         Text(text, style = MaterialTheme.typography.bodySmall, color = if (ok) c.success.fg else c.danger.fg)
     }
+}
+
+/** How the message box shows a recording: the waveform recorder or today's compact strip. */
+@Composable
+internal fun VoiceStyleControl(title: String, settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
+    ChoiceRow(
+        title = title,
+        subtitle = stringResource(
+            when (settings.voiceRecordingStyle) {
+                VoiceRecordingStyle.Waveform -> Res.string.settings_voice_style_waveform_sub
+                VoiceRecordingStyle.Compact -> Res.string.settings_voice_style_compact_sub
+            },
+        ),
+        choices = listOf(
+            OcSegment(VoiceRecordingStyle.Waveform, stringResource(Res.string.settings_voice_style_waveform), "settings_voice_style_waveform"),
+            OcSegment(VoiceRecordingStyle.Compact, stringResource(Res.string.settings_voice_style_compact), "settings_voice_style_compact"),
+        ),
+        selected = settings.voiceRecordingStyle,
+        onSelect = { onEvent(SettingsEvent.VoiceRecordingStyleChanged(it)) },
+    )
 }
 
 internal class MenuItem(val label: String, val tag: String, val onClick: () -> Unit)

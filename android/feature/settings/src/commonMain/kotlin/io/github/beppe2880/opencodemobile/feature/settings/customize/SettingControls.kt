@@ -164,6 +164,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_up
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_hold
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_hold_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_key_search
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_language
@@ -177,6 +179,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_vo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_model_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_waveform_sub
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
@@ -215,6 +219,8 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.VoiceModel -> Res.string.settings_voice_model
         SettingOption.VoiceKey -> Res.string.settings_voice_key
         SettingOption.VoiceLanguage -> Res.string.settings_voice_language
+        SettingOption.VoiceStyle -> Res.string.settings_voice_style
+        SettingOption.VoiceHold -> Res.string.settings_voice_hold
         SettingOption.SelectionApply -> Res.string.settings_selection_apply
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model
         SettingOption.ShareMenu -> Res.string.settings_share_menu
@@ -269,6 +275,8 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.VoiceModel -> Res.string.settings_voice_model_sub
         SettingOption.VoiceKey -> Res.string.settings_voice_key_search
         SettingOption.VoiceLanguage -> Res.string.settings_voice_language_sub
+        SettingOption.VoiceStyle -> Res.string.settings_voice_style_waveform_sub
+        SettingOption.VoiceHold -> Res.string.settings_voice_hold_sub
         SettingOption.SelectionApply -> Res.string.settings_selection_apply_sub
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model_sub
         SettingOption.ShareMenu -> Res.string.settings_share_menu_sub
@@ -430,6 +438,8 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.VoiceModel -> VoiceModelControl(title, subtitle, state, onEvent, modifier)
         SettingOption.VoiceKey -> VoiceKeyControl(title, state, onEvent, modifier)
         SettingOption.VoiceLanguage -> switch(settings.sttLanguageHint, SettingsEvent::SttLanguageHintChanged)()
+        SettingOption.VoiceStyle -> VoiceStyleControl(title, settings, onEvent)
+        SettingOption.VoiceHold -> switch(settings.voiceHoldToRecord, SettingsEvent::VoiceHoldToRecordChanged)()
         SettingOption.SelectionApply -> ChoiceRow(
             title = title,
             subtitle = subtitle,
@@ -566,6 +576,8 @@ private val SettingOption.tag: String
         SettingOption.VoiceModel -> "voice_model"
         SettingOption.VoiceKey -> "voice_key"
         SettingOption.VoiceLanguage -> "voice_language"
+        SettingOption.VoiceStyle -> "voice_style"
+        SettingOption.VoiceHold -> "voice_hold"
         SettingOption.RunningInList -> "running_in_list"
         SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"

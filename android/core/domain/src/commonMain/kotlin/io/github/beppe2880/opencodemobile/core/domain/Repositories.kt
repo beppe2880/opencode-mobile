@@ -397,6 +397,10 @@ data class AppSettings(
     val sttBaseUrl: String = "",
     /** With [VoiceEngine.Cloud]: the app language is sent as the language of the audio, otherwise the provider detects it. */
     val sttLanguageHint: Boolean = true,
+    /** With [VoiceEngine.Cloud]: how the message box shows the recording. */
+    val voiceRecordingStyle: VoiceRecordingStyle = VoiceRecordingStyle.Waveform,
+    /** With [VoiceEngine.Cloud]: holding the microphone records, releasing transcribes, sliding away cancels. */
+    val voiceHoldToRecord: Boolean = false,
     /** When agent and model changes in a chat reach the server. */
     val selectionApply: SelectionApply = SelectionApply.NextMessage,
     /** The model a new chat starts with. */

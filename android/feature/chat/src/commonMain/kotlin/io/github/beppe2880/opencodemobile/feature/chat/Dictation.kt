@@ -3,6 +3,8 @@ package io.github.beppe2880.opencodemobile.feature.chat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
+import kotlinx.coroutines.flow.StateFlow
 
 /** Why dictation stopped without text. */
 internal enum class DictationFailure { NoSpeech, Permission, Unavailable, Other }
@@ -74,7 +76,8 @@ internal fun formatElapsed(ms: Long): String {
 /**
  * Voice input as the composer sees it; null hides the microphone. [cloud] is the state of a
  * cloud recording, null with the system recognizer; [transcript] waits to be inserted at the
- * cursor.
+ * cursor. [level] is the system recognizer's loudness; a cloud recording's changes too often
+ * for state and is read from [levels] while drawing.
  */
 @Immutable
 data class VoiceInput(
@@ -83,4 +86,11 @@ data class VoiceInput(
     val cloud: CloudVoicePhase? = null,
     val provider: String = "",
     val transcript: PendingTranscript? = null,
-)
+    val levels: StateFlow<Float>? = null,
+    val style: VoiceRecordingStyle = VoiceRecordingStyle.Waveform,
+    val holdToRecord: Boolean = false,
+) {
+    /** A cloud recording or transcription shown inside the message box instead of the text. */
+    val inBox: Boolean get() = cloud != null && style == VoiceRecordingStyle.Waveform &&
+        (cloud is CloudVoicePhase.Recording || cloud == CloudVoicePhase.Transcribing)
+}

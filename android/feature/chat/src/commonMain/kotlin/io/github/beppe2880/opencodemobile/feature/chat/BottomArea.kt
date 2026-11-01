@@ -77,6 +77,7 @@ internal fun BottomArea(
     voice: VoiceInput? = null,
     onDictate: () -> Unit = {},
     onVoice: (VoiceInputEvent) -> Unit = {},
+    onHoldVoice: () -> Unit = {},
 ) {
     val c = OcTheme.colors
     val editMode = LocalEditMode.current
@@ -151,6 +152,7 @@ internal fun BottomArea(
             voice = voice,
             onDictate = onDictate,
             onVoice = onVoice,
+            onHoldVoice = onHoldVoice,
         )
     }
 }

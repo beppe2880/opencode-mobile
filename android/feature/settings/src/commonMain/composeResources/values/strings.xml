@@ -139,6 +139,13 @@
     <string name="settings_voice_test_provider">The provider answered with an error: %1$s</string>
     <string name="settings_voice_language">Send the app language</string>
     <string name="settings_voice_language_sub">Tells the provider the language of the recording, which helps accuracy; off lets it detect the language</string>
+    <string name="settings_voice_style">Recording style</string>
+    <string name="settings_voice_style_waveform">Waveform</string>
+    <string name="settings_voice_style_compact">Compact</string>
+    <string name="settings_voice_style_waveform_sub">The message box turns into the recorder: a live waveform, the time, cancel and confirm</string>
+    <string name="settings_voice_style_compact_sub">A small strip with the time above the message box; the microphone becomes the stop button</string>
+    <string name="settings_voice_hold">Hold to record</string>
+    <string name="settings_voice_hold_sub">Hold the microphone to record and release to transcribe; slide away to cancel. A tap still starts and stops</string>
     <string name="settings_selection_apply">Apply agent and model changes</string>
     <string name="settings_selection_apply_sub">When an agent, model or reasoning level picked in a chat is sent to the server: with the next message, or as soon as it is picked</string>
     <string name="settings_selection_apply_next">Next message</string>

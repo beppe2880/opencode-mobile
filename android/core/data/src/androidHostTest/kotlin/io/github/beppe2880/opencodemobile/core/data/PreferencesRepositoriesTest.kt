@@ -18,6 +18,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -43,12 +44,17 @@ class PreferencesRepositoriesTest {
             .putString("stt_provider", "Deepgram")
             .putString("stt_model_OpenAI", "   ")
             .putString("stt_model_Groq", "whisper-large-v3")
+            .putString("voice_recording_style", "Bars")
             .commit()
         val read = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
         assertEquals(VoiceEngine.System, read.voiceEngine)
         assertEquals(SttProvider.OpenRouter, read.sttProvider)
         assertEquals(mapOf(SttProvider.Groq to "whisper-large-v3"), read.sttModels)
         assertEquals("gpt-4o-mini-transcribe", read.sttModel(SttProvider.OpenAI))
+        // The waveform recorder without hold to record, unless chosen.
+        assertEquals(VoiceRecordingStyle.Waveform, read.voiceRecordingStyle)
+        assertFalse(read.voiceHoldToRecord)
+        assertEquals(VoiceRecordingStyle.Waveform, upgraded.voiceRecordingStyle)
 
         // Going back to a provider's default removes its stored model.
         val repository = PreferencesSettingsRepository(SharedPreferencesSettings(prefs))
@@ -96,6 +102,8 @@ class PreferencesRepositoriesTest {
             sttModels = mapOf(SttProvider.Groq to "whisper-large-v3", SttProvider.Custom to "Systran/faster-whisper-small"),
             sttBaseUrl = "http://192.168.1.10:8000/v1",
             sttLanguageHint = false,
+            voiceRecordingStyle = VoiceRecordingStyle.Compact,
+            voiceHoldToRecord = true,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 

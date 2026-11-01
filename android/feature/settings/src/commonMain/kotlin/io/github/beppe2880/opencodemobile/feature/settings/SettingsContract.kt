@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
@@ -143,6 +144,8 @@ sealed interface SettingsEvent {
     data class SttModelChanged(val model: String) : SettingsEvent
     data class SttBaseUrlChanged(val url: String) : SettingsEvent
     data class SttLanguageHintChanged(val enabled: Boolean) : SettingsEvent
+    data class VoiceRecordingStyleChanged(val style: VoiceRecordingStyle) : SettingsEvent
+    data class VoiceHoldToRecordChanged(val enabled: Boolean) : SettingsEvent
 
     /** Stores [key] for the selected provider in secure storage; the field is cleared by the UI. */
     data class SaveSttKey(val key: String) : SettingsEvent
