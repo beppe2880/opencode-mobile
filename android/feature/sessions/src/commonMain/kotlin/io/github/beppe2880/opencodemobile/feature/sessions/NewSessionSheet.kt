@@ -38,6 +38,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Project
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcAgentChips
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -45,6 +47,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
@@ -177,7 +180,7 @@ internal fun NewSessionForm(
             secondaryText = selectedModel?.providerName ?: model?.providerId,
             onClick = { onEvent(SessionsEvent.NewSessionModelPicker(true)) },
             trailingIcon = Icons.Outlined.ExpandMore,
-            modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_model"),
+            modifier = Modifier.padding(horizontal = OcSpacing.lg).editable(SettingsPart.NewChat, LocalEditMode.current).testTag("sessions_new_model"),
         )
         state.error?.let {
             Text(

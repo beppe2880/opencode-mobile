@@ -60,10 +60,10 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
 }
 
 /**
- * Properties no control changes directly: the one-time notifications explanation, and the edit
- * marks of the previews, switched from the toolbar of every area.
+ * Properties no option changes: the one-time notifications explanation, and how Settings itself
+ * looks (the edit marks and the preview size of the previews, the style picked at its top).
  */
-internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks")
+internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks", "settingsStyle", "settingsPreviewFraction")
 
 /** Every option of this part of a preview, applying or not. */
 val SettingsPart.options: List<SettingOption>
@@ -99,12 +99,12 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.LiveReads -> listOf(SettingOption.LiveReads)
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
         SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
-        SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply)
+        SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.AgentOutline)
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel)
         SettingsPart.SessionRows -> listOf(SettingOption.RunningInList)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats)
         SettingsPart.SplitView -> listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList)
-        SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys)
+        SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard)
         SettingsPart.TerminalKeyboard -> listOf(SettingOption.TerminalKeyboard)
         SettingsPart.TerminalFullscreen -> listOf(SettingOption.TerminalFullscreen)
         SettingsPart.NotificationShade -> listOf(SettingOption.Notifications)
@@ -141,3 +141,28 @@ fun SettingsPart.shownWith(settings: AppSettings): Boolean = when (this) {
     SettingsPart.Activity -> settings.groupActivity
     else -> true
 }
+
+/**
+ * The parts the real screens mark for the live demo's edit mode (with `Modifier.editable`), and
+ * so the options it reaches. The others have no element of their own on the real screens: the
+ * theme and swiping concern whole screens, running steps and notifications only exist while an
+ * agent works or the app is in the background. Their options stay in the list and the previews.
+ */
+val EDIT_MODE_PARTS: List<SettingsPart> = listOf(
+    SettingsPart.Header,
+    SettingsPart.RunningLine,
+    SettingsPart.Messages,
+    SettingsPart.Thoughts,
+    SettingsPart.Tools,
+    SettingsPart.Activity,
+    SettingsPart.Footer,
+    SettingsPart.PendingCards,
+    SettingsPart.ComposerBox,
+    SettingsPart.SelectionTiming,
+    SettingsPart.SessionRows,
+    SettingsPart.NewChat,
+    SettingsPart.SplitView,
+    SettingsPart.UpdateBanner,
+    SettingsPart.KeyBar,
+    SettingsPart.TerminalFullscreen,
+)

@@ -46,5 +46,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.CheckForUpdatesChanged -> copy(checkForUpdates = event.enabled)
     is SettingsEvent.EditMarksChanged -> copy(showEditMarks = event.visible)
     SettingsEvent.ResetTerminalKeys -> copy(terminalKeys = null)
+    is SettingsEvent.SettingsStyleChanged -> copy(settingsStyle = event.style)
+    is SettingsEvent.PreviewFractionChanged -> copy(settingsPreviewFraction = event.fraction)
     else -> null
 }

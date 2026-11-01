@@ -17,6 +17,8 @@ fun SettingsRoute(
     onOpenUsage: () -> Unit = {},
     /** Draws the previews of the groups that show other screens (chat, sessions, terminal). */
     preview: AreaPreviewContent = { _, _, _ -> },
+    /** Opens the offline demo in edit mode; null where there is none. */
+    onOpenLiveDemo: (() -> Unit)? = null,
     /** The offline demo: no real servers, and notification access is simulated. */
     demo: Boolean = false,
 ) {
@@ -40,5 +42,5 @@ fun SettingsRoute(
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()
         }
     }
-    SettingsScreen(state = state, onEvent = viewModel::onEvent, preview = preview, modifier = modifier, demo = demo)
+    SettingsScreen(state = state, onEvent = viewModel::onEvent, preview = preview, modifier = modifier, demo = demo, onOpenLiveDemo = onOpenLiveDemo)
 }

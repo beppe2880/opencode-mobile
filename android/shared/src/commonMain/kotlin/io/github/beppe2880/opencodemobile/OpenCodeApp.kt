@@ -30,6 +30,10 @@ fun OpenCodeApp(
     onNewSessionOpened: () -> Unit = {},
     onDarkThemeChange: (Boolean) -> Unit = {},
     onTryDemo: (() -> Unit)? = null,
+    /** Opens the offline demo in edit mode (Android); null hides the entry in Settings. */
+    onCustomizeInDemo: (() -> Unit)? = null,
+    openSettings: Boolean = false,
+    onSettingsOpened: () -> Unit = {},
     overlay: @Composable (AppSettings) -> Unit = {},
 ) {
     val settings = koinInject<SettingsRepository>()
@@ -50,6 +54,9 @@ fun OpenCodeApp(
                     onSessionOpened = onSessionOpened,
                     openNewSession = openNewSession,
                     onNewSessionOpened = onNewSessionOpened,
+                    onCustomizeInDemo = onCustomizeInDemo,
+                    openSettings = openSettings,
+                    onSettingsOpened = onSettingsOpened,
                 )
                 if (activeServer != null) overlay(appSettings)
             }

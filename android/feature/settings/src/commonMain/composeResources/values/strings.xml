@@ -199,8 +199,6 @@
     <string name="settings_marks_hide">Hide edit marks</string>
     <string name="settings_preview_running">Show the agent at work</string>
     <string name="settings_preview_finished">Show a finished answer</string>
-    <string name="settings_preview_expand">Show more of the preview</string>
-    <string name="settings_preview_collapse">Show less of the preview</string>
     <string name="settings_preview_app">OpenCode · now</string>
     <string name="settings_preview_watching">Watching 2 running sessions</string>
     <string name="settings_preview_watching_text">Keeps the connection while you are in other apps</string>
@@ -216,4 +214,19 @@
     <string name="settings_preview_update_on">Shown above the session list when a newer version is out</string>
     <string name="settings_preview_update_off">Off: the app never looks for new versions</string>
     <string name="settings_part_hidden">Not in the preview with the current settings: change them here to bring it back</string>
+    <string name="settings_style_list">List</string>
+    <string name="settings_style_preview">Preview</string>
+    <string name="settings_live_demo">Customize in the demo</string>
+    <string name="settings_live_demo_sub">Tap any part of the real screens, with sample data, to change it. Nothing reaches your servers</string>
+    <string name="settings_preview_hide">Hide</string>
+    <string name="settings_preview_small">Small</string>
+    <string name="settings_preview_half">Half</string>
+    <string name="settings_preview_large">Large</string>
+    <string name="settings_preview_divider">Preview size</string>
+    <string name="settings_edit_mode">Edit</string>
+    <string name="settings_use_mode">Use</string>
+    <string name="settings_edit_done">Done</string>
+    <string name="settings_edit_hint">Tap a marked part to change it</string>
+    <string name="settings_use_hint">Use the demo as usual</string>
+    <string name="settings_edit_close">Close options</string>
 </resources>

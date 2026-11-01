@@ -433,6 +433,10 @@ data class AppSettings(
     val backShowsList: Boolean = true,
     /** The previews in Settings outline the parts that can be tapped and mark them with a pencil. */
     val showEditMarks: Boolean = true,
+    /** How Settings opens: the classic list or the previews of each group. */
+    val settingsStyle: SettingsStyle = SettingsStyle.List,
+    /** Share of the height the preview takes above its options on narrow screens; 0 hides it, null for the default. */
+    val settingsPreviewFraction: Float? = null,
 )
 
 /** Share of the window width the session list can be given from Settings. */

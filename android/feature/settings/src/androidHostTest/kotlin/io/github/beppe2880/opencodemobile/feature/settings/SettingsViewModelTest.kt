@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
@@ -285,6 +286,24 @@ class SettingsViewModelTest {
         assertFalse(settings.settings.value.showEditMarks)
         assertNull(settings.settings.value.terminalKeys)
         assertFalse(vm.state.value.settings.showEditMarks)
+    }
+
+    @Test
+    fun `the settings style and the preview size are kept`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        assertEquals(SettingsStyle.List, vm.state.value.settings.settingsStyle)
+
+        vm.onEvent(SettingsEvent.SettingsStyleChanged(SettingsStyle.Preview))
+        vm.onEvent(SettingsEvent.PreviewFractionChanged(0f))
+        advanceUntilIdle()
+
+        assertEquals(SettingsStyle.Preview, settings.settings.value.settingsStyle)
+        assertEquals(0f, settings.settings.value.settingsPreviewFraction)
+        assertEquals(SettingsStyle.Preview, vm.state.value.settings.settingsStyle)
+
+        vm.onEvent(SettingsEvent.SettingsStyleChanged(SettingsStyle.List))
+        advanceUntilIdle()
+        assertEquals(SettingsStyle.List, settings.settings.value.settingsStyle)
     }
 
     @Test

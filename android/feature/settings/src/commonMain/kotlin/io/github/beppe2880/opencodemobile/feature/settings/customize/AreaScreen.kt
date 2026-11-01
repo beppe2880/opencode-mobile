@@ -59,7 +59,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -82,8 +84,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ma
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_marks_show
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_option_needs
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_part_hidden
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_collapse
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_expand
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_divider
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_finished
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_running
 import org.jetbrains.compose.resources.stringResource
@@ -179,9 +180,10 @@ internal fun AreaScreen(
             } else {
                 StackedLayout(
                     available = maxHeight,
+                    fraction = state.settings.settingsPreviewFraction ?: PreviewSize.DEFAULT_FRACTION,
+                    onFraction = { onEvent(SettingsEvent.PreviewFractionChanged(it)) },
                     frame = frame,
                     options = { optionsModifier -> OptionsList(parts, state, onEvent, listState, tail, optionsModifier) },
-                    area = area,
                 )
             }
         }
@@ -191,64 +193,75 @@ internal fun AreaScreen(
 private val SideBySideMinWidth = 560.dp
 private val ExpandedWidth = 840.dp
 
+/**
+ * Preview above, options below, split where the user left the divider: dragged, or set with
+ * Hide, Small, Half or Large, and kept for next time. The preview never gets smaller than its
+ * minimum (it hides instead) and always leaves the options room for a couple of controls.
+ */
 @Composable
 private fun StackedLayout(
     available: Dp,
+    fraction: Float,
+    onFraction: (Float) -> Unit,
     frame: @Composable (Modifier) -> Unit,
     options: @Composable (Modifier) -> Unit,
-    area: SettingsArea,
 ) {
     val c = OcTheme.colors
     val density = LocalDensity.current
-    val expanded = (available * 0.42f).coerceIn(160.dp, 440.dp)
-    val collapsed = (available * 0.2f).coerceIn(96.dp, 160.dp)
-    var height by rememberSaveable(area) { mutableStateOf(expanded.value) }
-    val currentHeight = height.dp.coerceIn(collapsed, expanded)
-    val shrink by rememberUpdatedState(collapsed)
-    val grow by rememberUpdatedState(expanded)
-    // Scrolling the options up first shrinks the preview; pulling them down at the top grows it.
-    val connection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = with(density) { available.y.toDp() }
-                if (delta >= 0.dp || height.dp <= shrink) return Offset.Zero
-                val used = max(delta.value, shrink.value - height)
-                height += used
-                return Offset(0f, with(density) { used.dp.toPx() })
-            }
-
-            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                val delta = with(density) { available.y.toDp() }
-                if (delta <= 0.dp || height.dp >= grow) return Offset.Zero
-                val used = min(delta.value, grow.value - height)
-                height += used
-                return Offset(0f, with(density) { used.dp.toPx() })
-            }
-        }
-    }
+    // Follows the finger while dragging; saved when the finger lifts.
+    var dragged by remember(fraction) { mutableStateOf<Dp?>(null) }
+    val height = dragged?.coerceIn(0.dp, available) ?: previewHeight(fraction, available)
     Column(Modifier.fillMaxSize()) {
-        frame(Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.sm).fillMaxWidth().height(currentHeight))
-        val isExpanded = currentHeight > (collapsed + expanded) / 2
-        val toggleLabel = stringResource(if (isExpanded) Res.string.settings_preview_collapse else Res.string.settings_preview_expand)
-        Box(
+        if (height > 0.dp) {
+            frame(Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.sm).fillMaxWidth().height(height))
+        }
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp)
-                .draggable(
-                    orientation = Orientation.Vertical,
-                    state = rememberDraggableState { delta ->
-                        height = (height + with(density) { delta.toDp() }.value).coerceIn(shrink.value, grow.value)
-                    },
-                )
-                .clickable(onClickLabel = toggleLabel, role = Role.Button) {
-                    height = if (isExpanded) collapsed.value else expanded.value
-                }
-                .testTag("area_preview_handle"),
-            contentAlignment = Alignment.Center,
+                .heightIn(min = 48.dp)
+                .padding(horizontal = OcSpacing.sm)
+                .testTag("area_preview_divider"),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(Modifier.size(width = 32.dp, height = 4.dp).background(c.layer04, RoundedCornerShape(2.dp)))
+            val label = stringResource(Res.string.settings_preview_divider)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp)
+                    .draggable(
+                        orientation = Orientation.Vertical,
+                        state = rememberDraggableState { delta ->
+                            dragged = (dragged ?: height) + with(density) { delta.toDp() }
+                        },
+                        onDragStopped = {
+                            val end = dragged ?: height
+                            dragged = null
+                            onFraction(snapFraction(end, available))
+                        },
+                    )
+                    .semantics { contentDescription = label }
+                    .testTag("area_preview_handle"),
+                contentAlignment = Alignment.Center,
+            ) {
+                Box(Modifier.size(width = 40.dp, height = 4.dp).background(c.layer04, RoundedCornerShape(2.dp)))
+            }
+            PreviewSize.entries.forEach { size ->
+                val current = previewHeight(size.fraction, available) == previewHeight(fraction, available)
+                Text(
+                    stringResource(size.label),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (current) c.textAccent else c.textMuted,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(OcRadius.md))
+                        .clickable(role = Role.Button) { onFraction(size.fraction) }
+                        .heightIn(min = 48.dp)
+                        .padding(horizontal = OcSpacing.sm, vertical = OcSpacing.md)
+                        .semantics { this.selected = current }
+                        .testTag("area_preview_size_${size.name.lowercase()}"),
+                )
+            }
         }
-        options(Modifier.weight(1f).fillMaxWidth().nestedScroll(connection))
+        options(Modifier.weight(1f).fillMaxWidth())
     }
 }
 
@@ -331,14 +344,6 @@ private fun OptionsList(
 private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
     val c = OcTheme.colors
     val selected = state.selected == part
-    val options = part.options
-    val shown = options.filter { it.appliesTo(state.settings, state.notificationsOn) }
-    // The switch to turn on first: past the ones that do not apply themselves (live kinds before the interval).
-    val needs = options.filterNot { it in shown }.mapNotNull { hidden ->
-        var parent = hidden.requires
-        while (parent != null && !parent.appliesTo(state.settings, state.notificationsOn)) parent = parent.requires ?: break
-        parent
-    }.distinct()
     Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs), modifier = Modifier.testTag("area_part_${part.name.lowercase()}")) {
         Text(
             part.label(),
@@ -351,30 +356,52 @@ private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (Sett
                 .padding(start = OcSpacing.xs, top = OcSpacing.sm)
                 .semantics { heading() },
         )
-        OcCard(borderColor = if (selected) c.textAccent else c.borderBase) {
-            if (!part.shownWith(state.settings)) {
-                Text(
-                    stringResource(Res.string.settings_part_hidden),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = c.textMuted,
-                    modifier = Modifier.fillMaxWidth().padding(start = OcSpacing.lg, end = OcSpacing.lg, top = OcSpacing.md),
-                )
+        PartOptionsCard(part, state, onEvent, highlighted = selected)
+    }
+}
+
+/** The options of [part] that apply in a card; those switched off by another one say which. */
+@Composable
+internal fun PartOptionsCard(
+    part: SettingsPart,
+    state: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
+    highlighted: Boolean,
+    /** Says when the preview leaves the part out; not for the real screens of the live demo. */
+    inPreview: Boolean = true,
+) {
+    val c = OcTheme.colors
+    val options = part.options
+    val shown = options.filter { it.appliesTo(state.settings, state.notificationsOn) }
+    // The switch to turn on first: past the ones that do not apply themselves (live kinds before the interval).
+    val needs = options.filterNot { it in shown }.mapNotNull { hidden ->
+        var parent = hidden.requires
+        while (parent != null && !parent.appliesTo(state.settings, state.notificationsOn)) parent = parent.requires ?: break
+        parent
+    }.distinct()
+    OcCard(borderColor = if (highlighted) c.textAccent else c.borderBase) {
+        if (!part.shownWith(state.settings)) {
+            Text(
+                stringResource(Res.string.settings_part_hidden),
+                style = MaterialTheme.typography.bodySmall,
+                color = c.textMuted,
+                modifier = Modifier.fillMaxWidth().padding(start = OcSpacing.lg, end = OcSpacing.lg, top = OcSpacing.md),
+            )
+        }
+        shown.forEachIndexed { i, option ->
+            if (i > 0) OcDivider()
+            Box(Modifier.background(if (state.focus == option) c.info.bg else Color.Transparent)) {
+                SettingOptionControl(option, state, onEvent)
             }
-            shown.forEachIndexed { i, option ->
-                if (i > 0) OcDivider()
-                Box(Modifier.background(if (state.focus == option) c.info.bg else Color.Transparent)) {
-                    SettingOptionControl(option, state, onEvent)
-                }
-            }
-            needs.forEach { parent ->
-                if (shown.isNotEmpty()) OcDivider()
-                Text(
-                    stringResource(Res.string.settings_option_needs, stringResource(parent.titleRes)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = c.textMuted,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
-                )
-            }
+        }
+        needs.forEach { parent ->
+            if (shown.isNotEmpty()) OcDivider()
+            Text(
+                stringResource(Res.string.settings_option_needs, stringResource(parent.titleRes)),
+                style = MaterialTheme.typography.bodySmall,
+                color = c.textMuted,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
+            )
         }
     }
 }

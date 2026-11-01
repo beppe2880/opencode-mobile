@@ -53,12 +53,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -313,6 +316,8 @@ internal fun TranscriptItem(
 ) {
     val defaultToolsExpanded = state.expandToolsByDefault
     val isExpanded: (String) -> Boolean = { key -> state.isExpanded(key) }
+    // Rows show a part of the chat settings: the live demo's edit mode opens its options.
+    val modifier = item.part()?.let { modifier.editable(it, LocalEditMode.current) } ?: modifier
     val onToggle: (String) -> Unit = { key -> onEvent(ChatEvent.Toggle(key)) }
     when (item) {
         is ChatItem.User -> UserBubble(

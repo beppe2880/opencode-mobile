@@ -49,16 +49,22 @@ class MainActivity : ComponentActivity() {
         keepSplashUntilLoaded()
         setContent {
             var demo by rememberSaveable { mutableStateOf(BuildConfig.USE_FAKE_DATA) }
+            // The live demo of Settings: edit mode on the real settings, back to Settings on exit.
+            var liveDemo by rememberSaveable { mutableStateOf(false) }
+            var openSettings by rememberSaveable { mutableStateOf(false) }
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val newSession by newSessionRequested.collectAsStateWithLifecycle()
             val appSettings by settings.settings.collectAsStateWithLifecycle()
             if (demo) {
                 DemoHost(
-                    container = demoData.container(applicationContext),
+                    container = demoData.container(applicationContext, realSettings = settings.takeIf { liveDemo }),
                     onExit = {
                         demoData.close()
                         demo = false
+                        if (liveDemo) openSettings = true
+                        liveDemo = false
                     },
+                    edit = liveDemo,
                     realDarkTheme = appSettings.theme.isDark(),
                     modifier = Modifier.semantics { testTagsAsResourceId = true },
                 )
@@ -66,6 +72,12 @@ class MainActivity : ComponentActivity() {
                 key("real") {
                     OpenCodeApp(
                         onTryDemo = { demo = true },
+                        onCustomizeInDemo = {
+                            liveDemo = true
+                            demo = true
+                        },
+                        openSettings = openSettings,
+                        onSettingsOpened = { openSettings = false },
                         modifier = Modifier.semantics { testTagsAsResourceId = true },
                         openSessionId = openSession,
                         onSessionOpened = { sessionToOpen.value = null },

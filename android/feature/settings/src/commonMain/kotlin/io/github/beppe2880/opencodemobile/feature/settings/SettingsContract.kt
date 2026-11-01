@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
@@ -70,6 +71,10 @@ sealed interface SettingsEvent {
     data class PreviewRunning(val running: Boolean) : SettingsEvent
     data class QueryChanged(val query: String) : SettingsEvent
     data class EditMarksChanged(val visible: Boolean) : SettingsEvent
+    data class SettingsStyleChanged(val style: SettingsStyle) : SettingsEvent
+
+    /** The divider between preview and options was dragged, or a size was picked; 0 hides the preview. */
+    data class PreviewFractionChanged(val fraction: Float) : SettingsEvent
 
     /** The terminal key bar goes back to its default keys. */
     data object ResetTerminalKeys : SettingsEvent

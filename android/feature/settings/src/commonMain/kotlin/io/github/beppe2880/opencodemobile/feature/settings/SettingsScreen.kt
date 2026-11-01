@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Science
+import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -57,6 +58,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -88,6 +90,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreview
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreviewContent
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaScreen
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
+import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
 import io.github.beppe2880.opencodemobile.feature.settings.customize.descriptionRes
 import io.github.beppe2880.opencodemobile.feature.settings.customize.searchOptions
 import io.github.beppe2880.opencodemobile.feature.settings.customize.titleRes
@@ -108,6 +111,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_areas
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server_hint
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_demo_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_password
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_remove
@@ -128,6 +133,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_actions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_server_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_servers
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_style_list
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_style_preview
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_switch
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unknown
@@ -147,6 +154,8 @@ fun SettingsScreen(
     showNotifications: Boolean = notificationsSupported,
     /** The offline demo: one demo entry instead of the saved servers. */
     demo: Boolean = false,
+    /** Opens the offline demo to change settings on its real screens; null where there is none (iOS, the demo itself). */
+    onOpenLiveDemo: (() -> Unit)? = null,
 ) {
     val areas = SettingsArea.entries.filter { showNotifications || it != SettingsArea.Notifications }
     OcBackHandler(enabled = state.area != null) { onEvent(SettingsEvent.CloseArea) }
@@ -154,7 +163,7 @@ fun SettingsScreen(
         if (area != null) {
             AreaScreen(state, onEvent, preview)
         } else {
-            SettingsHome(state, onEvent, preview, areas, demo)
+            SettingsHome(state, onEvent, preview, areas, demo, showNotifications, onOpenLiveDemo)
         }
     }
     state.renaming?.let { server ->
@@ -193,8 +202,9 @@ fun SettingsScreen(
 }
 
 /**
- * The groups of settings, each with a live miniature of its preview, then servers, usage, reset
- * and versions. Typing in the search field replaces the groups with every option that matches.
+ * The first screen of Settings, in the style the user picked at its top: the classic list, or
+ * the groups of settings with a live miniature of their preview, a search for any option, then
+ * servers, usage, reset and versions. Both offer the live demo where there is one.
  */
 @Composable
 private fun SettingsHome(
@@ -203,7 +213,10 @@ private fun SettingsHome(
     preview: AreaPreviewContent,
     areas: List<SettingsArea>,
     demo: Boolean,
+    showNotifications: Boolean,
+    onOpenLiveDemo: (() -> Unit)?,
 ) {
+    val list = state.settings.settingsStyle == SettingsStyle.List
     val c = OcTheme.colors
     Scaffold(
         containerColor = c.bgDeep,
@@ -227,15 +240,20 @@ private fun SettingsHome(
             val columns = ((width - OcSpacing.gutter * 2) / AreaCardMinWidth).toInt().coerceIn(2, 4)
             val results = searchResults(state.query, areas)
             LazyColumn(
-                modifier = Modifier.widthIn(max = 840.dp).fillMaxSize().testTag("settings_list"),
+                modifier = Modifier.widthIn(max = if (list) 640.dp else 840.dp).fillMaxSize().testTag("settings_list"),
                 contentPadding = PaddingValues(
                     start = OcSpacing.gutter,
                     end = OcSpacing.gutter,
-                    top = OcSpacing.md,
+                    top = OcSpacing.lg,
                     bottom = OcSpacing.xxl + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
                 ),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
             ) {
+                item(key = "style") { StylePicker(state.settings.settingsStyle, onEvent, onOpenLiveDemo) }
+                if (list) {
+                    settingsList(state, onEvent, showNotifications, demo)
+                    return@LazyColumn
+                }
                 item(key = "search") {
                     OcSearchField(
                         value = state.query,
@@ -271,13 +289,43 @@ private fun SettingsHome(
                 item(key = "servers") { ServersSection(state, onEvent, demo) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
-                item(key = "about") { AboutSection(state) }
+                item(key = "about") { AboutSection(state, onEvent, checkForUpdates = false) }
             }
         }
     }
 }
 
 private val AreaCardMinWidth = 168.dp
+
+/**
+ * How Settings looks: the list or the previews, kept for next time, and the live demo where the
+ * real screens can be changed in place.
+ */
+@Composable
+private fun StylePicker(style: SettingsStyle, onEvent: (SettingsEvent) -> Unit, onOpenLiveDemo: (() -> Unit)?) {
+    Column(Modifier.padding(bottom = OcSpacing.lg), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
+        OcSegmentedControl(
+            segments = listOf(
+                OcSegment(SettingsStyle.List, stringResource(Res.string.settings_style_list), "settings_style_list"),
+                OcSegment(SettingsStyle.Preview, stringResource(Res.string.settings_style_preview), "settings_style_preview"),
+            ),
+            selected = style,
+            onSelect = { onEvent(SettingsEvent.SettingsStyleChanged(it)) },
+        )
+        if (onOpenLiveDemo != null) {
+            OcCard {
+                OcListRow(
+                    title = stringResource(Res.string.settings_live_demo),
+                    subtitle = stringResource(Res.string.settings_live_demo_sub),
+                    onClick = onOpenLiveDemo,
+                    leading = { Icon(Icons.Outlined.TouchApp, contentDescription = null, tint = OcTheme.colors.textAccent) },
+                    trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = OcTheme.colors.iconMuted) },
+                    modifier = Modifier.testTag("settings_live_demo"),
+                )
+            }
+        }
+    }
+}
 
 /** Options matching [query] in [areas], or null while the query is blank. */
 @Composable
@@ -357,7 +405,7 @@ private fun SectionTitle(title: String) {
 }
 
 @Composable
-private fun Section(title: String, content: @Composable () -> Unit) {
+internal fun Section(title: String, content: @Composable () -> Unit) {
     Column(Modifier.padding(bottom = OcSpacing.lg), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
         Text(
             title,
@@ -370,7 +418,7 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean) {
+internal fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_servers)) {
         OcCard {
@@ -446,7 +494,7 @@ private fun ServerRow(server: ServerProfile, active: Boolean, onEvent: (Settings
 }
 
 @Composable
-private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
+internal fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(Res.string.usage_title)) {
         OcCard {
             OcListRow(
@@ -478,7 +526,7 @@ internal fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegm
 }
 
 @Composable
-private fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
+internal fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(Res.string.settings_reset_section)) {
         OcButton(
             text = stringResource(Res.string.settings_reset),
@@ -490,7 +538,7 @@ private fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
 }
 
 @Composable
-private fun AboutSection(state: SettingsState) {
+internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, checkForUpdates: Boolean) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_about)) {
         OcCard {
@@ -509,6 +557,10 @@ private fun AboutSection(state: SettingsState) {
             )
             OcDivider()
             AboutRow(stringResource(Res.string.settings_api_version), state.apiVersion)
+            if (checkForUpdates) {
+                OcDivider()
+                SettingOptionControl(SettingOption.CheckUpdates, state, onEvent)
+            }
         }
     }
 }

@@ -50,8 +50,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -121,6 +124,11 @@ fun AppNavHost(
     onTryDemo: (() -> Unit)? = null,
     onConnectServer: (() -> Unit)? = null,
     isDemo: Boolean = false,
+    /** Opens the offline demo in edit mode to change settings on the real screens; null where there is none. */
+    onCustomizeInDemo: (() -> Unit)? = null,
+    /** Opens Settings over the session list once (back from the live demo). */
+    openSettings: Boolean = false,
+    onSettingsOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -141,6 +149,14 @@ fun AppNavHost(
             popUpTo<SessionsDestination>()
         }
         onSessionOpened()
+    }
+
+    LaunchedEffect(openSettings, hasActiveServer) {
+        if (!openSettings || !hasActiveServer) return@LaunchedEffect
+        navController.navigate(SettingsDestination) {
+            popUpTo<SessionsDestination>()
+        }
+        onSettingsOpened()
     }
 
     // Handed to the session list, which opens its sheet and clears it.
@@ -205,6 +221,7 @@ fun AppNavHost(
                 onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
                 preview = settingsPreviews,
+                onOpenLiveDemo = onCustomizeInDemo,
             )
         }
         composable<UsageDestination> {
@@ -373,7 +390,7 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
         shape = RoundedCornerShape(OcRadius.md),
         color = c.layer02,
         border = BorderStroke(1.dp, c.borderBase),
-        modifier = modifier.size(width = HandleWidth, height = 48.dp).testTag("sessions_pane_toggle"),
+        modifier = modifier.size(width = HandleWidth, height = 48.dp).editable(SettingsPart.SplitView, LocalEditMode.current).testTag("sessions_pane_toggle"),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
@@ -391,5 +408,7 @@ private val HandleWidth = 24.dp
 /** The notice of a new app release, at the top of the session list. */
 @Composable
 private fun UpdateBanner() {
-    UpdateNoticeRoute(Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md))
+    UpdateNoticeRoute(
+        Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateBanner, LocalEditMode.current),
+    )
 }

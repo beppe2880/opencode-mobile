@@ -41,10 +41,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -75,6 +78,7 @@ internal fun BottomArea(
     onDictate: () -> Unit = {},
 ) {
     val c = OcTheme.colors
+    val editMode = LocalEditMode.current
     Column(
         modifier = Modifier
             .widthIn(max = OcSpacing.contentMaxWidth)
@@ -106,6 +110,7 @@ internal fun BottomArea(
                 collapsed = state.isPermissionCollapsed(request.id),
                 onCollapse = { onEvent(ChatEvent.CollapsePermission(request.id, it)) },
                 onReply = { onEvent(ChatEvent.ReplyPermission(request.id, it)) },
+                modifier = Modifier.editable(SettingsPart.PendingCards, editMode),
             )
         }
         if (state.permissions.isEmpty()) {
@@ -120,6 +125,7 @@ internal fun BottomArea(
                     onAnswer = { key, answer -> onEvent(ChatEvent.FormAnswerChanged(key, answer)) },
                     onSubmit = { onEvent(ChatEvent.SubmitForm) },
                     onDismiss = { onEvent(ChatEvent.DismissForm) },
+                    modifier = Modifier.editable(SettingsPart.PendingCards, editMode),
                 )
             }
         }
@@ -135,7 +141,15 @@ internal fun BottomArea(
         if (state.suggestions.isNotEmpty()) {
             SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
         }
-        Composer(state, onEvent, onAttachPhoto, onAttachFile, voice = voice, onDictate = onDictate)
+        Composer(
+            state,
+            onEvent,
+            onAttachPhoto,
+            onAttachFile,
+            modifier = Modifier.editable(SettingsPart.ComposerBox, editMode),
+            voice = voice,
+            onDictate = onDictate,
+        )
     }
 }
 

@@ -116,7 +116,8 @@ Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Thr
   "Build · Model · 3s · $0.002" with copy; "Working…" row while running; permission card pinned above
   the composer; composer card with agent chip, model chip, send / stop and Steer / Queue choice
   while the agent runs.
-- **Settings**: search field (every option by name, opening its group at its part), cards of the
+- **Settings**: List or Preview (segmented control at the top, remembered) and "Customize in the
+  demo" (Android). List is the classic list of every option. Preview: search field (every option by name, opening its group at its part), cards of the
   setting groups with a live miniature (`OcThumbnail`) of their preview, then servers, usage,
   reset and versions.
 - **Setting group**: a live preview drawn by the real components of each screen from sample data
@@ -126,7 +127,13 @@ Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Thr
   phones in portrait the preview takes about 40% of the height and shrinks to a strip while the
   options scroll; tapping a part scrolls to its options, scrolling the options selects the part
   being read and scrolls the preview to it. Wide or landscape windows put them side by side.
-  `SettingsCoverageTest` fails when an `AppSettings` property has no option.
+  On narrow windows a divider between preview and options can be dragged or set to Hide, Small,
+  Half or Large, and stays where it was left. `SettingsCoverageTest` fails when an `AppSettings`
+  property has no option.
+- **Live demo edit mode**: the offline demo on the user's real settings. Real composables mark
+  their parts with `Modifier.editable(part, LocalEditMode.current)` (no-op outside it); a bottom
+  bar switches Edit and Use and has Done; a tapped part's options dock above the bar, pushing
+  the screen up so the part scrolls into view above them.
 - **Adaptive**: at >= 840dp width Sessions and Chat are shown side by side; single-pane content
   is limited to 760dp and centered.
 

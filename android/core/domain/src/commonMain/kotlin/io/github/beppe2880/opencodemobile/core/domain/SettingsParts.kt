@@ -1,5 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
+/** How Settings opens: the classic list, or the groups of settings with their live previews. */
+enum class SettingsStyle { List, Preview }
+
 /** A group of settings with its own live preview in Settings, in the order Settings lists them. */
 enum class SettingsArea {
     Appearance,
