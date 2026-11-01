@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.PendingShare
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
@@ -15,11 +16,17 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
+import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -42,6 +49,7 @@ class SessionsViewModel(
     private val chat: ChatRepository,
     private val settings: SettingsRepository,
     private val recents: RecentModelRepository,
+    private val shares: ShareRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -66,6 +74,12 @@ class SessionsViewModel(
     /** Directory filter last chosen on each server while this screen lives. */
     private val filters = mutableMapOf<String, String?>()
 
+    /** The share from another app this screen opened the sheet or the chat choice for. */
+    private var shownShare: Long? = null
+
+    /** The share this screen handed to a chat, which takes it when it opens. */
+    private var assignedShare: Long? = null
+
     init {
         viewModelScope.launch {
             servers.activeServer.collect { server -> updateState { it.copy(serverName = server?.name.orEmpty()) } }
@@ -77,6 +91,7 @@ class SessionsViewModel(
             events.connection.collect { connection -> updateState { it.copy(connection = connection) } }
         }
         viewModelScope.launch { events.events.collect(::onServerEvent) }
+        viewModelScope.launch { shares.pending.collect(::onShare) }
         viewModelScope.launch {
             settings.settings.map { it.showRunningWorkInList }.distinctUntilChanged().collect { enabled ->
                 updateState { it.copy(showRunningWork = enabled, work = if (enabled) it.work else emptyMap()) }
@@ -110,7 +125,7 @@ class SessionsViewModel(
                 showCachedFirst = true
                 load(initial = false)
             }
-            is SessionsEvent.Open -> sendEffect(SessionsEffect.OpenChat(event.sessionId))
+            is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
             SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
@@ -119,8 +134,15 @@ class SessionsViewModel(
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
             is SessionsEvent.ConfirmRename -> rename(event.title)
             SessionsEvent.ConfirmDelete -> delete()
-            SessionsEvent.StartNewSession -> startNewSession()
-            SessionsEvent.DismissNewSession -> updateState { it.copy(newSession = null) }
+            // While a chat is picked for a share, a new session takes it.
+            SessionsEvent.StartNewSession -> startNewSession(currentState.sharing)
+            SessionsEvent.DismissNewSession -> {
+                val shared = currentState.newSession?.shared
+                updateState { it.copy(newSession = null) }
+                // Opened by the share itself: closing it drops the share; picking a chat goes on.
+                if (shared != null && currentState.sharing == null) discardShare()
+            }
+            SessionsEvent.DiscardShare -> discardShare()
             is SessionsEvent.NewSessionDirectory -> updateNew { it.copy(directory = event.directory, customDirectory = event.custom, error = null) }
             is SessionsEvent.NewSessionAgent -> updateNew { withDefaultModel(it.copy(agent = event.agent)) }
             is SessionsEvent.NewSessionModelPicker -> updateNew { it.copy(pickingModel = event.open) }
@@ -153,6 +175,7 @@ class SessionsViewModel(
                 refreshing = false,
                 error = null,
                 newSession = null,
+                sharing = null,
                 actionsFor = null,
                 renaming = null,
                 deleting = null,
@@ -162,6 +185,59 @@ class SessionsViewModel(
         showCachedFirst = true
         load(initial = true)
         loadProjects(cachedFirst = true)
+        // A share still to place opens again on the new server.
+        shownShare = null
+        onShare(shares.pending.value)
+    }
+
+    /**
+     * A share from another app (the active server's): opens the new session sheet with it, or
+     * asks for its chat (Settings). One handed to a chat before this screen existed, because
+     * the app was stopped before the chat opened, opens that chat.
+     */
+    private fun onShare(share: PendingShare?) {
+        if (share == null) {
+            shownShare = null
+            updateState { it.copy(sharing = null, newSession = it.newSession?.copy(shared = null)) }
+            return
+        }
+        val server = serverId ?: return
+        val sessionId = share.sessionId
+        if (!share.needsChatOn(server) && sessionId != null) {
+            if (assignedShare != share.id) {
+                assignedShare = share.id
+                sendEffect(SessionsEffect.OpenChat(sessionId))
+            }
+            return
+        }
+        if (shownShare == share.id) return
+        shownShare = share.id
+        when (settings.settings.value.shareOpens) {
+            ShareOpens.NewSession -> {
+                updateState { it.copy(sharing = null) }
+                startNewSession(share.content)
+            }
+            ShareOpens.ChooseChat -> updateState { it.copy(sharing = share.content, newSession = null) }
+        }
+    }
+
+    /** The picked chat takes the share into its composer when it opens. */
+    private fun shareTo(sessionId: String) {
+        val share = shares.pending.value ?: return sendEffect(SessionsEffect.OpenChat(sessionId))
+        assignedShare = share.id
+        updateState { it.copy(sharing = null) }
+        viewModelScope.launch {
+            shares.assign(sessionId, serverId)
+            sendEffect(SessionsEffect.OpenChat(sessionId))
+        }
+    }
+
+    private fun discardShare() {
+        updateState { it.copy(sharing = null, newSession = it.newSession?.copy(shared = null)) }
+        viewModelScope.launch {
+            shares.discard()
+            sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_share_discarded)))
+        }
     }
 
     private fun onServerEvent(event: ServerEvent) {
@@ -367,14 +443,14 @@ class SessionsViewModel(
         }
     }
 
-    private fun startNewSession() {
+    private fun startNewSession(shared: SharedContent? = null) {
         val state = currentState
         val directory = state.directoryFilter
             ?: sessionList.firstOrNull()?.directory
             ?: state.projects.firstOrNull()?.directory
             ?: ""
         val recent = (recents.recent() + sessionList.recentModels()).distinctBy { it.key }.take(RECENT_MODELS)
-        updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = recent)) }
+        updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = recent, shared = shared)) }
         viewModelScope.launch {
             val dir = directory.ifBlank { null }
             // A config that cannot be read only skips its step.
@@ -427,7 +503,11 @@ class SessionsViewModel(
         viewModelScope.launch {
             sessions.create(new.directory.trim(), new.agent, new.effectiveModel).fold(
                 onSuccess = { session ->
-                    updateState { it.copy(newSession = null) }
+                    if (new.shared != null) {
+                        assignedShare = shares.pending.value?.id
+                        shares.assign(session.id, serverId)
+                    }
+                    updateState { it.copy(newSession = null, sharing = null) }
                     sendEffect(SessionsEffect.OpenChat(session.id))
                     load(initial = false)
                 },

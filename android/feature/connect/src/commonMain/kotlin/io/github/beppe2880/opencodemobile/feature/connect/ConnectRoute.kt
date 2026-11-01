@@ -21,6 +21,8 @@ fun ConnectRoute(
     showBack: Boolean = false,
     onBack: () -> Unit = {},
     onTryDemo: (() -> Unit)? = null,
+    /** Drawn above the form, such as content shared from another app waiting for a server; may draw nothing. */
+    banner: @Composable () -> Unit = {},
 ) {
     val viewModel: ConnectViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -49,6 +51,7 @@ fun ConnectRoute(
         showBack = showBack,
         onBack = onBack,
         onTryDemo = onTryDemo,
+        banner = banner,
         snackbarHostState = snackbar,
         secretFocusRequester = focus,
     )

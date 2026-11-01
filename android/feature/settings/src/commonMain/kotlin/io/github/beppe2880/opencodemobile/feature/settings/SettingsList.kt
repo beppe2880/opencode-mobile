@@ -55,6 +55,8 @@ internal fun LazyListScope.settingsList(state: SettingsState, onEvent: (Settings
                 SettingOption.Dictation,
                 SettingOption.SelectionApply,
                 SettingOption.NewChatModel,
+                SettingOption.ShareMenu,
+                SettingOption.ShareOpens,
             ),
         )
     }

@@ -21,11 +21,11 @@ import org.koin.dsl.module
 fun sharedModule(appInfo: AppInfo): Module = module {
     single { appInfo }
     viewModel { ConnectViewModel(get(), get()) }
-    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
-    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
     viewModelOf(::UpdateNoticeViewModel)

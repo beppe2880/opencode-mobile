@@ -52,8 +52,13 @@ import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
+import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSharedContent
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -71,6 +76,8 @@ import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session_message
+import io.github.beppe2880.opencodemobile.shared.resources.app_share_discard
+import io.github.beppe2880.opencodemobile.shared.resources.app_share_needs_server
 import io.github.beppe2880.opencodemobile.shared.resources.app_show_sessions
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -132,6 +139,7 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
+    val scope = rememberCoroutineScope()
 
     // Losing the active server (removed in Settings) always returns to Connect with a clean stack.
     LaunchedEffect(hasActiveServer) {
@@ -159,6 +167,16 @@ fun AppNavHost(
         onSettingsOpened()
     }
 
+    // Content shared from another app: the session list opens the new session sheet or the
+    // chat choice for it, so it comes to the front. Without a server, Connect shows it waiting.
+    val shares = koinInject<ShareRepository>()
+    val share by shares.pending.collectAsStateWithLifecycle()
+    val shareToPlace = share?.takeIf { it.sessionId == null }?.id
+    LaunchedEffect(shareToPlace, hasActiveServer) {
+        if (shareToPlace == null || !hasActiveServer || isDemo) return@LaunchedEffect
+        navController.popBackStack(SessionsDestination, inclusive = false)
+    }
+
     // Handed to the session list, which opens its sheet and clears it.
     var pendingNewSession by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(openNewSession, hasActiveServer) {
@@ -176,6 +194,11 @@ fun AppNavHost(
                 onTryDemo = onTryDemo.takeUnless { args.addServer },
                 showBack = args.addServer,
                 onBack = { navController.popBackStack() },
+                banner = {
+                    share?.let { pending ->
+                        if (!isDemo) SharedWaitingForServer(pending.content, onDiscard = { scope.launch { shares.discard() } })
+                    }
+                },
                 onConnected = {
                     if (args.addServer) {
                         navController.popBackStack(SessionsDestination, inclusive = false)
@@ -411,4 +434,18 @@ private fun UpdateBanner() {
     UpdateNoticeRoute(
         Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateBanner, LocalEditMode.current),
     )
+}
+
+/** On Connect: content shared from another app waits until a server is connected. */
+@Composable
+private fun SharedWaitingForServer(content: SharedContent, onDiscard: () -> Unit) {
+    OcSharedContent(content = content, message = stringResource(Res.string.app_share_needs_server), modifier = Modifier.testTag("connect_shared")) {
+        OcButton(
+            text = stringResource(Res.string.app_share_discard),
+            onClick = onDiscard,
+            variant = OcButtonVariant.Ghost,
+            compact = true,
+            modifier = Modifier.align(Alignment.End).testTag("connect_shared_discard"),
+        )
+    }
 }

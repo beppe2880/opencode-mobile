@@ -36,9 +36,11 @@ import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCustomizable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.PartPreview
+import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -46,6 +48,9 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_back_leave
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_back_list
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_share_choose
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_share_new
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_share_off
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_split_off
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_swipe_off
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_swipe_on
@@ -105,7 +110,20 @@ fun NewChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         defaultModel = if (lastUsed) SampleData.sonnet else null,
     )
     OcCustomizable(SettingsPart.NewChat, preview, modifier.padding(OcSpacing.sm).testTag("new_chat_preview")) {
-        NewSessionForm(state, projects, onEvent = {}, inSheet = false)
+        Column {
+            NewSessionForm(state, projects, onEvent = {}, inSheet = false)
+            if (shareTargetSupported) {
+                Caption(
+                    when {
+                        !preview.settings.showInShareMenu -> Res.string.sessions_preview_share_off
+                        preview.settings.shareOpens == ShareOpens.ChooseChat -> Res.string.sessions_preview_share_choose
+                        else -> Res.string.sessions_preview_share_new
+                    },
+                    // Lined up with the form above.
+                    Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
+                )
+            }
+        }
     }
 }
 
@@ -195,11 +213,11 @@ private fun SplitSketch(split: Boolean, fraction: Float, handle: Boolean, backSh
 }
 
 @Composable
-private fun Caption(text: StringResource) {
+private fun Caption(text: StringResource, modifier: Modifier = Modifier) {
     Text(
         stringResource(text),
         style = MaterialTheme.typography.bodySmall,
         color = OcTheme.colors.textMuted,
-        modifier = Modifier.padding(horizontal = OcSpacing.xs),
+        modifier = modifier.padding(horizontal = OcSpacing.xs),
     )
 }

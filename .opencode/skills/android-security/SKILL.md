@@ -9,8 +9,12 @@ Treat every scanned QR, pasted link, intent and server payload as untrusted.
 
 ## Components And Intents
 
-- Only the launcher activity is exported. New activities, services, receivers
-  and providers default to `android:exported="false"`.
+- Only the launcher activity, the widget receiver and the share menu entry
+  (`ShareActivity`, which can be disabled in Settings) are exported. New activities,
+  services, receivers and providers default to `android:exported="false"`.
+- Shared content is untrusted: `ShareIntents` accepts only plain text and images,
+  bounds the text, refuses `file:` URIs and this app's own providers, and the images
+  are copied at once into app-private no-backup storage. Never log shared content.
 - Validate `onCreate` and `onNewIntent` paths for the `singleTop` activity.
 - Do not add deep links that accept pairing codes from other apps without an
   explicit decision; codes grant full server access.

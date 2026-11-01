@@ -50,4 +50,12 @@
     <string name="sessions_preview_split_off">The chat opens over the list, also on wide screens</string>
     <string name="sessions_preview_back_list">Back with the list hidden shows it again</string>
     <string name="sessions_preview_back_leave">Back with the list hidden leaves the app</string>
+    <string name="sessions_share_sheet_hint">Once the session is created, the shared content waits in its message box, ready to edit and send.</string>
+    <string name="sessions_share_choose">Tap a chat to add the shared content to its message box, or start a new session.</string>
+    <string name="sessions_share_new">New session</string>
+    <string name="sessions_share_discard">Discard</string>
+    <string name="sessions_share_discarded">Shared content discarded</string>
+    <string name="sessions_preview_share_new">Text, links and images shared from other apps open this sheet</string>
+    <string name="sessions_preview_share_choose">Text, links and images shared from other apps first ask for a chat, or open this sheet</string>
+    <string name="sessions_preview_share_off">OpenCode is not in the share menu of other apps</string>
 </resources>

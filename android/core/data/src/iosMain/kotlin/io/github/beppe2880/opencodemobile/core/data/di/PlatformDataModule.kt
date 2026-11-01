@@ -10,6 +10,8 @@ import io.github.beppe2880.opencodemobile.core.data.events.PathNetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.server.InterfaceServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.KeychainServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
+import io.github.beppe2880.opencodemobile.core.data.share.MemoryShareStore
+import io.github.beppe2880.opencodemobile.core.data.share.ShareStore
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
 import org.koin.core.module.Module
@@ -26,5 +28,7 @@ internal actual val platformDataModule: Module = module {
     single<ServerDiscovery> { InterfaceServerDiscovery() }
     single<NetworkMonitor> { PathNetworkMonitor() }
     single<Settings>(SettingsStore) { NSUserDefaultsSettings(NSUserDefaults(suiteName = "settings")) }
+    // Nothing can be shared to the iOS app yet (no share extension).
+    single<ShareStore> { MemoryShareStore() }
     single<Settings>(DraftsStore) { NSUserDefaultsSettings(NSUserDefaults(suiteName = "drafts")) }
 }

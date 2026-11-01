@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.PendingShare
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
@@ -28,6 +29,9 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
@@ -72,8 +76,9 @@ class SessionsViewModelTest {
     private val settings = FakeSettings()
     private val recents = FakeRecents()
     private var catalog = FakeCatalog()
+    private val shares = FakeShares()
 
-    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, clock = { now }, zone = zone)
+    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, clock = { now }, zone = zone)
 
     private fun SessionsState.ids() = groups.flatMap { g -> g.sessions.map { it.id } }
 
@@ -218,6 +223,119 @@ class SessionsViewModelTest {
 
         assertNotNull(vm.state.value.error)
         assertTrue(vm.state.value.groups.isEmpty())
+    }
+
+    @Test
+    fun `a share opens the new session sheet and goes to the created chat`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        shares.offer(shared)
+        advanceUntilIdle()
+        val sheet = vm.state.value.newSession!!
+        assertEquals(shared, sheet.shared)
+        assertEquals("/p/today", sheet.directory)
+        assertEquals("build", sheet.agent)
+        assertEquals(null, vm.state.value.sharing)
+
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+
+        assertEquals("/p/today", sessions.created.single())
+        assertEquals("new" to "s1", shares.pending.value!!.sessionId to shares.pending.value!!.serverId)
+        assertEquals(SessionsEffect.OpenChat("new"), vm.effect.first())
+        // Handed over here: no second chat opens for it.
+        assertEquals(null, withTimeoutOrNull(1_000) { vm.effect.first() })
+    }
+
+    @Test
+    fun `closing the sheet opened by a share discards it`() = runTest(main.testDispatcher) {
+        shares.offer(shared)
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(shared, vm.state.value.newSession?.shared)
+
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        advanceUntilIdle()
+
+        assertEquals(null, shares.pending.value)
+        assertEquals(null, vm.state.value.newSession)
+        assertTrue(vm.effect.first() is SessionsEffect.ShowMessage)
+    }
+
+    @Test
+    fun `a new session started from the button carries no share`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+        assertEquals(null, vm.state.value.newSession!!.shared)
+    }
+
+    @Test
+    fun `choosing a chat for a share puts it in the tapped session or a new one`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(shareOpens = ShareOpens.ChooseChat)
+        val vm = vm()
+        advanceUntilIdle()
+        shares.offer(shared)
+        advanceUntilIdle()
+        assertEquals(shared, vm.state.value.sharing)
+        assertEquals(null, vm.state.value.newSession)
+
+        // A new session sheet from the choice takes the share; closing it goes back to the choice.
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+        assertEquals(shared, vm.state.value.newSession!!.shared)
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        advanceUntilIdle()
+        assertEquals(shared, vm.state.value.sharing)
+        assertNotNull(shares.pending.value)
+
+        vm.onEvent(SessionsEvent.Open("week"))
+        advanceUntilIdle()
+        assertEquals(SessionsEffect.OpenChat("week"), vm.effect.first())
+        assertEquals("week", shares.pending.value!!.sessionId)
+        assertEquals(null, vm.state.value.sharing)
+
+        // Without a share, tapping a session only opens it.
+        shares.discard()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.Open("old"))
+        assertEquals(SessionsEffect.OpenChat("old"), vm.effect.first())
+    }
+
+    @Test
+    fun `discarding the share closes the choice`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(shareOpens = ShareOpens.ChooseChat)
+        shares.offer(shared)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.DiscardShare)
+        advanceUntilIdle()
+        assertEquals(null, vm.state.value.sharing)
+        assertEquals(null, shares.pending.value)
+    }
+
+    @Test
+    fun `a share handed to a chat before a restart opens that chat`() = runTest(main.testDispatcher) {
+        shares.offer(shared)
+        shares.assign("week", "s1")
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(SessionsEffect.OpenChat("week"), vm.effect.first())
+        assertEquals(null, vm.state.value.newSession)
+    }
+
+    @Test
+    fun `a share waiting for a chat opens again on another server`() = runTest(main.testDispatcher) {
+        shares.offer(shared)
+        shares.assign("week", "s1")
+        val vm = vm()
+        advanceUntilIdle()
+        vm.effect.first()
+
+        servers.activate("s2")
+        advanceUntilIdle()
+        assertEquals(shared, vm.state.value.newSession!!.shared)
     }
 
     @Test
@@ -551,6 +669,27 @@ private class FakeCatalog(
     override suspend fun configuredModel(directory: String?): Result<ModelRef?> = configured
     override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(agents)
     override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(models)
+}
+
+private val shared = SharedContent(
+    text = "Crash on start\nhttps://github.com/o/r/issues/1",
+    attachments = listOf(PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")),
+)
+
+private class FakeShares : ShareRepository {
+    override val pending = MutableStateFlow<PendingShare?>(null)
+    private var ids = 0L
+    override suspend fun offer(content: SharedContent) {
+        pending.value = PendingShare(++ids, content)
+    }
+    override suspend fun assign(sessionId: String, serverId: String?) {
+        pending.value = pending.value?.copy(sessionId = sessionId, serverId = serverId)
+    }
+    override suspend fun take(sessionId: String): SharedContent? =
+        pending.value?.takeIf { it.sessionId == sessionId }?.content?.also { pending.value = null }
+    override suspend fun discard() {
+        pending.value = null
+    }
 }
 
 private class FakeSettings : SettingsRepository {

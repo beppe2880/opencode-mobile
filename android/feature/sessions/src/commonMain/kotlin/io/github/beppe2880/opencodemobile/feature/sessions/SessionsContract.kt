@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 enum class DayBucket { Today, Yesterday, ThisWeek, Older }
@@ -33,6 +34,8 @@ data class NewSessionState(
     val pickingModel: Boolean = false,
     val creating: Boolean = false,
     val error: UiText? = null,
+    /** Shared from another app: the new chat's composer gets it. */
+    val shared: SharedContent? = null,
 ) {
     val canCreate: Boolean get() = directory.isNotBlank() && !creating
 
@@ -56,6 +59,11 @@ data class SessionsState(
     val refreshing: Boolean = false,
     val error: UiText? = null,
     val newSession: NewSessionState? = null,
+    /**
+     * Shared from another app, waiting for the user to pick its chat (Settings: sharing opens
+     * Choose a chat): tapping a session sends it there, a new session takes it too.
+     */
+    val sharing: SharedContent? = null,
     val actionsFor: Session? = null,
     val renaming: Session? = null,
     val deleting: Session? = null,
@@ -87,6 +95,9 @@ sealed interface SessionsEvent {
     data class NewSessionModelPicker(val open: Boolean) : SessionsEvent
     data class NewSessionModel(val model: ModelRef) : SessionsEvent
     data object CreateSession : SessionsEvent
+
+    /** Drops the content shared from another app. */
+    data object DiscardShare : SessionsEvent
 }
 
 sealed interface SessionsEffect {

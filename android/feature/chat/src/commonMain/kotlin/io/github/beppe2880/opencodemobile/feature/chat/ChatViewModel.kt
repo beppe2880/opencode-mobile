@@ -26,6 +26,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
@@ -51,6 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -69,6 +71,7 @@ class ChatViewModel(
     private val mcps: McpRepository,
     private val recents: RecentModelRepository,
     private val vcs: VcsRepository,
+    private val shares: ShareRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
 
@@ -174,6 +177,18 @@ class ChatViewModel(
             }
         }
         viewModelScope.launch { events.connection.collect { c -> updateState { it.copy(connection = c) } } }
+        viewModelScope.launch {
+            // Content shared from another app and sent to this chat: into the composer, to edit and send.
+            shares.pending.filter { it?.sessionId == sessionId }.collect {
+                val shared = shares.take(sessionId) ?: return@collect
+                updateState { s ->
+                    s.copy(
+                        draft = listOf(s.draft, shared.text).filter { it.isNotBlank() }.joinToString("\n\n"),
+                        attachments = (s.attachments + shared.attachments).distinctBy { it.uri },
+                    )
+                }
+            }
+        }
         viewModelScope.launch { events.events.collect(::onServerEvent) }
         loadAll()
     }

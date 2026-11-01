@@ -65,4 +65,15 @@
     <string name="oc_part_notify_finished">Session finished</string>
     <string name="oc_part_update">Update banner</string>
     <string name="oc_part_customize">Customize</string>
+    <string name="oc_shared_title">Shared with OpenCode</string>
+    <plurals name="oc_shared_images">
+        <item quantity="one">%1$d image</item>
+        <item quantity="other">%1$d images</item>
+    </plurals>
+    <plurals name="oc_shared_skipped">
+        <item quantity="one">%1$d item could not be added</item>
+        <item quantity="other">%1$d items could not be added</item>
+    </plurals>
+    <string name="oc_share_nothing">Nothing to share: OpenCode accepts text, links and images</string>
+    <string name="oc_shared_truncated">The text was too long and was shortened</string>
 </resources>

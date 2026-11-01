@@ -29,7 +29,7 @@ repository boundaries.
 
 | Module | Responsibility |
 |---|---|
-| `:app` | Android only: `OpenCodeApplication` (starts Koin), `MainActivity`, `appModule`, optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver), home screen widget (`widget/`, Glance) |
+| `:app` | Android only: `OpenCodeApplication` (starts Koin), `MainActivity`, `appModule`, optional session notifications (`notifications/`: `SessionMonitor`, foreground service, permission reply receiver), home screen widget (`widget/`, Glance), share menu entry (`share/`: `ShareActivity` copies shared text and images into `ShareRepository`) |
 | `:shared` | Shared by both apps: `OpenCodeApp` shell, root navigation (`AppNavHost`), `sharedModule` (ViewModels), widget model and loader (`widget/`); iOS entry point `MainViewController()`, `opencodemobile://` links and the widget snapshot for WidgetKit, in the `Shared` framework |
 | `:feature:connect` | QR scan, paste link, manual URL + password/code, saved servers |
 | `:feature:sessions` | Session list, search, project filter, create/rename/delete |

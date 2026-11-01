@@ -21,6 +21,7 @@ import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -120,6 +121,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_menu
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_menu_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_choose
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_choose_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_new
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning
@@ -183,6 +191,8 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.Dictation -> Res.string.settings_dictation
         SettingOption.SelectionApply -> Res.string.settings_selection_apply
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model
+        SettingOption.ShareMenu -> Res.string.settings_share_menu
+        SettingOption.ShareOpens -> Res.string.settings_share_opens
         SettingOption.RunningInList -> Res.string.settings_running_in_list
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats
         SettingOption.SplitView -> Res.string.settings_split_view
@@ -230,6 +240,8 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.Dictation -> Res.string.settings_dictation_sub
         SettingOption.SelectionApply -> Res.string.settings_selection_apply_sub
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model_sub
+        SettingOption.ShareMenu -> Res.string.settings_share_menu_sub
+        SettingOption.ShareOpens -> Res.string.settings_share_opens_sub
         SettingOption.RunningInList -> Res.string.settings_running_in_list_sub
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats_sub
         SettingOption.SplitView -> Res.string.settings_split_view_sub
@@ -384,6 +396,22 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             selected = settings.newChatModel,
             onSelect = { onEvent(SettingsEvent.NewChatModelChanged(it)) },
         )
+        SettingOption.ShareMenu -> switch(settings.showInShareMenu, SettingsEvent::ShowInShareMenuChanged)()
+        SettingOption.ShareOpens -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.shareOpens) {
+                    ShareOpens.NewSession -> Res.string.settings_share_opens_sub
+                    ShareOpens.ChooseChat -> Res.string.settings_share_opens_choose_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(ShareOpens.NewSession, stringResource(Res.string.settings_share_opens_new), "settings_share_opens_new"),
+                OcSegment(ShareOpens.ChooseChat, stringResource(Res.string.settings_share_opens_choose), "settings_share_opens_choose"),
+            ),
+            selected = settings.shareOpens,
+            onSelect = { onEvent(SettingsEvent.ShareOpensChanged(it)) },
+        )
         SettingOption.RunningInList -> switch(settings.showRunningWorkInList, SettingsEvent::RunningInListChanged)()
         SettingOption.SwipeChats -> switch(settings.swipeBetweenChats, SettingsEvent::SwipeBetweenChatsChanged)()
         SettingOption.SplitView -> switch(settings.splitView, SettingsEvent::SplitViewChanged)()
@@ -464,6 +492,7 @@ private val SettingOption.tag: String
         SettingOption.AgentOutline -> "agent_outline"
         SettingOption.Dictation -> "dictation"
         SettingOption.RunningInList -> "running_in_list"
+        SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"
         SettingOption.SplitView -> "split_view"
         SettingOption.ListHandle -> "list_handle"

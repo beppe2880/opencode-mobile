@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
@@ -118,6 +119,8 @@ sealed interface SettingsEvent {
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
+    data class ShowInShareMenuChanged(val enabled: Boolean) : SettingsEvent
+    data class ShareOpensChanged(val opens: ShareOpens) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
     data class GroupThoughtsChanged(val enabled: Boolean) : SettingsEvent
     data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent

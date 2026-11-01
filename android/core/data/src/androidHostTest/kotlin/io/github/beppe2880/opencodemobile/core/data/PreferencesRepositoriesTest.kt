@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
+import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -49,6 +50,8 @@ class PreferencesRepositoriesTest {
             listPaneHandle = false,
             selectionApply = SelectionApply.Immediately,
             newChatModel = NewChatModel.ServerDefault,
+            showInShareMenu = false,
+            shareOpens = ShareOpens.ChooseChat,
             checkForUpdates = false,
             backShowsList = false,
             showEditMarks = false,
@@ -76,6 +79,7 @@ class PreferencesRepositoriesTest {
             // Only the folder and the session can be opened from the header.
             .putString("chat_header_opens", "LastTurn")
             .putString("settings_style", "Cards")
+            .putString("share_opens", "Ask")
             .putFloat("settings_preview_fraction", 3f)
             .commit()
 

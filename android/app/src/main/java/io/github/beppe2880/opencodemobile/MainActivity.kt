@@ -10,6 +10,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,9 @@ class MainActivity : ComponentActivity() {
     /** The widget's new session button was tapped; cleared once the sheet is open. */
     private val newSessionRequested = MutableStateFlow(false)
 
+    /** Something was shared from another app (kept by the share repository); cleared once handled. */
+    private val shareArrived = MutableStateFlow(false)
+
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -55,6 +59,17 @@ class MainActivity : ComponentActivity() {
             val openSession by sessionToOpen.collectAsStateWithLifecycle()
             val newSession by newSessionRequested.collectAsStateWithLifecycle()
             val appSettings by settings.settings.collectAsStateWithLifecycle()
+            val shared by shareArrived.collectAsStateWithLifecycle()
+            // Shared content is for a real server: the demo closes to show it.
+            LaunchedEffect(shared) {
+                if (!shared) return@LaunchedEffect
+                shareArrived.value = false
+                if (demo && !BuildConfig.USE_FAKE_DATA) {
+                    demoData.close()
+                    demo = false
+                    liveDemo = false
+                }
+            }
             if (demo) {
                 DemoHost(
                     container = demoData.container(applicationContext, realSettings = settings.takeIf { liveDemo }),
@@ -102,6 +117,10 @@ class MainActivity : ComponentActivity() {
     /** The launcher activity is exported: the session id is checked. */
     private fun readIntent(intent: Intent?) {
         intent ?: return
+        if (intent.getBooleanExtra(EXTRA_SHARED, false)) {
+            intent.removeExtra(EXTRA_SHARED)
+            shareArrived.value = true
+        }
         if (intent.getBooleanExtra(EXTRA_NEW_SESSION, false)) {
             intent.removeExtra(EXTRA_NEW_SESSION)
             newSessionRequested.value = true
@@ -114,6 +133,9 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_SESSION_ID = "io.github.beppe2880.opencodemobile.extra.SESSION_ID"
         const val EXTRA_NEW_SESSION = "io.github.beppe2880.opencodemobile.extra.NEW_SESSION"
+
+        /** Set by the share menu entry; what was shared is read from the share repository, never from the intent. */
+        const val EXTRA_SHARED = "io.github.beppe2880.opencodemobile.extra.SHARED"
     }
 
     /** Holds the first frame (the system splash screen) until the saved servers are read. */

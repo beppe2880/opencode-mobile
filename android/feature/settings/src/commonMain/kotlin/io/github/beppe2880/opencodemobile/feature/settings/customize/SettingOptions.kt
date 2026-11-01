@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 
 /**
  * One control of Settings. [fields] are the [AppSettings] properties it changes (a test checks
@@ -38,6 +39,8 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     Dictation(listOf("dictation")),
     SelectionApply(listOf("selectionApply")),
     NewChatModel(listOf("newChatModel")),
+    ShareMenu(listOf("showInShareMenu")),
+    ShareOpens(listOf("shareOpens"), requires = ShareMenu),
     RunningInList(listOf("showRunningWorkInList")),
     SwipeChats(listOf("swipeBetweenChats")),
     SplitView(listOf("splitView")),
@@ -100,7 +103,8 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
         SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
         SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.AgentOutline)
-        SettingsPart.NewChat -> listOf(SettingOption.NewChatModel)
+        // Sharing from other apps opens the new chat sheet.
+        SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
         SettingsPart.SessionRows -> listOf(SettingOption.RunningInList)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats)
         SettingsPart.SplitView -> listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList)
@@ -128,8 +132,14 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ListWidth, SettingOption.ListHandle -> settings.splitView
     SettingOption.BackShowsList -> settings.splitView && settings.listPaneHandle
     SettingOption.NotifyPermissions, SettingOption.NotifyQuestions, SettingOption.NotifyFinished -> notificationsOn
+    SettingOption.ShareMenu -> supported
+    SettingOption.ShareOpens -> supported && settings.showInShareMenu
     else -> true
 }
+
+/** Whether the option exists on this platform: nothing can be shared to the iOS app yet. */
+val SettingOption.supported: Boolean
+    get() = shareTargetSupported || (this != SettingOption.ShareMenu && this != SettingOption.ShareOpens)
 
 /**
  * Whether the preview shows this part with [settings]: grouped thinking and tools make one row,

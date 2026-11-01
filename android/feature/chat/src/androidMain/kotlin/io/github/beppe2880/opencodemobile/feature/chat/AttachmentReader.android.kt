@@ -135,3 +135,18 @@ internal object AttachmentReader {
         }
     }
 }
+
+/**
+ * Reads an image another app shared, as the photo picker's are read (downscaled, at most
+ * [AttachmentLimits.MAX_BYTES]). The sender is untrusted: the provider must call it an image,
+ * whatever the share said. Null otherwise or when it cannot be read. Blocking.
+ */
+fun readSharedImage(resolver: ContentResolver, uri: Uri): PromptAttachment? {
+    // Whatever the other app's provider throws, the share only loses this image.
+    return try {
+        val type = resolver.getType(uri)
+        if (type == null || !type.lowercase().startsWith("image/")) null else AttachmentReader.read(resolver, uri)
+    } catch (_: RuntimeException) {
+        null
+    }
+}
