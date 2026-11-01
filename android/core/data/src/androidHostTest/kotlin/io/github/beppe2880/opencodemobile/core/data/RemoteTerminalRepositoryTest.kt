@@ -11,6 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -268,11 +270,12 @@ class RemoteTerminalRepositoryTest {
     @Test
     fun `a connection cut without a close frame reconnects instead of ending the shell`() = runBlocking {
         server.enqueue(
-            socket({ ws ->
-                ws.send(cursorFrame(2))
-                // Drops the TCP connection without a close frame, like a lost network.
-                ws.cancel()
-            }),
+            socket(
+                onOpen = { ws -> ws.send(cursorFrame(2)) },
+                // The client answers once it has the cursor; then the TCP connection is dropped
+                // without a close frame, like a lost network.
+                onBytes = { ws, _ -> ws.cancel() },
+            ),
         )
         server.enqueue(
             socket({ ws ->
@@ -280,8 +283,13 @@ class RemoteTerminalRepositoryTest {
                 ws.close(1000, null)
             }),
         )
+        val input = Channel<ByteArray>(Channel.UNLIMITED)
 
-        val updates = withTimeout(10_000) { terminals.attach("/work", "pty_1", emptyFlow()).toList() }
+        val updates = withTimeout(10_000) {
+            terminals.attach("/work", "pty_1", input.receiveAsFlow()).onEach { update ->
+                if ((update as? TerminalUpdate.Link)?.state == TerminalLink.Connected) input.send("x".encodeToByteArray())
+            }.toList()
+        }
 
         assertEquals(listOf("Connecting", "Connected", "Reconnecting", "Connected", "Exited"), updates.describe())
         server.takeRequest()
