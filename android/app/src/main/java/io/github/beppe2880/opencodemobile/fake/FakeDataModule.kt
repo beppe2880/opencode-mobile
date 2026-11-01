@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
@@ -517,7 +518,8 @@ internal class FakeTerminals : TerminalRepository {
 
     override suspend fun close(directory: String, terminalId: String) = Result.success(Unit)
 
-    override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate> = flow {
+    override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>, visible: Flow<Boolean>): Flow<TerminalUpdate> = flow {
+        if (visible.firstOrNull { it } != true) return@flow
         emit(TerminalUpdate.Link(TerminalLink.Connected))
         emit(TerminalUpdate.Output("Demo terminal: input is echoed, commands are not executed.\r\n\u001b[32m~/${directory.substringAfterLast('/')}\u001b[0m $ "))
         input.collect { bytes -> emit(TerminalUpdate.Output(bytes.decodeToString().replace("\r", "\r\n$ "))) }

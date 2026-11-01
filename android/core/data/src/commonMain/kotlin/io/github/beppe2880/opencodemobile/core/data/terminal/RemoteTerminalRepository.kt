@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.api.models.PtyCreateRequest
 import io.github.beppe2880.opencodemobile.api.models.PtyUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.PtyUpdateRequestSize
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
+import io.github.beppe2880.opencodemobile.core.data.events.NetworkGate
+import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.TerminalInfo
@@ -16,13 +18,18 @@ import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.awaitSuccess
 import io.github.beppe2880.opencodemobile.core.network.toOpenCodeError
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 internal class RemoteTerminalRepository(
     private val clients: OpenCodeClients,
     private val retryDelaysMillis: List<Long> = RETRY_DELAYS_MILLIS,
+    private val network: NetworkMonitor,
 ) : TerminalRepository {
 
     override suspend fun open(directory: String): Result<TerminalInfo> = resultOf {
@@ -43,43 +50,87 @@ internal class RemoteTerminalRepository(
         awaitSuccess { api.ptyRemove(terminalId, locationDirectory = directory) }
     }
 
-    override fun attach(directory: String, terminalId: String, input: Flow<ByteArray>): Flow<TerminalUpdate> = flow {
+    override fun attach(
+        directory: String,
+        terminalId: String,
+        input: Flow<ByteArray>,
+        visible: Flow<Boolean>,
+    ): Flow<TerminalUpdate> = channelFlow {
         // Absolute output position already shown; null until the first replay ends.
         var cursor: Long? = null
         var failures = 0
-        emit(TerminalUpdate.Link(TerminalLink.Connecting))
-        while (true) {
-            try {
-                clients.active().ptyConnect(terminalId, directory, cursor, input).collect { frame ->
-                    when (frame) {
-                        is PtyFrame.Cursor -> {
-                            cursor = frame.value
-                            failures = 0
-                            emit(TerminalUpdate.Link(TerminalLink.Connected))
-                        }
+        var link: TerminalLink? = null
+        suspend fun link(state: TerminalLink) {
+            if (state != link) send(TerminalUpdate.Link(state))
+            link = state
+        }
+        val gate = NetworkGate(network)
+        gate.start(this)
+        try {
+            link(TerminalLink.Connecting)
+            while (true) {
+                // Both at once: the network can go while the terminal is hidden, and the other way round.
+                combine(visible, gate.connected, ::Pair).first { (shown, online) ->
+                    // Shown without a network: the old connection is gone, so do not look connected.
+                    if (shown && !online && cursor != null) link(TerminalLink.Reconnecting)
+                    shown && online
+                }
+                var hidden = false
+                var failure: Throwable? = null
+                val connection = launch {
+                    try {
+                        clients.active().ptyConnect(terminalId, directory, cursor, input).collect { frame ->
+                            when (frame) {
+                                is PtyFrame.Cursor -> {
+                                    cursor = frame.value
+                                    failures = 0
+                                    link(TerminalLink.Connected)
+                                }
 
-                        is PtyFrame.Output -> {
-                            cursor = cursor?.plus(frame.text.length)
-                            emit(TerminalUpdate.Output(frame.text))
+                                is PtyFrame.Output -> {
+                                    cursor = cursor?.plus(frame.text.length)
+                                    send(TerminalUpdate.Output(frame.text))
+                                }
+                            }
+                        }
+                    } catch (e: CancellationException) {
+                        if (!hidden) throw e
+                    } catch (e: Exception) {
+                        failure = e
+                    }
+                }
+                // Closing the socket, instead of just stopping collection, also stops its pings.
+                val watcher = launch {
+                    visible.collect { state ->
+                        if (!state) {
+                            hidden = true
+                            connection.cancel()
                         }
                     }
                 }
-                break
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                when (val error = e.toOpenCodeError()) {
+                connection.join()
+                watcher.cancel()
+                if (hidden) {
+                    // Closed for hiding: the screen keeps its last state, the next one is sent again.
+                    link = null
+                    continue
+                }
+                if (failure == null) break
+                when (val error = failure.toOpenCodeError()) {
                     is OpenCodeError.NotFound -> break
                     is OpenCodeError.Unauthorized -> throw error
                     else -> {
-                        emit(TerminalUpdate.Link(TerminalLink.Reconnecting))
-                        delay(retryDelaysMillis[minOf(failures, retryDelaysMillis.lastIndex)])
+                        link(TerminalLink.Reconnecting)
+                        visible.firstOrNull { it } ?: awaitCancellation()
+                        gate.waitAfterFailure(retryDelaysMillis[minOf(failures, retryDelaysMillis.lastIndex)])
                         failures++
                     }
                 }
             }
+            link(TerminalLink.Exited)
+        } finally {
+            gate.stop()
         }
-        emit(TerminalUpdate.Link(TerminalLink.Exited))
     }
 
     private companion object {

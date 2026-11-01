@@ -39,7 +39,7 @@ class SseEventRepositoryTest {
     private val server = MockWebServer()
     private val scope = CoroutineScope(Job())
     private val visible = MutableStateFlow(true)
-    private val networkSignals = MutableSharedFlow<Unit>()
+    private val networkSignals = MutableStateFlow(true)
     private lateinit var graph: TestGraph
     private lateinit var repository: SseEventRepository
 
@@ -67,7 +67,7 @@ class SseEventRepositoryTest {
             override val isVisible = visible
         },
         network = object : NetworkMonitor {
-            override val networkAvailable = networkSignals
+            override val connected = networkSignals
         },
         scope = scope,
         backoff = backoff,
@@ -236,19 +236,40 @@ class SseEventRepositoryTest {
     }
 
     @Test
-    fun `network becoming available cuts the reconnect wait`() = runBlocking {
+    fun `network recovering cuts the reconnect wait`() = runBlocking {
         repository = repository(backoff = Backoff(initialMillis = 60_000, maxMillis = 60_000))
-        server.enqueue(MockResponse().setResponseCode(503))
+        server.enqueue(MockResponse().setResponseCode(503).setHeadersDelay(100, TimeUnit.MILLISECONDS))
         server.enqueue(stream("ses_1"))
         val connected = scope.async { repository.events.first() }
 
         withTimeout(5_000) { repository.connection.first { it == ConnectionState.Reconnecting } }
         withTimeout(5_000) { networkSignals.subscriptionCount.first { it > 0 } }
-        networkSignals.emit(Unit)
+        // An offline window that outlives the failed attempt freezes the retry.
+        networkSignals.value = false
+        delay(300)
+        networkSignals.value = true
 
-        // Without the signal the next attempt would wait at least 30 s.
+        // Without recovery the next attempt would wait at least 30 s.
         assertEquals(ServerEvent.Connected, withTimeout(5_000) { connected.await() })
         assertEquals(2, server.requestCount)
+    }
+
+    @Test
+    fun `no connection is attempted while offline`() = runBlocking {
+        networkSignals.value = false
+        repository = repository()
+        server.enqueue(stream("ses_1", open = true))
+        val collecting = repository.events.launchIn(scope)
+
+        withTimeout(5_000) { networkSignals.subscriptionCount.first { it > 0 } }
+        delay(200)
+        assertEquals(ConnectionState.Disconnected, repository.connection.value)
+        assertEquals(0, server.requestCount)
+
+        networkSignals.value = true
+        withTimeout(5_000) { repository.connection.first { it == ConnectionState.Connected } }
+        assertEquals(1, server.requestCount)
+        collecting.cancel()
     }
 
     @Test

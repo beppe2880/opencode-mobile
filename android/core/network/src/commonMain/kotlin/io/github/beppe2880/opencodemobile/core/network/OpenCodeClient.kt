@@ -80,7 +80,7 @@ class OpenCodeClient internal constructor(
      * for hours, so there is no read timeout.
      *
      * Completes when the shell exits, fails with [OpenCodeError.NotFound] when the PTY is gone and
-     * with [OpenCodeError] on HTTP or transport errors.
+     * with [OpenCodeError] on HTTP or transport errors, a connection cut without a close frame included.
      */
     fun ptyConnect(ptyId: String, directory: String?, cursor: Long?, input: Flow<ByteArray>): Flow<PtyFrame> = channelFlow {
         val url = URLBuilder(baseUrl).apply {
@@ -114,8 +114,12 @@ class OpenCodeClient internal constructor(
                 sending.cancel()
                 val reason = closeReason.await()
                 when (val code = reason?.code?.toInt()) {
-                    null, NORMAL_CLOSURE -> Unit
+                    // The server closes with 1000 when the shell exits.
+                    NORMAL_CLOSURE -> Unit
                     PTY_GONE -> throw OpenCodeError.NotFound(reason.message.ifEmpty { "Terminal not found" })
+                    // No close frame: the connection was cut (network loss, server or proxy restart),
+                    // and the shell may still be there. If it is not, the retry ends with PTY_GONE.
+                    null -> throw OpenCodeError.Unreachable("Terminal connection lost")
                     // Server restarts and proxies: the shell may still be there.
                     else -> throw OpenCodeError.Unreachable("Terminal connection closed ($code)")
                 }
