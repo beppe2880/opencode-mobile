@@ -246,7 +246,7 @@
     <string name="settings_area_terminal_sub">키 바, 키보드 및 전체 화면</string>
     <string name="settings_area_notifications_sub">실행 중인 세션이 알려 주는 내용</string>
     <string name="settings_area_updates_sub">앱의 새 버전</string>
-    <string name="settings_area_servers_sub">저장된 서버, 페어링, 사용 통계</string>
+    <string name="settings_area_servers_sub">저장된 서버와 페어링</string>
     <string name="settings_area_voice_sub">마이크, 음성을 텍스트로, 클라우드 제공업체, API 키</string>
     <string name="settings_area_sharing_sub">다른 앱의 공유 메뉴에 있는 OpenCode</string>
     <string name="settings_area_about_sub">앱 및 서버 버전, 모든 설정 초기화</string>

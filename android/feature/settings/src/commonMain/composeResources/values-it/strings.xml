@@ -249,7 +249,7 @@
     <string name="settings_area_terminal_sub">Barra dei tasti, tastiera e schermo intero</string>
     <string name="settings_area_notifications_sub">Cosa ti segnala una sessione in corso</string>
     <string name="settings_area_updates_sub">Nuove versioni dell'app</string>
-    <string name="settings_area_servers_sub">Server salvati, abbinamento e statistiche di utilizzo</string>
+    <string name="settings_area_servers_sub">Server salvati e abbinamento</string>
     <string name="settings_area_voice_sub">Microfono, trascrizione vocale, fornitore cloud e chiave API</string>
     <string name="settings_area_sharing_sub">OpenCode nel menu di condivisione di altre app</string>
     <string name="settings_area_about_sub">Versioni di app e server, ripristina tutte le impostazioni</string>

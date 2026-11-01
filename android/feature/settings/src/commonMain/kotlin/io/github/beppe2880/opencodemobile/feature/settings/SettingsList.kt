@@ -83,7 +83,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
  * category with its options in groups, the dependent ones nested under the option they need.
  */
 
-/** The categories as rows of the first page, in three cards: servers, the app, then updates and about. */
+/** The categories as rows of the first page, in three cards: servers (with usage under them), the app, then updates and about. */
 internal fun LazyListScope.categoryRows(
     areas: List<SettingsArea>,
     state: SettingsState,
@@ -106,6 +106,10 @@ internal fun LazyListScope.categoryRows(
                     CategoryRow(area, state, onEvent, wide, demo, selected = area == selected)
                 }
             }
+        }
+        // Usage stays on the first page, right under the servers, as before the categories.
+        if (card.first() == SettingsArea.Servers && state.activeServerId != null) {
+            item(key = "usage") { UsageSection(onEvent) }
         }
     }
 }
@@ -200,10 +204,7 @@ internal fun CategoryScreen(
                     .testTag("category_${area.name.lowercase()}"),
             ) {
                 when (area) {
-                    SettingsArea.Servers -> {
-                        ServersSection(state, onEvent, demo, titled = false)
-                        if (state.activeServerId != null) UsageSection(onEvent)
-                    }
+                    SettingsArea.Servers -> ServersSection(state, onEvent, demo, titled = false)
                     SettingsArea.About -> {
                         AboutSection(state, onEvent, showUpdateNotice = false)
                         ResetSection(onEvent)

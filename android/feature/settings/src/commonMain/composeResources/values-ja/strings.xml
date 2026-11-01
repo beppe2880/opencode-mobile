@@ -246,7 +246,7 @@
     <string name="settings_area_terminal_sub">キーバー、キーボード、全画面</string>
     <string name="settings_area_notifications_sub">実行中のセッションからの通知内容</string>
     <string name="settings_area_updates_sub">アプリの新しいバージョン</string>
-    <string name="settings_area_servers_sub">保存したサーバー、ペアリング、利用統計</string>
+    <string name="settings_area_servers_sub">保存したサーバーとペアリング</string>
     <string name="settings_area_voice_sub">マイク、音声をテキストに、クラウドプロバイダー、APIキー</string>
     <string name="settings_area_sharing_sub">他のアプリの共有メニューにあるOpenCode</string>
     <string name="settings_area_about_sub">アプリとサーバーのバージョン、すべての設定をリセット</string>

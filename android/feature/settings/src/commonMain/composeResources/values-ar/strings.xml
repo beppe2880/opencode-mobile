@@ -261,7 +261,7 @@
     <string name="settings_area_terminal_sub">شريط المفاتيح ولوحة المفاتيح وملء الشاشة</string>
     <string name="settings_area_notifications_sub">ما تُخبرك به الجلسة الجارية</string>
     <string name="settings_area_updates_sub">إصدارات جديدة من التطبيق</string>
-    <string name="settings_area_servers_sub">الخوادم المحفوظة والاقتران وإحصاءات الاستخدام</string>
+    <string name="settings_area_servers_sub">الخوادم المحفوظة والاقتران</string>
     <string name="settings_area_voice_sub">الميكروفون وتحويل الكلام إلى نص والمزود ومفتاح API</string>
     <string name="settings_area_sharing_sub">OpenCode في قائمة المشاركة لتطبيقات أخرى</string>
     <string name="settings_area_about_sub">إصدارات التطبيق والخادم، وإعادة ضبط كل الإعدادات</string>

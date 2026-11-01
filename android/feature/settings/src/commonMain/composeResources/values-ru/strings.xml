@@ -255,7 +255,7 @@
     <string name="settings_area_terminal_sub">Панель клавиш, клавиатура и полноэкранный режим</string>
     <string name="settings_area_notifications_sub">О чём сообщает выполняющаяся сессия</string>
     <string name="settings_area_updates_sub">Новые версии приложения</string>
-    <string name="settings_area_servers_sub">Сохранённые серверы, сопряжение и статистика использования</string>
+    <string name="settings_area_servers_sub">Сохранённые серверы и сопряжение</string>
     <string name="settings_area_voice_sub">Микрофон, речь в текст, облачный провайдер и ключ API</string>
     <string name="settings_area_sharing_sub">OpenCode в меню «Поделиться» других приложений</string>
     <string name="settings_area_about_sub">Версии приложения и сервера, сброс всех настроек</string>

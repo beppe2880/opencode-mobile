@@ -249,7 +249,7 @@
     <string name="settings_area_terminal_sub">Key bar, keyboard and full screen</string>
     <string name="settings_area_notifications_sub">What a running session tells you</string>
     <string name="settings_area_updates_sub">New versions of the app</string>
-    <string name="settings_area_servers_sub">Saved servers, pairing and usage statistics</string>
+    <string name="settings_area_servers_sub">Saved servers and pairing</string>
     <string name="settings_area_voice_sub">Microphone, speech to text, cloud provider and API key</string>
     <string name="settings_area_sharing_sub">OpenCode in the share menu of other apps</string>
     <string name="settings_area_about_sub">App and server versions, reset all settings</string>

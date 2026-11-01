@@ -249,7 +249,7 @@
     <string name="settings_area_terminal_sub">Tastenleiste, Tastatur und Vollbild</string>
     <string name="settings_area_notifications_sub">Was dir eine laufende Sitzung meldet</string>
     <string name="settings_area_updates_sub">Neue Versionen der App</string>
-    <string name="settings_area_servers_sub">Gespeicherte Server, Kopplung und Nutzungsstatistik</string>
+    <string name="settings_area_servers_sub">Gespeicherte Server und Kopplung</string>
     <string name="settings_area_voice_sub">Mikrofon, Sprache in Text, Cloud-Anbieter und API-Schlüssel</string>
     <string name="settings_area_sharing_sub">OpenCode im Teilen-Menü anderer Apps</string>
     <string name="settings_area_about_sub">App- und Serverversionen, alle Einstellungen zurücksetzen</string>

@@ -246,7 +246,7 @@
     <string name="settings_area_terminal_sub">按键栏、键盘和全屏</string>
     <string name="settings_area_notifications_sub">运行中的会话会通知你的内容</string>
     <string name="settings_area_updates_sub">应用的新版本</string>
-    <string name="settings_area_servers_sub">已保存的服务器、配对和用量统计</string>
+    <string name="settings_area_servers_sub">已保存的服务器和配对</string>
     <string name="settings_area_voice_sub">麦克风、语音转文字、云服务商和 API 密钥</string>
     <string name="settings_area_sharing_sub">其他应用分享菜单中的 OpenCode</string>
     <string name="settings_area_about_sub">应用和服务器版本，重置所有设置</string>
