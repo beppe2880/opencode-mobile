@@ -266,6 +266,29 @@ class RemoteTerminalRepositoryTest {
     }
 
     @Test
+    fun `a connection cut without a close frame reconnects instead of ending the shell`() = runBlocking {
+        server.enqueue(
+            socket({ ws ->
+                ws.send(cursorFrame(2))
+                // Drops the TCP connection without a close frame, like a lost network.
+                ws.cancel()
+            }),
+        )
+        server.enqueue(
+            socket({ ws ->
+                ws.send(cursorFrame(4))
+                ws.close(1000, null)
+            }),
+        )
+
+        val updates = withTimeout(10_000) { terminals.attach("/work", "pty_1", emptyFlow()).toList() }
+
+        assertEquals(listOf("Connecting", "Connected", "Reconnecting", "Connected", "Exited"), updates.describe())
+        server.takeRequest()
+        assertEquals("/api/pty/pty_1/connect?location%5Bdirectory%5D=%2Fwork&cursor=2", server.takeRequest().path)
+    }
+
+    @Test
     fun `a terminal that is gone ends without retrying`() = runBlocking {
         server.enqueue(socket({ ws -> ws.close(4404, "session exited") }))
 
