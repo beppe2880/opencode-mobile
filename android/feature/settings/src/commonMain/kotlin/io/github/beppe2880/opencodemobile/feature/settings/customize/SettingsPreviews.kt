@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
@@ -37,12 +36,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_pr
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_question_text
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_question_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_reject
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_update_off
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_update_on
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_watching
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_watching_text
-import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNotice
-import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeState
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeSample
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -136,25 +132,12 @@ private fun NotificationMock(title: StringResource, text: StringResource, sent: 
     }
 }
 
-/** The real update banner with a sample release, and where it shows; faded when the app never looks. */
+/** The update notice with a sample release, as the chosen style shows it. */
 @Composable
 private fun UpdatesPreview(preview: PartPreview, target: UpdateTarget, modifier: Modifier) {
-    val on = preview.settings.checkForUpdates
-    val release = AppRelease("1.4.0", "https://github.com/beppe2880/opencode-mobile/releases")
     Column(modifier.fillMaxWidth().padding(OcSpacing.md)) {
-        OcCustomizable(SettingsPart.UpdateBanner, preview) {
-            Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-                UpdateNotice(
-                    state = UpdateNoticeState(release, target.actionFor(release)),
-                    onEvent = {},
-                    modifier = Modifier.alpha(if (on) 1f else 0.4f),
-                )
-                Text(
-                    stringResource(if (on) Res.string.settings_preview_update_on else Res.string.settings_preview_update_off),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = OcTheme.colors.textMuted,
-                )
-            }
+        OcCustomizable(SettingsPart.UpdateNotice, preview) {
+            UpdateNoticeSample(preview.settings.updateNotice, target)
         }
     }
 }

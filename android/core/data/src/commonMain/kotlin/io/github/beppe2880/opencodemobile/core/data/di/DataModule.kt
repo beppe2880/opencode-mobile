@@ -96,6 +96,6 @@ val dataModule = module {
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
     single<UpdateRepository> {
         val releases = GitHubReleases()
-        GitHubUpdateRepository(releases::latest, get(SettingsStore))
+        GitHubUpdateRepository(releases::recent, get(SettingsStore))
     }
 }

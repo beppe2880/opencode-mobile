@@ -63,6 +63,6 @@
     <string name="oc_part_notify_permission">許可リクエスト</string>
     <string name="oc_part_notify_question">質問</string>
     <string name="oc_part_notify_finished">セッション完了</string>
-    <string name="oc_part_update">アップデートのバナー</string>
+    <string name="oc_part_update">アップデートの通知</string>
     <string name="oc_part_customize">カスタマイズ</string>
 </resources>

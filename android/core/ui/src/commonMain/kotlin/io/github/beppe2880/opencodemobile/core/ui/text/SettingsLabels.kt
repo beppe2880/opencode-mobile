@@ -92,6 +92,6 @@ fun SettingsPart.label(): String = stringResource(
         SettingsPart.PermissionNotification -> Res.string.oc_part_notify_permission
         SettingsPart.QuestionNotification -> Res.string.oc_part_notify_question
         SettingsPart.FinishedNotification -> Res.string.oc_part_notify_finished
-        SettingsPart.UpdateBanner -> Res.string.oc_part_update
+        SettingsPart.UpdateNotice -> Res.string.oc_part_update
     },
 )

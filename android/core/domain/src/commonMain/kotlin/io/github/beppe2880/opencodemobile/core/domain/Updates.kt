@@ -1,19 +1,42 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
-/** A published release of the app: its version (tag) and the page to download it from. */
-data class AppRelease(val version: String, val url: String)
+/**
+ * A published release of the app: its version (tag), the page to download it from and its
+ * release notes as published (Markdown, read with [ReleaseNotes.parse]).
+ */
+data class AppRelease(val version: String, val url: String, val notes: String = "")
+
+/** A newer release of the app than the installed one. */
+data class AppUpdate(
+    /** The newest release: the one to install and to skip. */
+    val latest: AppRelease,
+    /** Every known release newer than the installed version, newest first; starts with [latest]. */
+    val releases: List<AppRelease> = listOf(latest),
+)
 
 /** New releases of the app, published on GitHub. */
 interface UpdateRepository {
     /**
-     * The latest release when it is newer than [installedVersion] and was not dismissed, else null.
-     * Asks GitHub at most once a day; in between, and when it cannot be reached, the release
-     * found by the last check is used.
+     * The releases newer than [installedVersion] when the newest was not dismissed, else null.
+     * Asks GitHub at most once a day; in between, and when it cannot be reached, the releases
+     * found by the last check are used.
      */
-    suspend fun availableUpdate(installedVersion: String): AppRelease?
+    suspend fun availableUpdate(installedVersion: String): AppUpdate?
 
     /** Hides [release] and older ones; a newer release is shown again. */
     suspend fun dismiss(release: AppRelease)
+}
+
+/** How the app announces a newer release when it opens. */
+enum class UpdateNoticeStyle {
+    /** A sheet with what changed, once per app start. */
+    Window,
+
+    /** A notice above the session list. */
+    Banner,
+
+    /** Never looks for new releases. */
+    Off,
 }
 
 /**

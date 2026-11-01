@@ -63,6 +63,6 @@
     <string name="oc_part_notify_permission">Запрос разрешения</string>
     <string name="oc_part_notify_question">Вопрос</string>
     <string name="oc_part_notify_finished">Сессия завершена</string>
-    <string name="oc_part_update">Баннер обновления</string>
+    <string name="oc_part_update">Уведомление об обновлении</string>
     <string name="oc_part_customize">Настроить</string>
 </resources>

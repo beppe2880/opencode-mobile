@@ -38,7 +38,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.update_view
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-/** A banner announcing a newer release of the app; draws nothing otherwise. */
+/** A banner announcing a newer release of the app when the update notice is a banner; draws nothing otherwise. */
 @Composable
 fun UpdateNoticeRoute(modifier: Modifier = Modifier) {
     val viewModel: UpdateNoticeViewModel = koinViewModel()
@@ -49,7 +49,7 @@ fun UpdateNoticeRoute(modifier: Modifier = Modifier) {
             is UpdateNoticeEffect.OpenUrl -> runCatching { uriHandler.openUri(effect.url) }
         }
     }
-    UpdateNotice(state, viewModel::onEvent, modifier)
+    if (state.bannerVisible) UpdateNotice(state, viewModel::onEvent, modifier)
 }
 
 @Composable
