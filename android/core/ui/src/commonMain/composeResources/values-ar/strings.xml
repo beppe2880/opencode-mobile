@@ -29,11 +29,15 @@
     <string name="oc_area_appearance">المظهر</string>
     <string name="oc_area_chat">المحادثة</string>
     <string name="oc_area_live">النشاط المباشر</string>
-    <string name="oc_area_composer">المحرر والنماذج</string>
-    <string name="oc_area_sessions">قائمة الجلسات</string>
+    <string name="oc_area_composer">صندوق الرسالة</string>
+    <string name="oc_area_sessions">الجلسات</string>
     <string name="oc_area_terminal">الطرفية</string>
     <string name="oc_area_notifications">الإشعارات</string>
     <string name="oc_area_updates">التحديثات</string>
+    <string name="oc_area_servers">الخوادم</string>
+    <string name="oc_area_voice">الإدخال الصوتي</string>
+    <string name="oc_area_sharing">المشاركة</string>
+    <string name="oc_area_about">حول وإعادة الضبط</string>
     <string name="oc_part_theme">السمة</string>
     <string name="oc_part_text_size">حجم النص</string>
     <string name="oc_part_header">العنوان وسطر الرأس</string>
@@ -65,6 +69,7 @@
     <string name="oc_part_notify_question">سؤال</string>
     <string name="oc_part_notify_finished">انتهت الجلسة</string>
     <string name="oc_part_update">إشعار التحديث</string>
+    <string name="oc_part_share">قائمة المشاركة</string>
     <string name="oc_part_customize">تخصيص</string>
     <string name="oc_shared_title">تمت مشاركته مع OpenCode</string>
     <plurals name="oc_shared_images">

@@ -5,9 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreviewContent
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun SettingsRoute(
@@ -21,8 +23,10 @@ fun SettingsRoute(
     onOpenLiveDemo: (() -> Unit)? = null,
     /** The offline demo: no real servers, and notification access is simulated. */
     demo: Boolean = false,
+    /** The category to open first, from a link; null for the first page. */
+    initialArea: SettingsArea? = null,
 ) {
-    val viewModel: SettingsViewModel = koinViewModel()
+    val viewModel: SettingsViewModel = koinViewModel { if (initialArea != null) parametersOf(initialArea) else parametersOf() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val notifications = rememberNotificationAccess { granted ->
         viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = granted, blocked = !granted))

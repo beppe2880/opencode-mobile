@@ -4,14 +4,18 @@ import androidx.compose.runtime.Composable
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_about
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_appearance
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_chat
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_composer
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_live
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_notifications
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_servers
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_sessions
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_sharing
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_terminal
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_updates
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_voice
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_activity
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_composer
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_footer
@@ -35,6 +39,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_running_line
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_selection
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_session_rows
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_share
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_split
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_swipe
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_text_size
@@ -43,22 +48,29 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_thoughts
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_tools
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_update
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_voice
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 /** The name of a group of settings, as Settings lists it. */
 @Composable
-fun SettingsArea.label(): String = stringResource(
-    when (this) {
+fun SettingsArea.label(): String = stringResource(labelRes)
+
+/** The resource of [label]. */
+private val SettingsArea.labelRes: StringResource
+    get() = when (this) {
+        SettingsArea.Servers -> Res.string.oc_area_servers
         SettingsArea.Appearance -> Res.string.oc_area_appearance
         SettingsArea.Chat -> Res.string.oc_area_chat
         SettingsArea.LiveActivity -> Res.string.oc_area_live
         SettingsArea.Composer -> Res.string.oc_area_composer
+        SettingsArea.VoiceInput -> Res.string.oc_area_voice
         SettingsArea.Sessions -> Res.string.oc_area_sessions
+        SettingsArea.Sharing -> Res.string.oc_area_sharing
         SettingsArea.Terminal -> Res.string.oc_area_terminal
         SettingsArea.Notifications -> Res.string.oc_area_notifications
         SettingsArea.Updates -> Res.string.oc_area_updates
-    },
-)
+        SettingsArea.About -> Res.string.oc_area_about
+    }
 
 /** The name of a part of a settings preview, as its preview and its options call it. */
 @Composable
@@ -87,6 +99,7 @@ fun SettingsPart.label(): String = stringResource(
         SettingsPart.SessionRows -> Res.string.oc_part_session_rows
         SettingsPart.SwipeChats -> Res.string.oc_part_swipe
         SettingsPart.SplitView -> Res.string.oc_part_split
+        SettingsPart.ShareTarget -> Res.string.oc_part_share
         SettingsPart.KeyBar -> Res.string.oc_part_key_bar
         SettingsPart.TerminalKeyboard -> Res.string.oc_part_keyboard
         SettingsPart.TerminalFullscreen -> Res.string.oc_part_fullscreen

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -37,6 +38,18 @@ class SettingsSearchTest {
     fun everyWordMustMatchSomewhere() {
         assertEquals(listOf(SettingOption.LiveShell), search("output live"))
         assertTrue(search("output terminal").isEmpty())
+    }
+
+    @Test
+    fun categoriesAreFoundByNameOrDescription() {
+        val names = mapOf(SettingsArea.Servers to "Servers", SettingsArea.About to "About and reset", SettingsArea.VoiceInput to "Voice input")
+        val descriptions = mapOf(SettingsArea.Servers to "Saved servers, pairing and usage statistics", SettingsArea.About to "Versions, reset all settings")
+        fun areas(query: String) = searchAreas(query, names.keys.toList(), { names.getValue(it) }, { descriptions[it].orEmpty() })
+        assertEquals(listOf(SettingsArea.Servers), areas("usage"))
+        assertEquals(listOf(SettingsArea.About), areas("RESET"))
+        assertEquals(listOf(SettingsArea.VoiceInput), areas("voice"))
+        assertTrue(areas(" ").isEmpty())
+        assertTrue(areas("voice usage").isEmpty())
     }
 
     @Test

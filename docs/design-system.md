@@ -116,9 +116,16 @@ Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Thr
   "Build · Model · 3s · $0.002" with copy; "Working…" row while running; permission card pinned above
   the composer; composer card with agent chip, model chip, send / stop and Steer / Queue choice
   while the agent runs.
-- **Settings**: List or Preview (segmented control at the top, remembered) and "Customize in the
-  demo" (Android). List is the classic list of every option. Preview: search field (every option by name, opening its group at its part), cards of the
-  setting groups with a live miniature (`OcThumbnail`) of their preview, then servers, usage,
+- **Settings**: List or Preview (segmented control at the top, remembered), "Customize in the
+  demo" (Android) and a search field for every category and option. Both styles share the
+  categories of `SettingsArea` (Servers, Appearance, Chat, Live activity, Message box, Voice
+  input, Sessions, Sharing on Android, Notifications where supported, Terminal, Updates, About and
+  reset); `SettingsCategories.kt` lists each option in exactly one of them. List: one row per
+  category with its icon and current values in one line, opening a page of grouped options where
+  dependent ones are indented under their parent and hidden until it allows them; a search result
+  opens its page scrolled to the option (or the parent that brings it back), briefly highlighted.
+  From 600dp the categories stay on the left with the open one on the right. Preview: cards of the
+  categories that have a preview, with a live miniature (`OcThumbnail`), then servers, usage,
   reset and versions.
 - **Setting group**: a live preview drawn by the real components of each screen from sample data
   (`ChatPreview`, `SessionsPreview`, `TerminalPreview`, ... handed to Settings by `:shared`), every

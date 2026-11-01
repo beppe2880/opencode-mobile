@@ -40,7 +40,6 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCustomizable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.PartPreview
-import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -58,48 +57,91 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pr
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * The session list for Settings: real rows from the sample sessions (one running with work in
- * the background), how swiping moves between chats, and a sketch of the list beside the chat on
- * wide screens that follows its width, handle and Back settings.
- */
+/** The session list for Settings: real rows from the sample sessions, one running with work in the background. */
 @Composable
 fun SessionsPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     val s = preview.settings
-    Column(modifier.fillMaxWidth().padding(vertical = OcSpacing.xs).testTag("sessions_preview"), verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+    Column(modifier.fillMaxWidth().padding(vertical = OcSpacing.xs).testTag("sessions_preview")) {
         OcCustomizable(SettingsPart.SessionRows, preview, Modifier.padding(horizontal = OcSpacing.sm)) {
-            Column {
-                SampleData.sessions.take(3).forEachIndexed { i, session ->
-                    if (i > 0) OcDivider()
-                    SessionRow(
-                        session = session,
-                        running = i == 0,
-                        selected = false,
-                        now = SampleData.NOW,
-                        onClick = {},
-                        onLongClick = {},
-                        onSwipeDelete = {},
-                        work = if (!s.showRunningWorkInList) null else if (i == 0) SampleData.runningWork else RunningWork(),
-                    )
-                }
-            }
+            SampleRows(work = s.showRunningWorkInList)
         }
-        OcCustomizable(SettingsPart.SwipeChats, preview, Modifier.padding(horizontal = OcSpacing.md)) { SwipeSketch(s.swipeBetweenChats) }
-        OcCustomizable(SettingsPart.SplitView, preview, Modifier.padding(horizontal = OcSpacing.md)) {
-            SplitSketch(
-                split = s.splitView,
-                fraction = (s.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION).coerceIn(LIST_PANE_FRACTION_RANGE),
-                handle = s.listPaneHandle,
-                backShowsList = s.backShowsList,
-            )
-        }
+    }
+}
+
+/** How swiping moves between chats. */
+@Composable
+fun SwipeChatsPreview(preview: PartPreview, modifier: Modifier = Modifier) {
+    OcCustomizable(SettingsPart.SwipeChats, preview, modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)) {
+        SwipeSketch(preview.settings.swipeBetweenChats)
+    }
+}
+
+/** A sketch of the list beside the chat on wide screens that follows its width, handle and Back settings. */
+@Composable
+fun SplitViewPreview(preview: PartPreview, modifier: Modifier = Modifier) {
+    val s = preview.settings
+    OcCustomizable(SettingsPart.SplitView, preview, modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)) {
+        SplitSketch(
+            split = s.splitView,
+            fraction = (s.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION).coerceIn(LIST_PANE_FRACTION_RANGE),
+            handle = s.listPaneHandle,
+            backShowsList = s.backShowsList,
+        )
     }
 }
 
 /** The new chat sheet with the model it starts with: the last used one or the server's default. */
 @Composable
 fun NewChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
-    val lastUsed = preview.settings.newChatModel == NewChatModel.LastUsed
+    OcCustomizable(SettingsPart.NewChat, preview, modifier.padding(OcSpacing.sm).testTag("new_chat_preview")) {
+        SampleNewSessionForm(lastUsed = preview.settings.newChatModel == NewChatModel.LastUsed)
+    }
+}
+
+/** What sharing to OpenCode from another app opens: the new chat sheet or the session list, or nothing. */
+@Composable
+fun SharingPreview(preview: PartPreview, modifier: Modifier = Modifier) {
+    val s = preview.settings
+    OcCustomizable(SettingsPart.ShareTarget, preview, modifier.padding(OcSpacing.sm).testTag("sharing_preview")) {
+        Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+            Caption(
+                when {
+                    !s.showInShareMenu -> Res.string.sessions_preview_share_off
+                    s.shareOpens == ShareOpens.ChooseChat -> Res.string.sessions_preview_share_choose
+                    else -> Res.string.sessions_preview_share_new
+                },
+                Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.sm),
+            )
+            when {
+                !s.showInShareMenu -> Unit
+                s.shareOpens == ShareOpens.ChooseChat -> SampleRows(work = false)
+                else -> SampleNewSessionForm(lastUsed = s.newChatModel == NewChatModel.LastUsed)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SampleRows(work: Boolean) {
+    Column {
+        SampleData.sessions.take(3).forEachIndexed { i, session ->
+            if (i > 0) OcDivider()
+            SessionRow(
+                session = session,
+                running = i == 0,
+                selected = false,
+                now = SampleData.NOW,
+                onClick = {},
+                onLongClick = {},
+                onSwipeDelete = {},
+                work = if (!work) null else if (i == 0) SampleData.runningWork else RunningWork(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SampleNewSessionForm(lastUsed: Boolean) {
     val projects = SampleData.projects.take(2)
     val state = NewSessionState(
         directory = projects.first().directory,
@@ -109,22 +151,7 @@ fun NewChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         agent = "build",
         defaultModel = if (lastUsed) SampleData.sonnet else null,
     )
-    OcCustomizable(SettingsPart.NewChat, preview, modifier.padding(OcSpacing.sm).testTag("new_chat_preview")) {
-        Column {
-            NewSessionForm(state, projects, onEvent = {}, inSheet = false)
-            if (shareTargetSupported) {
-                Caption(
-                    when {
-                        !preview.settings.showInShareMenu -> Res.string.sessions_preview_share_off
-                        preview.settings.shareOpens == ShareOpens.ChooseChat -> Res.string.sessions_preview_share_choose
-                        else -> Res.string.sessions_preview_share_new
-                    },
-                    // Lined up with the form above.
-                    Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm),
-                )
-            }
-        }
-    }
+    NewSessionForm(state, projects, onEvent = {}, inSheet = false)
 }
 
 /** The open chat between its neighbors in the list, which a swipe brings in. */

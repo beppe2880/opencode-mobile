@@ -144,12 +144,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_te
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keys
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keys_reset
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keys_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_large
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_largest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_small
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_light
@@ -311,17 +307,13 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             selected = settings.theme,
             onSelect = { onEvent(SettingsEvent.ThemeChanged(it)) },
         )
-        SettingOption.TextSize -> {
-            val sizes =
-                listOf(Res.string.settings_text_small, Res.string.settings_text_default, Res.string.settings_text_large, Res.string.settings_text_largest)
-            ChoiceRow(
-                title = title,
-                subtitle = subtitle,
-                choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(sizes[i]), "settings_text_size_$i") },
-                selected = settings.chatTextScale,
-                onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
-            )
-        }
+        SettingOption.TextSize -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(TEXT_SIZE_LABELS[i]), "settings_text_size_$i") },
+            selected = settings.chatTextScale,
+            onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
+        )
         SettingOption.HeaderLine -> ChoiceRow(
             title = title,
             subtitle = stringResource(

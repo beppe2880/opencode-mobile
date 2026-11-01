@@ -11,14 +11,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
@@ -34,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +63,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
@@ -91,24 +97,22 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreview
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaScreen
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
+import io.github.beppe2880.opencodemobile.feature.settings.customize.area
+import io.github.beppe2880.opencodemobile.feature.settings.customize.availableIn
+import io.github.beppe2880.opencodemobile.feature.settings.customize.description
 import io.github.beppe2880.opencodemobile.feature.settings.customize.descriptionRes
+import io.github.beppe2880.opencodemobile.feature.settings.customize.group
+import io.github.beppe2880.opencodemobile.feature.settings.customize.searchAreas
 import io.github.beppe2880.opencodemobile.feature.settings.customize.searchOptions
 import io.github.beppe2880.opencodemobile.feature.settings.customize.supported
 import io.github.beppe2880.opencodemobile.feature.settings.customize.titleRes
+import io.github.beppe2880.opencodemobile.feature.settings.customize.visibleAreas
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_about
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_active
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_add_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_api_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_version
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_appearance_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_chat_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_composer_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_live_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_notifications_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_sessions_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_terminal_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_updates_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_areas
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server_hint
@@ -158,13 +162,36 @@ fun SettingsScreen(
     /** Opens the offline demo to change settings on its real screens; null where there is none (iOS, the demo itself). */
     onOpenLiveDemo: (() -> Unit)? = null,
 ) {
-    val areas = SettingsArea.entries.filter { showNotifications || it != SettingsArea.Notifications }
-    OcBackHandler(enabled = state.area != null) { onEvent(SettingsEvent.CloseArea) }
-    AnimatedContent(targetState = state.area, modifier = modifier, label = "settings_area") { area ->
-        if (area != null) {
-            AreaScreen(state, onEvent, preview)
+    val areas = visibleAreas(showNotifications)
+    val list = state.settings.settingsStyle == SettingsStyle.List
+    // Hoisted above the pages, so Back from a category finds the first page where it was left.
+    val homeState = rememberLazyListState()
+    BoxWithConstraints(modifier) {
+        val wide = maxWidth >= ListDetailMinWidth
+        // The split view options only do something where the app can show the chat beside the list.
+        val wideWindow = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= SplitViewMinWidth
+        val home: @Composable (selected: SettingsArea?, onBack: () -> Unit, homeModifier: Modifier) -> Unit = { selected, onBack, homeModifier ->
+            SettingsHome(state, onEvent, preview, areas, demo, wideWindow, onOpenLiveDemo, homeState, selected, onBack, homeModifier)
+        }
+        if (list && wide) {
+            // Categories on the left, the open one (or the first) on the right; Back leaves Settings.
+            val shown = state.area ?: areas.first()
+            val paneWidth = (maxWidth * 0.4f).coerceIn(ListPaneMinWidth, ListPaneMaxWidth)
+            Row(Modifier.fillMaxSize()) {
+                home(shown, { onEvent(SettingsEvent.Leave) }, Modifier.width(paneWidth).fillMaxHeight())
+                VerticalDivider(color = OcTheme.colors.borderBase)
+                CategoryScreen(shown, state, onEvent, showBack = false, wide = wideWindow, demo = demo, modifier = Modifier.weight(1f))
+            }
         } else {
-            SettingsHome(state, onEvent, preview, areas, demo, showNotifications, onOpenLiveDemo)
+            OcBackHandler(enabled = state.area != null) { onEvent(SettingsEvent.CloseArea) }
+            AnimatedContent(targetState = state.area, label = "settings_area") { area ->
+                when {
+                    area == null -> home(null, { onEvent(SettingsEvent.Back) }, Modifier)
+                    // Servers and about have no preview: both styles show their page.
+                    !list && SettingsPart.of(area).isNotEmpty() -> AreaScreen(state, onEvent, preview)
+                    else -> CategoryScreen(area, state, onEvent, showBack = true, wide = wideWindow, demo = demo)
+                }
+            }
         }
     }
     state.renaming?.let { server ->
@@ -202,10 +229,21 @@ fun SettingsScreen(
     }
 }
 
+/** From this width the List style shows the categories beside the open one, like the session list beside the chat. */
+private val ListDetailMinWidth = 600.dp
+
+/** Bounds of the width of the categories beside the open one, which gets the rest. */
+private val ListPaneMinWidth = 280.dp
+private val ListPaneMaxWidth = 360.dp
+
+/** Matches the width at which the app shows the chat beside the session list. */
+private val SplitViewMinWidth = 600.dp
+
 /**
- * The first screen of Settings, in the style the user picked at its top: the classic list, or
- * the groups of settings with a live miniature of their preview, a search for any option, then
- * servers, usage, reset and versions. Both offer the live demo where there is one.
+ * The first screen of Settings, in the style the user picked at its top, with a search for any
+ * category or option under it: in the List style one row per category with its current values;
+ * in the Preview style the categories with a live miniature of their preview, then servers,
+ * usage, reset and versions. Both offer the live demo where there is one.
  */
 @Composable
 private fun SettingsHome(
@@ -214,12 +252,18 @@ private fun SettingsHome(
     preview: AreaPreviewContent,
     areas: List<SettingsArea>,
     demo: Boolean,
-    showNotifications: Boolean,
+    wideWindow: Boolean,
     onOpenLiveDemo: (() -> Unit)?,
+    listState: LazyListState,
+    /** The category open beside the list on wide windows. */
+    selected: SettingsArea?,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val list = state.settings.settingsStyle == SettingsStyle.List
     val c = OcTheme.colors
     Scaffold(
+        modifier = modifier,
         containerColor = c.bgDeep,
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -229,7 +273,7 @@ private fun SettingsHome(
                     OcIconButton(
                         icon = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = stringResource(UiRes.string.oc_back),
-                        onClick = { onEvent(SettingsEvent.Back) },
+                        onClick = onBack,
                         modifier = Modifier.testTag("settings_back_button"),
                     )
                 },
@@ -239,8 +283,10 @@ private fun SettingsHome(
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
             val width = minOf(maxWidth, 840.dp)
             val columns = ((width - OcSpacing.gutter * 2) / AreaCardMinWidth).toInt().coerceIn(2, 4)
-            val results = searchResults(state.query, areas)
+            val previewed = areas.filter { SettingsPart.of(it).isNotEmpty() }
+            val results = searchResults(state.query, areas, list, wideWindow)
             LazyColumn(
+                state = listState,
                 modifier = Modifier.widthIn(max = if (list) 640.dp else 840.dp).fillMaxSize().testTag("settings_list"),
                 contentPadding = PaddingValues(
                     start = OcSpacing.gutter,
@@ -251,10 +297,6 @@ private fun SettingsHome(
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
             ) {
                 item(key = "style") { StylePicker(state.settings.settingsStyle, onEvent, onOpenLiveDemo) }
-                if (list) {
-                    settingsList(state, onEvent, showNotifications, demo)
-                    return@LazyColumn
-                }
                 item(key = "search") {
                     OcSearchField(
                         value = state.query,
@@ -274,12 +316,16 @@ private fun SettingsHome(
                             )
                         }
                     } else {
-                        item(key = "results") { SearchResults(results, onEvent) }
+                        item(key = "results") { SearchResults(results, list, onEvent) }
                     }
                     return@LazyColumn
                 }
+                if (list) {
+                    categoryRows(areas, state, onEvent, wideWindow, demo, selected)
+                    return@LazyColumn
+                }
                 item(key = "areas_title") { SectionTitle(stringResource(Res.string.settings_areas)) }
-                areas.chunked(columns).forEachIndexed { row, chunk ->
+                previewed.chunked(columns).forEachIndexed { row, chunk ->
                     item(key = "areas_$row") {
                         Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
                             chunk.forEach { area -> AreaCard(area, state, preview, onEvent, Modifier.weight(1f)) }
@@ -328,29 +374,71 @@ private fun StylePicker(style: SettingsStyle, onEvent: (SettingsEvent) -> Unit, 
     }
 }
 
-/** Options matching [query] in [areas], or null while the query is blank. */
+/** What a search found: categories by name or description, then options. */
+private class SearchHits(val areas: List<SettingsArea>, val options: List<SettingOption>) {
+    fun isEmpty() = areas.isEmpty() && options.isEmpty()
+}
+
+/**
+ * Categories and options matching [query] among [areas], or null while the query is blank.
+ * Options are found by their title, description, category, group (List) and part (Preview);
+ * in the List style only those its pages can show here ([wideWindow] for the split view).
+ */
 @Composable
-private fun searchResults(query: String, areas: List<SettingsArea>): List<SettingOption>? {
+private fun searchResults(query: String, areas: List<SettingsArea>, list: Boolean, wideWindow: Boolean): SearchHits? {
     if (query.isBlank()) return null
+    val areaNames = areas.associateWith { it.label() }
+    val areaDescriptions = areas.associateWith { stringResource(it.description) }
     val titles = SettingOption.entries.associateWith { stringResource(it.titleRes) }
     val descriptions = SettingOption.entries.associateWith { option ->
-        stringResource(option.descriptionRes) + " " + option.part.label() + " " + option.area.label()
+        listOfNotNull(
+            stringResource(option.descriptionRes),
+            option.part.label(),
+            option.area.label(),
+            option.group.title?.let { stringResource(it) },
+        ).joinToString(" ")
     }
-    return searchOptions(query, { titles.getValue(it) }, { descriptions.getValue(it) }).filter { it.area in areas && it.supported }
+    return SearchHits(
+        areas = searchAreas(query, areas, { areaNames.getValue(it) }, { areaDescriptions.getValue(it) }),
+        options = searchOptions(query, { titles.getValue(it) }, { descriptions.getValue(it) })
+            .filter { it.area in areas && if (list) it.availableIn(wideWindow) else it.supported },
+    )
 }
 
 @Composable
-private fun SearchResults(results: List<SettingOption>, onEvent: (SettingsEvent) -> Unit) {
-    OcCard {
-        results.forEachIndexed { i, option ->
-            if (i > 0) OcDivider()
-            OcListRow(
-                title = stringResource(option.titleRes),
-                subtitle = stringResource(Res.string.settings_search_result, option.area.label(), option.part.label()),
-                onClick = { onEvent(SettingsEvent.OpenArea(option.area, option.part, option)) },
-                trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = OcTheme.colors.iconMuted) },
-                modifier = Modifier.testTag("settings_result_${option.name.lowercase()}"),
-            )
+private fun SearchResults(results: SearchHits, list: Boolean, onEvent: (SettingsEvent) -> Unit) {
+    val c = OcTheme.colors
+    Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.md)) {
+        if (results.areas.isNotEmpty()) {
+            OcCard {
+                results.areas.forEachIndexed { i, area ->
+                    if (i > 0) OcDivider()
+                    OcListRow(
+                        title = area.label(),
+                        subtitle = stringResource(area.description),
+                        onClick = { onEvent(SettingsEvent.OpenArea(area)) },
+                        leading = { Icon(area.icon, contentDescription = null, tint = c.iconMuted) },
+                        trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted) },
+                        modifier = Modifier.testTag("settings_result_area_${area.name.lowercase()}"),
+                    )
+                }
+            }
+        }
+        if (results.options.isNotEmpty()) {
+            OcCard {
+                results.options.forEachIndexed { i, option ->
+                    if (i > 0) OcDivider()
+                    // Where the option is: its category and the group of its page, or the part of the preview.
+                    val place = if (list) option.group.title?.let { stringResource(it) } else option.part.label()
+                    OcListRow(
+                        title = stringResource(option.titleRes),
+                        subtitle = place?.let { stringResource(Res.string.settings_search_result, option.area.label(), it) } ?: option.area.label(),
+                        onClick = { onEvent(SettingsEvent.OpenArea(option.area, option = option)) },
+                        trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted) },
+                        modifier = Modifier.testTag("settings_result_${option.name.lowercase()}"),
+                    )
+                }
+            }
         }
     }
 }
@@ -375,25 +463,19 @@ private fun AreaCard(area: SettingsArea, state: SettingsState, preview: AreaPrev
         OcDivider()
         Column(Modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.sm)) {
             Text(name, style = MaterialTheme.typography.titleSmall, color = c.textBase, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(stringResource(area.summary), style = MaterialTheme.typography.bodySmall, color = c.textMuted, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Text(
+                stringResource(area.description),
+                style = MaterialTheme.typography.bodySmall,
+                color = c.textMuted,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
 
 /** Miniatures are drawn at this scale: a phone-wide preview fits a card of half a phone. */
 private const val THUMBNAIL_SCALE = 0.42f
-
-private val SettingsArea.summary
-    get() = when (this) {
-        SettingsArea.Appearance -> Res.string.settings_area_appearance_sub
-        SettingsArea.Chat -> Res.string.settings_area_chat_sub
-        SettingsArea.LiveActivity -> Res.string.settings_area_live_sub
-        SettingsArea.Composer -> Res.string.settings_area_composer_sub
-        SettingsArea.Sessions -> Res.string.settings_area_sessions_sub
-        SettingsArea.Terminal -> Res.string.settings_area_terminal_sub
-        SettingsArea.Notifications -> Res.string.settings_area_notifications_sub
-        SettingsArea.Updates -> Res.string.settings_area_updates_sub
-    }
 
 @Composable
 private fun SectionTitle(title: String) {
@@ -406,22 +488,24 @@ private fun SectionTitle(title: String) {
 }
 
 @Composable
-internal fun Section(title: String, content: @Composable () -> Unit) {
+internal fun Section(title: String?, content: @Composable () -> Unit) {
     Column(Modifier.padding(bottom = OcSpacing.lg), verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
-        Text(
-            title,
-            style = MaterialTheme.typography.labelMedium,
-            color = OcTheme.colors.textMuted,
-            modifier = Modifier.padding(start = OcSpacing.xs).semantics { heading() },
-        )
+        if (title != null) {
+            Text(
+                title,
+                style = MaterialTheme.typography.labelMedium,
+                color = OcTheme.colors.textMuted,
+                modifier = Modifier.padding(start = OcSpacing.xs).semantics { heading() },
+            )
+        }
         content()
     }
 }
 
 @Composable
-internal fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean) {
+internal fun ServersSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean, titled: Boolean = true) {
     val c = OcTheme.colors
-    Section(stringResource(Res.string.settings_servers)) {
+    Section(if (titled) stringResource(Res.string.settings_servers) else null) {
         OcCard {
             if (demo) {
                 OcListRow(

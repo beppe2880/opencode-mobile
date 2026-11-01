@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
@@ -33,6 +34,8 @@ fun OpenCodeApp(
     /** Opens the offline demo in edit mode (Android); null hides the entry in Settings. */
     onCustomizeInDemo: (() -> Unit)? = null,
     openSettings: Boolean = false,
+    /** The category [openSettings] opens; null for the first page. */
+    openSettingsArea: SettingsArea? = null,
     onSettingsOpened: () -> Unit = {},
     overlay: @Composable (AppSettings) -> Unit = {},
 ) {
@@ -56,6 +59,7 @@ fun OpenCodeApp(
                     onNewSessionOpened = onNewSessionOpened,
                     onCustomizeInDemo = onCustomizeInDemo,
                     openSettings = openSettings,
+                    openSettingsArea = openSettingsArea,
                     onSettingsOpened = onSettingsOpened,
                 )
                 if (activeServer != null) overlay(appSettings)

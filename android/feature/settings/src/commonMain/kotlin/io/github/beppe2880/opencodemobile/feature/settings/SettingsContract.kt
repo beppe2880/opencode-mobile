@@ -47,15 +47,18 @@ data class SettingsState(
     val notificationsAllowed: Boolean = true,
     /** The permission was denied: only the system settings can grant it now. */
     val notificationsBlocked: Boolean = false,
-    /** The group of settings open with its preview; null on the list of groups. */
+    /**
+     * The open category: its page in the List style, its preview in the Preview style; null on
+     * the first page. Wide windows show the first page beside it.
+     */
     val area: SettingsArea? = null,
     /** The part of the preview whose options are in view. */
     val selected: SettingsPart? = null,
-    /** The option a search result opened, highlighted until another part is picked. */
+    /** The option a search result opened: highlighted on the page, or until another part is picked. */
     val focus: SettingOption? = null,
     /** Chat previews show the agent at work instead of a finished answer. */
     val running: Boolean = false,
-    /** Text of the search field; options matching it replace the groups. */
+    /** Text of the search field; categories and options matching it replace the categories. */
     val query: String = "",
     /** Speech-to-text providers with an API key saved on this device. */
     val sttKeys: Set<SttProvider> = emptySet(),
@@ -78,11 +81,15 @@ sealed interface SttTest {
 }
 
 sealed interface SettingsEvent {
+    /** Back from the open category to the first page, or out of Settings from the first page. */
     data object Back : SettingsEvent
+
+    /** Out of Settings even with a category open, as on wide windows that show both. */
+    data object Leave : SettingsEvent
     data object AddServer : SettingsEvent
     data object OpenUsage : SettingsEvent
 
-    /** Opens a group of settings with its preview, at [part] or at the part of [option]. */
+    /** Opens a category, at [part] of its preview or at [option] (the part of [option] in the Preview style). */
     data class OpenArea(val area: SettingsArea, val part: SettingsPart? = null, val option: SettingOption? = null) : SettingsEvent
     data object CloseArea : SettingsEvent
 
