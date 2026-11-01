@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.feature.sessions
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -195,7 +196,8 @@ class SessionsViewModel(
         workPoll = if (workVisible && showRunningWork) {
             viewModelScope.launch {
                 while (true) {
-                    refreshRunning()
+                    // Offline or unreachable a refresh only fails; reconnecting refreshes anyway.
+                    if (events.connection.value == ConnectionState.Connected) refreshRunning()
                     delay(RUNNING_POLL_MS)
                 }
             }

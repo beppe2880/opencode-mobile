@@ -281,6 +281,27 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `running work is not polled while the server is unreachable`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(1, chat.runningReads)
+
+        events.connection.value = ConnectionState.Reconnecting
+        advanceTimeBy(120_000)
+        runCurrent()
+        assertEquals(1, chat.runningReads)
+
+        events.connection.value = ConnectionState.Connected
+        events.flow.emit(ServerEvent.Connected)
+        advanceTimeBy(16_000)
+        runCurrent()
+        assertTrue(chat.runningReads >= 2)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
     fun `MCP menu and slash open the same project panel without prompting`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()

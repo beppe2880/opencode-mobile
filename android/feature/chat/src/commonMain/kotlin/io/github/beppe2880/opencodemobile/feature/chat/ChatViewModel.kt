@@ -341,7 +341,8 @@ class ChatViewModel(
         workPoll = if (workVisible) {
             viewModelScope.launch {
                 while (true) {
-                    refreshRunning()
+                    // Offline or unreachable a refresh only fails; reconnecting refreshes anyway.
+                    if (events.connection.value == ConnectionState.Connected) refreshRunning()
                     delay(if (currentState.workOpen) RUNNING_SHEET_POLL_MS else RUNNING_POLL_MS)
                 }
             }
