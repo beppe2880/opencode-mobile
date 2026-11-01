@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.DropdownMenu
@@ -41,18 +42,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
-import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
-import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
-import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
-import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
-import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -75,12 +71,13 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.feature.settings.customize.ChatOption
+import io.github.beppe2880.opencodemobile.feature.settings.customize.ChatOptionControl
+import io.github.beppe2880.opencodemobile.feature.settings.customize.appliesTo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_about
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_active
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_add_server
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_api_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_appearance
@@ -91,38 +88,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ch
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_conversation
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_customize_chat
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_customize_chat_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server_hint
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_activity_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_thoughts
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_thoughts_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_all_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_branch_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_line_folder_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_folder
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_session
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_opens_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_full_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
@@ -154,14 +125,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_no
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_permissions_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_password
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_permissions_collapsed
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_permissions_collapsed_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_questions_collapsed_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fast
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
@@ -190,10 +155,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_cost_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_show_reasoning_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats
@@ -204,18 +165,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_te
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_large
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_largest
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_size_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_small
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_light
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_title
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unknown
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage_sub
@@ -263,6 +216,7 @@ fun SettingsScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
             ) {
+                item(key = "customize") { CustomizeEntry(onEvent) }
                 item(key = "servers") { ServersSection(state, onEvent, demo) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "appearance") { AppearanceSection(state.settings, onEvent) }
@@ -399,6 +353,22 @@ private fun ServerRow(server: ServerProfile, active: Boolean, onEvent: (Settings
     )
 }
 
+/** Opens the chat customizer: the first thing most people look for in Settings. */
+@Composable
+private fun CustomizeEntry(onEvent: (SettingsEvent) -> Unit) {
+    val c = OcTheme.colors
+    OcCard(Modifier.padding(bottom = OcSpacing.lg)) {
+        OcListRow(
+            title = stringResource(Res.string.settings_customize_chat),
+            subtitle = stringResource(Res.string.settings_customize_chat_sub),
+            onClick = { onEvent(SettingsEvent.OpenCustomizer) },
+            leading = { Icon(Icons.Outlined.Palette, contentDescription = null, tint = c.textAccent) },
+            trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted) },
+            modifier = Modifier.testTag("settings_customize_row"),
+        )
+    }
+}
+
 @Composable
 private fun UsageSection(onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(Res.string.usage_title)) {
@@ -430,15 +400,7 @@ private fun AppearanceSection(settings: AppSettings, onEvent: (SettingsEvent) ->
             onSelect = { onEvent(SettingsEvent.ThemeChanged(it)) },
         )
         OcCard {
-            val sizes =
-                listOf(Res.string.settings_text_small, Res.string.settings_text_default, Res.string.settings_text_large, Res.string.settings_text_largest)
-            ChoiceRow(
-                title = stringResource(Res.string.settings_text_size),
-                subtitle = stringResource(Res.string.settings_text_size_sub),
-                choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(sizes[i]), "settings_text_size_$i") },
-                selected = settings.chatTextScale,
-                onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
-            )
+            ChatOptionControl(ChatOption.TextSize, settings, onEvent)
             if (wide) {
                 OcDivider()
                 OcSwitchRow(
@@ -491,7 +453,7 @@ private val SplitViewMinWidth = 600.dp
 
 /** A title and subtitle with a segmented choice under them, inside a card. */
 @Composable
-private fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegment<T>>, selected: T, onSelect: (T) -> Unit) {
+internal fun <T> ChoiceRow(title: String, subtitle: String, choices: List<OcSegment<T>>, selected: T, onSelect: (T) -> Unit) {
     val c = OcTheme.colors
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
@@ -544,94 +506,22 @@ private fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
 private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) -> Unit) {
     Section(stringResource(Res.string.settings_conversation)) {
         OcCard {
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_show_reasoning),
-                subtitle = stringResource(Res.string.settings_show_reasoning_sub),
-                checked = settings.showReasoning,
-                onCheckedChange = { onEvent(SettingsEvent.ShowReasoningChanged(it)) },
-                modifier = Modifier.testTag("settings_show_reasoning_switch"),
-            )
+            ChatOptionControl(ChatOption.ShowReasoning, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_expand_tools),
-                subtitle = stringResource(Res.string.settings_expand_tools_sub),
-                checked = settings.expandToolsByDefault,
-                onCheckedChange = { onEvent(SettingsEvent.ExpandToolsChanged(it)) },
-                modifier = Modifier.testTag("settings_expand_tools_switch"),
-            )
+            ChatOptionControl(ChatOption.ExpandTools, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_group_activity),
-                subtitle = stringResource(Res.string.settings_group_activity_sub),
-                checked = settings.groupActivity,
-                onCheckedChange = { onEvent(SettingsEvent.GroupActivityChanged(it)) },
-                modifier = Modifier.testTag("settings_group_activity_switch"),
-            )
+            ChatOptionControl(ChatOption.GroupActivity, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_group_thoughts),
-                subtitle = stringResource(Res.string.settings_group_thoughts_sub),
-                checked = settings.groupThoughts,
-                onCheckedChange = { onEvent(SettingsEvent.GroupThoughtsChanged(it)) },
-                modifier = Modifier.testTag("settings_group_thoughts_switch"),
-            )
+            ChatOptionControl(ChatOption.GroupThoughts, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_show_cost),
-                subtitle = stringResource(Res.string.settings_show_cost_sub),
-                checked = settings.showCost,
-                onCheckedChange = { onEvent(SettingsEvent.ShowCostChanged(it)) },
-                modifier = Modifier.testTag("settings_show_cost_switch"),
-            )
+            ChatOptionControl(ChatOption.ShowCost, settings, onEvent)
             OcDivider()
-            ChoiceRow(
-                title = stringResource(Res.string.settings_header_line),
-                subtitle = stringResource(
-                    when (settings.chatHeaderLine) {
-                        ChatHeaderLine.FolderBranchFiles -> Res.string.settings_header_line_all_sub
-                        ChatHeaderLine.BranchFiles -> Res.string.settings_header_line_branch_sub
-                        ChatHeaderLine.Folder -> Res.string.settings_header_line_folder_sub
-                    },
-                ),
-                choices = listOf(
-                    OcSegment(ChatHeaderLine.FolderBranchFiles, stringResource(Res.string.settings_header_line_all), "settings_header_line_all"),
-                    OcSegment(ChatHeaderLine.BranchFiles, stringResource(Res.string.settings_header_line_branch), "settings_header_line_branch"),
-                    OcSegment(ChatHeaderLine.Folder, stringResource(Res.string.settings_header_line_folder), "settings_header_line_folder"),
-                ),
-                selected = settings.chatHeaderLine,
-                onSelect = { onEvent(SettingsEvent.ChatHeaderLineChanged(it)) },
-            )
-            // A folder path alone has no style and is not a line to tap.
-            if (settings.chatHeaderLine != ChatHeaderLine.Folder) {
+            ChatOptionControl(ChatOption.HeaderLine, settings, onEvent)
+            if (ChatOption.HeaderStyle.appliesTo(settings)) {
                 OcDivider()
-                ChoiceRow(
-                    title = stringResource(Res.string.settings_header_style),
-                    subtitle = stringResource(
-                        when (settings.chatHeaderStyle) {
-                            ChatHeaderStyle.Icons -> Res.string.settings_header_style_icons_sub
-                            ChatHeaderStyle.Short -> Res.string.settings_header_style_short_sub
-                            ChatHeaderStyle.Full -> Res.string.settings_header_style_full_sub
-                        },
-                    ),
-                    choices = listOf(
-                        OcSegment(ChatHeaderStyle.Icons, stringResource(Res.string.settings_header_style_icons), "settings_header_style_icons"),
-                        OcSegment(ChatHeaderStyle.Short, stringResource(Res.string.settings_header_style_short), "settings_header_style_short"),
-                        OcSegment(ChatHeaderStyle.Full, stringResource(Res.string.settings_header_style_full), "settings_header_style_full"),
-                    ),
-                    selected = settings.chatHeaderStyle,
-                    onSelect = { onEvent(SettingsEvent.ChatHeaderStyleChanged(it)) },
-                )
+                ChatOptionControl(ChatOption.HeaderStyle, settings, onEvent)
                 OcDivider()
-                ChoiceRow(
-                    title = stringResource(Res.string.settings_header_opens),
-                    subtitle = stringResource(Res.string.settings_header_opens_sub),
-                    choices = listOf(
-                        OcSegment(ChangesScope.Folder, stringResource(Res.string.settings_header_opens_folder), "settings_header_opens_folder"),
-                        OcSegment(ChangesScope.Session, stringResource(Res.string.settings_header_opens_session), "settings_header_opens_session"),
-                    ),
-                    selected = settings.headerOpens,
-                    onSelect = { onEvent(SettingsEvent.HeaderOpensChanged(it)) },
-                )
+                ChatOptionControl(ChatOption.HeaderOpens, settings, onEvent)
             }
             OcDivider()
             OcSwitchRow(
@@ -658,37 +548,13 @@ private fun ConversationSection(settings: AppSettings, onEvent: (SettingsEvent) 
                 modifier = Modifier.testTag("settings_confirm_stop_switch"),
             )
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_agent_outline),
-                subtitle = stringResource(Res.string.settings_agent_outline_sub),
-                checked = settings.agentColorOutline,
-                onCheckedChange = { onEvent(SettingsEvent.AgentColorOutlineChanged(it)) },
-                modifier = Modifier.testTag("settings_agent_outline_switch"),
-            )
+            ChatOptionControl(ChatOption.AgentOutline, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_questions_collapsed),
-                subtitle = stringResource(Res.string.settings_questions_collapsed_sub),
-                checked = settings.questionsCollapsed,
-                onCheckedChange = { onEvent(SettingsEvent.QuestionsCollapsedChanged(it)) },
-                modifier = Modifier.testTag("settings_questions_collapsed_switch"),
-            )
+            ChatOptionControl(ChatOption.QuestionsCollapsed, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_permissions_collapsed),
-                subtitle = stringResource(Res.string.settings_permissions_collapsed_sub),
-                checked = settings.permissionsCollapsed,
-                onCheckedChange = { onEvent(SettingsEvent.PermissionsCollapsedChanged(it)) },
-                modifier = Modifier.testTag("settings_permissions_collapsed_switch"),
-            )
+            ChatOptionControl(ChatOption.PermissionsCollapsed, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_dictation),
-                subtitle = stringResource(Res.string.settings_dictation_sub),
-                checked = settings.dictation,
-                onCheckedChange = { onEvent(SettingsEvent.DictationChanged(it)) },
-                modifier = Modifier.testTag("settings_dictation_switch"),
-            )
+            ChatOptionControl(ChatOption.Dictation, settings, onEvent)
             OcDivider()
             ChoiceRow(
                 title = stringResource(Res.string.settings_selection_apply),
@@ -770,29 +636,11 @@ private fun LiveActivitySection(settings: AppSettings, onEvent: (SettingsEvent) 
                 )
             }
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_full_commands),
-                subtitle = stringResource(Res.string.settings_full_commands_sub),
-                checked = settings.showFullCommands,
-                onCheckedChange = { onEvent(SettingsEvent.ShowFullCommandsChanged(it)) },
-                modifier = Modifier.testTag("settings_full_commands_switch"),
-            )
+            ChatOptionControl(ChatOption.FullCommands, settings, onEvent)
             OcDivider()
-            OcSwitchRow(
-                title = stringResource(Res.string.settings_tool_details),
-                subtitle = stringResource(Res.string.settings_tool_details_sub),
-                checked = settings.showToolDetails,
-                onCheckedChange = { onEvent(SettingsEvent.ShowToolDetailsChanged(it)) },
-                modifier = Modifier.testTag("settings_tool_details_switch"),
-            )
+            ChatOptionControl(ChatOption.ToolDetails, settings, onEvent)
             OcDivider()
-            ChoiceRow(
-                title = stringResource(Res.string.settings_output_lines),
-                subtitle = stringResource(Res.string.settings_output_lines_sub),
-                choices = OUTPUT_LINE_CHOICES.map { OcSegment(it, it.toString(), "settings_output_lines_$it") },
-                selected = settings.outputPreviewLines,
-                onSelect = { onEvent(SettingsEvent.OutputPreviewLinesChanged(it)) },
-            )
+            ChatOptionControl(ChatOption.OutputLines, settings, onEvent)
             if (settings.followRunningTools) {
                 OcDivider()
                 OcSwitchRow(

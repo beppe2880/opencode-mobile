@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.lifecycle.viewModelScope
+import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -38,6 +39,7 @@ class SettingsViewModel(
             SettingsEvent.Back -> sendEffect(SettingsEffect.NavigateBack)
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
             SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
+            SettingsEvent.OpenCustomizer -> sendEffect(SettingsEffect.OpenCustomizer)
             is SettingsEvent.SelectServer -> viewModelScope.launch { servers.activate(event.serverId) }
             is SettingsEvent.RequestRename -> updateState { it.copy(renaming = event.server) }
             is SettingsEvent.RequestRemove -> updateState { it.copy(removing = event.server) }
@@ -59,42 +61,6 @@ class SettingsViewModel(
                 updateState { it.copy(removing = null) }
                 viewModelScope.launch { servers.remove(server.id) }
             }
-            is SettingsEvent.ThemeChanged -> update { it.copy(theme = event.theme) }
-            is SettingsEvent.ShowReasoningChanged -> update { it.copy(showReasoning = event.enabled) }
-            is SettingsEvent.ExpandToolsChanged -> update { it.copy(expandToolsByDefault = event.enabled) }
-            is SettingsEvent.FollowRunningToolsChanged -> update { it.copy(followRunningTools = event.enabled) }
-            is SettingsEvent.LiveThinkingChanged -> update { it.copy(liveThinking = event.enabled) }
-            is SettingsEvent.LiveShellChanged -> update { it.copy(liveShell = event.enabled) }
-            is SettingsEvent.LiveEditsChanged -> update { it.copy(liveEdits = event.enabled) }
-            is SettingsEvent.LiveReadsChanged -> update { it.copy(liveReads = event.enabled) }
-            is SettingsEvent.LiveOtherChanged -> update { it.copy(liveOther = event.enabled) }
-            is SettingsEvent.ShowFullCommandsChanged -> update { it.copy(showFullCommands = event.enabled) }
-            is SettingsEvent.ShowToolDetailsChanged -> update { it.copy(showToolDetails = event.enabled) }
-            is SettingsEvent.TerminalOpenKeyboardChanged -> update { it.copy(terminalOpenKeyboard = event.enabled) }
-            is SettingsEvent.TerminalFullscreenByDefaultChanged -> update { it.copy(terminalFullscreenByDefault = event.enabled) }
-            is SettingsEvent.SplitViewChanged -> update { it.copy(splitView = event.enabled) }
-            is SettingsEvent.ListPaneFractionChanged -> update { it.copy(listPaneFraction = event.fraction) }
-            is SettingsEvent.ListPaneHandleChanged -> update { it.copy(listPaneHandle = event.enabled) }
-            is SettingsEvent.BackShowsListChanged -> update { it.copy(backShowsList = event.enabled) }
-            is SettingsEvent.OutputPreviewLinesChanged -> update { it.copy(outputPreviewLines = event.lines) }
-            is SettingsEvent.LiveOutputIntervalChanged -> update { it.copy(liveOutputIntervalMs = event.millis) }
-            is SettingsEvent.KeepLiveStepsOpenChanged -> update { it.copy(keepLiveStepsOpen = event.enabled) }
-            is SettingsEvent.ChatTextScaleChanged -> update { it.copy(chatTextScale = event.scale) }
-            is SettingsEvent.ShowCostChanged -> update { it.copy(showCost = event.enabled) }
-            is SettingsEvent.ChatHeaderLineChanged -> update { it.copy(chatHeaderLine = event.line) }
-            is SettingsEvent.HeaderOpensChanged -> update { it.copy(headerOpens = event.scope) }
-            is SettingsEvent.ChatHeaderStyleChanged -> update { it.copy(chatHeaderStyle = event.style) }
-            is SettingsEvent.SwipeBetweenChatsChanged -> update { it.copy(swipeBetweenChats = event.enabled) }
-            is SettingsEvent.RunningInListChanged -> update { it.copy(showRunningWorkInList = event.enabled) }
-            is SettingsEvent.ConfirmStopChanged -> update { it.copy(confirmStopCommand = event.enabled) }
-            is SettingsEvent.AgentColorOutlineChanged -> update { it.copy(agentColorOutline = event.enabled) }
-            is SettingsEvent.DictationChanged -> update { it.copy(dictation = event.enabled) }
-            is SettingsEvent.SelectionApplyChanged -> update { it.copy(selectionApply = event.apply) }
-            is SettingsEvent.NewChatModelChanged -> update { it.copy(newChatModel = event.model) }
-            is SettingsEvent.GroupActivityChanged -> update { it.copy(groupActivity = event.enabled) }
-            is SettingsEvent.GroupThoughtsChanged -> update { it.copy(groupThoughts = event.enabled) }
-            is SettingsEvent.QuestionsCollapsedChanged -> update { it.copy(questionsCollapsed = event.enabled) }
-            is SettingsEvent.PermissionsCollapsedChanged -> update { it.copy(permissionsCollapsed = event.enabled) }
             is SettingsEvent.NotificationsChanged -> when {
                 !event.enabled || currentState.notificationsAllowed -> update { it.copy(notifications = event.enabled) }
                 else -> {
@@ -105,10 +71,6 @@ class SettingsViewModel(
                     )
                 }
             }
-            is SettingsEvent.NotifyPermissionsChanged -> update { it.copy(notifyPermissions = event.enabled) }
-            is SettingsEvent.NotifyQuestionsChanged -> update { it.copy(notifyQuestions = event.enabled) }
-            is SettingsEvent.NotifyFinishedChanged -> update { it.copy(notifyFinished = event.enabled) }
-            is SettingsEvent.CheckForUpdatesChanged -> update { it.copy(checkForUpdates = event.enabled) }
             is SettingsEvent.NotificationAccess -> {
                 updateState {
                     it.copy(
@@ -120,10 +82,12 @@ class SettingsViewModel(
                 if (event.allowed && awaitingPermission) update { it.copy(notifications = true) }
                 if (event.allowed || event.blocked) awaitingPermission = false
             }
+            // Switches and choices of a single setting.
+            else -> update { it.updatedBy(event) ?: it }
         }
     }
 
-    private fun update(transform: (io.github.beppe2880.opencodemobile.core.domain.AppSettings) -> io.github.beppe2880.opencodemobile.core.domain.AppSettings) {
+    private fun update(transform: (AppSettings) -> AppSettings) {
         viewModelScope.launch { settings.update(transform) }
     }
 

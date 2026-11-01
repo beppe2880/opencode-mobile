@@ -14,6 +14,7 @@ fun SettingsRoute(
     onAddServer: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenUsage: () -> Unit = {},
+    onOpenCustomizer: () -> Unit = {},
     /** The offline demo: no real servers, and notification access is simulated. */
     demo: Boolean = false,
 ) {
@@ -32,6 +33,7 @@ fun SettingsRoute(
             SettingsEffect.NavigateBack -> onBack()
             SettingsEffect.OpenConnect -> onAddServer()
             SettingsEffect.OpenUsage -> onOpenUsage()
+            SettingsEffect.OpenCustomizer -> onOpenCustomizer()
             SettingsEffect.RequestNotificationPermission ->
                 if (!demo) notifications.request() else viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = true))
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()

@@ -26,4 +26,13 @@
     <string name="oc_working">Working</string>
     <string name="oc_running_agents">Subagents: %1$d</string>
     <string name="oc_running_commands">Commands: %1$d</string>
+    <string name="oc_chat_part_header">Title and header line</string>
+    <string name="oc_chat_part_messages">Messages</string>
+    <string name="oc_chat_part_thoughts">Thinking</string>
+    <string name="oc_chat_part_tools">Tool rows</string>
+    <string name="oc_chat_part_activity">Grouped activity</string>
+    <string name="oc_chat_part_footer">Answer footer</string>
+    <string name="oc_chat_part_pending">Permission and question cards</string>
+    <string name="oc_chat_part_composer">Composer and agent chip</string>
+    <string name="oc_chat_part_customize">Customize</string>
 </resources>

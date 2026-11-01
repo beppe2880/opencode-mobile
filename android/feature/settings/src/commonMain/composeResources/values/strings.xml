@@ -178,4 +178,11 @@
     <string name="settings_back_shows_list_sub">When the session list is hidden, Back shows it again instead of leaving the app</string>
     <string name="settings_demo_server">Demo</string>
     <string name="settings_demo_server_hint">Sample sessions · no server</string>
+    <string name="settings_customize_chat">Customize the chat</string>
+    <string name="settings_customize_chat_sub">See a sample chat and tap a part of it to change how it looks</string>
+    <string name="customize_hint">Tap a part of the chat to change how it looks. Changes are saved right away.</string>
+    <string name="customize_parts">Parts of the chat</string>
+    <string name="customize_marks_show">Show edit marks</string>
+    <string name="customize_marks_hide">Hide edit marks</string>
+    <string name="customize_close">Close options</string>
 </resources>

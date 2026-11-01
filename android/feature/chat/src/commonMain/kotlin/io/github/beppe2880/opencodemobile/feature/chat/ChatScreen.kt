@@ -208,7 +208,7 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatTopBar(
+internal fun ChatTopBar(
     state: ChatState,
     showBack: Boolean,
     onBack: () -> Unit,
@@ -218,6 +218,7 @@ private fun ChatTopBar(
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
     onRunning: () -> Unit,
+    applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
     var menuOpen by remember { mutableStateOf(false) }
@@ -289,6 +290,7 @@ private fun ChatTopBar(
                 }
             }
         },
+        applyStatusBarInset = applyStatusBarInset,
     )
 }
 

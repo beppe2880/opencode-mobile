@@ -116,8 +116,11 @@ Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Thr
   "Build · Model · 3s · $0.002" with copy; "Working…" row while running; permission card pinned above
   the composer; composer card with agent chip, model chip, send / stop and Steer / Queue choice
   while the agent runs.
-- **Settings**: servers card (active badge, overflow menu), theme segmented control,
-  conversation switches, about rows (app, server and OpenCode API versions).
+- **Settings**: "Customize the chat" row on top, servers card (active badge, overflow menu),
+  theme segmented control, conversation switches, about rows (app, server and OpenCode API versions).
+- **Chat customizer**: the real chat components (`ChatPreview`) drawn from sample data and the
+  current settings; every part has a dashed outline and an edit badge (hidden from the top bar) and
+  opens only its options, docked under the preview on narrow windows and beside it on wide ones.
 - **Adaptive**: at >= 840dp width Sessions and Chat are shown side by side; single-pane content
   is limited to 760dp and centered.
 

@@ -142,6 +142,41 @@ object SampleData {
         ),
     )
 
+    /**
+     * One short turn with something for every chat display setting: two thoughts in a row, a
+     * shell command with a long output, a read, the answer and its cost (the chat customizer).
+     */
+    val customizeTranscript: List<Message> = listOf(
+        Message.User("msg_c_u1", NOW - 4 * MINUTE, "Run the cart tests and fix whatever fails."),
+        Message.Assistant(
+            id = "msg_c_a1",
+            createdAt = NOW - 4 * MINUTE + 300,
+            agent = "build",
+            model = haiku,
+            parts = listOf(
+                Part.Reasoning(0, "The user wants the cart tests to pass. I'll run them first to see what fails.", startedAt = NOW - 4 * MINUTE + 400, completedAt = NOW - 4 * MINUTE + 2_400),
+                Part.Reasoning(1, "Only the coupon tests run in the cart module, so a module-wide run is quick.", startedAt = NOW - 4 * MINUTE + 2_400, completedAt = NOW - 4 * MINUTE + 3_400),
+                Part.Tool(
+                    "call_c1",
+                    "bash",
+                    ToolStatus.Completed,
+                    """{"command":"./gradlew :cart:test --tests 'shop.cart.CouponTest' --console=plain","description":"Run the cart tests"}""",
+                    output = (1..14).joinToString("\n") {
+                        "CouponTest > case $it PASSED"
+                    } + "\nCouponTest > rounds the discount down FAILED\n\n15 tests completed, 1 failed",
+                    startedAt = NOW - 4 * MINUTE + 3_500,
+                    completedAt = NOW - 4 * MINUTE + 9_500,
+                ),
+                Part.Tool("call_c2", "read", ToolStatus.Completed, """{"filePath":"/home/user/code/shop/src/cart/Coupon.kt"}""", output = "15:     fun apply(subtotal: Long): Long = subtotal - subtotal * percent / 100", startedAt = NOW - 4 * MINUTE + 9_600, completedAt = NOW - 4 * MINUTE + 9_700),
+                Part.Text(2, "One test fails: `Coupon.apply` rounds the discount up instead of down. I'll fix it, clear the build folder and run the tests again."),
+            ),
+            completedAt = NOW - 4 * MINUTE + 14_000,
+            finish = "stop",
+            cost = 0.0042,
+            tokens = TokenUsage(input = 11_000, output = 260),
+        ),
+    )
+
     val permission = PermissionRequest(
         id = "per_1",
         sessionId = "ses_1",

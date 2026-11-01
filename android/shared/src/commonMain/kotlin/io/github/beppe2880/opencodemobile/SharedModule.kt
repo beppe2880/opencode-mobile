@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.feature.files.FileViewerViewModel
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsViewModel
+import io.github.beppe2880.opencodemobile.feature.settings.customize.CustomizeViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageViewModel
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
@@ -28,6 +29,7 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get(), get(), get()) }
     viewModel { UsageViewModel(get(), get()) }
+    viewModel { CustomizeViewModel(get()) }
     viewModelOf(::UpdateNoticeViewModel)
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
