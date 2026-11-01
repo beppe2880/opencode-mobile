@@ -157,8 +157,6 @@
     <string name="settings_server_version">서버 버전</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">사용 불가</string>
-    <string name="settings_check_updates">업데이트 확인</string>
-    <string name="settings_check_updates_sub">앱을 열 때 하루에 최대 한 번 새 버전을 확인하고 알림을 표시합니다</string>
     <string name="update_available">버전 %1$s 사용 가능</string>
     <string name="update_view">보기</string>
     <string name="update_release_notes">릴리스 노트</string>

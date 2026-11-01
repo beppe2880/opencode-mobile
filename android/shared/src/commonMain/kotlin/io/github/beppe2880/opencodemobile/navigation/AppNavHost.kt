@@ -63,8 +63,11 @@ import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRoute
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeSample
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateSheetRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
@@ -274,6 +277,8 @@ private fun SessionsListDetail(
         selectedServerId = activeServerId
     }
     var listHidden by rememberSaveable { mutableStateOf(false) }
+    // Outside the list, which may scroll the banner slot away; the demos never look for updates.
+    if (!demo) UpdateSheetRoute()
     BoxWithConstraints(Modifier.fillMaxSize()) {
         if (maxWidth < ListDetailMinWidth || !appSettings.splitView) {
             SessionsRoute(
@@ -405,10 +410,18 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
 
 private val HandleWidth = 24.dp
 
-/** The notice of a new app release, at the top of the session list. */
+/**
+ * The banner of a new app release, at the top of the session list. The live demo never looks for
+ * releases: it shows a sample of the notice instead, to reach its options.
+ */
 @Composable
 private fun UpdateBanner() {
-    UpdateNoticeRoute(
-        Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateBanner, LocalEditMode.current),
-    )
+    val editMode = LocalEditMode.current
+    val modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateNotice, editMode)
+    if (editMode != null) {
+        val style = koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle().value.updateNotice
+        UpdateNoticeSample(style, koinInject<AppInfo>().updateTarget, modifier, compact = true)
+    } else {
+        UpdateNoticeRoute(modifier)
+    }
 }

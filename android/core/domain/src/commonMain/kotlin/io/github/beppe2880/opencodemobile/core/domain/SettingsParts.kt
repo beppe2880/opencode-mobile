@@ -74,7 +74,7 @@ enum class SettingsPart(val area: SettingsArea) {
     PermissionNotification(SettingsArea.Notifications),
     QuestionNotification(SettingsArea.Notifications),
     FinishedNotification(SettingsArea.Notifications),
-    UpdateBanner(SettingsArea.Updates),
+    UpdateNotice(SettingsArea.Updates),
     ;
 
     companion object {

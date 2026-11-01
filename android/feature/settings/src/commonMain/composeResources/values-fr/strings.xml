@@ -160,8 +160,6 @@
     <string name="settings_server_version">Version du serveur</string>
     <string name="settings_api_version">API OpenCode</string>
     <string name="settings_unknown">Indisponible</string>
-    <string name="settings_check_updates">Rechercher les mises à jour</string>
-    <string name="settings_check_updates_sub">À l'ouverture de l'application, au plus une fois par jour, recherche une nouvelle version et affiche un avis</string>
     <string name="update_available">La version %1$s est disponible</string>
     <string name="update_view">Voir</string>
     <string name="update_release_notes">Notes de version</string>

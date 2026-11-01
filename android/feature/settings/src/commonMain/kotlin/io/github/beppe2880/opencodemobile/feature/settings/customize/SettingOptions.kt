@@ -51,7 +51,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     NotifyPermissions(listOf("notifyPermissions"), requires = Notifications),
     NotifyQuestions(listOf("notifyQuestions"), requires = Notifications),
     NotifyFinished(listOf("notifyFinished"), requires = Notifications),
-    CheckUpdates(listOf("checkForUpdates")),
+    UpdateNotice(listOf("updateNotice")),
     ;
 
     /** The part whose options include this one first: where a search result opens. */
@@ -111,7 +111,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.PermissionNotification -> listOf(SettingOption.NotifyPermissions)
         SettingsPart.QuestionNotification -> listOf(SettingOption.NotifyQuestions)
         SettingsPart.FinishedNotification -> listOf(SettingOption.NotifyFinished)
-        SettingsPart.UpdateBanner -> listOf(SettingOption.CheckUpdates)
+        SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice)
     }
 
 /**
@@ -162,7 +162,7 @@ val EDIT_MODE_PARTS: List<SettingsPart> = listOf(
     SettingsPart.SessionRows,
     SettingsPart.NewChat,
     SettingsPart.SplitView,
-    SettingsPart.UpdateBanner,
+    SettingsPart.UpdateNotice,
     SettingsPart.KeyBar,
     SettingsPart.TerminalFullscreen,
 )

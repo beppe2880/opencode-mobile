@@ -160,8 +160,6 @@
     <string name="settings_server_version">Versão do servidor</string>
     <string name="settings_api_version">API do OpenCode</string>
     <string name="settings_unknown">Indisponível</string>
-    <string name="settings_check_updates">Verificar atualizações</string>
-    <string name="settings_check_updates_sub">Ao abrir o app, no máximo uma vez por dia, procura uma nova versão e mostra um aviso</string>
     <string name="update_available">A versão %1$s está disponível</string>
     <string name="update_view">Ver</string>
     <string name="update_release_notes">Notas da versão</string>

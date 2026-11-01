@@ -157,8 +157,6 @@
     <string name="settings_server_version">サーバーのバージョン</string>
     <string name="settings_api_version">OpenCode API</string>
     <string name="settings_unknown">利用不可</string>
-    <string name="settings_check_updates">アップデートを確認</string>
-    <string name="settings_check_updates_sub">アプリの起動時に、1日1回まで新しいバージョンを確認し、通知を表示します</string>
     <string name="update_available">バージョン %1$s が利用可能です</string>
     <string name="update_view">表示</string>
     <string name="update_release_notes">リリースノート</string>
