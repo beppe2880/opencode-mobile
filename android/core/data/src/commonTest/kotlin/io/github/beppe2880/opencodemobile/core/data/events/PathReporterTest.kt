@@ -9,7 +9,7 @@ class PathReporterTest {
     private val cellular = setOf("pdp_ip0")
 
     @Test
-    fun `the first path is always reported, usable or not`() {
+    fun `the first path is always reported usable or not`() {
         assertEquals(true, PathReporter().onPath(true, wifi))
         assertEquals(false, PathReporter().onPath(false, emptySet()))
     }
