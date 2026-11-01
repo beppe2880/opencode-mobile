@@ -110,8 +110,9 @@ ANDROID_SERIAL=<serial> ./gradlew :app:installDebug
 ```
 
 Before finishing: `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug`
-and `./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64` (what CI runs; iOS klibs
-compile on Linux too), plus `bun run check` in `../tools/api-gen` when the API changed.
+and `./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileTestKotlinIosSimulatorArm64`
+(what CI runs; iOS klibs compile on Linux too, and the test compile rejects test names Kotlin/Native
+does not accept, such as names with commas), plus `bun run check` in `../tools/api-gen` when the API changed.
 
 ### iOS
 
