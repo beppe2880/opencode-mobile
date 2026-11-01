@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">Другие инструменты выполняются</string>
     <string name="oc_part_composer">Композер и чип агента</string>
     <string name="oc_part_selection">Смена агента и модели</string>
+    <string name="oc_part_voice">Голосовой ввод</string>
     <string name="oc_part_new_chat">Новый чат</string>
     <string name="oc_part_session_rows">Строки сессий</string>
     <string name="oc_part_swipe">Перелистывать чаты</string>

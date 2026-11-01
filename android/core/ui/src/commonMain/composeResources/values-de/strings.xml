@@ -52,6 +52,7 @@
     <string name="oc_part_live_other">Andere Werkzeuge laufen</string>
     <string name="oc_part_composer">Eingabe und Agent-Chip</string>
     <string name="oc_part_selection">Agent- und Modelländerungen</string>
+    <string name="oc_part_voice">Spracheingabe</string>
     <string name="oc_part_new_chat">Neuer Chat</string>
     <string name="oc_part_session_rows">Sitzungszeilen</string>
     <string name="oc_part_swipe">Zwischen Chats wischen</string>
