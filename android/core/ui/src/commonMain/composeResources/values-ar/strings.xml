@@ -63,7 +63,7 @@
     <string name="oc_part_notify_permission">طلب إذن</string>
     <string name="oc_part_notify_question">سؤال</string>
     <string name="oc_part_notify_finished">انتهت الجلسة</string>
-    <string name="oc_part_update">شريط التحديث</string>
+    <string name="oc_part_update">إشعار التحديث</string>
     <string name="oc_part_customize">تخصيص</string>
     <string name="oc_shared_title">تمت مشاركته مع OpenCode</string>
     <plurals name="oc_shared_images">

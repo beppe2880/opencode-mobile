@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,7 +81,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_BACK_SHOWS_LIST, next.backShowsList)
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
-        prefs.putBoolean(KEY_CHECK_UPDATES, next.checkForUpdates)
+        prefs.putString(KEY_UPDATE_NOTICE, next.updateNotice.name)
+        // Kept for older versions of the app, which only had the switch.
+        prefs.putBoolean(KEY_CHECK_UPDATES, next.updateNotice != UpdateNoticeStyle.Off)
         prefs.putBoolean(KEY_EDIT_MARKS, next.showEditMarks)
         prefs.putString(KEY_SETTINGS_STYLE, next.settingsStyle.name)
         val previewFraction = next.settingsPreviewFraction
@@ -136,7 +139,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             terminalFullscreenByDefault = prefs.getBoolean(KEY_TERMINAL_FULLSCREEN, defaults.terminalFullscreenByDefault),
             splitView = prefs.getBoolean(KEY_SPLIT_VIEW, defaults.splitView),
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
-            checkForUpdates = prefs.getBoolean(KEY_CHECK_UPDATES, defaults.checkForUpdates),
+            updateNotice = UpdateNoticeStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UPDATE_NOTICE) }
+                // Before the choice there was a switch: off stays off.
+                ?: if (prefs.getBooleanOrNull(KEY_CHECK_UPDATES) == false) UpdateNoticeStyle.Off else defaults.updateNotice,
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
             showEditMarks = prefs.getBoolean(KEY_EDIT_MARKS, defaults.showEditMarks),
             settingsStyle = SettingsStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SETTINGS_STYLE) } ?: defaults.settingsStyle,
@@ -197,6 +202,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIST_PANE_FRACTION = "list_pane_fraction"
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
+        const val KEY_UPDATE_NOTICE = "update_notice"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         const val KEY_EDIT_MARKS = "settings_edit_marks"
         const val KEY_SETTINGS_STYLE = "settings_style"

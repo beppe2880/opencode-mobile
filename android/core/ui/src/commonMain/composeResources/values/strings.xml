@@ -63,7 +63,7 @@
     <string name="oc_part_notify_permission">Permission request</string>
     <string name="oc_part_notify_question">Question</string>
     <string name="oc_part_notify_finished">Session finished</string>
-    <string name="oc_part_update">Update banner</string>
+    <string name="oc_part_update">Update notice</string>
     <string name="oc_part_customize">Customize</string>
     <string name="oc_shared_title">Shared with OpenCode</string>
     <plurals name="oc_shared_images">

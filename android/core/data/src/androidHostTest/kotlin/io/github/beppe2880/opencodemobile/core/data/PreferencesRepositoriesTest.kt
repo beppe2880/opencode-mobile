@@ -15,6 +15,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -50,9 +51,9 @@ class PreferencesRepositoriesTest {
             listPaneHandle = false,
             selectionApply = SelectionApply.Immediately,
             newChatModel = NewChatModel.ServerDefault,
+            updateNotice = UpdateNoticeStyle.Banner,
             showInShareMenu = false,
             shareOpens = ShareOpens.ChooseChat,
-            checkForUpdates = false,
             backShowsList = false,
             showEditMarks = false,
             settingsStyle = SettingsStyle.Preview,
@@ -81,11 +82,33 @@ class PreferencesRepositoriesTest {
             .putString("settings_style", "Cards")
             .putString("share_opens", "Ask")
             .putFloat("settings_preview_fraction", 3f)
+            .putString("update_notice", "Popup")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
 
         assertEquals(AppSettings(), settings)
+    }
+
+    @Test
+    fun `the former update switch becomes the update notice`() = runBlocking {
+        fun noticeWith(edit: (android.content.SharedPreferences.Editor) -> Unit): UpdateNoticeStyle {
+            val prefs = InMemoryPreferences()
+            prefs.edit().also(edit).commit()
+            return PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.updateNotice
+        }
+        assertEquals(UpdateNoticeStyle.Off, noticeWith { it.putBoolean("check_for_updates", false) })
+        assertEquals(UpdateNoticeStyle.Window, noticeWith { it.putBoolean("check_for_updates", true) })
+        assertEquals(UpdateNoticeStyle.Window, noticeWith { })
+        // Once chosen, the choice wins over the former switch.
+        assertEquals(UpdateNoticeStyle.Banner, noticeWith { it.putBoolean("check_for_updates", false).putString("update_notice", "Banner") })
+
+        // Older versions of the app still read the switch.
+        val prefs = InMemoryPreferences()
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(updateNotice = UpdateNoticeStyle.Off) }
+        assertEquals(false, prefs.values["check_for_updates"])
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(updateNotice = UpdateNoticeStyle.Banner) }
+        assertEquals(true, prefs.values["check_for_updates"])
     }
 
     @Test

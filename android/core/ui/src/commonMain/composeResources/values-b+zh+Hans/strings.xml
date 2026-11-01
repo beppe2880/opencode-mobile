@@ -63,7 +63,7 @@
     <string name="oc_part_notify_permission">权限请求</string>
     <string name="oc_part_notify_question">问题</string>
     <string name="oc_part_notify_finished">会话已完成</string>
-    <string name="oc_part_update">更新横幅</string>
+    <string name="oc_part_update">更新提示</string>
     <string name="oc_part_customize">自定义</string>
     <string name="oc_shared_title">已与 OpenCode 共享</string>
     <plurals name="oc_shared_images">

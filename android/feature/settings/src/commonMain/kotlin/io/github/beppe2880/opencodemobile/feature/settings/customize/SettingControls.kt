@@ -24,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
@@ -39,8 +40,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_check_updates_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
@@ -156,6 +155,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_th
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_off_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window_sub
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
@@ -206,7 +212,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.NotifyPermissions -> Res.string.settings_notify_permissions
         SettingOption.NotifyQuestions -> Res.string.settings_notify_questions
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished
-        SettingOption.CheckUpdates -> Res.string.settings_check_updates
+        SettingOption.UpdateNotice -> Res.string.settings_update_notice
     }
 
 /** What the option does, for search; the controls may show a variant for the current value. */
@@ -255,7 +261,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.NotifyPermissions -> Res.string.settings_notify_permissions_sub
         SettingOption.NotifyQuestions -> Res.string.settings_notify_questions_sub
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished_sub
-        SettingOption.CheckUpdates -> Res.string.settings_check_updates_sub
+        SettingOption.UpdateNotice -> Res.string.settings_update_notice_window_sub
     }
 
 /** The switch, choice or slider of [option]; [onEvent] receives the same events everywhere in Settings. */
@@ -465,7 +471,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.NotifyPermissions -> switch(settings.notifyPermissions, SettingsEvent::NotifyPermissionsChanged)()
         SettingOption.NotifyQuestions -> switch(settings.notifyQuestions, SettingsEvent::NotifyQuestionsChanged)()
         SettingOption.NotifyFinished -> switch(settings.notifyFinished, SettingsEvent::NotifyFinishedChanged)()
-        SettingOption.CheckUpdates -> switch(settings.checkForUpdates, SettingsEvent::CheckForUpdatesChanged)()
+        SettingOption.UpdateNotice -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.updateNotice) {
+                    UpdateNoticeStyle.Window -> Res.string.settings_update_notice_window_sub
+                    UpdateNoticeStyle.Banner -> Res.string.settings_update_notice_banner_sub
+                    UpdateNoticeStyle.Off -> Res.string.settings_update_notice_off_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(UpdateNoticeStyle.Window, stringResource(Res.string.settings_update_notice_window), "settings_update_notice_window"),
+                OcSegment(UpdateNoticeStyle.Banner, stringResource(Res.string.settings_update_notice_banner), "settings_update_notice_banner"),
+                OcSegment(UpdateNoticeStyle.Off, stringResource(Res.string.settings_update_notice_off), "settings_update_notice_off"),
+            ),
+            selected = settings.updateNotice,
+            onSelect = { onEvent(SettingsEvent.UpdateNoticeChanged(it)) },
+        )
     }
 }
 
@@ -503,6 +525,5 @@ private val SettingOption.tag: String
         SettingOption.NotifyPermissions -> "notify_permissions"
         SettingOption.NotifyQuestions -> "notify_questions"
         SettingOption.NotifyFinished -> "notify_finished"
-        SettingOption.CheckUpdates -> "check_updates"
         else -> name.lowercase()
     }

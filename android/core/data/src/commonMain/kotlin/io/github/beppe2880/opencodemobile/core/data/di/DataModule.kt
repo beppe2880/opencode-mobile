@@ -99,6 +99,6 @@ val dataModule = module {
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }
     single<UpdateRepository> {
         val releases = GitHubReleases()
-        GitHubUpdateRepository(releases::latest, get(SettingsStore))
+        GitHubUpdateRepository(releases::recent, get(SettingsStore))
     }
 }

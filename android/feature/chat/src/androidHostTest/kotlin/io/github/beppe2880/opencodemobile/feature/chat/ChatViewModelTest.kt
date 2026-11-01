@@ -1284,6 +1284,61 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a running bash tool loaded without its shell id shows live output from the session shells`() = runTest(main.testDispatcher) {
+        // As the server stores it (2.2.1): no shellID; the shell list names the session instead.
+        val bash = Part.Tool("c1", "shell", ToolStatus.Running, input = """{"command":"for i in 1 2; do echo line ${'$'}i; done"}""", startedAt = 5)
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))
+        chat.runningCommands = listOf(
+            RunningCommand("sh_other", "for i in 1 2; do echo line \$i; done", "/repo", 6, sessionId = "s2"),
+            RunningCommand("sh_1", "for i in 1 2; do echo line \$i; done", "/repo", 6, sessionId = "s1"),
+        )
+        chat.shellPages += listOf("line 1\n", "line 2\n")
+        val vm = vm()
+        runCurrent()
+        assertTrue(chat.shellReads.isEmpty())
+
+        vm.onEvent(ChatEvent.Visible(true))
+        try {
+            runCurrent()
+            advanceTimeBy(700)
+            runCurrent()
+
+            assertEquals("line 1\nline 2\n", vm.tool("c1").output)
+            assertEquals(listOf("sh_1" to 0L, "sh_1" to 7L), chat.shellReads.take(2))
+        } finally {
+            // Stops both polls, so a failure ends the test instead of running them forever.
+            events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "line 1\nline 2\n", emptyMap(), 9))
+            vm.onEvent(ChatEvent.Visible(false))
+            runCurrent()
+        }
+    }
+
+    @Test
+    fun `a reload that drops the shell id keeps reading the same shell from the cursor`() = runTest(main.testDispatcher) {
+        val stored = Part.Tool("c1", "shell", ToolStatus.Running, input = """{"command":"make"}""")
+        chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(stored.copy(metadata = mapOf("shellID" to "sh_1"))))
+        chat.shellPages += listOf("line 1\n", "line 2\n")
+        val vm = vm()
+        try {
+            runCurrent()
+            assertEquals(listOf("sh_1" to 0L), chat.shellReads)
+
+            // Reconnected: the transcript comes back from the server without the id.
+            chat.transcript = chat.transcript.map { if (it is Message.Assistant) it.copy(parts = listOf(stored)) else it }
+            events.flow.emit(ServerEvent.Connected)
+            runCurrent()
+            advanceTimeBy(700)
+            runCurrent()
+
+            assertEquals(listOf("sh_1" to 0L, "sh_1" to 7L), chat.shellReads.take(2))
+            assertEquals("line 1\nline 2\n", vm.tool("c1").output)
+        } finally {
+            events.flow.emit(ServerEvent.ToolSucceeded("s1", "a1", "c1", "", emptyMap(), 9))
+            runCurrent()
+        }
+    }
+
+    @Test
     fun `shell output pauses while the chat is hidden and resumes from the cursor`() = runTest(main.testDispatcher) {
         val bash = Part.Tool("c1", "bash", ToolStatus.Running, input = "{}", metadata = mapOf("shellID" to "sh_1"))
         chat.transcript = chat.transcript + Message.Assistant("a1", 5, "build", model, listOf(bash))

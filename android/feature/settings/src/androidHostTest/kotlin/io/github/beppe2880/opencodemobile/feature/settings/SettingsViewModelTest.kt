@@ -16,6 +16,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
@@ -87,9 +88,9 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
         vm.onEvent(SettingsEvent.SelectionApplyChanged(SelectionApply.Immediately))
         vm.onEvent(SettingsEvent.NewChatModelChanged(NewChatModel.ServerDefault))
+        vm.onEvent(SettingsEvent.UpdateNoticeChanged(UpdateNoticeStyle.Banner))
         vm.onEvent(SettingsEvent.ShowInShareMenuChanged(false))
         vm.onEvent(SettingsEvent.ShareOpensChanged(ShareOpens.ChooseChat))
-        vm.onEvent(SettingsEvent.CheckForUpdatesChanged(false))
         vm.onEvent(SettingsEvent.BackShowsListChanged(false))
         advanceUntilIdle()
 
@@ -129,7 +130,7 @@ class SettingsViewModelTest {
                 groupThoughts = false,
                 questionsCollapsed = true,
                 permissionsCollapsed = true,
-                checkForUpdates = false,
+                updateNotice = UpdateNoticeStyle.Banner,
                 backShowsList = false,
             ),
             settings.settings.value,

@@ -431,8 +431,11 @@ data class AppSettings(
     val listPaneFraction: Float? = null,
     /** With [splitView]: a handle on the divider hides the list or resizes it by dragging. */
     val listPaneHandle: Boolean = true,
-    /** At launch, at most once a day, look for a newer release of the app on GitHub. */
-    val checkForUpdates: Boolean = true,
+    /**
+     * How a newer release of the app is announced; the app looks for one on GitHub at launch, at
+     * most once a day, unless [UpdateNoticeStyle.Off].
+     */
+    val updateNotice: UpdateNoticeStyle = UpdateNoticeStyle.Window,
     /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
     val backShowsList: Boolean = true,
     /** The previews in Settings outline the parts that can be tapped and mark them with a pencil. */

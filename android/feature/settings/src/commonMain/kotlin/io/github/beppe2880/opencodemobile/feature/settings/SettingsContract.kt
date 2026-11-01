@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
@@ -129,7 +130,7 @@ sealed interface SettingsEvent {
     data class NotifyPermissionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
-    data class CheckForUpdatesChanged(val enabled: Boolean) : SettingsEvent
+    data class UpdateNoticeChanged(val style: UpdateNoticeStyle) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent

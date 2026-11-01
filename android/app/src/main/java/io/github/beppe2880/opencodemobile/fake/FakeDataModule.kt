@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.data.share.StoredShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AppUpdate
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
@@ -108,7 +109,7 @@ val fakeDataModule = module {
     single<TerminalRepository> { FakeTerminals() }
     single<UpdateRepository> {
         object : UpdateRepository {
-            override suspend fun availableUpdate(installedVersion: String): AppRelease? = null
+            override suspend fun availableUpdate(installedVersion: String): AppUpdate? = null
             override suspend fun dismiss(release: AppRelease) = Unit
         }
     }

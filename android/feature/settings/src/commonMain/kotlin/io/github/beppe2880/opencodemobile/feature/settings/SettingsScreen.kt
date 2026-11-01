@@ -290,7 +290,7 @@ private fun SettingsHome(
                 item(key = "servers") { ServersSection(state, onEvent, demo) }
                 if (state.activeServerId != null) item(key = "usage") { UsageSection(onEvent) }
                 item(key = "reset") { ResetSection(onEvent) }
-                item(key = "about") { AboutSection(state, onEvent, checkForUpdates = false) }
+                item(key = "about") { AboutSection(state, onEvent, showUpdateNotice = false) }
             }
         }
     }
@@ -539,7 +539,7 @@ internal fun ResetSection(onEvent: (SettingsEvent) -> Unit) {
 }
 
 @Composable
-internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, checkForUpdates: Boolean) {
+internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit, showUpdateNotice: Boolean) {
     val c = OcTheme.colors
     Section(stringResource(Res.string.settings_about)) {
         OcCard {
@@ -558,9 +558,9 @@ internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit
             )
             OcDivider()
             AboutRow(stringResource(Res.string.settings_api_version), state.apiVersion)
-            if (checkForUpdates) {
+            if (showUpdateNotice) {
                 OcDivider()
-                SettingOptionControl(SettingOption.CheckUpdates, state, onEvent)
+                SettingOptionControl(SettingOption.UpdateNotice, state, onEvent)
             }
         }
     }

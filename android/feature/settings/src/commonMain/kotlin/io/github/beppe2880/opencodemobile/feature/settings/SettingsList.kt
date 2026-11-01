@@ -99,7 +99,7 @@ internal fun LazyListScope.settingsList(state: SettingsState, onEvent: (Settings
         )
     }
     item(key = "reset") { ResetSection(onEvent) }
-    item(key = "about") { AboutSection(state, onEvent, checkForUpdates = true) }
+    item(key = "about") { AboutSection(state, onEvent, showUpdateNotice = true) }
 }
 
 /** [options] that apply in one card, divided by hairlines; the others are left out, like their switch says. */

@@ -35,7 +35,7 @@ class SettingOptionsTest {
         assertEquals(listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed), SettingsPart.PendingCards.options)
         assertEquals(listOf(SettingOption.AgentOutline, SettingOption.Dictation), SettingsPart.ComposerBox.options)
         assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval), SettingsPart.LiveShell.options)
-        assertEquals(listOf(SettingOption.CheckUpdates), SettingsPart.UpdateBanner.options)
+        assertEquals(listOf(SettingOption.UpdateNotice), SettingsPart.UpdateNotice.options)
         assertTrue(SettingsPart.Activity.options.containsAll(SettingsPart.Thoughts.options + SettingsPart.Tools.options))
     }
 
