@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">L'agente è in esecuzione</string>
     <string name="sessions_new_show_all">Mostra tutti i %1$d progetti</string>
     <string name="sessions_untitled">Sessione senza titolo</string>
+    <string name="sessions_preview_swipe_on">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente</string>
+    <string name="sessions_preview_swipe_off">Disattivato: torna all’elenco per aprire un’altra sessione</string>
+    <string name="sessions_preview_wide">Su pieghevoli aperti e tablet</string>
+    <string name="sessions_preview_split_off">La chat si apre sopra l’elenco, anche sugli schermi larghi</string>
+    <string name="sessions_preview_back_list">Indietro con l’elenco nascosto lo mostra di nuovo</string>
+    <string name="sessions_preview_back_leave">Indietro con l’elenco nascosto chiude l’app</string>
 </resources>

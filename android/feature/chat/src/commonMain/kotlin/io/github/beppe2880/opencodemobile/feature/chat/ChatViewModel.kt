@@ -73,6 +73,7 @@ class ChatViewModel(
     private var messages: List<Message> = emptyList()
     private var showReasoning: Boolean = settings.settings.value.showReasoning
     private var groupActivity: Boolean = settings.settings.value.groupActivity
+    private var groupThoughts: Boolean = settings.settings.value.groupThoughts
     private var reloadJob: Job? = null
     private var olderJob: Job? = null
     private var previewJob: Job? = null
@@ -159,30 +160,14 @@ class ChatViewModel(
                 showReasoning = s.showReasoning
                 liveOutputIntervalMs = s.liveOutputIntervalMs
                 groupActivity = s.groupActivity
+                groupThoughts = s.groupThoughts
                 selectionApply = s.selectionApply
                 confirmStop = s.confirmStopCommand
                 val vcsTurnedOn = s.chatHeaderLine != ChatHeaderLine.Folder && !vcsInHeader
                 headerLine = s.chatHeaderLine
                 headerOpens = s.headerOpens
                 if (vcsTurnedOn) refreshBranch()
-                updateState {
-                    it.copy(
-                        expandToolsByDefault = s.expandToolsByDefault,
-                        live = LiveFollow.of(s),
-                        showFullCommands = s.showFullCommands,
-                        showToolDetails = s.showToolDetails,
-                        outputPreviewLines = s.outputPreviewLines,
-                        keepLiveStepsOpen = s.keepLiveStepsOpen,
-                        chatTextScale = s.chatTextScale,
-                        showCost = s.showCost,
-                        swipeEnabled = s.swipeBetweenChats,
-                        agentColorOutline = s.agentColorOutline,
-                        dictation = s.dictation,
-                        permissionsCollapsedByDefault = s.permissionsCollapsed,
-                        questionsCollapsedByDefault = s.questionsCollapsed,
-                        headerStyle = s.chatHeaderStyle,
-                    )
-                }
+                updateState { it.withSettings(s) }
                 rebuild()
             }
         }
@@ -223,7 +208,11 @@ class ChatViewModel(
             ChatEvent.Stop -> stop()
             ChatEvent.MoveToBackground -> moveToBackground()
             ChatEvent.Compact -> compact()
-            is ChatEvent.OpenSession -> sendEffect(ChatEffect.OpenSession(event.sessionId))
+            is ChatEvent.OpenSession -> {
+                // Otherwise the Running sheet is still open on return, and the first Back only closes it.
+                updateState { it.copy(workOpen = false) }
+                sendEffect(ChatEffect.OpenSession(event.sessionId))
+            }
             is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
             is ChatEvent.SwitchSession -> sendEffect(ChatEffect.SwitchSession(event.sessionId))
             ChatEvent.LoadOlder -> loadOlder()
@@ -852,7 +841,14 @@ class ChatViewModel(
         val queuedIds = state.queued.mapTo(HashSet()) { it.id }
         val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
         followShells(shown)
-        val items = ChatItemsBuilder.build(withLiveOutput(withImages(shown)), state.running, showReasoning, state.models::labelFor, groupActivity)
+        val items = ChatItemsBuilder.build(
+            withLiveOutput(withImages(shown)),
+            state.running,
+            showReasoning,
+            state.models::labelFor,
+            groupActivity,
+            groupThoughts,
+        )
         val backgroundable = BackgroundableWork.find(visible)?.takeIf { it.key !in movedToBackground }
         val compactions = visible.filterIsInstance<Message.Notice>()
             .filter { it.kind == NoticeKind.Compacting || it.kind == NoticeKind.Compaction }
@@ -1206,7 +1202,7 @@ class ChatViewModel(
 
     private fun vcsLine(visible: List<Message>): VcsLine? {
         if (!vcsInHeader) return null
-        val folder = folderName(currentState.directory).takeIf { headerLine == ChatHeaderLine.FolderBranchFiles }
+        val folder = headerFolder(headerLine, currentState.directory)
         return when (inRepository) {
             true -> VcsLine(folder, branch?.current, changedFiles)
             false -> agentEditedFiles(visible).takeIf { it > 0 }?.let { VcsLine(folder, null, it, agentEdits = true) }

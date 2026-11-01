@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">OK</string>
     <string name="terminal_fullscreen">Plein écran</string>
     <string name="terminal_fullscreen_exit">Quitter le plein écran</string>
+    <string name="terminal_preview_fullscreen">Plein écran : ni barre de titre ni barres système</string>
+    <string name="terminal_preview_keyboard_on">Le clavier s’ouvre avec le terminal</string>
+    <string name="terminal_preview_keyboard_off">Le clavier s’ouvre lorsque vous touchez le terminal</string>
 </resources>

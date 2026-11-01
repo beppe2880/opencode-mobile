@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">O agente está trabalhando</string>
     <string name="sessions_new_show_all">Mostrar todos os %1$d projetos</string>
     <string name="sessions_untitled">Sessão sem título</string>
+    <string name="sessions_preview_swipe_on">Deslize para a esquerda ou para a direita em um chat para abrir a sessão seguinte ou anterior</string>
+    <string name="sessions_preview_swipe_off">Desativado: volte à lista para abrir outra sessão</string>
+    <string name="sessions_preview_wide">Em dobráveis desdobrados e tablets</string>
+    <string name="sessions_preview_split_off">O chat abre sobre a lista, também em telas largas</string>
+    <string name="sessions_preview_back_list">Voltar com a lista oculta a mostra novamente</string>
+    <string name="sessions_preview_back_leave">Voltar com a lista oculta fecha o app</string>
 </resources>

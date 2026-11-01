@@ -44,6 +44,15 @@ sealed interface ChatItem {
     ) : ChatItem
     data class Text(override val key: String, val text: String, val streaming: Boolean) : ChatItem
     data class Reasoning(override val key: String, val text: String, val streaming: Boolean, val durationMs: Long?) : ChatItem
+
+    /**
+     * Two or more [Reasoning] rows with nothing in between, shown as one row. The key is the
+     * first thought's, so the row keeps its place (and expansion) while the run grows.
+     */
+    data class Thoughts(override val key: String, val thoughts: List<Reasoning>) : ChatItem {
+        val streaming: Boolean get() = thoughts.any { it.streaming }
+        val durationMs: Long get() = thoughts.sumOf { it.durationMs ?: 0L }
+    }
     data class Tools(override val key: String, val tools: List<Part.Tool>) : ChatItem {
         val running: Boolean get() = tools.any { it.status == ToolStatus.Running || it.status == ToolStatus.Streaming }
         val failed: Int get() = tools.count { it.status == ToolStatus.Error }
@@ -74,15 +83,22 @@ sealed interface ChatItem {
 
     /**
      * Thinking and tool rows that follow each other with nothing else in between, shown as
-     * one summary row. [entries] are [Reasoning] and [Tools] in transcript order. The key is
-     * the first entry's, so the row keeps its place (and expansion) while the group grows.
+     * one summary row. [entries] are [Reasoning], [Thoughts] and [Tools] in transcript order.
+     * The key is the first entry's, so the row keeps its place (and expansion) while the group grows.
      */
     data class Activity(override val key: String, val entries: List<ChatItem>) : ChatItem {
         val tools: List<Part.Tool> get() = entries.filterIsInstance<Tools>().flatMap { it.tools }
-        val thoughts: List<Reasoning> get() = entries.filterIsInstance<Reasoning>()
+        val thoughts: List<Reasoning>
+            get() = entries.flatMap {
+                when (it) {
+                    is Reasoning -> listOf(it)
+                    is Thoughts -> it.thoughts
+                    else -> emptyList()
+                }
+            }
         val thinkingMs: Long get() = thoughts.sumOf { it.durationMs ?: 0L }
         val running: Boolean
-            get() = entries.any { (it is Tools && it.running) || (it is Reasoning && it.streaming) }
+            get() = entries.any { (it is Tools && it.running) || (it is Reasoning && it.streaming) || (it is Thoughts && it.streaming) }
         val failed: Int get() = tools.count { it.status == ToolStatus.Error }
     }
 }
@@ -107,12 +123,36 @@ object ChatItemsBuilder {
         showReasoning: Boolean,
         modelLabel: (ModelRef) -> ModelLabel,
         groupActivity: Boolean = false,
+        groupThoughts: Boolean = false,
     ): List<ChatItem> {
-        val items = buildRows(messages, running, showReasoning, modelLabel)
+        val rows = buildRows(messages, running, showReasoning, modelLabel)
+        val items = if (groupThoughts) groupThoughts(rows) else rows
         return if (groupActivity) groupActivity(items) else items
     }
 
-    /** Merges each run of two or more consecutive [ChatItem.Reasoning] / [ChatItem.Tools] rows. */
+    /** Merges each run of two or more consecutive [ChatItem.Reasoning] rows into [ChatItem.Thoughts]. */
+    internal fun groupThoughts(items: List<ChatItem>): List<ChatItem> {
+        val out = ArrayList<ChatItem>(items.size)
+        var run = ArrayList<ChatItem.Reasoning>()
+        fun flush() {
+            when (run.size) {
+                0 -> Unit
+                1 -> out += run.single()
+                else -> out += ChatItem.Thoughts(run.first().key, run)
+            }
+            run = ArrayList()
+        }
+        for (item in items) {
+            if (item is ChatItem.Reasoning) run += item else {
+                flush()
+                out += item
+            }
+        }
+        flush()
+        return out
+    }
+
+    /** Merges each run of two or more consecutive [ChatItem.Reasoning] / [ChatItem.Thoughts] / [ChatItem.Tools] rows. */
     internal fun groupActivity(items: List<ChatItem>): List<ChatItem> {
         val out = ArrayList<ChatItem>(items.size)
         var run = ArrayList<ChatItem>()
@@ -125,7 +165,7 @@ object ChatItemsBuilder {
             run = ArrayList()
         }
         for (item in items) {
-            if (item is ChatItem.Reasoning || item is ChatItem.Tools) run += item else {
+            if (item is ChatItem.Reasoning || item is ChatItem.Thoughts || item is ChatItem.Tools) run += item else {
                 flush()
                 out += item
             }
@@ -212,6 +252,7 @@ object ChatItemsBuilder {
                 }
                 is Message.Assistant -> {
                     turn += message
+                    var previous: Part? = null
                     message.parts.forEach { part ->
                         when (part) {
                             is Part.Tool -> {
@@ -225,9 +266,20 @@ object ChatItemsBuilder {
                             is Part.Reasoning -> if (showReasoning && (part.text.isNotBlank() || part.streaming)) {
                                 flushTools()
                                 val duration = if (part.startedAt != null && part.completedAt != null) part.completedAt!! - part.startedAt!! else null
-                                addTurnItem(ChatItem.Reasoning("${message.id}/${part.key}", part.text.trim(), part.streaming, duration))
+                                val before = out.lastOrNull() as? ChatItem.Reasoning
+                                if (previous is Part.Reasoning && before != null && !before.streaming && isContinuation(part, duration)) {
+                                    val text = part.text.trim()
+                                    out[out.lastIndex] = before.copy(
+                                        // Each part may repeat the summary title of the one before.
+                                        text = if (text.isEmpty() || before.text.endsWith(text)) before.text else "${before.text}\n\n$text",
+                                        durationMs = (before.durationMs ?: 0L) + duration!!,
+                                    )
+                                } else {
+                                    addTurnItem(ChatItem.Reasoning("${message.id}/${part.key}", part.text.trim(), part.streaming, duration))
+                                }
                             }
                         }
+                        previous = part
                     }
                     message.error?.let {
                         flushTools()
@@ -253,6 +305,16 @@ object ChatItemsBuilder {
         }
         return out
     }
+
+    /**
+     * Some providers (OpenAI reasoning summaries) split one thought into several parts: the
+     * first spans the whole thinking time, the others arrive within milliseconds of its end.
+     * Shown alone they would read "Thought" with no duration, so they extend the thought before.
+     */
+    private fun isContinuation(part: Part.Reasoning, duration: Long?): Boolean =
+        !part.streaming && duration != null && duration < CONTINUATION_MS
+
+    private const val CONTINUATION_MS = 1_000L
 
     /**
      * Same metric as the OpenCode TUI: output + reasoning tokens over the summed streaming time

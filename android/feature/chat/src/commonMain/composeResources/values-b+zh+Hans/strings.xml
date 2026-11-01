@@ -21,6 +21,12 @@
     <string name="chat_thinking">正在思考…</string>
     <string name="chat_thought_for">已思考 %1$s</string>
     <string name="chat_thought">思考</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="other">%1$d 条思考</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="other">已思考 %1$d 次</item>
+    </plurals>
     <string name="chat_working">正在工作…</string>
     <string name="chat_used_tools">已使用</string>
     <string name="chat_tool_running">运行中</string>
@@ -166,4 +172,12 @@
     <string name="chat_running_refresh">刷新运行中的任务</string>
     <string name="chat_running_stop_title">停止此命令？</string>
     <string name="chat_running_stop_message">%1$s\n\n命令将被结束，其输出将不再可用。</string>
+    <string name="chat_preview_folds">实时跟随的步骤在回答结束后会折叠</string>
+    <string name="chat_preview_kept_open">实时跟随的步骤在回答结束后保持展开</string>
+    <string name="chat_preview_not_followed">运行中的步骤保持折叠，直到你打开它们</string>
+    <string name="chat_preview_refresh">每 %1$s 刷新一次新输出</string>
+    <string name="chat_preview_selection_next">在输入框中选择：发送下一条消息时聊天切换到这些内容</string>
+    <string name="chat_preview_selection_now">在输入框中选择：聊天立即切换到这些内容</string>
+    <string name="chat_preview_stop_asks">从“运行中”面板停止命令前会先询问</string>
+    <string name="chat_preview_stop_direct">从“运行中”面板停止命令会立即结束它</string>
 </resources>

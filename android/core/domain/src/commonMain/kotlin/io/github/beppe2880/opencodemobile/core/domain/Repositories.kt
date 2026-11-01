@@ -393,6 +393,8 @@ data class AppSettings(
     val newChatModel: NewChatModel = NewChatModel.LastUsed,
     /** Consecutive thinking and tool rows collapse into one summary row. */
     val groupActivity: Boolean = true,
+    /** Thoughts that follow each other with nothing in between collapse into one row, also while running. */
+    val groupThoughts: Boolean = true,
     /** A question from the agent first shows as a one-line bar above the composer instead of the full card. */
     val questionsCollapsed: Boolean = false,
     /** A permission request first shows as a one-line bar above the composer instead of the full card. */
@@ -429,6 +431,12 @@ data class AppSettings(
     val checkForUpdates: Boolean = true,
     /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
     val backShowsList: Boolean = true,
+    /** The previews in Settings outline the parts that can be tapped and mark them with a pencil. */
+    val showEditMarks: Boolean = true,
+    /** How Settings opens: the classic list or the previews of each group. */
+    val settingsStyle: SettingsStyle = SettingsStyle.List,
+    /** Share of the height the preview takes above its options on narrow screens; 0 hides it, null for the default. */
+    val settingsPreviewFraction: Float? = null,
 )
 
 /** Share of the window width the session list can be given from Settings. */

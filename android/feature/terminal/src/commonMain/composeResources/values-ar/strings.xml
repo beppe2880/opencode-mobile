@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">تم</string>
     <string name="terminal_fullscreen">ملء الشاشة</string>
     <string name="terminal_fullscreen_exit">الخروج من ملء الشاشة</string>
+    <string name="terminal_preview_fullscreen">ملء الشاشة: بدون شريط العنوان ولا أشرطة النظام</string>
+    <string name="terminal_preview_keyboard_on">تفتح لوحة المفاتيح مع الطرفية</string>
+    <string name="terminal_preview_keyboard_off">تفتح لوحة المفاتيح عند النقر على الطرفية</string>
 </resources>

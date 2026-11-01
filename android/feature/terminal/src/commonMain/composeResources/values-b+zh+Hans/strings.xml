@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">完成</string>
     <string name="terminal_fullscreen">全屏</string>
     <string name="terminal_fullscreen_exit">退出全屏</string>
+    <string name="terminal_preview_fullscreen">全屏：无标题栏，也没有系统栏</string>
+    <string name="terminal_preview_keyboard_on">键盘随终端一起打开</string>
+    <string name="terminal_preview_keyboard_off">点击终端时才会打开键盘</string>
 </resources>

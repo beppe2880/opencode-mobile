@@ -33,13 +33,21 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
+import io.github.beppe2880.opencodemobile.feature.settings.customize.LiveEditHost
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import org.koin.compose.KoinIsolatedContext
 import org.koin.core.KoinApplication
 
 /** No real repositories, stores, network clients, widgets or notification monitors enter this container. */
 @Composable
-fun DemoHost(container: KoinApplication, onExit: () -> Unit, realDarkTheme: Boolean, modifier: Modifier = Modifier) {
+fun DemoHost(
+    container: KoinApplication,
+    onExit: () -> Unit,
+    realDarkTheme: Boolean,
+    modifier: Modifier = Modifier,
+    /** The live demo of Settings: the real screens in edit mode, its own bar to leave. */
+    edit: Boolean = false,
+) {
     val settings = remember(container) { container.koin.get<SettingsRepository>() }
     val preferences by settings.settings.collectAsStateWithLifecycle()
     val dark = preferences.theme.isDark()
@@ -60,6 +68,12 @@ fun DemoHost(container: KoinApplication, onExit: () -> Unit, realDarkTheme: Bool
                 modifier.fillMaxSize().background(OcTheme.colors.bgBase)
                     .statusBarsPadding().consumeWindowInsets(WindowInsets.statusBars),
             ) {
+                if (edit) {
+                    LiveEditHost(onDone = onExit, modifier = Modifier.weight(1f)) {
+                        AppNavHost(isDemo = true, hasActiveServer = true, onConnectServer = onExit)
+                    }
+                    return@Column
+                }
                 Row(
                     Modifier.background(OcTheme.colors.bgDeep).padding(horizontal = OcSpacing.md),
                     verticalAlignment = Alignment.CenterVertically,

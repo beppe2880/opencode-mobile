@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,6 +60,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_GROUP_ACTIVITY, next.groupActivity)
+        prefs.putBoolean(KEY_GROUP_THOUGHTS, next.groupThoughts)
         prefs.putBoolean(KEY_QUESTIONS_COLLAPSED, next.questionsCollapsed)
         prefs.putBoolean(KEY_PERMISSIONS_COLLAPSED, next.permissionsCollapsed)
         prefs.putBoolean(KEY_NOTIFICATIONS, next.notifications)
@@ -76,6 +78,10 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
         prefs.putBoolean(KEY_CHECK_UPDATES, next.checkForUpdates)
+        prefs.putBoolean(KEY_EDIT_MARKS, next.showEditMarks)
+        prefs.putString(KEY_SETTINGS_STYLE, next.settingsStyle.name)
+        val previewFraction = next.settingsPreviewFraction
+        if (previewFraction == null) prefs.remove(KEY_PREVIEW_FRACTION) else prefs.putFloat(KEY_PREVIEW_FRACTION, previewFraction)
     }
 
     private fun read(): AppSettings {
@@ -113,6 +119,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
                 ?: defaults.newChatModel,
             groupActivity = prefs.getBoolean(KEY_GROUP_ACTIVITY, defaults.groupActivity),
+            groupThoughts = prefs.getBoolean(KEY_GROUP_THOUGHTS, defaults.groupThoughts),
             questionsCollapsed = prefs.getBoolean(KEY_QUESTIONS_COLLAPSED, defaults.questionsCollapsed),
             permissionsCollapsed = prefs.getBoolean(KEY_PERMISSIONS_COLLAPSED, defaults.permissionsCollapsed),
             notifications = prefs.getBoolean(KEY_NOTIFICATIONS, defaults.notifications),
@@ -126,6 +133,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             listPaneHandle = prefs.getBoolean(KEY_LIST_PANE_HANDLE, defaults.listPaneHandle),
             checkForUpdates = prefs.getBoolean(KEY_CHECK_UPDATES, defaults.checkForUpdates),
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
+            showEditMarks = prefs.getBoolean(KEY_EDIT_MARKS, defaults.showEditMarks),
+            settingsStyle = SettingsStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SETTINGS_STYLE) } ?: defaults.settingsStyle,
+            settingsPreviewFraction = prefs.getFloatOrNull(KEY_PREVIEW_FRACTION)?.takeIf { it in 0f..1f },
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -165,6 +175,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_SELECTION_APPLY = "selection_apply"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_GROUP_ACTIVITY = "group_activity"
+        const val KEY_GROUP_THOUGHTS = "group_thoughts"
         const val KEY_QUESTIONS_COLLAPSED = "questions_collapsed"
         const val KEY_PERMISSIONS_COLLAPSED = "permissions_collapsed"
         const val KEY_NOTIFICATIONS = "notifications"
@@ -180,6 +191,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
+        const val KEY_EDIT_MARKS = "settings_edit_marks"
+        const val KEY_SETTINGS_STYLE = "settings_style"
+        const val KEY_PREVIEW_FRACTION = "settings_preview_fraction"
         val KeyRows = ListSerializer(ListSerializer(String.serializer()))
     }
 }

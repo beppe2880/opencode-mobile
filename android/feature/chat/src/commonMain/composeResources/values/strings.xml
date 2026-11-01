@@ -23,6 +23,14 @@
     <string name="chat_thinking">Thinking…</string>
     <string name="chat_thought_for">Thought for %1$s</string>
     <string name="chat_thought">Thought</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="one">%1$d thought</item>
+        <item quantity="other">%1$d thoughts</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="one">Thought %1$d time</item>
+        <item quantity="other">Thought %1$d times</item>
+    </plurals>
     <string name="chat_working">Working…</string>
     <string name="chat_used_tools">Used</string>
     <string name="chat_tool_running">Running</string>
@@ -175,4 +183,12 @@
     <string name="chat_running_refresh">Refresh running work</string>
     <string name="chat_running_stop_title">Stop this command?</string>
     <string name="chat_running_stop_message">%1$s\n\nThe command is ended and its output is no longer available.</string>
+    <string name="chat_preview_folds">Steps followed live fold back when the answer ends</string>
+    <string name="chat_preview_kept_open">Steps followed live stay open after the answer</string>
+    <string name="chat_preview_not_followed">Running steps stay folded until you open them</string>
+    <string name="chat_preview_refresh">New output every %1$s</string>
+    <string name="chat_preview_selection_next">Picked in the composer: the chat switches to them when you send the next message</string>
+    <string name="chat_preview_selection_now">Picked in the composer: the chat switches to them right away</string>
+    <string name="chat_preview_stop_asks">Stopping a command from the Running sheet asks first</string>
+    <string name="chat_preview_stop_direct">Stopping a command from the Running sheet ends it at once</string>
 </resources>

@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -31,6 +32,7 @@ class PreferencesRepositoriesTest {
             chatHeaderStyle = ChatHeaderStyle.Full,
             headerOpens = ChangesScope.Session,
             groupActivity = false,
+            groupThoughts = false,
             showRunningWorkInList = false,
             confirmStopCommand = false,
             questionsCollapsed = true,
@@ -49,6 +51,9 @@ class PreferencesRepositoriesTest {
             newChatModel = NewChatModel.ServerDefault,
             checkForUpdates = false,
             backShowsList = false,
+            showEditMarks = false,
+            settingsStyle = SettingsStyle.Preview,
+            settingsPreviewFraction = 0.25f,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -70,6 +75,8 @@ class PreferencesRepositoriesTest {
             .putString("chat_header_style", "Emoji")
             // Only the folder and the session can be opened from the header.
             .putString("chat_header_opens", "LastTurn")
+            .putString("settings_style", "Cards")
+            .putFloat("settings_preview_fraction", 3f)
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value

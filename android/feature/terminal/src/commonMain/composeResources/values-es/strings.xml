@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Listo</string>
     <string name="terminal_fullscreen">Pantalla completa</string>
     <string name="terminal_fullscreen_exit">Salir de pantalla completa</string>
+    <string name="terminal_preview_fullscreen">Pantalla completa: sin barra de título ni barras del sistema</string>
+    <string name="terminal_preview_keyboard_on">El teclado se abre con el terminal</string>
+    <string name="terminal_preview_keyboard_off">El teclado se abre al tocar el terminal</string>
 </resources>

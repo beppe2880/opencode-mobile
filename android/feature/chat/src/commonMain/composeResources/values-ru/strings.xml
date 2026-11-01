@@ -27,6 +27,18 @@
     <string name="chat_thinking">Размышляет…</string>
     <string name="chat_thought_for">Размышлял %1$s</string>
     <string name="chat_thought">Рассуждение</string>
+    <plurals name="chat_thoughts_count">
+        <item quantity="one">%1$d мысль</item>
+        <item quantity="few">%1$d мысли</item>
+        <item quantity="many">%1$d мыслей</item>
+        <item quantity="other">%1$d мысли</item>
+    </plurals>
+    <plurals name="chat_thought_times">
+        <item quantity="one">Размышлял %1$d раз</item>
+        <item quantity="few">Размышлял %1$d раза</item>
+        <item quantity="many">Размышлял %1$d раз</item>
+        <item quantity="other">Размышлял %1$d раза</item>
+    </plurals>
     <string name="chat_working">Работает…</string>
     <string name="chat_used_tools">Использовано</string>
     <string name="chat_tool_running">Выполняется</string>
@@ -193,4 +205,12 @@
     <string name="chat_running_refresh">Обновить выполняемые задачи</string>
     <string name="chat_running_stop_title">Остановить эту команду?</string>
     <string name="chat_running_stop_message">%1$s\n\nКоманда завершается, и её вывод больше не доступен.</string>
+    <string name="chat_preview_folds">Шаги, которые отслеживались в реальном времени, сворачиваются по окончании ответа</string>
+    <string name="chat_preview_kept_open">Шаги, которые отслеживались в реальном времени, остаются открытыми после ответа</string>
+    <string name="chat_preview_not_followed">Выполняющиеся шаги остаются свернутыми, пока вы их не откроете</string>
+    <string name="chat_preview_refresh">Новый вывод каждые %1$s</string>
+    <string name="chat_preview_selection_next">Выбрано в поле ввода: чат переключится на них при отправке следующего сообщения</string>
+    <string name="chat_preview_selection_now">Выбрано в поле ввода: чат сразу переключится на них</string>
+    <string name="chat_preview_stop_asks">Остановка команды из листа «Выполняется» сначала запрашивает подтверждение</string>
+    <string name="chat_preview_stop_direct">Остановка команды из листа «Выполняется» сразу её завершает</string>
 </resources>

@@ -34,13 +34,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.platform.rememberTextClipboard
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
@@ -126,7 +129,7 @@ fun TerminalScreen(
                 onEdit = { onEvent(TerminalEvent.EditKeys(true)) },
                 fullscreen = state.fullscreen,
                 onExitFullscreen = { onEvent(TerminalEvent.Fullscreen(false)) },
-                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars).editable(SettingsPart.KeyBar, LocalEditMode.current),
             )
         }
     }
@@ -174,7 +177,7 @@ private fun TopBar(state: TerminalState, onEvent: (TerminalEvent) -> Unit) {
                 icon = Icons.Outlined.Fullscreen,
                 contentDescription = stringResource(Res.string.terminal_fullscreen),
                 onClick = { onEvent(TerminalEvent.Fullscreen(true)) },
-                modifier = Modifier.testTag("terminal_fullscreen_button"),
+                modifier = Modifier.editable(SettingsPart.TerminalFullscreen, LocalEditMode.current).testTag("terminal_fullscreen_button"),
             )
             OcIconButton(
                 icon = Icons.Outlined.DeleteOutline,

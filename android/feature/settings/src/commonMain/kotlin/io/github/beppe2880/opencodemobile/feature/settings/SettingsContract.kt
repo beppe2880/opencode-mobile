@@ -8,7 +8,11 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
+import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 
 /** Build information provided by the app module. */
@@ -28,6 +32,8 @@ data class SettingsState(
     val serverVersionLoading: Boolean = false,
     val appVersion: String = "",
     val apiVersion: String = "",
+    /** Where this platform's app is updated from, for the update banner's preview. */
+    val updateTarget: UpdateTarget = UpdateTarget.Android,
     val renaming: ServerProfile? = null,
     val removing: ServerProfile? = null,
     /** The confirmation to reset every setting is open. */
@@ -36,12 +42,42 @@ data class SettingsState(
     val notificationsAllowed: Boolean = true,
     /** The permission was denied: only the system settings can grant it now. */
     val notificationsBlocked: Boolean = false,
-)
+    /** The group of settings open with its preview; null on the list of groups. */
+    val area: SettingsArea? = null,
+    /** The part of the preview whose options are in view. */
+    val selected: SettingsPart? = null,
+    /** The option a search result opened, highlighted until another part is picked. */
+    val focus: SettingOption? = null,
+    /** Chat previews show the agent at work instead of a finished answer. */
+    val running: Boolean = false,
+    /** Text of the search field; options matching it replace the groups. */
+    val query: String = "",
+) {
+    /** Notifications are on and the system lets the app post them. */
+    val notificationsOn: Boolean get() = settings.notifications && notificationsAllowed
+}
 
 sealed interface SettingsEvent {
     data object Back : SettingsEvent
     data object AddServer : SettingsEvent
     data object OpenUsage : SettingsEvent
+
+    /** Opens a group of settings with its preview, at [part] or at the part of [option]. */
+    data class OpenArea(val area: SettingsArea, val part: SettingsPart? = null, val option: SettingOption? = null) : SettingsEvent
+    data object CloseArea : SettingsEvent
+
+    /** A part of the preview was tapped, or its options scrolled into view. */
+    data class SelectPart(val part: SettingsPart) : SettingsEvent
+    data class PreviewRunning(val running: Boolean) : SettingsEvent
+    data class QueryChanged(val query: String) : SettingsEvent
+    data class EditMarksChanged(val visible: Boolean) : SettingsEvent
+    data class SettingsStyleChanged(val style: SettingsStyle) : SettingsEvent
+
+    /** The divider between preview and options was dragged, or a size was picked; 0 hides the preview. */
+    data class PreviewFractionChanged(val fraction: Float) : SettingsEvent
+
+    /** The terminal key bar goes back to its default keys. */
+    data object ResetTerminalKeys : SettingsEvent
     data class SelectServer(val serverId: String) : SettingsEvent
     data class RequestRename(val server: ServerProfile) : SettingsEvent
     data class ConfirmRename(val name: String) : SettingsEvent
@@ -83,6 +119,7 @@ sealed interface SettingsEvent {
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class GroupActivityChanged(val enabled: Boolean) : SettingsEvent
+    data class GroupThoughtsChanged(val enabled: Boolean) : SettingsEvent
     data class QuestionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class PermissionsCollapsedChanged(val enabled: Boolean) : SettingsEvent
     data class NotificationsChanged(val enabled: Boolean) : SettingsEvent

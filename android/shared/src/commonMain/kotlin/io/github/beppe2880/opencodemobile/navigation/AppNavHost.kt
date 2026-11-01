@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -49,8 +50,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -120,6 +124,11 @@ fun AppNavHost(
     onTryDemo: (() -> Unit)? = null,
     onConnectServer: (() -> Unit)? = null,
     isDemo: Boolean = false,
+    /** Opens the offline demo in edit mode to change settings on the real screens; null where there is none. */
+    onCustomizeInDemo: (() -> Unit)? = null,
+    /** Opens Settings over the session list once (back from the live demo). */
+    openSettings: Boolean = false,
+    onSettingsOpened: () -> Unit = {},
     navController: NavHostController = rememberNavController(),
 ) {
     val start: Any = if (hasActiveServer) SessionsDestination else ConnectDestination()
@@ -140,6 +149,14 @@ fun AppNavHost(
             popUpTo<SessionsDestination>()
         }
         onSessionOpened()
+    }
+
+    LaunchedEffect(openSettings, hasActiveServer) {
+        if (!openSettings || !hasActiveServer) return@LaunchedEffect
+        navController.navigate(SettingsDestination) {
+            popUpTo<SessionsDestination>()
+        }
+        onSettingsOpened()
     }
 
     // Handed to the session list, which opens its sheet and clears it.
@@ -173,7 +190,7 @@ fun AppNavHost(
         composable<SessionsDestination> {
             SessionsListDetail(
                 demo = isDemo,
-                onOpenChatFullScreen = { navController.navigate(ChatDestination(it)) },
+                onOpenChatFullScreen = navController::openChat,
                 onOpenSettings = { navController.navigate(SettingsDestination) },
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
@@ -186,7 +203,7 @@ fun AppNavHost(
             ChatRoute(
                 sessionId = args.sessionId,
                 onBack = { navController.popBackStack() },
-                onOpenSession = { navController.navigate(ChatDestination(it)) },
+                onOpenSession = navController::openChat,
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
                 onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
                 onSwitchSession = {
@@ -203,6 +220,8 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
+                preview = settingsPreviews,
+                onOpenLiveDemo = onCustomizeInDemo,
             )
         }
         composable<UsageDestination> {
@@ -216,6 +235,16 @@ fun AppNavHost(
             FileViewerRoute(directory = args.directory, path = args.path, onBack = { navController.popBackStack() })
         }
     }
+}
+
+/**
+ * Pushes the chat of [sessionId] unless it is already on top: a repeated tap (or a second
+ * effect delivered during the transition) would otherwise stack it twice, needing an extra Back.
+ */
+private fun NavController.openChat(sessionId: String) {
+    val top = currentBackStackEntry
+    if (top?.destination?.hasRoute<ChatDestination>() == true && top.toRoute<ChatDestination>().sessionId == sessionId) return
+    navigate(ChatDestination(sessionId))
 }
 
 /**
@@ -361,7 +390,7 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
         shape = RoundedCornerShape(OcRadius.md),
         color = c.layer02,
         border = BorderStroke(1.dp, c.borderBase),
-        modifier = modifier.size(width = HandleWidth, height = 48.dp).testTag("sessions_pane_toggle"),
+        modifier = modifier.size(width = HandleWidth, height = 48.dp).editable(SettingsPart.SplitView, LocalEditMode.current).testTag("sessions_pane_toggle"),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
@@ -379,5 +408,7 @@ private val HandleWidth = 24.dp
 /** The notice of a new app release, at the top of the session list. */
 @Composable
 private fun UpdateBanner() {
-    UpdateNoticeRoute(Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md))
+    UpdateNoticeRoute(
+        Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateBanner, LocalEditMode.current),
+    )
 }

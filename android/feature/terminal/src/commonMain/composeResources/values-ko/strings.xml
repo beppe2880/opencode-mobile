@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">완료</string>
     <string name="terminal_fullscreen">전체 화면</string>
     <string name="terminal_fullscreen_exit">전체 화면 종료</string>
+    <string name="terminal_preview_fullscreen">전체 화면: 제목 표시줄과 시스템 막대가 없습니다</string>
+    <string name="terminal_preview_keyboard_on">터미널과 함께 키보드가 열립니다</string>
+    <string name="terminal_preview_keyboard_off">터미널을 탭하면 키보드가 열립니다</string>
 </resources>

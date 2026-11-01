@@ -172,6 +172,13 @@ internal fun ActivityGroup(
                             onToggle = { onToggle("r:${entry.key}") },
                             live = live,
                         )
+                        is ChatItem.Thoughts -> ThoughtsGroup(
+                            item = entry,
+                            expanded = isExpanded("t:${entry.key}"),
+                            isExpanded = isExpanded,
+                            onToggle = onToggle,
+                            live = live,
+                        )
                         is ChatItem.Tools -> ToolsGroup(
                             item = entry,
                             directory = directory,

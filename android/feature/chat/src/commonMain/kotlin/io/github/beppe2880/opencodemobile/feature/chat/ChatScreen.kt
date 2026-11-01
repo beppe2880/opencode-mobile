@@ -62,6 +62,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
@@ -70,6 +72,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
@@ -208,7 +211,7 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatTopBar(
+internal fun ChatTopBar(
     state: ChatState,
     showBack: Boolean,
     onBack: () -> Unit,
@@ -218,14 +221,29 @@ private fun ChatTopBar(
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
     onRunning: () -> Unit,
+    applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
+    val editMode = LocalEditMode.current
     var menuOpen by remember { mutableStateOf(false) }
     OcTopBar(
         // Blank until the session is known, then a placeholder until the server names it.
         title = state.title.ifBlank { if (state.directory.isEmpty()) " " else stringResource(Res.string.chat_untitled) },
         subtitle = state.directory.takeIf { it.isNotEmpty() },
-        subtitleContent = state.vcs?.let { line -> { VcsSubtitle(line, state.headerStyle, onHeaderChanges) } },
+        subtitleContent = state.vcs?.let { line -> { VcsSubtitle(line, state.headerStyle, onHeaderChanges) } }
+            ?: editMode?.takeIf { it.active && state.directory.isNotEmpty() }?.let { mode ->
+                // The folder path alone, marked so its setting can bring the branch line back.
+                {
+                    Text(
+                        state.directory,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = c.textMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.editable(SettingsPart.Header, mode),
+                    )
+                }
+            },
         leading = if (showBack) {
             {
                 OcIconButton(
@@ -289,6 +307,7 @@ private fun ChatTopBar(
                 }
             }
         },
+        applyStatusBarInset = applyStatusBarInset,
     )
 }
 
@@ -320,6 +339,7 @@ private fun VcsSubtitle(line: VcsLine, style: ChatHeaderStyle, onClick: () -> Un
     val icons = style == ChatHeaderStyle.Icons
     // The 56dp top bar has no room for a 48dp target: the changes button is the full-size alternative.
     val modifier = Modifier
+        .editable(SettingsPart.Header, LocalEditMode.current)
         .testTag("chat_vcs_line")
         .clickable(onClickLabel = stringResource(Res.string.chat_changes_open), role = Role.Button, onClick = onClick)
         // One sentence for screen readers instead of the icons and fragments.
@@ -354,12 +374,12 @@ private const val SEPARATOR = " · "
  * "Running" menu item is the full-size alternative.
  */
 @Composable
-private fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
+internal fun RunningLine(work: RunningWork, style: ChatHeaderStyle, onClick: () -> Unit) {
     val c = OcTheme.colors
     val textStyle = MaterialTheme.typography.bodySmall
     val iconSize = with(LocalDensity.current) { textStyle.fontSize.toDp() }
     val summary = runningSummary(work)
-    Column {
+    Column(Modifier.editable(SettingsPart.RunningLine, LocalEditMode.current)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

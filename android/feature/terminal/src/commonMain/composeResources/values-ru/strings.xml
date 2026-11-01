@@ -45,4 +45,7 @@
     <string name="terminal_keys_done">Готово</string>
     <string name="terminal_fullscreen">Полноэкранный режим</string>
     <string name="terminal_fullscreen_exit">Выйти из полноэкранного режима</string>
+    <string name="terminal_preview_fullscreen">Полноэкранный режим: без строки заголовка и системных панелей</string>
+    <string name="terminal_preview_keyboard_on">Клавиатура открывается вместе с терминалом</string>
+    <string name="terminal_preview_keyboard_off">Клавиатура открывается при нажатии на терминал</string>
 </resources>

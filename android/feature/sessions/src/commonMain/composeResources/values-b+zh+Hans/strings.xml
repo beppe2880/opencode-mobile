@@ -44,4 +44,10 @@
     <string name="sessions_running_a11y">智能体正在运行</string>
     <string name="sessions_new_show_all">显示全部 %1$d 个项目</string>
     <string name="sessions_untitled">未命名会话</string>
+    <string name="sessions_preview_swipe_on">在聊天中左右滑动，打开下一个或上一个会话</string>
+    <string name="sessions_preview_swipe_off">关闭：返回列表以打开其他会话</string>
+    <string name="sessions_preview_wide">在展开的折叠屏和平板上</string>
+    <string name="sessions_preview_split_off">聊天在列表上方打开，宽屏上也是如此</string>
+    <string name="sessions_preview_back_list">列表隐藏时按返回键会再次显示列表</string>
+    <string name="sessions_preview_back_leave">列表隐藏时按返回键会退出应用</string>
 </resources>
