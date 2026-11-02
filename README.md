@@ -1,148 +1,231 @@
-# OpenCode Mobile
-
-**An unofficial native Android and iOS client for [OpenCode](https://opencode.ai).** Follow your
-coding sessions live from your phone, send prompts, approve permissions and answer the
-agent's questions while you are away from the desk.
-
-[![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-![OpenCode 2.0.27](https://img.shields.io/badge/OpenCode-2.0.27-black)
-![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3ddc84)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
-
-<p>
-  <img src="docs/media/agent-run.gif" width="300" alt="The agent edits files, asks a question and waits for approval while you follow along on the phone">
-  <img src="docs/media/usage-and-settings.gif" width="300" alt="Usage statistics and settings">
+<p align="center">
+  <img src="docs/media/app-icon.png" width="80" alt="OpenCode Mobile icon">
 </p>
 
-<p>
-  <img src="docs/screenshots/sessions.png" width="200" alt="Session list">
-  <img src="docs/screenshots/chat.png" width="200" alt="Chat">
-  <img src="docs/screenshots/chat-dark.png" width="200" alt="Chat in dark theme">
-  <img src="docs/screenshots/model-picker-dark.png" width="200" alt="Model picker">
+<h1 align="center">OpenCode Mobile</h1>
+
+<p align="center">
+  <strong>Step away from your desk. Stay with your agent.</strong><br>
+  A native Android and iOS client for <a href="https://opencode.ai">OpenCode</a>.<br>
+  Follow live sessions, send prompts, review changes and approve the next step from your phone.
 </p>
 
-> OpenCode Mobile is a community project, not affiliated with or endorsed by the OpenCode team.
+<p align="center">
+  <a href="https://github.com/beppe2880/opencode-mobile/releases/latest"><img src="https://img.shields.io/github/v/release/beppe2880/opencode-mobile?style=flat-square&amp;color=5865f2" alt="Latest release"></a>
+  <a href="#get-the-app"><img src="https://img.shields.io/badge/Android-8.0%2B-3ddc84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 or newer"></a>
+  <a href="#get-the-app"><img src="https://img.shields.io/badge/iOS-15%2B-111111?style=flat-square&amp;logo=apple&amp;logoColor=white" alt="iOS 15 or newer; build from source"></a>
+  <a href="https://github.com/beppe2880/opencode-mobile/actions/workflows/ci.yml"><img src="https://github.com/beppe2880/opencode-mobile/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT license"></a>
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/beppe2880/opencode-mobile/releases/latest"><strong>Download Android APK</strong></a>
+  &nbsp; · &nbsp;
+  <a href="#ios"><strong>Build for iOS</strong></a>
+  &nbsp; · &nbsp;
+  <a href="#connect-in-two-steps"><strong>Quick start</strong></a>
+</p>
 
-- **Live transcripts**: text, reasoning and tool calls stream in as the agent works, with
-  diffs, shell output and subagent sessions one tap away.
-- **Drive the agent**: send prompts (steer or queue while it runs, then send queued ones
-  now, edit or remove them), `/` commands, `!` shell commands, `@` file mentions and image
-  attachments; stop, undo and redo, compact the context, fork a session from any prompt.
-- **Review the changes**: every file the agent edited, with its diff, for the whole session
-  or the last turn.
-- **Approve from the phone**: permission requests and the agent's questions show up in
-  the chat.
-- **Notifications** (Android): while sessions run, the app stays connected in the background and tells
-  you when one needs an answer or finishes. Allow or reject an edit right from the
-  notification. The app explains them and asks for permission after you connect; in Settings
-  you choose which kinds you get (permission requests, questions, finished sessions) or turn
-  them off.
-- **Terminal**: a shell on the server in the session's folder, with a key bar for Esc, Ctrl,
-  arrows and your own keys; it keeps running when you leave and picks up where it was.
-- **Read files** the agent touched, with syntax highlighting, line numbers and images.
-- **MCP servers**: see their status and connect or disconnect them for the project.
-- **Home screen widget**: running and recent sessions, one tap to open one or start a new
-  one.
-- **Voice input**: dictate prompts with the microphone in the message box, using the
-  phone's speech recognition (can be turned off in Settings).
-- **Usage statistics**: cost, tokens and activity per day and per model, for today, the
-  last 7 or 30 days.
-- **Switch agent, model and reasoning level** per session, with recently used models first.
-- **Fast on large sessions**: transcripts are cached on the device and synced incrementally.
-- **Swipe between chats**, reading position remembered per chat, drafts saved per session.
-- **Multiple servers**, found automatically on your Wi-Fi or paired with a QR code or a
-  password.
-- Faithful to the OpenCode V2 look (Inter and IBM Plex Mono), light and dark theme, phones,
-  foldables and tablets. Available in English, Italian, Spanish, French, German, Brazilian
-  Portuguese, Russian, Simplified Chinese, Japanese, Korean and Arabic.
+<p align="center">
+  <img src="docs/media/android-and-ios.png" width="1000" alt="OpenCode Mobile running on Android and iPhone, with dark-theme chat and syntax-highlighted Kotlin code on both platforms">
+</p>
 
-## Requirements
+<p align="center">
+  Android APK available now · iOS available from source<br>
+  <sub>Independent community project. Not affiliated with or endorsed by the OpenCode team.</sub>
+</p>
 
-- Android 8.0 or newer, or iOS 15 or newer (the iOS app is built from source for now).
-- An [OpenCode](https://opencode.ai) **2.x** server (`opencode serve` or the background
-  service) that the phone can reach: same Wi‑Fi, or a VPN such as WireGuard or Tailscale.
+<p align="center">
+  <a href="#see-it-in-action">Demo</a> ·
+  <a href="#what-you-can-do">Features</a> ·
+  <a href="#get-the-app">Install</a> ·
+  <a href="#build-from-source">Build</a> ·
+  <a href="https://github.com/beppe2880/opencode-mobile/issues">Feedback</a>
+</p>
 
-## Install
+## Your workspace, within reach
 
-Download the APK from the [latest release](../../releases/latest) and open it on your phone
-(allow installing from your browser or file manager when asked). The release page lists the
-SHA-256 checksum of every APK.
+| Follow the work | Keep it moving | Check the result |
+| --- | --- | --- |
+| Read streaming responses, reasoning, tool output and subagent conversations. | Send a prompt, answer a question or approve a permission without returning to your desk. | Review file diffs, open source files and use the server's terminal from the same app. |
 
-## Connect to your server
+Your projects and agents run on **your OpenCode server**. The app connects to your existing
+sessions, so you can pick up a conversation on your phone while the work stays on your computer.
 
-Want a preview first? Tap **Try without a server** on the connect screen to explore
-sample sessions, scripted replies and settings offline. **Exit demo** returns to your
-real servers; demo changes are discarded and never affect your saved data.
+## See it in action
 
-1. On the computer running OpenCode, run:
+<table>
+  <tr>
+    <th>Follow a run and approve the next step</th>
+    <th>Track usage and make it yours</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/media/agent-run.gif" width="280" alt="Android demo: an agent edits files, asks a question and waits for permission"></td>
+    <td align="center"><img src="docs/media/usage-and-settings.gif" width="280" alt="Android demo: daily usage statistics, model costs and appearance settings"></td>
+  </tr>
+</table>
 
-   ```bash
-   opencode pair
-   ```
+*Recorded on Android with sample data. The opening image shows Android and iOS app captures.*
 
-   It prints one-time links and a QR code with every address of the computer; the app uses
-   the first one it can reach. To pin one (for example a VPN IP), add
-   `--url http://<address>:4096`.
-2. In the app, tap **Scan QR code** and scan it, or paste a link. You can also type the
-   server URL with the server password.
+<details>
+<summary><strong>More screenshots: sessions, light theme and model selection</strong></summary>
 
-On the same Wi-Fi the app also looks for OpenCode on the default port 4096 by itself: servers
-it finds appear under **Found on this network**, and you only need to enter a pairing code
-or the password.
+<p>
+  <img src="docs/screenshots/sessions.png" width="240" alt="Android: sessions grouped by project">
+  <img src="docs/screenshots/chat.png" width="240" alt="Android: chat in light theme">
+  <img src="docs/screenshots/model-picker-dark.png" width="240" alt="Android: model picker in dark theme">
+</p>
 
-Pairing codes work once and expire after a few minutes. The app keeps a token, encrypted on
-the device.
+Screenshots and recordings may show earlier versions of the app.
 
-> **Security:** OpenCode serves plain HTTP, so use a network you trust and never expose the
-> server port to the internet. See [SECURITY.md](SECURITY.md).
+</details>
+
+## What you can do
+
+### Chat and steer
+
+- **Live conversations** with streamed text, reasoning, tool calls, shell output and subagent sessions.
+- **More than a message box:** image attachments, `@` file mentions, `/` commands and `!` shell commands.
+- **Stay in control:** steer an active run or queue a prompt; send queued prompts now, edit or remove them.
+- **Answer from your phone:** approve or reject permission requests and respond to the agent's questions.
+- **Choose how the agent works:** switch agent, model and reasoning level per session, with recent models first.
+- **Voice input:** dictate with your phone's speech recognition or a configured cloud transcription provider.
+
+### Review and work
+
+- **Inspect changes** for a whole session or just the last turn, with file diffs one tap away.
+- **Read files** with syntax highlighting, line numbers and image previews.
+- **Open a terminal** in the session's directory on the server, with a configurable key bar for Esc, Ctrl and arrows.
+- **Manage context:** stop, undo, redo, compact or fork a session from a prompt.
+- **Manage MCP connections** for the current project.
+
+### Pick up where you left off
+
+- **Cached transcripts** and incremental sync for large conversations.
+- **Swipe between chats**, with saved drafts and remembered reading positions.
+- **Multiple saved servers**, QR pairing and discovery on your Wi-Fi network.
+- **Usage statistics** by day and model: cost, tokens and activity over 1, 7 or 30 days.
+- **Home screen widgets** for running and recent sessions.
+- **Light and dark themes**, phone and larger-screen layouts, and the familiar OpenCode typography.
+
+Available in **11 languages**: English, Italian, Spanish, French, German, Brazilian Portuguese,
+Russian, Simplified Chinese, Japanese, Korean and Arabic.
+
+### Platform-specific extras
+
+| Feature | Android | iOS |
+| --- | --- | --- |
+| Live chat, permissions, diffs, files and terminal | Yes | Yes |
+| Voice input, usage statistics and home screen widget | Yes | Yes |
+| Background session notifications and permission replies from notifications | Yes | — |
+| Start a session from another app's share menu | Yes | — |
+| Offline demo with sample sessions | Yes | — |
+| Installation | Release APK | Build from source |
+
+On Android, choose which notifications you receive: permission requests, questions and finished
+sessions. On iOS, live updates resume when you return to the app.
+
+## Get the app
+
+| Android | iPhone / iPad |
+| --- | --- |
+| **Android 8.0+** | **iOS 15+** |
+| [Download the latest APK](https://github.com/beppe2880/opencode-mobile/releases/latest) | [Build the iOS app from source](#ios) |
+| Open the APK on your phone and allow installation from your browser or file manager when prompted. Release assets include SHA-256 checksums. | Requires a Mac with Xcode. The iOS app is not currently distributed through the App Store or TestFlight. |
+
+You also need an **[OpenCode 2.x](https://opencode.ai) server** that your phone can reach,
+on the same Wi-Fi or through a VPN such as WireGuard or Tailscale.
+
+**Just looking around?** On Android, tap **Try without a server** on the initial connection
+screen to explore sample sessions and scripted replies. **Exit demo** returns to your real
+servers; demo changes are discarded.
+
+## Connect in two steps
+
+**1. Get a pairing code on your computer**
+
+With OpenCode running, use:
+
+```bash
+opencode pair
+```
+
+It prints one-time links and a QR code with your computer's addresses. To select a specific
+address, such as a VPN IP, use `opencode pair --url http://<address>:4096`.
+
+**2. Scan it on your phone**
+
+Tap **Scan QR code**, or paste the pairing link. The app tries the addresses in the code and
+saves the one it can reach. You can also enter a server URL and password manually.
+
+On the same Wi-Fi, nearby servers appear under **Found on this network**. Select one and enter
+a pairing code or password. Pairing codes are single-use and expire after a few minutes;
+credentials are stored securely on the device.
+
+> OpenCode serves plain HTTP. Use a trusted network or VPN and never expose the server port
+> to the internet. See [SECURITY.md](SECURITY.md).
 
 ## Build from source
+
+```bash
+git clone https://github.com/beppe2880/opencode-mobile.git
+cd opencode-mobile
+```
+
+### Android
 
 Requirements: JDK 21 and the Android SDK (compile SDK 37).
 
 ```bash
-git clone <this repository>
-cd opencode-mobile/android
-./gradlew :app:installDebug                    # needs a connected device or emulator
-./gradlew :app:installDebug -PfakeData=true    # opens the offline demo on launch
+cd android
+./gradlew :app:installDebug                  # connected device or emulator
+./gradlew :app:installDebug -PfakeData=true  # open the offline demo on launch
 ```
 
-On an emulator the app finds the host's server at `http://10.0.2.2:4096` by itself; pair it
-with a code from `opencode pair`.
+The Android emulator discovers the host server at `http://10.0.2.2:4096`; pair with a code
+from `opencode pair`. Release signing is configured through `android/keystore.properties`
+or `OCM_KEYSTORE_*` environment variables; see
+[`android/app/build.gradle.kts`](android/app/build.gradle.kts).
 
-Release builds read the signing key from `android/keystore.properties` or `OCM_KEYSTORE_*`
-environment variables (see [`android/app/build.gradle.kts`](android/app/build.gradle.kts)).
+### iOS
 
-## How it works
+Requirements: macOS, Xcode and JDK 21. Set `JAVA_HOME` to your JDK installation.
 
-- Kotlin Multiplatform: one codebase for Android and iOS with Compose Multiplatform,
-  Material 3, MVI, Koin, Ktor and Room. The iOS app (`iosApp/`) hosts the shared UI.
-- The OpenCode HTTP client in `android/core/api` is **generated** from the server's OpenAPI
-  document (`api/openapi.json`) and event schemas, so it follows the server contract exactly
-  (`bun run generate` in `tools/api-gen`).
-- Live updates come from the server's event stream (SSE); transcripts are cached in Room.
+1. Open [`iosApp/iosApp.xcodeproj`](iosApp/iosApp.xcodeproj) in Xcode.
+2. Select an Apple Silicon iOS simulator and run the `iosApp` target. Xcode builds the shared
+   Kotlin framework automatically.
+3. For a physical device, configure `TEAM_ID` in
+   [`iosApp/Configuration/Config.xcconfig`](iosApp/Configuration/Config.xcconfig) and enable
+   the configured App Group for the app and widget.
 
-Architecture, conventions and the design system are documented in [`AGENTS.md`](AGENTS.md),
-[`android/AGENTS.md`](android/AGENTS.md) and [`docs/design-system.md`](docs/design-system.md).
+See [Contributing](CONTRIBUTING.md#build-and-run) and the
+[iOS build notes](android/AGENTS.md#ios) for command-line builds and signing details.
 
-## Roadmap
+## Under the hood
 
-Planned work lives in [issues labeled `feature`](../../issues?q=is%3Aissue+is%3Aopen+label%3Afeature).
-Highlights:
+**Kotlin Multiplatform · Compose Multiplatform · Material 3 · MVI · Koin · Ktor · Room**
 
-- A terminal through the server's PTY.
+Android and iOS share the UI and core logic. The thin iOS host lives in `iosApp/`; the shared
+Gradle modules live in `android/`. Platform integrations handle credentials, voice input,
+widgets and other OS services.
 
-Issues labeled [`good first issue`](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-are a good place to start.
+The OpenCode HTTP client is **generated from the server's OpenAPI contract** and event
+schemas. Live updates arrive through SSE; transcripts are cached locally in Room.
 
-## Contributing
+[Architecture](AGENTS.md) · [Module guide](android/AGENTS.md) ·
+[Design system](docs/design-system.md) · [API generation](tools/api-gen)
 
-Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first:
-pull request titles follow Conventional Commits, and issues use the templates.
+## Feedback and contributions
+
+Found a bug or have an idea? [Open an issue](https://github.com/beppe2880/opencode-mobile/issues).
+Planned work lives in [feature issues](https://github.com/beppe2880/opencode-mobile/issues?q=is%3Aissue+is%3Aopen+label%3Afeature);
+[`good first issue`](https://github.com/beppe2880/opencode-mobile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+is a good place to start contributing.
+
+Pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, verification
+and Conventional Commit titles.
 
 ## License
 
-[MIT](LICENSE). The bundled Inter and IBM Plex Mono fonts are under the SIL Open Font
-License (see [NOTICE](NOTICE)).
+[MIT](LICENSE). Inter and IBM Plex Mono are licensed under the SIL Open Font License;
+see [NOTICE](NOTICE).
