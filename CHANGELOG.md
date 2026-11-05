@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/beppe2880/opencode-mobile/compare/v0.11.0...v0.12.0) (2026-11-05)
+
+
+### Features
+
+* **chat:** Stop all background commands and subagents from the Running sheet ([#146](https://github.com/beppe2880/opencode-mobile/issues/146)) ([ebbc6fd](https://github.com/beppe2880/opencode-mobile/commit/ebbc6fd67462ef87c9423a6474ca4c5b4bdf688b))
+
+
+### Documentation
+
+* Showcase Android and iOS in the README ([#142](https://github.com/beppe2880/opencode-mobile/issues/142)) ([b4cafaa](https://github.com/beppe2880/opencode-mobile/commit/b4cafaa63c2bda4519dc776a041b62fe43b3d553))
+
 ## [0.11.0](https://github.com/beppe2880/opencode-mobile/compare/v0.10.0...v0.11.0) (2026-11-01)
 
 
