@@ -926,7 +926,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.DraftChanged("/"))
-        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
+        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "connect", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
         vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.last()))
         assertEquals("/review ", vm.state.value.draft)
 
@@ -941,6 +941,18 @@ class ChatViewModelTest {
         vm.onEvent(ChatEvent.Send)
         advanceUntilIdle()
         assertEquals(listOf("/nope x" to PromptDelivery.Steer), chat.prompts)
+    }
+
+    @Test
+    fun `connect opens locally and never sends a prompt or server command`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/connect"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(ChatEffect.OpenProviders, vm.effect.first())
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
     }
 
     @Test

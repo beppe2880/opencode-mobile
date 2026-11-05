@@ -1,0 +1,10 @@
+<resources>
+    <string name="chat_providers">ربط مزوّد</string>
+    <string name="chat_providers_hint">طرق مفتاح API فقط. تُحفظ بيانات الاعتماد على هذا الخادم وليس على هاتفك.</string>
+    <string name="chat_providers_search">البحث عن المزوّدين</string>
+    <string name="chat_providers_key">مفتاح API</string>
+    <string name="chat_providers_save">ربط</string>
+    <string name="chat_providers_connected">تم حفظ بيانات الاعتماد على الخادم.</string>
+    <string name="chat_providers_error">تعذّر إكمال الطلب. تحقّق من الاتصال والحقول المطلوبة ثم أعد المحاولة.</string>
+    <string name="chat_providers_empty">لا توجد تكاملات مطابقة بمفتاح API.</string>
+</resources>

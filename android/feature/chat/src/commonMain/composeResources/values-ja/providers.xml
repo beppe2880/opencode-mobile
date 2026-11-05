@@ -1,0 +1,10 @@
+<resources>
+    <string name="chat_providers">プロバイダーを接続</string>
+    <string name="chat_providers_hint">API キー方式のみ。認証情報はスマートフォンではなく、このサーバーに保存されます。</string>
+    <string name="chat_providers_search">プロバイダーを検索</string>
+    <string name="chat_providers_key">API キー</string>
+    <string name="chat_providers_save">接続</string>
+    <string name="chat_providers_connected">認証情報をサーバーに保存しました。</string>
+    <string name="chat_providers_error">リクエストを完了できませんでした。接続と必須項目を確認して、再試行してください。</string>
+    <string name="chat_providers_empty">一致する API キー連携はありません。</string>
+</resources>

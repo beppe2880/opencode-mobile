@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.api.apis.AgentApi
 import io.github.beppe2880.opencodemobile.api.apis.CommandApi
 import io.github.beppe2880.opencodemobile.api.apis.ConfigApi
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
+import io.github.beppe2880.opencodemobile.api.apis.IntegrationApi
 import io.github.beppe2880.opencodemobile.api.apis.McpApi
 import io.github.beppe2880.opencodemobile.api.apis.ModelApi
 import io.github.beppe2880.opencodemobile.api.apis.PermissionApi
@@ -63,6 +64,7 @@ class OpenCodeClient internal constructor(
     val agents: AgentApi = AgentApi(baseUrl, http)
     val models: ModelApi = ModelApi(baseUrl, http)
     val providers: ProviderApi = ProviderApi(baseUrl, http)
+    val integrations: IntegrationApi = IntegrationApi(baseUrl, http)
     val projects: ProjectApi = ProjectApi(baseUrl, http)
     val commands: CommandApi = CommandApi(baseUrl, http)
     val config: ConfigApi = ConfigApi(baseUrl, http)

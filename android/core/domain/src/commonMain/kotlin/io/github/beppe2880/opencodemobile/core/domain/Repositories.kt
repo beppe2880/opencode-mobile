@@ -283,6 +283,9 @@ interface ChatRepository {
 }
 
 interface CatalogRepository {
+    /** Drop cached models after provider connection, including other folders on this server. */
+    fun invalidateModels(serverId: String) {}
+
     /** Agents available in [directory]; hidden and subagent-only agents are included and flagged. */
     suspend fun agents(directory: String?): Result<List<Agent>>
 

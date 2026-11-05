@@ -26,11 +26,20 @@ internal class RemoteCatalogRepository(
      * Agents, models and commands rarely change and every chat needs them: they are kept per
      * server, folder and kind for [CATALOG_TTL_MS], so switching chats does not reload them.
      */
-    private val memo = ConcurrentMap<String, Pair<Long, Any>>()
+    private data class MemoKey(val serverId: String?, val kind: String, val directory: String?, val revision: Any?)
+    private val memo = ConcurrentMap<MemoKey, Pair<Long, Any>>()
+    private val modelRevisions = ConcurrentMap<String, Any>()
+
+    override fun invalidateModels(serverId: String) {
+        // A model read started before invalidation must not repopulate the current cache.
+        modelRevisions[serverId] = Any()
+        memo.removeMatching { it.serverId == serverId && it.kind == "models" }
+    }
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : Any> remembered(kind: String, directory: String?, load: suspend () -> T): Result<T> {
-        val key = "${clients.activeIdOrNull()}|$kind|${directory.orEmpty()}"
+        val serverId = clients.activeIdOrNull()
+        val key = MemoKey(serverId, kind, directory, if (kind == "models" && serverId != null) modelRevisions[serverId] else null)
         memo[key]?.let { (at, value) -> if (clock() - at < CATALOG_TTL_MS) return Result.success(value as T) }
         return resultOf { load() }.onSuccess { memo[key] = clock() to it }
     }

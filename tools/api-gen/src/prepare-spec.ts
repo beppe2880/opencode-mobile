@@ -7,7 +7,7 @@
 const KEEP_TAGS = new Set([
   "server", "location", "agent", "session", "model", "project", "form", "permission",
   "filesystem", "command", "skill", "event", "shell", "worktree", "vcs", "pty", "reference",
-  "provider", "mcp", "config",
+  "provider", "mcp", "config", "integration",
 ])
 
 /** Config operations used by the app; the rest of the `config` area stays out. */

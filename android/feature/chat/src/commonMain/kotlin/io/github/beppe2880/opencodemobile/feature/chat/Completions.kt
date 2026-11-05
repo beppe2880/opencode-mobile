@@ -9,6 +9,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_fo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_undo
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import org.jetbrains.compose.resources.StringResource
 
 /** `/` commands and `@` file mentions typed in the composer. */
@@ -20,6 +21,7 @@ internal object Completions {
         Compact("compact", Res.string.chat_command_compact),
         Fork("fork", Res.string.chat_command_fork),
         Mcps("mcps", Res.string.chat_command_mcps),
+        Connect("connect", Res.string.chat_providers),
         ;
 
         companion object {

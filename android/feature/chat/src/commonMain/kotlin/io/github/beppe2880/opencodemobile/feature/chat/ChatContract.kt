@@ -378,6 +378,8 @@ sealed interface ChatEvent {
     /** The header line was tapped: opens the folder or the session changes (setting). */
     data object OpenHeaderChanges : ChatEvent
     data object OpenMcps : ChatEvent
+    data object OpenProviders : ChatEvent
+    data object ProvidersConnected : ChatEvent
     data object CloseMcps : ChatEvent
     data object RefreshMcps : ChatEvent
     data class SetMcpConnected(val name: String, val connected: Boolean) : ChatEvent
@@ -396,6 +398,7 @@ sealed interface ChatEvent {
 }
 
 sealed interface ChatEffect {
+    data object OpenProviders : ChatEffect
     data class ShowMessage(val message: UiText) : ChatEffect
     data object NavigateBack : ChatEffect
     data object PromptSent : ChatEffect

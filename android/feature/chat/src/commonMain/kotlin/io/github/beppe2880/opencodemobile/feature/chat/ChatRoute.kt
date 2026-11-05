@@ -5,10 +5,13 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -59,6 +62,24 @@ fun ChatRoute(
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
     val scope = rememberCoroutineScope()
+    val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
+    var providersOpen by remember(sessionId) { mutableStateOf(false) }
+    val providerState by providerModel.state.collectAsStateWithLifecycle()
+    DisposableEffect(providerModel) {
+        onDispose { providerModel.onEvent(ProviderConnectionEvent.Close) }
+    }
+    CollectEffect(providerModel.effect) { effect ->
+        when (effect) {
+            ProviderConnectionEffect.Connected -> viewModel.onEvent(ChatEvent.ProvidersConnected)
+            ProviderConnectionEffect.Close -> providersOpen = false
+        }
+    }
+    if (providersOpen) {
+        ProviderConnectionSheet(providerState, providerModel::onEvent) {
+            providerModel.onEvent(ProviderConnectionEvent.Close)
+            providersOpen = false
+        }
+    }
     // Per session: in list + detail the same route shows another session after a swipe.
     val listState = rememberSaveable(sessionId, saver = LazyListState.Saver) { LazyListState() }
 
@@ -117,6 +138,10 @@ fun ChatRoute(
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
+            ChatEffect.OpenProviders -> {
+                providerModel.onEvent(ProviderConnectionEvent.Open(state.directory))
+                providersOpen = true
+            }
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
             ChatEffect.NavigateBack -> onBack()
             ChatEffect.PromptSent -> {

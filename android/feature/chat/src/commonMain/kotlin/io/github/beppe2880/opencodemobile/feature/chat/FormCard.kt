@@ -39,6 +39,8 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Form
@@ -206,7 +208,7 @@ private fun CollapsedForm(form: Form, pendingCount: Int, onExpand: () -> Unit) {
 }
 
 @Composable
-private fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (FormAnswer?) -> Unit) {
+internal fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (FormAnswer?) -> Unit, sensitive: Boolean = false) {
     val c = OcTheme.colors
     Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs), modifier = Modifier.testTag("form_field_${field.key}")) {
         if (field !is FormField.Toggle) {
@@ -220,7 +222,7 @@ private fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (For
             field.description?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = c.textMuted) }
         }
         when (field) {
-            is FormField.Text -> TextInput(field, (answer as? FormAnswer.Text)?.value, onAnswer)
+            is FormField.Text -> TextInput(field, (answer as? FormAnswer.Text)?.value, onAnswer, sensitive)
             is FormField.Toggle -> OcSwitchRow(
                 title = field.title ?: field.key,
                 subtitle = field.description,
@@ -231,7 +233,7 @@ private fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (For
             is FormField.MultiSelect -> MultiSelectInput(field, (answer as? FormAnswer.Choices)?.values.orEmpty(), onAnswer)
             is FormField.Number -> {
                 // Local text so partial input like "3." is not reformatted while typing.
-                var text by rememberSaveable(field.key) {
+                var text by androidx.compose.runtime.remember(field.key, sensitive) {
                     mutableStateOf((answer as? FormAnswer.Number)?.value?.let { if (field.integer) it.toLong().toString() else it.toString() }.orEmpty())
                 }
                 OcTextField(
@@ -261,7 +263,7 @@ private fun FormFieldInput(field: FormField, answer: FormAnswer?, onAnswer: (For
 
 /** Options as single-choice chips; free text when there are none or [FormField.Text.custom] allows it. */
 @Composable
-private fun TextInput(field: FormField.Text, value: String?, onAnswer: (FormAnswer?) -> Unit) {
+private fun TextInput(field: FormField.Text, value: String?, onAnswer: (FormAnswer?) -> Unit, sensitive: Boolean = false) {
     val isOption = field.options.any { it.value == value }
     if (field.options.isNotEmpty()) {
         OptionChips(field.key, field.options, selected = { it.value == value }) { option ->
@@ -275,6 +277,8 @@ private fun TextInput(field: FormField.Text, value: String?, onAnswer: (FormAnsw
             placeholder = field.placeholder ?: if (field.options.isNotEmpty()) stringResource(Res.string.chat_form_other) else null,
             singleLine = false,
             maxLines = 4,
+            keyboardOptions = if (sensitive) KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false) else KeyboardOptions.Default,
+            visualTransformation = if (sensitive) PasswordVisualTransformation() else VisualTransformation.None,
             modifier = Modifier.fillMaxWidth().testTag("form_text_${field.key}"),
         )
     }
