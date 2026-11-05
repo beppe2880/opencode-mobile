@@ -193,6 +193,28 @@
     <string name="chat_running_refresh">刷新运行中的任务</string>
     <string name="chat_running_stop_title">停止此命令？</string>
     <string name="chat_running_stop_message">%1$s\n\n命令将被结束，其输出将不再可用。</string>
+    <string name="chat_running_subagents">子代理</string>
+    <string name="chat_running_commands">命令</string>
+    <string name="chat_running_stop_all">全部停止</string>
+    <string name="chat_running_stop_all_commands">停止所有命令</string>
+    <string name="chat_running_stop_all_agents">停止所有子代理</string>
+    <string name="chat_running_stop_agent_description">停止子代理 %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="other">停止 %1$d 个命令？</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">由此会话启动的命令将被结束，其输出将不再可用。此项目中的其他命令将继续运行。</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="other">停止 %1$d 个子代理？</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">它们当前的工作将被中断。此会话不会停止。</string>
+    <string name="chat_running_stop_agent_title">停止此子代理？</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\n其当前工作将被中断。此会话不会停止。</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="other">无法停止 %1$d 个命令</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="other">无法停止 %1$d 个子代理</item>
+    </plurals>
     <string name="chat_preview_folds">实时跟随的步骤在回答结束后会折叠</string>
     <string name="chat_preview_kept_open">实时跟随的步骤在回答结束后保持展开</string>
     <string name="chat_preview_not_followed">运行中的步骤保持折叠，直到你打开它们</string>

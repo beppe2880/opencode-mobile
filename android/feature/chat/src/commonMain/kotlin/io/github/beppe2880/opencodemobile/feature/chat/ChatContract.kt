@@ -120,6 +120,12 @@ data class ChatState(
     val stoppingCommands: Set<String> = emptySet(),
     /** The command whose Stop waits for confirmation; null when none. */
     val confirmingStop: String? = null,
+    /** Child sessions (subagents) being interrupted. */
+    val stoppingAgents: Set<String> = emptySet(),
+    /** The subagent whose Stop waits for confirmation; null when none. */
+    val confirmingStopAgent: String? = null,
+    /** The group whose "Stop all" waits for confirmation; null when none. */
+    val confirmingStopAll: RunningGroup? = null,
     /** Server clock minus device clock, for elapsed times of server timestamps. */
     val clockOffsetMs: Long = 0L,
     /** The branch line under the title; null while unknown, empty or turned off (setting). */
@@ -170,6 +176,12 @@ internal fun headerFolder(line: ChatHeaderLine, directory: String): String? =
     folderName(directory).takeIf { line == ChatHeaderLine.FolderBranchFiles }
 
 data class SessionPeek(val id: String, val title: String)
+
+/**
+ * A section of the Running sheet that can be stopped at once: the subagents, or the commands
+ * attributed to this session (never the unassigned ones).
+ */
+enum class RunningGroup { Agents, Commands }
 
 /**
  * The project's [folder] name (null when the setting leaves it out), [branch] (null on a
@@ -283,6 +295,16 @@ sealed interface ChatEvent {
     data class StopCommand(val id: String) : ChatEvent
     data object ConfirmStopCommand : ChatEvent
     data object DismissStopCommand : ChatEvent
+
+    /** Interrupts one subagent's child session; this session keeps running. */
+    data class StopAgent(val sessionId: String) : ChatEvent
+    data object ConfirmStopAgent : ChatEvent
+    data object DismissStopAgent : ChatEvent
+
+    /** Stops every running item of [group]; always asks for confirmation first. */
+    data class StopAll(val group: RunningGroup) : ChatEvent
+    data object ConfirmStopAll : ChatEvent
+    data object DismissStopAll : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent

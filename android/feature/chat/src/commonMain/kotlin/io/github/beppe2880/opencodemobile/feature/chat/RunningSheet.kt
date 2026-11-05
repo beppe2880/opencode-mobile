@@ -31,8 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.RunningAgent
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
@@ -44,17 +48,32 @@ import io.github.beppe2880.opencodemobile.core.ui.text.formatDuration
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_commands
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_elapsed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_empty
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_no_output
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_refresh
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_description
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_message
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_message
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_message
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_subagents
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_stop
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.PluralStringResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
@@ -109,20 +128,29 @@ internal fun RunningSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
             if (!state.workLoading && state.workError == null && state.work.isEmpty) {
                 item(key = "empty") { Text(stringResource(Res.string.chat_running_empty), color = colors.textMuted) }
             }
+            if (state.work.agents.isNotEmpty()) {
+                item(key = "agents_header") {
+                    SectionHeader(
+                        title = stringResource(Res.string.chat_running_subagents),
+                        stopAllDescription = stringResource(Res.string.chat_running_stop_all_agents),
+                        stopping = state.work.agents.all { it.session.id in state.stoppingAgents },
+                        testTag = "running_stop_all_agents",
+                        onStopAll = { onEvent(ChatEvent.StopAll(RunningGroup.Agents)) },
+                    )
+                }
+            }
             items(state.work.agents, key = { "agent:${it.session.id}" }) { agent ->
-                Row(
-                    Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("running_agent_${agent.session.id}")
-                        .clickable(role = Role.Button) { onEvent(ChatEvent.OpenSession(agent.session.id)) }
-                        .padding(vertical = OcSpacing.sm),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
-                        Text(agent.session.title, style = MaterialTheme.typography.bodyMedium)
-                        agent.session.agent?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = colors.textMuted) }
-                        agent.startedAt?.let { Elapsed(it, now, state.clockOffsetMs) }
-                    }
-                    Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = colors.iconMuted)
+                AgentRow(agent, state, now, onEvent)
+            }
+            if (state.work.commands.isNotEmpty()) {
+                item(key = "commands_header") {
+                    SectionHeader(
+                        title = stringResource(Res.string.chat_running_commands),
+                        stopAllDescription = stringResource(Res.string.chat_running_stop_all_commands),
+                        stopping = state.work.commands.all { it.id in state.stoppingCommands },
+                        testTag = "running_stop_all_commands",
+                        onStopAll = { onEvent(ChatEvent.StopAll(RunningGroup.Commands)) },
+                    )
                 }
             }
             items(state.work.commands, key = { "command:${it.id}" }) { command ->
@@ -152,6 +180,95 @@ internal fun RunningSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
             destructive = true,
             testTagPrefix = "running_stop",
         )
+    }
+    state.confirmingStopAgent?.let { id ->
+        val title = state.work.agents.firstOrNull { it.session.id == id }?.session?.title.orEmpty()
+        OcConfirmDialog(
+            title = stringResource(Res.string.chat_running_stop_agent_title),
+            text = stringResource(Res.string.chat_running_stop_agent_message, title),
+            confirmLabel = stringResource(Res.string.chat_stop),
+            onConfirm = { onEvent(ChatEvent.ConfirmStopAgent) },
+            onDismiss = { onEvent(ChatEvent.DismissStopAgent) },
+            destructive = true,
+            testTagPrefix = "running_stop_agent",
+        )
+    }
+    state.confirmingStopAll?.let { group ->
+        val (count, title, message, tagPrefix) = when (group) {
+            RunningGroup.Agents -> StopAllDialog(
+                state.work.agents.size,
+                Res.plurals.chat_running_stop_all_agents_title,
+                Res.string.chat_running_stop_all_agents_message,
+                "running_stop_all_agents",
+            )
+            RunningGroup.Commands -> StopAllDialog(
+                state.work.commands.size,
+                Res.plurals.chat_running_stop_all_commands_title,
+                Res.string.chat_running_stop_all_commands_message,
+                "running_stop_all_commands",
+            )
+        }
+        OcConfirmDialog(
+            title = pluralStringResource(title, count, count),
+            text = stringResource(message),
+            confirmLabel = stringResource(Res.string.chat_running_stop_all),
+            onConfirm = { onEvent(ChatEvent.ConfirmStopAll) },
+            onDismiss = { onEvent(ChatEvent.DismissStopAll) },
+            destructive = true,
+            testTagPrefix = tagPrefix,
+        )
+    }
+}
+
+private data class StopAllDialog(val count: Int, val title: PluralStringResource, val message: StringResource, val testTagPrefix: String)
+
+/** A small section title with the section's "Stop all", shown while anything in it runs. */
+@Composable
+private fun SectionHeader(title: String, stopAllDescription: String, stopping: Boolean, testTag: String, onStopAll: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            title,
+            style = MaterialTheme.typography.labelLarge,
+            color = OcTheme.colors.textMuted,
+            modifier = Modifier.weight(1f).semantics { heading() },
+        )
+        TextButton(
+            onClick = onStopAll,
+            enabled = !stopping,
+            modifier = Modifier.testTag(testTag).semantics { contentDescription = stopAllDescription },
+        ) {
+            if (stopping) OcSpinner() else Text(stringResource(Res.string.chat_running_stop_all))
+        }
+    }
+}
+
+/** Tapping the row opens the child session; its Stop only interrupts it. */
+@Composable
+private fun AgentRow(agent: RunningAgent, state: ChatState, now: Long, onEvent: (ChatEvent) -> Unit) {
+    val colors = OcTheme.colors
+    val id = agent.session.id
+    val stopping = id in state.stoppingAgents
+    val stopDescription = stringResource(Res.string.chat_running_stop_agent_description, agent.session.title)
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 48.dp)
+            .testTag("running_agent_$id")
+            .clickable(role = Role.Button) { onEvent(ChatEvent.OpenSession(id)) }
+            .padding(vertical = OcSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+            Text(agent.session.title, style = MaterialTheme.typography.bodyMedium)
+            agent.session.agent?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = colors.textMuted) }
+            agent.startedAt?.let { Elapsed(it, now, state.clockOffsetMs) }
+        }
+        TextButton(
+            onClick = { onEvent(ChatEvent.StopAgent(id)) },
+            enabled = !stopping,
+            modifier = Modifier.testTag("running_stop_agent_$id").semantics { contentDescription = stopDescription },
+        ) {
+            if (stopping) OcSpinner() else Text(stringResource(Res.string.chat_stop))
+        }
+        Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = colors.iconMuted)
     }
 }
 

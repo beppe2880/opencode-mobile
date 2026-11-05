@@ -204,6 +204,32 @@
     <string name="chat_running_refresh">Laufende Vorgänge aktualisieren</string>
     <string name="chat_running_stop_title">Diesen Befehl beenden?</string>
     <string name="chat_running_stop_message">%1$s\n\nDer Befehl wird beendet und seine Ausgabe ist nicht mehr verfügbar.</string>
+    <string name="chat_running_subagents">Subagenten</string>
+    <string name="chat_running_commands">Befehle</string>
+    <string name="chat_running_stop_all">Alle beenden</string>
+    <string name="chat_running_stop_all_commands">Alle Befehle beenden</string>
+    <string name="chat_running_stop_all_agents">Alle Subagenten beenden</string>
+    <string name="chat_running_stop_agent_description">Subagent %1$s beenden</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">%1$d Befehl beenden?</item>
+        <item quantity="other">%1$d Befehle beenden?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">Die von dieser Sitzung gestarteten Befehle werden beendet und ihre Ausgabe ist nicht mehr verfügbar. Andere Befehle in diesem Projekt laufen weiter.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">%1$d Subagenten beenden?</item>
+        <item quantity="other">%1$d Subagenten beenden?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">Ihre aktuelle Arbeit wird unterbrochen. Diese Sitzung wird nicht beendet.</string>
+    <string name="chat_running_stop_agent_title">Diesen Subagenten beenden?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nIhre aktuelle Arbeit wird unterbrochen. Diese Sitzung wird nicht beendet.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">%1$d Befehl konnte nicht beendet werden</item>
+        <item quantity="other">%1$d Befehle konnten nicht beendet werden</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">%1$d Subagent konnte nicht beendet werden</item>
+        <item quantity="other">%1$d Subagenten konnten nicht beendet werden</item>
+    </plurals>
     <string name="chat_preview_folds">Live verfolgte Schritte klappen am Ende der Antwort wieder zu</string>
     <string name="chat_preview_kept_open">Live verfolgte Schritte bleiben nach der Antwort geöffnet</string>
     <string name="chat_preview_not_followed">Laufende Schritte bleiben zugeklappt, bis du sie öffnest</string>

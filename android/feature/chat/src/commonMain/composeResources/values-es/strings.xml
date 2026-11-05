@@ -204,6 +204,32 @@
     <string name="chat_running_refresh">Actualizar trabajo en ejecución</string>
     <string name="chat_running_stop_title">¿Detener este comando?</string>
     <string name="chat_running_stop_message">%1$s\n\nEl comando se termina y su salida ya no está disponible.</string>
+    <string name="chat_running_subagents">Subagentes</string>
+    <string name="chat_running_commands">Comandos</string>
+    <string name="chat_running_stop_all">Detener todo</string>
+    <string name="chat_running_stop_all_commands">Detener todos los comandos</string>
+    <string name="chat_running_stop_all_agents">Detener todos los subagentes</string>
+    <string name="chat_running_stop_agent_description">Detener el subagente %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">¿Detener %1$d comando?</item>
+        <item quantity="other">¿Detener %1$d comandos?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">Los comandos iniciados por esta sesión se terminan y su salida ya no está disponible. Otros comandos de este proyecto siguen en ejecución.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">¿Detener %1$d subagente?</item>
+        <item quantity="other">¿Detener %1$d subagentes?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">Su trabajo actual se interrumpe. Esta sesión no se detiene.</string>
+    <string name="chat_running_stop_agent_title">¿Detener este subagente?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nSu trabajo actual se interrumpe. Esta sesión no se detiene.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">No se pudo detener %1$d comando</item>
+        <item quantity="other">No se pudieron detener %1$d comandos</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">No se pudo detener %1$d subagente</item>
+        <item quantity="other">No se pudieron detener %1$d subagentes</item>
+    </plurals>
     <string name="chat_preview_folds">Los pasos seguidos en directo se pliegan al terminar la respuesta</string>
     <string name="chat_preview_kept_open">Los pasos seguidos en directo quedan abiertos tras la respuesta</string>
     <string name="chat_preview_not_followed">Los pasos en ejecución permanecen plegados hasta que los abras</string>

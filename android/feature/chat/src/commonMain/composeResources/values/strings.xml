@@ -204,6 +204,32 @@
     <string name="chat_running_refresh">Refresh running work</string>
     <string name="chat_running_stop_title">Stop this command?</string>
     <string name="chat_running_stop_message">%1$s\n\nThe command is ended and its output is no longer available.</string>
+    <string name="chat_running_subagents">Subagents</string>
+    <string name="chat_running_commands">Commands</string>
+    <string name="chat_running_stop_all">Stop all</string>
+    <string name="chat_running_stop_all_commands">Stop all commands</string>
+    <string name="chat_running_stop_all_agents">Stop all subagents</string>
+    <string name="chat_running_stop_agent_description">Stop subagent %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">Stop %1$d command?</item>
+        <item quantity="other">Stop %1$d commands?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">The commands started by this session are ended and their output is no longer available. Other commands in this project keep running.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">Stop %1$d subagent?</item>
+        <item quantity="other">Stop %1$d subagents?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">Their current work is interrupted. This session is not stopped.</string>
+    <string name="chat_running_stop_agent_title">Stop this subagent?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nIts current work is interrupted. This session is not stopped.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">Could not stop %1$d command</item>
+        <item quantity="other">Could not stop %1$d commands</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">Could not stop %1$d subagent</item>
+        <item quantity="other">Could not stop %1$d subagents</item>
+    </plurals>
     <string name="chat_preview_folds">Steps followed live fold back when the answer ends</string>
     <string name="chat_preview_kept_open">Steps followed live stay open after the answer</string>
     <string name="chat_preview_not_followed">Running steps stay folded until you open them</string>

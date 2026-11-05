@@ -193,6 +193,28 @@
     <string name="chat_running_refresh">실행 중인 작업 새로 고침</string>
     <string name="chat_running_stop_title">이 명령을 중지할까요?</string>
     <string name="chat_running_stop_message">%1$s\n\n명령이 종료되며 출력은 더 이상 볼 수 없습니다.</string>
+    <string name="chat_running_subagents">하위 에이전트</string>
+    <string name="chat_running_commands">명령</string>
+    <string name="chat_running_stop_all">모두 중지</string>
+    <string name="chat_running_stop_all_commands">모든 명령 중지</string>
+    <string name="chat_running_stop_all_agents">모든 하위 에이전트 중지</string>
+    <string name="chat_running_stop_agent_description">하위 에이전트 %1$s 중지</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="other">명령 %1$d개를 중지할까요?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">이 세션에서 시작된 명령은 종료되며 출력은 더 이상 볼 수 없습니다. 이 프로젝트의 다른 명령은 계속 실행됩니다.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="other">하위 에이전트 %1$d개를 중지할까요?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">현재 작업이 중단됩니다. 이 세션은 중지되지 않습니다.</string>
+    <string name="chat_running_stop_agent_title">이 하위 에이전트를 중지할까요?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\n현재 작업이 중단됩니다. 이 세션은 중지되지 않습니다.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="other">명령 %1$d개를 중지할 수 없습니다</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="other">하위 에이전트 %1$d개를 중지할 수 없습니다</item>
+    </plurals>
     <string name="chat_preview_folds">실시간으로 따라간 단계는 답변이 끝나면 다시 접힙니다</string>
     <string name="chat_preview_kept_open">실시간으로 따라간 단계는 답변 후에도 열린 상태로 유지됩니다</string>
     <string name="chat_preview_not_followed">실행 중인 단계는 열기 전까지 접힌 상태로 유지됩니다</string>

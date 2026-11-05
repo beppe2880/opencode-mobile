@@ -204,6 +204,32 @@
     <string name="chat_running_refresh">Actualiser les tâches en cours</string>
     <string name="chat_running_stop_title">Arrêter cette commande ?</string>
     <string name="chat_running_stop_message">%1$s\n\nLa commande est arrêtée et sa sortie n’est plus disponible.</string>
+    <string name="chat_running_subagents">Sous-agents</string>
+    <string name="chat_running_commands">Commandes</string>
+    <string name="chat_running_stop_all">Tout arrêter</string>
+    <string name="chat_running_stop_all_commands">Arrêter toutes les commandes</string>
+    <string name="chat_running_stop_all_agents">Arrêter tous les sous-agents</string>
+    <string name="chat_running_stop_agent_description">Arrêter le sous-agent %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">Arrêter %1$d commande ?</item>
+        <item quantity="other">Arrêter %1$d commandes ?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">Les commandes lancées par cette session sont arrêtées et leur sortie n’est plus disponible. Les autres commandes de ce projet continuent de tourner.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">Arrêter %1$d sous-agent ?</item>
+        <item quantity="other">Arrêter %1$d sous-agents ?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">Leur travail en cours est interrompu. Cette session n’est pas arrêtée.</string>
+    <string name="chat_running_stop_agent_title">Arrêter ce sous-agent ?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nSon travail en cours est interrompu. Cette session n’est pas arrêtée.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">Impossible d’arrêter %1$d commande</item>
+        <item quantity="other">Impossible d’arrêter %1$d commandes</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">Impossible d’arrêter %1$d sous-agent</item>
+        <item quantity="other">Impossible d’arrêter %1$d sous-agents</item>
+    </plurals>
     <string name="chat_preview_folds">Les étapes suivies en direct se replient à la fin de la réponse</string>
     <string name="chat_preview_kept_open">Les étapes suivies en direct restent ouvertes après la réponse</string>
     <string name="chat_preview_not_followed">Les étapes en cours restent repliées jusqu’à ce que vous les ouvriez</string>

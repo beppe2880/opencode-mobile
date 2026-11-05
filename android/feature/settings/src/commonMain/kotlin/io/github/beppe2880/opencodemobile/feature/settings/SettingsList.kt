@@ -74,6 +74,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.visibleGrou
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
@@ -136,6 +137,7 @@ private fun CategoryRow(area: SettingsArea, state: SettingsState, onEvent: (Sett
 internal fun UiText.text(): String = when (this) {
     is UiText.Raw -> value
     is UiText.Resource -> stringResource(id, *args.map { if (it is UiText) it.text() else it }.toTypedArray())
+    is UiText.Plural -> pluralStringResource(id, quantity, *args.map { if (it is UiText) it.text() else it }.toTypedArray())
 }
 
 internal val SettingsArea.icon: ImageVector

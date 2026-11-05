@@ -10,8 +10,11 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_error_pairing
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_error_server
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_error_unauthorized
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_error_unreachable
+import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getPluralString
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
 /** Localizable text that ViewModels can put in State without a Context. */
@@ -20,10 +23,14 @@ sealed interface UiText {
     data class Resource(val id: StringResource, val args: List<Any> = emptyList()) : UiText
     data class Raw(val value: String) : UiText
 
+    /** A count phrase: [quantity] picks the plural form, [args] fill its placeholders. */
+    data class Plural(val id: PluralStringResource, val quantity: Int, val args: List<Any> = emptyList()) : UiText
+
     @Composable
     fun resolve(): String = when (this) {
         is Resource -> stringResource(id, *args.toTypedArray())
         is Raw -> value
+        is Plural -> pluralStringResource(id, quantity, *args.toTypedArray())
     }
 }
 
@@ -41,4 +48,5 @@ fun Throwable.toUiText(): UiText = when (this) {
 suspend fun UiText.asString(): String = when (this) {
     is UiText.Raw -> value
     is UiText.Resource -> getString(id, *args.toTypedArray())
+    is UiText.Plural -> getPluralString(id, quantity, *args.toTypedArray())
 }
