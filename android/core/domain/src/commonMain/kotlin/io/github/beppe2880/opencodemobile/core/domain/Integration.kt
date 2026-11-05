@@ -59,6 +59,14 @@ private fun FormField.active(answers: Map<String, FormAnswer>): Boolean = condit
 }
 
 interface IntegrationRepository {
+    /** Structured local browser flow. Closing/cancelling the caller releases the listener and temporary secrets. */
+    suspend fun connectBrowserOAuth(
+        serverId: String,
+        directory: String,
+        integrationId: String,
+        methodId: String,
+        openBrowser: suspend (String) -> Unit,
+    ): Result<Unit> = Result.failure(OpenCodeError.NotFound("Browser OAuth unavailable"))
     suspend fun startOAuth(
         serverId: String,
         directory: String,
@@ -76,7 +84,14 @@ interface IntegrationRepository {
     suspend fun connectKey(serverId: String, directory: String, integrationId: String, key: String, answers: Map<String, FormAnswer>): Result<Unit>
 }
 
-data class ProviderOAuthMethod(val id: String, val label: String, val form: KeyIntegration, val mobileSupported: Boolean)
+data class ProviderOAuthMethod(
+    val id: String,
+    val label: String,
+    val form: KeyIntegration,
+    val mobileSupported: Boolean,
+    val browser: Boolean = false,
+    val requiresSecureTransport: Boolean = false,
+)
 data class ProviderOAuthAttempt(val id: String, val url: String, val instructions: String)
 enum class ProviderOAuthStatus { Pending, Complete, Failed, Expired }
 

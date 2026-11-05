@@ -43,6 +43,25 @@ class ProviderConnectionViewModelTest {
     }
     private val integration = KeyIntegration("custom", "Custom", false, null, listOf(FormField.Text("region", default = "eu", required = true)))
     private val repository = object : IntegrationRepository {
+        var browserCalls = 0
+        var browserCancelled = false
+        var browserGate: CompletableDeferred<Unit>? = null
+        var browserResult = Result.success(Unit)
+        override suspend fun connectBrowserOAuth(
+            serverId: String,
+            directory: String,
+            integrationId: String,
+            methodId: String,
+            openBrowser: suspend (String) -> Unit,
+        ): Result<Unit> {
+            browserCalls++
+            target = serverId to directory
+            try {
+                openBrowser("https://auth.example/authorize")
+                browserGate?.await()
+                return browserResult
+            } finally { browserCancelled = true }
+        }
         var oauthCalls = 0
         var statusCalls = 0
         var cancellations = 0
@@ -94,6 +113,67 @@ class ProviderConnectionViewModelTest {
         override suspend fun models(directory: String?) = Result.success(emptyList<ModelInfo>())
     }
     private fun vm() = ProviderConnectionViewModel(repository, servers, catalog)
+    private suspend fun openBrowserMethod(): ProviderConnectionViewModel {
+        val method = ProviderOAuthMethod("browser", "Sign in", integration.copy(fields = emptyList()), true, browser = true)
+        repository.listResult = Result.success(listOf(integration.copy(oauthMethods = listOf(method))))
+        val vm = vm()
+        vm.onEvent(ProviderConnectionEvent.Open("/repo"))
+        kotlinx.coroutines.yield()
+        vm.onEvent(ProviderConnectionEvent.Select("custom"))
+        vm.onEvent(ProviderConnectionEvent.ChooseOAuth("browser"))
+        return vm
+    }
+
+    @Test fun `browser flow waits through background and completes without device polling`() = runTest(main.testDispatcher) {
+        val vm = openBrowserMethod()
+        repository.browserGate = CompletableDeferred()
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        runCurrent()
+        assertEquals(1, repository.browserCalls)
+        assertEquals("https://auth.example/authorize", vm.state.value.browserUrl)
+        assertTrue(vm.state.value.saving)
+        vm.onEvent(ProviderConnectionEvent.Visible(false))
+        runCurrent()
+        assertFalse(repository.browserCancelled)
+        repository.browserGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.connected)
+        assertEquals(null, vm.state.value.browserUrl)
+        assertEquals("s1", catalog.invalidated)
+        assertEquals("s1" to "/repo", repository.target)
+        assertEquals(0, repository.oauthCalls)
+        assertEquals(0, repository.statusCalls)
+        vm.onEvent(ProviderConnectionEvent.Close)
+    }
+
+    @Test fun `closing browser flow cancels work and clears authorization URL`() = runTest(main.testDispatcher) {
+        val vm = openBrowserMethod()
+        repository.browserGate = CompletableDeferred()
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        runCurrent()
+        vm.onEvent(ProviderConnectionEvent.Close)
+        advanceUntilIdle()
+        assertTrue(repository.browserCancelled)
+        assertEquals(ProviderConnectionState(), vm.state.value)
+    }
+
+    @Test fun `browser failure clears authorization material and allows fresh retry`() = runTest(main.testDispatcher) {
+        val vm = openBrowserMethod()
+        repository.browserResult = Result.failure(OpenCodeError.Server(400, null, "secret-token"))
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.failed)
+        assertEquals(null, vm.state.value.browserUrl)
+        assertFalse(vm.state.value.saving)
+        assertFalse(vm.state.value.toString().contains("secret-token"))
+        repository.browserResult = Result.success(Unit)
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.connected)
+        assertEquals(2, repository.browserCalls)
+        vm.onEvent(ProviderConnectionEvent.Close)
+    }
     private fun ProviderConnectionViewModel.select() {
         onEvent(ProviderConnectionEvent.Select("custom"))
         onEvent(ProviderConnectionEvent.KeyChanged("dummy-key"))

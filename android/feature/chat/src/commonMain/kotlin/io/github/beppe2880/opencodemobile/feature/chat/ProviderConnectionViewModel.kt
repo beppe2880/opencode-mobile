@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthMethod
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -31,6 +32,7 @@ data class ProviderConnectionState(
     val oauth: ProviderOAuthMethod? = null,
     val attempt: ProviderOAuthAttempt? = null,
     val visible: Boolean = true,
+    val browserUrl: String? = null,
 )
 
 sealed interface ProviderConnectionEvent {
@@ -91,7 +93,9 @@ class ProviderConnectionViewModel(
             is ProviderConnectionEvent.Visible -> {
                 updateState { it.copy(visible = event.value, failed = if (event.value && it.attempt != null) false else it.failed) }
             }
-            ProviderConnectionEvent.OpenBrowser -> currentState.attempt?.let { sendEffect(ProviderConnectionEffect.OpenBrowser(it.url)) }
+            ProviderConnectionEvent.OpenBrowser -> (currentState.browserUrl ?: currentState.attempt?.url)?.let {
+                sendEffect(ProviderConnectionEffect.OpenBrowser(it))
+            }
             ProviderConnectionEvent.StartOAuth -> startOAuth()
             is ProviderConnectionEvent.ChooseOAuth -> {
                 if (currentState.saving || currentState.attempt != null) return
@@ -131,6 +135,10 @@ class ProviderConnectionViewModel(
         val id = serverId ?: return
         val folder = directory
         if (state.saving || state.attempt != null || !method.mobileSupported || !method.form.isComplete(state.answers)) return
+        if (method.browser) {
+            startBrowserOAuth(id, folder, selected.id, method.id)
+            return
+        }
         val token = generation
         updateState { it.copy(saving = true, failed = false) }
         job = viewModelScope.launch {
@@ -175,6 +183,26 @@ class ProviderConnectionViewModel(
                     withContext(NonCancellable) { integrations.cancelOAuth(id, folder, selected.id, attempt.id) }
                 }
             }
+        }
+    }
+
+    private fun startBrowserOAuth(id: String, folder: String, integrationId: String, methodId: String) {
+        val token = generation
+        catalog.invalidateModels(id)
+        updateState { it.copy(saving = true, failed = false, key = "", answers = emptyMap()) }
+        job = viewModelScope.launch {
+            val result = integrations.connectBrowserOAuth(id, folder, integrationId, methodId) { url ->
+                withContext(Dispatchers.Main.immediate) {
+                    if (token == generation) {
+                        updateState { it.copy(browserUrl = url) }
+                        sendEffect(ProviderConnectionEffect.OpenBrowser(url))
+                    }
+                }
+            }
+            if (result.isSuccess) catalog.invalidateModels(id)
+            if (token != generation) return@launch
+            updateState { it.copy(saving = false, browserUrl = null, failed = result.isFailure, connected = result.isSuccess) }
+            if (result.isSuccess) sendEffect(ProviderConnectionEffect.Connected)
         }
     }
 

@@ -1,4 +1,6 @@
 <resources>
+    <string name="chat_provider_browser_waiting">Завершите вход в браузере и вернитесь сюда. Учётные данные безопасно передаются серверу и не сохраняются на телефоне. Закрытие панели отменяет вход.</string>
+    <string name="chat_provider_secure">Для входа через браузер требуется HTTPS-соединение с сервером. Сначала обновите сохранённый адрес сервера.</string>
     <string name="chat_provider_device">Продолжить с кодом устройства</string>
     <string name="chat_provider_browser">Открыть браузер для авторизации</string>
     <string name="chat_provider_computer">Этот метод пока не поддерживается на мобильных устройствах. Используйте компьютер или другой метод.</string>

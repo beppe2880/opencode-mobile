@@ -1,4 +1,6 @@
 <resources>
+    <string name="chat_provider_browser_waiting">在浏览器中完成登录后返回此处。凭据将安全传输到服务器，不会保存在手机上。关闭此面板将取消登录。</string>
+    <string name="chat_provider_secure">浏览器登录需要通过 HTTPS 连接服务器。请先更新保存的服务器地址。</string>
     <string name="chat_provider_device">使用设备代码继续</string>
     <string name="chat_provider_browser">打开浏览器授权</string>
     <string name="chat_provider_computer">移动端暂不支持此方式。请使用电脑或其他方式。</string>

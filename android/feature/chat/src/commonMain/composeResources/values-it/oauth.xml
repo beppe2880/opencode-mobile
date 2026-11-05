@@ -1,4 +1,6 @@
 <resources>
+    <string name="chat_provider_browser_waiting">Completa l'accesso nel browser, poi torna qui. Le credenziali vengono trasferite in sicurezza al server e non salvate sul telefono. Chiudendo il pannello annulli l'accesso.</string>
+    <string name="chat_provider_secure">L'accesso dal browser richiede una connessione HTTPS al server. Aggiorna l'indirizzo del server salvato prima di continuare.</string>
     <string name="chat_provider_device">Continua con codice dispositivo</string>
     <string name="chat_provider_browser">Apri il browser per autorizzare</string>
     <string name="chat_provider_computer">Questo metodo non è ancora supportato da mobile. Usa il computer o un altro metodo.</string>

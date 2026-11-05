@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
+import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
 import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
@@ -102,7 +103,8 @@ val dataModule = module {
     single<TerminalRepository> { RemoteTerminalRepository(get(), network = get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
     single<McpRepository> { RemoteMcpRepository(get()) }
-    single<IntegrationRepository> { RemoteIntegrationRepository(get(), get()) }
+    single { BrowserOAuth(get(), get(SettingsStore)) }
+    single<IntegrationRepository> { RemoteIntegrationRepository(get(), get(), get()) }
     single<VcsRepository> { RemoteVcsRepository(get()) }
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }

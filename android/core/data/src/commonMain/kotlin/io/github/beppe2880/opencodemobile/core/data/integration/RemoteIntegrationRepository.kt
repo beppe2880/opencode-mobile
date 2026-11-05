@@ -1,5 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.data.integration
 
+import io.github.beppe2880.opencodemobile.api.models.CredentialCreateInput
+import io.github.beppe2880.opencodemobile.api.models.CredentialOAuth
+import io.github.beppe2880.opencodemobile.api.models.CredentialValue
 import io.github.beppe2880.opencodemobile.api.models.IntegrationAttemptEncoded
 import io.github.beppe2880.opencodemobile.api.models.IntegrationAttemptStatus
 import io.github.beppe2880.opencodemobile.api.models.IntegrationConnectKeyRequest
@@ -19,9 +22,72 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toJson
 import io.github.beppe2880.opencodemobile.core.network.mapping.toKeyIntegration
 import io.ktor.http.Url
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
-internal class RemoteIntegrationRepository(private val clients: OpenCodeClients, private val servers: ServerRepository) : IntegrationRepository {
+internal class RemoteIntegrationRepository(
+    private val clients: OpenCodeClients,
+    private val servers: ServerRepository,
+    private val browser: BrowserOAuth? = null,
+) : IntegrationRepository {
+    override suspend fun connectBrowserOAuth(
+        serverId: String,
+        directory: String,
+        integrationId: String,
+        methodId: String,
+        openBrowser: suspend (String) -> Unit,
+    ) = resultOf {
+        val provider = OpenAiBrowser
+        require(integrationId == provider.integrationId && methodId == provider.methodId)
+        val profile = servers.servers.value.firstOrNull { it.id == serverId } ?: throw OpenCodeError.NotFound("Server removed")
+        require(protectedOAuthTransport(profile.baseUrl))
+        val targetClient = clients.forProfile(profile)
+        val oauth = requireNotNull(browser)
+        // Recheck discovery: do not import credentials for a method the target server does not implement.
+        val available = listKeys(serverId, directory).getOrThrow()
+        require(available.any { it.id == integrationId && it.oauthMethods.any { method -> method.id == methodId && method.mobileSupported } })
+        // OpenAI requires a stable destination-host ID before import. The existing plugin owns
+        // that store and initializes it lazily on authorize; prepare then immediately cancel
+        // an unopened server attempt. Never copy the phone's host ID into the server.
+        val integrationApi = targetClient.integrations
+        val prepared = awaitBody {
+            integrationApi.integrationOauthConnect(integrationId, IntegrationOauthConnectRequest(methodId, emptyMap()), directory)
+        }.data
+        val preparedId = requireNotNull(prepared.attemptID)
+        try {
+            val preparedUrl = Url(requireNotNull(prepared.url))
+            require(preparedUrl.parameters["ext_agent_host_id"]?.startsWith("urn:uuid:") == true)
+        } finally {
+            withContext(NonCancellable) { awaitSuccess { integrationApi.integrationOauthCancel(integrationId, preparedId, directory) } }
+        }
+        val credential = oauth.authorize(provider, openBrowser)
+        currentCoroutineContext().ensureActive()
+        require(servers.servers.value.firstOrNull { it.id == serverId } == profile && servers.activeServer.value?.id == serverId)
+        val api = targetClient.credentials
+        awaitSuccess {
+            api.credentialCreate(
+                CredentialCreateInput(
+                    integrationID = integrationId,
+                    value = CredentialValue.OauthWrapper(
+                        CredentialOAuth(
+                            type = CredentialOAuth.Type.OAUTH, methodID = methodId,
+                            refresh = credential.refresh, access = credential.access, expires = credential.expires,
+                            metadata = buildJsonObject {
+                                put("clientID", credential.clientId)
+                                put("scopes", JsonArray(credential.scopes.map(::JsonPrimitive)))
+                            },
+                        ),
+                    ),
+                    label = "OpenCode Mobile", activate = true,
+                ),
+            )
+        }
+    }
     override suspend fun startOAuth(serverId: String, directory: String, integrationId: String, methodId: String, answers: Map<String, FormAnswer>) = resultOf {
         require(deviceOAuthSupported(integrationId, methodId))
         val api = client(serverId).integrations
@@ -62,7 +128,19 @@ internal class RemoteIntegrationRepository(private val clients: OpenCodeClients,
 
     override suspend fun listKeys(serverId: String, directory: String) = resultOf {
         val api = client(serverId).integrations
-        awaitBody { api.integrationList(locationDirectory = directory) }.data.mapNotNull { it.toKeyIntegration() }.sortedBy { it.name.lowercase() }
+        val secure = protectedOAuthTransport(client(serverId).baseUrl)
+        awaitBody { api.integrationList(locationDirectory = directory) }.data.mapNotNull { it.toKeyIntegration() }.map { integration ->
+            integration.copy(
+                oauthMethods = integration.oauthMethods.map { method ->
+                    if (integration.id == OpenAiBrowser.integrationId && method.id == OpenAiBrowser.methodId) {
+                        method.copy(
+                            browser = true, mobileSupported = browser?.supported == true && secure,
+                            requiresSecureTransport = browser?.supported == true && !secure,
+                        )
+                    } else method
+                },
+            )
+        }.sortedBy { it.name.lowercase() }
     }
 
     override suspend fun connectKey(serverId: String, directory: String, integrationId: String, key: String, answers: Map<String, FormAnswer>) = resultOf {

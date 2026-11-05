@@ -38,6 +38,7 @@ kotlin {
             implementation(libs.androidx.room.runtime)
         }
         androidMain.dependencies {
+            implementation(libs.okhttp)
             implementation(libs.androidx.security.crypto)
             implementation(libs.androidx.lifecycle.process)
             implementation(libs.kotlinx.coroutines.android)

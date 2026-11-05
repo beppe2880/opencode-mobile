@@ -30,8 +30,10 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_browser
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_browser_waiting
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_computer
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_device
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_secure
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_connected
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_empty
@@ -78,10 +80,13 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
                 }
             } else if (selected != null) {
                 val oauth = state.oauth
-                if (state.attempt != null) {
+                if (state.attempt != null || state.browserUrl != null) {
                     item("oauth_waiting") {
                         SelectionContainer {
-                            Text(state.attempt.instructions, modifier = Modifier.testTag("provider_oauth_instructions"))
+                            Text(
+                                state.attempt?.instructions ?: stringResource(Res.string.chat_provider_browser_waiting),
+                                modifier = Modifier.testTag("provider_oauth_instructions"),
+                            )
                         }
                         OcButton(stringResource(Res.string.chat_provider_browser), {
                             onEvent(ProviderConnectionEvent.OpenBrowser)
@@ -101,7 +106,7 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
                                     modifier = Modifier.fillMaxWidth().testTag("provider_oauth_${method.id}"), variant = OcButtonVariant.Secondary,
                                 )
                                 if (!method.mobileSupported) Text(
-                                    stringResource(Res.string.chat_provider_computer),
+                                    stringResource(if (method.requiresSecureTransport) Res.string.chat_provider_secure else Res.string.chat_provider_computer),
                                     style = MaterialTheme.typography.bodySmall, color = c.textMuted,
                                 )
                             }
@@ -130,7 +135,8 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
                                 modifier = Modifier.testTag("provider_back"), variant = OcButtonVariant.Secondary, enabled = !state.saving,
                             )
                             if (oauth != null) OcButton(
-                                stringResource(Res.string.chat_provider_device), { onEvent(ProviderConnectionEvent.StartOAuth) },
+                                stringResource(if (oauth.browser) Res.string.chat_provider_browser else Res.string.chat_provider_device),
+                                { onEvent(ProviderConnectionEvent.StartOAuth) },
                                 enabled = oauth.form.isComplete(state.answers), loading = state.saving,
                                 modifier = Modifier.weight(1f).testTag("provider_oauth_start"),
                             ) else if (selected.hasKey) OcButton(
