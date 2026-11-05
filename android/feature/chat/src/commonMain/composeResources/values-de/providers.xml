@@ -1,10 +1,10 @@
 <resources>
     <string name="chat_providers">Anbieter verbinden</string>
-    <string name="chat_providers_hint">Nur API-Schlüssel. Zugangsdaten werden auf diesem Server gespeichert, nicht auf dem Telefon.</string>
+    <string name="chat_providers_hint">Zugangsdaten werden auf diesem Server gespeichert, nicht auf dem Telefon.</string>
     <string name="chat_providers_search">Anbieter suchen</string>
     <string name="chat_providers_key">API-Schlüssel</string>
     <string name="chat_providers_save">Verbinden</string>
     <string name="chat_providers_connected">Zugangsdaten auf dem Server gespeichert.</string>
     <string name="chat_providers_error">Anfrage fehlgeschlagen. Prüfe die Verbindung und Pflichtfelder und versuche es erneut.</string>
-    <string name="chat_providers_empty">Keine passenden API-Schlüssel-Integrationen verfügbar.</string>
+    <string name="chat_providers_empty">Keine passenden Integrationen verfügbar.</string>
 </resources>

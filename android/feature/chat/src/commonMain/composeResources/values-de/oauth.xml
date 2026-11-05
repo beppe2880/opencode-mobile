@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">Mit Gerätecode fortfahren</string>
+    <string name="chat_provider_browser">Browser zur Autorisierung öffnen</string>
+    <string name="chat_provider_computer">Diese Methode wird auf Mobilgeräten noch nicht unterstützt. Verwende den Computer oder eine andere Methode.</string>
+</resources>

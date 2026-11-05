@@ -6,6 +6,16 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class KeyIntegrationTest {
+    @Test fun deviceCompatibilityIsMethodSpecific() {
+        assertTrue(deviceOAuthSupported("github-copilot", "device"))
+        assertTrue(deviceOAuthSupported("openai", "chatgpt-headless"))
+        assertTrue(deviceOAuthSupported("opencode", "device"))
+        assertTrue(deviceOAuthSupported("xai", "device"))
+        assertFalse(deviceOAuthSupported("openai", "chatgpt-token-sharing"))
+        assertFalse(deviceOAuthSupported("openai", "chatgpt-browser"))
+        assertFalse(deviceOAuthSupported("unknown", "device"))
+    }
+
     @Test
     fun hiddenDefaultsFollowConditionsAndInactiveAnswersAreOmitted() {
         val integration = KeyIntegration(

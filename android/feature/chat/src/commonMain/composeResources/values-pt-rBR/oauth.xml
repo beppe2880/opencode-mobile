@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">Continuar com código do dispositivo</string>
+    <string name="chat_provider_browser">Abrir navegador para autorizar</string>
+    <string name="chat_provider_computer">Este método ainda não é compatível com dispositivos móveis. Use o computador ou outro método.</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">Continuer avec un code appareil</string>
+    <string name="chat_provider_browser">Ouvrir le navigateur pour autoriser</string>
+    <string name="chat_provider_computer">Cette méthode n'est pas encore prise en charge sur mobile. Utilisez l'ordinateur ou une autre méthode.</string>
+</resources>

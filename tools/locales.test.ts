@@ -35,6 +35,17 @@ const alwaysTranslated = ["it"]
 const strict = process.env.STRICT_LOCALES === "1"
 const pending: string[] = []
 
+async function directoryResources(directory: string): Promise<Map<string, Resource>> {
+  const result = new Map<string, Resource>()
+  for await (const file of new Bun.Glob("*.xml").scan({ cwd: directory })) {
+    for (const [key, value] of resources(await Bun.file(`${directory}/${file}`).text())) {
+      if (result.has(key)) throw new Error(`Duplicate resource: ${key}`)
+      result.set(key, value)
+    }
+  }
+  return result
+}
+
 afterAll(() => {
   if (pending.length === 0) return
   console.warn(`${pending.length} strings to translate before the next release:\n  ${pending.join("\n  ")}`)
@@ -43,10 +54,10 @@ afterAll(() => {
 for (const module of modules) {
   const compose = module !== "app"
   const res = compose ? `${root}/android/${module}/src/commonMain/composeResources` : `${root}/android/${module}/src/main/res`
-  const source = resources(await Bun.file(`${res}/values/strings.xml`).text())
+  const source = await directoryResources(`${res}/values`)
   for (const locale of locales) {
     test(`${module}: ${locale} coverage, format arguments and plural forms`, async () => {
-      const translated = resources(await Bun.file(`${res}/values-${locale}/strings.xml`).text())
+      const translated = await directoryResources(`${res}/values-${locale}`)
       for (const [name, original] of source) {
         if (!original.translatable) continue
         const value = translated.get(name)

@@ -1,10 +1,10 @@
 <resources>
     <string name="chat_providers">Conectar provedor</string>
-    <string name="chat_providers_hint">Apenas métodos com chave API. As credenciais são salvas neste servidor, não no telefone.</string>
+    <string name="chat_providers_hint">As credenciais são salvas neste servidor, não no telefone.</string>
     <string name="chat_providers_search">Buscar provedores</string>
     <string name="chat_providers_key">Chave API</string>
     <string name="chat_providers_save">Conectar</string>
     <string name="chat_providers_connected">Credenciais salvas no servidor.</string>
     <string name="chat_providers_error">Não foi possível concluir a solicitação. Verifique a conexão e os campos obrigatórios e tente novamente.</string>
-    <string name="chat_providers_empty">Nenhuma integração com chave API correspondente disponível.</string>
+    <string name="chat_providers_empty">Nenhuma integração correspondente disponível.</string>
 </resources>

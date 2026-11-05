@@ -8,6 +8,8 @@ data class KeyIntegration(
     val keyLabel: String?,
     val fields: List<FormField>,
     val hidden: Set<String> = emptySet(),
+    val hasKey: Boolean = true,
+    val oauthMethods: List<ProviderOAuthMethod> = emptyList(),
 ) {
     fun answers(values: Map<String, FormAnswer>): Map<String, FormAnswer> {
         val result = mutableMapOf<String, FormAnswer>()
@@ -57,7 +59,30 @@ private fun FormField.active(answers: Map<String, FormAnswer>): Boolean = condit
 }
 
 interface IntegrationRepository {
+    suspend fun startOAuth(
+        serverId: String,
+        directory: String,
+        integrationId: String,
+        methodId: String,
+        answers: Map<String, FormAnswer>,
+    ): Result<ProviderOAuthAttempt> =
+        Result.failure(OpenCodeError.NotFound("OAuth unavailable"))
+    suspend fun oauthStatus(serverId: String, directory: String, integrationId: String, attemptId: String): Result<ProviderOAuthStatus> =
+        Result.failure(OpenCodeError.NotFound("OAuth unavailable"))
+    suspend fun cancelOAuth(serverId: String, directory: String, integrationId: String, attemptId: String): Result<Unit> = Result.success(Unit)
+
     /** Includes every integration offering a key method, scoped to the original saved server. */
     suspend fun listKeys(serverId: String, directory: String): Result<List<KeyIntegration>>
     suspend fun connectKey(serverId: String, directory: String, integrationId: String, key: String, answers: Map<String, FormAnswer>): Result<Unit>
+}
+
+data class ProviderOAuthMethod(val id: String, val label: String, val form: KeyIntegration, val mobileSupported: Boolean)
+data class ProviderOAuthAttempt(val id: String, val url: String, val instructions: String)
+enum class ProviderOAuthStatus { Pending, Complete, Failed, Expired }
+
+/** Only audited remote-compatible flows. `auto` alone does not distinguish device from loopback OAuth. */
+fun deviceOAuthSupported(integrationId: String, methodId: String): Boolean = when (integrationId) {
+    "github-copilot", "opencode", "xai" -> methodId == "device"
+    "openai" -> methodId == "chatgpt-headless"
+    else -> false
 }

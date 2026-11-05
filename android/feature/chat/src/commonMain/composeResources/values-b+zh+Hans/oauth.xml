@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">使用设备代码继续</string>
+    <string name="chat_provider_browser">打开浏览器授权</string>
+    <string name="chat_provider_computer">移动端暂不支持此方式。请使用电脑或其他方式。</string>
+</resources>

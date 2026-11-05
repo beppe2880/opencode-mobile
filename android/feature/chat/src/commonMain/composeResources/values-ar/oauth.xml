@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">المتابعة برمز الجهاز</string>
+    <string name="chat_provider_browser">فتح المتصفح للتفويض</string>
+    <string name="chat_provider_computer">هذه الطريقة غير مدعومة على الهاتف بعد. استخدم الكمبيوتر أو طريقة أخرى.</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">Продолжить с кодом устройства</string>
+    <string name="chat_provider_browser">Открыть браузер для авторизации</string>
+    <string name="chat_provider_computer">Этот метод пока не поддерживается на мобильных устройствах. Используйте компьютер или другой метод.</string>
+</resources>

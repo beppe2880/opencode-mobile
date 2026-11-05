@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +26,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
 import kotlinx.coroutines.launch
@@ -63,6 +65,11 @@ fun ChatRoute(
     val clipboard = rememberTextClipboard()
     val scope = rememberCoroutineScope()
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
+    val providerBrowser = LocalUriHandler.current
+    LifecycleStartEffect(providerModel) {
+        providerModel.onEvent(ProviderConnectionEvent.Visible(true))
+        onStopOrDispose { providerModel.onEvent(ProviderConnectionEvent.Visible(false)) }
+    }
     var providersOpen by remember(sessionId) { mutableStateOf(false) }
     val providerState by providerModel.state.collectAsStateWithLifecycle()
     DisposableEffect(providerModel) {
@@ -72,6 +79,11 @@ fun ChatRoute(
         when (effect) {
             ProviderConnectionEffect.Connected -> viewModel.onEvent(ChatEvent.ProvidersConnected)
             ProviderConnectionEffect.Close -> providersOpen = false
+            is ProviderConnectionEffect.OpenBrowser -> {
+                if (runCatching { providerBrowser.openUri(effect.url) }.isFailure) {
+                    snackbar.showSnackbar(getString(Res.string.chat_providers_error))
+                }
+            }
         }
     }
     if (providersOpen) {

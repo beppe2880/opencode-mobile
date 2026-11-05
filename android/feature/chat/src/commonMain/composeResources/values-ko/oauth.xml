@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">기기 코드로 계속</string>
+    <string name="chat_provider_browser">브라우저를 열어 승인</string>
+    <string name="chat_provider_computer">이 방식은 아직 모바일에서 지원하지 않습니다. 컴퓨터 또는 다른 방식을 사용하세요.</string>
+</resources>

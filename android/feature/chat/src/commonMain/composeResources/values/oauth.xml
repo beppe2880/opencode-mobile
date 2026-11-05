@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">Continue with device code</string>
+    <string name="chat_provider_browser">Open browser to authorize</string>
+    <string name="chat_provider_computer">This method is not supported on mobile yet. Use the computer or another method.</string>
+</resources>

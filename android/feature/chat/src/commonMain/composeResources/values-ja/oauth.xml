@@ -1,0 +1,5 @@
+<resources>
+    <string name="chat_provider_device">デバイスコードで続行</string>
+    <string name="chat_provider_browser">ブラウザーを開いて認証</string>
+    <string name="chat_provider_computer">この方法はモバイルではまだ対応していません。パソコンまたは別の方法を使用してください。</string>
+</resources>

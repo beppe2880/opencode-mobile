@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegratio
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -18,6 +19,51 @@ import org.junit.Before
 import org.junit.Test
 
 class RemoteIntegrationRepositoryTest {
+    @Test fun `device attempt and status preserve original server and location`() = runBlocking {
+        val time = """"time":{"created":1,"expires":9999999999999}"""
+        server.enqueue(
+            MockResponse().setBody(
+                """{"location":{"directory":"/repo"},"data":{
+            "attemptID":"attempt","url":"https://example.test/device",
+            "instructions":"Authorize in browser","mode":"auto",$time}}""",
+            ),
+        )
+        val attempt = repository.startOAuth("s1", "/repo", "github-copilot", "device", emptyMap()).getOrThrow()
+        assertEquals("attempt", attempt.id)
+        val start = server.takeRequest()
+        assertEquals("/api/integration/github-copilot/connect/oauth", start.requestUrl!!.encodedPath)
+        assertEquals("/repo", start.requestUrl!!.queryParameter("location[directory]"))
+        assertEquals("device", Json.parseToJsonElement(start.body.readUtf8()).jsonObject["methodID"]!!.jsonPrimitive.content)
+        val statuses = listOf(
+            "pending" to ProviderOAuthStatus.Pending,
+            "complete" to ProviderOAuthStatus.Complete,
+            "expired" to ProviderOAuthStatus.Expired,
+        )
+        statuses.forEach { (status, expected) ->
+            server.enqueue(MockResponse().setBody("""{"location":{"directory":"/repo"},"data":{"status":"$status",$time}}"""))
+            assertEquals(expected, repository.oauthStatus("s1", "/repo", "github-copilot", "attempt").getOrThrow())
+            assertEquals("/repo", server.takeRequest().requestUrl!!.queryParameter("location[directory]"))
+        }
+        server.enqueue(MockResponse().setResponseCode(204))
+        repository.cancelOAuth("s1", "/repo", "github-copilot", "attempt").getOrThrow()
+        assertEquals("DELETE", server.takeRequest().method)
+    }
+
+    @Test fun `unsafe authorization URL is cancelled and browser flows cannot start`() = runBlocking {
+        server.enqueue(
+            MockResponse().setBody(
+                """{"location":{"directory":"/repo"},"data":{
+            "attemptID":"attempt","url":"http://127.0.0.1:1234/callback","instructions":"Never open",
+            "mode":"auto","time":{"created":1,"expires":9999999999999}}}""",
+            ),
+        )
+        server.enqueue(MockResponse().setResponseCode(204))
+        assertTrue(repository.startOAuth("s1", "/repo", "xai", "device", emptyMap()).isFailure)
+        server.takeRequest()
+        assertEquals("DELETE", server.takeRequest().method)
+        assertTrue(repository.startOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", emptyMap()).isFailure)
+        assertEquals(2, server.requestCount)
+    }
     private val server = MockWebServer()
     private lateinit var graph: TestGraph
     private lateinit var repository: RemoteIntegrationRepository
@@ -42,7 +88,9 @@ class RemoteIntegrationRepositoryTest {
             ),
         )
         val list = repository.listKeys("s1", "/repo").getOrThrow()
-        assertEquals(listOf("another", "custom-z"), list.map { it.id })
+        assertEquals(listOf("another", "oauth-only", "custom-z"), list.map { it.id })
+        assertFalse(list[1].hasKey)
+        assertFalse(list[1].oauthMethods.single().mobileSupported)
         assertEquals("Token", list.first().keyLabel)
         assertFalse(list.last().isComplete(emptyMap()))
         assertTrue(list.last().isComplete(list.last().defaults()))
