@@ -66,7 +66,10 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
             }
             if (state.loading) item("loading") { OcSpinner() }
             if (state.failed) item("error") {
-                Text(stringResource(Res.string.chat_providers_error), color = c.danger.fg, modifier = Modifier.testTag("provider_connection_error"))
+                Text(
+                    state.browserError?.let { providerOAuthErrorText(it) } ?: stringResource(Res.string.chat_providers_error),
+                    color = c.danger.fg, modifier = Modifier.testTag("provider_connection_error"),
+                )
                 if (state.selected == null || state.attempt != null) OcButton(
                     stringResource(UiRes.string.oc_retry), { onEvent(ProviderConnectionEvent.Retry) },
                     modifier = Modifier.testTag("provider_retry"), variant = OcButtonVariant.Secondary,

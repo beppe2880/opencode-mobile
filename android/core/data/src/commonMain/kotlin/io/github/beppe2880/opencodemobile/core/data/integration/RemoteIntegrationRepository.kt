@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthAttempt
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.deviceOAuthSupported
@@ -42,50 +43,56 @@ internal class RemoteIntegrationRepository(
         methodId: String,
         openBrowser: suspend (String) -> Unit,
     ) = resultOf {
-        val provider = OpenAiBrowser
-        require(integrationId == provider.integrationId && methodId == provider.methodId)
-        val profile = servers.servers.value.firstOrNull { it.id == serverId } ?: throw OpenCodeError.NotFound("Server removed")
-        require(protectedOAuthTransport(profile.baseUrl))
-        val targetClient = clients.forProfile(profile)
-        val oauth = requireNotNull(browser)
-        // Recheck discovery: do not import credentials for a method the target server does not implement.
-        val available = listKeys(serverId, directory).getOrThrow()
-        require(available.any { it.id == integrationId && it.oauthMethods.any { method -> method.id == methodId && method.mobileSupported } })
-        // OpenAI requires a stable destination-host ID before import. The existing plugin owns
-        // that store and initializes it lazily on authorize; prepare then immediately cancel
-        // an unopened server attempt. Never copy the phone's host ID into the server.
-        val integrationApi = targetClient.integrations
-        val prepared = awaitBody {
-            integrationApi.integrationOauthConnect(integrationId, IntegrationOauthConnectRequest(methodId, emptyMap()), directory)
-        }.data
-        val preparedId = requireNotNull(prepared.attemptID)
-        try {
-            val preparedUrl = Url(requireNotNull(prepared.url))
-            require(preparedUrl.parameters["ext_agent_host_id"]?.startsWith("urn:uuid:") == true)
-        } finally {
-            withContext(NonCancellable) { awaitSuccess { integrationApi.integrationOauthCancel(integrationId, preparedId, directory) } }
-        }
-        val credential = oauth.authorize(provider, openBrowser)
-        currentCoroutineContext().ensureActive()
-        require(servers.servers.value.firstOrNull { it.id == serverId } == profile && servers.activeServer.value?.id == serverId)
-        val api = targetClient.credentials
-        awaitSuccess {
-            api.credentialCreate(
-                CredentialCreateInput(
-                    integrationID = integrationId,
-                    value = CredentialValue.OauthWrapper(
-                        CredentialOAuth(
-                            type = CredentialOAuth.Type.OAUTH, methodID = methodId,
-                            refresh = credential.refresh, access = credential.access, expires = credential.expires,
-                            metadata = buildJsonObject {
-                                put("clientID", credential.clientId)
-                                put("scopes", JsonArray(credential.scopes.map(::JsonPrimitive)))
-                            },
+        oauthStep(ProviderOAuthStage.Preparation) {
+            val provider = OpenAiBrowser
+            require(integrationId == provider.integrationId && methodId == provider.methodId)
+            val profile = servers.servers.value.firstOrNull { it.id == serverId } ?: throw OpenCodeError.NotFound("Server removed")
+            require(protectedOAuthTransport(profile.baseUrl))
+            val targetClient = clients.forProfile(profile)
+            val oauth = requireNotNull(browser)
+            // Recheck discovery: do not import credentials for a method the target server does not implement.
+            val available = listKeys(serverId, directory).getOrThrow()
+            require(available.any { it.id == integrationId && it.oauthMethods.any { method -> method.id == methodId && method.mobileSupported } })
+            // OpenAI requires a stable destination-host ID before import. The existing plugin owns
+            // that store and initializes it lazily on authorize; prepare then immediately cancel
+            // an unopened server attempt. Never copy the phone's host ID into the server.
+            val integrationApi = targetClient.integrations
+            val prepared = awaitBody {
+                integrationApi.integrationOauthConnect(integrationId, IntegrationOauthConnectRequest(methodId, emptyMap()), directory)
+            }.data
+            val preparedId = requireNotNull(prepared.attemptID)
+            try {
+                val preparedUrl = Url(requireNotNull(prepared.url))
+                require(preparedUrl.parameters["ext_agent_host_id"]?.startsWith("urn:uuid:") == true)
+            } finally {
+                withContext(NonCancellable) { awaitSuccess { integrationApi.integrationOauthCancel(integrationId, preparedId, directory) } }
+            }
+            val credential = oauth.authorize(provider, openBrowser)
+            currentCoroutineContext().ensureActive()
+            oauthStep(ProviderOAuthStage.ServerChanged) {
+                require(servers.servers.value.firstOrNull { it.id == serverId } == profile && servers.activeServer.value?.id == serverId)
+            }
+            val api = targetClient.credentials
+            oauthStep(ProviderOAuthStage.Import) {
+                awaitSuccess {
+                    api.credentialCreate(
+                        CredentialCreateInput(
+                            integrationID = integrationId,
+                            value = CredentialValue.OauthWrapper(
+                                CredentialOAuth(
+                                    type = CredentialOAuth.Type.OAUTH, methodID = methodId,
+                                    refresh = credential.refresh, access = credential.access, expires = credential.expires,
+                                    metadata = buildJsonObject {
+                                        put("clientID", credential.clientId)
+                                        put("scopes", JsonArray(credential.scopes.map(::JsonPrimitive)))
+                                    },
+                                ),
+                            ),
+                            label = "OpenCode Mobile", activate = true,
                         ),
-                    ),
-                    label = "OpenCode Mobile", activate = true,
-                ),
-            )
+                    )
+                }
+            }
         }
     }
     override suspend fun startOAuth(serverId: String, directory: String, integrationId: String, methodId: String, answers: Map<String, FormAnswer>) = resultOf {

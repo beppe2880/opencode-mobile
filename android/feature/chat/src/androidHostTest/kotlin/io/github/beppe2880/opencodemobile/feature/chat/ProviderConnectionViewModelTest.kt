@@ -10,7 +10,9 @@ import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthAttempt
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthMethod
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -122,6 +124,26 @@ class ProviderConnectionViewModelTest {
         vm.onEvent(ProviderConnectionEvent.Select("custom"))
         vm.onEvent(ProviderConnectionEvent.ChooseOAuth("browser"))
         return vm
+    }
+
+    @Test fun `browser diagnostic survives failure but fresh attempt and close clear it`() = runTest(main.testDispatcher) {
+        val vm = openBrowserMethod()
+        repository.browserResult = Result.failure(ProviderOAuthError(ProviderOAuthStage.Import, 403))
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        advanceUntilIdle()
+        assertEquals("OAUTH_Import_HTTP_403", vm.state.value.browserError?.diagnosticCode)
+        assertEquals(null, vm.state.value.browserUrl)
+        repository.browserResult = Result.success(Unit)
+        repository.browserGate = CompletableDeferred()
+        vm.onEvent(ProviderConnectionEvent.StartOAuth)
+        runCurrent()
+        assertEquals(null, vm.state.value.browserError)
+        repository.browserGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.connected)
+        assertEquals(null, vm.state.value.browserError)
+        vm.onEvent(ProviderConnectionEvent.Close)
+        assertEquals(ProviderConnectionState(), vm.state.value)
     }
 
     @Test fun `browser flow waits through background and completes without device polling`() = runTest(main.testDispatcher) {

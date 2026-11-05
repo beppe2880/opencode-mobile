@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegratio
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -64,9 +66,25 @@ class RemoteIntegrationRepositoryTest {
         repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
         enqueueBrowserPreparation()
         server.enqueue(MockResponse().setResponseCode(307).setHeader("Location", server.url("/leak")))
-        assertTrue(repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).isFailure)
+        val failure = repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).exceptionOrNull() as ProviderOAuthError
+        assertEquals("OAUTH_Import_HTTP_307", failure.diagnosticCode)
         assertEquals(4, server.requestCount)
         assertTrue(fixture.closed)
+    }
+
+    @Test fun `import failure preserves only phase and status and preparation failures remain separate`() = runBlocking {
+        val fixture = OAuthFixture()
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        enqueueBrowserPreparation()
+        server.enqueue(MockResponse().setResponseCode(403).setBody("""{"message":"test-refresh secret-code"}"""))
+        val failure = repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).exceptionOrNull() as ProviderOAuthError
+        assertEquals("OAUTH_Import_HTTP_403", failure.diagnosticCode)
+        assertEquals(null, failure.cause)
+        assertFalse(failure.toString().contains("test-refresh"))
+        server.enqueue(MockResponse().setResponseCode(401).setBody("""{"message":"secret-code"}"""))
+        val preparation = repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened)
+            .exceptionOrNull() as ProviderOAuthError
+        assertEquals("OAUTH_Preparation_HTTP_401", preparation.diagnosticCode)
     }
 
     @Test fun `server switch and invalid tokens never import credentials`() = runBlocking {

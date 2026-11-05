@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">Impossibile preparare l'accesso dal browser sul server (%1$s). Riprova.</string>
+    <string name="oauth_error_callback">Impossibile ricevere una risposta di autorizzazione valida dal browser (%1$s). Avvia nuovamente l'accesso.</string>
+    <string name="oauth_error_exchange">Impossibile scambiare il codice di autorizzazione con il gestore (%1$s). Avvia nuovamente l'accesso.</string>
+    <string name="oauth_error_validation">Impossibile verificare la risposta di accesso del gestore (%1$s). Nessuna credenziale è stata inviata al server.</string>
+    <string name="oauth_error_import">Impossibile confermare il salvataggio delle credenziali sul server (%1$s). Controlla la connessione e lo stato del gestore prima di riprovare.</string>
+    <string name="oauth_error_expired">L'accesso dal browser è scaduto (%1$s). Avvia nuovamente l'accesso.</string>
+    <string name="oauth_error_server_changed">Il server selezionato è cambiato durante l'accesso (%1$s). Avvia nuovamente l'accesso.</string>
+    <string name="oauth_error_unknown">Impossibile completare l'accesso dal browser (%1$s). Avvia nuovamente l'accesso.</string>
+</resources>

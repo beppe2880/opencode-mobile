@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.data.integration
 
 import com.russhwolf.settings.Settings
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineDispatcher
@@ -102,30 +104,42 @@ internal class BrowserOAuth(
                     provider.hostParameter?.let { parameters.append(it, hostId) }
                 }.buildString()
                 openBrowser(url)
-                val response = callback.receive()
-                require(response["state"] == state && response["error"] == null)
-                val code = requireNotNull(response["code"]).also { require(it.isNotBlank()) }
-                val clientId = (if (provider.issuedClientId) requireNotNull(response["client_id"]) else provider.registrationClientId)
-                    .also { require(it.isNotBlank() && it.length <= 1024) }
-                val tokens = platform.json(
-                    provider.tokenUrl,
-                    provider.tokenParameters + mapOf(
-                        "grant_type" to "authorization_code", "client_id" to clientId, "code" to code,
-                        "code_verifier" to verifier, "redirect_uri" to callback.redirect,
-                    ),
-                )
-                val scopes = tokens.string("scope").split(' ').filter { it.isNotBlank() }
-                require(provider.requiredScope in scopes)
-                val idToken = tokens.string("id_token")
-                platform.verifySignature(idToken, platform.json(provider.jwksUrl))
-                validateIdClaims(idToken, provider.issuer, clientId, nonce)
-                val seconds = requireNotNull(tokens["expires_in"]?.jsonPrimitive?.longOrNull)
-                require(seconds in 1..86_400)
-                BrowserCredential(tokens.string("access_token"), tokens.string("refresh_token"), now() + seconds * 1000, clientId, scopes)
+                val (code, clientId) = oauthStep(ProviderOAuthStage.Callback) {
+                    val response = callback.receive()
+                    require(response["state"] == state && response["error"] == null)
+                    val code = requireNotNull(response["code"]).also { require(it.isNotBlank()) }
+                    val clientId = (if (provider.issuedClientId) requireNotNull(response["client_id"]) else provider.registrationClientId)
+                        .also { require(it.isNotBlank() && it.length <= 1024) }
+                    code to clientId
+                }
+                val tokens = oauthStep(ProviderOAuthStage.TokenExchange) {
+                    platform.json(
+                        provider.tokenUrl,
+                        provider.tokenParameters + mapOf(
+                            "grant_type" to "authorization_code", "client_id" to clientId, "code" to code,
+                            "code_verifier" to verifier, "redirect_uri" to callback.redirect,
+                        ),
+                    )
+                }
+                val scopes = oauthStep(ProviderOAuthStage.Scope) {
+                    tokens.string("scope").split(' ').filter { it.isNotBlank() }.also { require(provider.requiredScope in it) }
+                }
+                val idToken = oauthStep(ProviderOAuthStage.TokenResponse) { tokens.string("id_token") }
+                val jwks = oauthStep(ProviderOAuthStage.Jwks) { platform.json(provider.jwksUrl) }
+                oauthStep(ProviderOAuthStage.Signature) { platform.verifySignature(idToken, jwks) }
+                oauthStep(ProviderOAuthStage.Claims) { validateIdClaims(idToken, provider.issuer, clientId, nonce) }
+                oauthStep(ProviderOAuthStage.TokenResponse) {
+                    // Match the server plugin: an absent expiry defaults to one hour. Malformed values still fail closed.
+                    val expiry = tokens["expires_in"]
+                    val seconds = if (expiry == null) 3600L else requireNotNull(expiry.jsonPrimitive.takeUnless { it.isString }?.longOrNull)
+                    val receivedAt = now()
+                    require(seconds > 0 && seconds <= (Long.MAX_VALUE - receivedAt) / 1000)
+                    BrowserCredential(tokens.string("access_token"), tokens.string("refresh_token"), receivedAt + seconds * 1000, clientId, scopes)
+                }
             } finally {
                 callback.close()
             }
-        } ?: error("Browser authorization expired")
+        } ?: throw ProviderOAuthError(ProviderOAuthStage.Expired)
     }
 }
 

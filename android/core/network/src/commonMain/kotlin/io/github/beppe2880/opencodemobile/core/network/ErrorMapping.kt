@@ -93,8 +93,8 @@ val OpenCodeError.isTimeout: Boolean
 internal fun httpError(status: Int, body: String?): OpenCodeError {
     val (tag, message) = parseErrorBody(body)
     return when (status) {
-        401 -> OpenCodeError.Unauthorized(message ?: "Authentication failed")
-        404 -> OpenCodeError.NotFound(message ?: "Not found")
+        401 -> OpenCodeError.Unauthorized(message ?: "Authentication failed", httpStatus = status)
+        404 -> OpenCodeError.NotFound(message ?: "Not found", httpStatus = status)
         else -> OpenCodeError.Server(status, tag, message ?: "HTTP $status")
     }
 }

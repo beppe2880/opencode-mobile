@@ -6,7 +6,9 @@ import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthAttempt
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthMethod
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -33,6 +35,7 @@ data class ProviderConnectionState(
     val attempt: ProviderOAuthAttempt? = null,
     val visible: Boolean = true,
     val browserUrl: String? = null,
+    val browserError: ProviderOAuthError? = null,
 )
 
 sealed interface ProviderConnectionEvent {
@@ -189,7 +192,7 @@ class ProviderConnectionViewModel(
     private fun startBrowserOAuth(id: String, folder: String, integrationId: String, methodId: String) {
         val token = generation
         catalog.invalidateModels(id)
-        updateState { it.copy(saving = true, failed = false, key = "", answers = emptyMap()) }
+        updateState { it.copy(saving = true, failed = false, key = "", answers = emptyMap(), browserError = null) }
         job = viewModelScope.launch {
             val result = integrations.connectBrowserOAuth(id, folder, integrationId, methodId) { url ->
                 withContext(Dispatchers.Main.immediate) {
@@ -201,7 +204,8 @@ class ProviderConnectionViewModel(
             }
             if (result.isSuccess) catalog.invalidateModels(id)
             if (token != generation) return@launch
-            updateState { it.copy(saving = false, browserUrl = null, failed = result.isFailure, connected = result.isSuccess) }
+            val error = result.exceptionOrNull()?.let { it as? ProviderOAuthError ?: ProviderOAuthError(ProviderOAuthStage.Unknown) }
+            updateState { it.copy(saving = false, browserUrl = null, failed = result.isFailure, connected = result.isSuccess, browserError = error) }
             if (result.isSuccess) sendEffect(ProviderConnectionEffect.Connected)
         }
     }

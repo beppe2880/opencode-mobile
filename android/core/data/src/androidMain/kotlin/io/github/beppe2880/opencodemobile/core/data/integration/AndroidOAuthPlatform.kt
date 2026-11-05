@@ -33,11 +33,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /** A separate unauthenticated HTTP client: never forwards OpenCode Basic auth or follows redirects. */
-internal class AndroidOAuthPlatform : OAuthPlatform {
+internal class AndroidOAuthPlatform(
+    private val http: OkHttpClient = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false)
+        .callTimeout(20, TimeUnit.SECONDS).build(),
+) : OAuthPlatform {
     override val supported = true
     private val random = SecureRandom()
-    private val http = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false)
-        .callTimeout(20, TimeUnit.SECONDS).build()
 
     override fun randomBytes(): ByteArray = ByteArray(32).also(random::nextBytes)
     override fun sha256(bytes: ByteArray): ByteArray = MessageDigest.getInstance("SHA-256").digest(bytes)
@@ -57,7 +58,7 @@ internal class AndroidOAuthPlatform : OAuthPlatform {
                 override fun onResponse(call: Call, response: Response) {
                     val result = runCatching {
                         response.use {
-                            check(it.isSuccessful) { "OAuth request failed" }
+                            if (!it.isSuccessful) throw OAuthHttpError(it.code)
                             val input = it.body.byteStream()
                             val output = java.io.ByteArrayOutputStream()
                             val buffer = ByteArray(4096)
@@ -71,7 +72,7 @@ internal class AndroidOAuthPlatform : OAuthPlatform {
                         }
                     }
                     if (continuation.isActive) result.fold(continuation::resume) {
-                        continuation.resumeWithException(IOException("Invalid OAuth response"))
+                        continuation.resumeWithException(OAuthHttpError(response.code))
                     }
                 }
             })

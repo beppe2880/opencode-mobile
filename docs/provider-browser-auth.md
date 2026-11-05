@@ -39,6 +39,16 @@ and credential import; actual sockets test callback handling and cancellation.
 Live emulator checks do not sign into personal accounts. Completing consent, using a
 real ChatGPT-plan token, and subsequent server refresh require user-assisted verification.
 
+Failures include a safe diagnostic such as `OAUTH_TokenExchange_HTTP_400` or
+`OAUTH_Claims`. Stages distinguish server preparation, callback, token exchange,
+scope, response shape, JWKS download, signature, claims, target-server changes,
+credential import and expiry. Only fixed identifiers and an available HTTP status
+reach the UI; original exception messages, response bodies and causes are discarded.
+An import error cannot prove the server did not save: check provider status before retrying.
+An absent `expires_in` defaults to one hour, matching the server plugin. Explicit
+malformed, non-positive or overflowing expiry values still fail validation; a valid
+expiry is not artificially restricted to one day. All OIDC checks remain required.
+
 References: [OpenAI registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in),
 [remote hosts](https://developers.openai.com/siwc/token-sharing-open-source/self-hosted-vms),
 [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252#section-7.3).

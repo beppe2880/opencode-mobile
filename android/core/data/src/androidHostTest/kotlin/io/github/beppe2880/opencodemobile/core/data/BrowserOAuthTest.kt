@@ -3,11 +3,14 @@ package io.github.beppe2880.opencodemobile.core.data
 import com.russhwolf.settings.MapSettings
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
+import io.github.beppe2880.opencodemobile.core.data.integration.OAuthHttpError
 import io.github.beppe2880.opencodemobile.core.data.integration.OAuthLoopback
 import io.github.beppe2880.opencodemobile.core.data.integration.OAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.integration.OpenAiBrowser
 import io.github.beppe2880.opencodemobile.core.data.integration.base64
 import io.github.beppe2880.opencodemobile.core.data.integration.now
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.ktor.http.Url
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancelAndJoin
@@ -16,6 +19,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -47,6 +52,10 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
     var badIssuer = false
     var expired = false
     var httpFailure = false
+    var expiry: JsonElement? = JsonPrimitive(3600)
+    var tokenHttpStatus: Int? = null
+    var jwksHttpStatus: Int? = null
+    var missingIdToken = false
     var exchanges = 0
     private var state = ""
 
@@ -70,15 +79,19 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
 
     override suspend fun json(url: String, form: Map<String, String>?): JsonObject {
         check(!httpFailure)
-        if (form == null) return jwks()
+        if (form == null) {
+            jwksHttpStatus?.let { throw OAuthHttpError(it) }
+            return jwks()
+        }
+        tokenHttpStatus?.let { throw OAuthHttpError(it) }
         exchanges++
         tokenForm = form
         return buildJsonObject {
             put("access_token", "test-access")
             put("refresh_token", "test-refresh")
-            put("expires_in", 3600)
+            expiry?.let { put("expires_in", it) }
             put("scope", if (missingScope) "openid" else OpenAiBrowser.scopes)
-            put("id_token", token())
+            if (!missingIdToken) put("id_token", token())
         }
     }
 
@@ -123,6 +136,64 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
 }
 
 class BrowserOAuthTest {
+    @Test fun `missing expiry uses server compatible one hour default after full token validation`() = runTest {
+        val fixture = OAuthFixture().apply { expiry = null }
+        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val before = now()
+        val credential = engine.authorize(OpenAiBrowser, fixture::opened)
+        assertTrue(credential.expires in (before + 3_600_000)..(now() + 3_600_000))
+        assertEquals("issued-client", credential.clientId)
+        assertTrue(fixture.closed)
+        fixture.badNonce = true
+        val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals(ProviderOAuthStage.Claims, failure.stage)
+    }
+
+    @Test fun `malformed zero negative and overflowing expiry are not treated as absent`() = runTest {
+        val fixture = OAuthFixture()
+        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        listOf(JsonNull, JsonPrimitive(0), JsonPrimitive(-1), JsonPrimitive("3600"), JsonPrimitive(1.5), JsonPrimitive(Long.MAX_VALUE)).forEach {
+            fixture.expiry = it
+            val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+            assertEquals(ProviderOAuthStage.TokenResponse, failure.stage)
+            assertTrue(fixture.closed)
+        }
+        fixture.expiry = JsonPrimitive(172800)
+        assertTrue(engine.authorize(OpenAiBrowser, fixture::opened).expires > now() + 86_400_000)
+    }
+
+    @Test fun `provider HTTP statuses identify exchange or JWKS phase without payloads`() = runTest {
+        val fixture = OAuthFixture()
+        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        fixture.tokenHttpStatus = 400
+        val exchange = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals("OAUTH_TokenExchange_HTTP_400", exchange.diagnosticCode)
+        assertEquals(null, exchange.cause)
+        fixture.tokenHttpStatus = null
+        fixture.jwksHttpStatus = 503
+        val keys = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals("OAUTH_Jwks_HTTP_503", keys.diagnosticCode)
+        assertEquals(null, keys.cause)
+        assertTrue(fixture.closed)
+    }
+
+    @Test fun `token validation failure identifies signature claims scope or missing ID token`() = runTest {
+        val cases = listOf<Pair<(OAuthFixture) -> Unit, ProviderOAuthStage>>(
+            { f: OAuthFixture -> f.invalidSignature = true } to ProviderOAuthStage.Signature,
+            { f: OAuthFixture -> f.badNonce = true } to ProviderOAuthStage.Claims,
+            { f: OAuthFixture -> f.missingScope = true } to ProviderOAuthStage.Scope,
+            { f: OAuthFixture -> f.missingIdToken = true } to ProviderOAuthStage.TokenResponse,
+        )
+        cases.forEach { (change, stage) ->
+            val fixture = OAuthFixture().also(change)
+            val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+            val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+            assertEquals(stage, failure.stage)
+            assertFalse(failure.toString().contains("test-code"))
+            assertTrue(fixture.closed)
+        }
+    }
+
     @Test fun `signature verification rejects unsigned tokens algorithm downgrades and unknown keys`() {
         val fixture = OAuthFixture()
         fixture.opened("https://auth.example/authorize?nonce=test")
@@ -167,7 +238,8 @@ class BrowserOAuthTest {
         listOf<(OAuthFixture) -> Unit>({ it.callbackState = "wrong" }, { it.missingClient = true }, { it.callbackError = true }).forEach { change ->
             val fixture = OAuthFixture().also(change)
             val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
-            assertTrue(runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.isFailure)
+            val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+            assertEquals(ProviderOAuthStage.Callback, failure.stage)
             assertEquals(0, fixture.exchanges)
             assertTrue(fixture.closed)
         }
@@ -195,10 +267,10 @@ class BrowserOAuthTest {
         assertTrue(fixture.closed)
         assertEquals(0, fixture.exchanges)
         fixture.closed = false
-        var failed = false
-        launch { failed = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.isFailure }
+        var expiration: ProviderOAuthError? = null
+        launch { expiration = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as? ProviderOAuthError }
         advanceUntilIdle()
-        assertTrue(failed)
+        assertEquals(ProviderOAuthStage.Expired, expiration?.stage)
         assertTrue(fixture.closed)
         assertEquals(0, fixture.exchanges)
         assertFalse(fixture.settings.toString().contains("test-refresh"))

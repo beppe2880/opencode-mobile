@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">Could not prepare browser sign-in on the server (%1$s). Try again.</string>
+    <string name="oauth_error_callback">Could not receive a valid browser authorization response (%1$s). Start sign-in again.</string>
+    <string name="oauth_error_exchange">Could not exchange the authorization code with the provider (%1$s). Start sign-in again.</string>
+    <string name="oauth_error_validation">Could not validate the provider's sign-in response (%1$s). No credentials were sent to the server.</string>
+    <string name="oauth_error_import">Could not confirm that credentials were saved on the server (%1$s). Check the connection and provider status before trying again.</string>
+    <string name="oauth_error_expired">Browser sign-in expired (%1$s). Start sign-in again.</string>
+    <string name="oauth_error_server_changed">The selected server changed during sign-in (%1$s). Start sign-in again.</string>
+    <string name="oauth_error_unknown">Browser sign-in could not be completed (%1$s). Start sign-in again.</string>
+</resources>

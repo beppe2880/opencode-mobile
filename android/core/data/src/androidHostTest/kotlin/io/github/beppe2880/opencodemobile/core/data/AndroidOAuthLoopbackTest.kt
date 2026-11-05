@@ -2,12 +2,17 @@ package io.github.beppe2880.opencodemobile.core.data
 
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthLoopback
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthPlatform
+import io.github.beppe2880.opencodemobile.core.data.integration.OAuthHttpError
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -16,6 +21,19 @@ import java.net.ServerSocket
 import java.net.Socket
 
 class AndroidOAuthLoopbackTest {
+    @Test fun `native OAuth HTTP errors and malformed JSON preserve status without secret response`() = runBlocking {
+        listOf(400 to "secret-token", 200 to "not-json secret-token").forEach { (status, body) ->
+            val client = OkHttpClient.Builder().addInterceptor {
+                Response.Builder().request(it.request()).protocol(Protocol.HTTP_1_1).code(status).message("Test")
+                    .body(body.toResponseBody()).build()
+            }.build()
+            val failure = runCatching { AndroidOAuthPlatform(client).json("https://auth.openai.com/test", emptyMap()) }
+                .exceptionOrNull() as OAuthHttpError
+            assertEquals(status, failure.status)
+            assertEquals(null, failure.cause)
+            assertTrue(!failure.toString().contains("secret-token"))
+        }
+    }
     private fun request(port: Int, target: String, method: String = "GET", extra: String = "", host: String = "127.0.0.1:$port"): String =
         Socket("127.0.0.1", port).use { socket ->
             socket.soTimeout = 4000
