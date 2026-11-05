@@ -204,6 +204,32 @@
     <string name="chat_running_refresh">Atualizar trabalho em execução</string>
     <string name="chat_running_stop_title">Parar este comando?</string>
     <string name="chat_running_stop_message">%1$s\n\nO comando é encerrado e sua saída não está mais disponível.</string>
+    <string name="chat_running_subagents">Subagentes</string>
+    <string name="chat_running_commands">Comandos</string>
+    <string name="chat_running_stop_all">Parar tudo</string>
+    <string name="chat_running_stop_all_commands">Parar todos os comandos</string>
+    <string name="chat_running_stop_all_agents">Parar todos os subagentes</string>
+    <string name="chat_running_stop_agent_description">Parar subagente %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">Parar %1$d comando?</item>
+        <item quantity="other">Parar %1$d comandos?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">Os comandos iniciados por esta sessão são encerrados e a saída deles deixa de estar disponível. Outros comandos deste projeto continuam em execução.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">Parar %1$d subagente?</item>
+        <item quantity="other">Parar %1$d subagentes?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">O trabalho atual deles é interrompido. Esta sessão não é parada.</string>
+    <string name="chat_running_stop_agent_title">Parar este subagente?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nO trabalho atual dele é interrompido. Esta sessão não é parada.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">Não foi possível parar %1$d comando</item>
+        <item quantity="other">Não foi possível parar %1$d comandos</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">Não foi possível parar %1$d subagente</item>
+        <item quantity="other">Não foi possível parar %1$d subagentes</item>
+    </plurals>
     <string name="chat_preview_folds">Passos acompanhados ao vivo são recolhidos quando a resposta termina</string>
     <string name="chat_preview_kept_open">Passos acompanhados ao vivo permanecem abertos após a resposta</string>
     <string name="chat_preview_not_followed">Passos em execução ficam recolhidos até você abri-los</string>

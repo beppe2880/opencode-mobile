@@ -248,6 +248,48 @@
     <string name="chat_running_refresh">تحديث الأعمال قيد التشغيل</string>
     <string name="chat_running_stop_title">هل تريد إيقاف هذا الأمر؟</string>
     <string name="chat_running_stop_message">%1$s\n\nسيتم إنهاء الأمر ولن يكون خرجه متاحاً بعد الآن.</string>
+    <string name="chat_running_subagents">الوكلاء الفرعيون</string>
+    <string name="chat_running_commands">الأوامر</string>
+    <string name="chat_running_stop_all">إيقاف الكل</string>
+    <string name="chat_running_stop_all_commands">إيقاف كل الأوامر</string>
+    <string name="chat_running_stop_all_agents">إيقاف كل الوكلاء الفرعيين</string>
+    <string name="chat_running_stop_agent_description">إيقاف الوكيل الفرعي %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="zero">إيقاف %1$d أمر؟</item>
+        <item quantity="one">إيقاف أمر واحد (%1$d)؟</item>
+        <item quantity="two">إيقاف أمرين (%1$d)؟</item>
+        <item quantity="few">إيقاف %1$d أوامر؟</item>
+        <item quantity="many">إيقاف %1$d أمراً؟</item>
+        <item quantity="other">إيقاف %1$d أمر؟</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">تنتهي الأوامر التي بدأتها هذه الجلسة ولن يكون خرجها متاحاً بعد الآن. تستمر الأوامر الأخرى في هذا المشروع في العمل.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="zero">إيقاف %1$d وكيل فرعي؟</item>
+        <item quantity="one">إيقاف وكيل فرعي واحد (%1$d)؟</item>
+        <item quantity="two">إيقاف وكيلين فرعيين (%1$d)؟</item>
+        <item quantity="few">إيقاف %1$d وكلاء فرعيين؟</item>
+        <item quantity="many">إيقاف %1$d وكيلاً فرعياً؟</item>
+        <item quantity="other">إيقاف %1$d وكيل فرعي؟</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">يتم مقاطعة عملهم الحالي. لن تتوقف هذه الجلسة.</string>
+    <string name="chat_running_stop_agent_title">إيقاف هذا الوكيل الفرعي؟</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nيتم مقاطعة عمله الحالي. لن تتوقف هذه الجلسة.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="zero">تعذر إيقاف %1$d أمر</item>
+        <item quantity="one">تعذر إيقاف أمر واحد (%1$d)</item>
+        <item quantity="two">تعذر إيقاف أمرين (%1$d)</item>
+        <item quantity="few">تعذر إيقاف %1$d أوامر</item>
+        <item quantity="many">تعذر إيقاف %1$d أمراً</item>
+        <item quantity="other">تعذر إيقاف %1$d أمر</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="zero">تعذر إيقاف %1$d وكيل فرعي</item>
+        <item quantity="one">تعذر إيقاف وكيل فرعي واحد (%1$d)</item>
+        <item quantity="two">تعذر إيقاف وكيلين فرعيين (%1$d)</item>
+        <item quantity="few">تعذر إيقاف %1$d وكلاء فرعيين</item>
+        <item quantity="many">تعذر إيقاف %1$d وكيلاً فرعياً</item>
+        <item quantity="other">تعذر إيقاف %1$d وكيل فرعي</item>
+    </plurals>
     <string name="chat_preview_folds">الخطوات التي تتابعها مباشرة تُطوى عند انتهاء الرد</string>
     <string name="chat_preview_kept_open">الخطوات التي تتابعها مباشرة تبقى مفتوحة بعد الرد</string>
     <string name="chat_preview_not_followed">تبقى خطوات التشغيل مطوية حتى تفتحها</string>

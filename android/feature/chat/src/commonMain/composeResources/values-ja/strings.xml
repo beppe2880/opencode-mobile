@@ -193,6 +193,28 @@
     <string name="chat_running_refresh">実行中の作業を更新</string>
     <string name="chat_running_stop_title">このコマンドを停止しますか？</string>
     <string name="chat_running_stop_message">%1$s\n\nコマンドは終了し、その出力は利用できなくなります。</string>
+    <string name="chat_running_subagents">サブエージェント</string>
+    <string name="chat_running_commands">コマンド</string>
+    <string name="chat_running_stop_all">すべて停止</string>
+    <string name="chat_running_stop_all_commands">すべてのコマンドを停止</string>
+    <string name="chat_running_stop_all_agents">すべてのサブエージェントを停止</string>
+    <string name="chat_running_stop_agent_description">サブエージェント %1$s を停止</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="other">%1$d 件のコマンドを停止しますか？</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">このセッションから開始されたコマンドは終了し、その出力は利用できなくなります。このプロジェクトの他のコマンドは実行を続けます。</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="other">%1$d 件のサブエージェントを停止しますか？</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">現在の作業は中断されます。このセッションは停止されません。</string>
+    <string name="chat_running_stop_agent_title">このサブエージェントを停止しますか？</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\n現在の作業は中断されます。このセッションは停止されません。</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="other">%1$d 件のコマンドを停止できませんでした</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="other">%1$d 件のサブエージェントを停止できませんでした</item>
+    </plurals>
     <string name="chat_preview_folds">リアルタイムで追跡された手順は、回答の終了時に折りたたまれます</string>
     <string name="chat_preview_kept_open">リアルタイムで追跡された手順は、回答後も開いたままになります</string>
     <string name="chat_preview_not_followed">実行中の手順は、開くまで折りたたまれたままです</string>

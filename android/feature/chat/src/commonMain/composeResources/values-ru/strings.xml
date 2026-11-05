@@ -226,6 +226,40 @@
     <string name="chat_running_refresh">Обновить выполняемые задачи</string>
     <string name="chat_running_stop_title">Остановить эту команду?</string>
     <string name="chat_running_stop_message">%1$s\n\nКоманда завершается, и её вывод больше не доступен.</string>
+    <string name="chat_running_subagents">Субагенты</string>
+    <string name="chat_running_commands">Команды</string>
+    <string name="chat_running_stop_all">Остановить все</string>
+    <string name="chat_running_stop_all_commands">Остановить все команды</string>
+    <string name="chat_running_stop_all_agents">Остановить всех субагентов</string>
+    <string name="chat_running_stop_agent_description">Остановить субагента %1$s</string>
+    <plurals name="chat_running_stop_all_commands_title">
+        <item quantity="one">Остановить %1$d команду?</item>
+        <item quantity="few">Остановить %1$d команды?</item>
+        <item quantity="many">Остановить %1$d команд?</item>
+        <item quantity="other">Остановить %1$d команд?</item>
+    </plurals>
+    <string name="chat_running_stop_all_commands_message">Команды, запущенные этим сеансом, завершаются, и их вывод становится недоступен. Другие команды в этом проекте продолжают работать.</string>
+    <plurals name="chat_running_stop_all_agents_title">
+        <item quantity="one">Остановить %1$d субагента?</item>
+        <item quantity="few">Остановить %1$d субагента?</item>
+        <item quantity="many">Остановить %1$d субагентов?</item>
+        <item quantity="other">Остановить %1$d субагентов?</item>
+    </plurals>
+    <string name="chat_running_stop_all_agents_message">Их текущая работа прерывается. Этот сеанс не останавливается.</string>
+    <string name="chat_running_stop_agent_title">Остановить этого субагента?</string>
+    <string name="chat_running_stop_agent_message">%1$s\n\nЕго текущая работа прерывается. Этот сеанс не останавливается.</string>
+    <plurals name="chat_running_stop_commands_failed">
+        <item quantity="one">Не удалось остановить %1$d команду</item>
+        <item quantity="few">Не удалось остановить %1$d команды</item>
+        <item quantity="many">Не удалось остановить %1$d команд</item>
+        <item quantity="other">Не удалось остановить %1$d команд</item>
+    </plurals>
+    <plurals name="chat_running_stop_agents_failed">
+        <item quantity="one">Не удалось остановить %1$d субагента</item>
+        <item quantity="few">Не удалось остановить %1$d субагента</item>
+        <item quantity="many">Не удалось остановить %1$d субагентов</item>
+        <item quantity="other">Не удалось остановить %1$d субагентов</item>
+    </plurals>
     <string name="chat_preview_folds">Шаги, которые отслеживались в реальном времени, сворачиваются по окончании ответа</string>
     <string name="chat_preview_kept_open">Шаги, которые отслеживались в реальном времени, остаются открытыми после ответа</string>
     <string name="chat_preview_not_followed">Выполняющиеся шаги остаются свернутыми, пока вы их не откроете</string>

@@ -51,6 +51,10 @@ import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.shellOwners
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.core.ui.text.UiText
+import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_commands_failed
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -260,6 +264,130 @@ class ChatViewModelTest {
         runCurrent()
         assertNull(vm.state.value.confirmingStop)
         assertEquals(listOf("shell", "other"), chat.stops)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `stop all commands stops every command of this session and leaves unassigned ones`() = runTest(main.testDispatcher) {
+        chat.runningCommands = listOf(
+            RunningCommand("build", "build", "/repo", 1, "s1"),
+            RunningCommand("test", "test", "/repo", 1, "s1"),
+            RunningCommand("watch", "watch", "/repo", 1),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
+
+        vm.onEvent(ChatEvent.StopAll(RunningGroup.Commands))
+        assertEquals(RunningGroup.Commands, vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.DismissStopAll)
+        assertNull(vm.state.value.confirmingStopAll)
+        assertTrue(chat.stops.isEmpty())
+
+        val gate = CompletableDeferred<Unit>()
+        chat.stopGate = gate
+        vm.onEvent(ChatEvent.StopAll(RunningGroup.Commands))
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        // Both stops run at once, each with its spinner.
+        assertEquals(setOf("build", "test"), chat.stops.toSet())
+        assertEquals(setOf("build", "test"), vm.state.value.stoppingCommands)
+        gate.complete(Unit)
+        runCurrent()
+        assertTrue(vm.state.value.work.commands.isEmpty())
+        assertTrue(vm.state.value.stoppingCommands.isEmpty())
+        assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
+        assertFalse("watch" in chat.stops)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `stop all subagents interrupts each child and never this session`() = runTest(main.testDispatcher) {
+        val root = FakeSessions(model).get("s1").getOrThrow()
+        val children = listOf("c1", "c2").map { root.copy(id = it, parentId = "s1", title = "Child $it") }
+        val sessions = FakeSessions(model, others = children).apply { activeIds = setOf("s1", "c1", "c2") }
+        chat.onInterrupt = { sessions.activeIds -= it }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf("c1", "c2"), vm.state.value.work.agents.map { it.session.id })
+
+        vm.onEvent(ChatEvent.StopAll(RunningGroup.Agents))
+        assertEquals(RunningGroup.Agents, vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        assertEquals(setOf("c1", "c2"), chat.interrupts.toSet())
+        assertFalse("s1" in chat.interrupts)
+        assertTrue(vm.state.value.work.agents.isEmpty())
+        assertTrue(vm.state.value.stoppingAgents.isEmpty())
+        assertNull(vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `stopping one subagent interrupts only its child session after confirmation`() = runTest(main.testDispatcher) {
+        val root = FakeSessions(model).get("s1").getOrThrow()
+        val children = listOf("c1", "c2").map { root.copy(id = it, parentId = "s1") }
+        val sessions = FakeSessions(model, others = children).apply { activeIds = setOf("c1", "c2") }
+        chat.onInterrupt = { sessions.activeIds -= it }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+
+        vm.onEvent(ChatEvent.StopAgent("c1"))
+        assertEquals("c1", vm.state.value.confirmingStopAgent)
+        assertTrue(chat.interrupts.isEmpty())
+        vm.onEvent(ChatEvent.ConfirmStopAgent)
+        runCurrent()
+        assertNull(vm.state.value.confirmingStopAgent)
+        assertEquals(listOf("c1"), chat.interrupts)
+        assertEquals(listOf("c2"), vm.state.value.work.agents.map { it.session.id })
+        // The parent is never stopped from the sheet.
+        vm.onEvent(ChatEvent.StopAgent("s1"))
+        vm.onEvent(ChatEvent.ConfirmStopAgent)
+        runCurrent()
+        assertEquals(listOf("c1"), chat.interrupts)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `partial stop failures are counted in one message and keep the failed items`() = runTest(main.testDispatcher) {
+        val root = FakeSessions(model).get("s1").getOrThrow()
+        val children = listOf("c1", "c2", "c3").map { root.copy(id = it, parentId = "s1") }
+        val sessions = FakeSessions(model, others = children).apply { activeIds = setOf("c1", "c2", "c3") }
+        chat.onInterrupt = { sessions.activeIds -= it }
+        chat.interruptFailing = setOf("c2", "c3")
+        chat.runningCommands = listOf(
+            RunningCommand("build", "build", "/repo", 1, "s1"),
+            RunningCommand("test", "test", "/repo", 1, "s1"),
+        )
+        chat.stopFailing = setOf("test")
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+
+        vm.onEvent(ChatEvent.StopAll(RunningGroup.Commands))
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        assertEquals(listOf("test"), vm.state.value.work.commands.map { it.id })
+        assertEquals(
+            ChatEffect.ShowMessage(UiText.Plural(Res.plurals.chat_running_stop_commands_failed, 1, listOf(1))),
+            vm.effect.first(),
+        )
+
+        vm.onEvent(ChatEvent.StopAll(RunningGroup.Agents))
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        assertEquals(listOf("c2", "c3"), vm.state.value.work.agents.map { it.session.id })
+        assertEquals(
+            ChatEffect.ShowMessage(UiText.Plural(Res.plurals.chat_running_stop_agents_failed, 2, listOf(2))),
+            vm.effect.first(),
+        )
         vm.onEvent(ChatEvent.Visible(false))
     }
 
@@ -1888,6 +2016,9 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     val stops = mutableListOf<String>()
     var stopGate: CompletableDeferred<Unit>? = null
     var stopResult: Result<Unit> = Result.success(Unit)
+
+    /** Shells whose stop fails, whatever [stopResult] says. */
+    var stopFailing: Set<String> = emptySet()
     override suspend fun runningShells(directory: String): Result<List<RunningCommand>> {
         runningReads++
         if (directory == failedDirectory) return Result.failure(OpenCodeError.NotFound("missing"))
@@ -1900,6 +2031,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     override suspend fun stopShell(directory: String, shellId: String): Result<Unit> {
         stops += shellId
         stopGate?.await()
+        if (shellId in stopFailing) return Result.failure(OpenCodeError.Unreachable("offline"))
         if (stopResult.isSuccess) runningCommands = runningCommands.filterNot { it.id == shellId }
         return stopResult
     }
@@ -2030,7 +2162,15 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         changesRequests += scope
         return changesByScope[scope] ?: Result.success(emptyList())
     }
-    override suspend fun interrupt(sessionId: String) = Result.success(Unit)
+    val interrupts = mutableListOf<String>()
+    var interruptFailing: Set<String> = emptySet()
+    var onInterrupt: (String) -> Unit = {}
+    override suspend fun interrupt(sessionId: String): Result<Unit> {
+        interrupts += sessionId
+        if (sessionId in interruptFailing) return Result.failure(OpenCodeError.Unreachable("offline"))
+        onInterrupt(sessionId)
+        return Result.success(Unit)
+    }
 
     /** Server requests in order: `agent:x`, `model:p/m/variant`, `prompt:text`, `shell:cmd`, `command:x`, `commit`. */
     val calls = mutableListOf<String>()

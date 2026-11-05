@@ -44,10 +44,14 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attachment_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_undo
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_commands_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_session_deleted
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -56,6 +60,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.PluralStringResource
 import kotlin.time.Clock
 
 class ChatViewModel(
@@ -88,6 +93,7 @@ class ChatViewModel(
     private var workEventJob: Job? = null
     private val runningWork = RunningWorkLoader(sessions, chat)
     private val commandStops = mutableMapOf<String, Job>()
+    private val agentStops = mutableMapOf<String, Job>()
     private var confirmStop: Boolean = settings.settings.value.confirmStopCommand
 
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
@@ -210,14 +216,37 @@ class ChatViewModel(
             is ChatEvent.StopCommand -> if (confirmStop) {
                 updateState { it.copy(confirmingStop = event.id) }
             } else {
-                stopCommand(event.id)
+                stopCommands(listOf(event.id))
             }
             ChatEvent.ConfirmStopCommand -> {
                 val id = currentState.confirmingStop
                 updateState { it.copy(confirmingStop = null) }
-                if (id != null) stopCommand(id)
+                if (id != null) stopCommands(listOf(id))
             }
             ChatEvent.DismissStopCommand -> updateState { it.copy(confirmingStop = null) }
+            is ChatEvent.StopAgent -> if (confirmStop) {
+                updateState { it.copy(confirmingStopAgent = event.sessionId) }
+            } else {
+                stopAgents(listOf(event.sessionId))
+            }
+            ChatEvent.ConfirmStopAgent -> {
+                val id = currentState.confirmingStopAgent
+                updateState { it.copy(confirmingStopAgent = null) }
+                if (id != null) stopAgents(listOf(id))
+            }
+            ChatEvent.DismissStopAgent -> updateState { it.copy(confirmingStopAgent = null) }
+            is ChatEvent.StopAll -> updateState { it.copy(confirmingStopAll = event.group) }
+            ChatEvent.ConfirmStopAll -> {
+                val group = currentState.confirmingStopAll
+                updateState { it.copy(confirmingStopAll = null) }
+                when (group) {
+                    // Only commands proven to belong to this session; unassigned ones keep their own Stop.
+                    RunningGroup.Commands -> stopCommands(currentState.work.commands.map { it.id })
+                    RunningGroup.Agents -> stopAgents(currentState.work.agents.map { it.session.id })
+                    null -> Unit
+                }
+            }
+            ChatEvent.DismissStopAll -> updateState { it.copy(confirmingStopAll = null) }
             ChatEvent.Retry -> loadAll()
             is ChatEvent.DraftChanged -> {
                 updateState { it.copy(draft = event.text) }
@@ -382,29 +411,79 @@ class ChatViewModel(
         }
     }
 
-    private fun stopCommand(id: String) {
-        if (commandStops[id]?.isActive == true) return
-        val command = (currentState.work.commands + currentState.unassignedCommands).firstOrNull { it.id == id } ?: return
-        updateState { it.copy(stoppingCommands = it.stoppingCommands + id) }
-        commandStops[id] = viewModelScope.launch {
+    /**
+     * Stops the listed commands concurrently, skipping those already stopping. Stopped ones leave
+     * the list at once, failed ones stay; then the list is refreshed.
+     */
+    private fun stopCommands(ids: List<String>) {
+        val known = currentState.work.commands + currentState.unassignedCommands
+        val targets = ids.distinct().mapNotNull { id -> known.firstOrNull { it.id == id } }.filter { commandStops[it.id]?.isActive != true }
+        if (targets.isEmpty()) return
+        val targetIds = targets.map { it.id }.toSet()
+        updateState { it.copy(stoppingCommands = it.stoppingCommands + targetIds) }
+        val job = viewModelScope.launch {
             try {
-                chat.stopShell(command.directory, id).fold(
-                    onSuccess = {
-                        workJob?.cancel()
-                        updateState { s ->
-                            s.copy(
-                                work = s.work.copy(commands = s.work.commands.filterNot { it.id == id }),
-                                unassignedCommands = s.unassignedCommands.filterNot { it.id == id },
-                            )
-                        }
-                        refreshRunning()
-                    },
-                    onFailure = { sendEffect(ChatEffect.ShowMessage(it.toUiText())) },
-                )
+                val failures = stopConcurrently(targets, { it.id }) { chat.stopShell(it.directory, it.id) }
+                val stopped = targetIds - failures.keys
+                if (stopped.isNotEmpty()) {
+                    workJob?.cancel()
+                    updateState { s ->
+                        s.copy(
+                            work = s.work.copy(commands = s.work.commands.filterNot { it.id in stopped }),
+                            unassignedCommands = s.unassignedCommands.filterNot { it.id in stopped },
+                        )
+                    }
+                    refreshRunning()
+                }
+                reportStopFailures(failures.values, targets.size, Res.plurals.chat_running_stop_commands_failed)
             } finally {
-                updateState { it.copy(stoppingCommands = it.stoppingCommands - id) }
-                commandStops.remove(id)
+                updateState { it.copy(stoppingCommands = it.stoppingCommands - targetIds) }
+                targetIds.forEach { commandStops.remove(it) }
             }
+        }
+        targetIds.forEach { commandStops[it] = job }
+    }
+
+    /** Interrupts the listed subagents' child sessions concurrently; never this session itself. */
+    private fun stopAgents(ids: List<String>) {
+        val running = currentState.work.agents.map { it.session.id }.toSet()
+        val targets = ids.distinct().filter { it != sessionId && it in running && agentStops[it]?.isActive != true }
+        if (targets.isEmpty()) return
+        val targetIds = targets.toSet()
+        updateState { it.copy(stoppingAgents = it.stoppingAgents + targetIds) }
+        val job = viewModelScope.launch {
+            try {
+                val failures = stopConcurrently(targets, { it }) { chat.interrupt(it) }
+                val stopped = targetIds - failures.keys
+                if (stopped.isNotEmpty()) {
+                    workJob?.cancel()
+                    updateState { s -> s.copy(work = s.work.copy(agents = s.work.agents.filterNot { it.session.id in stopped })) }
+                    refreshRunning()
+                }
+                reportStopFailures(failures.values, targets.size, Res.plurals.chat_running_stop_agents_failed)
+            } finally {
+                updateState { it.copy(stoppingAgents = it.stoppingAgents - targetIds) }
+                targetIds.forEach { agentStops.remove(it) }
+            }
+        }
+        targetIds.forEach { agentStops[it] = job }
+    }
+
+    /** Runs [stop] for every item at once; the failures by item id. */
+    private suspend fun <T> stopConcurrently(items: List<T>, id: (T) -> String, stop: suspend (T) -> Result<Unit>): Map<String, Throwable> =
+        coroutineScope {
+            items.map { item -> async { id(item) to stop(item).exceptionOrNull() } }
+                .awaitAll()
+                .mapNotNull { (key, error) -> error?.let { key to it } }
+                .toMap()
+        }
+
+    /** A single stop shows its error; several are counted in one message. */
+    private fun reportStopFailures(failures: Collection<Throwable>, attempted: Int, counted: PluralStringResource) {
+        when {
+            failures.isEmpty() -> Unit
+            attempted == 1 -> sendEffect(ChatEffect.ShowMessage(failures.first().toUiText()))
+            else -> sendEffect(ChatEffect.ShowMessage(UiText.Plural(counted, failures.size, listOf(failures.size))))
         }
     }
 
