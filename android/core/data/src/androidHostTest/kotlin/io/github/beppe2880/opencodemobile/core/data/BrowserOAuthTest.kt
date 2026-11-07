@@ -45,6 +45,7 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
     var tokenForm: Map<String, String>? = null
     var closed = false
     var responded = false
+    var responseAttempts = 0
     private var pendingResponse = false
     var responseError: ProviderOAuthError? = null
     var block = false
@@ -71,6 +72,7 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
     override fun listen(state: String): OAuthLoopback {
         this.state = state
         responded = false
+        responseAttempts = 0
         responseError = null
         pendingResponse = false
         return object : OAuthLoopback {
@@ -85,7 +87,10 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
                 }
             }
             override fun close() { closed = true }
-            override suspend fun respond(error: ProviderOAuthError?) {
+            override suspend fun acknowledge() { recordResponse(null) }
+            override suspend fun reject(error: ProviderOAuthError) { recordResponse(error) }
+            private fun recordResponse(error: ProviderOAuthError?) {
+                responseAttempts++
                 if (pendingResponse) {
                     responded = true
                     responseError = error
@@ -177,6 +182,7 @@ class BrowserOAuthTest {
         runCurrent()
         assertTrue(fixture.responded)
         assertEquals(null, fixture.responseError)
+        assertEquals(1, fixture.responseAttempts)
         assertTrue(fixture.closed)
         advanceTimeBy(15_000)
         runCurrent()
@@ -252,11 +258,13 @@ class BrowserOAuthTest {
         val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
         assertEquals(ProviderOAuthStage.Claims, failure.stage)
         assertEquals(null, fixture.responseError)
+        assertEquals(1, fixture.responseAttempts)
         fixture.badNonce = false
         fixture.tokenHttpStatus = 400
         val exchange = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
         assertEquals(ProviderOAuthStage.TokenExchange, exchange.stage)
         assertEquals(null, fixture.responseError)
+        assertEquals(1, fixture.responseAttempts)
         assertTrue(fixture.closed)
     }
 

@@ -181,24 +181,27 @@ internal class AndroidOAuthLoopback(private val state: String) : OAuthLoopback {
         error("Unreachable")
     }
 
-    override suspend fun respond(error: ProviderOAuthError?) = withContext(Dispatchers.IO) {
-        pending.getAndSet(null)?.use { socket ->
-            val body = if (error == null) {
-                "Authorization response received. Return to OpenCode Mobile to complete sign-in. Sign-in is not complete yet."
-            } else {
-                "Sign-in failed (${error.diagnosticCode}). Return to OpenCode Mobile to start sign-in again."
-            }
-            writeResponse(socket, body, error == null)
-        }
+    override suspend fun acknowledge() = sendResponse(
+        "Authorization response received. Return to OpenCode Mobile to complete sign-in. Sign-in is not complete yet.",
+        accepted = true,
+    )
+
+    override suspend fun reject(error: ProviderOAuthError) = sendResponse(
+        "Sign-in failed (${error.diagnosticCode}). Return to OpenCode Mobile to start sign-in again.",
+        accepted = false,
+    )
+
+    private suspend fun sendResponse(body: String, accepted: Boolean) = withContext(Dispatchers.IO) {
+        pending.getAndSet(null)?.use { writeResponse(it, body, accepted) }
         Unit
     }
 
-    private fun writeResponse(socket: Socket, body: String, success: Boolean) {
+    private fun writeResponse(socket: Socket, body: String, accepted: Boolean) {
         // The browser may have closed its tab: that must not invalidate an otherwise valid OAuth result.
         runCatching {
             socket.getOutputStream().write(
                 (
-                    "HTTP/1.1 ${if (success) "202 Accepted" else "400 Bad Request"}\r\n" +
+                    "HTTP/1.1 ${if (accepted) "202 Accepted" else "400 Bad Request"}\r\n" +
                         "Content-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\n" +
                         "Content-Security-Policy: default-src 'none'\r\nConnection: close\r\nContent-Length: ${body.length}\r\n\r\n$body"
                     ).toByteArray(Charsets.US_ASCII),

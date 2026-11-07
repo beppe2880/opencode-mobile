@@ -5,7 +5,6 @@ import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -35,8 +34,9 @@ internal interface OAuthLoopback {
     val redirect: String
     suspend fun receive(): Map<String, String>
 
-    /** Acknowledge receipt only, or reject an invalid callback. Never claims OAuth completion or echoes parameters. */
-    suspend fun respond(error: ProviderOAuthError? = null)
+    /** Acknowledge receipt only. Never claims OAuth completion or echoes parameters. */
+    suspend fun acknowledge()
+    suspend fun reject(error: ProviderOAuthError)
     fun close()
 }
 
@@ -117,17 +117,22 @@ internal class BrowserOAuth(
                     provider.hostParameter?.let { parameters.append(it, hostId) }
                 }.buildString()
                 openBrowser(url)
-                val (code, clientId) = oauthStep(ProviderOAuthStage.Callback) {
-                    val response = callback.receive()
-                    require(response["state"] == state && response["error"] == null)
-                    val code = requireNotNull(response["code"]).also { require(it.isNotBlank()) }
-                    val clientId = (if (provider.issuedClientId) requireNotNull(response["client_id"]) else provider.registrationClientId)
-                        .also { require(it.isNotBlank() && it.length <= 1024) }
-                    code to clientId
+                val (code, clientId) = try {
+                    oauthStep(ProviderOAuthStage.Callback) {
+                        val response = callback.receive()
+                        require(response["state"] == state && response["error"] == null)
+                        val code = requireNotNull(response["code"]).also { require(it.isNotBlank()) }
+                        val clientId = (if (provider.issuedClientId) requireNotNull(response["client_id"]) else provider.registrationClientId)
+                            .also { require(it.isNotBlank() && it.length <= 1024) }
+                        code to clientId
+                    }
+                } catch (error: ProviderOAuthError) {
+                    callback.reject(error)
+                    throw error
                 }
                 // The browser must release the user before waiting for the app to become foreground.
                 // This acknowledges receipt, not token verification or server import.
-                callback.respond()
+                callback.acknowledge()
                 callback.close()
                 awaitForeground()
                 val tokens = oauthStep(ProviderOAuthStage.TokenExchange) {
@@ -147,7 +152,7 @@ internal class BrowserOAuth(
                 val jwks = oauthStep(ProviderOAuthStage.Jwks) { platform.json(provider.jwksUrl) }
                 oauthStep(ProviderOAuthStage.Signature) { platform.verifySignature(idToken, jwks) }
                 oauthStep(ProviderOAuthStage.Claims) { validateIdClaims(idToken, provider.issuer, clientId, nonce) }
-                val credential = oauthStep(ProviderOAuthStage.TokenResponse) {
+                oauthStep(ProviderOAuthStage.TokenResponse) {
                     // Match the server plugin: an absent expiry defaults to one hour. Malformed values still fail closed.
                     val expiry = tokens["expires_in"]
                     val seconds = if (expiry == null) 3600L else requireNotNull(expiry.jsonPrimitive.takeUnless { it.isString }?.longOrNull)
@@ -155,12 +160,6 @@ internal class BrowserOAuth(
                     require(seconds > 0 && seconds <= (Long.MAX_VALUE - receivedAt) / 1000)
                     BrowserCredential(tokens.string("access_token"), tokens.string("refresh_token"), receivedAt + seconds * 1000, clientId, scopes)
                 }
-                credential
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                callback.respond(error as? ProviderOAuthError ?: ProviderOAuthError(ProviderOAuthStage.Unknown))
-                throw error
             } finally {
                 callback.close()
             }

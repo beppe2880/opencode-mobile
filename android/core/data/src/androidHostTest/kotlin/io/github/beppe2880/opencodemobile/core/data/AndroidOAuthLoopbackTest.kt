@@ -49,7 +49,7 @@ class AndroidOAuthLoopbackTest {
         val callback = AndroidOAuthLoopback("expected-state")
         val port = Url(callback.redirect).port
         try {
-            val waiting = async(Dispatchers.IO) { callback.receive().also { callback.respond() } }
+            val waiting = async(Dispatchers.IO) { callback.receive().also { callback.acknowledge() } }
             val target = "/auth/callback?code=test-code&client_id=test-client&state=expected-state"
             assertTrue(request(port, target.replace("expected-state", "wrong")).startsWith("HTTP/1.1 400"))
             assertTrue(request(port, "$target&state=expected-state").startsWith("HTTP/1.1 400"))
@@ -79,7 +79,7 @@ class AndroidOAuthLoopbackTest {
         ServerSocket(port, 1, InetAddress.getByName("127.0.0.1")).use { assertTrue(it.isBound) }
         val denied = AndroidOAuthLoopback("state")
         try {
-            val result = async(Dispatchers.IO) { denied.receive().also { denied.respond(ProviderOAuthError(ProviderOAuthStage.Callback)) } }
+            val result = async(Dispatchers.IO) { denied.receive().also { denied.reject(ProviderOAuthError(ProviderOAuthStage.Callback)) } }
             assertTrue(request(Url(denied.redirect).port, "/auth/callback?state=state&error=access_denied").startsWith("HTTP/1.1 400"))
             assertEquals("access_denied", withTimeout(5000) { result.await() }["error"])
         } finally { denied.close() }
@@ -94,7 +94,7 @@ class AndroidOAuthLoopbackTest {
             }
             assertEquals("secret-code", withTimeout(5000) { waiting.await() }["code"])
             assertFalse(browser.isCompleted)
-            callback.respond()
+            callback.acknowledge()
             val page = withTimeout(5000) { browser.await() }
             assertTrue(page.startsWith("HTTP/1.1 202"))
             assertTrue(page.contains("Sign-in is not complete yet"))
