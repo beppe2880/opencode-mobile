@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.core.data.integration
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthTransport
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -13,6 +14,18 @@ import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class OAuthErrorsTest {
+    @Test fun transportCategoryAndDurationSurviveWithoutOriginalCause() = runTest {
+        val raw = OAuthTransportError(ProviderOAuthTransport.Timeout, 20001)
+        val error = assertIs<ProviderOAuthError>(runCatching { oauthStep(ProviderOAuthStage.TokenExchange) { throw raw } }.exceptionOrNull())
+        assertEquals("OAUTH_TokenExchange_Timeout_20001ms", error.diagnosticCode)
+        assertNull(error.cause)
+        assertNull(error.httpStatus)
+        val partial = OAuthTransportError(ProviderOAuthTransport.ConnectionIO, 150, 200)
+        val responseError = assertIs<ProviderOAuthError>(runCatching { oauthStep(ProviderOAuthStage.Jwks) { throw partial } }.exceptionOrNull())
+        assertEquals("OAUTH_Jwks_ConnectionIO_HTTP_200_150ms", responseError.diagnosticCode)
+        assertNull(ProviderOAuthError(ProviderOAuthStage.Callback, elapsedMillis = -1).elapsedMillis)
+    }
+
     @Test fun serverErrorsExposeOnlyStageAndStatus() = runTest {
         val errors = listOf(
             OpenCodeError.Server(403, "secret-tag", "secret-token") to 403,

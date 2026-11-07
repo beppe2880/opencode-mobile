@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data.integration
 
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthTransport
 import io.ktor.http.Url
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +20,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.math.BigInteger
 import java.net.InetAddress
 import java.net.ServerSocket
+import java.net.Socket
 import java.net.SocketTimeoutException
 import java.security.KeyFactory
 import java.security.MessageDigest
@@ -29,13 +33,15 @@ import java.security.Signature
 import java.security.spec.RSAPublicKeySpec
 import java.util.Base64
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.TimeSource
 
 /** A separate unauthenticated HTTP client: never forwards OpenCode Basic auth or follows redirects. */
 internal class AndroidOAuthPlatform(
     private val http: OkHttpClient = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false)
-        .callTimeout(20, TimeUnit.SECONDS).build(),
+        .retryOnConnectionFailure(false).callTimeout(20, TimeUnit.SECONDS).build(),
 ) : OAuthPlatform {
     override val supported = true
     private val random = SecureRandom()
@@ -49,11 +55,19 @@ internal class AndroidOAuthPlatform(
         val request = Request.Builder().url(url).header("Accept", "application/json").header("User-Agent", "OpenCode-Mobile")
         form?.let { request.post(FormBody.Builder().apply { it.forEach { (key, value) -> add(key, value) } }.build()) }
         return suspendCancellableCoroutine { continuation ->
+            val started = TimeSource.Monotonic.markNow()
             val call = http.newCall(request.build())
             continuation.invokeOnCancellation { call.cancel() }
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    if (continuation.isActive) continuation.resumeWithException(IOException("OAuth request failed"))
+                    if (continuation.isActive) continuation.resumeWithException(
+                        OAuthTransportError(
+                            // Only the owning coroutine or OkHttp's call deadline can cancel this private call.
+                            // An inactive coroutine is handled above; do not infer timeouts from message text.
+                            if (call.isCanceled() && e is InterruptedIOException) ProviderOAuthTransport.Timeout else oauthTransportKind(e),
+                            started.elapsedNow().inWholeMilliseconds,
+                        ),
+                    )
                 }
                 override fun onResponse(call: Call, response: Response) {
                     val result = runCatching {
@@ -72,7 +86,11 @@ internal class AndroidOAuthPlatform(
                         }
                     }
                     if (continuation.isActive) result.fold(continuation::resume) {
-                        continuation.resumeWithException(OAuthHttpError(response.code))
+                        val elapsed = started.elapsedNow().inWholeMilliseconds
+                        continuation.resumeWithException(
+                            if (it is IOException) OAuthTransportError(oauthTransportKind(it), elapsed, response.code)
+                            else OAuthHttpError(response.code, elapsed),
+                        )
                     }
                 }
             })
@@ -107,13 +125,15 @@ internal class AndroidOAuthPlatform(
 /** Bound only to literal IPv4 loopback. Bounded reads and timeouts prevent a local peer pinning the listener. */
 internal class AndroidOAuthLoopback(private val state: String) : OAuthLoopback {
     private val server = ServerSocket(0, 8, InetAddress.getByName("127.0.0.1")).apply { soTimeout = 500 }
+    private val pending = AtomicReference<Socket?>(null)
     override val redirect = "http://127.0.0.1:${server.localPort}/auth/callback"
 
     override suspend fun receive(): Map<String, String> = withContext(Dispatchers.IO) {
         while (true) {
             currentCoroutineContext().ensureActive()
             val socket = try { server.accept() } catch (_: SocketTimeoutException) { continue }
-            socket.use {
+            var retained = false
+            try {
                 socket.soTimeout = 1000
                 val parsed = try {
                     val input = socket.getInputStream()
@@ -147,22 +167,46 @@ internal class AndroidOAuthLoopback(private val state: String) : OAuthLoopback {
                 } catch (_: Exception) {
                     null
                 }
-                runCatching {
-                    val body = if (parsed == null) "Invalid authorization response." else "Return to OpenCode Mobile to check sign-in."
-                    socket.getOutputStream().write(
-                        (
-                            "HTTP/1.1 ${if (parsed == null) "400 Bad Request" else "200 OK"}\r\n" +
-                                "Content-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\n" +
-                                "Content-Security-Policy: default-src 'none'\r\nConnection: close\r\nContent-Length: ${body.length}\r\n\r\n$body"
-                            ).toByteArray(Charsets.US_ASCII),
-                    )
+                if (parsed != null) {
+                    pending.set(socket)
+                    retained = true
+                    return@withContext parsed
                 }
-                if (parsed != null) return@withContext parsed
+                writeResponse(socket, "Invalid authorization response.", false)
+            } finally {
+                if (!retained) socket.close()
             }
         }
         @Suppress("UNREACHABLE_CODE")
         error("Unreachable")
     }
 
-    override fun close() { server.close() }
+    override suspend fun respond(error: ProviderOAuthError?) = withContext(Dispatchers.IO) {
+        pending.getAndSet(null)?.use { socket ->
+            val body = if (error == null) {
+                "OpenAI authorization verified. Return to OpenCode Mobile to check whether credentials were saved on the server."
+            } else {
+                "Sign-in failed (${error.diagnosticCode}). Return to OpenCode Mobile to start sign-in again."
+            }
+            writeResponse(socket, body, error == null)
+        }
+        Unit
+    }
+
+    private fun writeResponse(socket: Socket, body: String, success: Boolean) {
+        // The browser may have closed its tab: that must not invalidate an otherwise valid OAuth result.
+        runCatching {
+            socket.getOutputStream().write(
+                (
+                    "HTTP/1.1 ${if (success) "200 OK" else "400 Bad Request"}\r\n" +
+                        "Content-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\n" +
+                        "Content-Security-Policy: default-src 'none'\r\nConnection: close\r\nContent-Length: ${body.length}\r\n\r\n$body"
+                    ).toByteArray(Charsets.US_ASCII),
+            )
+        }
+    }
+
+    override fun close() {
+        try { server.close() } finally { pending.getAndSet(null)?.close() }
+    }
 }

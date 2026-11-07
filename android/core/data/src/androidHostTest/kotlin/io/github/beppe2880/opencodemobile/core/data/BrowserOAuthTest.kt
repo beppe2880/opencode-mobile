@@ -35,12 +35,14 @@ import java.security.Signature
 import java.security.interfaces.RSAPublicKey
 
 /** Real RSA signatures, fake authorization service; no account or internet required. */
-internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
+internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlatform()) : OAuthPlatform by native {
     private val keys = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.generateKeyPair()
     val settings = MapSettings()
     var authorization: Url? = null
     var tokenForm: Map<String, String>? = null
     var closed = false
+    var responded = false
+    var responseError: ProviderOAuthError? = null
     var block = false
     var callbackState: String? = null
     var callbackError = false
@@ -61,6 +63,8 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
 
     override fun listen(state: String): OAuthLoopback {
         this.state = state
+        responded = false
+        responseError = null
         return object : OAuthLoopback {
             override val redirect = "http://127.0.0.1:54321/auth/callback"
             override suspend fun receive(): Map<String, String> {
@@ -72,12 +76,22 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
                 }
             }
             override fun close() { closed = true }
+            override suspend fun respond(error: ProviderOAuthError?) {
+                responded = true
+                responseError = error
+            }
         }
     }
 
     fun opened(url: String) { authorization = Url(url) }
 
+    override fun verifySignature(token: String, jwks: JsonObject) {
+        check(!responded)
+        native.verifySignature(token, jwks)
+    }
+
     override suspend fun json(url: String, form: Map<String, String>?): JsonObject {
+        check(!responded)
         check(!httpFailure)
         if (form == null) {
             jwksHttpStatus?.let { throw OAuthHttpError(it) }
@@ -136,6 +150,22 @@ internal class OAuthFixture : OAuthPlatform by AndroidOAuthPlatform() {
 }
 
 class BrowserOAuthTest {
+    @Test fun `browser response follows verification and reports validation or exchange failure`() = runTest {
+        val fixture = OAuthFixture()
+        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        engine.authorize(OpenAiBrowser, fixture::opened)
+        assertTrue(fixture.responded)
+        assertEquals(null, fixture.responseError)
+        fixture.badNonce = true
+        runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }
+        assertEquals(ProviderOAuthStage.Claims, fixture.responseError?.stage)
+        fixture.badNonce = false
+        fixture.tokenHttpStatus = 400
+        runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }
+        assertEquals(ProviderOAuthStage.TokenExchange, fixture.responseError?.stage)
+        assertTrue(fixture.closed)
+    }
+
     @Test fun `missing expiry uses server compatible one hour default after full token validation`() = runTest {
         val fixture = OAuthFixture().apply { expiry = null }
         val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))

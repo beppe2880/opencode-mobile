@@ -29,8 +29,10 @@ iOS browser authentication is disabled pending a native loopback listener and ve
   releases the listener. Process death requires starting again. Only the server refreshes tokens.
 - A cancelled import may already have reached the server; no automatic delete or
   refresh/retry is attempted. Model caches are invalidated before and after connection.
-- The browser callback page says to return to the app; only the app reports whether
-  validation and import actually succeeded. OAuth/server error bodies are not displayed.
+- The callback connection waits for token exchange and validation. Only then does the
+  browser report verified authorization and ask the user to check server saving in the app.
+  Validation/exchange failures produce a safe failure page, never premature success.
+  Only the app confirms import; OAuth/server error bodies are not displayed.
 
 ## Verification limits
 
@@ -44,6 +46,13 @@ Failures include a safe diagnostic such as `OAUTH_TokenExchange_HTTP_400` or
 scope, response shape, JWKS download, signature, claims, target-server changes,
 credential import and expiry. Only fixed identifiers and an available HTTP status
 reach the UI; original exception messages, response bodies and causes are discarded.
+Native transport failures additionally include an allowlisted category (DNS, connection,
+certificate, TLS, socket timeout, interrupted I/O, connection I/O, protocol or other I/O)
+and elapsed milliseconds from a monotonic clock, for example
+`OAUTH_TokenExchange_DNS_42ms`. An interrupted I/O operation is not assumed to be a
+timeout just from its message. Response-body transport failures retain HTTP status when
+available. No hostnames, messages or stack traces are copied into diagnostics. OAuth
+POST connection retries remain disabled: a lost response must not silently reuse a code.
 An import error cannot prove the server did not save: check provider status before retrying.
 An absent `expires_in` defaults to one hour, matching the server plugin. Explicit
 malformed, non-positive or overflowing expiry values still fail validation; a valid

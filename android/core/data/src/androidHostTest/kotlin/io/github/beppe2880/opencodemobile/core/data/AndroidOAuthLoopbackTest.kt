@@ -3,6 +3,9 @@ package io.github.beppe2880.opencodemobile.core.data
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthLoopback
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.integration.OAuthHttpError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
+import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthTransport
 import io.ktor.http.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -14,6 +17,7 @@ import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.net.InetAddress
@@ -45,7 +49,7 @@ class AndroidOAuthLoopbackTest {
         val callback = AndroidOAuthLoopback("expected-state")
         val port = Url(callback.redirect).port
         try {
-            val waiting = async(Dispatchers.IO) { callback.receive() }
+            val waiting = async(Dispatchers.IO) { callback.receive().also { callback.respond() } }
             val target = "/auth/callback?code=test-code&client_id=test-client&state=expected-state"
             assertTrue(request(port, target.replace("expected-state", "wrong")).startsWith("HTTP/1.1 400"))
             assertTrue(request(port, "$target&state=expected-state").startsWith("HTTP/1.1 400"))
@@ -75,10 +79,41 @@ class AndroidOAuthLoopbackTest {
         ServerSocket(port, 1, InetAddress.getByName("127.0.0.1")).use { assertTrue(it.isBound) }
         val denied = AndroidOAuthLoopback("state")
         try {
-            val result = async(Dispatchers.IO) { denied.receive() }
-            request(Url(denied.redirect).port, "/auth/callback?state=state&error=access_denied")
+            val result = async(Dispatchers.IO) { denied.receive().also { denied.respond(ProviderOAuthError(ProviderOAuthStage.Callback)) } }
+            assertTrue(request(Url(denied.redirect).port, "/auth/callback?state=state&error=access_denied").startsWith("HTTP/1.1 400"))
             assertEquals("access_denied", withTimeout(5000) { result.await() }["error"])
         } finally { denied.close() }
+    }
+
+    @Test fun `browser waits for validation then receives only a safe failure diagnostic`() = runBlocking {
+        val callback = AndroidOAuthLoopback("state")
+        try {
+            val waiting = async(Dispatchers.IO) { callback.receive() }
+            val browser = async(Dispatchers.IO) {
+                request(Url(callback.redirect).port, "/auth/callback?state=state&code=secret-code&client_id=secret-client")
+            }
+            assertEquals("secret-code", withTimeout(5000) { waiting.await() }["code"])
+            assertFalse(browser.isCompleted)
+            callback.respond(ProviderOAuthError(ProviderOAuthStage.TokenExchange, transport = ProviderOAuthTransport.DNS, elapsedMillis = 42))
+            val page = withTimeout(5000) { browser.await() }
+            assertTrue(page.startsWith("HTTP/1.1 400"))
+            assertTrue(page.contains("OAUTH_TokenExchange_DNS_42ms"))
+            assertFalse(page.contains("secret-code"))
+            assertFalse(page.contains("secret-client"))
+            assertTrue(page.contains("Cache-Control: no-store"))
+        } finally { callback.close() }
+    }
+
+    @Test fun `closing while browser waits releases callback without reporting success`() = runBlocking {
+        val callback = AndroidOAuthLoopback("state")
+        val waiting = async(Dispatchers.IO) { callback.receive() }
+        val browser = async(Dispatchers.IO) {
+            request(Url(callback.redirect).port, "/auth/callback?state=state&code=code&client_id=client")
+        }
+        withTimeout(5000) { waiting.await() }
+        assertFalse(browser.isCompleted)
+        callback.close()
+        assertFalse(withTimeout(5000) { browser.await() }.contains("200 OK"))
     }
 
     @Test fun `OAuth transport refuses plaintext endpoints before sending anything`() = runBlocking {
