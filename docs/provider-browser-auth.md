@@ -29,10 +29,16 @@ iOS browser authentication is disabled pending a native loopback listener and ve
   releases the listener. Process death requires starting again. Only the server refreshes tokens.
 - A cancelled import may already have reached the server; no automatic delete or
   refresh/retry is attempted. Model caches are invalidated before and after connection.
-- The callback connection waits for token exchange and validation. Only then does the
-  browser report verified authorization and ask the user to check server saving in the app.
-  Validation/exchange failures produce a safe failure page, never premature success.
-  Only the app confirms import; OAuth/server error bodies are not displayed.
+- After checking state and callback parameters, the phone returns HTTP 202 with a neutral
+  receipt: return to the app to complete sign-in. This is not a success/verification page.
+  The listener is released immediately; the code remains only in the owning coroutine.
+- Token exchange, JWKS retrieval and credential import wait for app visibility. Android
+  can block networking for a background UID while still delivering the loopback callback;
+  this can surface as a DNS failure even with correct DNS settings. No foreground service,
+  DNS override or change to VPN settings is needed. Foreground waits are bounded to five
+  minutes and closing the panel cancels them; the local authorization also has its existing
+  five-minute deadline. Only the app confirms verification and server import.
+  OAuth/server error bodies are never displayed.
 
 ## Verification limits
 

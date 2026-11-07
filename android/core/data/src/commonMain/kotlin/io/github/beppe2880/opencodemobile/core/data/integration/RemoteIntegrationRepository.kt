@@ -50,6 +50,7 @@ internal class RemoteIntegrationRepository(
             require(protectedOAuthTransport(profile.baseUrl))
             val targetClient = clients.forProfile(profile)
             val oauth = requireNotNull(browser)
+            oauth.awaitForeground()
             // Recheck discovery: do not import credentials for a method the target server does not implement.
             val available = listKeys(serverId, directory).getOrThrow()
             require(available.any { it.id == integrationId && it.oauthMethods.any { method -> method.id == methodId && method.mobileSupported } })
@@ -68,6 +69,7 @@ internal class RemoteIntegrationRepository(
                 withContext(NonCancellable) { awaitSuccess { integrationApi.integrationOauthCancel(integrationId, preparedId, directory) } }
             }
             val credential = oauth.authorize(provider, openBrowser)
+            oauth.awaitForeground()
             currentCoroutineContext().ensureActive()
             oauthStep(ProviderOAuthStage.ServerChanged) {
                 require(servers.servers.value.firstOrNull { it.id == serverId } == profile && servers.activeServer.value?.id == serverId)

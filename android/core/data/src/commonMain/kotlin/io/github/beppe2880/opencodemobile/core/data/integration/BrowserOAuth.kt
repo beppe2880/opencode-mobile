@@ -9,6 +9,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.JsonObject
@@ -33,7 +35,7 @@ internal interface OAuthLoopback {
     val redirect: String
     suspend fun receive(): Map<String, String>
 
-    /** Best-effort browser response, only after validation. Never echoes callback parameters. */
+    /** Acknowledge receipt only, or reject an invalid callback. Never claims OAuth completion or echoes parameters. */
     suspend fun respond(error: ProviderOAuthError? = null)
     fun close()
 }
@@ -77,9 +79,16 @@ internal val OpenAiBrowser = OAuthProvider(
 internal class BrowserOAuth(
     private val platform: OAuthPlatform,
     private val settings: Settings,
+    private val foreground: Flow<Boolean>,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     val supported: Boolean get() = platform.supported
+
+    /** Network access can be blocked for a background UID even though loopback callbacks still arrive. */
+    suspend fun awaitForeground() {
+        withTimeoutOrNull(300_000) { foreground.first { it } }
+            ?: throw ProviderOAuthError(ProviderOAuthStage.Expired)
+    }
 
     suspend fun authorize(provider: OAuthProvider, openBrowser: suspend (String) -> Unit): BrowserCredential = withContext(dispatcher) {
         withTimeoutOrNull(300_000) {
@@ -116,6 +125,11 @@ internal class BrowserOAuth(
                         .also { require(it.isNotBlank() && it.length <= 1024) }
                     code to clientId
                 }
+                // The browser must release the user before waiting for the app to become foreground.
+                // This acknowledges receipt, not token verification or server import.
+                callback.respond()
+                callback.close()
+                awaitForeground()
                 val tokens = oauthStep(ProviderOAuthStage.TokenExchange) {
                     platform.json(
                         provider.tokenUrl,
@@ -129,6 +143,7 @@ internal class BrowserOAuth(
                     tokens.string("scope").split(' ').filter { it.isNotBlank() }.also { require(provider.requiredScope in it) }
                 }
                 val idToken = oauthStep(ProviderOAuthStage.TokenResponse) { tokens.string("id_token") }
+                awaitForeground()
                 val jwks = oauthStep(ProviderOAuthStage.Jwks) { platform.json(provider.jwksUrl) }
                 oauthStep(ProviderOAuthStage.Signature) { platform.verifySignature(idToken, jwks) }
                 oauthStep(ProviderOAuthStage.Claims) { validateIdClaims(idToken, provider.issuer, clientId, nonce) }
@@ -140,7 +155,6 @@ internal class BrowserOAuth(
                     require(seconds > 0 && seconds <= (Long.MAX_VALUE - receivedAt) / 1000)
                     BrowserCredential(tokens.string("access_token"), tokens.string("refresh_token"), receivedAt + seconds * 1000, clientId, scopes)
                 }
-                callback.respond()
                 credential
             } catch (error: CancellationException) {
                 throw error

@@ -58,7 +58,7 @@ class AndroidOAuthLoopbackTest {
             assertTrue(request(port, target, host = "evil.example:$port").startsWith("HTTP/1.1 400"))
             assertTrue(request(port, target.replace("/auth/callback", "/other")).startsWith("HTTP/1.1 400"))
             val response = request(port, target)
-            assertTrue(response.startsWith("HTTP/1.1 200"))
+            assertTrue(response.startsWith("HTTP/1.1 202"))
             assertTrue(response.contains("Cache-Control: no-store"))
             assertTrue(!response.contains("test-code"))
             assertEquals("test-code", withTimeout(5000) { waiting.await() }["code"])
@@ -85,7 +85,7 @@ class AndroidOAuthLoopbackTest {
         } finally { denied.close() }
     }
 
-    @Test fun `browser waits for validation then receives only a safe failure diagnostic`() = runBlocking {
+    @Test fun `browser acknowledgement is neutral and never echoes authorization parameters`() = runBlocking {
         val callback = AndroidOAuthLoopback("state")
         try {
             val waiting = async(Dispatchers.IO) { callback.receive() }
@@ -94,10 +94,12 @@ class AndroidOAuthLoopbackTest {
             }
             assertEquals("secret-code", withTimeout(5000) { waiting.await() }["code"])
             assertFalse(browser.isCompleted)
-            callback.respond(ProviderOAuthError(ProviderOAuthStage.TokenExchange, transport = ProviderOAuthTransport.DNS, elapsedMillis = 42))
+            callback.respond()
             val page = withTimeout(5000) { browser.await() }
-            assertTrue(page.startsWith("HTTP/1.1 400"))
-            assertTrue(page.contains("OAUTH_TokenExchange_DNS_42ms"))
+            assertTrue(page.startsWith("HTTP/1.1 202"))
+            assertTrue(page.contains("Sign-in is not complete yet"))
+            assertTrue(page.contains("Return to OpenCode Mobile to complete"))
+            assertFalse(page.contains("verified"))
             assertFalse(page.contains("secret-code"))
             assertFalse(page.contains("secret-client"))
             assertTrue(page.contains("Cache-Control: no-store"))
@@ -113,7 +115,7 @@ class AndroidOAuthLoopbackTest {
         withTimeout(5000) { waiting.await() }
         assertFalse(browser.isCompleted)
         callback.close()
-        assertFalse(withTimeout(5000) { browser.await() }.contains("200 OK"))
+        assertFalse(withTimeout(5000) { browser.await() }.contains("202 Accepted"))
     }
 
     @Test fun `OAuth transport refuses plaintext endpoints before sending anything`() = runBlocking {

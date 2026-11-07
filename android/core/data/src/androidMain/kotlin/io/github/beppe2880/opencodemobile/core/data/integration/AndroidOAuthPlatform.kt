@@ -184,7 +184,7 @@ internal class AndroidOAuthLoopback(private val state: String) : OAuthLoopback {
     override suspend fun respond(error: ProviderOAuthError?) = withContext(Dispatchers.IO) {
         pending.getAndSet(null)?.use { socket ->
             val body = if (error == null) {
-                "OpenAI authorization verified. Return to OpenCode Mobile to check whether credentials were saved on the server."
+                "Authorization response received. Return to OpenCode Mobile to complete sign-in. Sign-in is not complete yet."
             } else {
                 "Sign-in failed (${error.diagnosticCode}). Return to OpenCode Mobile to start sign-in again."
             }
@@ -198,7 +198,7 @@ internal class AndroidOAuthLoopback(private val state: String) : OAuthLoopback {
         runCatching {
             socket.getOutputStream().write(
                 (
-                    "HTTP/1.1 ${if (success) "200 OK" else "400 Bad Request"}\r\n" +
+                    "HTTP/1.1 ${if (success) "202 Accepted" else "400 Bad Request"}\r\n" +
                         "Content-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\n" +
                         "Content-Security-Policy: default-src 'none'\r\nConnection: close\r\nContent-Length: ${body.length}\r\n\r\n$body"
                     ).toByteArray(Charsets.US_ASCII),

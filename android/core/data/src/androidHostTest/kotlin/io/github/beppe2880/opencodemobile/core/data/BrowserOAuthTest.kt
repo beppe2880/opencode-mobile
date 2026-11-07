@@ -14,7 +14,9 @@ import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.ktor.http.Url
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -38,10 +40,12 @@ import java.security.interfaces.RSAPublicKey
 internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlatform()) : OAuthPlatform by native {
     private val keys = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.generateKeyPair()
     val settings = MapSettings()
+    val foreground = MutableStateFlow(true)
     var authorization: Url? = null
     var tokenForm: Map<String, String>? = null
     var closed = false
     var responded = false
+    private var pendingResponse = false
     var responseError: ProviderOAuthError? = null
     var block = false
     var callbackState: String? = null
@@ -59,16 +63,21 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
     var jwksHttpStatus: Int? = null
     var missingIdToken = false
     var exchanges = 0
+    var jwksRequests = 0
+    var backgroundAfterExchange = false
+    var onSignatureVerified: (() -> Unit)? = null
     private var state = ""
 
     override fun listen(state: String): OAuthLoopback {
         this.state = state
         responded = false
         responseError = null
+        pendingResponse = false
         return object : OAuthLoopback {
             override val redirect = "http://127.0.0.1:54321/auth/callback"
             override suspend fun receive(): Map<String, String> {
                 if (block) CompletableDeferred<Unit>().await()
+                pendingResponse = true
                 return buildMap {
                     put("state", callbackState ?: state)
                     if (callbackError) put("error", "access_denied") else put("code", "test-code")
@@ -77,8 +86,11 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
             }
             override fun close() { closed = true }
             override suspend fun respond(error: ProviderOAuthError?) {
-                responded = true
-                responseError = error
+                if (pendingResponse) {
+                    responded = true
+                    responseError = error
+                    pendingResponse = false
+                }
             }
         }
     }
@@ -86,19 +98,23 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
     fun opened(url: String) { authorization = Url(url) }
 
     override fun verifySignature(token: String, jwks: JsonObject) {
-        check(!responded)
+        check(responded && responseError == null)
         native.verifySignature(token, jwks)
+        onSignatureVerified?.invoke()
     }
 
     override suspend fun json(url: String, form: Map<String, String>?): JsonObject {
-        check(!responded)
+        check(responded && responseError == null)
+        check(foreground.value) { "Network attempted in background" }
         check(!httpFailure)
         if (form == null) {
+            jwksRequests++
             jwksHttpStatus?.let { throw OAuthHttpError(it) }
             return jwks()
         }
         tokenHttpStatus?.let { throw OAuthHttpError(it) }
         exchanges++
+        if (backgroundAfterExchange) foreground.value = false
         tokenForm = form
         return buildJsonObject {
             put("access_token", "test-access")
@@ -150,25 +166,103 @@ internal class OAuthFixture(private val native: OAuthPlatform = AndroidOAuthPlat
 }
 
 class BrowserOAuthTest {
-    @Test fun `browser response follows verification and reports validation or exchange failure`() = runTest {
+    @Test fun `callback is acknowledged in background but exchange waits until foreground`() = runTest {
         val fixture = OAuthFixture()
-        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        var complete = false
+        launch {
+            engine.authorize(OpenAiBrowser) { url -> fixture.opened(url); fixture.foreground.value = false }
+            complete = true
+        }
+        runCurrent()
+        assertTrue(fixture.responded)
+        assertEquals(null, fixture.responseError)
+        assertTrue(fixture.closed)
+        advanceTimeBy(15_000)
+        runCurrent()
+        assertEquals(0, fixture.exchanges)
+        assertEquals(0, fixture.jwksRequests)
+        assertFalse(complete)
+        fixture.foreground.value = true
+        advanceUntilIdle()
+        assertTrue(complete)
+        assertEquals(1, fixture.exchanges)
+        assertEquals(1, fixture.jwksRequests)
+    }
+
+    @Test fun `JWKS request waits again if app backgrounds after token exchange`() = runTest {
+        val fixture = OAuthFixture().apply { backgroundAfterExchange = true }
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        var complete = false
+        launch { engine.authorize(OpenAiBrowser, fixture::opened); complete = true }
+        runCurrent()
+        assertEquals(1, fixture.exchanges)
+        assertEquals(0, fixture.jwksRequests)
+        assertFalse(complete)
+        fixture.foreground.value = true
+        advanceUntilIdle()
+        assertTrue(complete)
+        assertEquals(1, fixture.exchanges)
+        assertEquals(1, fixture.jwksRequests)
+    }
+
+    @Test fun `cancelling after callback while background never exchanges the code later`() = runTest {
+        val fixture = OAuthFixture().apply { foreground.value = false }
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val job = launch { engine.authorize(OpenAiBrowser, fixture::opened) }
+        runCurrent()
+        assertTrue(fixture.responded)
+        job.cancelAndJoin()
+        fixture.foreground.value = true
+        advanceUntilIdle()
+        assertEquals(0, fixture.exchanges)
+        assertTrue(fixture.closed)
+    }
+
+    @Test fun `not returning to app expires foreground wait without network or browser success`() = runTest {
+        val fixture = OAuthFixture().apply { foreground.value = false }
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        var error: ProviderOAuthError? = null
+        launch { error = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as? ProviderOAuthError }
+        runCurrent()
+        assertTrue(fixture.responded)
+        advanceUntilIdle()
+        assertEquals(ProviderOAuthStage.Expired, error?.stage)
+        assertEquals(0, fixture.exchanges)
+        assertTrue(fixture.closed)
+    }
+
+    @Test fun `denied callback fails immediately even while app is background`() = runTest {
+        val fixture = OAuthFixture().apply { foreground.value = false; callbackError = true }
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val error = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals(ProviderOAuthStage.Callback, error.stage)
+        assertEquals(ProviderOAuthStage.Callback, fixture.responseError?.stage)
+        assertEquals(0, fixture.exchanges)
+        assertTrue(fixture.closed)
+    }
+
+    @Test fun `browser acknowledges callback without claiming validation and app retains later failures`() = runTest {
+        val fixture = OAuthFixture()
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
         engine.authorize(OpenAiBrowser, fixture::opened)
         assertTrue(fixture.responded)
         assertEquals(null, fixture.responseError)
         fixture.badNonce = true
-        runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }
-        assertEquals(ProviderOAuthStage.Claims, fixture.responseError?.stage)
+        val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals(ProviderOAuthStage.Claims, failure.stage)
+        assertEquals(null, fixture.responseError)
         fixture.badNonce = false
         fixture.tokenHttpStatus = 400
-        runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }
-        assertEquals(ProviderOAuthStage.TokenExchange, fixture.responseError?.stage)
+        val exchange = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
+        assertEquals(ProviderOAuthStage.TokenExchange, exchange.stage)
+        assertEquals(null, fixture.responseError)
         assertTrue(fixture.closed)
     }
 
     @Test fun `missing expiry uses server compatible one hour default after full token validation`() = runTest {
         val fixture = OAuthFixture().apply { expiry = null }
-        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
         val before = now()
         val credential = engine.authorize(OpenAiBrowser, fixture::opened)
         assertTrue(credential.expires in (before + 3_600_000)..(now() + 3_600_000))
@@ -181,7 +275,7 @@ class BrowserOAuthTest {
 
     @Test fun `malformed zero negative and overflowing expiry are not treated as absent`() = runTest {
         val fixture = OAuthFixture()
-        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
         listOf(JsonNull, JsonPrimitive(0), JsonPrimitive(-1), JsonPrimitive("3600"), JsonPrimitive(1.5), JsonPrimitive(Long.MAX_VALUE)).forEach {
             fixture.expiry = it
             val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
@@ -194,7 +288,7 @@ class BrowserOAuthTest {
 
     @Test fun `provider HTTP statuses identify exchange or JWKS phase without payloads`() = runTest {
         val fixture = OAuthFixture()
-        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
         fixture.tokenHttpStatus = 400
         val exchange = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
         assertEquals("OAUTH_TokenExchange_HTTP_400", exchange.diagnosticCode)
@@ -216,7 +310,7 @@ class BrowserOAuthTest {
         )
         cases.forEach { (change, stage) ->
             val fixture = OAuthFixture().also(change)
-            val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+            val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
             val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
             assertEquals(stage, failure.stage)
             assertFalse(failure.toString().contains("test-code"))
@@ -243,7 +337,7 @@ class BrowserOAuthTest {
 
     @Test fun `OpenAI registration exchanges exact redirect and PKCE then validates signed ID token`() = runTest {
         val fixture = OAuthFixture()
-        val engine = BrowserOAuth(fixture, fixture.settings, testScheduler.let { kotlinx.coroutines.test.StandardTestDispatcher(it) })
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, testScheduler.let { kotlinx.coroutines.test.StandardTestDispatcher(it) })
         val credential = engine.authorize(OpenAiBrowser, fixture::opened)
         val url = requireNotNull(fixture.authorization)
         val form = requireNotNull(fixture.tokenForm)
@@ -267,7 +361,7 @@ class BrowserOAuthTest {
     @Test fun `wrong state missing client and denial never exchange tokens`() = runTest {
         listOf<(OAuthFixture) -> Unit>({ it.callbackState = "wrong" }, { it.missingClient = true }, { it.callbackError = true }).forEach { change ->
             val fixture = OAuthFixture().also(change)
-            val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+            val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
             val failure = runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.exceptionOrNull() as ProviderOAuthError
             assertEquals(ProviderOAuthStage.Callback, failure.stage)
             assertEquals(0, fixture.exchanges)
@@ -282,7 +376,7 @@ class BrowserOAuthTest {
         )
         changes.forEach { change ->
             val fixture = OAuthFixture().also(change)
-            val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+            val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
             assertTrue(runCatching { engine.authorize(OpenAiBrowser, fixture::opened) }.isFailure)
             assertTrue(fixture.closed)
         }
@@ -290,7 +384,7 @@ class BrowserOAuthTest {
 
     @Test fun `cancellation and expiry always close callback without storing tokens`() = runTest {
         val fixture = OAuthFixture().apply { block = true }
-        val engine = BrowserOAuth(fixture, fixture.settings, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
+        val engine = BrowserOAuth(fixture, fixture.settings, fixture.foreground, kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))
         val job = launch { engine.authorize(OpenAiBrowser, fixture::opened) }
         runCurrent()
         job.cancelAndJoin()

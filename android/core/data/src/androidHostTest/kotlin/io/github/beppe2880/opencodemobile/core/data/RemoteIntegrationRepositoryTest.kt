@@ -8,7 +8,12 @@ import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthError
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStage
 import io.github.beppe2880.opencodemobile.core.domain.ProviderOAuthStatus
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -38,9 +43,31 @@ class RemoteIntegrationRepositoryTest {
         server.enqueue(MockResponse().setResponseCode(204))
     }
 
+    @Test fun `credential import also waits for foreground after token validation`() = runBlocking {
+        val fixture = OAuthFixture()
+        val validated = CompletableDeferred<Unit>()
+        fixture.onSignatureVerified = { fixture.foreground.value = false; validated.complete(Unit) }
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
+        enqueueBrowserPreparation()
+        server.enqueue(MockResponse().setBody("{}"))
+        val connection = async { repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened) }
+        try {
+            withTimeout(10_000) {
+                validated.await()
+                fixture.foreground.subscriptionCount.first { it > 0 }
+            }
+            assertEquals(3, server.requestCount)
+            fixture.foreground.value = true
+            assertTrue(withTimeout(10_000) { connection.await() }.isSuccess)
+            assertEquals(4, server.requestCount)
+        } finally {
+            connection.cancelAndJoin()
+        }
+    }
+
     @Test fun `validated browser credential imports client and scopes without overwriting server host identity`() = runBlocking {
         val fixture = OAuthFixture()
-        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
         enqueueBrowserPreparation()
         server.enqueue(MockResponse().setBody("{}"))
         repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).getOrThrow()
@@ -63,7 +90,7 @@ class RemoteIntegrationRepositoryTest {
 
     @Test fun `credential import does not follow redirects`() = runBlocking {
         val fixture = OAuthFixture()
-        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
         enqueueBrowserPreparation()
         server.enqueue(MockResponse().setResponseCode(307).setHeader("Location", server.url("/leak")))
         val failure = repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).exceptionOrNull() as ProviderOAuthError
@@ -74,7 +101,7 @@ class RemoteIntegrationRepositoryTest {
 
     @Test fun `import failure preserves only phase and status and preparation failures remain separate`() = runBlocking {
         val fixture = OAuthFixture()
-        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
         enqueueBrowserPreparation()
         server.enqueue(MockResponse().setResponseCode(403).setBody("""{"message":"test-refresh secret-code"}"""))
         val failure = repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).exceptionOrNull() as ProviderOAuthError
@@ -96,7 +123,7 @@ class RemoteIntegrationRepositoryTest {
             ),
         )
         val fixture = OAuthFixture().apply { badNonce = true }
-        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
         enqueueBrowserPreparation()
         assertTrue(repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).isFailure)
         assertEquals(3, server.requestCount)
@@ -114,7 +141,7 @@ class RemoteIntegrationRepositoryTest {
     @Test fun `plain remote transport and unknown methods are refused before browser launch`() = runBlocking {
         val fixture = OAuthFixture()
         graph = TestGraph(FakeServerStore(StoredServers(listOf(profile("s1", "http://192.168.1.2:4096")), activeId = "s1")))
-        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings))
+        repository = RemoteIntegrationRepository(graph.clients, graph.servers, BrowserOAuth(fixture, fixture.settings, fixture.foreground))
         assertTrue(repository.connectBrowserOAuth("s1", "/repo", "openai", "chatgpt-token-sharing", fixture::opened).isFailure)
         assertTrue(repository.connectBrowserOAuth("s1", "/repo", "unknown", "browser", fixture::opened).isFailure)
         assertEquals(null, fixture.authorization)
