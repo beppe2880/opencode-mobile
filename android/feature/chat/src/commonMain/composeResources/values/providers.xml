@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">Connected</string>
+    <string name="chat_providers_group_popular">Popular</string>
+    <string name="chat_providers_group_other">Other providers</string>
+    <string name="chat_providers_status_connected">Connected</string>
     <string name="chat_providers">Connect provider</string>
     <string name="chat_providers_hint">Credentials are saved on this server, not on your phone.</string>
     <string name="chat_providers_search">Search providers</string>

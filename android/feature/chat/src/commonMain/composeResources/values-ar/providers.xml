@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">المتصلون</string>
+    <string name="chat_providers_group_popular">الشائعون</string>
+    <string name="chat_providers_group_other">مزودون آخرون</string>
+    <string name="chat_providers_status_connected">متصل</string>
     <string name="chat_providers">ربط مزوّد</string>
     <string name="chat_providers_hint">تُحفظ بيانات الاعتماد على هذا الخادم وليس على هاتفك.</string>
     <string name="chat_providers_search">البحث عن المزوّدين</string>

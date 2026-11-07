@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">接続済み</string>
+    <string name="chat_providers_group_popular">人気</string>
+    <string name="chat_providers_group_other">その他のプロバイダー</string>
+    <string name="chat_providers_status_connected">接続済み</string>
     <string name="chat_providers">プロバイダーを接続</string>
     <string name="chat_providers_hint">認証情報はスマートフォンではなく、このサーバーに保存されます。</string>
     <string name="chat_providers_search">プロバイダーを検索</string>

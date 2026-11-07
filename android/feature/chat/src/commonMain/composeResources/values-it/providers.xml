@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">Connessi</string>
+    <string name="chat_providers_group_popular">Popolari</string>
+    <string name="chat_providers_group_other">Altri provider</string>
+    <string name="chat_providers_status_connected">Connesso</string>
     <string name="chat_providers">Connetti provider</string>
     <string name="chat_providers_hint">Le credenziali vengono salvate su questo server, non sul telefono.</string>
     <string name="chat_providers_search">Cerca provider</string>

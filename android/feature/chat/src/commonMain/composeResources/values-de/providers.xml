@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">Verbunden</string>
+    <string name="chat_providers_group_popular">Beliebt</string>
+    <string name="chat_providers_group_other">Weitere Anbieter</string>
+    <string name="chat_providers_status_connected">Verbunden</string>
     <string name="chat_providers">Anbieter verbinden</string>
     <string name="chat_providers_hint">Zugangsdaten werden auf diesem Server gespeichert, nicht auf dem Telefon.</string>
     <string name="chat_providers_search">Anbieter suchen</string>

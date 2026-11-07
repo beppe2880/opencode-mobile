@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
-import io.github.beppe2880.opencodemobile.core.ui.components.OcSearchField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
@@ -36,12 +35,10 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_d
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_provider_secure
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_connected
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_empty
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_key
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_save
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_search
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
@@ -49,6 +46,10 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (ProviderConnectionEvent) -> Unit, onClose: () -> Unit) {
     val c = OcTheme.colors
     OcBottomSheet(onDismiss = onClose, testTag = "chat_providers_sheet") {
+        if (state.selected == null && !state.connected) {
+            ProviderPicker(state, onEvent, onClose)
+            return@OcBottomSheet
+        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
             contentPadding = PaddingValues(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
@@ -149,22 +150,6 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
                             )
                         }
                     }
-                }
-            } else {
-                item("search") {
-                    OcSearchField(state.query, {
-                        onEvent(ProviderConnectionEvent.Search(it))
-                    }, stringResource(Res.string.chat_providers_search), Modifier.testTag("provider_search"))
-                }
-                val matches = state.integrations.filter { it.name.contains(state.query, true) || it.id.contains(state.query, true) }
-                if (!state.loading && !state.failed && matches.isEmpty()) item("empty") {
-                    Text(stringResource(Res.string.chat_providers_empty), color = c.textMuted)
-                }
-                items(matches, key = { it.id }) { integration ->
-                    OcButton(
-                        integration.name, { onEvent(ProviderConnectionEvent.Select(integration.id)) },
-                        variant = OcButtonVariant.Secondary, modifier = Modifier.fillMaxWidth().testTag("provider_select_${integration.id}"),
-                    )
                 }
             }
         }

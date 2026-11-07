@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">已连接</string>
+    <string name="chat_providers_group_popular">热门</string>
+    <string name="chat_providers_group_other">其他提供商</string>
+    <string name="chat_providers_status_connected">已连接</string>
     <string name="chat_providers">连接提供商</string>
     <string name="chat_providers_hint">凭据保存在此服务器上，而非手机上。</string>
     <string name="chat_providers_search">搜索提供商</string>

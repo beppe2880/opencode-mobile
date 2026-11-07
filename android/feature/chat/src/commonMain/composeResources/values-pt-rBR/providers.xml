@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">Conectados</string>
+    <string name="chat_providers_group_popular">Populares</string>
+    <string name="chat_providers_group_other">Outros provedores</string>
+    <string name="chat_providers_status_connected">Conectado</string>
     <string name="chat_providers">Conectar provedor</string>
     <string name="chat_providers_hint">As credenciais são salvas neste servidor, não no telefone.</string>
     <string name="chat_providers_search">Buscar provedores</string>

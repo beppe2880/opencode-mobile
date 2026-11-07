@@ -1,4 +1,8 @@
 <resources>
+    <string name="chat_providers_group_connected">Connectés</string>
+    <string name="chat_providers_group_popular">Populaires</string>
+    <string name="chat_providers_group_other">Autres fournisseurs</string>
+    <string name="chat_providers_status_connected">Connecté</string>
     <string name="chat_providers">Connecter un fournisseur</string>
     <string name="chat_providers_hint">Les identifiants sont enregistrés sur ce serveur, pas sur votre téléphone.</string>
     <string name="chat_providers_search">Rechercher des fournisseurs</string>
