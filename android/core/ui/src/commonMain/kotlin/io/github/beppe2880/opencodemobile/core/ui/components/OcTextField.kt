@@ -16,14 +16,21 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res
@@ -32,6 +39,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_hide_password
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_show_password
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -59,9 +67,10 @@ fun OcTextField(
     trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     val textStyle = if (mono) OcTheme.mono.code else androidx.compose.material3.MaterialTheme.typography.bodyMedium
+    val text = rememberSyncedText(value)
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = text.sync(value),
+        onValueChange = { text.input(it, onValueChange) },
         modifier = modifier.fillMaxWidth(),
         enabled = enabled,
         textStyle = textStyle,
@@ -80,6 +89,71 @@ fun OcTextField(
         shape = RoundedCornerShape(OcRadius.md),
         colors = ocTextFieldColors(),
     )
+}
+
+/** [SyncedText] that falls back to the caller's value when it never echoes the last keystroke. */
+@Composable
+internal fun rememberSyncedText(value: String): SyncedText {
+    val text = remember { SyncedText(value) }
+    val current by rememberUpdatedState(value)
+    LaunchedEffect(text.inputs) {
+        delay(SyncedText.REJECT_AFTER_MS)
+        text.settle(current)
+    }
+    return text
+}
+
+/**
+ * The text being typed, kept until the caller's state catches up. A String-based field that
+ * recomposes before the caller's state arrives (iOS sheets do) is reset to the stale value and
+ * its cursor to the start, and fast keystrokes get lost. Values the caller sends back for
+ * earlier keystrokes are echoes; any other new value is a real change (clear, reset, transform).
+ */
+@Stable
+internal class SyncedText(initial: String) {
+    private var field by mutableStateOf(TextFieldValue(initial, TextRange(initial.length)))
+    private var external = initial
+    private val sent = ArrayDeque<String>()
+
+    /** Changes with every keystroke that edits the text. */
+    var inputs by mutableIntStateOf(0)
+        private set
+
+    fun sync(value: String): TextFieldValue {
+        val echo = sent.indexOf(value)
+        when {
+            value == field.text -> sent.clear()
+            echo >= 0 -> repeat(echo + 1) { sent.removeFirst() }
+            value != external -> {
+                sent.clear()
+                field = TextFieldValue(value, TextRange(value.length))
+            }
+        }
+        external = value
+        return field
+    }
+
+    fun input(next: TextFieldValue, onValueChange: (String) -> Unit) {
+        val changed = next.text != field.text
+        field = next
+        if (changed) {
+            sent.addLast(next.text)
+            inputs++
+            onValueChange(next.text)
+        }
+    }
+
+    /** The caller kept another value (rejected or truncated input): show it. */
+    fun settle(value: String) {
+        if (sent.isEmpty() || value == field.text) return
+        sent.clear()
+        external = value
+        field = TextFieldValue(value, TextRange(value.length))
+    }
+
+    companion object {
+        const val REJECT_AFTER_MS = 300L
+    }
 }
 
 /** Password field with a show/hide toggle. */
@@ -159,9 +233,10 @@ fun OcSearchField(
     modifier: Modifier = Modifier,
 ) {
     val c = OcTheme.colors
+    val text = rememberSyncedText(value)
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = text.sync(value),
+        onValueChange = { text.input(it, onValueChange) },
         modifier = modifier.fillMaxWidth(),
         singleLine = true,
         textStyle = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
