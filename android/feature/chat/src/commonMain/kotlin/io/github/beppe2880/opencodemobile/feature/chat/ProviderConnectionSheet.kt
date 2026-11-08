@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
@@ -41,6 +42,12 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_save
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
+
+// Provider forms have no secret flag: their extra fields are identifiers (account IDs, resource
+// names, URLs) next to the masked API key, so only fields named like a secret are masked.
+private val secretName = Regex("secret|token|password|passphrase|credential|api[_ -]?key", RegexOption.IGNORE_CASE)
+
+internal fun FormField.looksSecret(): Boolean = secretName.containsMatchIn(key) || title?.let(secretName::containsMatchIn) == true
 
 @Composable
 internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (ProviderConnectionEvent) -> Unit, onClose: () -> Unit) {
@@ -118,7 +125,10 @@ internal fun ProviderConnectionSheet(state: ProviderConnectionState, onEvent: (P
                     }
                     if (!state.saving) {
                         items((oauth?.form ?: selected).visibleFields(state.answers), key = { "field-${it.key}" }) { field ->
-                            FormFieldInput(field, state.answers[field.key], { onEvent(ProviderConnectionEvent.Answer(field.key, it)) }, sensitive = true)
+                            FormFieldInput(
+                                field, state.answers[field.key], { onEvent(ProviderConnectionEvent.Answer(field.key, it)) },
+                                sensitive = field.looksSecret(), autoCorrect = false,
+                            )
                         }
                     }
                     if (selected.hasKey && oauth == null) item("key") {

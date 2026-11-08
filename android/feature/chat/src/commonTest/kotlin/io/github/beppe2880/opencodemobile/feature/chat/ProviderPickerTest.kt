@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,6 +24,18 @@ class ProviderPickerTest {
         assertEquals(listOf("opencode", "opencode-go", "github-copilot", "anthropic", "google"), groups.getValue(ProviderGroup.Popular).map { it.id })
         assertEquals(listOf("alpha", "zeta"), groups.getValue(ProviderGroup.Other).map { it.id })
         assertEquals(all.map { it.id }.sorted(), groups.values.flatten().map { it.id }.sorted())
+    }
+
+    @Test
+    fun onlySecretLookingFormFieldsAreMasked() {
+        fun field(key: String, title: String? = null) = FormField.Text(key = key, title = title)
+        assertFalse(field("accountId", "Enter your Cloudflare Account ID").looksSecret())
+        assertFalse(field("resourceName", "Enter Azure Resource Name").looksSecret())
+        assertFalse(field("enterpriseUrl").looksSecret())
+        assertFalse(field("server").looksSecret())
+        assertTrue(field("secretAccessKey").looksSecret())
+        assertTrue(field("token").looksSecret())
+        assertTrue(field("extra", "Service API key").looksSecret())
     }
 
     @Test
