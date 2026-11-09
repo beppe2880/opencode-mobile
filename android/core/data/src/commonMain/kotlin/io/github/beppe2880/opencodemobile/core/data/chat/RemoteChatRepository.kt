@@ -18,6 +18,7 @@ import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.CachedEntry
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
+import io.github.beppe2880.opencodemobile.core.data.files.fileLocation
 import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
@@ -27,6 +28,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
@@ -50,6 +52,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlin.io.encoding.Base64
 
 /**
  * Chat operations on the active server. Transcripts are mirrored in [cache]; [maxMessages]
@@ -110,6 +113,37 @@ internal class RemoteChatRepository(
         val user = awaitBody { api.sessionMessageGet(sessionId, messageId) }.data.toDomain() as? Message.User
         // One entry per attachment so callers can index by prompt position.
         user?.images.orEmpty().map { it.dataUri }
+    }
+
+    override suspend fun toolFileData(
+        sessionId: String,
+        directory: String,
+        messageId: String,
+        callId: String,
+    ): Result<List<String?>> = resultOf {
+        val client = clients.active()
+        val assistant = awaitBody { client.sessions.sessionMessageGet(sessionId, messageId) }.data.toDomain() as? Message.Assistant
+        val tool = assistant?.parts?.firstOrNull { it is Part.Tool && it.callId == callId } as? Part.Tool
+        tool?.files.orEmpty().map { file ->
+            when {
+                file.hasInlinePayload -> file.uri.takeIf { (file.inlineBytes ?: 0L) <= MAX_TOOL_FILE_BYTES }
+                file.isDataUri || file.isWebUrl || !file.baseMime.startsWith("image/") -> null
+                else -> file.serverPath?.let { path -> readImage(directory, path, file.baseMime) }
+            }
+        }
+    }
+
+    /** An image on the server as a `data:` URI; null when it is missing, too large or not an image. */
+    private suspend fun readImage(directory: String, path: String, mime: String): String? {
+        val (location, relative) = fileLocation(directory, path)
+        val read = try {
+            clients.active().readFile(location, relative, MAX_SERVER_IMAGE_BYTES)
+        } catch (e: OpenCodeError) {
+            return null
+        }
+        if (read.size > read.bytes.size || read.bytes.isEmpty()) return null
+        val type = read.mime?.substringBefore(';')?.trim()?.lowercase()?.takeIf { it.startsWith("image/") } ?: mime
+        return "data:$type;base64," + Base64.encode(read.bytes)
     }
 
     /**
@@ -470,5 +504,11 @@ internal class RemoteChatRepository(
 
         const val PROMPT_PAGE_SIZE = 50
         const val MAX_PROMPT_PAGES = 20
+
+        /** The server's own limit for media a tool reads (`MAX_MEDIA_INGEST_BYTES`). */
+        const val MAX_TOOL_FILE_BYTES = 20L * 1024 * 1024
+
+        /** Images read by path, as the file viewer reads them. */
+        const val MAX_SERVER_IMAGE_BYTES = 8 * 1024 * 1024
     }
 }

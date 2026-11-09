@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -45,8 +46,10 @@ class ChatPreviewTest {
                 expandToolsByDefault = true,
                 outputPreviewLines = 6,
                 chatHeaderStyle = ChatHeaderStyle.Full,
+                toolMediaSize = ToolMediaSize.Large,
             ),
         )
+        assertEquals(ToolMediaSize.Large, state.toolMediaSize)
         assertFalse(state.showCost)
         assertFalse(state.agentColorOutline)
         assertEquals(1.3f, state.chatTextScale)
@@ -54,6 +57,17 @@ class ChatPreviewTest {
         assertTrue(state.expandToolsByDefault)
         assertEquals(6, state.outputPreviewLines)
         assertEquals(ChatHeaderStyle.Full, state.headerStyle)
+    }
+
+    @Test
+    fun `the sample turn reads a screenshot the preview can draw`() {
+        val media = previewChatState(AppSettings(), running = false).items.filterIsInstance<ChatItem.Activity>().single().media.single()
+        assertEquals(MediaKind.Image, media.kind)
+        assertTrue(media.file.isDecodable())
+        val bmp = dataUriBytes(media.file)!!
+        assertEquals("BM", bmp.copyOf(2).decodeToString())
+        // Header size field matches the payload.
+        assertEquals(bmp.size, (0 until 4).sumOf { (bmp[2 + it].toInt() and 0xFF) shl (8 * it) })
     }
 
     @Test

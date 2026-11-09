@@ -117,6 +117,9 @@
     <string name="chat_open_image">打开图片</string>
     <string name="chat_close_preview">关闭</string>
     <string name="chat_image_failed">无法加载图片</string>
+    <string name="chat_tool_media_image">智能体读取的图片：%1$s</string>
+    <string name="chat_tool_media_video">视频：%1$s，%2$s</string>
+    <string name="chat_tool_media_file">来自智能体的文件：%1$s，%2$s</string>
     <string name="chat_attachment_failed">无法添加附件（最大 10 MB）</string>
     <string name="chat_dictation_start">听写</string>
     <string name="chat_dictation_stop">停止听写</string>

@@ -64,6 +64,12 @@
     <string name="settings_reset_message">所有选项都将恢复默认值。已保存的服务器、草稿和终端按键会保留。</string>
     <string name="settings_reset_confirm">重置</string>
     <string name="settings_full_commands_sub">在工具行中自动换行显示长命令和路径，而不是截断</string>
+    <string name="settings_tool_media_size">智能体读取的图片</string>
+    <string name="settings_tool_media_size_sub">工具读取的截图和其他图片显示在其所在行下方；“隐藏”只显示文件名</string>
+    <string name="settings_tool_media_size_hidden">隐藏</string>
+    <string name="settings_tool_media_size_small">小</string>
+    <string name="settings_tool_media_size_medium">中</string>
+    <string name="settings_tool_media_size_large">大</string>
     <string name="settings_running_in_list">在会话列表中显示运行中的工作</string>
     <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
     <string name="settings_confirm_stop">停止命令前需确认</string>

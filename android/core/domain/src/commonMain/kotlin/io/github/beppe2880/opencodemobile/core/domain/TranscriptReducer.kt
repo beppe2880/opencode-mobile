@@ -96,6 +96,7 @@ object TranscriptReducer {
                 metadata = it.metadata + event.metadata,
                 completedAt = event.at,
                 diffs = event.diffs.ifEmpty { it.diffs },
+                files = event.files.ifEmpty { it.files },
             )
         }
 

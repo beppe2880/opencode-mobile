@@ -144,6 +144,9 @@
     <string name="chat_open_image">Открыть изображение</string>
     <string name="chat_close_preview">Закрыть</string>
     <string name="chat_image_failed">Не удалось загрузить изображение</string>
+    <string name="chat_tool_media_image">Изображение, прочитанное агентом: %1$s</string>
+    <string name="chat_tool_media_video">Видео: %1$s, %2$s</string>
+    <string name="chat_tool_media_file">Файл от агента: %1$s, %2$s</string>
     <string name="chat_attachment_failed">Не удалось прикрепить файл (макс. 10 МБ)</string>
     <string name="chat_dictation_start">Диктовать</string>
     <string name="chat_dictation_stop">Остановить диктовку</string>

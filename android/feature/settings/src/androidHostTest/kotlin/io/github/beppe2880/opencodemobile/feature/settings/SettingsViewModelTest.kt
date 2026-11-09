@@ -18,6 +18,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
@@ -85,6 +86,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
+        vm.onEvent(SettingsEvent.ToolMediaSizeChanged(ToolMediaSize.Small))
         vm.onEvent(SettingsEvent.TerminalOpenKeyboardChanged(false))
         vm.onEvent(SettingsEvent.TerminalFullscreenByDefaultChanged(true))
         vm.onEvent(SettingsEvent.OutputPreviewLinesChanged(24))
@@ -118,6 +120,7 @@ class SettingsViewModelTest {
                 liveOther = true,
                 showFullCommands = true,
                 showToolDetails = false,
+                toolMediaSize = ToolMediaSize.Small,
                 terminalOpenKeyboard = false,
                 terminalFullscreenByDefault = true,
                 outputPreviewLines = 24,

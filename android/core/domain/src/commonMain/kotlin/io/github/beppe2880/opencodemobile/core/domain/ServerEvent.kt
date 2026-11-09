@@ -74,6 +74,7 @@ sealed interface ServerEvent {
         val metadata: Map<String, String>,
         val at: Long,
         val diffs: List<FileDiff> = emptyList(),
+        val files: List<ToolFile> = emptyList(),
     ) : SessionScoped
     data class ToolFailed(override val sessionId: String, val messageId: String, val callId: String, val error: String, val at: Long) : SessionScoped
 

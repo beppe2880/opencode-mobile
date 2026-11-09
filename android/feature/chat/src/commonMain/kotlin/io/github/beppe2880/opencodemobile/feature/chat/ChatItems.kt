@@ -53,7 +53,9 @@ sealed interface ChatItem {
         val streaming: Boolean get() = thoughts.any { it.streaming }
         val durationMs: Long get() = thoughts.sumOf { it.durationMs ?: 0L }
     }
-    data class Tools(override val key: String, val tools: List<Part.Tool>) : ChatItem {
+
+    /** [media]: the files the tools returned, in order, shown under the group even when folded. */
+    data class Tools(override val key: String, val tools: List<Part.Tool>, val media: List<ToolMedia> = emptyList()) : ChatItem {
         val running: Boolean get() = tools.any { it.status == ToolStatus.Running || it.status == ToolStatus.Streaming }
         val failed: Int get() = tools.count { it.status == ToolStatus.Error }
     }
@@ -88,6 +90,7 @@ sealed interface ChatItem {
      */
     data class Activity(override val key: String, val entries: List<ChatItem>) : ChatItem {
         val tools: List<Part.Tool> get() = entries.filterIsInstance<Tools>().flatMap { it.tools }
+        val media: List<ToolMedia> get() = entries.filterIsInstance<Tools>().flatMap { it.media }
         val thoughts: List<Reasoning>
             get() = entries.flatMap {
                 when (it) {
@@ -182,6 +185,7 @@ object ChatItemsBuilder {
     ): List<ChatItem> {
         val out = ArrayList<ChatItem>(messages.size * 2)
         var tools = ArrayList<Part.Tool>()
+        var media = ArrayList<ToolMedia>()
         // Call ids are only unique per message (some providers restart at call_0 every step).
         var toolsKey = ""
         var turn = ArrayList<Message.Assistant>()
@@ -198,8 +202,9 @@ object ChatItemsBuilder {
 
         fun flushTools() {
             if (tools.isNotEmpty()) {
-                addTurnItem(ChatItem.Tools(toolsKey, tools))
+                addTurnItem(ChatItem.Tools(toolsKey, tools, media))
                 tools = ArrayList()
+                media = ArrayList()
             }
         }
 
@@ -258,6 +263,7 @@ object ChatItemsBuilder {
                             is Part.Tool -> {
                                 if (tools.isEmpty()) toolsKey = "tools-${message.id}/${part.callId}"
                                 tools += part
+                                part.files.forEachIndexed { i, file -> media += ToolMedia(message.id, part.callId, i, file) }
                             }
                             is Part.Text -> if (part.text.isNotBlank() || part.streaming) {
                                 flushTools()
