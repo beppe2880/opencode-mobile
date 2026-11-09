@@ -43,6 +43,8 @@
     <string name="sessions_actions_title">Acciones de la sesión</string>
     <string name="sessions_running_a11y">El agente está trabajando</string>
     <string name="sessions_new_show_all">Mostrar los %1$d proyectos</string>
+    <string name="sessions_new_project_search">Buscar proyectos</string>
+    <string name="sessions_new_project_search_empty">No hay proyectos coincidentes</string>
     <string name="sessions_untitled">Sesión sin título</string>
     <string name="sessions_preview_swipe_on">Desliza a la izquierda o a la derecha en un chat para abrir la sesión siguiente o anterior</string>
     <string name="sessions_preview_swipe_off">Desactivado: vuelve a la lista para abrir otra sesión</string>
