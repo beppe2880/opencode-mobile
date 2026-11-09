@@ -64,6 +64,12 @@
     <string name="settings_reset_message">すべての項目が初期値に戻ります。保存済みのサーバー、下書き、ターミナルのキーは保持されます。</string>
     <string name="settings_reset_confirm">リセット</string>
     <string name="settings_full_commands_sub">ツール行で長いコマンドやパスを切り捨てず、折り返して表示</string>
+    <string name="settings_tool_media_size">エージェントが読み込んだ画像</string>
+    <string name="settings_tool_media_size_sub">ツールが読み込んだスクリーンショットなどの画像を行の下に表示します。「非表示」ではファイル名のみ表示</string>
+    <string name="settings_tool_media_size_hidden">非表示</string>
+    <string name="settings_tool_media_size_small">小</string>
+    <string name="settings_tool_media_size_medium">中</string>
+    <string name="settings_tool_media_size_large">大</string>
     <string name="settings_running_in_list">セッション一覧に実行中の作業を表示</string>
     <string name="settings_running_in_list_sub">各セッションの下に、実行中のサブエージェントとバックグラウンドコマンドの数を表示</string>
     <string name="settings_confirm_stop">コマンドを停止する前に確認</string>

@@ -142,6 +142,7 @@ private fun SessionMessageAssistantTool.toDomain(): Part.Tool {
                 output = content.joinedText(),
                 metadata = metadata?.toStringMap().orEmpty(),
                 diffs = toolDiffs(base.name, input, metadata),
+                files = content.files(),
             )
         }
         is SessionMessageAssistantToolState.ErrorWrapper -> with(state.value) {

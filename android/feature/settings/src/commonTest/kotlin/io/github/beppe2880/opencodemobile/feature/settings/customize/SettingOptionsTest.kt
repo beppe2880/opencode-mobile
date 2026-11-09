@@ -52,6 +52,21 @@ class SettingOptionsTest {
         assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines), SettingsPart.LiveShell.options)
         assertEquals(listOf(SettingOption.UpdateNotice), SettingsPart.UpdateNotice.options)
         assertTrue(SettingsPart.Activity.options.containsAll(SettingsPart.Thoughts.options + SettingsPart.Tools.options))
+        // The images read by the agent show under the tool rows, grouped or not.
+        assertEquals(
+            listOf(
+                SettingOption.ExpandTools,
+                SettingOption.ToolDetails,
+                SettingOption.FullCommands,
+                SettingOption.ToolMediaSize,
+                SettingOption.OutputLines,
+                SettingOption.GroupActivity,
+            ),
+            SettingsPart.Tools.options,
+        )
+        assertTrue(SettingOption.ToolMediaSize in SettingsPart.Activity.options)
+        assertEquals(SettingsPart.Tools, SettingOption.ToolMediaSize.part)
+        assertTrue(SettingOption.ToolMediaSize.appliesTo(AppSettings()))
     }
 
     @Test

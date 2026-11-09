@@ -117,6 +117,9 @@
     <string name="chat_open_image">画像を開く</string>
     <string name="chat_close_preview">閉じる</string>
     <string name="chat_image_failed">画像を読み込めませんでした</string>
+    <string name="chat_tool_media_image">エージェントが読み込んだ画像: %1$s</string>
+    <string name="chat_tool_media_video">動画: %1$s、%2$s</string>
+    <string name="chat_tool_media_file">エージェントからのファイル: %1$s、%2$s</string>
     <string name="chat_attachment_failed">ファイルを添付できませんでした（最大 10 MB）</string>
     <string name="chat_dictation_start">音声入力</string>
     <string name="chat_dictation_stop">音声入力を停止</string>

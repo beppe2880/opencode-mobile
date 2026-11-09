@@ -21,6 +21,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 @Immutable
@@ -64,6 +65,8 @@ data class ChatState(
     val showToolDetails: Boolean = true,
     /** Tool rows wrap long commands and paths (setting). */
     val showFullCommands: Boolean = false,
+    /** How big images read by tools show under their row (setting). */
+    val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
     /** The microphone button of the composer (setting). */
@@ -104,6 +107,11 @@ data class ChatState(
     val olderFailed: Boolean = false,
     /** Full-screen image open over the chat. */
     val preview: ImagePreview? = null,
+    /**
+     * Tool calls ([ToolMedia.fetchKey]) whose files were fetched in this chat, successfully or
+     * not: their images that still have no content show as file chips.
+     */
+    val toolMediaLoaded: Set<String> = emptySet(),
     /** Where the user left this chat last time; null opens it at the bottom. */
     val savedScroll: ScrollMemory.Anchor? = null,
     /** Prompts queued to run after the current work, oldest first; shown above the composer. */
@@ -164,6 +172,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     live = LiveFollow.of(s),
     showFullCommands = s.showFullCommands,
     showToolDetails = s.showToolDetails,
+    toolMediaSize = s.toolMediaSize,
     outputPreviewLines = s.outputPreviewLines,
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,
@@ -367,6 +376,12 @@ sealed interface ChatEvent {
 
     /** Opens the [index]th image of a sent prompt full screen. */
     data class OpenImage(val messageId: String, val index: Int) : ChatEvent
+
+    /** Opens the [index]th image tool call [callId] of [messageId] returned full screen. */
+    data class OpenToolImage(val messageId: String, val callId: String, val index: Int) : ChatEvent
+
+    /** A card of a tool's image is on screen without its content: fetch the call's files. */
+    data class LoadToolMedia(val messageId: String, val callId: String) : ChatEvent
     data object ClosePreview : ChatEvent
 
     /** A picked file could not be read or is too large. */

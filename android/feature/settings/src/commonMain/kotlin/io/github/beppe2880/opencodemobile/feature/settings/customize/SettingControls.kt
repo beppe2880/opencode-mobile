@@ -24,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -157,6 +158,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_th
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_hidden
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_large
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_medium
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_small
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner_sub
@@ -200,6 +207,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ExpandTools -> Res.string.settings_expand_tools
         SettingOption.ToolDetails -> Res.string.settings_tool_details
         SettingOption.FullCommands -> Res.string.settings_full_commands
+        SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size
         SettingOption.OutputLines -> Res.string.settings_output_lines
         SettingOption.ShowCost -> Res.string.settings_show_cost
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed
@@ -258,6 +266,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ExpandTools -> Res.string.settings_expand_tools_sub
         SettingOption.ToolDetails -> Res.string.settings_tool_details_sub
         SettingOption.FullCommands -> Res.string.settings_full_commands_sub
+        SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size_sub
         SettingOption.OutputLines -> Res.string.settings_output_lines_sub
         SettingOption.ShowCost -> Res.string.settings_show_cost_sub
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed_sub
@@ -381,6 +390,18 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.ExpandTools -> switch(settings.expandToolsByDefault, SettingsEvent::ExpandToolsChanged)()
         SettingOption.ToolDetails -> switch(settings.showToolDetails, SettingsEvent::ShowToolDetailsChanged)()
         SettingOption.FullCommands -> switch(settings.showFullCommands, SettingsEvent::ShowFullCommandsChanged)()
+        SettingOption.ToolMediaSize -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(ToolMediaSize.Hidden, stringResource(Res.string.settings_tool_media_size_hidden), "settings_tool_media_size_hidden"),
+                OcSegment(ToolMediaSize.Small, stringResource(Res.string.settings_tool_media_size_small), "settings_tool_media_size_small"),
+                OcSegment(ToolMediaSize.Medium, stringResource(Res.string.settings_tool_media_size_medium), "settings_tool_media_size_medium"),
+                OcSegment(ToolMediaSize.Large, stringResource(Res.string.settings_tool_media_size_large), "settings_tool_media_size_large"),
+            ),
+            selected = settings.toolMediaSize,
+            onSelect = { onEvent(SettingsEvent.ToolMediaSizeChanged(it)) },
+        )
         SettingOption.OutputLines -> ChoiceRow(
             title = title,
             subtitle = subtitle,
@@ -561,6 +582,7 @@ private val SettingOption.tag: String
         SettingOption.ExpandTools -> "expand_tools"
         SettingOption.ToolDetails -> "tool_details"
         SettingOption.FullCommands -> "full_commands"
+        SettingOption.ToolMediaSize -> "tool_media_size"
         SettingOption.ShowCost -> "show_cost"
         SettingOption.PermissionsCollapsed -> "permissions_collapsed"
         SettingOption.QuestionsCollapsed -> "questions_collapsed"

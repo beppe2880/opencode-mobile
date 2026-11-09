@@ -51,6 +51,11 @@ class SettingsCategoriesTest {
         )
         assertEquals(SettingsArea.Chat, SettingOption.SwipeChats.area)
         assertEquals(SettingsArea.Chat, SettingOption.QuestionsCollapsed.area)
+        // Right after the tool row options of the transcript group.
+        val transcript = SettingOption.ToolMediaSize.group.options
+        assertEquals(SettingsArea.Chat, SettingOption.ToolMediaSize.area)
+        assertEquals(transcript.indexOf(SettingOption.FullCommands) + 1, transcript.indexOf(SettingOption.ToolMediaSize))
+        assertEquals(0, SettingOption.ToolMediaSize.depthIn(SettingOption.ToolMediaSize.group))
         assertEquals(SettingsArea.LiveActivity, SettingOption.OutputLines.area)
         assertEquals(listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.NewChatModel), SettingsArea.Composer.options)
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)

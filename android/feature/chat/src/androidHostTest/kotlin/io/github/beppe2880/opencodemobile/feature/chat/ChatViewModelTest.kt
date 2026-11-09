@@ -46,6 +46,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.ToolFile
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
@@ -1494,6 +1495,71 @@ class ChatViewModelTest {
         assertEquals(ImagePreview("b.png", null, failed = true), vm.state.value.preview)
     }
 
+    private fun readTool(vararg files: ToolFile) = Message.Assistant(
+        id = "a1",
+        createdAt = 1,
+        agent = "build",
+        model = model,
+        completedAt = 3,
+        parts = listOf(Part.Tool("c1", "read", ToolStatus.Completed, "{}", output = "Image read successfully", files = files.toList())),
+    )
+
+    @Test
+    fun `tool images the cache dropped are fetched once when their card asks`() = runTest(main.testDispatcher) {
+        val stored = ToolFile("data:image/png;base64,", "image/png", "shot.png")
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(stored))
+        chat.toolFiles = Result.success(listOf("data:image/png;base64,AAAA"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        val before = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertEquals(stored, before.file)
+        // Nothing is fetched until a card is on screen.
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        advanceUntilIdle()
+
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+        val after = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertEquals("data:image/png;base64,AAAA", after.file.uri)
+        assertTrue(after.fetchKey in vm.state.value.toolMediaLoaded)
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        assertEquals(ImagePreview("shot.png", "data:image/png;base64,AAAA"), vm.state.value.preview)
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+    }
+
+    @Test
+    fun `a tool image that cannot be fetched is marked loaded and its preview fails`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(ToolFile("data:image/png;base64,", "image/png", "shot.png")))
+        chat.toolFiles = Result.failure(OpenCodeError.Unreachable("down"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        advanceUntilIdle()
+        val media = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertFalse(media.file.hasInlinePayload)
+        assertTrue(media.fetchKey in vm.state.value.toolMediaLoaded)
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        advanceUntilIdle()
+        assertEquals(ImagePreview("shot.png", null, failed = true), vm.state.value.preview)
+    }
+
+    @Test
+    fun `an inline tool image opens without a request`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(ToolFile("data:image/png;base64,AAAA", "image/png", "/repo/shot.png")))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        assertEquals(ImagePreview("shot.png", "data:image/png;base64,AAAA"), vm.state.value.preview)
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+    }
+
     @Test
     fun `the neighbors are prefetched once the chat has loaded`() = runTest(main.testDispatcher) {
         vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
@@ -2228,6 +2294,12 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
     override suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> {
         imageRequests += messageId
         return images
+    }
+    var toolFiles: Result<List<String?>> = Result.success(emptyList())
+    val toolFileRequests = mutableListOf<String>()
+    override suspend fun toolFileData(sessionId: String, directory: String, messageId: String, callId: String): Result<List<String?>> {
+        toolFileRequests += "$messageId/$callId"
+        return toolFiles
     }
     val prefetched = mutableListOf<Pair<List<String>, Int>>()
     override suspend fun prefetch(sessionIds: List<String>, lastMessages: Int) {

@@ -64,6 +64,12 @@
     <string name="settings_reset_message">Every option goes back to its default. Saved servers, drafts and terminal keys are kept.</string>
     <string name="settings_reset_confirm">Reset</string>
     <string name="settings_full_commands_sub">Wrap long commands and paths in tool rows instead of cutting them off</string>
+    <string name="settings_tool_media_size">Images read by the agent</string>
+    <string name="settings_tool_media_size_sub">Screenshots and other images a tool reads show under its row; Hidden keeps only the file name</string>
+    <string name="settings_tool_media_size_hidden">Hidden</string>
+    <string name="settings_tool_media_size_small">Small</string>
+    <string name="settings_tool_media_size_medium">Medium</string>
+    <string name="settings_tool_media_size_large">Large</string>
     <string name="settings_running_in_list">Show running work in the session list</string>
     <string name="settings_running_in_list_sub">Count running subagents and background commands under each session</string>
     <string name="settings_confirm_stop">Confirm before stopping commands</string>

@@ -27,6 +27,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
+import io.github.beppe2880.opencodemobile.core.domain.ToolFile
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
@@ -98,6 +99,9 @@ class ChatViewModel(
 
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
     private val imageRequests = HashSet<String>()
+
+    /** Tool calls whose files were requested in this chat ([ToolMedia.fetchKey]). */
+    private val toolMediaRequests = HashSet<String>()
     private var suggestJob: Job? = null
     private var changesJob: Job? = null
     private var queueJob: Job? = null
@@ -298,6 +302,8 @@ class ChatViewModel(
                 updateState { it.copy(preview = ImagePreview(a.name, a.uri)) }
             }
             is ChatEvent.OpenImage -> openImage(event.messageId, event.index)
+            is ChatEvent.OpenToolImage -> openToolImage(event.messageId, event.callId, event.index)
+            is ChatEvent.LoadToolMedia -> loadToolMedia(event.messageId, event.callId)
             ChatEvent.ClosePreview -> {
                 previewJob?.cancel()
                 updateState { it.copy(preview = null) }
@@ -618,6 +624,70 @@ class ChatViewModel(
             val uri = chat.messageImages(sessionId, messageId).getOrNull()?.getOrNull(index)
             updateState { s -> s.preview?.let { s.copy(preview = it.copy(dataUri = uri, failed = uri == null)) } ?: s }
         }
+    }
+
+    private fun toolFile(messageId: String, callId: String, index: Int): ToolFile? {
+        val assistant = messages.firstOrNull { it.id == messageId } as? Message.Assistant ?: return null
+        val tool = assistant.parts.firstOrNull { it is Part.Tool && it.callId == callId } as? Part.Tool ?: return null
+        return tool.files.getOrNull(index)
+    }
+
+    /** Shows an image a tool returned; a payload the cache dropped is fetched again. */
+    private fun openToolImage(messageId: String, callId: String, index: Int) {
+        val file = toolFile(messageId, callId, index) ?: return
+        val key = toolMediaKey(messageId, callId)
+        val known = file.uri.takeIf { file.isDecodable() } ?: images.get(key)?.getOrNull(index)
+        previewJob?.cancel()
+        updateState { it.copy(preview = ImagePreview(file.displayName, known)) }
+        if (known != null) return
+        previewJob = viewModelScope.launch {
+            val uris = chat.toolFileData(sessionId, currentState.directory, messageId, callId).getOrNull()
+            if (uris != null) images.put(key, uris)
+            val uri = uris?.getOrNull(index)
+            updateState { s -> s.preview?.let { s.copy(preview = it.copy(dataUri = uri, failed = uri == null)) } ?: s }
+        }
+    }
+
+    /**
+     * Fetches the files of one tool call whose image cards have no content (the message cache
+     * drops inline payloads; images by path are read from the server), once per chat.
+     */
+    private fun loadToolMedia(messageId: String, callId: String) {
+        val key = toolMediaKey(messageId, callId)
+        if (images.get(key) != null) {
+            // Fetched in an earlier visit: what is still missing is not available.
+            updateState { it.copy(toolMediaLoaded = it.toolMediaLoaded + key) }
+            return
+        }
+        if (!toolMediaRequests.add(key)) return
+        viewModelScope.launch {
+            chat.toolFileData(sessionId, currentState.directory, messageId, callId).onSuccess { images.put(key, it) }
+            updateState { it.copy(toolMediaLoaded = it.toolMediaLoaded + key) }
+            rebuild()
+        }
+    }
+
+    /** Fills in tool images fetched by [loadToolMedia], kept in [images] across chats. */
+    private fun withToolMedia(visible: List<Message>): List<Message> = visible.map { message ->
+        if (message !is Message.Assistant || message.parts.none { it is Part.Tool && it.files.any { f -> f.needsFetch() } }) {
+            return@map message
+        }
+        message.copy(
+            parts = message.parts.map { part ->
+                val tool = part as? Part.Tool
+                val fetched = tool?.takeIf { it.files.any { f -> f.needsFetch() } }?.let { images.get(toolMediaKey(message.id, it.callId)) }
+                if (tool == null || fetched == null) {
+                    part
+                } else {
+                    tool.copy(
+                        files = tool.files.mapIndexed { i, file ->
+                            val uri = fetched.getOrNull(i)
+                            if (uri != null && file.needsFetch()) file.copy(uri = uri) else file
+                        },
+                    )
+                }
+            },
+        )
     }
 
     /** Caches the newest messages of the sessions a swipe would open, so they show at once. */
@@ -983,7 +1053,7 @@ class ChatViewModel(
         val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
         followShells(shown)
         val items = ChatItemsBuilder.build(
-            withLiveOutput(withImages(shown)),
+            withLiveOutput(withToolMedia(withImages(shown))),
             state.running,
             showReasoning,
             state.models::labelFor,

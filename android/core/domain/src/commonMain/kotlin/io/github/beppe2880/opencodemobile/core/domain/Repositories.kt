@@ -179,6 +179,16 @@ interface ChatRepository {
      */
     suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> = Result.success(emptyList())
 
+    /**
+     * The content of the files tool call [callId] of [messageId] returned, as `data:` URIs, one
+     * entry per [Part.Tool.files] in order. Inline content is fetched again with its message;
+     * images referenced by server path (absolute, `file://` or relative to [directory]) are read
+     * through the file API. An entry is null when its content is not available (another type, a
+     * web URL, too large or unreadable).
+     */
+    suspend fun toolFileData(sessionId: String, directory: String, messageId: String, callId: String): Result<List<String?>> =
+        Result.success(emptyList())
+
     /** Stores the last [lastMessages] of sessions not cached yet so they open instantly. Never fails. */
     suspend fun prefetch(sessionIds: List<String>, lastMessages: Int = 2) {}
 
@@ -334,6 +344,12 @@ enum class ChatHeaderLine { FolderBranchFiles, BranchFiles, Folder }
 /** Icons before the folder, branch and count; or the same as short ("4 files") or full words ("4 files changed"). */
 enum class ChatHeaderStyle { Icons, Short, Full }
 
+/**
+ * How big images a tool returned (a screenshot the agent read) show under their tool row:
+ * [Hidden] keeps only the file chip, which still opens the image.
+ */
+enum class ToolMediaSize { Hidden, Small, Medium, Large }
+
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
@@ -377,6 +393,8 @@ data class AppSettings(
     val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */
     val showFullCommands: Boolean = false,
+    /** How big images read by the agent show under their tool row. */
+    val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** What the line under the chat title shows. */

@@ -388,6 +388,34 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `tool files come back inline, read by path or as null`() = runBlocking {
+        server.enqueue(
+            json(
+                """
+                {"data":{"id":"msg_a","time":{"created":1,"completed":3},"type":"assistant","agent":"build",
+                  "model":{"id":"m","providerID":"p"},
+                  "content":[{"type":"tool","id":"call_1","name":"read","time":{"created":1,"completed":2},
+                    "state":{"status":"completed","input":{},"content":[
+                      {"type":"text","text":"Image read successfully"},
+                      {"type":"file","uri":"data:image/png;base64,QUJD","mime":"image/png","name":"a.png"},
+                      {"type":"file","uri":"file:///repo/shots/b.png","mime":"image/png"},
+                      {"type":"file","uri":"data:application/pdf;base64,QUJD","mime":"application/pdf","name":"c.pdf"},
+                      {"type":"file","uri":"https://example.com/d.png","mime":"image/png"}
+                    ]}}]}}
+                """.trimIndent(),
+            ),
+        )
+        server.enqueue(MockResponse().setHeader("Content-Type", "image/png").setBody("XYZ"))
+
+        val files = RemoteChatRepository(graph.clients, InMemoryMessageCache()).toolFileData("ses_1", "/repo", "msg_a", "call_1").getOrThrow()
+
+        // Inline content is returned whatever its type; a web URL is not ours to load.
+        assertEquals(listOf("data:image/png;base64,QUJD", "data:image/png;base64,WFla", "data:application/pdf;base64,QUJD", null), files)
+        server.takeRequest()
+        assertEquals("/api/fs/read/shots/b.png?location%5Bdirectory%5D=%2Frepo", server.takeRequest().path)
+    }
+
+    @Test
     fun `rename and delete keep the session cache in sync`() = runBlocking {
         server.enqueue(json(fixture("session_get.json")))
         val repository = RemoteSessionRepository(graph.clients)

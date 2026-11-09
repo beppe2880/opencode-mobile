@@ -16,6 +16,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -56,6 +57,7 @@ internal class PreferencesSettingsRepository(
         prefs.putBoolean(KEY_LIVE_OTHER, next.liveOther)
         prefs.putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
         prefs.putBoolean(KEY_TOOL_DETAILS, next.showToolDetails)
+        prefs.putString(KEY_TOOL_MEDIA_SIZE, next.toolMediaSize.name)
         prefs.putInt(KEY_OUTPUT_LINES, next.outputPreviewLines)
         prefs.putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
@@ -129,6 +131,7 @@ internal class PreferencesSettingsRepository(
             liveOther = prefs.getBoolean(KEY_LIVE_OTHER, defaults.liveOther),
             showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
             showToolDetails = prefs.getBoolean(KEY_TOOL_DETAILS, defaults.showToolDetails),
+            toolMediaSize = ToolMediaSize.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_TOOL_MEDIA_SIZE) } ?: defaults.toolMediaSize,
             outputPreviewLines = prefs.getInt(KEY_OUTPUT_LINES, defaults.outputPreviewLines)
                 .takeIf { it in OUTPUT_LINE_CHOICES } ?: defaults.outputPreviewLines,
             liveOutputIntervalMs = prefs.getLong(KEY_LIVE_INTERVAL, defaults.liveOutputIntervalMs)
@@ -208,6 +211,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_LIVE_OTHER = "live_other"
         const val KEY_FULL_COMMANDS = "show_full_commands"
         const val KEY_TOOL_DETAILS = "show_tool_details"
+        const val KEY_TOOL_MEDIA_SIZE = "tool_media_size"
         const val KEY_OUTPUT_LINES = "output_preview_lines"
         const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"

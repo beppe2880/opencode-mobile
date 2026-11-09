@@ -121,6 +121,7 @@ val SettingsArea.groups: List<OptionGroup>
                     SettingOption.ExpandTools,
                     SettingOption.ToolDetails,
                     SettingOption.FullCommands,
+                    SettingOption.ToolMediaSize,
                     SettingOption.ShowCost,
                 ),
             ),

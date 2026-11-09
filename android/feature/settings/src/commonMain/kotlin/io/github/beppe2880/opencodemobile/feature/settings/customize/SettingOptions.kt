@@ -23,6 +23,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ExpandTools(listOf("expandToolsByDefault")),
     ToolDetails(listOf("showToolDetails")),
     FullCommands(listOf("showFullCommands")),
+    ToolMediaSize(listOf("toolMediaSize")),
     OutputLines(listOf("outputPreviewLines")),
     ShowCost(listOf("showCost")),
     PermissionsCollapsed(listOf("permissionsCollapsed")),
@@ -91,6 +92,7 @@ val SettingsPart.options: List<SettingOption>
             SettingOption.ExpandTools,
             SettingOption.ToolDetails,
             SettingOption.FullCommands,
+            SettingOption.ToolMediaSize,
             SettingOption.OutputLines,
             SettingOption.GroupActivity,
         )
@@ -101,6 +103,7 @@ val SettingsPart.options: List<SettingOption>
             SettingOption.ExpandTools,
             SettingOption.ToolDetails,
             SettingOption.FullCommands,
+            SettingOption.ToolMediaSize,
             SettingOption.OutputLines,
         )
         SettingsPart.Footer -> listOf(SettingOption.ShowCost)
@@ -173,6 +176,7 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
 internal val SettingOption.searchKeywords: List<String>
     get() = when (this) {
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
+        SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
         else -> emptyList()
     }
 

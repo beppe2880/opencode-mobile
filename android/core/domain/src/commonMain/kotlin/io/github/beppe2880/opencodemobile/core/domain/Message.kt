@@ -111,6 +111,8 @@ sealed interface Part {
         val completedAt: Long? = null,
         /** File changes made by the tool (edit, write, patch), in display order. */
         val diffs: List<FileDiff> = emptyList(),
+        /** Files returned with the result (for example the image `read` loaded), in order. */
+        val files: List<ToolFile> = emptyList(),
     ) : Part {
         override val key: String get() = "tool-$callId"
     }
@@ -133,3 +135,84 @@ data class FileDiff(
 }
 
 enum class ToolStatus { Streaming, Running, Completed, Error }
+
+/**
+ * A file a tool returned with its result. The `read` tool returns images and PDFs inline as a
+ * base64 `data:` URI, with the path it was asked for as [name]; other tools may return `file://`
+ * URIs, absolute paths or http(s) URLs. Stored transcripts keep a `data:` URI without its payload
+ * (`data:image/png;base64,`, see `MessageCodec`); [ChatRepository.toolFileData] fetches it again.
+ */
+data class ToolFile(val uri: String, val mime: String, val name: String?) {
+
+    /** The media type without parameters, lower case (`image/png`). */
+    val baseMime: String get() = mime.substringBefore(';').trim().lowercase()
+
+    val isDataUri: Boolean get() = uri.startsWith("data:", ignoreCase = true)
+
+    /** A `data:` URI that still carries its content (stored copies have it removed). */
+    val hasInlinePayload: Boolean get() = isDataUri && uri.indexOf(',').let { it >= 0 && it < uri.length - 1 }
+
+    val isWebUrl: Boolean get() = uri.startsWith("http://", ignoreCase = true) || uri.startsWith("https://", ignoreCase = true)
+
+    /**
+     * Server path of the file: the path of a `file://` URI or an absolute path; for inline
+     * content the [name] the tool reports (the `read` tool's input path, which may be relative to
+     * the session folder). Null when the file has no path on the server.
+     */
+    val serverPath: String?
+        get() = when {
+            uri.startsWith("file://", ignoreCase = true) -> fileUriPath(uri)
+            uri.startsWith("/") -> uri
+            isDataUri -> name?.takeIf { it.isNotBlank() && !it.contains("://") }
+            else -> null
+        }
+
+    /** Size of the inline content in bytes, computed from the base64 length; null when unknown. */
+    val inlineBytes: Long?
+        get() {
+            if (!hasInlinePayload) return null
+            val start = uri.indexOf(',') + 1
+            if (!uri.substring(5, start - 1).endsWith(";base64", ignoreCase = true)) return (uri.length - start).toLong()
+            var end = uri.length
+            var padding = 0
+            while (end > start && uri[end - 1] == '=' && padding < 2) {
+                end--
+                padding++
+            }
+            return (uri.length - start).toLong() * 3 / 4 - padding
+        }
+
+    private companion object {
+        /** `file:///a/b` and `file://host/a/b` to `/a/b`, percent-decoded. */
+        fun fileUriPath(uri: String): String? {
+            val rest = uri.substring("file://".length)
+            val path = if (rest.startsWith('/')) rest else rest.substringAfter('/', "").let { if (it.isEmpty()) "" else "/$it" }
+            return percentDecode(path.substringBefore('?').substringBefore('#')).takeIf { it.isNotEmpty() }
+        }
+
+        /** Decodes `%XX` sequences as UTF-8; malformed sequences are kept as written. */
+        fun percentDecode(text: String): String {
+            if ('%' !in text) return text
+            val out = StringBuilder(text.length)
+            val bytes = ArrayList<Byte>()
+            var i = 0
+            while (i < text.length) {
+                val escape = if (text[i] == '%' && i + 2 <= text.lastIndex) text.substring(i + 1, i + 3) else null
+                val hex = escape?.takeIf { s -> s.all { it.digitToIntOrNull(16) != null } }?.toInt(16)
+                if (hex != null) {
+                    bytes += hex.toByte()
+                    i += 3
+                } else {
+                    if (bytes.isNotEmpty()) {
+                        out.append(bytes.toByteArray().decodeToString())
+                        bytes.clear()
+                    }
+                    out.append(text[i])
+                    i++
+                }
+            }
+            if (bytes.isNotEmpty()) out.append(bytes.toByteArray().decodeToString())
+            return out.toString()
+        }
+    }
+}

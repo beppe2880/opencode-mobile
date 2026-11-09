@@ -64,6 +64,12 @@
     <string name="settings_reset_message">Cada opción vuelve a su valor predeterminado. Los servidores guardados, borradores y teclas del terminal se conservan.</string>
     <string name="settings_reset_confirm">Restablecer</string>
     <string name="settings_full_commands_sub">Ajustar en varias líneas los comandos y rutas largos en las filas de herramientas en lugar de cortarlos</string>
+    <string name="settings_tool_media_size">Imágenes leídas por el agente</string>
+    <string name="settings_tool_media_size_sub">Las capturas y otras imágenes que lee una herramienta aparecen bajo su fila; Ocultas muestra solo el nombre del archivo</string>
+    <string name="settings_tool_media_size_hidden">Ocultas</string>
+    <string name="settings_tool_media_size_small">Pequeñas</string>
+    <string name="settings_tool_media_size_medium">Medianas</string>
+    <string name="settings_tool_media_size_large">Grandes</string>
     <string name="settings_running_in_list">Mostrar trabajo en curso en la lista de sesiones</string>
     <string name="settings_running_in_list_sub">Contar subagentes y comandos en segundo plano bajo cada sesión</string>
     <string name="settings_confirm_stop">Confirmar antes de detener comandos</string>

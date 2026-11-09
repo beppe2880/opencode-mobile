@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
@@ -122,6 +123,7 @@ sealed interface SettingsEvent {
     data class LiveReadsChanged(val enabled: Boolean) : SettingsEvent
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
+    data class ToolMediaSizeChanged(val size: ToolMediaSize) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalOpenKeyboardChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalFullscreenByDefaultChanged(val enabled: Boolean) : SettingsEvent

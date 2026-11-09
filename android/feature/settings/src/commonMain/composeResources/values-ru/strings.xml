@@ -64,6 +64,12 @@
     <string name="settings_reset_message">Каждый параметр вернётся к значению по умолчанию. Сохранённые серверы, черновики и клавиши терминала сохранятся.</string>
     <string name="settings_reset_confirm">Сбросить</string>
     <string name="settings_full_commands_sub">Переносить длинные команды и пути на несколько строк в строках инструментов вместо обрезки</string>
+    <string name="settings_tool_media_size">Изображения, прочитанные агентом</string>
+    <string name="settings_tool_media_size_sub">Скриншоты и другие изображения, прочитанные инструментом, показываются под его строкой; «Скрыты» оставляет только имя файла</string>
+    <string name="settings_tool_media_size_hidden">Скрыты</string>
+    <string name="settings_tool_media_size_small">Маленькие</string>
+    <string name="settings_tool_media_size_medium">Средние</string>
+    <string name="settings_tool_media_size_large">Большие</string>
     <string name="settings_running_in_list">Показывать текущую работу в списке сессий</string>
     <string name="settings_running_in_list_sub">Считать выполняемых субагентов и фоновые команды под каждой сессией</string>
     <string name="settings_confirm_stop">Подтверждать остановку команд</string>

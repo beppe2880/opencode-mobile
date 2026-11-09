@@ -126,6 +126,9 @@
     <string name="chat_open_image">Ouvrir l’image</string>
     <string name="chat_close_preview">Fermer</string>
     <string name="chat_image_failed">Impossible de charger l’image</string>
+    <string name="chat_tool_media_image">Image lue par l’agent : %1$s</string>
+    <string name="chat_tool_media_video">Vidéo : %1$s, %2$s</string>
+    <string name="chat_tool_media_file">Fichier de l’agent : %1$s, %2$s</string>
     <string name="chat_attachment_failed">Impossible de joindre le fichier (10 Mo max.)</string>
     <string name="chat_dictation_start">Dicter</string>
     <string name="chat_dictation_stop">Arrêter la dictée</string>

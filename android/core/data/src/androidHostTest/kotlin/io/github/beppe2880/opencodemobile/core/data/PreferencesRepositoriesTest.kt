@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -111,6 +112,7 @@ class PreferencesRepositoriesTest {
             sttLanguageHint = false,
             voiceRecordingStyle = VoiceRecordingStyle.Compact,
             voiceHoldToRecord = true,
+            toolMediaSize = ToolMediaSize.Large,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -157,6 +159,22 @@ class PreferencesRepositoriesTest {
     }
 
     @Test
+    fun `images read by the agent start at medium and keep every choice`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        fun size() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.toolMediaSize
+        assertEquals(ToolMediaSize.Medium, size())
+
+        for (choice in ToolMediaSize.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(toolMediaSize = choice) }
+            assertEquals(choice.name, prefs.values["tool_media_size"])
+            assertEquals(choice, size())
+        }
+
+        prefs.edit().putString("tool_media_size", "Huge").commit()
+        assertEquals(ToolMediaSize.Medium, size())
+    }
+
+    @Test
     fun `a theme no longer shipped reads as none`() {
         val prefs = InMemoryPreferences()
         prefs.edit().putString("opencode_theme", "retired").commit()
@@ -179,6 +197,7 @@ class PreferencesRepositoriesTest {
             .putString("share_opens", "Ask")
             .putFloat("settings_preview_fraction", 3f)
             .putString("update_notice", "Popup")
+            .putString("tool_media_size", "Huge")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value

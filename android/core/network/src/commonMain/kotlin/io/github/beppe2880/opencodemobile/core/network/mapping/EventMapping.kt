@@ -84,6 +84,7 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
             metadata = metadata?.toStringMap().orEmpty(),
             at = value.created.toLong(),
             diffs = metadata.fileDiffs(),
+            files = content.files(),
         )
     }
     is OpenCodeEvent.SessiontoolfailedWrapper -> with(value.data) {
