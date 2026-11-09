@@ -339,7 +339,7 @@ class ChatViewModelTest {
         assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
 
         vm.onEvent(ChatEvent.StopAll(RunningGroup.Commands))
-        assertEquals(RunningGroup.Commands, vm.state.value.confirmingStopAll)
+        assertEquals(StopAllTarget.Group(RunningGroup.Commands), vm.state.value.confirmingStopAll)
         vm.onEvent(ChatEvent.DismissStopAll)
         assertNull(vm.state.value.confirmingStopAll)
         assertTrue(chat.stops.isEmpty())
@@ -374,7 +374,7 @@ class ChatViewModelTest {
         assertEquals(listOf("c1", "c2"), vm.state.value.work.agents.map { it.session.id })
 
         vm.onEvent(ChatEvent.StopAll(RunningGroup.Agents))
-        assertEquals(RunningGroup.Agents, vm.state.value.confirmingStopAll)
+        assertEquals(StopAllTarget.Group(RunningGroup.Agents), vm.state.value.confirmingStopAll)
         vm.onEvent(ChatEvent.ConfirmStopAll)
         runCurrent()
         assertEquals(setOf("c1", "c2"), chat.interrupts.toSet())
@@ -382,6 +382,51 @@ class ChatViewModelTest {
         assertTrue(vm.state.value.work.agents.isEmpty())
         assertTrue(vm.state.value.stoppingAgents.isEmpty())
         assertNull(vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `stop everything asks first then stops every subagent and command of this session and leaves unassigned ones`() = runTest(main.testDispatcher) {
+        val root = FakeSessions(model).get("s1").getOrThrow()
+        val children = listOf("c1", "c2").map { root.copy(id = it, parentId = "s1", title = "Child $it") }
+        val sessions = FakeSessions(model, others = children).apply { activeIds = setOf("s1", "c1", "c2") }
+        chat.onInterrupt = { sessions.activeIds -= it }
+        chat.runningCommands = listOf(
+            RunningCommand("build", "build", "/repo", 1, "s1"),
+            RunningCommand("watch", "watch", "/repo", 1),
+        )
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf("c1", "c2"), vm.state.value.work.agents.map { it.session.id })
+        assertEquals(listOf("build"), vm.state.value.work.commands.map { it.id })
+
+        vm.onEvent(RunningStop.All.event)
+        assertEquals(StopAllTarget.Everything, vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.DismissStopAll)
+        assertNull(vm.state.value.confirmingStopAll)
+        assertTrue(chat.interrupts.isEmpty())
+        assertTrue(chat.stops.isEmpty())
+
+        val gate = CompletableDeferred<Unit>()
+        chat.stopGate = gate
+        vm.onEvent(ChatEvent.StopAll(StopAllTarget.Everything))
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        assertNull(vm.state.value.confirmingStopAll)
+        // Shells and subagents stop at once; Stop all spins while everything stops.
+        assertEquals(setOf("build"), vm.state.value.stoppingCommands)
+        assertTrue(RunningStop.Group(RunningGroup.Commands, 1).stopping(vm.state.value))
+        gate.complete(Unit)
+        runCurrent()
+        assertEquals(setOf("c1", "c2"), chat.interrupts.toSet())
+        assertFalse("s1" in chat.interrupts)
+        assertEquals(listOf("build"), chat.stops)
+        assertTrue(vm.state.value.work.isEmpty)
+        assertTrue(vm.state.value.stoppingCommands.isEmpty())
+        assertTrue(vm.state.value.stoppingAgents.isEmpty())
+        assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
         vm.onEvent(ChatEvent.Visible(false))
     }
 

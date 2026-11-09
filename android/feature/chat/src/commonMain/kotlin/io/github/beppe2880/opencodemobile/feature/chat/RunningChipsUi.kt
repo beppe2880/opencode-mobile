@@ -13,6 +13,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,14 +33,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -83,6 +83,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
+import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
@@ -102,7 +103,10 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_co
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_list_agents
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_list_shells
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_no_output
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_agent_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_session
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_open_shell_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_share
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_status_ended
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_status_exited
@@ -110,18 +114,22 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_st
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_status_running
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_label
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_title
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_everything_description
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_everything_message
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_everything_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_shell
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_shells_label
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_subagent
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_stop
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -155,16 +163,18 @@ internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, mod
         val panel = state.runningPanel
         if (panel != null && panel.item == null) {
             val gap = with(LocalDensity.current) { OcSpacing.xs.roundToPx() }
+            // A Stop's confirmation shows over the list: touching it must not close the list.
+            val confirming = state.confirmingStop != null || state.confirmingStopAgent != null || state.confirmingStopAll != null
             Popup(
                 popupPositionProvider = remember(gap) { AboveAnchor(gap) },
                 onDismissRequest = { onEvent(ChatEvent.ShowRunningList(null)) },
-                properties = PopupProperties(focusable = true),
+                properties = PopupProperties(focusable = !confirming, dismissOnBackPress = !confirming, dismissOnClickOutside = !confirming),
             ) {
                 RunningListPopover(
                     state = state,
                     group = panel.group,
                     width = with(LocalDensity.current) { anchorWidth.toDp() },
-                    onOpen = { onEvent(ChatEvent.ShowRunningItem(panel.group, it)) },
+                    onEvent = onEvent,
                 )
             }
         }
@@ -220,6 +230,12 @@ private val RunningGroup.listTitle: StringResource
         RunningGroup.Agents -> Res.string.chat_running_list_agents
     }
 
+private val RunningGroup.tagName: String
+    get() = when (this) {
+        RunningGroup.Commands -> "shells"
+        RunningGroup.Agents -> "agents"
+    }
+
 /** Above the anchor (the chips), at its start edge, kept inside the window. */
 private class AboveAnchor(private val gap: Int) : PopupPositionProvider {
     override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize): IntOffset {
@@ -232,11 +248,15 @@ private class AboveAnchor(private val gap: Int) : PopupPositionProvider {
     }
 }
 
+/**
+ * Everything that runs in separate sections (Agents, Shells: own heading and rows, a divider
+ * between them), the tapped [group] first; each row opens its
+ * item's sheet, its Open the subagent's session (or the shell's sheet); the Stops at the end.
+ */
 @Composable
-private fun RunningListPopover(state: ChatState, group: RunningGroup, width: Dp, onOpen: (String) -> Unit) {
+private fun RunningListPopover(state: ChatState, group: RunningGroup, width: Dp, onEvent: (ChatEvent) -> Unit) {
     val c = OcTheme.colors
     val now = rememberNow()
-    val entries = state.work.entries(group)
     val shape = RoundedCornerShape(OcRadius.xl)
     Column(
         Modifier
@@ -245,30 +265,48 @@ private fun RunningListPopover(state: ChatState, group: RunningGroup, width: Dp,
             .background(c.bgBase, shape)
             .border(BorderStroke(1.dp, c.borderBase), shape)
             .exposeTestTags()
-            .testTag(
-                when (group) {
-                    RunningGroup.Commands -> "running_popover_shells"
-                    RunningGroup.Agents -> "running_popover_agents"
-                },
-            )
+            .testTag("running_popover_${group.tagName}")
             .padding(vertical = OcSpacing.sm),
     ) {
-        Text(
-            stringResource(group.listTitle),
-            style = MaterialTheme.typography.titleSmall,
-            color = c.textBase,
-            modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs).semantics { heading() },
-        )
         LazyColumn(Modifier.heightIn(max = 320.dp)) {
-            items(entries, key = { it.id }) { entry -> RunningRow(entry, state, now, onClick = { onOpen(entry.id) }) }
+            // Agents and shells stay apart: each its own heading and rows, a divider between them.
+            state.work.listGroups(group).forEachIndexed { index, section ->
+                item(key = "section:${section.name}") {
+                    Column(Modifier.testTag("running_section_${section.tagName}")) {
+                        if (index > 0) OcDivider(Modifier.padding(vertical = OcSpacing.xs))
+                        Text(
+                            stringResource(section.listTitle),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = c.textBase,
+                            modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs).semantics { heading() },
+                        )
+                    }
+                }
+                items(state.work.entries(section), key = { "${section.name}:${it.id}" }) { entry ->
+                    val showItem = { onEvent(ChatEvent.ShowRunningItem(entry.group, entry.id)) }
+                    RunningRow(
+                        entry,
+                        state,
+                        now,
+                        onClick = showItem,
+                        onOpen = if (entry.group == RunningGroup.Agents) ({ onEvent(ChatEvent.OpenSession(entry.id)) }) else showItem,
+                    )
+                }
+            }
         }
+        RunningStops(state, onEvent)
     }
 }
 
 @Composable
-private fun RunningRow(entry: RunningEntry, state: ChatState, now: Long, onClick: () -> Unit) {
+private fun RunningRow(entry: RunningEntry, state: ChatState, now: Long, onClick: () -> Unit, onOpen: () -> Unit) {
     val c = OcTheme.colors
     val shell = entry.group == RunningGroup.Commands
+    val label = entryLabel(entry)
+    val openDescription = stringResource(
+        if (shell) Res.string.chat_running_open_shell_description else Res.string.chat_running_open_agent_description,
+        label,
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,7 +320,7 @@ private fun RunningRow(entry: RunningEntry, state: ChatState, now: Long, onClick
         RunningDots(c.textMuted)
         Column(Modifier.weight(1f)) {
             Text(
-                entryLabel(entry),
+                label,
                 style = if (shell) OcTheme.mono.code else MaterialTheme.typography.bodyMedium,
                 color = c.textBase,
                 maxLines = 1,
@@ -293,7 +331,84 @@ private fun RunningRow(entry: RunningEntry, state: ChatState, now: Long, onClick
         runningElapsedMs(entry, null, now, state.clockOffsetMs)?.let {
             Text(formatElapsedClock(it), style = OcTheme.mono.label, color = c.textMuted, maxLines = 1)
         }
-        Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(20.dp))
+        OcButton(
+            text = stringResource(Res.string.chat_running_open),
+            onClick = onOpen,
+            variant = OcButtonVariant.Ghost,
+            compact = true,
+            modifier = Modifier.testTag("running_open_${entry.id}").semantics { contentDescription = openDescription },
+        )
+    }
+}
+
+/** The footer's Stops ([runningStops]); the pressed one shows a spinner while it stops. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RunningStops(state: ChatState, onEvent: (ChatEvent) -> Unit) {
+    val stops = runningStops(state.work)
+    if (stops.isEmpty()) return
+    // Without it, Stop all stopping everything would also spin the groups' Stops.
+    var pressed by remember { mutableStateOf<String?>(null) }
+    val stopAllDescription = stringResource(Res.string.chat_running_stop_everything_description)
+    FlowRow(
+        Modifier.fillMaxWidth().padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm, Alignment.End),
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        stops.forEach { stop ->
+            val tag = when (stop) {
+                is RunningStop.One -> "running_stop"
+                RunningStop.All -> "running_stop_all"
+                is RunningStop.Group -> when (stop.group) {
+                    RunningGroup.Agents -> "running_stop_agents"
+                    RunningGroup.Commands -> "running_stop_shells"
+                }
+            }
+            val text = when (stop) {
+                is RunningStop.One -> stringResource(Res.string.chat_stop)
+                RunningStop.All -> stringResource(Res.string.chat_running_stop_all)
+                is RunningStop.Group -> stringResource(
+                    when (stop.group) {
+                        RunningGroup.Agents -> if (stop.count == 1) Res.string.chat_running_stop_subagent else Res.string.chat_running_stop_agents_label
+                        RunningGroup.Commands -> if (stop.count == 1) Res.string.chat_running_stop_shell else Res.string.chat_running_stop_shells_label
+                    },
+                )
+            }
+            val stopping = stop.stopping(state)
+            RunningStopButton(
+                text = text,
+                stopping = stopping,
+                spinner = stopping && (pressed == null || pressed == tag),
+                onClick = {
+                    pressed = tag
+                    onEvent(stop.event)
+                },
+                modifier = Modifier
+                    .testTag(tag)
+                    .then(if (stop == RunningStop.All) Modifier.semantics { contentDescription = stopAllDescription } else Modifier),
+            )
+        }
+    }
+}
+
+/** A destructive Stop, disabled while [stopping]; [spinner] replaces its text. */
+@Composable
+private fun RunningStopButton(text: String, stopping: Boolean, spinner: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    Button(
+        onClick = onClick,
+        enabled = !stopping,
+        shape = RoundedCornerShape(OcRadius.md),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = c.danger.bg,
+            contentColor = c.danger.fg,
+            disabledContainerColor = c.layer02,
+            disabledContentColor = c.textFaint,
+        ),
+        elevation = null,
+        modifier = modifier.heightIn(min = 44.dp),
+    ) {
+        if (spinner) OcSpinner(color = c.danger.fg) else Text(text, maxLines = 1)
     }
 }
 
@@ -464,25 +579,13 @@ private fun ItemFooter(state: ChatState, panel: RunningPanel, item: RunningEntry
         Spacer(Modifier.weight(1f))
         if (!ended) {
             val stopping = if (shell) item.id in state.stoppingCommands else item.id in state.stoppingAgents
-            Button(
+            RunningStopButton(
+                text = stringResource(if (shell) Res.string.chat_running_stop_shell else Res.string.chat_running_stop_subagent),
+                stopping = stopping,
+                spinner = stopping,
                 onClick = { onEvent(if (shell) ChatEvent.StopCommand(item.id) else ChatEvent.StopAgent(item.id)) },
-                enabled = !stopping,
-                shape = RoundedCornerShape(OcRadius.md),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = c.danger.bg,
-                    contentColor = c.danger.fg,
-                    disabledContainerColor = c.layer02,
-                    disabledContentColor = c.textFaint,
-                ),
-                elevation = null,
-                modifier = Modifier.heightIn(min = 44.dp).testTag("running_item_stop"),
-            ) {
-                if (stopping) {
-                    OcSpinner(color = c.danger.fg)
-                } else {
-                    Text(stringResource(if (shell) Res.string.chat_running_stop_shell else Res.string.chat_running_stop_subagent), maxLines = 1)
-                }
-            }
+                modifier = Modifier.testTag("running_item_stop"),
+            )
         }
     }
 }
@@ -569,24 +672,29 @@ internal fun RunningStopDialogs(state: ChatState, onEvent: (ChatEvent) -> Unit) 
             testTagPrefix = "running_stop_agent",
         )
     }
-    state.confirmingStopAll?.let { group ->
-        val (count, title, message, tagPrefix) = when (group) {
-            RunningGroup.Agents -> StopAllDialog(
-                state.work.agents.size,
-                Res.plurals.chat_running_stop_all_agents_title,
-                Res.string.chat_running_stop_all_agents_message,
-                "running_stop_all_agents",
+    state.confirmingStopAll?.let { target ->
+        val (title, message, tagPrefix) = when (target) {
+            StopAllTarget.Everything -> Triple(
+                stringResource(Res.string.chat_running_stop_everything_title),
+                stringResource(Res.string.chat_running_stop_everything_message),
+                "running_stop_everything",
             )
-            RunningGroup.Commands -> StopAllDialog(
-                state.work.commands.size,
-                Res.plurals.chat_running_stop_all_commands_title,
-                Res.string.chat_running_stop_all_commands_message,
-                "running_stop_all_commands",
-            )
+            is StopAllTarget.Group -> when (target.group) {
+                RunningGroup.Agents -> Triple(
+                    pluralStringResource(Res.plurals.chat_running_stop_all_agents_title, state.work.agents.size, state.work.agents.size),
+                    stringResource(Res.string.chat_running_stop_all_agents_message),
+                    "running_stop_all_agents",
+                )
+                RunningGroup.Commands -> Triple(
+                    pluralStringResource(Res.plurals.chat_running_stop_all_commands_title, state.work.commands.size, state.work.commands.size),
+                    stringResource(Res.string.chat_running_stop_all_commands_message),
+                    "running_stop_all_commands",
+                )
+            }
         }
         OcConfirmDialog(
-            title = pluralStringResource(title, count, count),
-            text = stringResource(message),
+            title = title,
+            text = message,
             confirmLabel = stringResource(Res.string.chat_running_stop_all),
             onConfirm = { onEvent(ChatEvent.ConfirmStopAll) },
             onDismiss = { onEvent(ChatEvent.DismissStopAll) },
@@ -595,5 +703,3 @@ internal fun RunningStopDialogs(state: ChatState, onEvent: (ChatEvent) -> Unit) 
         )
     }
 }
-
-private data class StopAllDialog(val count: Int, val title: PluralStringResource, val message: StringResource, val testTagPrefix: String)

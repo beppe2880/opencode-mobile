@@ -144,7 +144,7 @@ fun ChatScreen(
                     onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
-                if (!state.work.isEmpty) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
+                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

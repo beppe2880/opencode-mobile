@@ -264,6 +264,14 @@
     <string name="chat_running_share">Share</string>
     <string name="chat_running_open_session">Open session</string>
     <string name="chat_running_agent_untitled">Subagent</string>
+    <string name="chat_running_open">Open</string>
+    <string name="chat_running_open_agent_description">Open agent session: %1$s</string>
+    <string name="chat_running_open_shell_description">Open shell output: %1$s</string>
+    <string name="chat_running_stop_agents_label">Stop agents</string>
+    <string name="chat_running_stop_shells_label">Stop shells</string>
+    <string name="chat_running_stop_everything_description">Stop all running work</string>
+    <string name="chat_running_stop_everything_title">Stop all running work?</string>
+    <string name="chat_running_stop_everything_message">The subagents are interrupted and the commands started by this session are ended. This session and other commands in this project keep running.</string>
     <string name="chat_preview_folds">Steps followed live fold back when the answer ends</string>
     <string name="chat_preview_kept_open">Steps followed live stay open after the answer</string>
     <string name="chat_preview_not_followed">Running steps stay folded until you open them</string>

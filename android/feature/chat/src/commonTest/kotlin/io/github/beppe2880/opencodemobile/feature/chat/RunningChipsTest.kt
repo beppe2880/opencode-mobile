@@ -88,9 +88,70 @@ class RunningChipsTest {
     }
 
     @Test
-    fun `an open list closes when nothing of its kind runs`() {
+    fun `an open list lists everything and closes only when nothing runs`() {
         val list = RunningPanel(RunningGroup.Commands)
         assertEquals(list, list.follow(work, serverNow = 0))
-        assertNull(list.follow(work.copy(commands = emptyList()), serverNow = 0))
+        assertEquals(list, list.follow(work.copy(commands = emptyList()), serverNow = 0))
+        assertNull(list.follow(RunningWork(), serverNow = 0))
+    }
+
+    @Test
+    fun `the list shows each running kind once with the tapped one first`() {
+        assertEquals(listOf(RunningGroup.Commands, RunningGroup.Agents), work.listGroups(RunningGroup.Commands))
+        assertEquals(listOf(RunningGroup.Agents, RunningGroup.Commands), work.listGroups(RunningGroup.Agents))
+        assertEquals(listOf(RunningGroup.Agents), work.copy(commands = emptyList()).listGroups(RunningGroup.Commands))
+        assertTrue(RunningWork().listGroups(RunningGroup.Agents).isEmpty())
+    }
+
+    @Test
+    fun `the header line hides while the chips show what runs`() {
+        assertFalse(ChatState(work = work).showsRunningLine)
+        assertTrue(ChatState(work = work).withSettings(AppSettings(runningChips = false)).showsRunningLine)
+        assertFalse(ChatState().withSettings(AppSettings(runningChips = false)).showsRunningLine)
+    }
+
+    @Test
+    fun `one item alone gets its own stop`() {
+        val shell = RunningWork(commands = listOf(command("c1", 1_000)))
+        assertEquals(listOf(RunningStop.One(shell.entries(RunningGroup.Commands).single())), runningStops(shell))
+        assertEquals(ChatEvent.StopCommand("c1"), runningStops(shell).single().event)
+
+        val agent = RunningWork(agents = listOf(agent("a1", "Find the tests")))
+        assertEquals(listOf(RunningStop.One(agent.entries(RunningGroup.Agents).single())), runningStops(agent))
+        assertEquals(ChatEvent.StopAgent("a1"), runningStops(agent).single().event)
+    }
+
+    @Test
+    fun `several items of one kind get the stop of that kind`() {
+        val agents = RunningWork(agents = listOf(agent("a1", "One"), agent("a2", "Two")))
+        assertEquals(listOf(RunningStop.Group(RunningGroup.Agents, 2)), runningStops(agents))
+        assertEquals(ChatEvent.StopAll(StopAllTarget.Group(RunningGroup.Agents)), runningStops(agents).single().event)
+
+        val shells = RunningWork(commands = listOf(command("c1", 1_000), command("c2", 2_000)))
+        assertEquals(listOf(RunningStop.Group(RunningGroup.Commands, 2)), runningStops(shells))
+        assertEquals(ChatEvent.StopAll(StopAllTarget.Group(RunningGroup.Commands)), runningStops(shells).single().event)
+    }
+
+    @Test
+    fun `both kinds get stop all and a stop per kind`() {
+        assertEquals(
+            listOf(RunningStop.All, RunningStop.Group(RunningGroup.Agents, 1), RunningStop.Group(RunningGroup.Commands, 2)),
+            runningStops(work),
+        )
+        assertEquals(ChatEvent.StopAll(StopAllTarget.Everything), RunningStop.All.event)
+        assertTrue(runningStops(RunningWork()).isEmpty())
+    }
+
+    @Test
+    fun `a stop is stopping once everything it stops is stopping`() {
+        val state = ChatState(work = work, stoppingCommands = setOf("late", "early"))
+        assertTrue(RunningStop.Group(RunningGroup.Commands, 2).stopping(state))
+        assertFalse(RunningStop.Group(RunningGroup.Agents, 1).stopping(state))
+        assertFalse(RunningStop.All.stopping(state))
+        assertTrue(RunningStop.All.stopping(state.copy(stoppingAgents = setOf("a1"))))
+        assertFalse(RunningStop.Group(RunningGroup.Commands, 2).stopping(state.copy(stoppingCommands = setOf("late"))))
+        val one = RunningStop.One(work.entries(RunningGroup.Agents).single())
+        assertFalse(one.stopping(state))
+        assertTrue(one.stopping(state.copy(stoppingAgents = setOf("a1"))))
     }
 }

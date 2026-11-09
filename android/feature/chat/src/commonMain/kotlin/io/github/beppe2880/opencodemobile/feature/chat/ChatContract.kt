@@ -133,8 +133,8 @@ data class ChatState(
     val stoppingAgents: Set<String> = emptySet(),
     /** The subagent whose Stop waits for confirmation; null when none. */
     val confirmingStopAgent: String? = null,
-    /** The group whose "Stop all" waits for confirmation; null when none. */
-    val confirmingStopAll: RunningGroup? = null,
+    /** What a "Stop all" waiting for confirmation stops; null when none. */
+    val confirmingStopAll: StopAllTarget? = null,
     /** Server clock minus device clock, for elapsed times of server timestamps. */
     val clockOffsetMs: Long = 0L,
     /** Chips above the composer count what runs (setting). */
@@ -198,6 +198,14 @@ data class SessionPeek(val id: String, val title: String)
  * attributed to this session (never the unassigned ones).
  */
 enum class RunningGroup { Agents, Commands }
+
+/** What a "Stop all" stops: every item of one [Group], or [Everything] that runs. */
+sealed interface StopAllTarget {
+    data class Group(val group: RunningGroup) : StopAllTarget
+
+    /** The subagents and the commands of this session (never the unassigned ones). */
+    data object Everything : StopAllTarget
+}
 
 /**
  * The project's [folder] name (null when the setting leaves it out), [branch] (null on a
@@ -317,8 +325,10 @@ sealed interface ChatEvent {
     data object ConfirmStopAgent : ChatEvent
     data object DismissStopAgent : ChatEvent
 
-    /** Stops every running item of [group]; always asks for confirmation first. */
-    data class StopAll(val group: RunningGroup) : ChatEvent
+    /** Stops every running item of [target]; always asks for confirmation first. */
+    data class StopAll(val target: StopAllTarget) : ChatEvent {
+        constructor(group: RunningGroup) : this(StopAllTarget.Group(group))
+    }
     data object ConfirmStopAll : ChatEvent
     data object DismissStopAll : ChatEvent
 

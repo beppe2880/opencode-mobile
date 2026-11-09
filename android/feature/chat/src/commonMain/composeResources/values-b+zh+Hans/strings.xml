@@ -245,6 +245,14 @@
     <string name="chat_running_share">分享</string>
     <string name="chat_running_open_session">打开会话</string>
     <string name="chat_running_agent_untitled">子代理</string>
+    <string name="chat_running_open">打开</string>
+    <string name="chat_running_open_agent_description">打开代理会话：%1$s</string>
+    <string name="chat_running_open_shell_description">打开 Shell 输出：%1$s</string>
+    <string name="chat_running_stop_agents_label">停止代理</string>
+    <string name="chat_running_stop_shells_label">停止 Shell</string>
+    <string name="chat_running_stop_everything_description">停止所有正在运行的工作</string>
+    <string name="chat_running_stop_everything_title">停止所有正在运行的工作？</string>
+    <string name="chat_running_stop_everything_message">子代理将被中断，此会话启动的命令将被结束。此会话和项目中的其他命令会继续运行。</string>
     <string name="chat_preview_folds">实时跟随的步骤在回答结束后会折叠</string>
     <string name="chat_preview_kept_open">实时跟随的步骤在回答结束后保持展开</string>
     <string name="chat_preview_not_followed">运行中的步骤保持折叠，直到你打开它们</string>

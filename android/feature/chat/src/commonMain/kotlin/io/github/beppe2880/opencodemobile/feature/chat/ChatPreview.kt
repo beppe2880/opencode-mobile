@@ -82,7 +82,8 @@ fun ChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.Header, preview, Modifier.padding(OcSpacing.sm)) {
             Column {
                 PreviewTopBar(state)
-                if (preview.running) RunningLine(state.work, state.headerStyle, onClick = {})
+                // Hidden while the chips above the composer show what runs, as in the chat.
+                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = {})
             }
         }
         Transcript(state, preview, cache, liveGroupKey = state.liveGroupKey())
