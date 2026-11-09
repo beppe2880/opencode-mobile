@@ -23,6 +23,8 @@ import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
+import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpServer
 import io.github.beppe2880.opencodemobile.core.domain.McpStatus
@@ -123,6 +125,20 @@ val fakeDataModule = module {
                 servers = servers.map { if (it.name == name) it.copy(status = if (connected) McpStatus.Connected else McpStatus.Disabled) else it }
                 return Result.success(Unit)
             }
+        }
+    }
+    // Providers are never connected from the demo: no key integrations to offer.
+    single<IntegrationRepository> {
+        object : IntegrationRepository {
+            override suspend fun listKeys(serverId: String, directory: String) = Result.success(emptyList<KeyIntegration>())
+            override suspend fun connectKey(
+                serverId: String,
+                directory: String,
+                integrationId: String,
+                key: String,
+                answers: Map<String, FormAnswer>,
+            ): Result<Unit> =
+                Result.failure(OpenCodeError.NotFound("Not available in the demo"))
         }
     }
     single<FileRepository> {
