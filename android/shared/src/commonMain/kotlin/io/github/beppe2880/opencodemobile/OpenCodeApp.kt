@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
+import io.github.beppe2880.opencodemobile.core.ui.theme.isDarkTheme
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import org.koin.compose.koinInject
 
@@ -45,8 +46,10 @@ fun OpenCodeApp(
     val loaded by servers.loaded.collectAsStateWithLifecycle()
     val activeServer by servers.activeServer.collectAsStateWithLifecycle()
     val dark = appSettings.theme.isDark()
-    LaunchedEffect(dark) { onDarkThemeChange(dark) }
-    OcTheme(darkTheme = dark) {
+    // A single-mode OpenCode theme is dark or light whatever the app setting: the bars follow it.
+    val barsDark = isDarkTheme(appSettings.openCodeTheme, dark)
+    LaunchedEffect(barsDark) { onDarkThemeChange(barsDark) }
+    OcTheme(darkTheme = dark, openCodeTheme = appSettings.openCodeTheme) {
         Box(modifier.fillMaxSize().background(OcTheme.colors.bgBase).dismissKeyboardOnTap()) {
             // Choosing the start screen needs the saved servers, read off the main thread.
             if (loaded) {

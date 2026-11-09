@@ -90,7 +90,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
         vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
-        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(true))
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("opencode"))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -123,7 +123,7 @@ class SettingsViewModelTest {
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
-                coloredMarkdown = true,
+                openCodeTheme = "opencode",
                 showCost = false,
                 chatHeaderLine = ChatHeaderLine.BranchFiles,
                 headerOpens = ChangesScope.Session,
@@ -150,19 +150,19 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `colored markdown is off by default and toggles both ways`() = runTest(main.testDispatcher) {
+    fun `the OpenCode theme is none by default and goes back to none`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
-        assertFalse(vm.state.value.settings.coloredMarkdown)
+        assertNull(vm.state.value.settings.openCodeTheme)
 
-        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(true))
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("dracula"))
         advanceUntilIdle()
-        assertTrue(settings.settings.value.coloredMarkdown)
-        assertTrue(vm.state.value.settings.coloredMarkdown)
+        assertEquals("dracula", settings.settings.value.openCodeTheme)
+        assertEquals("dracula", vm.state.value.settings.openCodeTheme)
 
-        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(false))
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged(null))
         advanceUntilIdle()
-        assertFalse(settings.settings.value.coloredMarkdown)
+        assertNull(settings.settings.value.openCodeTheme)
     }
 
     @Test

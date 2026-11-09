@@ -50,8 +50,10 @@
     <string name="settings_refresh_slow">3초</string>
     <string name="settings_text_size">채팅 글자 크기</string>
     <string name="settings_text_size_sub">메시지와 도구 출력의 크기이며 시스템 글자 크기에 더해집니다</string>
-    <string name="settings_colored_markdown">컬러 마크다운</string>
-    <string name="settings_colored_markdown_sub">답변의 제목, 굵은 글씨, 링크, 코드에 OpenCode 터미널 앱의 색을 사용합니다</string>
+    <string name="settings_opencode_theme">OpenCode 테마</string>
+    <string name="settings_opencode_theme_sub">OpenCode 터미널 앱 테마의 색상. 앱 전체와 답변의 마크다운에 적용됩니다</string>
+    <string name="settings_opencode_theme_none">없음</string>
+    <string name="settings_opencode_theme_none_sub">앱 고유의 색상</string>
     <string name="settings_text_small">작게</string>
     <string name="settings_text_default">기본</string>
     <string name="settings_text_large">크게</string>
@@ -270,7 +272,6 @@
     <string name="settings_summary_blocked">차단됨</string>
     <string name="settings_summary_no_server">서버 없음</string>
     <string name="settings_summary_split">목록 옆에 채팅</string>
-    <string name="settings_summary_colored_markdown">컬러 마크다운</string>
     <string name="settings_summary_reasoning">생각</string>
     <string name="settings_summary_grouped">묶인 활동</string>
     <string name="settings_summary_cost">비용</string>

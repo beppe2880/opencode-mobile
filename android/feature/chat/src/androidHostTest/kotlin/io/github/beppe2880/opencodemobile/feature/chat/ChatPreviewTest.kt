@@ -41,7 +41,6 @@ class ChatPreviewTest {
                 showCost = false,
                 agentColorOutline = false,
                 chatTextScale = 1.3f,
-                coloredMarkdown = true,
                 permissionsCollapsed = true,
                 expandToolsByDefault = true,
                 outputPreviewLines = 6,
@@ -51,8 +50,6 @@ class ChatPreviewTest {
         assertFalse(state.showCost)
         assertFalse(state.agentColorOutline)
         assertEquals(1.3f, state.chatTextScale)
-        assertTrue(state.coloredMarkdown)
-        assertFalse(previewChatState(running = false, settings = AppSettings()).coloredMarkdown)
         assertTrue(state.isPermissionCollapsed(state.permissions.single().id))
         assertTrue(state.expandToolsByDefault)
         assertEquals(6, state.outputPreviewLines)

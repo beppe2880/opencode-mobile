@@ -50,8 +50,10 @@
     <string name="settings_refresh_slow">3 с</string>
     <string name="settings_text_size">Размер текста чата</string>
     <string name="settings_text_size_sub">Размер сообщений и вывода инструментов поверх системного размера</string>
-    <string name="settings_colored_markdown">Цветной Markdown</string>
-    <string name="settings_colored_markdown_sub">Заголовки, жирный текст, ссылки и код в ответах окрашены, как в терминальном приложении OpenCode</string>
+    <string name="settings_opencode_theme">Тема OpenCode</string>
+    <string name="settings_opencode_theme_sub">Цвета темы терминального приложения OpenCode для всего приложения и для markdown в ответах</string>
+    <string name="settings_opencode_theme_none">Нет</string>
+    <string name="settings_opencode_theme_none_sub">Собственные цвета приложения</string>
     <string name="settings_text_small">Малый</string>
     <string name="settings_text_default">По умолчанию</string>
     <string name="settings_text_large">Большой</string>
@@ -279,7 +281,6 @@
     <string name="settings_summary_blocked">Заблокировано</string>
     <string name="settings_summary_no_server">Нет сервера</string>
     <string name="settings_summary_split">Чат рядом со списком</string>
-    <string name="settings_summary_colored_markdown">Цветной Markdown</string>
     <string name="settings_summary_reasoning">Рассуждения</string>
     <string name="settings_summary_grouped">Группировка активности</string>
     <string name="settings_summary_cost">Стоимость</string>

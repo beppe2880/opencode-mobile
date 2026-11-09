@@ -26,6 +26,9 @@ class SettingOptionsTest {
         assertEquals(SettingOption.entries.toSet(), SettingsPart.entries.flatMap { it.options }.toSet())
         assertEquals(SettingsPart.TextSize, SettingOption.TextSize.part)
         assertEquals(SettingsArea.Appearance, SettingOption.TextSize.area)
+        // The OpenCode theme opens at the theme, and the messages it colors offer it too.
+        assertEquals(SettingsPart.Theme, SettingOption.OpenCodeTheme.part)
+        assertTrue(SettingOption.OpenCodeTheme in SettingsPart.Messages.options)
         assertEquals(SettingsPart.Thoughts, SettingOption.GroupActivity.part)
         assertEquals(SettingsArea.LiveActivity, SettingOption.LiveInterval.area)
         assertEquals(SettingsArea.Appearance, SettingOption.BackShowsList.area)

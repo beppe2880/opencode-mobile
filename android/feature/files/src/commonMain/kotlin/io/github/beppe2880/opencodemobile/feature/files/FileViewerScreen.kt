@@ -181,8 +181,9 @@ private fun CodeView(content: FileContent.Text, name: String, wrap: Boolean, bot
     val c = OcTheme.colors
     val style = OcTheme.mono.code
     val dark = c.isDark
-    val lines by produceState<List<AnnotatedString>?>(null, content, dark) {
-        value = withContext(Dispatchers.Default) { splitLines(highlightCode(content.text, name, dark)) }
+    val syntax = c.syntax
+    val lines by produceState<List<AnnotatedString>?>(null, content, dark, syntax) {
+        value = withContext(Dispatchers.Default) { splitLines(highlightCode(content.text, name, dark, syntax)) }
     }
     val shown = lines ?: run {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { OcSpinner(size = 20.dp) }

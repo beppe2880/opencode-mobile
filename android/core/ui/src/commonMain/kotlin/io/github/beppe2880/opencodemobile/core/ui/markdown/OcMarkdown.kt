@@ -4,7 +4,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,12 +30,10 @@ import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
 import dev.snipme.highlights.Highlights
-import dev.snipme.highlights.model.SyntaxThemes
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcMarkdownPalette
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcMonoTypography
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.core.ui.theme.markdownPalette
 import org.intellij.markdown.MarkdownElementTypes
 
 /**
@@ -53,19 +50,19 @@ fun OcMarkdown(
     val colors = OcTheme.colors
     val typography = MaterialTheme.typography
     val mono = OcTheme.mono
-    val highlights = remember(colors.isDark) {
-        Highlights.Builder().theme(SyntaxThemes.atom(darkMode = colors.isDark))
+    val highlights = remember(colors.isDark, colors.syntax) {
+        Highlights.Builder().theme(syntaxTheme(colors.syntax, colors.isDark))
     }
-    val colored = LocalColoredMarkdown.current
-    val palette = if (colored) colors.markdownPalette else null
+    // The active OpenCode theme's markdown colors; the app's own themes have none.
+    val palette = colors.markdown
     val mdColors = remember(colors) { markdownColors(colors) }
-    val mdTypography = remember(typography, colors, mono, colored) { markdownTypography(typography, mono, colors, palette) }
+    val mdTypography = remember(typography, colors, mono) { markdownTypography(typography, mono, colors, palette) }
     // The renderer lays out the paragraphs of a quote like any other, with the paragraph style of
     // the current typography: colored quotes provide one whose text is the quote style.
-    val quoteTypography = remember(typography, colors, mono, colored) {
+    val quoteTypography = remember(typography, colors, mono) {
         palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true) }
     }
-    val annotator = remember(colors.isDark, colored) {
+    val annotator = remember(palette) {
         if (palette != null) coloredAnnotator(palette) else markdownAnnotator()
     }
     val components = remember(highlights, quoteTypography) {
@@ -129,25 +126,18 @@ fun OcMarkdown(
     )
 }
 
-/**
- * Whether [OcMarkdown] colors headings, bold and italic text, inline code, link text, quotes and
- * list markers with the [OcMarkdownPalette] of the OpenCode terminal app; off renders them in the
- * text color.
- */
-val LocalColoredMarkdown = compositionLocalOf { false }
-
 private fun markdownColors(c: OcColors): MarkdownColors = DefaultMarkdownColors(
-    text = c.textBase,
+    text = c.markdown?.text ?: c.textBase,
     codeBackground = if (c.isDark) c.layer01 else c.layer02,
     inlineCodeBackground = c.layer02,
-    dividerColor = c.borderBase,
+    dividerColor = c.markdown?.horizontalRule ?: c.borderBase,
     tableBackground = if (c.isDark) c.layer01 else c.layer02,
 )
 
 /**
- * The text styles of markdown; with a [palette] (colored markdown) headings, inline code, link
- * text, quotes and list markers take its colors like in the OpenCode terminal app. Code blocks
- * never change. [quoteText] gives the text the quote style, for the content of a quote: inline
+ * The text styles of markdown; with a [palette] (an OpenCode theme) the text, headings, inline
+ * code, link text, quotes, list markers and code block text take its colors like in the OpenCode
+ * terminal app. [quoteText] gives the text the quote style, for the content of a quote: inline
  * code, links and (through the annotator) bold and italic text inside keep their own colors.
  */
 internal fun markdownTypography(
@@ -181,30 +171,31 @@ internal fun markdownTypography(
             table = t.bodySmall,
         )
     }
+    val paragraph = body.copy(color = palette.text)
     fun TextStyle.heading() = copy(color = palette.heading, fontWeight = FontWeight.Bold)
-    val quote = body.copy(color = palette.blockQuote, fontStyle = FontStyle.Italic)
-    val text = if (quoteText) quote else body
+    val quote = paragraph.copy(color = palette.blockQuote, fontStyle = FontStyle.Italic)
+    val text = if (quoteText) quote else paragraph
     return DefaultMarkdownTypography(
         h1 = t.titleLarge.heading().copy(textDecoration = TextDecoration.Underline),
         h2 = t.titleMedium.heading(),
         h3 = t.titleSmall.heading(),
         h4 = t.titleSmall.heading(),
-        h5 = body.heading(),
-        h6 = body.heading(),
+        h5 = paragraph.heading(),
+        h6 = paragraph.heading(),
         text = text,
-        code = mono.codeSmall,
+        code = mono.codeSmall.copy(color = palette.codeBlock),
         inlineCode = inlineCode.copy(color = palette.inlineCode),
         quote = quote,
         paragraph = text,
         // The list renderers draw their marker (number or bullet) with these styles and the
         // item content as paragraphs.
-        ordered = body.copy(color = palette.listNumber),
-        bullet = body.copy(color = palette.listBullet),
+        ordered = paragraph.copy(color = palette.listNumber),
+        bullet = paragraph.copy(color = palette.listBullet),
         list = text,
         textLink = TextLinkStyles(
-            style = body.copy(color = palette.linkText, textDecoration = TextDecoration.Underline).toSpanStyle(),
+            style = paragraph.copy(color = palette.linkText, textDecoration = TextDecoration.Underline).toSpanStyle(),
         ),
-        table = t.bodySmall,
+        table = t.bodySmall.copy(color = palette.text),
     )
 }
 

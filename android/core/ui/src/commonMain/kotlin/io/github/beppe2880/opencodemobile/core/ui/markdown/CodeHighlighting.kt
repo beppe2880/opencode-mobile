@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.ui.markdown
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -9,20 +10,23 @@ import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
+import dev.snipme.highlights.model.SyntaxTheme
 import dev.snipme.highlights.model.SyntaxThemes
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcSyntaxColors
 
 /**
  * [code] with syntax colors for the language of [fileName], in the theme of the chat's code
- * blocks. Prose and unknown file types, and code longer than [MAX_HIGHLIGHTED_CHARS], stay plain.
+ * blocks: the active OpenCode theme's [syntax] colors (`OcTheme.colors.syntax`), otherwise Atom
+ * One. Prose and unknown file types, and code longer than [MAX_HIGHLIGHTED_CHARS], stay plain.
  * Slow on large files: call it off the main thread.
  */
-fun highlightCode(code: String, fileName: String, dark: Boolean): AnnotatedString {
+fun highlightCode(code: String, fileName: String, dark: Boolean, syntax: OcSyntaxColors? = null): AnnotatedString {
     val language = languageOf(fileName)
     if (language == null || code.length > MAX_HIGHLIGHTED_CHARS) return AnnotatedString(code)
     val highlights = Highlights.Builder()
         .code(code)
         .language(language)
-        .theme(SyntaxThemes.atom(darkMode = dark))
+        .theme(syntaxTheme(syntax, dark))
         .build()
         .getHighlights()
     return buildAnnotatedString {
@@ -36,6 +40,27 @@ fun highlightCode(code: String, fileName: String, dark: Boolean): AnnotatedStrin
             }
         }
     }
+}
+
+/**
+ * The highlighter theme for [syntax], or Atom One without it. The highlighter has no function
+ * category; its `metadata` (annotations, decorators) takes the type color and `mark` the operators.
+ */
+internal fun syntaxTheme(syntax: OcSyntaxColors?, dark: Boolean): SyntaxTheme {
+    if (syntax == null) return SyntaxThemes.atom(darkMode = dark)
+    fun Color.rgb() = toArgb() and 0xFFFFFF
+    return SyntaxTheme(
+        key = "opencode",
+        code = syntax.variable.rgb(),
+        keyword = syntax.keyword.rgb(),
+        string = syntax.string.rgb(),
+        literal = syntax.number.rgb(),
+        comment = syntax.comment.rgb(),
+        metadata = syntax.type.rgb(),
+        multilineComment = syntax.comment.rgb(),
+        punctuation = syntax.punctuation.rgb(),
+        mark = syntax.operator.rgb(),
+    )
 }
 
 /** Highlighting is regex based and grows with the file; past this it would take seconds. */

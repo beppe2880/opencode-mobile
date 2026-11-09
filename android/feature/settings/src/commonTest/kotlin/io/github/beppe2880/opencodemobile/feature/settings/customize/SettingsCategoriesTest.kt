@@ -9,10 +9,10 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_colored_markdown
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_off
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
@@ -46,7 +46,7 @@ class SettingsCategoriesTest {
     @Test
     fun theCategoriesTheIssueAskedFor() {
         assertEquals(
-            listOf(SettingOption.Theme, SettingOption.TextSize, SettingOption.ColoredMarkdown, SettingOption.SplitView),
+            listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize, SettingOption.SplitView),
             SettingsArea.Appearance.options.take(4),
         )
         assertEquals(SettingsArea.Chat, SettingOption.SwipeChats.area)
@@ -87,7 +87,7 @@ class SettingsCategoriesTest {
 
         // The list beside the chat only on wide windows.
         val narrow = visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = false)
-        assertEquals(listOf(SettingOption.Theme, SettingOption.TextSize, SettingOption.ColoredMarkdown), narrow.flatMap { it.options })
+        assertEquals(listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize), narrow.flatMap { it.options })
         assertTrue(SettingOption.BackShowsList in visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = true).flatMap { it.options })
         assertFalse(SettingOption.ListWidth in visibleGroups(SettingsArea.Appearance, AppSettings(splitView = false), true, wide = true).flatMap { it.options })
 
@@ -140,10 +140,13 @@ class SettingsCategoriesTest {
             listOf(UiText.Resource(Res.string.settings_theme_dark), UiText.Resource(Res.string.settings_text_default)),
             summaryOf(SettingsArea.Appearance, AppSettings(theme = ThemeMode.Dark)),
         )
+        // The OpenCode theme by its name, after the light or dark mode; none says nothing.
+        val theme = OpenCodeThemes.all.first()
         assertEquals(
-            UiText.Resource(Res.string.settings_summary_colored_markdown),
-            summaryOf(SettingsArea.Appearance, AppSettings(coloredMarkdown = true)).last(),
+            listOf(UiText.Resource(Res.string.settings_theme_dark), UiText.Raw(theme.displayName), UiText.Resource(Res.string.settings_text_default)),
+            summaryOf(SettingsArea.Appearance, AppSettings(theme = ThemeMode.Dark, openCodeTheme = theme.id)),
         )
+        assertEquals(2, summaryOf(SettingsArea.Appearance, AppSettings(openCodeTheme = "retired")).size)
         val wide = summary(SettingsArea.Appearance, SettingsState(), wide = true)
         assertEquals(UiText.Resource(Res.string.settings_summary_split), wide.last())
         val off = listOf(UiText.Resource(Res.string.settings_summary_off))
