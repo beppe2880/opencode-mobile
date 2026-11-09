@@ -1,8 +1,5 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,9 +45,11 @@ import io.github.beppe2880.opencodemobile.core.ui.components.EditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegmentedControl
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -102,8 +101,10 @@ fun LiveEditHost(
                     content()
                 }
             }
-            AnimatedVisibility(visible = selected != null, enter = expandVertically(), exit = shrinkVertically()) {
-                selected?.let { part -> OptionsPanel(part, state, onEvent, onClose = { selected = null }, onOpenArea, Modifier.heightIn(max = panelMax)) }
+            // The options rise above the edit bar; closing, they keep showing the part they were for.
+            val shownPart = rememberLastNonNull(selected)
+            OcExpandable(visible = selected != null, label = "live_edit_options") {
+                shownPart?.let { part -> OptionsPanel(part, state, onEvent, onClose = { selected = null }, onOpenArea, Modifier.heightIn(max = panelMax)) }
             }
             EditBar(
                 editing = editing,

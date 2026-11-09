@@ -118,10 +118,10 @@ fun OcProjectAvatar(name: String, modifier: Modifier = Modifier, size: Dp = 20.d
     }
 }
 
-/** Dot that pulses while something is running. */
+/** Dot that pulses while something is running; steady when the system asks for less motion. */
 @Composable
 fun OcPulsingDot(color: Color, modifier: Modifier = Modifier, size: Dp = 8.dp, pulsing: Boolean = true) {
-    val alpha = if (pulsing) {
+    val alpha = if (pulsing && !OcTheme.reducedMotion) {
         val transition = rememberInfiniteTransition(label = "pulse")
         val value by transition.animateFloat(
             initialValue = 1f,
@@ -145,16 +145,21 @@ fun OcSpinner(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color = Oc
     CircularProgressIndicator(modifier = modifier.size(size), strokeWidth = 1.5.dp, color = color)
 }
 
-/** Shimmering placeholder block used by skeleton loaders. */
+/** Shimmering placeholder block used by skeleton loaders; still when the system asks for less motion. */
 @Composable
 fun OcSkeleton(modifier: Modifier = Modifier, shape: Shape = RoundedCornerShape(OcRadius.xs)) {
-    val transition = rememberInfiniteTransition(label = "skeleton")
-    val alpha by transition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
-        label = "skeletonAlpha",
-    )
+    val alpha = if (OcTheme.reducedMotion) {
+        0.75f
+    } else {
+        val transition = rememberInfiniteTransition(label = "skeleton")
+        val value by transition.animateFloat(
+            initialValue = 0.5f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
+            label = "skeletonAlpha",
+        )
+        value
+    }
     Box(
         modifier = modifier
             .clip(shape)

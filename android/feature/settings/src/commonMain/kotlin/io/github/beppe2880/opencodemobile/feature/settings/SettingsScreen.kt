@@ -92,6 +92,7 @@ import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.core.ui.theme.ocPageTransition
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreview
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreviewContent
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaScreen
@@ -185,7 +186,13 @@ fun SettingsScreen(
             }
         } else {
             OcBackHandler(enabled = state.area != null) { onEvent(SettingsEvent.CloseArea) }
-            AnimatedContent(targetState = state.area, label = "settings_area") { area ->
+            val reduced = OcTheme.reducedMotion
+            // A category opens like a page from the end and Back returns from the start.
+            AnimatedContent(
+                targetState = state.area,
+                transitionSpec = { ocPageTransition(forward = targetState != null, reduced = reduced) },
+                label = "settings_area",
+            ) { area ->
                 when {
                     area == null -> home(null, { onEvent(SettingsEvent.Back) }, Modifier)
                     // Servers and about have no preview: both styles show their page.

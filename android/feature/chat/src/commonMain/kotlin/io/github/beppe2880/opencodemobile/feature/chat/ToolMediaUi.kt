@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
+import io.github.beppe2880.opencodemobile.core.ui.components.OcCrossfade
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.text.formatFileSize
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -166,14 +167,17 @@ private fun ToolMediaItem(
                 .testTag("tool_media_open_${item.tagId}"),
             contentAlignment = Alignment.Center,
         ) {
-            when (image) {
-                is Decoded.Ready -> Image(
-                    bitmap = image.bitmap,
-                    contentDescription = null,
-                    contentScale = if (single) ContentScale.Fit else ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-                else -> OcSkeleton(Modifier.fillMaxSize(), shape)
+            // The decoded image fades in over its placeholder.
+            OcCrossfade(image, Modifier.fillMaxSize(), label = "tool_media") { shown ->
+                when (shown) {
+                    is Decoded.Ready -> Image(
+                        bitmap = shown.bitmap,
+                        contentDescription = null,
+                        contentScale = if (single) ContentScale.Fit else ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    else -> OcSkeleton(Modifier.fillMaxSize(), shape)
+                }
             }
         }
     }

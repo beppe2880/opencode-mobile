@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.ui.platform.rememberSystemReducedMotion
 
 /** 4dp based spacing scale. */
 @Immutable
@@ -76,6 +77,12 @@ object OcTheme {
         get() = LocalOcColors.current.markdown
     val spacing: OcSpacing get() = OcSpacing
     val radius: OcRadius get() = OcRadius
+    val motion: OcMotion get() = OcMotion
+
+    /** The system asks for less motion: [OcMotion] specs built with it are instant. */
+    val reducedMotion: Boolean
+        @Composable @ReadOnlyComposable
+        get() = LocalReducedMotion.current
 }
 
 @Composable
@@ -95,10 +102,16 @@ fun ThemeMode.isDark(): Boolean = when (this) {
 fun OcTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     openCodeTheme: String? = null,
+    /** Less motion: every [OcMotion] transition is instant. Follows the system setting by default. */
+    reducedMotion: Boolean = rememberSystemReducedMotion(),
     content: @Composable () -> Unit,
 ) {
     val colors = remember(openCodeTheme, darkTheme) { ocColors(openCodeTheme, darkTheme) }
-    CompositionLocalProvider(LocalOcColors provides colors, LocalOcMono provides ocMonoTypography()) {
+    CompositionLocalProvider(
+        LocalOcColors provides colors,
+        LocalOcMono provides ocMonoTypography(),
+        LocalReducedMotion provides reducedMotion,
+    ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(),
             typography = ocMaterialTypography(),

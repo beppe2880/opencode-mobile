@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
@@ -62,6 +63,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.label
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
@@ -221,6 +223,7 @@ internal fun CategoryScreen(
 @Composable
 private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (SettingsEvent) -> Unit, wide: Boolean, scroll: ScrollState) {
     val c = OcTheme.colors
+    val reduced = OcTheme.reducedMotion
     val target = state.focus?.takeIf { it.area == area }?.anchor(state.settings, state.notificationsOn)
     val highlight = remember(target) { Animatable(if (target != null) 1f else 0f) }
     // The options and the target, once laid out: where the target is below the top of the options.
@@ -238,7 +241,8 @@ private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (
     Column(Modifier.onGloballyPositioned { page = it }) {
         visibleGroups(area, state.settings, state.notificationsOn, wide).forEach { group ->
             val content: @Composable () -> Unit = {
-                OcCard {
+                // An option turned on unrolls the ones that depend on it under it; off, they roll back up.
+                OcCard(Modifier.animateContentSize(OcMotion.sizeSpec(reduced))) {
                     group.options.forEachIndexed { i, option ->
                         val indent = NestIndent * option.depthIn(group)
                         // A nested option's divider starts at its indent, so it reads as part of its parent.

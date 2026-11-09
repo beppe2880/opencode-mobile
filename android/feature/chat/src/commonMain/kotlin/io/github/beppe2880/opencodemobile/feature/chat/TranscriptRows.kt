@@ -1,7 +1,5 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +46,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
+import io.github.beppe2880.opencodemobile.core.ui.components.animateChevronRotation
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.OcMarkdown
 import io.github.beppe2880.opencodemobile.core.ui.text.formatCost
@@ -225,7 +224,7 @@ internal fun ReasoningBlock(
             if (item.streaming) OcSpinner(size = 10.dp)
         }
         // Summarized thinking only arrives at the end: no empty box while it streams.
-        AnimatedVisibility(visible = open && item.text.isNotBlank()) {
+        OcExpandable(visible = open && item.text.isNotBlank(), label = "reasoning") {
             ThoughtText(item.text)
         }
     }
@@ -273,10 +272,10 @@ internal fun ThoughtsGroup(
             )
             if (item.streaming) OcSpinner(size = 10.dp)
         }
-        AnimatedVisibility(visible = followLatest) {
+        OcExpandable(visible = followLatest, label = "latest_thought") {
             ThoughtText(latest.text)
         }
-        AnimatedVisibility(visible = expanded) {
+        OcExpandable(visible = expanded, label = "thoughts") {
             Column(
                 modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
@@ -317,7 +316,8 @@ internal fun DisclosureRow(
     content: @Composable RowScope.() -> Unit,
 ) {
     val c = OcTheme.colors
-    val rotation by animateFloatAsState(if (expanded) 0f else -90f, label = "chevron")
+    // Points to the end while folded and down once open, turning with the content.
+    val rotation = animateChevronRotation(expanded, collapsedDegrees = -90f, expandedDegrees = 0f)
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(OcRadius.sm))
@@ -382,7 +382,7 @@ internal fun NoticeRow(
             Box(Modifier.weight(1f).heightIn(min = 1.dp, max = 1.dp).background(c.borderMuted))
         }
         if (summary != null) {
-            AnimatedVisibility(visible = expanded) {
+            OcExpandable(visible = expanded, label = "compaction_summary") {
                 Box(
                     Modifier
                         .padding(top = OcSpacing.xs)

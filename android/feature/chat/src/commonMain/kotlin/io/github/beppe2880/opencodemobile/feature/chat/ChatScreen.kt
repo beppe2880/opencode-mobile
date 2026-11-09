@@ -68,12 +68,14 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
@@ -144,7 +146,11 @@ fun ChatScreen(
                     onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
-                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
+                // Unrolls under the header when work starts in the background, rolls back up when it ends.
+                val work = rememberLastNonNull(state.work.takeIf { state.showsRunningLine })
+                OcExpandable(visible = state.showsRunningLine, label = "chat_running_line") {
+                    work?.let { RunningLine(it, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) }) }
+                }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

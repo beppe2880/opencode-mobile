@@ -1,6 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -60,20 +61,23 @@ internal fun PermissionCard(
 ) {
     val c = OcTheme.colors
     val collapse by rememberUpdatedState(onCollapse)
+    val reduced = OcTheme.reducedMotion
     OcCard(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize()
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag("permission_card"),
         color = if (c.isDark) c.layer01 else c.warning.bg,
         borderColor = c.warning.border,
         shape = RoundedCornerShape(OcRadius.xl),
     ) {
-        if (collapsed) {
-            CollapsedPermission(request, pendingCount, onExpand = { collapse(false) })
-        } else {
-            ExpandedPermission(request, pendingCount, replying, onCollapse = { collapse(true) }, onReply)
+        // The bar and the open card crossfade while the card grows up from the composer or shrinks back.
+        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(reduced) }, label = "permission_card") { folded ->
+            if (folded) {
+                CollapsedPermission(request, pendingCount, onExpand = { collapse(false) })
+            } else {
+                ExpandedPermission(request, pendingCount, replying, onCollapse = { collapse(true) }, onReply)
+            }
         }
     }
 }
