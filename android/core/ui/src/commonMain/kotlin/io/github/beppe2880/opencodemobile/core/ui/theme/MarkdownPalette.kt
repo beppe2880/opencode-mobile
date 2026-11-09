@@ -4,8 +4,19 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 /**
- * The markdown colors of the OpenCode terminal app's default theme (`opencode.json` and the
- * markdown scopes of its syntax rules), used by colored markdown in the chat.
+ * The markdown colors of the OpenCode terminal app's default theme, used by colored markdown in
+ * the chat. The values are the `markdown*` tokens of `packages/tui/src/theme/assets/opencode.json`
+ * and the styles follow the markdown scopes of the syntax rules in `packages/tui/src/theme/index.ts`:
+ *
+ * - [heading]: `markup.heading` = `markdownHeading`, bold; `markup.heading.1` is also underlined.
+ * - [strong]: `markup.strong` = `markdownStrong`, bold.
+ * - [emphasis]: `markup.italic` = `markdownEmph`, italic.
+ * - [inlineCode]: `markup.raw.inline` = `markdownCode`.
+ * - [linkText]: `markup.link.label`, the visible text of a link = `markdownLinkText`, underlined.
+ *   The URL (`markup.link.url` = `markdownLink`) is never shown, so it has no color here.
+ * - [blockQuote]: `markup.quote` = `markdownBlockQuote`, italic, for the quote text and its bar.
+ * - [listBullet]: `markup.list` bullets = `markdownListItem`.
+ * - [listNumber]: ordered list numbers = `markdownListEnumeration`.
  */
 @Immutable
 data class OcMarkdownPalette(
@@ -13,7 +24,7 @@ data class OcMarkdownPalette(
     val strong: Color,
     val emphasis: Color,
     val inlineCode: Color,
-    val link: Color,
+    val linkText: Color,
     val blockQuote: Color,
     val listBullet: Color,
     val listNumber: Color,
@@ -28,7 +39,7 @@ private val DarkMarkdownPalette = OcMarkdownPalette(
     strong = Color(0xFFF5A742),
     emphasis = Color(0xFFE5C07B),
     inlineCode = Color(0xFF7FD88F),
-    link = Color(0xFFFAB283),
+    linkText = Color(0xFF56B6C2),
     blockQuote = Color(0xFFE5C07B),
     listBullet = Color(0xFFFAB283),
     listNumber = Color(0xFF56B6C2),
@@ -39,7 +50,7 @@ private val LightMarkdownPalette = OcMarkdownPalette(
     strong = Color(0xFFD68C27),
     emphasis = Color(0xFFB0851F),
     inlineCode = Color(0xFF3D9A57),
-    link = Color(0xFF3B7DD8),
+    linkText = Color(0xFF318795),
     blockQuote = Color(0xFFB0851F),
     listBullet = Color(0xFF3B7DD8),
     listNumber = Color(0xFF318795),

@@ -94,7 +94,7 @@ control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
 | `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section. |
 | `OcTopBar` | 56dp bar with optional back button, title accessory (status dot), subtitle or custom subtitle content, and actions; owns the status bar inset. |
 | `OcLogo` | Canvas-drawn OpenCode-style mark. |
-| `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. With `LocalColoredMarkdown` (the "Colored markdown" setting) headings, bold, italic, inline code, links and quotes take `OcColors.markdownPalette`, the OpenCode TUI default-theme colors for the light or dark theme. |
+| `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. With `LocalColoredMarkdown` (the "Colored markdown" setting) the markdown follows the OpenCode TUI default theme (`OcColors.markdownPalette`, light or dark): headings bold (h1 underlined), bold and italic text, inline code, link text cyan and underlined, quotes italic with their text and bar colored, bullets and numbers of lists. Styles nested in a quote keep their colors; code blocks never change. Off renders as before. |
 | `Modifier.exposeTestTags()` | Applies `testTagsAsResourceId` inside popups, dialogs and sheets (separate composition roots). |
 
 Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Throwable.toUiText()`

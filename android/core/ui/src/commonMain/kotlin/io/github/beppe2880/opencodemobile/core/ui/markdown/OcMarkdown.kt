@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.core.ui.markdown
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -14,6 +15,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import com.mikepenz.markdown.compose.LocalMarkdownTypography
+import com.mikepenz.markdown.compose.components.CurrentComponentsBridge
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeBlock
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeFence
@@ -53,8 +56,28 @@ fun OcMarkdown(
     val highlights = remember(colors.isDark) {
         Highlights.Builder().theme(SyntaxThemes.atom(darkMode = colors.isDark))
     }
-    val components = remember(highlights) {
+    val colored = LocalColoredMarkdown.current
+    val palette = if (colored) colors.markdownPalette else null
+    val mdColors = remember(colors) { markdownColors(colors) }
+    val mdTypography = remember(typography, colors, mono, colored) { markdownTypography(typography, mono, colors, palette) }
+    // The renderer lays out the paragraphs of a quote like any other, with the paragraph style of
+    // the current typography: colored quotes provide one whose text is the quote style.
+    val quoteTypography = remember(typography, colors, mono, colored) {
+        palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true) }
+    }
+    val annotator = remember(colors.isDark, colored) {
+        if (palette != null) coloredAnnotator(palette) else markdownAnnotator()
+    }
+    val components = remember(highlights, quoteTypography) {
+        val defaultBlockQuote = CurrentComponentsBridge.blockQuote
         markdownComponents(
+            blockQuote = if (quoteTypography == null) {
+                defaultBlockQuote
+            } else {
+                { model ->
+                    CompositionLocalProvider(LocalMarkdownTypography provides quoteTypography) { defaultBlockQuote(model) }
+                }
+            },
             codeFence = {
                 MarkdownHighlightedCodeFence(
                     content = it.content,
@@ -95,14 +118,6 @@ fun OcMarkdown(
             },
         )
     }
-    val colored = LocalColoredMarkdown.current
-    val mdColors = remember(colors) { markdownColors(colors) }
-    val mdTypography = remember(typography, colors, mono, colored) {
-        markdownTypography(typography, mono, colors, if (colored) colors.markdownPalette else null)
-    }
-    val annotator = remember(colors.isDark, colored) {
-        if (colored) coloredAnnotator(colors.markdownPalette) else markdownAnnotator()
-    }
     val state = cache.stateFor(id, content)
     Markdown(
         state = state,
@@ -115,8 +130,9 @@ fun OcMarkdown(
 }
 
 /**
- * Whether [OcMarkdown] colors headings, bold and italic text, inline code, links and quotes with
- * the [OcMarkdownPalette] of the OpenCode terminal app; off renders them in the text color.
+ * Whether [OcMarkdown] colors headings, bold and italic text, inline code, link text, quotes and
+ * list markers with the [OcMarkdownPalette] of the OpenCode terminal app; off renders them in the
+ * text color.
  */
 val LocalColoredMarkdown = compositionLocalOf { false }
 
@@ -129,10 +145,18 @@ private fun markdownColors(c: OcColors): MarkdownColors = DefaultMarkdownColors(
 )
 
 /**
- * The text styles of markdown; with a [palette] (colored markdown) headings, inline code, links
- * and quotes take its colors like in the OpenCode terminal app. Code blocks never change.
+ * The text styles of markdown; with a [palette] (colored markdown) headings, inline code, link
+ * text, quotes and list markers take its colors like in the OpenCode terminal app. Code blocks
+ * never change. [quoteText] gives the text the quote style, for the content of a quote: inline
+ * code, links and (through the annotator) bold and italic text inside keep their own colors.
  */
-private fun markdownTypography(t: Typography, mono: OcMonoTypography, c: OcColors, palette: OcMarkdownPalette?): MarkdownTypography {
+internal fun markdownTypography(
+    t: Typography,
+    mono: OcMonoTypography,
+    c: OcColors,
+    palette: OcMarkdownPalette?,
+    quoteText: Boolean = false,
+): MarkdownTypography {
     val body: TextStyle = t.bodyMedium.copy(color = c.textBase)
     val inlineCode = body.merge(mono.code.copy(fontSize = body.fontSize * 0.92f))
     if (palette == null) {
@@ -158,6 +182,8 @@ private fun markdownTypography(t: Typography, mono: OcMonoTypography, c: OcColor
         )
     }
     fun TextStyle.heading() = copy(color = palette.heading, fontWeight = FontWeight.Bold)
+    val quote = body.copy(color = palette.blockQuote, fontStyle = FontStyle.Italic)
+    val text = if (quoteText) quote else body
     return DefaultMarkdownTypography(
         h1 = t.titleLarge.heading().copy(textDecoration = TextDecoration.Underline),
         h2 = t.titleMedium.heading(),
@@ -165,16 +191,18 @@ private fun markdownTypography(t: Typography, mono: OcMonoTypography, c: OcColor
         h4 = t.titleSmall.heading(),
         h5 = body.heading(),
         h6 = body.heading(),
-        text = body,
+        text = text,
         code = mono.codeSmall,
         inlineCode = inlineCode.copy(color = palette.inlineCode),
-        quote = body.copy(color = palette.blockQuote, fontStyle = FontStyle.Italic),
-        paragraph = body,
-        ordered = body,
-        bullet = body,
-        list = body,
+        quote = quote,
+        paragraph = text,
+        // The list renderers draw their marker (number or bullet) with these styles and the
+        // item content as paragraphs.
+        ordered = body.copy(color = palette.listNumber),
+        bullet = body.copy(color = palette.listBullet),
+        list = text,
         textLink = TextLinkStyles(
-            style = body.copy(color = palette.link, textDecoration = TextDecoration.Underline).toSpanStyle(),
+            style = body.copy(color = palette.linkText, textDecoration = TextDecoration.Underline).toSpanStyle(),
         ),
         table = t.bodySmall,
     )
