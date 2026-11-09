@@ -43,6 +43,8 @@
     <string name="sessions_actions_title">إجراءات الجلسة</string>
     <string name="sessions_running_a11y">الوكيل قيد التشغيل</string>
     <string name="sessions_new_show_all">عرض كل المشاريع (%1$d)</string>
+    <string name="sessions_new_project_search">البحث عن مشاريع</string>
+    <string name="sessions_new_project_search_empty">لا توجد مشاريع مطابقة</string>
     <string name="sessions_untitled">جلسة بلا عنوان</string>
     <string name="sessions_preview_swipe_on">اسحب يساراً أو يميناً داخل الدردشة لفتح الجلسة التالية أو السابقة</string>
     <string name="sessions_preview_swipe_off">إيقاف: ارجع إلى القائمة لفتح جلسة أخرى</string>
