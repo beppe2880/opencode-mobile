@@ -96,6 +96,7 @@
     <string name="chat_new_messages">새 메시지</string>
     <string name="chat_command_compact">기록을 요약하여 컨텍스트 확보</string>
     <string name="chat_command_fork">이 세션을 새 세션으로 복사</string>
+    <string name="chat_command_new">이 디렉터리에서 새 채팅 시작</string>
     <string name="chat_context">컨텍스트</string>
     <string name="chat_context_tokens">토큰 %1$s개</string>
     <string name="chat_context_of">%2$s의 %1$d%</string>

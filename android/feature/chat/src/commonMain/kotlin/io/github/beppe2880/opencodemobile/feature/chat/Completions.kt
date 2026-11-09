@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_compact
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_fork
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_mcps
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_new
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_command_undo
 import org.jetbrains.compose.resources.StringResource
@@ -15,6 +16,7 @@ import org.jetbrains.compose.resources.StringResource
 internal object Completions {
     /** Commands the app runs itself, like the OpenCode TUI, instead of sending them. */
     enum class Builtin(val command: String, val description: StringResource) {
+        New("new", Res.string.chat_command_new),
         Undo("undo", Res.string.chat_command_undo),
         Redo("redo", Res.string.chat_command_redo),
         Compact("compact", Res.string.chat_command_compact),

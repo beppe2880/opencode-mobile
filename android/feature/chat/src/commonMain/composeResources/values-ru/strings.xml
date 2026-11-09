@@ -123,6 +123,7 @@
     <string name="chat_new_messages">Новые сообщения</string>
     <string name="chat_command_compact">Сжать историю, чтобы освободить контекст</string>
     <string name="chat_command_fork">Скопировать эту сессию в новую</string>
+    <string name="chat_command_new">Начать новый чат в этой папке</string>
     <string name="chat_context">Контекст</string>
     <string name="chat_context_tokens">%1$s токенов</string>
     <string name="chat_context_of">%1$d% из %2$s</string>

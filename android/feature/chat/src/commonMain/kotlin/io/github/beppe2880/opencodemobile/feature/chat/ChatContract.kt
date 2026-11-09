@@ -85,6 +85,7 @@ data class ChatState(
     val revertedCount: Int = 0,
     val reverting: Boolean = false,
     val forking: Boolean = false,
+    val creatingSession: Boolean = false,
     /** Blocking work the user can move to the background; the hint shows once it runs long. */
     val backgroundable: BackgroundableWork? = null,
     /** Context the next step will use; null before the first reply or right after a compaction. */
@@ -140,7 +141,7 @@ data class ChatState(
     /** The draft is a `!command` for the session's shell. */
     val isShell: Boolean get() = Completions.shell(draft) != null
     val canSend: Boolean get() = when {
-        sending || reverting -> false
+        sending || reverting || creatingSession -> false
         isShell -> !Completions.shell(draft).isNullOrEmpty()
         else -> draft.isNotBlank() || uploads.isNotEmpty()
     }
