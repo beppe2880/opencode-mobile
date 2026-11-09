@@ -231,6 +231,34 @@
         <item quantity="one">%1$d Subagent konnte nicht beendet werden</item>
         <item quantity="other">%1$d Subagenten konnten nicht beendet werden</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d Shell</item>
+        <item quantity="other">%1$d Shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d Agent</item>
+        <item quantity="other">%1$d Agenten</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d Shell läuft</item>
+        <item quantity="other">%1$d Shells laufen</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d Agent läuft</item>
+        <item quantity="other">%1$d Agenten laufen</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agenten</string>
+    <string name="chat_running_status_running">Läuft · %1$s</string>
+    <string name="chat_running_status_exited">Beendet · %1$s</string>
+    <string name="chat_running_status_finished">Fertig · %1$s</string>
+    <string name="chat_running_status_ended">Beendet</string>
+    <string name="chat_running_stop_shell">Shell beenden</string>
+    <string name="chat_running_stop_subagent">Agent stoppen</string>
+    <string name="chat_running_copy_command">Befehl kopieren</string>
+    <string name="chat_running_share">Teilen</string>
+    <string name="chat_running_open_session">Sitzung öffnen</string>
+    <string name="chat_running_agent_untitled">Subagent</string>
     <string name="chat_preview_folds">Live verfolgte Schritte klappen am Ende der Antwort wieder zu</string>
     <string name="chat_preview_kept_open">Live verfolgte Schritte bleiben nach der Antwort geöffnet</string>
     <string name="chat_preview_not_followed">Laufende Schritte bleiben zugeklappt, bis du sie öffnest</string>

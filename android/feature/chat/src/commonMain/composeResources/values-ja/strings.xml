@@ -216,6 +216,30 @@
     <plurals name="chat_running_stop_agents_failed">
         <item quantity="other">%1$d 件のサブエージェントを停止できませんでした</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="other">シェル %1$d</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="other">エージェント %1$d</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="other">%1$d 個のシェルが実行中</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="other">%1$d 個のエージェントが実行中</item>
+    </plurals>
+    <string name="chat_running_list_shells">シェル</string>
+    <string name="chat_running_list_agents">エージェント</string>
+    <string name="chat_running_status_running">実行中 · %1$s</string>
+    <string name="chat_running_status_exited">終了 · %1$s</string>
+    <string name="chat_running_status_finished">完了 · %1$s</string>
+    <string name="chat_running_status_ended">終了</string>
+    <string name="chat_running_stop_shell">シェルを停止</string>
+    <string name="chat_running_stop_subagent">エージェントを停止</string>
+    <string name="chat_running_copy_command">コマンドをコピー</string>
+    <string name="chat_running_share">共有</string>
+    <string name="chat_running_open_session">セッションを開く</string>
+    <string name="chat_running_agent_untitled">サブエージェント</string>
     <string name="chat_preview_folds">リアルタイムで追跡された手順は、回答の終了時に折りたたまれます</string>
     <string name="chat_preview_kept_open">リアルタイムで追跡された手順は、回答後も開いたままになります</string>
     <string name="chat_preview_not_followed">実行中の手順は、開くまで折りたたまれたままです</string>

@@ -231,6 +231,34 @@
         <item quantity="one">Impossible d’arrêter %1$d sous-agent</item>
         <item quantity="other">Impossible d’arrêter %1$d sous-agents</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agent</item>
+        <item quantity="other">%1$d agents</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell en cours</item>
+        <item quantity="other">%1$d shells en cours</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agent en cours</item>
+        <item quantity="other">%1$d agents en cours</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agents</string>
+    <string name="chat_running_status_running">En cours · %1$s</string>
+    <string name="chat_running_status_exited">Terminé · %1$s</string>
+    <string name="chat_running_status_finished">Fini · %1$s</string>
+    <string name="chat_running_status_ended">Terminé</string>
+    <string name="chat_running_stop_shell">Arrêter le shell</string>
+    <string name="chat_running_stop_subagent">Arrêter l’agent</string>
+    <string name="chat_running_copy_command">Copier la commande</string>
+    <string name="chat_running_share">Partager</string>
+    <string name="chat_running_open_session">Ouvrir la session</string>
+    <string name="chat_running_agent_untitled">Sous-agent</string>
     <string name="chat_preview_folds">Les étapes suivies en direct se replient à la fin de la réponse</string>
     <string name="chat_preview_kept_open">Les étapes suivies en direct restent ouvertes après la réponse</string>
     <string name="chat_preview_not_followed">Les étapes en cours restent repliées jusqu’à ce que vous les ouvriez</string>

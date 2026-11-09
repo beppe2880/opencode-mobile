@@ -231,6 +231,34 @@
         <item quantity="one">No se pudo detener %1$d subagente</item>
         <item quantity="other">No se pudieron detener %1$d subagentes</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agente</item>
+        <item quantity="other">%1$d agentes</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell en ejecución</item>
+        <item quantity="other">%1$d shells en ejecución</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agente en ejecución</item>
+        <item quantity="other">%1$d agentes en ejecución</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agentes</string>
+    <string name="chat_running_status_running">En ejecución · %1$s</string>
+    <string name="chat_running_status_exited">Terminado · %1$s</string>
+    <string name="chat_running_status_finished">Finalizado · %1$s</string>
+    <string name="chat_running_status_ended">Terminado</string>
+    <string name="chat_running_stop_shell">Detener shell</string>
+    <string name="chat_running_stop_subagent">Detener agente</string>
+    <string name="chat_running_copy_command">Copiar comando</string>
+    <string name="chat_running_share">Compartir</string>
+    <string name="chat_running_open_session">Abrir sesión</string>
+    <string name="chat_running_agent_untitled">Subagente</string>
     <string name="chat_preview_folds">Los pasos seguidos en directo se pliegan al terminar la respuesta</string>
     <string name="chat_preview_kept_open">Los pasos seguidos en directo quedan abiertos tras la respuesta</string>
     <string name="chat_preview_not_followed">Los pasos en ejecución permanecen plegados hasta que los abras</string>

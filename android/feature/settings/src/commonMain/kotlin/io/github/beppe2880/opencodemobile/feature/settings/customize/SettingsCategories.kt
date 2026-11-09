@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_header
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_running_line
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
@@ -125,6 +126,7 @@ val SettingsArea.groups: List<OptionGroup>
             ),
             OptionGroup(UiRes.string.oc_part_header, listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)),
             OptionGroup(UiRes.string.oc_part_pending, listOf(SettingOption.QuestionsCollapsed, SettingOption.PermissionsCollapsed)),
+            OptionGroup(UiRes.string.oc_part_running_line, listOf(SettingOption.RunningChips)),
             OptionGroup(Res.string.settings_group_gestures, listOf(SettingOption.SwipeChats)),
         )
         SettingsArea.LiveActivity -> listOf(

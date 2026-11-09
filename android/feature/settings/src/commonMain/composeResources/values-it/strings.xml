@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">Conta i sottoagenti e i comandi in background sotto ogni sessione</string>
     <string name="settings_confirm_stop">Conferma prima di interrompere i comandi</string>
     <string name="settings_confirm_stop_sub">Chiedi conferma prima di interrompere un comando in background dal pannello In esecuzione</string>
+    <string name="settings_running_chips">Attività in corso sopra la casella del messaggio</string>
+    <string name="settings_running_chips_sub">Dei chip sopra la casella del messaggio contano le shell e i subagenti in esecuzione; toccane uno per seguirli o fermarli</string>
     <string name="settings_show_cost">Mostra costo</string>
     <string name="settings_show_cost_sub">Mostra sotto la risposta il costo in dollari di ogni turno</string>
     <string name="settings_header_line">Riga di intestazione della chat</string>

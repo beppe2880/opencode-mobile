@@ -121,6 +121,8 @@ fun ChatScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     listState: LazyListState = rememberLazyListState(),
     markdownCache: MarkdownCache = rememberMarkdownCache(),
+    /** Shares text through the system; null hides sharing. */
+    onShare: ((String) -> Unit)? = null,
 ) {
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
@@ -204,6 +206,11 @@ fun ChatScreen(
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
     if (state.workOpen) RunningSheet(state, onEvent)
+    state.runningPanel?.let { panel ->
+        panel.item?.let { item -> RunningItemSheet(state, panel, item, onEvent, onCopy, onShare) }
+    }
+    // After the sheets, so a confirmation shows over the one that asked for it.
+    RunningStopDialogs(state, onEvent)
     if (contextOpen) {
         ContextSheet(
             context = state.context,

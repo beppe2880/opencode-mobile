@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">각 세션 아래에 실행 중인 하위 에이전트와 백그라운드 명령 수를 표시</string>
     <string name="settings_confirm_stop">명령 중지 전 확인</string>
     <string name="settings_confirm_stop_sub">실행 중 시트에서 백그라운드 명령을 중지하기 전에 확인합니다</string>
+    <string name="settings_running_chips">메시지 상자 위에 실행 중인 작업 표시</string>
+    <string name="settings_running_chips_sub">메시지 상자 위의 칩에 실행 중인 셸과 하위 에이전트 수가 표시됩니다. 탭하면 확인하거나 중지할 수 있습니다</string>
     <string name="settings_show_cost">비용 표시</string>
     <string name="settings_show_cost_sub">응답 아래에 각 턴의 달러 비용 표시</string>
     <string name="settings_header_line">채팅 헤더 줄</string>

@@ -81,6 +81,7 @@ class PreferencesRepositoriesTest {
             groupThoughts = false,
             showRunningWorkInList = false,
             confirmStopCommand = false,
+            runningChips = false,
             questionsCollapsed = true,
             permissionsCollapsed = true,
             terminalKeys = keys,
@@ -116,6 +117,7 @@ class PreferencesRepositoriesTest {
         val reopened = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
 
         assertEquals(changed, reopened)
+        assertEquals(false, prefs.values["running_chips"])
         assertEquals(AppSettings(), PreferencesSettingsRepository(SharedPreferencesSettings(InMemoryPreferences())).settings.value)
     }
 

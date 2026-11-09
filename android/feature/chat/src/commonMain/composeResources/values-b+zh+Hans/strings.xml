@@ -216,6 +216,30 @@
     <plurals name="chat_running_stop_agents_failed">
         <item quantity="other">无法停止 %1$d 个子代理</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="other">%1$d 个 Shell</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="other">%1$d 个代理</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="other">%1$d 个 Shell 正在运行</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="other">%1$d 个代理正在运行</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shell</string>
+    <string name="chat_running_list_agents">代理</string>
+    <string name="chat_running_status_running">运行中 · %1$s</string>
+    <string name="chat_running_status_exited">已退出 · %1$s</string>
+    <string name="chat_running_status_finished">已完成 · %1$s</string>
+    <string name="chat_running_status_ended">已结束</string>
+    <string name="chat_running_stop_shell">停止 Shell</string>
+    <string name="chat_running_stop_subagent">停止代理</string>
+    <string name="chat_running_copy_command">复制命令</string>
+    <string name="chat_running_share">分享</string>
+    <string name="chat_running_open_session">打开会话</string>
+    <string name="chat_running_agent_untitled">子代理</string>
     <string name="chat_preview_folds">实时跟随的步骤在回答结束后会折叠</string>
     <string name="chat_preview_kept_open">实时跟随的步骤在回答结束后保持展开</string>
     <string name="chat_preview_not_followed">运行中的步骤保持折叠，直到你打开它们</string>

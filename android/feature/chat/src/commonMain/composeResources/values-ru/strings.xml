@@ -261,6 +261,42 @@
         <item quantity="many">Не удалось остановить %1$d субагентов</item>
         <item quantity="other">Не удалось остановить %1$d субагентов</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d оболочка</item>
+        <item quantity="few">%1$d оболочки</item>
+        <item quantity="many">%1$d оболочек</item>
+        <item quantity="other">%1$d оболочки</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d агент</item>
+        <item quantity="few">%1$d агента</item>
+        <item quantity="many">%1$d агентов</item>
+        <item quantity="other">%1$d агента</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">Выполняется %1$d оболочка</item>
+        <item quantity="few">Выполняются %1$d оболочки</item>
+        <item quantity="many">Выполняются %1$d оболочек</item>
+        <item quantity="other">Выполняются %1$d оболочки</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">Выполняется %1$d агент</item>
+        <item quantity="few">Выполняются %1$d агента</item>
+        <item quantity="many">Выполняются %1$d агентов</item>
+        <item quantity="other">Выполняются %1$d агента</item>
+    </plurals>
+    <string name="chat_running_list_shells">Оболочки</string>
+    <string name="chat_running_list_agents">Агенты</string>
+    <string name="chat_running_status_running">Выполняется · %1$s</string>
+    <string name="chat_running_status_exited">Завершена · %1$s</string>
+    <string name="chat_running_status_finished">Завершён · %1$s</string>
+    <string name="chat_running_status_ended">Завершено</string>
+    <string name="chat_running_stop_shell">Остановить оболочку</string>
+    <string name="chat_running_stop_subagent">Остановить агента</string>
+    <string name="chat_running_copy_command">Копировать команду</string>
+    <string name="chat_running_share">Поделиться</string>
+    <string name="chat_running_open_session">Открыть сеанс</string>
+    <string name="chat_running_agent_untitled">Субагент</string>
     <string name="chat_preview_folds">Шаги, которые отслеживались в реальном времени, сворачиваются по окончании ответа</string>
     <string name="chat_preview_kept_open">Шаги, которые отслеживались в реальном времени, остаются открытыми после ответа</string>
     <string name="chat_preview_not_followed">Выполняющиеся шаги остаются свернутыми, пока вы их не откроете</string>

@@ -291,6 +291,50 @@
         <item quantity="many">تعذر إيقاف %1$d وكيلاً فرعياً</item>
         <item quantity="other">تعذر إيقاف %1$d وكيل فرعي</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="zero">%1$d صدفة</item>
+        <item quantity="one">صدفة واحدة (%1$d)</item>
+        <item quantity="two">صدفتان (%1$d)</item>
+        <item quantity="few">%1$d صدفات</item>
+        <item quantity="many">%1$d صدفة</item>
+        <item quantity="other">%1$d صدفة</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="zero">%1$d وكيل</item>
+        <item quantity="one">وكيل واحد (%1$d)</item>
+        <item quantity="two">وكيلان (%1$d)</item>
+        <item quantity="few">%1$d وكلاء</item>
+        <item quantity="many">%1$d وكيلاً</item>
+        <item quantity="other">%1$d وكيل</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="zero">%1$d صدفة قيد التشغيل</item>
+        <item quantity="one">صدفة واحدة قيد التشغيل (%1$d)</item>
+        <item quantity="two">صدفتان قيد التشغيل (%1$d)</item>
+        <item quantity="few">%1$d صدفات قيد التشغيل</item>
+        <item quantity="many">%1$d صدفة قيد التشغيل</item>
+        <item quantity="other">%1$d صدفة قيد التشغيل</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="zero">%1$d وكيل قيد التشغيل</item>
+        <item quantity="one">وكيل واحد قيد التشغيل (%1$d)</item>
+        <item quantity="two">وكيلان قيد التشغيل (%1$d)</item>
+        <item quantity="few">%1$d وكلاء قيد التشغيل</item>
+        <item quantity="many">%1$d وكيلاً قيد التشغيل</item>
+        <item quantity="other">%1$d وكيل قيد التشغيل</item>
+    </plurals>
+    <string name="chat_running_list_shells">الصدفات</string>
+    <string name="chat_running_list_agents">الوكلاء</string>
+    <string name="chat_running_status_running">قيد التشغيل · %1$s</string>
+    <string name="chat_running_status_exited">انتهت · %1$s</string>
+    <string name="chat_running_status_finished">اكتمل · %1$s</string>
+    <string name="chat_running_status_ended">انتهى</string>
+    <string name="chat_running_stop_shell">إيقاف الصدفة</string>
+    <string name="chat_running_stop_subagent">إيقاف الوكيل</string>
+    <string name="chat_running_copy_command">نسخ الأمر</string>
+    <string name="chat_running_share">مشاركة</string>
+    <string name="chat_running_open_session">فتح الجلسة</string>
+    <string name="chat_running_agent_untitled">وكيل فرعي</string>
     <string name="chat_preview_folds">الخطوات التي تتابعها مباشرة تُطوى عند انتهاء الرد</string>
     <string name="chat_preview_kept_open">الخطوات التي تتابعها مباشرة تبقى مفتوحة بعد الرد</string>
     <string name="chat_preview_not_followed">تبقى خطوات التشغيل مطوية حتى تفتحها</string>
