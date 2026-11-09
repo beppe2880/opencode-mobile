@@ -242,6 +242,14 @@
     <string name="chat_running_share">공유</string>
     <string name="chat_running_open_session">세션 열기</string>
     <string name="chat_running_agent_untitled">하위 에이전트</string>
+    <string name="chat_running_open">열기</string>
+    <string name="chat_running_open_agent_description">에이전트 세션 열기: %1$s</string>
+    <string name="chat_running_open_shell_description">셸 출력 열기: %1$s</string>
+    <string name="chat_running_stop_agents_label">에이전트 모두 중지</string>
+    <string name="chat_running_stop_shells_label">셸 모두 중지</string>
+    <string name="chat_running_stop_everything_description">실행 중인 모든 작업 중지</string>
+    <string name="chat_running_stop_everything_title">실행 중인 모든 작업을 중지할까요?</string>
+    <string name="chat_running_stop_everything_message">하위 에이전트가 중단되고 이 세션이 시작한 명령이 종료됩니다. 이 세션과 프로젝트의 다른 명령은 계속 실행됩니다.</string>
     <string name="chat_preview_folds">실시간으로 따라간 단계는 답변이 끝나면 다시 접힙니다</string>
     <string name="chat_preview_kept_open">실시간으로 따라간 단계는 답변 후에도 열린 상태로 유지됩니다</string>
     <string name="chat_preview_not_followed">실행 중인 단계는 열기 전까지 접힌 상태로 유지됩니다</string>

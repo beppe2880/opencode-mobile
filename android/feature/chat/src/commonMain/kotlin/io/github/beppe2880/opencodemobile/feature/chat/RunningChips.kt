@@ -19,8 +19,8 @@ data class RunningEntry(
 data class RunningChip(val group: RunningGroup, val count: Int)
 
 /**
- * What the running chips opened: the list of [group] (a popover above the composer), or one
- * [item] of it in a sheet. [endedAt] (server clock) is set once [item] no longer runs, so its
+ * What the running chips opened: the list of everything that runs (a popover above the
+ * composer), [group] (the chip tapped) first, or one [item] of [group] in a sheet. [endedAt] (server clock) is set once [item] no longer runs, so its
  * sheet shows how long it ran instead of disappearing.
  */
 data class RunningPanel(
@@ -50,13 +50,81 @@ internal fun runningChips(work: RunningWork, enabled: Boolean): List<RunningChip
         }
     }
 
+/** The running line under the header, unless the chips above the composer already show what runs. */
+internal val ChatState.showsRunningLine: Boolean
+    get() = !work.isEmpty && runningChips(work, runningChips).isEmpty()
+
+/** The kinds the list shows, [first] (the chip tapped) first; only those that run. */
+internal fun RunningWork.listGroups(first: RunningGroup): List<RunningGroup> =
+    (listOf(first) + RunningGroup.entries).distinct().filter { count(it) > 0 }
+
+/** A Stop in the footer of the running list. */
+internal sealed interface RunningStop {
+    /** The only item that runs: its own Stop, with its confirmation. */
+    data class One(val entry: RunningEntry) : RunningStop
+
+    /** Everything that runs: the subagents and this session's shells. */
+    data object All : RunningStop
+
+    /** Every item of [group]; [count] picks "Stop agent" or "Stop agents". */
+    data class Group(val group: RunningGroup, val count: Int) : RunningStop
+}
+
+/**
+ * The Stops of the running list: one item alone gets its own Stop; one kind only, its group's;
+ * both kinds, Stop all and each group's.
+ */
+internal fun runningStops(work: RunningWork): List<RunningStop> {
+    val agents = work.count(RunningGroup.Agents)
+    val shells = work.count(RunningGroup.Commands)
+    return when {
+        agents + shells == 0 -> emptyList()
+        agents + shells == 1 -> listOf(RunningStop.One((work.entries(RunningGroup.Agents) + work.entries(RunningGroup.Commands)).single()))
+        agents > 0 && shells > 0 -> listOf(
+            RunningStop.All,
+            RunningStop.Group(RunningGroup.Agents, agents),
+            RunningStop.Group(RunningGroup.Commands, shells),
+        )
+        agents > 0 -> listOf(RunningStop.Group(RunningGroup.Agents, agents))
+        else -> listOf(RunningStop.Group(RunningGroup.Commands, shells))
+    }
+}
+
+/** What pressing [this] sends; each asks for confirmation as its counterpart elsewhere does. */
+internal val RunningStop.event: ChatEvent
+    get() = when (this) {
+        is RunningStop.One -> when (entry.group) {
+            RunningGroup.Commands -> ChatEvent.StopCommand(entry.id)
+            RunningGroup.Agents -> ChatEvent.StopAgent(entry.id)
+        }
+        RunningStop.All -> ChatEvent.StopAll(StopAllTarget.Everything)
+        is RunningStop.Group -> ChatEvent.StopAll(group)
+    }
+
+/** Everything [this] would stop is already stopping. */
+internal fun RunningStop.stopping(state: ChatState): Boolean {
+    val shells = state.work.commands.all { it.id in state.stoppingCommands }
+    val agents = state.work.agents.all { it.session.id in state.stoppingAgents }
+    return when (this) {
+        is RunningStop.One -> when (entry.group) {
+            RunningGroup.Commands -> entry.id in state.stoppingCommands
+            RunningGroup.Agents -> entry.id in state.stoppingAgents
+        }
+        RunningStop.All -> shells && agents
+        is RunningStop.Group -> when (group) {
+            RunningGroup.Commands -> shells
+            RunningGroup.Agents -> agents
+        }
+    }
+}
+
 /**
  * The panel after a refresh to [work] at [serverNow]: the open item takes its latest data or,
- * once gone, is marked ended (once); an open list closes when nothing of its kind runs anymore.
+ * once gone, is marked ended (once); an open list closes when nothing runs anymore.
  */
 internal fun RunningPanel.follow(work: RunningWork, serverNow: Long): RunningPanel? {
+    val open = item ?: return takeIf { !work.isEmpty }
     val current = work.entries(group)
-    val open = item ?: return takeIf { current.isNotEmpty() }
     val found = current.firstOrNull { it.id == open.id }
     return when {
         found != null -> copy(item = found, endedAt = null)

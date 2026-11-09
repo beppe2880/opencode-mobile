@@ -337,6 +337,14 @@
     <string name="chat_running_share">مشاركة</string>
     <string name="chat_running_open_session">فتح الجلسة</string>
     <string name="chat_running_agent_untitled">وكيل فرعي</string>
+    <string name="chat_running_open">فتح</string>
+    <string name="chat_running_open_agent_description">فتح جلسة الوكيل: %1$s</string>
+    <string name="chat_running_open_shell_description">فتح مخرجات الصدفة: %1$s</string>
+    <string name="chat_running_stop_agents_label">إيقاف الوكلاء</string>
+    <string name="chat_running_stop_shells_label">إيقاف الصدفات</string>
+    <string name="chat_running_stop_everything_description">إيقاف كل ما يعمل</string>
+    <string name="chat_running_stop_everything_title">إيقاف كل ما يعمل؟</string>
+    <string name="chat_running_stop_everything_message">تتم مقاطعة الوكلاء الفرعيين وإنهاء الأوامر التي بدأتها هذه الجلسة. تستمر هذه الجلسة والأوامر الأخرى في المشروع في العمل.</string>
     <string name="chat_preview_folds">الخطوات التي تتابعها مباشرة تُطوى عند انتهاء الرد</string>
     <string name="chat_preview_kept_open">الخطوات التي تتابعها مباشرة تبقى مفتوحة بعد الرد</string>
     <string name="chat_preview_not_followed">تبقى خطوات التشغيل مطوية حتى تفتحها</string>

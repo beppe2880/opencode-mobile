@@ -261,6 +261,14 @@
     <string name="chat_running_share">Teilen</string>
     <string name="chat_running_open_session">Sitzung öffnen</string>
     <string name="chat_running_agent_untitled">Subagent</string>
+    <string name="chat_running_open">Öffnen</string>
+    <string name="chat_running_open_agent_description">Agentensitzung öffnen: %1$s</string>
+    <string name="chat_running_open_shell_description">Shell-Ausgabe öffnen: %1$s</string>
+    <string name="chat_running_stop_agents_label">Agenten stoppen</string>
+    <string name="chat_running_stop_shells_label">Shells beenden</string>
+    <string name="chat_running_stop_everything_description">Alles Laufende stoppen</string>
+    <string name="chat_running_stop_everything_title">Alles Laufende stoppen?</string>
+    <string name="chat_running_stop_everything_message">Die Subagenten werden unterbrochen und die von dieser Sitzung gestarteten Befehle beendet. Diese Sitzung und andere Befehle im Projekt laufen weiter.</string>
     <string name="chat_preview_folds">Live verfolgte Schritte klappen am Ende der Antwort wieder zu</string>
     <string name="chat_preview_kept_open">Live verfolgte Schritte bleiben nach der Antwort geöffnet</string>
     <string name="chat_preview_not_followed">Laufende Schritte bleiben zugeklappt, bis du sie öffnest</string>

@@ -261,6 +261,14 @@
     <string name="chat_running_share">Compartir</string>
     <string name="chat_running_open_session">Abrir sesión</string>
     <string name="chat_running_agent_untitled">Subagente</string>
+    <string name="chat_running_open">Abrir</string>
+    <string name="chat_running_open_agent_description">Abrir la sesión del agente: %1$s</string>
+    <string name="chat_running_open_shell_description">Abrir la salida de la shell: %1$s</string>
+    <string name="chat_running_stop_agents_label">Detener agentes</string>
+    <string name="chat_running_stop_shells_label">Detener shells</string>
+    <string name="chat_running_stop_everything_description">Detener todo lo que se está ejecutando</string>
+    <string name="chat_running_stop_everything_title">¿Detener todo lo que se está ejecutando?</string>
+    <string name="chat_running_stop_everything_message">Los subagentes se interrumpen y los comandos iniciados por esta sesión terminan. Esta sesión y los demás comandos del proyecto siguen ejecutándose.</string>
     <string name="chat_preview_folds">Los pasos seguidos en directo se pliegan al terminar la respuesta</string>
     <string name="chat_preview_kept_open">Los pasos seguidos en directo quedan abiertos tras la respuesta</string>
     <string name="chat_preview_not_followed">Los pasos en ejecución permanecen plegados hasta que los abras</string>

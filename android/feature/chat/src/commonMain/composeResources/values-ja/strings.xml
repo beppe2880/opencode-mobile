@@ -242,6 +242,14 @@
     <string name="chat_running_share">共有</string>
     <string name="chat_running_open_session">セッションを開く</string>
     <string name="chat_running_agent_untitled">サブエージェント</string>
+    <string name="chat_running_open">開く</string>
+    <string name="chat_running_open_agent_description">エージェントのセッションを開く：%1$s</string>
+    <string name="chat_running_open_shell_description">シェルの出力を開く：%1$s</string>
+    <string name="chat_running_stop_agents_label">エージェントを停止</string>
+    <string name="chat_running_stop_shells_label">シェルを停止</string>
+    <string name="chat_running_stop_everything_description">実行中のすべての処理を停止</string>
+    <string name="chat_running_stop_everything_title">実行中のすべての処理を停止しますか？</string>
+    <string name="chat_running_stop_everything_message">サブエージェントは中断され、このセッションが開始したコマンドは終了します。このセッションとプロジェクト内の他のコマンドは実行を続けます。</string>
     <string name="chat_preview_folds">リアルタイムで追跡された手順は、回答の終了時に折りたたまれます</string>
     <string name="chat_preview_kept_open">リアルタイムで追跡された手順は、回答後も開いたままになります</string>
     <string name="chat_preview_not_followed">実行中の手順は、開くまで折りたたまれたままです</string>

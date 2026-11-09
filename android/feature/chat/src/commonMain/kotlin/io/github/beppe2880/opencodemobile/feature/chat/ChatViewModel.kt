@@ -235,16 +235,18 @@ class ChatViewModel(
                 if (id != null) stopAgents(listOf(id))
             }
             ChatEvent.DismissStopAgent -> updateState { it.copy(confirmingStopAgent = null) }
-            is ChatEvent.StopAll -> updateState { it.copy(confirmingStopAll = event.group) }
+            is ChatEvent.StopAll -> updateState { it.copy(confirmingStopAll = event.target) }
             ChatEvent.ConfirmStopAll -> {
-                val group = currentState.confirmingStopAll
-                updateState { it.copy(confirmingStopAll = null) }
-                when (group) {
-                    // Only commands proven to belong to this session; unassigned ones keep their own Stop.
-                    RunningGroup.Commands -> stopCommands(currentState.work.commands.map { it.id })
-                    RunningGroup.Agents -> stopAgents(currentState.work.agents.map { it.session.id })
-                    null -> Unit
+                val groups = when (val target = currentState.confirmingStopAll) {
+                    is StopAllTarget.Group -> listOf(target.group)
+                    StopAllTarget.Everything -> RunningGroup.entries
+                    null -> emptyList()
                 }
+                updateState { it.copy(confirmingStopAll = null) }
+                val work = currentState.work
+                // Only commands proven to belong to this session; unassigned ones keep their own Stop.
+                if (RunningGroup.Commands in groups) stopCommands(work.commands.map { it.id })
+                if (RunningGroup.Agents in groups) stopAgents(work.agents.map { it.session.id })
             }
             ChatEvent.DismissStopAll -> updateState { it.copy(confirmingStopAll = null) }
             is ChatEvent.ShowRunningList -> {

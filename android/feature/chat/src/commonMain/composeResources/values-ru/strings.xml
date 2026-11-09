@@ -299,6 +299,14 @@
     <string name="chat_running_share">Поделиться</string>
     <string name="chat_running_open_session">Открыть сеанс</string>
     <string name="chat_running_agent_untitled">Субагент</string>
+    <string name="chat_running_open">Открыть</string>
+    <string name="chat_running_open_agent_description">Открыть сеанс агента: %1$s</string>
+    <string name="chat_running_open_shell_description">Открыть вывод оболочки: %1$s</string>
+    <string name="chat_running_stop_agents_label">Остановить агентов</string>
+    <string name="chat_running_stop_shells_label">Остановить оболочки</string>
+    <string name="chat_running_stop_everything_description">Остановить всё, что выполняется</string>
+    <string name="chat_running_stop_everything_title">Остановить всё, что выполняется?</string>
+    <string name="chat_running_stop_everything_message">Субагенты будут прерваны, а команды, запущенные этим сеансом, завершены. Этот сеанс и другие команды проекта продолжат работу.</string>
     <string name="chat_preview_folds">Шаги, которые отслеживались в реальном времени, сворачиваются по окончании ответа</string>
     <string name="chat_preview_kept_open">Шаги, которые отслеживались в реальном времени, остаются открытыми после ответа</string>
     <string name="chat_preview_not_followed">Выполняющиеся шаги остаются свернутыми, пока вы их не откроете</string>
