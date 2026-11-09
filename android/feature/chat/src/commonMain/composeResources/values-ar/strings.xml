@@ -124,6 +124,8 @@
     <string name="chat_session_deleted">تم حذف هذه الجلسة</string>
     <string name="chat_agent">الوكيل</string>
     <string name="chat_model">النموذج</string>
+    <string name="chat_model_description">النموذج: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">النموذج: %1$s (%2$s)، مستوى الجهد %3$s</string>
     <string name="chat_select_agent">اختيار الوكيل</string>
     <string name="chat_select_model">اختيار النموذج</string>
     <string name="chat_permission_title">يلزم إذن</string>

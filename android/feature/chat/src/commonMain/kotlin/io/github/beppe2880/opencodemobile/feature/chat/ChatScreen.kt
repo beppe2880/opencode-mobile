@@ -196,6 +196,7 @@ fun ChatScreen(
                 recent = state.recentModels,
                 onSelect = { onEvent(ChatEvent.SelectModel(it)) },
                 onSelectVariant = { onEvent(ChatEvent.SelectVariant(it)) },
+                providerMark = { id, name -> ProviderMark(id, name, size = 20.dp) },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }

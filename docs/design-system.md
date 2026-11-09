@@ -134,7 +134,8 @@ control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
 | `OcEmptyState`, `OcErrorState` | Centered icon + title + message + action (retry). |
 | `OcConfirmDialog`, `OcTextInputDialog` | Destructive confirmations and rename flows. |
 | `OcBottomSheet` | Modal sheet with token colors, starts below the status bar. |
-| `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section. |
+| `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section; with a `providerMark` slot rows show the mark and the short name. |
+| `OcModelName`, `OcProviderInitial` | Short model name with its variant in the muted color (the variant ellipsizes first); initial of a provider without a logo. Short names come from `shortModelName` (`core/ui/text/ModelText.kt`). |
 | `OcTopBar` | 56dp bar with optional back button, title accessory (status dot), subtitle or custom subtitle content, and actions; owns the status bar inset. |
 | `OcLogo` | Canvas-drawn OpenCode-style mark. |
 | `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. With an OpenCode theme the markdown takes its `markdown` tokens (`OcColors.markdown`) like the TUI: text, headings bold (h1 underlined), bold and italic text, inline code, link text underlined, quotes italic with their text and bar colored, bullets and numbers of lists, code block text, rules and table lines; styles nested in a quote keep their colors. Code is highlighted with the theme's `syntax` tokens. Without a theme it renders uncolored, with Atom One code. |

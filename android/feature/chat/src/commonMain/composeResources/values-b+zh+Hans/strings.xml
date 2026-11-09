@@ -79,6 +79,8 @@
     <string name="chat_session_deleted">此会话已删除</string>
     <string name="chat_agent">智能体</string>
     <string name="chat_model">模型</string>
+    <string name="chat_model_description">模型：%1$s（%2$s）</string>
+    <string name="chat_model_description_variant">模型：%1$s（%2$s），推理强度 %3$s</string>
     <string name="chat_select_agent">选择智能体</string>
     <string name="chat_select_model">选择模型</string>
     <string name="chat_permission_title">需要授权</string>
