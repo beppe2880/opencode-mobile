@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile
 
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ProviderConnectionViewModel
@@ -23,6 +25,8 @@ import org.koin.dsl.module
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
 fun sharedModule(appInfo: AppInfo): Module = module {
     single { appInfo }
+    // Stored ids of themes no longer shipped read as none (PreferencesSettingsRepository).
+    single<OpenCodeThemeIds> { OpenCodeThemeIds { OpenCodeThemes.byId(it) != null } }
     viewModel { ConnectViewModel(get(), get()) }
     viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     // Kept across chats for the whole app run.

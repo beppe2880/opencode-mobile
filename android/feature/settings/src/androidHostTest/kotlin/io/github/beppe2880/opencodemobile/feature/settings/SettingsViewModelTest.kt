@@ -90,6 +90,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
         vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("opencode"))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -122,6 +123,7 @@ class SettingsViewModelTest {
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
+                openCodeTheme = "opencode",
                 showCost = false,
                 chatHeaderLine = ChatHeaderLine.BranchFiles,
                 headerOpens = ChangesScope.Session,
@@ -145,6 +147,22 @@ class SettingsViewModelTest {
             settings.settings.value,
         )
         assertEquals(settings.settings.value, vm.state.value.settings)
+    }
+
+    @Test
+    fun `the OpenCode theme is none by default and goes back to none`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.settings.openCodeTheme)
+
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("dracula"))
+        advanceUntilIdle()
+        assertEquals("dracula", settings.settings.value.openCodeTheme)
+        assertEquals("dracula", vm.state.value.settings.openCodeTheme)
+
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged(null))
+        advanceUntilIdle()
+        assertNull(settings.settings.value.openCodeTheme)
     }
 
     @Test

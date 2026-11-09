@@ -50,6 +50,10 @@
     <string name="settings_refresh_slow">3 s</string>
     <string name="settings_text_size">Chat-Textgröße</string>
     <string name="settings_text_size_sub">Größe von Nachrichten und Werkzeugausgaben, zusätzlich zur Systemgröße</string>
+    <string name="settings_opencode_theme">OpenCode-Theme</string>
+    <string name="settings_opencode_theme_sub">Farben eines Themes der Terminal-App OpenCode, für die ganze App und das Markdown in Antworten</string>
+    <string name="settings_opencode_theme_none">Keines</string>
+    <string name="settings_opencode_theme_none_sub">Die eigenen Farben der App</string>
     <string name="settings_text_small">Klein</string>
     <string name="settings_text_default">Standard</string>
     <string name="settings_text_large">Groß</string>

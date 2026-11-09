@@ -50,6 +50,10 @@
     <string name="settings_refresh_slow">3초</string>
     <string name="settings_text_size">채팅 글자 크기</string>
     <string name="settings_text_size_sub">메시지와 도구 출력의 크기이며 시스템 글자 크기에 더해집니다</string>
+    <string name="settings_opencode_theme">OpenCode 테마</string>
+    <string name="settings_opencode_theme_sub">OpenCode 터미널 앱 테마의 색상. 앱 전체와 답변의 마크다운에 적용됩니다</string>
+    <string name="settings_opencode_theme_none">없음</string>
+    <string name="settings_opencode_theme_none_sub">앱 고유의 색상</string>
     <string name="settings_text_small">작게</string>
     <string name="settings_text_default">기본</string>
     <string name="settings_text_large">크게</string>

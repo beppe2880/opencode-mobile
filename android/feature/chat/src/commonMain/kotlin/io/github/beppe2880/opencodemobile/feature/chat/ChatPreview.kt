@@ -129,7 +129,7 @@ fun AppearancePreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.Theme, preview, Modifier.padding(horizontal = OcSpacing.sm)) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
                 PreviewTopBar(state)
-                ThemeSwatches(preview.settings.theme)
+                ThemeSwatches(preview.settings.theme, preview.settings.openCodeTheme)
             }
         }
         OcCustomizable(SettingsPart.TextSize, preview, Modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.sm)) {
@@ -352,25 +352,25 @@ private fun Caption(text: StringResource, vararg args: Any) {
     )
 }
 
-/** The three themes, the chosen one outlined; each tile is drawn in its own colors. */
+/** The three themes, the chosen one outlined; each tile is drawn in its own colors, of [openCodeTheme] if any. */
 @Composable
-private fun ThemeSwatches(theme: ThemeMode) {
+private fun ThemeSwatches(theme: ThemeMode, openCodeTheme: String?) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = OcSpacing.gutter, end = OcSpacing.gutter, bottom = OcSpacing.sm),
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
-        Swatch(ThemeMode.System, Icons.Outlined.SettingsBrightness, theme, Modifier.weight(1f))
-        Swatch(ThemeMode.Light, Icons.Outlined.LightMode, theme, Modifier.weight(1f))
-        Swatch(ThemeMode.Dark, Icons.Outlined.DarkMode, theme, Modifier.weight(1f))
+        Swatch(ThemeMode.System, Icons.Outlined.SettingsBrightness, theme, openCodeTheme, Modifier.weight(1f))
+        Swatch(ThemeMode.Light, Icons.Outlined.LightMode, theme, openCodeTheme, Modifier.weight(1f))
+        Swatch(ThemeMode.Dark, Icons.Outlined.DarkMode, theme, openCodeTheme, Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun Swatch(mode: ThemeMode, icon: ImageVector, selected: ThemeMode, modifier: Modifier) {
+private fun Swatch(mode: ThemeMode, icon: ImageVector, selected: ThemeMode, openCodeTheme: String?, modifier: Modifier) {
     val accent = OcTheme.colors.textAccent
     val shape = RoundedCornerShape(OcRadius.md)
     val tile: @Composable (Boolean, Modifier) -> Unit = { dark, tileModifier ->
-        OcTheme(darkTheme = dark) {
+        OcTheme(darkTheme = dark, openCodeTheme = openCodeTheme) {
             val c = OcTheme.colors
             Column(tileModifier.fillMaxHeight().background(c.bgBase).padding(OcSpacing.xs), verticalArrangement = Arrangement.spacedBy(OcSpacing.xxs)) {
                 Box(Modifier.fillMaxWidth(0.7f).height(4.dp).background(c.textBase, RoundedCornerShape(2.dp)))

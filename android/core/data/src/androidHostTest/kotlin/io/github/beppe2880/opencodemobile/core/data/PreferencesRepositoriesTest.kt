@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
@@ -23,9 +24,13 @@ import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PreferencesRepositoriesTest {
+
+    /** The themes this test pretends to ship. */
+    private val knownThemes = OpenCodeThemeIds { it in setOf("opencode", "dracula", "tokyonight") }
 
     @Test
     fun `voice input settings keep system dictation until changed and drop unknown values`() = runBlocking {
@@ -83,6 +88,7 @@ class PreferencesRepositoriesTest {
             liveOutputIntervalMs = 3_000,
             keepLiveStepsOpen = true,
             chatTextScale = 1.15f,
+            openCodeTheme = "tokyonight",
             terminalOpenKeyboard = false,
             terminalFullscreenByDefault = true,
             splitView = false,
@@ -111,6 +117,48 @@ class PreferencesRepositoriesTest {
 
         assertEquals(changed, reopened)
         assertEquals(AppSettings(), PreferencesSettingsRepository(SharedPreferencesSettings(InMemoryPreferences())).settings.value)
+    }
+
+    @Test
+    fun `the OpenCode theme starts as none and is kept once chosen`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        fun theme() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).settings.value.openCodeTheme
+        assertNull(theme())
+
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).update { it.copy(openCodeTheme = "dracula") }
+        assertEquals("dracula", prefs.values["opencode_theme"])
+        assertEquals("dracula", theme())
+
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).update { it.copy(openCodeTheme = null) }
+        assertFalse(prefs.contains("opencode_theme"))
+        assertNull(theme())
+    }
+
+    @Test
+    fun `the former colored markdown switch becomes the OpenCode theme`() = runBlocking {
+        fun themeWith(edit: (android.content.SharedPreferences.Editor) -> Unit): String? {
+            val prefs = InMemoryPreferences()
+            prefs.edit().also(edit).commit()
+            return PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).settings.value.openCodeTheme
+        }
+        assertEquals("opencode", themeWith { it.putBoolean("colored_markdown", true) })
+        assertNull(themeWith { it.putBoolean("colored_markdown", false) })
+        // Once chosen, the theme wins over the former switch.
+        assertEquals("dracula", themeWith { it.putBoolean("colored_markdown", true).putString("opencode_theme", "dracula") })
+
+        // The first write drops the switch: choosing None then stays None.
+        val prefs = InMemoryPreferences()
+        prefs.edit().putBoolean("colored_markdown", true).commit()
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).update { it.copy(openCodeTheme = null) }
+        assertFalse(prefs.contains("colored_markdown"))
+        assertNull(PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).settings.value.openCodeTheme)
+    }
+
+    @Test
+    fun `a theme no longer shipped reads as none`() {
+        val prefs = InMemoryPreferences()
+        prefs.edit().putString("opencode_theme", "retired").commit()
+        assertNull(PreferencesSettingsRepository(SharedPreferencesSettings(prefs), knownThemes).settings.value.openCodeTheme)
     }
 
     @Test

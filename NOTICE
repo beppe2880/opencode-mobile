@@ -10,3 +10,7 @@ Bundled fonts, under the SIL Open Font License 1.1:
 
 The API client in android/core/api is generated from the OpenCode server's OpenAPI document
 (OpenCode is MIT licensed, https://github.com/sst/opencode).
+
+The OpenCode themes (android/core/ui/.../theme/generated/OpenCodeThemes.kt) are the colors of the
+OpenCode terminal app's built-in themes (copied in tools/themes/assets), resolved with OpenCode's
+@opencode/theme package. Copyright (c) 2025 opencode, MIT License (docs/licenses/OpenCode-MIT.txt).

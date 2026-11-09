@@ -50,6 +50,10 @@
     <string name="settings_refresh_slow">3 s</string>
     <string name="settings_text_size">Tamaño del texto del chat</string>
     <string name="settings_text_size_sub">Tamaño de mensajes y salida de herramientas, sobre el tamaño del sistema</string>
+    <string name="settings_opencode_theme">Tema de OpenCode</string>
+    <string name="settings_opencode_theme_sub">Colores de un tema de la app de terminal OpenCode, para toda la app y el markdown de las respuestas</string>
+    <string name="settings_opencode_theme_none">Ninguno</string>
+    <string name="settings_opencode_theme_none_sub">Los colores propios de la app</string>
     <string name="settings_text_small">Pequeño</string>
     <string name="settings_text_default">Predeterminado</string>
     <string name="settings_text_large">Grande</string>

@@ -103,6 +103,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.description
 import io.github.beppe2880.opencodemobile.feature.settings.customize.descriptionRes
 import io.github.beppe2880.opencodemobile.feature.settings.customize.group
 import io.github.beppe2880.opencodemobile.feature.settings.customize.searchAreas
+import io.github.beppe2880.opencodemobile.feature.settings.customize.searchKeywords
 import io.github.beppe2880.opencodemobile.feature.settings.customize.searchOptions
 import io.github.beppe2880.opencodemobile.feature.settings.customize.supported
 import io.github.beppe2880.opencodemobile.feature.settings.customize.titleRes
@@ -396,7 +397,7 @@ private fun searchResults(query: String, areas: List<SettingsArea>, list: Boolea
             option.part.label(),
             option.area.label(),
             option.group.title?.let { stringResource(it) },
-        ).joinToString(" ")
+        ).plus(option.searchKeywords).joinToString(" ")
     }
     return SearchHits(
         areas = searchAreas(query, areas, { areaNames.getValue(it) }, { areaDescriptions.getValue(it) }),

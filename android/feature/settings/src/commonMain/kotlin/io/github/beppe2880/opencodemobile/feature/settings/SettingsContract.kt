@@ -133,6 +133,9 @@ sealed interface SettingsEvent {
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent
     data class ChatTextScaleChanged(val scale: Float) : SettingsEvent
+
+    /** The OpenCode theme picked by its id; null for none (the app's own colors). */
+    data class OpenCodeThemeChanged(val id: String?) : SettingsEvent
     data object RequestReset : SettingsEvent
     data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent

@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
+import io.github.beppe2880.opencodemobile.core.ui.theme.isDarkTheme
 import io.github.beppe2880.opencodemobile.fake.DemoData
 import io.github.beppe2880.opencodemobile.fake.DemoHost
 import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
                         liveDemo = false
                     },
                     edit = liveDemo,
-                    realDarkTheme = appSettings.theme.isDark(),
+                    realDarkTheme = isDarkTheme(appSettings.openCodeTheme, appSettings.theme.isDark()),
                     modifier = Modifier.semantics { testTagsAsResourceId = true },
                 )
             } else {

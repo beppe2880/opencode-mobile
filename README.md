@@ -106,7 +106,8 @@ Screenshots and recordings may show earlier versions of the app.
 - **Multiple saved servers**, QR pairing and discovery on your Wi-Fi network.
 - **Usage statistics** by day and model: cost, tokens and activity over 1, 7 or 30 days.
 - **Home screen widgets** for running and recent sessions.
-- **Light and dark themes**, phone and larger-screen layouts, and the familiar OpenCode typography.
+- **Light and dark themes**, optionally in the colors of an OpenCode terminal theme (markdown
+  included), phone and larger-screen layouts, and the familiar OpenCode typography.
 
 Available in **11 languages**: English, Italian, Spanish, French, German, Brazilian Portuguese,
 Russian, Simplified Chinese, Japanese, Korean and Arabic.

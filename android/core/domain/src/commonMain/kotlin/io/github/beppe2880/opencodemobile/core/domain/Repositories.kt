@@ -368,6 +368,11 @@ data class AppSettings(
     val keepLiveStepsOpen: Boolean = false,
     /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
     val chatTextScale: Float = 1f,
+    /**
+     * Id of the OpenCode terminal theme the app takes its colors from (markdown included); null
+     * keeps the app's own colors. One of [OpenCodeThemeIds].
+     */
+    val openCodeTheme: String? = null,
     /** Opening a tool group shows each tool's output or diff, not only its name. */
     val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */
@@ -468,6 +473,14 @@ val LIST_PANE_FRACTION_RANGE = 0.25f..0.6f
 
 /** Share of the window width taken by the session list until it is changed. */
 const val DEFAULT_LIST_PANE_FRACTION = 0.4f
+
+/**
+ * The OpenCode themes this build ships, by id (the catalog lives in `core:ui`): a stored id of a
+ * removed theme reads as none.
+ */
+fun interface OpenCodeThemeIds {
+    operator fun contains(id: String): Boolean
+}
 
 interface SettingsRepository {
     val settings: StateFlow<AppSettings>

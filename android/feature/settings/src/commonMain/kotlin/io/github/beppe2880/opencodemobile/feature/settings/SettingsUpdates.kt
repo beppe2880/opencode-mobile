@@ -25,6 +25,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.LiveOutputIntervalChanged -> copy(liveOutputIntervalMs = event.millis)
     is SettingsEvent.KeepLiveStepsOpenChanged -> copy(keepLiveStepsOpen = event.enabled)
     is SettingsEvent.ChatTextScaleChanged -> copy(chatTextScale = event.scale)
+    is SettingsEvent.OpenCodeThemeChanged -> copy(openCodeTheme = event.id)
     is SettingsEvent.ShowCostChanged -> copy(showCost = event.enabled)
     is SettingsEvent.ChatHeaderLineChanged -> copy(chatHeaderLine = event.line)
     is SettingsEvent.HeaderOpensChanged -> copy(headerOpens = event.scope)

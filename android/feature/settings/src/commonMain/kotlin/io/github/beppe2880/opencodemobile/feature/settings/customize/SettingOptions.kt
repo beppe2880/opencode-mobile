@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
  */
 enum class SettingOption(val fields: List<String>, val requires: SettingOption? = null) {
     Theme(listOf("theme")),
+    OpenCodeTheme(listOf("openCodeTheme")),
     TextSize(listOf("chatTextScale")),
     HeaderLine(listOf("chatHeaderLine")),
     HeaderStyle(listOf("chatHeaderStyle")),
@@ -79,10 +80,11 @@ internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks",
 /** Every option of this part of a preview, applying or not. */
 val SettingsPart.options: List<SettingOption>
     get() = when (this) {
-        SettingsPart.Theme -> listOf(SettingOption.Theme)
-        SettingsPart.TextSize -> listOf(SettingOption.TextSize)
+        SettingsPart.Theme -> listOf(SettingOption.Theme, SettingOption.OpenCodeTheme)
+        // The theme also colors the markdown of answers.
+        SettingsPart.TextSize -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Header -> listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)
-        SettingsPart.Messages -> listOf(SettingOption.TextSize)
+        SettingsPart.Messages -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Thoughts -> listOf(SettingOption.ShowReasoning, SettingOption.GroupThoughts, SettingOption.GroupActivity)
         SettingsPart.Tools -> listOf(
             SettingOption.ExpandTools,
@@ -164,6 +166,13 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ShareOpens -> supported && settings.showInShareMenu
     else -> true
 }
+
+/** Words search also finds the option by in every language, besides its translated texts. */
+internal val SettingOption.searchKeywords: List<String>
+    get() = when (this) {
+        SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
+        else -> emptyList()
+    }
 
 /** Whether the option exists on this platform: nothing can be shared to the iOS app yet. */
 val SettingOption.supported: Boolean

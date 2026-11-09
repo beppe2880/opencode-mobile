@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -107,7 +108,8 @@ val dataModule = module {
     single { BrowserOAuth(get(), get(SettingsStore), get<AppVisibility>().isVisible) }
     single<IntegrationRepository> { RemoteIntegrationRepository(get(), get(), get()) }
     single<VcsRepository> { RemoteVcsRepository(get()) }
-    single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
+    // The theme catalog is in core:ui; the app's modules provide it.
+    single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore), get<OpenCodeThemeIds>()) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }

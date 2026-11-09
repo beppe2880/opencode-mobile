@@ -50,6 +50,10 @@
     <string name="settings_refresh_slow">3秒</string>
     <string name="settings_text_size">聊天文字大小</string>
     <string name="settings_text_size_sub">消息和工具输出的大小，在系统字号基础上调整</string>
+    <string name="settings_opencode_theme">OpenCode 主题</string>
+    <string name="settings_opencode_theme_sub">OpenCode 终端应用某个主题的配色，应用于整个应用以及回答中的 Markdown</string>
+    <string name="settings_opencode_theme_none">无</string>
+    <string name="settings_opencode_theme_none_sub">应用自身的配色</string>
     <string name="settings_text_small">小</string>
     <string name="settings_text_default">默认</string>
     <string name="settings_text_large">大</string>

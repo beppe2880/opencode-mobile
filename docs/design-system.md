@@ -9,9 +9,11 @@ no hard-coded colors outside `theme/OcColors.kt`.
 
 | API | Purpose |
 |---|---|
-| `OcTheme(darkTheme) { }` | Provides `LocalOcColors` and a Material 3 `ColorScheme`, typography and shapes mapped from the tokens. |
-| `ThemeMode.isDark()` | Resolves `AppSettings.theme` (System / Light / Dark). `MainActivity` also updates system bar icon appearance. |
-| `OcTheme.colors` | Full token set (`OcColors`), including state and agent colors. |
+| `OcTheme(darkTheme, openCodeTheme) { }` | Provides `LocalOcColors` and a Material 3 `ColorScheme`, typography and shapes mapped from the tokens. `openCodeTheme` is the id of an OpenCode theme (below); null keeps the app's own colors. |
+| `ThemeMode.isDark()` | Resolves `AppSettings.theme` (System / Light / Dark): the requested mode. |
+| `isDarkTheme(openCodeTheme, dark)` | Whether the app is actually dark: an OpenCode theme with a single mode keeps it. System bar icons follow this (inside `OcTheme`, `OcTheme.colors.isDark`). |
+| `OcTheme.colors` | Full token set (`OcColors`), including state, agent and diff colors, and the markdown, syntax and terminal colors of an OpenCode theme. |
+| `OcTheme.markdown` | The markdown colors of the active OpenCode theme, null without one. |
 | `OcTheme.mono` | IBM Plex Mono styles: `code`, `codeSmall`, `label`. |
 | `OcSpacing`, `OcRadius` | Spacing and corner scales. |
 
@@ -56,6 +58,47 @@ a stable palette slot.
 | review | `#198B43` | `#B8E9C1` |
 | writer | `#623BE2` | `#9E99F7` |
 
+## OpenCode themes
+
+The user can give the whole app the colors of one of the OpenCode terminal app's (TUI) built-in
+themes, like `/theme` there. `OpenCodeThemes.all` lists them ("opencode", the TUI default, first,
+then alphabetical); `OpenCodeTheme` has the `light` and `dark` `OpenCodeThemeTokens` and a
+`preview(dark)` swatch for the picker. No theme (null) keeps the colors above, unchanged.
+
+The colors are generated, never hand-written: `tools/themes` resolves the TUI's theme files (cached
+in `tools/themes/assets` at the pinned OpenCode tag) with OpenCode's own `@opencode/theme`
+(`migrateV1` for V1 files, `parseThemeDocument`, `resolveThemeDocument` per mode) and writes
+`core/ui/.../theme/generated/OpenCodeThemes.kt`. A theme with only one mode has it in both, so it
+stays dark (or light) whatever the app mode: `OcColors.isDark`, the Material scheme and the system
+bars follow the theme. CI fails when the file is stale (`bun run check` in `tools/themes`); to
+update, `bun add @opencode/theme@<version>` (exact version), `bun run refresh`.
+
+`OpenCodeThemeTokens.toOcColors()` (`theme/OpenCodeColors.kt`) maps a theme like the TUI uses it:
+
+| `OcColors` | OpenCode token |
+|---|---|
+| `bgDeep`, `bgBase`, `textInverse` | `background.base` |
+| `layer01`, `bgCodePath`, `userBubbleBg` | `background.raised.base` (panels; the TUI's user message) |
+| `layer02`, `borderMuted` | `background.raised.high` (menus) |
+| `layer03` | `background.raised.max` |
+| `layer04` | halfway between `background.raised.max` and `text.muted` |
+| `textBase`, `bgInverse`, `iconBase`, `userBubbleText` | `text.base` |
+| `textMuted`, `iconMuted` / `textFaint` | `text.muted` / `text.faint` |
+| `bgAccent`, `textAccent`, `borderFocus` | `hue.interactive[200]` (the TUI's primary) |
+| `onAccent` | `text.action.primary.focused` (text of a selected item on the primary color) |
+| `textCodePath` | `markdown.code` |
+| `borderBase` / `borderStrong` | `border.base` / `scrollbar.base` |
+| `success`, `warning`, `danger`, `info` | fg `text.feedback.{success,warning,error,info}.base`; bg the fg at 15% over `background.base`, border at 45% |
+| `agents` build, plan, explore, review, writer | `categorical[0..4][200]`, repeats removed, wrapping around |
+| `scrim` | unchanged (the app's light or dark scrim) |
+| `diff` | `diff.text.added/removed` (markers), `diff.text.hunkHeader`, `diff.background.*`, `diff.lineNumber.*`; code `text.base`, hunk rows `background.raised.high` |
+| `markdown` | every `markdown.*` token (`OcMarkdownPalette`) |
+| `syntax` | `syntax.*`; the highlighter's `code` = variable, `literal` = number, `metadata` = type, `mark` = operator (it has no function category) |
+| `ansi` (`terminalAnsi`) | red, green, yellow, blue, purple (magenta), cyan at step 200, bright at 100; a missing hue falls back to `text.feedback.*` (yellow first to orange), blue to interactive, purple to accent. Black / white from the neutral hue: dark themes 900 / 200 (bright 500 / 100), light themes 100 / 400 (bright 300 / 500). The terminal background and text are `bgDeep` / `textBase`. |
+
+Without a theme `diff` holds the colors the diff always had (state colors, `layer01`/`layer02`,
+`textFaint` numbers) and `markdown`, `syntax` and `ansi` are null.
+
 ## Typography
 
 - UI: **Inter** (regular 400, medium 500, semibold 600), bundled in `core/ui/res/font`.
@@ -94,7 +137,7 @@ control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
 | `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section. |
 | `OcTopBar` | 56dp bar with optional back button, title accessory (status dot), subtitle or custom subtitle content, and actions; owns the status bar inset. |
 | `OcLogo` | Canvas-drawn OpenCode-style mark. |
-| `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. |
+| `OcMarkdown` + `MarkdownCache` | mikepenz renderer with highlighted code fences (language header + copy button); parse cache keyed by item so only the streaming part re-parses. With an OpenCode theme the markdown takes its `markdown` tokens (`OcColors.markdown`) like the TUI: text, headings bold (h1 underlined), bold and italic text, inline code, link text underlined, quotes italic with their text and bar colored, bullets and numbers of lists, code block text, rules and table lines; styles nested in a quote keep their colors. Code is highlighted with the theme's `syntax` tokens. Without a theme it renders uncolored, with Atom One code. |
 | `Modifier.exposeTestTags()` | Applies `testTagsAsResourceId` inside popups, dialogs and sheets (separate composition roots). |
 
 Text helpers live in `core/ui/text`: `UiText` (localizable text for State), `Throwable.toUiText()`

@@ -15,6 +15,7 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_header
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline
@@ -103,7 +104,7 @@ val SettingsArea.groups: List<OptionGroup>
     get() = when (this) {
         SettingsArea.Servers, SettingsArea.About -> emptyList()
         SettingsArea.Appearance -> listOf(
-            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.TextSize)),
+            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize)),
             OptionGroup(
                 Res.string.settings_group_wide,
                 listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList),
@@ -268,6 +269,7 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
         }
         SettingsArea.Appearance -> listOfNotNull(
             res(s.theme.labelRes),
+            OpenCodeThemes.byId(s.openCodeTheme)?.let { UiText.Raw(it.displayName) },
             res(textSizeLabel(s.chatTextScale)),
             if (wide && s.splitView) res(Res.string.settings_summary_split) else null,
         )

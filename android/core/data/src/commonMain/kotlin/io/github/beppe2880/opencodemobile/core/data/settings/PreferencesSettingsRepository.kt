@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.HEADER_OPENS_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
@@ -27,8 +28,14 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-/** Non-sensitive UI preferences. Unknown stored values fall back to [AppSettings] defaults. */
-internal class PreferencesSettingsRepository(private val prefs: Settings) : SettingsRepository {
+/**
+ * Non-sensitive UI preferences. Unknown stored values fall back to [AppSettings] defaults;
+ * [themes] tells the OpenCode themes that still exist.
+ */
+internal class PreferencesSettingsRepository(
+    private val prefs: Settings,
+    private val themes: OpenCodeThemeIds = OpenCodeThemeIds { true },
+) : SettingsRepository {
 
     private val mutex = Mutex()
 
@@ -53,6 +60,10 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
+        val openCodeTheme = next.openCodeTheme
+        if (openCodeTheme == null) prefs.remove(KEY_OPENCODE_THEME) else prefs.putString(KEY_OPENCODE_THEME, openCodeTheme)
+        // Read once into the theme; a choice of None must not bring it back.
+        prefs.remove(KEY_COLORED_MARKDOWN)
         prefs.putBoolean(KEY_SHOW_COST, next.showCost)
         prefs.putString(KEY_HEADER_LINE, next.chatHeaderLine.name)
         prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
@@ -124,6 +135,9 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             keepLiveStepsOpen = prefs.getBoolean(KEY_KEEP_LIVE_OPEN, defaults.keepLiveStepsOpen),
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
+            // Before the themes there was a "Colored markdown" switch, which used the OpenCode theme.
+            openCodeTheme = (prefs.getStringOrNull(KEY_OPENCODE_THEME) ?: OPENCODE_THEME.takeIf { prefs.getBoolean(KEY_COLORED_MARKDOWN, false) })
+                ?.takeIf { it in themes },
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             chatHeaderLine = ChatHeaderLine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_LINE) } ?: defaults.chatHeaderLine,
             chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
@@ -196,6 +210,13 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
+        const val KEY_OPENCODE_THEME = "opencode_theme"
+
+        /** The former "Colored markdown" switch; true reads as [OPENCODE_THEME] until a theme is written. */
+        const val KEY_COLORED_MARKDOWN = "colored_markdown"
+
+        /** Id of OpenCode's default theme, the colors of the former switch. */
+        const val OPENCODE_THEME = "opencode"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_HEADER_LINE = "chat_header_line"
         const val KEY_HEADER_OPENS = "chat_header_opens"
