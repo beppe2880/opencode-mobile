@@ -48,6 +48,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSearchField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSharedContent
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
@@ -62,6 +63,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ne
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_other_directory
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_path_label
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_path_placeholder
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_project_search
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_project_search_empty
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_show_all
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_choose
@@ -131,10 +134,28 @@ internal fun NewSessionForm(
         if (inSheet) {
             Label(stringResource(Res.string.sessions_new_directory))
             var showAll by rememberSaveable { mutableStateOf(false) }
-            val visible = if (showAll || projects.size <= COLLAPSED_PROJECTS) {
-                projects
-            } else {
-                (projects.take(COLLAPSED_PROJECTS) + projects.filter { it.directory == state.directory }).distinctBy { it.id }
+            // Local UI state like showAll: the sheet leaves composition when it closes, which resets it.
+            var query by rememberSaveable { mutableStateOf("") }
+            val searchable = projects.size > COLLAPSED_PROJECTS
+            val searching = searchable && query.isNotBlank()
+            val visible = visibleProjects(projects, if (searchable) query else "", showAll, state.directory)
+            if (searchable) {
+                OcSearchField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = stringResource(Res.string.sessions_new_project_search),
+                    modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_project_search"),
+                )
+            }
+            if (searching && visible.isEmpty()) {
+                Text(
+                    stringResource(Res.string.sessions_new_project_search_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = c.textMuted,
+                    modifier = Modifier
+                        .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm)
+                        .testTag("sessions_new_project_search_empty"),
+                )
             }
             visible.forEach { project ->
                 DirectoryOption(
@@ -145,7 +166,7 @@ internal fun NewSessionForm(
                     modifier = Modifier.testTag("sessions_new_project_${project.id}"),
                 )
             }
-            if (visible.size < projects.size) {
+            if (!searching && visible.size < projects.size) {
                 Text(
                     text = stringResource(Res.string.sessions_new_show_all, projects.size),
                     style = MaterialTheme.typography.labelLarge,
@@ -216,8 +237,6 @@ internal fun NewSessionForm(
         )
     }
 }
-
-private const val COLLAPSED_PROJECTS = 5
 
 /** Above the session list while a chat is picked for content shared from another app. */
 @Composable

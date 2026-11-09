@@ -96,6 +96,7 @@
     <string name="chat_new_messages">新しいメッセージ</string>
     <string name="chat_command_compact">履歴を要約してコンテキストを空ける</string>
     <string name="chat_command_fork">このセッションを新しいセッションにコピー</string>
+    <string name="chat_command_new">このディレクトリで新しいチャットを開始</string>
     <string name="chat_context">コンテキスト</string>
     <string name="chat_context_tokens">%1$s トークン</string>
     <string name="chat_context_of">%2$s の %1$d%</string>

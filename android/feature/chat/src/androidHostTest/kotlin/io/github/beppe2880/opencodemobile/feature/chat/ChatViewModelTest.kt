@@ -926,7 +926,12 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.DraftChanged("/"))
-        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "connect", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
+        assertEquals(
+            listOf("new", "undo", "redo", "compact", "fork", "mcps", "connect", "review"),
+            vm.state.value.suggestions.map {
+                (it as Suggestion.Slash).name
+            },
+        )
         vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.last()))
         assertEquals("/review ", vm.state.value.draft)
 
@@ -1043,6 +1048,92 @@ class ChatViewModelTest {
         assertEquals("", drafts.load("s2"))
         assertTrue(chat.prompts.isEmpty())
         assertEquals("", vm.state.value.draft)
+    }
+
+    @Test
+    fun `slash new creates in the same directory with server defaults and no copied history`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.AddAttachments(listOf(PromptAttachment("data:image/png;base64,AA==", "photo.png", "image/png"))))
+
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(listOf(Triple("/repo", null, null)), sessions.creates)
+        assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
+        assertTrue(sessions.forks.isEmpty())
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
+        assertTrue(chat.stops.isEmpty())
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+        assertEquals(1, vm.state.value.attachments.size)
+        assertEquals("", drafts.load("s-new"))
+        assertEquals("", vm.state.value.draft)
+        assertFalse(vm.state.value.creatingSession)
+    }
+
+    @Test
+    fun `picking new creates once while pending and does not send a prompt`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply { createGate = gate }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/ne"))
+        val suggestion = vm.state.value.suggestions.single()
+        vm.onEvent(ChatEvent.PickSuggestion(suggestion))
+        runCurrent()
+        assertTrue(vm.state.value.creatingSession)
+        assertFalse(vm.state.value.canSend)
+
+        vm.onEvent(ChatEvent.PickSuggestion(suggestion))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertEquals(1, sessions.creates.size)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
+        assertFalse(vm.state.value.creatingSession)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `failed new keeps the original chat and restores the command for retry`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { createResult = Result.failure(OpenCodeError.Unreachable("down")) }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertTrue(vm.effect.first() is ChatEffect.ShowMessage)
+        assertEquals("/new", vm.state.value.draft)
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+        assertFalse(vm.state.value.creatingSession)
+        assertTrue(vm.state.value.canSend)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `failed new does not overwrite text typed while creating`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply {
+            createGate = gate
+            createResult = Result.failure(OpenCodeError.Unreachable("down"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("keep this"))
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertTrue(vm.effect.first() is ChatEffect.ShowMessage)
+        assertEquals("keep this", vm.state.value.draft)
+        assertFalse(vm.state.value.creatingSession)
     }
 
     @Test
@@ -2007,7 +2098,14 @@ private class FakeSessions(
     }
     override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
-    override suspend fun create(directory: String, agent: String?, model: ModelRef?) = Result.success(session)
+    val creates = mutableListOf<Triple<String, String?, ModelRef?>>()
+    var createGate: CompletableDeferred<Unit>? = null
+    var createResult: Result<Session> = Result.success(session.copy(id = "s-new", agent = "build", model = null))
+    override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
+        creates += Triple(directory, agent, model)
+        createGate?.await()
+        return createResult
+    }
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     val forks = mutableListOf<Pair<String, String?>>()

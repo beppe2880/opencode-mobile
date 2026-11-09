@@ -43,6 +43,8 @@
     <string name="sessions_actions_title">Session actions</string>
     <string name="sessions_running_a11y">Agent is running</string>
     <string name="sessions_new_show_all">Show all %1$d projects</string>
+    <string name="sessions_new_project_search">Search projects</string>
+    <string name="sessions_new_project_search_empty">No matching projects</string>
     <string name="sessions_untitled">Untitled session</string>
     <string name="sessions_preview_swipe_on">Swipe left or right in a chat to open the next or previous session</string>
     <string name="sessions_preview_swipe_off">Off: go back to the list to open another session</string>

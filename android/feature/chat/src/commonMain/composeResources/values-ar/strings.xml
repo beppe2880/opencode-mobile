@@ -141,6 +141,7 @@
     <string name="chat_new_messages">رسائل جديدة</string>
     <string name="chat_command_compact">تلخيص السجل لتحرير مساحة السياق</string>
     <string name="chat_command_fork">نسخ هذه الجلسة إلى جلسة جديدة</string>
+    <string name="chat_command_new">بدء محادثة جديدة في هذا المجلد</string>
     <string name="chat_context">السياق</string>
     <string name="chat_context_tokens">%1$s رمز</string>
     <string name="chat_context_of">%1$d% من %2$s</string>

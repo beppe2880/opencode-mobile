@@ -36,6 +36,9 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.datetime)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
         getByName("androidHostTest").dependencies {
             implementation(project(":core:testing"))
             implementation(libs.junit)

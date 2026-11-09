@@ -96,6 +96,7 @@
     <string name="chat_new_messages">新消息</string>
     <string name="chat_command_compact">总结历史记录以释放上下文</string>
     <string name="chat_command_fork">将此会话复制到新会话</string>
+    <string name="chat_command_new">在此目录中开始新对话</string>
     <string name="chat_context">上下文</string>
     <string name="chat_context_tokens">%1$s 个 token</string>
     <string name="chat_context_of">%2$s 的 %1$d%</string>

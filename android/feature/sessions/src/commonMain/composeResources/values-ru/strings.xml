@@ -43,6 +43,8 @@
     <string name="sessions_actions_title">Действия с сессией</string>
     <string name="sessions_running_a11y">Агент работает</string>
     <string name="sessions_new_show_all">Показать все проекты: %1$d</string>
+    <string name="sessions_new_project_search">Поиск проектов</string>
+    <string name="sessions_new_project_search_empty">Нет подходящих проектов</string>
     <string name="sessions_untitled">Сессия без названия</string>
     <string name="sessions_preview_swipe_on">Проведите влево или вправо в чате, чтобы открыть следующую или предыдущую сессию</string>
     <string name="sessions_preview_swipe_off">Выкл.: вернитесь к списку, чтобы открыть другую сессию</string>

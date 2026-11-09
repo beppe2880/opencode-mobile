@@ -105,6 +105,7 @@
     <string name="chat_new_messages">Neue Nachrichten</string>
     <string name="chat_command_compact">Verlauf zusammenfassen, um Kontext freizugeben</string>
     <string name="chat_command_fork">Diese Sitzung in eine neue kopieren</string>
+    <string name="chat_command_new">Neuen Chat in diesem Verzeichnis starten</string>
     <string name="chat_context">Kontext</string>
     <string name="chat_context_tokens">%1$s Token</string>
     <string name="chat_context_of">%1$d% von %2$s</string>
