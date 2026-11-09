@@ -1092,13 +1092,34 @@ class ChatViewModel(
     }
 
     private fun runBuiltin(builtin: Completions.Builtin) {
+        if (currentState.creatingSession) return
+        val draft = currentState.draft
         updateState { it.copy(draft = "", suggestions = emptyList()) }
         when (builtin) {
+            Completions.Builtin.New -> newSession(draft)
             Completions.Builtin.Undo -> undo()
             Completions.Builtin.Redo -> restoreRevert()
             Completions.Builtin.Compact -> compact()
             Completions.Builtin.Fork -> fork(null)
             Completions.Builtin.Mcps -> onEvent(ChatEvent.OpenMcps)
+        }
+    }
+
+    /** A fresh session in this folder; the server resolves its agent and model, without history. */
+    private fun newSession(draft: String) {
+        val directory = currentState.directory
+        updateState { it.copy(creatingSession = true) }
+        viewModelScope.launch {
+            sessions.create(directory, agent = null, model = null).fold(
+                onSuccess = { session ->
+                    updateState { it.copy(creatingSession = false) }
+                    sendEffect(ChatEffect.OpenSession(session.id))
+                },
+                onFailure = { error ->
+                    updateState { it.copy(creatingSession = false, draft = it.draft.ifEmpty { draft }) }
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                },
+            )
         }
     }
 

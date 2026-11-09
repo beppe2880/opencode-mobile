@@ -26,7 +26,13 @@ class CompletionsTest {
     fun `slash suggestions list built-ins first and filter by prefix`() {
         val commands = listOf(Command("review", "Review changes"), Command("release", null))
 
-        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "review", "release"), Completions.slashSuggestions("/", commands)?.map { it.name })
+        assertEquals(
+            listOf("new", "undo", "redo", "compact", "fork", "mcps", "review", "release"),
+            Completions.slashSuggestions("/", commands)?.map {
+                it.name
+            },
+        )
+        assertEquals(listOf("new"), Completions.slashSuggestions("/ne", commands)?.map { it.name })
         assertEquals(listOf("mcps"), Completions.slashSuggestions("/mc", commands)?.map { it.name })
         assertEquals(listOf("review", "release"), Completions.slashSuggestions("/RE", commands)?.map { it.name }?.filter { it != "redo" })
         assertNull(Completions.slashSuggestions("/review now", commands))

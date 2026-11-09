@@ -105,6 +105,7 @@
     <string name="chat_new_messages">New messages</string>
     <string name="chat_command_compact">Summarize the history to free context</string>
     <string name="chat_command_fork">Copy this session to a new one</string>
+    <string name="chat_command_new">Start a new chat in this directory</string>
     <string name="chat_context">Context</string>
     <string name="chat_context_tokens">%1$s tokens</string>
     <string name="chat_context_of">%1$d% of %2$s</string>
