@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">无法在服务器上准备浏览器登录（%1$s）。请重试。</string>
+    <string name="oauth_error_callback">未收到浏览器的有效授权响应（%1$s）。请重新登录。</string>
+    <string name="oauth_error_exchange">无法向提供商交换授权码（%1$s）。请重新登录。</string>
+    <string name="oauth_error_validation">无法验证提供商的登录响应（%1$s）。未向服务器发送任何凭据。</string>
+    <string name="oauth_error_import">无法确认凭据已保存到服务器（%1$s）。重试前请检查连接和提供商状态。</string>
+    <string name="oauth_error_expired">浏览器登录已过期（%1$s）。请重新登录。</string>
+    <string name="oauth_error_server_changed">登录期间所选服务器发生变化（%1$s）。请重新登录。</string>
+    <string name="oauth_error_unknown">无法完成浏览器登录（%1$s）。请重新登录。</string>
+</resources>

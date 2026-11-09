@@ -310,6 +310,12 @@ class ChatViewModel(
             ChatEvent.OpenHeaderChanges -> loadChanges(
                 if (headerOpens == ChangesScope.Folder && inRepository == true) ChangesScope.Folder else ChangesScope.Session,
             )
+            ChatEvent.OpenProviders -> if (currentState.directory.isNotEmpty()) sendEffect(ChatEffect.OpenProviders)
+            ChatEvent.ProvidersConnected -> {
+                viewModelScope.launch {
+                    catalog.models(currentState.directory).onSuccess { models -> updateState { it.copy(models = models) } }
+                }
+            }
             ChatEvent.OpenMcps -> {
                 updateState { it.copy(mcps = it.mcps ?: McpPanel(changing = changingMcps.toSet())) }
                 refreshMcps()
@@ -1102,6 +1108,7 @@ class ChatViewModel(
             Completions.Builtin.Compact -> compact()
             Completions.Builtin.Fork -> fork(null)
             Completions.Builtin.Mcps -> onEvent(ChatEvent.OpenMcps)
+            Completions.Builtin.Connect -> onEvent(ChatEvent.OpenProviders)
         }
     }
 

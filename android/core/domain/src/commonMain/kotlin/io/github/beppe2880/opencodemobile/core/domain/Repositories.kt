@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 sealed class OpenCodeError(message: String, cause: Throwable? = null) : Exception(message, cause) {
     /** Credentials rejected (HTTP 401). */
-    class Unauthorized(message: String = "Authentication failed") : OpenCodeError(message)
+    class Unauthorized(message: String = "Authentication failed", val httpStatus: Int? = null) : OpenCodeError(message)
 
     /** Server could not be reached (DNS, refused, timeout, TLS). */
     class Unreachable(message: String, cause: Throwable? = null) : OpenCodeError(message, cause)
@@ -21,7 +21,7 @@ sealed class OpenCodeError(message: String, cause: Throwable? = null) : Exceptio
     /** Pairing code expired, already used or invalid. */
     class PairingFailed(message: String) : OpenCodeError(message)
 
-    class NotFound(message: String) : OpenCodeError(message)
+    class NotFound(message: String, val httpStatus: Int? = null) : OpenCodeError(message)
 
     /** Any other HTTP or decoding failure. [tag] is the server `_tag` when present. */
     class Server(val status: Int, val tag: String?, message: String) : OpenCodeError(message)
@@ -283,6 +283,9 @@ interface ChatRepository {
 }
 
 interface CatalogRepository {
+    /** Drop cached models after provider connection, including other folders on this server. */
+    fun invalidateModels(serverId: String) {}
+
     /** Agents available in [directory]; hidden and subagent-only agents are included and flagged. */
     suspend fun agents(directory: String?): Result<List<Agent>>
 

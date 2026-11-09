@@ -1,0 +1,7 @@
+<resources>
+    <string name="chat_provider_browser_waiting">أكمل تسجيل الدخول في المتصفح ثم عد إلى هنا. تُنقل بيانات الاعتماد بأمان إلى الخادم ولا تُحفظ على هاتفك. إغلاق هذه اللوحة يلغي تسجيل الدخول.</string>
+    <string name="chat_provider_secure">يتطلب تسجيل الدخول عبر المتصفح اتصال HTTPS بالخادم. حدّث عنوان الخادم المحفوظ قبل المتابعة.</string>
+    <string name="chat_provider_device">المتابعة برمز الجهاز</string>
+    <string name="chat_provider_browser">فتح المتصفح للتفويض</string>
+    <string name="chat_provider_computer">هذه الطريقة غير مدعومة على الهاتف بعد. استخدم الكمبيوتر أو طريقة أخرى.</string>
+</resources>

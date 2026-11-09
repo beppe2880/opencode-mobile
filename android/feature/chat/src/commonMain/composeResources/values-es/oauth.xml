@@ -1,0 +1,7 @@
+<resources>
+    <string name="chat_provider_browser_waiting">Completa el acceso en el navegador y vuelve aquí. Las credenciales se transfieren de forma segura al servidor y no se guardan en el teléfono. Cerrar este panel cancela el acceso.</string>
+    <string name="chat_provider_secure">El acceso desde el navegador requiere una conexión HTTPS al servidor. Actualiza la dirección del servidor guardado antes de continuar.</string>
+    <string name="chat_provider_device">Continuar con código de dispositivo</string>
+    <string name="chat_provider_browser">Abrir el navegador para autorizar</string>
+    <string name="chat_provider_computer">Este método aún no es compatible con móviles. Usa el ordenador u otro método.</string>
+</resources>

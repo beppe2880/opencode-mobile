@@ -10,6 +10,8 @@ import io.github.beppe2880.opencodemobile.core.data.events.AppVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.ConnectivityNetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.ProcessLifecycleVisibility
+import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthPlatform
+import io.github.beppe2880.opencodemobile.core.data.integration.OAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.server.EncryptedServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.LanServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
@@ -26,6 +28,7 @@ import org.koin.dsl.module
 import java.io.File
 
 internal actual val platformDataModule: Module = module {
+    single<OAuthPlatform> { AndroidOAuthPlatform() }
     single {
         val debuggable = androidContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
         OpenCodeClientFactory(debugLogging = debuggable)

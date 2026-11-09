@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">Die Browser-Anmeldung konnte auf dem Server nicht vorbereitet werden (%1$s). Versuche es erneut.</string>
+    <string name="oauth_error_callback">Keine gültige Autorisierungsantwort vom Browser erhalten (%1$s). Starte die Anmeldung erneut.</string>
+    <string name="oauth_error_exchange">Der Autorisierungscode konnte nicht mit dem Anbieter ausgetauscht werden (%1$s). Starte die Anmeldung erneut.</string>
+    <string name="oauth_error_validation">Die Antwort des Anbieters konnte nicht geprüft werden (%1$s). Es wurden keine Zugangsdaten an den Server gesendet.</string>
+    <string name="oauth_error_import">Das Speichern der Zugangsdaten auf dem Server konnte nicht bestätigt werden (%1$s). Prüfe vor einem erneuten Versuch die Verbindung und den Anbieterstatus.</string>
+    <string name="oauth_error_expired">Die Browser-Anmeldung ist abgelaufen (%1$s). Starte die Anmeldung erneut.</string>
+    <string name="oauth_error_server_changed">Der ausgewählte Server wurde während der Anmeldung geändert (%1$s). Starte die Anmeldung erneut.</string>
+    <string name="oauth_error_unknown">Die Browser-Anmeldung konnte nicht abgeschlossen werden (%1$s). Starte die Anmeldung erneut.</string>
+</resources>

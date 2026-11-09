@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">サーバーでブラウザーログインを準備できませんでした（%1$s）。再試行してください。</string>
+    <string name="oauth_error_callback">ブラウザーから有効な認証応答を受信できませんでした（%1$s）。ログインをやり直してください。</string>
+    <string name="oauth_error_exchange">プロバイダーと認証コードを交換できませんでした（%1$s）。ログインをやり直してください。</string>
+    <string name="oauth_error_validation">プロバイダーのログイン応答を検証できませんでした（%1$s）。認証情報はサーバーに送信されていません。</string>
+    <string name="oauth_error_import">サーバーへの認証情報の保存を確認できませんでした（%1$s）。再試行前に接続とプロバイダーの状態を確認してください。</string>
+    <string name="oauth_error_expired">ブラウザーログインの有効期限が切れました（%1$s）。ログインをやり直してください。</string>
+    <string name="oauth_error_server_changed">ログイン中に選択したサーバーが変更されました（%1$s）。ログインをやり直してください。</string>
+    <string name="oauth_error_unknown">ブラウザーログインを完了できませんでした（%1$s）。ログインをやり直してください。</string>
+</resources>

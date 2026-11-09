@@ -19,4 +19,5 @@ internal class ConcurrentMap<K, V> {
     }
 
     fun remove(key: K): V? = synchronized(lock) { map.remove(key) }
+    fun removeMatching(predicate: (K) -> Boolean) { synchronized(lock) { map.keys.removeAll(predicate) } }
 }

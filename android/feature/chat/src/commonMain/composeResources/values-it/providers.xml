@@ -1,0 +1,14 @@
+<resources>
+    <string name="chat_providers_group_connected">Connessi</string>
+    <string name="chat_providers_group_popular">Popolari</string>
+    <string name="chat_providers_group_other">Altri provider</string>
+    <string name="chat_providers_status_connected">Connesso</string>
+    <string name="chat_providers">Connetti provider</string>
+    <string name="chat_providers_hint">Le credenziali vengono salvate su questo server, non sul telefono.</string>
+    <string name="chat_providers_search">Cerca provider</string>
+    <string name="chat_providers_key">Chiave API</string>
+    <string name="chat_providers_save">Connetti</string>
+    <string name="chat_providers_connected">Credenziali salvate sul server.</string>
+    <string name="chat_providers_error">Impossibile completare la richiesta. Controlla la connessione e i campi obbligatori, poi riprova.</string>
+    <string name="chat_providers_empty">Nessuna integrazione corrispondente disponibile.</string>
+</resources>

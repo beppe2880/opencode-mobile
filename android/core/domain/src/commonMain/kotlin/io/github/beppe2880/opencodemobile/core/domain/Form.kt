@@ -29,6 +29,9 @@ sealed interface FormField {
         val custom: Boolean = false,
         val placeholder: String? = null,
         val default: String? = null,
+        val minLength: Int? = null,
+        val maxLength: Int? = null,
+        val pattern: String? = null,
     ) : FormField
 
     data class Toggle(

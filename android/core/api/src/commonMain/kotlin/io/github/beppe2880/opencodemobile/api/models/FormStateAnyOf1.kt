@@ -42,7 +42,7 @@ data class FormStateAnyOf1 (
     val status: FormStateAnyOf1.Status,
 
     @Contextual @SerialName(value = "answer")
-    val answer: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>
+    val answer: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>?
 
 ) {
 

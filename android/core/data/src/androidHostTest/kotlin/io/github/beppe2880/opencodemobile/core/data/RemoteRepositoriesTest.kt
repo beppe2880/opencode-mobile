@@ -460,6 +460,24 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `connecting a provider invalidates model caches in all folders of that server`() = runBlocking {
+        server.dispatcher = catalogDispatcher(json("""{"location":{"directory":"/tmp/x"},"data":[]}"""))
+        val catalog = RemoteCatalogRepository(graph.clients)
+        catalog.models("/tmp/x").getOrThrow()
+        catalog.models("/tmp/y").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.models("/tmp/x").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.invalidateModels("other-server")
+        catalog.models("/tmp/x").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.invalidateModels("s1")
+        catalog.models("/tmp/x").getOrThrow()
+        catalog.models("/tmp/y").getOrThrow()
+        assertEquals(8, server.requestCount)
+    }
+
+    @Test
     fun `no active server fails with Unauthorized`() = runBlocking {
         val empty = TestGraph(FakeServerStore(StoredServers()))
 

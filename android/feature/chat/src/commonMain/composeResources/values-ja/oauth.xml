@@ -1,0 +1,7 @@
+<resources>
+    <string name="chat_provider_browser_waiting">ブラウザーでログインを完了し、ここに戻ってください。認証情報はサーバーに安全に転送され、スマートフォンには保存されません。このパネルを閉じるとログインがキャンセルされます。</string>
+    <string name="chat_provider_secure">ブラウザーでのログインにはサーバーへの HTTPS 接続が必要です。保存済みのサーバーアドレスを更新してください。</string>
+    <string name="chat_provider_device">デバイスコードで続行</string>
+    <string name="chat_provider_browser">ブラウザーを開いて認証</string>
+    <string name="chat_provider_computer">この方法はモバイルではまだ対応していません。パソコンまたは別の方法を使用してください。</string>
+</resources>

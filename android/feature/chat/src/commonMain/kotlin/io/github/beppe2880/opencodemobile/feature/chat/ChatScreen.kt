@@ -91,6 +91,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_titl
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_branch_description
@@ -138,6 +139,7 @@ fun ChatScreen(
                     onHeaderChanges = { onEvent(ChatEvent.OpenHeaderChanges) },
                     onTerminal = { onEvent(ChatEvent.OpenTerminal) },
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
+                    onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
                 if (!state.work.isEmpty) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
@@ -223,6 +225,7 @@ internal fun ChatTopBar(
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
     onRunning: () -> Unit,
+    onProviders: () -> Unit = {},
     applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
@@ -296,6 +299,12 @@ internal fun ChatTopBar(
                             onRunning()
                         },
                         modifier = Modifier.testTag("chat_running_menu_item"),
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.chat_providers)) },
+                        onClick = { menuOpen = false; onProviders() },
+                        enabled = state.directory.isNotEmpty(),
+                        modifier = Modifier.testTag("chat_providers_menu_item"),
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.chat_mcps)) },

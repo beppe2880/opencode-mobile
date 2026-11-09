@@ -1,0 +1,14 @@
+<resources>
+    <string name="chat_providers_group_connected">Connectés</string>
+    <string name="chat_providers_group_popular">Populaires</string>
+    <string name="chat_providers_group_other">Autres fournisseurs</string>
+    <string name="chat_providers_status_connected">Connecté</string>
+    <string name="chat_providers">Connecter un fournisseur</string>
+    <string name="chat_providers_hint">Les identifiants sont enregistrés sur ce serveur, pas sur votre téléphone.</string>
+    <string name="chat_providers_search">Rechercher des fournisseurs</string>
+    <string name="chat_providers_key">Clé API</string>
+    <string name="chat_providers_save">Connecter</string>
+    <string name="chat_providers_connected">Identifiants enregistrés sur le serveur.</string>
+    <string name="chat_providers_error">Impossible de terminer la demande. Vérifiez la connexion et les champs obligatoires, puis réessayez.</string>
+    <string name="chat_providers_empty">Aucune intégration correspondante disponible.</string>
+</resources>

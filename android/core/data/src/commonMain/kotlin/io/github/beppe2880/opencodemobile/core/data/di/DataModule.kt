@@ -11,8 +11,11 @@ import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentMod
 import io.github.beppe2880.opencodemobile.core.data.catalog.RemoteCatalogRepository
 import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
+import io.github.beppe2880.opencodemobile.core.data.events.AppVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
+import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
+import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
@@ -28,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
+import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
@@ -100,6 +104,8 @@ val dataModule = module {
     single<TerminalRepository> { RemoteTerminalRepository(get(), network = get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
     single<McpRepository> { RemoteMcpRepository(get()) }
+    single { BrowserOAuth(get(), get(SettingsStore), get<AppVisibility>().isVisible) }
+    single<IntegrationRepository> { RemoteIntegrationRepository(get(), get(), get()) }
     single<VcsRepository> { RemoteVcsRepository(get()) }
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }

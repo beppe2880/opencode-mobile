@@ -8,6 +8,8 @@ import io.github.beppe2880.opencodemobile.core.data.events.AppVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.ApplicationStateVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.PathNetworkMonitor
+import io.github.beppe2880.opencodemobile.core.data.integration.OAuthPlatform
+import io.github.beppe2880.opencodemobile.core.data.integration.UnsupportedOAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.server.InterfaceServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.KeychainServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
@@ -24,6 +26,7 @@ import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalNativeApi::class)
 internal actual val platformDataModule: Module = module {
+    single<OAuthPlatform> { UnsupportedOAuthPlatform() }
     single { OpenCodeClientFactory(debugLogging = Platform.isDebugBinary) }
     single<ServerStore> { KeychainServerStore() }
     single<AppVisibility> { ApplicationStateVisibility() }
