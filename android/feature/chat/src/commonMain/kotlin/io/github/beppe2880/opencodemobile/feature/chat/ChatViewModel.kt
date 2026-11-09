@@ -247,6 +247,19 @@ class ChatViewModel(
                 }
             }
             ChatEvent.DismissStopAll -> updateState { it.copy(confirmingStopAll = null) }
+            is ChatEvent.ShowRunningList -> {
+                updateState { s -> s.copy(runningPanel = if (s.runningChips) event.group?.let { RunningPanel(it) } else null) }
+                restartRunningPoll()
+            }
+            is ChatEvent.ShowRunningItem -> {
+                val entry = currentState.work.entries(event.group).firstOrNull { it.id == event.id } ?: return
+                updateState { it.copy(runningPanel = RunningPanel(event.group, entry)) }
+                restartRunningPoll()
+            }
+            ChatEvent.CloseRunningItem -> {
+                updateState { it.copy(runningPanel = null) }
+                restartRunningPoll()
+            }
             ChatEvent.Retry -> loadAll()
             is ChatEvent.DraftChanged -> {
                 updateState { it.copy(draft = event.text) }
@@ -259,7 +272,7 @@ class ChatViewModel(
             ChatEvent.Compact -> compact()
             is ChatEvent.OpenSession -> {
                 // Otherwise the Running sheet is still open on return, and the first Back only closes it.
-                updateState { it.copy(workOpen = false) }
+                updateState { it.copy(workOpen = false, runningPanel = null) }
                 sendEffect(ChatEffect.OpenSession(event.sessionId))
             }
             is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
@@ -347,39 +360,49 @@ class ChatViewModel(
             }
             // Commands started by this transcript's tools are owned through the messages already in memory.
             val owners = shellOwners(sessionId, messages) + toolShells.values.associateWith { sessionId }
-            runningWork.load(listOf(root), details = currentState.workOpen, shellOwners = owners).fold(
+            // Subagent titles and start times are read for the sheet and for the chips' lists.
+            val details = currentState.workOpen || currentState.runningPanel != null
+            runningWork.load(listOf(root), details = details, shellOwners = owners).fold(
                 onSuccess = { snapshot ->
                     val work = snapshot.sessions[sessionId] ?: RunningWork()
-                    val ids = (work.commands + snapshot.unassigned).map { it.id }.toSet()
+                    val offset = chat.serverClockOffsetMs()
+                    // The item open in its sheet keeps its last output once it ended.
+                    val ids = (work.commands + snapshot.unassigned).map { it.id }.toSet() + listOfNotNull(currentState.runningPanel?.item?.id)
                     val newShells = work.commands.map { it.id } != currentState.work.commands.map { it.id }
                     updateState {
                         it.copy(
                             work = work,
-                            clockOffsetMs = chat.serverClockOffsetMs(),
+                            clockOffsetMs = offset,
                             unassignedCommands = snapshot.unassigned,
                             workLoading = false,
                             workError = snapshot.errors[sessionId]?.toUiText(),
                             workOutput = it.workOutput.filterKeys { id -> id in ids },
                             workOutputErrors = it.workOutputErrors.filterKeys { id -> id in ids },
+                            runningPanel = it.runningPanel?.follow(work, clock() + offset),
                         )
                     }
                     // Running tools whose shell id the transcript lost can follow these shells.
                     if (newShells) rebuild()
-                    if (currentState.workOpen) {
-                        for (command in work.commands + snapshot.unassigned) {
-                            chat.shellTail(command.directory, command.id).fold(
-                                onSuccess = { output ->
-                                    updateState {
-                                        it.copy(workOutput = it.workOutput + (command.id to output), workOutputErrors = it.workOutputErrors - command.id)
-                                    }
-                                },
-                                onFailure = { error ->
-                                    updateState {
-                                        it.copy(workOutputErrors = it.workOutputErrors + (command.id to error.toUiText()))
-                                    }
-                                },
-                            )
-                        }
+                    // The sheet shows every output; a chip's sheet only its own shell's.
+                    val tails = if (currentState.workOpen) {
+                        work.commands + snapshot.unassigned
+                    } else {
+                        val open = currentState.runningPanel?.takeIf { it.endedAt == null }?.item?.takeIf { it.group == RunningGroup.Commands }
+                        work.commands.filter { it.id == open?.id }
+                    }
+                    for (command in tails) {
+                        chat.shellTail(command.directory, command.id).fold(
+                            onSuccess = { output ->
+                                updateState {
+                                    it.copy(workOutput = it.workOutput + (command.id to output), workOutputErrors = it.workOutputErrors - command.id)
+                                }
+                            },
+                            onFailure = { error ->
+                                updateState {
+                                    it.copy(workOutputErrors = it.workOutputErrors + (command.id to error.toUiText()))
+                                }
+                            },
+                        )
                     }
                 },
                 onFailure = { error -> updateState { it.copy(workLoading = false, workError = error.toUiText()) } },
@@ -400,7 +423,8 @@ class ChatViewModel(
                 while (true) {
                     // Offline or unreachable a refresh only fails; reconnecting refreshes anyway.
                     if (events.connection.value == ConnectionState.Connected) refreshRunning()
-                    delay(if (currentState.workOpen) RUNNING_SHEET_POLL_MS else RUNNING_POLL_MS)
+                    val outputShown = currentState.workOpen || currentState.runningPanel?.item != null
+                    delay(if (outputShown) RUNNING_SHEET_POLL_MS else RUNNING_POLL_MS)
                 }
             }
         } else {

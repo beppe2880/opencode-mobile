@@ -27,6 +27,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ShowCost(listOf("showCost")),
     PermissionsCollapsed(listOf("permissionsCollapsed")),
     QuestionsCollapsed(listOf("questionsCollapsed")),
+    RunningChips(listOf("runningChips")),
     ConfirmStop(listOf("confirmStopCommand")),
     FollowRunning(listOf("followRunningTools")),
     KeepLiveOpen(listOf("keepLiveStepsOpen"), requires = FollowRunning),
@@ -103,7 +104,8 @@ val SettingsPart.options: List<SettingOption>
             SettingOption.OutputLines,
         )
         SettingsPart.Footer -> listOf(SettingOption.ShowCost)
-        SettingsPart.PendingCards -> listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed)
+        // Everything above the composer: the pending cards and the running chips.
+        SettingsPart.PendingCards -> listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed, SettingOption.RunningChips)
         SettingsPart.RunningLine -> listOf(SettingOption.ConfirmStop)
         SettingsPart.LiveStep -> listOf(SettingOption.FollowRunning, SettingOption.KeepLiveOpen)
         SettingsPart.LiveThinking -> listOf(SettingOption.LiveThinking)

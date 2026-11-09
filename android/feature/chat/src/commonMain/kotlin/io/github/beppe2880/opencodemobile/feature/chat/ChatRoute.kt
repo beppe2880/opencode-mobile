@@ -63,6 +63,7 @@ fun ChatRoute(
     }
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
+    val share = rememberTextShare()
     val scope = rememberCoroutineScope()
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
@@ -215,5 +216,6 @@ fun ChatRoute(
         showBack = showBack,
         snackbarHostState = snackbar,
         listState = listState,
+        onShare = share,
     )
 }

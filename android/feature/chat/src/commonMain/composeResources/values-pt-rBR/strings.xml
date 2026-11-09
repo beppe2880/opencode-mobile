@@ -231,6 +231,34 @@
         <item quantity="one">Não foi possível parar %1$d subagente</item>
         <item quantity="other">Não foi possível parar %1$d subagentes</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agente</item>
+        <item quantity="other">%1$d agentes</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell em execução</item>
+        <item quantity="other">%1$d shells em execução</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agente em execução</item>
+        <item quantity="other">%1$d agentes em execução</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agentes</string>
+    <string name="chat_running_status_running">Em execução · %1$s</string>
+    <string name="chat_running_status_exited">Encerrado · %1$s</string>
+    <string name="chat_running_status_finished">Concluído · %1$s</string>
+    <string name="chat_running_status_ended">Encerrado</string>
+    <string name="chat_running_stop_shell">Parar shell</string>
+    <string name="chat_running_stop_subagent">Parar agente</string>
+    <string name="chat_running_copy_command">Copiar comando</string>
+    <string name="chat_running_share">Compartilhar</string>
+    <string name="chat_running_open_session">Abrir sessão</string>
+    <string name="chat_running_agent_untitled">Subagente</string>
     <string name="chat_preview_folds">Passos acompanhados ao vivo são recolhidos quando a resposta termina</string>
     <string name="chat_preview_kept_open">Passos acompanhados ao vivo permanecem abertos após a resposta</string>
     <string name="chat_preview_not_followed">Passos em execução ficam recolhidos até você abri-los</string>

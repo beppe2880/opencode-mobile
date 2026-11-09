@@ -231,6 +231,34 @@
         <item quantity="one">Could not stop %1$d subagent</item>
         <item quantity="other">Could not stop %1$d subagents</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agent</item>
+        <item quantity="other">%1$d agents</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell running</item>
+        <item quantity="other">%1$d shells running</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agent running</item>
+        <item quantity="other">%1$d agents running</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agents</string>
+    <string name="chat_running_status_running">Running · %1$s</string>
+    <string name="chat_running_status_exited">Exited · %1$s</string>
+    <string name="chat_running_status_finished">Finished · %1$s</string>
+    <string name="chat_running_status_ended">Ended</string>
+    <string name="chat_running_stop_shell">Stop shell</string>
+    <string name="chat_running_stop_subagent">Stop agent</string>
+    <string name="chat_running_copy_command">Copy command</string>
+    <string name="chat_running_share">Share</string>
+    <string name="chat_running_open_session">Open session</string>
+    <string name="chat_running_agent_untitled">Subagent</string>
     <string name="chat_preview_folds">Steps followed live fold back when the answer ends</string>
     <string name="chat_preview_kept_open">Steps followed live stay open after the answer</string>
     <string name="chat_preview_not_followed">Running steps stay folded until you open them</string>

@@ -231,6 +231,34 @@
         <item quantity="one">Impossibile fermare %1$d sottoagente</item>
         <item quantity="other">Impossibile fermare %1$d sottoagenti</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shell</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agente</item>
+        <item quantity="other">%1$d agenti</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell in esecuzione</item>
+        <item quantity="other">%1$d shell in esecuzione</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agente in esecuzione</item>
+        <item quantity="other">%1$d agenti in esecuzione</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shell</string>
+    <string name="chat_running_list_agents">Agenti</string>
+    <string name="chat_running_status_running">In esecuzione · %1$s</string>
+    <string name="chat_running_status_exited">Terminata · %1$s</string>
+    <string name="chat_running_status_finished">Finito · %1$s</string>
+    <string name="chat_running_status_ended">Terminato</string>
+    <string name="chat_running_stop_shell">Ferma shell</string>
+    <string name="chat_running_stop_subagent">Ferma agente</string>
+    <string name="chat_running_copy_command">Copia comando</string>
+    <string name="chat_running_share">Condividi</string>
+    <string name="chat_running_open_session">Apri sessione</string>
+    <string name="chat_running_agent_untitled">Subagente</string>
     <string name="chat_preview_folds">I passaggi seguiti in diretta si ripiegano alla fine della risposta</string>
     <string name="chat_preview_kept_open">I passaggi seguiti in diretta restano aperti dopo la risposta</string>
     <string name="chat_preview_not_followed">I passaggi in esecuzione restano ripiegati finché non li apri</string>

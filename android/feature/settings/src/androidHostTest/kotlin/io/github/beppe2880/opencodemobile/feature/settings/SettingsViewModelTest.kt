@@ -75,6 +75,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
+        vm.onEvent(SettingsEvent.RunningChipsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
         vm.onEvent(SettingsEvent.GroupThoughtsChanged(false))
@@ -131,6 +132,7 @@ class SettingsViewModelTest {
                 swipeBetweenChats = false,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
+                runningChips = false,
                 agentColorOutline = false,
                 dictation = false,
                 selectionApply = SelectionApply.Immediately,

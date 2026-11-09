@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">عرض عدد الوكلاء الفرعيين والأوامر الخلفية قيد التشغيل أسفل كل جلسة</string>
     <string name="settings_confirm_stop">تأكيد قبل إيقاف الأوامر</string>
     <string name="settings_confirm_stop_sub">اطلب التأكيد قبل إيقاف أمر خلفي من ورقة قيد التشغيل</string>
+    <string name="settings_running_chips">العمل الجاري فوق مربع الرسالة</string>
+    <string name="settings_running_chips_sub">تعرض شرائح فوق مربع الرسالة عدد الصدفات والوكلاء الفرعيين قيد التشغيل؛ اضغط على إحداها لمتابعتها أو إيقافها</string>
     <string name="settings_show_cost">إظهار التكلفة</string>
     <string name="settings_show_cost_sub">عرض تكلفة كل جولة بالدولار أسفل الرد</string>
     <string name="settings_header_line">سطر رأس المحادثة</string>

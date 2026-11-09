@@ -129,6 +129,10 @@ data class ChatState(
     val confirmingStopAll: RunningGroup? = null,
     /** Server clock minus device clock, for elapsed times of server timestamps. */
     val clockOffsetMs: Long = 0L,
+    /** Chips above the composer count what runs (setting). */
+    val runningChips: Boolean = true,
+    /** The list or item the running chips opened; null when closed. */
+    val runningPanel: RunningPanel? = null,
     /** The branch line under the title; null while unknown, empty or turned off (setting). */
     val vcs: VcsLine? = null,
     /** How the header line is written (setting). */
@@ -170,6 +174,8 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     permissionsCollapsedByDefault = s.permissionsCollapsed,
     questionsCollapsedByDefault = s.questionsCollapsed,
     headerStyle = s.chatHeaderStyle,
+    runningChips = s.runningChips,
+    runningPanel = runningPanel.takeIf { s.runningChips },
 )
 
 /** The folder name of the header line, when [line] includes it. */
@@ -306,6 +312,13 @@ sealed interface ChatEvent {
     data class StopAll(val group: RunningGroup) : ChatEvent
     data object ConfirmStopAll : ChatEvent
     data object DismissStopAll : ChatEvent
+
+    /** Opens the list of a running chip above the composer; null closes it. */
+    data class ShowRunningList(val group: RunningGroup?) : ChatEvent
+
+    /** Opens one running item of the chips in its sheet. */
+    data class ShowRunningItem(val group: RunningGroup, val id: String) : ChatEvent
+    data object CloseRunningItem : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent

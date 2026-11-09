@@ -165,6 +165,63 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a running chip opens its list then one shell that reads only its own output and stays once stopped`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(confirmStopCommand = false)
+        chat.runningCommands = listOf(
+            RunningCommand("shell", "npm test", "/repo", 1, "s1"),
+            RunningCommand("other", "watch", "/repo", 2, "s1"),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf(RunningChip(RunningGroup.Commands, 2)), runningChips(vm.state.value.work, vm.state.value.runningChips))
+
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        runCurrent()
+        assertEquals(RunningPanel(RunningGroup.Commands), vm.state.value.runningPanel)
+        assertTrue(chat.tailReads.isEmpty())
+
+        vm.onEvent(ChatEvent.ShowRunningItem(RunningGroup.Commands, "shell"))
+        runCurrent()
+        assertEquals("npm test", vm.state.value.runningPanel?.item?.label)
+        assertEquals(listOf("shell"), chat.tailReads)
+        assertEquals("last line", vm.state.value.workOutput["shell"])
+
+        vm.onEvent(ChatEvent.StopCommand("shell"))
+        runCurrent()
+        val panel = vm.state.value.runningPanel!!
+        assertEquals("shell", panel.item?.id)
+        assertNotNull(panel.endedAt)
+        // Its last output stays readable in the open sheet.
+        assertEquals("last line", vm.state.value.workOutput["shell"])
+
+        vm.onEvent(ChatEvent.CloseRunningItem)
+        assertNull(vm.state.value.runningPanel)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `with the running chips setting off nothing opens and an open list closes`() = runTest(main.testDispatcher) {
+        chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        assertEquals(RunningPanel(RunningGroup.Commands), vm.state.value.runningPanel)
+
+        settings.settings.value = AppSettings(runningChips = false)
+        runCurrent()
+        assertFalse(vm.state.value.runningChips)
+        assertNull(vm.state.value.runningPanel)
+        assertTrue(runningChips(vm.state.value.work, vm.state.value.runningChips).isEmpty())
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        assertNull(vm.state.value.runningPanel)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
     fun `opening a subagent session closes the running sheet`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()

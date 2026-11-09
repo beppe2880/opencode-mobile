@@ -145,6 +145,7 @@ sealed interface SettingsEvent {
     data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
+    data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class VoiceEngineChanged(val engine: VoiceEngine) : SettingsEvent

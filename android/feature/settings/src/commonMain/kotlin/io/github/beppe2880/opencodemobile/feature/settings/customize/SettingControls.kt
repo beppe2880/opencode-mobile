@@ -115,6 +115,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_re
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_slow
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_chips
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_chips_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply
@@ -202,6 +204,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ShowCost -> Res.string.settings_show_cost
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed
         SettingOption.QuestionsCollapsed -> Res.string.settings_questions_collapsed
+        SettingOption.RunningChips -> Res.string.settings_running_chips
         SettingOption.ConfirmStop -> Res.string.settings_confirm_stop
         SettingOption.FollowRunning -> Res.string.settings_follow_running
         SettingOption.KeepLiveOpen -> Res.string.settings_keep_live_open
@@ -259,6 +262,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ShowCost -> Res.string.settings_show_cost_sub
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed_sub
         SettingOption.QuestionsCollapsed -> Res.string.settings_questions_collapsed_sub
+        SettingOption.RunningChips -> Res.string.settings_running_chips_sub
         SettingOption.ConfirmStop -> Res.string.settings_confirm_stop_sub
         SettingOption.FollowRunning -> Res.string.settings_follow_running_sub
         SettingOption.KeepLiveOpen -> Res.string.settings_keep_live_open_sub
@@ -387,6 +391,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.ShowCost -> switch(settings.showCost, SettingsEvent::ShowCostChanged)()
         SettingOption.PermissionsCollapsed -> switch(settings.permissionsCollapsed, SettingsEvent::PermissionsCollapsedChanged)()
         SettingOption.QuestionsCollapsed -> switch(settings.questionsCollapsed, SettingsEvent::QuestionsCollapsedChanged)()
+        SettingOption.RunningChips -> switch(settings.runningChips, SettingsEvent::RunningChipsChanged)()
         SettingOption.ConfirmStop -> switch(settings.confirmStopCommand, SettingsEvent::ConfirmStopChanged)()
         SettingOption.FollowRunning -> switch(settings.followRunningTools, SettingsEvent::FollowRunningToolsChanged)()
         SettingOption.KeepLiveOpen -> switch(settings.keepLiveStepsOpen, SettingsEvent::KeepLiveStepsOpenChanged)()
@@ -559,6 +564,7 @@ private val SettingOption.tag: String
         SettingOption.ShowCost -> "show_cost"
         SettingOption.PermissionsCollapsed -> "permissions_collapsed"
         SettingOption.QuestionsCollapsed -> "questions_collapsed"
+        SettingOption.RunningChips -> "running_chips"
         SettingOption.ConfirmStop -> "confirm_stop"
         SettingOption.FollowRunning -> "follow_running"
         SettingOption.KeepLiveOpen -> "keep_live_open"

@@ -389,6 +389,8 @@ data class AppSettings(
     val showRunningWorkInList: Boolean = true,
     /** Stopping a background command from the Running sheet asks first. */
     val confirmStopCommand: Boolean = true,
+    /** Chips above the composer count the running shells and subagents, and open them. */
+    val runningChips: Boolean = true,
     /** Horizontal swipes in a chat open the previous or next session of the list. */
     val swipeBetweenChats: Boolean = true,
     /** The composer outline takes the selected agent's color. */

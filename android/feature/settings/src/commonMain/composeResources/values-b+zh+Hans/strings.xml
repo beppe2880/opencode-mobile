@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
     <string name="settings_confirm_stop">停止命令前需确认</string>
     <string name="settings_confirm_stop_sub">从“运行中”面板停止后台命令前进行询问</string>
+    <string name="settings_running_chips">在消息框上方显示运行中的任务</string>
+    <string name="settings_running_chips_sub">消息框上方的标签显示正在运行的 Shell 和子代理数量；点按即可查看或停止</string>
     <string name="settings_show_cost">显示费用</string>
     <string name="settings_show_cost_sub">在回复下方显示每轮的美元费用</string>
     <string name="settings_header_line">聊天标题栏</string>

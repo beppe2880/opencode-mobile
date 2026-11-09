@@ -113,6 +113,9 @@ fun ChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
                         onSubmit = {},
                         onDismiss = {},
                     )
+                    // Right above the composer, like in the chat.
+                    val chips = runningChips(SampleData.runningWork, preview.settings.runningChips)
+                    if (chips.isNotEmpty()) RunningChipRow(chips, onClick = {})
                 }
             }
             OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }

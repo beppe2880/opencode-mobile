@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.RunningAgent
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
-import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
@@ -55,25 +54,14 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_er
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_no_output
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_refresh
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_description
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_message
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agent_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_message
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_agents_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_message
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_all_commands_title
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_message
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_subagents
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_unassigned_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_stop
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.PluralStringResource
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
@@ -169,58 +157,8 @@ internal fun RunningSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
             }
         }
     }
-    state.confirmingStop?.let { id ->
-        val command = (state.work.commands + state.unassignedCommands).firstOrNull { it.id == id }?.command.orEmpty()
-        OcConfirmDialog(
-            title = stringResource(Res.string.chat_running_stop_title),
-            text = stringResource(Res.string.chat_running_stop_message, command),
-            confirmLabel = stringResource(Res.string.chat_stop),
-            onConfirm = { onEvent(ChatEvent.ConfirmStopCommand) },
-            onDismiss = { onEvent(ChatEvent.DismissStopCommand) },
-            destructive = true,
-            testTagPrefix = "running_stop",
-        )
-    }
-    state.confirmingStopAgent?.let { id ->
-        val title = state.work.agents.firstOrNull { it.session.id == id }?.session?.title.orEmpty()
-        OcConfirmDialog(
-            title = stringResource(Res.string.chat_running_stop_agent_title),
-            text = stringResource(Res.string.chat_running_stop_agent_message, title),
-            confirmLabel = stringResource(Res.string.chat_stop),
-            onConfirm = { onEvent(ChatEvent.ConfirmStopAgent) },
-            onDismiss = { onEvent(ChatEvent.DismissStopAgent) },
-            destructive = true,
-            testTagPrefix = "running_stop_agent",
-        )
-    }
-    state.confirmingStopAll?.let { group ->
-        val (count, title, message, tagPrefix) = when (group) {
-            RunningGroup.Agents -> StopAllDialog(
-                state.work.agents.size,
-                Res.plurals.chat_running_stop_all_agents_title,
-                Res.string.chat_running_stop_all_agents_message,
-                "running_stop_all_agents",
-            )
-            RunningGroup.Commands -> StopAllDialog(
-                state.work.commands.size,
-                Res.plurals.chat_running_stop_all_commands_title,
-                Res.string.chat_running_stop_all_commands_message,
-                "running_stop_all_commands",
-            )
-        }
-        OcConfirmDialog(
-            title = pluralStringResource(title, count, count),
-            text = stringResource(message),
-            confirmLabel = stringResource(Res.string.chat_running_stop_all),
-            onConfirm = { onEvent(ChatEvent.ConfirmStopAll) },
-            onDismiss = { onEvent(ChatEvent.DismissStopAll) },
-            destructive = true,
-            testTagPrefix = tagPrefix,
-        )
-    }
+    // Its Stop confirmations are RunningStopDialogs, shown by the chat screen.
 }
-
-private data class StopAllDialog(val count: Int, val title: PluralStringResource, val message: StringResource, val testTagPrefix: String)
 
 /** A small section title with the section's "Stop all", shown while anything in it runs. */
 @Composable

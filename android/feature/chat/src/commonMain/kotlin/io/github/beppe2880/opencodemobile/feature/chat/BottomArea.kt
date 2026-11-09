@@ -143,6 +143,8 @@ internal fun BottomArea(
         if (state.suggestions.isNotEmpty()) {
             SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
         }
+        // Part of this column, so the transcript above ends before them and is never covered.
+        RunningChipsBar(state, onEvent)
         Composer(
             state,
             onEvent,

@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">Считать выполняемых субагентов и фоновые команды под каждой сессией</string>
     <string name="settings_confirm_stop">Подтверждать остановку команд</string>
     <string name="settings_confirm_stop_sub">Спрашивать перед остановкой фоновой команды из панели «Выполняется»</string>
+    <string name="settings_running_chips">Выполняемая работа над полем сообщения</string>
+    <string name="settings_running_chips_sub">Чипы над полем сообщения показывают число запущенных оболочек и субагентов; нажмите, чтобы следить за ними или остановить</string>
     <string name="settings_show_cost">Показывать стоимость</string>
     <string name="settings_show_cost_sub">Показывать стоимость каждого хода в долларах под ответом</string>
     <string name="settings_header_line">Строка заголовка чата</string>

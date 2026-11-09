@@ -71,6 +71,7 @@ internal class PreferencesSettingsRepository(
         prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
+        prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putString(KEY_VOICE_ENGINE, next.voiceEngine.name)
@@ -145,6 +146,7 @@ internal class PreferencesSettingsRepository(
             swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
+            runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             voiceEngine = VoiceEngine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_VOICE_ENGINE) } ?: defaults.voiceEngine,
@@ -224,6 +226,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
+        const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
         const val KEY_VOICE_ENGINE = "voice_engine"

@@ -68,6 +68,8 @@
     <string name="settings_running_in_list_sub">Laufende Subagenten und Hintergrundbefehle unter jeder Sitzung zählen</string>
     <string name="settings_confirm_stop">Vor dem Beenden von Befehlen bestätigen</string>
     <string name="settings_confirm_stop_sub">Vor dem Beenden eines Hintergrundbefehls aus dem Blatt „Laufend“ nachfragen</string>
+    <string name="settings_running_chips">Laufende Arbeit über dem Nachrichtenfeld</string>
+    <string name="settings_running_chips_sub">Chips über dem Nachrichtenfeld zählen laufende Shells und Subagenten; tippe auf einen, um sie zu verfolgen oder zu beenden</string>
     <string name="settings_show_cost">Kosten anzeigen</string>
     <string name="settings_show_cost_sub">Kosten jedes Durchlaufs in Dollar unter der Antwort anzeigen</string>
     <string name="settings_header_line">Kopfzeile des Chats</string>
