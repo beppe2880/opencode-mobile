@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.fake
 
+import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
@@ -8,6 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.koin.dsl.koinApplication
 
 class FakeDataTest {
     @Test
@@ -37,5 +39,11 @@ class FakeDataTest {
         assertTrue("This is the demo" in reply)
         assertFalse("fake" in reply.lowercase())
         assertFalse(session.id in store.running)
+    }
+
+    @Test
+    fun `the demo binds provider integrations, which every chat resolves`() = runTest {
+        val koin = koinApplication { modules(fakeDataModule) }.koin
+        assertTrue(koin.get<IntegrationRepository>().listKeys("demo", "/demo").getOrThrow().isEmpty())
     }
 }
