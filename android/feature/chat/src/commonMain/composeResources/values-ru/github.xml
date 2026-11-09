@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">Открыть #%1$s</string>
+    <string name="chat_github_open_pull">Открыть PR #%1$s</string>
+    <string name="chat_github_open_new_pull">Открыть новый PR</string>
+    <string name="chat_github_open_run">Открыть запуск %1$s</string>
+    <string name="chat_github_open_commit">Открыть коммит %1$s</string>
+    <string name="chat_github_open_repo">Открыть %1$s</string>
+    <string name="chat_github_issue_description">Открыть issue %1$s на GitHub</string>
+    <string name="chat_github_pull_description">Открыть pull request %1$s на GitHub</string>
+    <string name="chat_github_new_pull_description">Открыть новый pull request на GitHub</string>
+    <string name="chat_github_run_description">Открыть запуск workflow %1$s на GitHub</string>
+    <string name="chat_github_commit_description">Открыть коммит %1$s на GitHub</string>
+    <string name="chat_github_repo_description">Открыть %1$s на GitHub</string>
+    <string name="chat_github_copy_link">Копировать ссылку</string>
+    <string name="chat_github_more_links">Другие ссылки GitHub</string>
+</resources>

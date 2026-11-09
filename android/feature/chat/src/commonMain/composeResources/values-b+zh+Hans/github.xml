@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">打开 #%1$s</string>
+    <string name="chat_github_open_pull">打开 PR #%1$s</string>
+    <string name="chat_github_open_new_pull">新建 PR</string>
+    <string name="chat_github_open_run">打开运行 %1$s</string>
+    <string name="chat_github_open_commit">打开提交 %1$s</string>
+    <string name="chat_github_open_repo">打开 %1$s</string>
+    <string name="chat_github_issue_description">在 GitHub 上打开议题 %1$s</string>
+    <string name="chat_github_pull_description">在 GitHub 上打开拉取请求 %1$s</string>
+    <string name="chat_github_new_pull_description">在 GitHub 上新建拉取请求</string>
+    <string name="chat_github_run_description">在 GitHub 上打开工作流运行 %1$s</string>
+    <string name="chat_github_commit_description">在 GitHub 上打开提交 %1$s</string>
+    <string name="chat_github_repo_description">在 GitHub 上打开 %1$s</string>
+    <string name="chat_github_copy_link">复制链接</string>
+    <string name="chat_github_more_links">更多 GitHub 链接</string>
+</resources>

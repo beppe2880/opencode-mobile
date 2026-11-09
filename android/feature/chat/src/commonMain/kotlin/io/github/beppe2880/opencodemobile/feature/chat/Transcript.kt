@@ -357,6 +357,7 @@ internal fun TranscriptItem(
             fullCommands = state.showFullCommands,
             inLiveGroup = item.key == liveGroupKey,
             details = state.showToolDetails || keptOpen(item.key),
+            onCopy = onCopy,
         )
         is ChatItem.Activity -> ActivityGroup(
             item = item,
@@ -372,6 +373,7 @@ internal fun TranscriptItem(
             modifier = modifier,
             live = state.live,
             fullCommands = state.showFullCommands,
+            onCopy = onCopy,
         )
         is ChatItem.Error -> ErrorRow(item, modifier)
         is ChatItem.Notice -> NoticeRow(

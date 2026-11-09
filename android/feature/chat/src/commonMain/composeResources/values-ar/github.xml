@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">فتح #%1$s</string>
+    <string name="chat_github_open_pull">فتح PR #%1$s</string>
+    <string name="chat_github_open_new_pull">فتح PR جديد</string>
+    <string name="chat_github_open_run">فتح التشغيل %1$s</string>
+    <string name="chat_github_open_commit">فتح الإيداع %1$s</string>
+    <string name="chat_github_open_repo">فتح %1$s</string>
+    <string name="chat_github_issue_description">فتح المشكلة %1$s على GitHub</string>
+    <string name="chat_github_pull_description">فتح طلب السحب %1$s على GitHub</string>
+    <string name="chat_github_new_pull_description">فتح طلب سحب جديد على GitHub</string>
+    <string name="chat_github_run_description">فتح تشغيل سير العمل %1$s على GitHub</string>
+    <string name="chat_github_commit_description">فتح الإيداع %1$s على GitHub</string>
+    <string name="chat_github_repo_description">فتح %1$s على GitHub</string>
+    <string name="chat_github_copy_link">نسخ الرابط</string>
+    <string name="chat_github_more_links">المزيد من روابط GitHub</string>
+</resources>

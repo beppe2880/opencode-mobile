@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">Abrir #%1$s</string>
+    <string name="chat_github_open_pull">Abrir PR #%1$s</string>
+    <string name="chat_github_open_new_pull">Abrir novo PR</string>
+    <string name="chat_github_open_run">Abrir execução %1$s</string>
+    <string name="chat_github_open_commit">Abrir commit %1$s</string>
+    <string name="chat_github_open_repo">Abrir %1$s</string>
+    <string name="chat_github_issue_description">Abrir a issue %1$s no GitHub</string>
+    <string name="chat_github_pull_description">Abrir o pull request %1$s no GitHub</string>
+    <string name="chat_github_new_pull_description">Abrir um novo pull request no GitHub</string>
+    <string name="chat_github_run_description">Abrir a execução do workflow %1$s no GitHub</string>
+    <string name="chat_github_commit_description">Abrir o commit %1$s no GitHub</string>
+    <string name="chat_github_repo_description">Abrir %1$s no GitHub</string>
+    <string name="chat_github_copy_link">Copiar link</string>
+    <string name="chat_github_more_links">Mais links do GitHub</string>
+</resources>

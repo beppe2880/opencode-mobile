@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">#%1$s を開く</string>
+    <string name="chat_github_open_pull">PR #%1$s を開く</string>
+    <string name="chat_github_open_new_pull">新しい PR を開く</string>
+    <string name="chat_github_open_run">実行 %1$s を開く</string>
+    <string name="chat_github_open_commit">コミット %1$s を開く</string>
+    <string name="chat_github_open_repo">%1$s を開く</string>
+    <string name="chat_github_issue_description">GitHub で Issue %1$s を開く</string>
+    <string name="chat_github_pull_description">GitHub でプルリクエスト %1$s を開く</string>
+    <string name="chat_github_new_pull_description">GitHub で新しいプルリクエストを開く</string>
+    <string name="chat_github_run_description">GitHub でワークフロー実行 %1$s を開く</string>
+    <string name="chat_github_commit_description">GitHub でコミット %1$s を開く</string>
+    <string name="chat_github_repo_description">GitHub で %1$s を開く</string>
+    <string name="chat_github_copy_link">リンクをコピー</string>
+    <string name="chat_github_more_links">その他の GitHub リンク</string>
+</resources>
