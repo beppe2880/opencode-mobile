@@ -41,6 +41,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_colored_markdown
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_colored_markdown_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
@@ -186,6 +188,7 @@ internal val SettingOption.titleRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme
         SettingOption.TextSize -> Res.string.settings_text_size
+        SettingOption.ColoredMarkdown -> Res.string.settings_colored_markdown
         SettingOption.HeaderLine -> Res.string.settings_header_line
         SettingOption.HeaderStyle -> Res.string.settings_header_style
         SettingOption.HeaderOpens -> Res.string.settings_header_opens
@@ -242,6 +245,7 @@ internal val SettingOption.descriptionRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme_sub
         SettingOption.TextSize -> Res.string.settings_text_size_sub
+        SettingOption.ColoredMarkdown -> Res.string.settings_colored_markdown_sub
         SettingOption.HeaderLine -> Res.string.settings_header_line_all_sub
         SettingOption.HeaderStyle -> Res.string.settings_header_style_icons_sub
         SettingOption.HeaderOpens -> Res.string.settings_header_opens_sub
@@ -322,6 +326,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             selected = settings.chatTextScale,
             onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
         )
+        SettingOption.ColoredMarkdown -> switch(settings.coloredMarkdown, SettingsEvent::ColoredMarkdownChanged)()
         SettingOption.HeaderLine -> ChoiceRow(
             title = title,
             subtitle = stringResource(
@@ -544,6 +549,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
 /** Test tags keep the names the settings list used before the previews. */
 private val SettingOption.tag: String
     get() = when (this) {
+        SettingOption.ColoredMarkdown -> "colored_markdown"
         SettingOption.ShowReasoning -> "show_reasoning"
         SettingOption.GroupThoughts -> "group_thoughts"
         SettingOption.GroupActivity -> "group_activity"

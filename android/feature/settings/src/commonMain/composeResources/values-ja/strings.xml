@@ -50,6 +50,8 @@
     <string name="settings_refresh_slow">3秒</string>
     <string name="settings_text_size">チャットの文字サイズ</string>
     <string name="settings_text_size_sub">メッセージとツール出力の大きさ。システムの文字サイズに加えて適用されます</string>
+    <string name="settings_colored_markdown">カラー Markdown</string>
+    <string name="settings_colored_markdown_sub">回答の見出し、太字、リンク、コードを OpenCode ターミナルアプリと同じ色で表示します</string>
     <string name="settings_text_small">小</string>
     <string name="settings_text_default">標準</string>
     <string name="settings_text_large">大</string>
@@ -268,6 +270,7 @@
     <string name="settings_summary_blocked">ブロック中</string>
     <string name="settings_summary_no_server">サーバーなし</string>
     <string name="settings_summary_split">リストの横にチャット</string>
+    <string name="settings_summary_colored_markdown">カラー Markdown</string>
     <string name="settings_summary_reasoning">思考</string>
     <string name="settings_summary_grouped">まとめたアクティビティ</string>
     <string name="settings_summary_cost">費用</string>

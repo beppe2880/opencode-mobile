@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 enum class SettingOption(val fields: List<String>, val requires: SettingOption? = null) {
     Theme(listOf("theme")),
     TextSize(listOf("chatTextScale")),
+    ColoredMarkdown(listOf("coloredMarkdown")),
     HeaderLine(listOf("chatHeaderLine")),
     HeaderStyle(listOf("chatHeaderStyle")),
     HeaderOpens(listOf("headerOpens")),
@@ -80,9 +81,9 @@ internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks",
 val SettingsPart.options: List<SettingOption>
     get() = when (this) {
         SettingsPart.Theme -> listOf(SettingOption.Theme)
-        SettingsPart.TextSize -> listOf(SettingOption.TextSize)
+        SettingsPart.TextSize -> listOf(SettingOption.TextSize, SettingOption.ColoredMarkdown)
         SettingsPart.Header -> listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)
-        SettingsPart.Messages -> listOf(SettingOption.TextSize)
+        SettingsPart.Messages -> listOf(SettingOption.TextSize, SettingOption.ColoredMarkdown)
         SettingsPart.Thoughts -> listOf(SettingOption.ShowReasoning, SettingOption.GroupThoughts, SettingOption.GroupActivity)
         SettingsPart.Tools -> listOf(
             SettingOption.ExpandTools,

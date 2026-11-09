@@ -53,6 +53,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_new
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_apply
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_blocked
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_colored_markdown
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_cost
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_custom_keys
@@ -103,7 +104,7 @@ val SettingsArea.groups: List<OptionGroup>
     get() = when (this) {
         SettingsArea.Servers, SettingsArea.About -> emptyList()
         SettingsArea.Appearance -> listOf(
-            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.TextSize)),
+            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.TextSize, SettingOption.ColoredMarkdown)),
             OptionGroup(
                 Res.string.settings_group_wide,
                 listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList),
@@ -269,6 +270,7 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
         SettingsArea.Appearance -> listOfNotNull(
             res(s.theme.labelRes),
             res(textSizeLabel(s.chatTextScale)),
+            if (s.coloredMarkdown) res(Res.string.settings_summary_colored_markdown) else null,
             if (wide && s.splitView) res(Res.string.settings_summary_split) else null,
         )
         SettingsArea.Chat -> on(

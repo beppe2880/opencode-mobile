@@ -60,6 +60,8 @@ data class ChatState(
     val keepLiveStepsOpen: Boolean = false,
     /** Transcript text size relative to the system one (setting). */
     val chatTextScale: Float = 1f,
+    /** Answers color their markdown like the OpenCode terminal app (setting). */
+    val coloredMarkdown: Boolean = false,
     /** An opened tool group shows each tool's output (setting). */
     val showToolDetails: Boolean = true,
     /** Tool rows wrap long commands and paths (setting). */
@@ -162,6 +164,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     outputPreviewLines = s.outputPreviewLines,
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,
+    coloredMarkdown = s.coloredMarkdown,
     showCost = s.showCost,
     swipeEnabled = s.swipeBetweenChats,
     agentColorOutline = s.agentColorOutline,

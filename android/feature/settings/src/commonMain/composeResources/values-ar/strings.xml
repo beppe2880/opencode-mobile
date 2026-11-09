@@ -50,6 +50,8 @@
     <string name="settings_refresh_slow">3 ث</string>
     <string name="settings_text_size">حجم نص الدردشة</string>
     <string name="settings_text_size_sub">حجم الرسائل ومخرجات الأدوات، إضافةً إلى حجم النظام</string>
+    <string name="settings_colored_markdown">Markdown ملوّن</string>
+    <string name="settings_colored_markdown_sub">تأخذ العناوين والنص العريض والروابط والشيفرة في الردود ألوان تطبيق OpenCode للطرفية</string>
     <string name="settings_text_small">صغير</string>
     <string name="settings_text_default">افتراضي</string>
     <string name="settings_text_large">كبير</string>
@@ -283,6 +285,7 @@
     <string name="settings_summary_blocked">محظور</string>
     <string name="settings_summary_no_server">لا يوجد خادم</string>
     <string name="settings_summary_split">المحادثة بجانب القائمة</string>
+    <string name="settings_summary_colored_markdown">Markdown ملوّن</string>
     <string name="settings_summary_reasoning">التفكير</string>
     <string name="settings_summary_grouped">نشاط مجمّع</string>
     <string name="settings_summary_cost">التكلفة</string>

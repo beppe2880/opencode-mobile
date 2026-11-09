@@ -50,6 +50,8 @@
     <string name="settings_refresh_slow">3 s</string>
     <string name="settings_text_size">Chat text size</string>
     <string name="settings_text_size_sub">Size of messages and tool output, on top of the system size</string>
+    <string name="settings_colored_markdown">Colored markdown</string>
+    <string name="settings_colored_markdown_sub">Headings, bold text, links and code in answers take the colors of the OpenCode terminal app</string>
     <string name="settings_text_small">Small</string>
     <string name="settings_text_default">Default</string>
     <string name="settings_text_large">Large</string>
@@ -271,6 +273,7 @@
     <string name="settings_summary_blocked">Blocked</string>
     <string name="settings_summary_no_server">No server</string>
     <string name="settings_summary_split">Chat beside the list</string>
+    <string name="settings_summary_colored_markdown">Colored markdown</string>
     <string name="settings_summary_reasoning">Reasoning</string>
     <string name="settings_summary_grouped">Grouped activity</string>
     <string name="settings_summary_cost">Cost</string>

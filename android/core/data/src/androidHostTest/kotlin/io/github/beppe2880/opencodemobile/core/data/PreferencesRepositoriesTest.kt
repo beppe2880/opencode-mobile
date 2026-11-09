@@ -83,6 +83,7 @@ class PreferencesRepositoriesTest {
             liveOutputIntervalMs = 3_000,
             keepLiveStepsOpen = true,
             chatTextScale = 1.15f,
+            coloredMarkdown = true,
             terminalOpenKeyboard = false,
             terminalFullscreenByDefault = true,
             splitView = false,
@@ -111,6 +112,16 @@ class PreferencesRepositoriesTest {
 
         assertEquals(changed, reopened)
         assertEquals(AppSettings(), PreferencesSettingsRepository(SharedPreferencesSettings(InMemoryPreferences())).settings.value)
+    }
+
+    @Test
+    fun `colored markdown starts off and is kept once turned on`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        assertFalse(PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.coloredMarkdown)
+
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(coloredMarkdown = true) }
+        assertEquals(true, prefs.values["colored_markdown"])
+        assertEquals(true, PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.coloredMarkdown)
     }
 
     @Test

@@ -53,6 +53,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
+        prefs.putBoolean(KEY_COLORED_MARKDOWN, next.coloredMarkdown)
         prefs.putBoolean(KEY_SHOW_COST, next.showCost)
         prefs.putString(KEY_HEADER_LINE, next.chatHeaderLine.name)
         prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
@@ -124,6 +125,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             keepLiveStepsOpen = prefs.getBoolean(KEY_KEEP_LIVE_OPEN, defaults.keepLiveStepsOpen),
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
+            coloredMarkdown = prefs.getBoolean(KEY_COLORED_MARKDOWN, defaults.coloredMarkdown),
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             chatHeaderLine = ChatHeaderLine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_LINE) } ?: defaults.chatHeaderLine,
             chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
@@ -196,6 +198,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
+        const val KEY_COLORED_MARKDOWN = "colored_markdown"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_HEADER_LINE = "chat_header_line"
         const val KEY_HEADER_OPENS = "chat_header_opens"

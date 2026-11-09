@@ -50,6 +50,8 @@
     <string name="settings_refresh_slow">3秒</string>
     <string name="settings_text_size">聊天文字大小</string>
     <string name="settings_text_size_sub">消息和工具输出的大小，在系统字号基础上调整</string>
+    <string name="settings_colored_markdown">彩色 Markdown</string>
+    <string name="settings_colored_markdown_sub">回答中的标题、粗体、链接和代码使用 OpenCode 终端应用的配色</string>
     <string name="settings_text_small">小</string>
     <string name="settings_text_default">默认</string>
     <string name="settings_text_large">大</string>
@@ -268,6 +270,7 @@
     <string name="settings_summary_blocked">已阻止</string>
     <string name="settings_summary_no_server">无服务器</string>
     <string name="settings_summary_split">聊天与列表并排</string>
+    <string name="settings_summary_colored_markdown">彩色 Markdown</string>
     <string name="settings_summary_reasoning">思考</string>
     <string name="settings_summary_grouped">合并活动</string>
     <string name="settings_summary_cost">费用</string>

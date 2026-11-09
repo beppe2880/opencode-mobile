@@ -62,6 +62,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
+import io.github.beppe2880.opencodemobile.core.ui.markdown.LocalColoredMarkdown
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -287,12 +288,13 @@ internal suspend fun LazyListState.scrollToLatest() {
     if (last >= 0) scrollToItem(last, Int.MAX_VALUE)
 }
 
-/** The chat text size and the tool output length of the settings, for transcript rows. */
+/** The chat text size, the markdown colors and the tool output length of the settings, for transcript rows. */
 @Composable
 internal fun TranscriptLocals(state: ChatState, content: @Composable () -> Unit) {
     val density = LocalDensity.current
     CompositionLocalProvider(
         LocalDensity provides Density(density.density, density.fontScale * state.chatTextScale),
+        LocalColoredMarkdown provides state.coloredMarkdown,
         LocalOutputLines provides state.outputPreviewLines,
         content = content,
     )

@@ -90,6 +90,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
         vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
+        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(true))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -122,6 +123,7 @@ class SettingsViewModelTest {
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
+                coloredMarkdown = true,
                 showCost = false,
                 chatHeaderLine = ChatHeaderLine.BranchFiles,
                 headerOpens = ChangesScope.Session,
@@ -145,6 +147,22 @@ class SettingsViewModelTest {
             settings.settings.value,
         )
         assertEquals(settings.settings.value, vm.state.value.settings)
+    }
+
+    @Test
+    fun `colored markdown is off by default and toggles both ways`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.settings.coloredMarkdown)
+
+        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(true))
+        advanceUntilIdle()
+        assertTrue(settings.settings.value.coloredMarkdown)
+        assertTrue(vm.state.value.settings.coloredMarkdown)
+
+        vm.onEvent(SettingsEvent.ColoredMarkdownChanged(false))
+        advanceUntilIdle()
+        assertFalse(settings.settings.value.coloredMarkdown)
     }
 
     @Test

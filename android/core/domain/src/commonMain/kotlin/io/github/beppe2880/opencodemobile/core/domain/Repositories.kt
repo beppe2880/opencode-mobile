@@ -365,6 +365,8 @@ data class AppSettings(
     val keepLiveStepsOpen: Boolean = false,
     /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
     val chatTextScale: Float = 1f,
+    /** Markdown in answers is colored like in the OpenCode terminal app (headings, bold, links, code...). */
+    val coloredMarkdown: Boolean = false,
     /** Opening a tool group shows each tool's output or diff, not only its name. */
     val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */

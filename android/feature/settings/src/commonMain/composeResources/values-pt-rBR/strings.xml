@@ -50,6 +50,8 @@
     <string name="settings_refresh_slow">3 s</string>
     <string name="settings_text_size">Tamanho do texto do chat</string>
     <string name="settings_text_size_sub">Tamanho das mensagens e da saída das ferramentas, além do tamanho do sistema</string>
+    <string name="settings_colored_markdown">Markdown colorido</string>
+    <string name="settings_colored_markdown_sub">Títulos, negrito, links e código nas respostas usam as cores do app de terminal do OpenCode</string>
     <string name="settings_text_small">Pequeno</string>
     <string name="settings_text_default">Padrão</string>
     <string name="settings_text_large">Grande</string>
@@ -271,6 +273,7 @@
     <string name="settings_summary_blocked">Bloqueado</string>
     <string name="settings_summary_no_server">Sem servidor</string>
     <string name="settings_summary_split">Chat ao lado da lista</string>
+    <string name="settings_summary_colored_markdown">Markdown colorido</string>
     <string name="settings_summary_reasoning">Raciocínio</string>
     <string name="settings_summary_grouped">Atividade agrupada</string>
     <string name="settings_summary_cost">Custo</string>
