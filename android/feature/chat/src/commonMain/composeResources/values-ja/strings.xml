@@ -79,6 +79,8 @@
     <string name="chat_session_deleted">このセッションは削除されました</string>
     <string name="chat_agent">エージェント</string>
     <string name="chat_model">モデル</string>
+    <string name="chat_model_description">モデル: %1$s（%2$s）</string>
+    <string name="chat_model_description_variant">モデル: %1$s（%2$s）、推論レベル %3$s</string>
     <string name="chat_select_agent">エージェントを選択</string>
     <string name="chat_select_model">モデルを選択</string>
     <string name="chat_permission_title">許可が必要です</string>

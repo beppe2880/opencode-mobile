@@ -88,6 +88,8 @@
     <string name="chat_session_deleted">This session was deleted</string>
     <string name="chat_agent">Agent</string>
     <string name="chat_model">Model</string>
+    <string name="chat_model_description">Model: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">Model: %1$s (%2$s), effort %3$s</string>
     <string name="chat_select_agent">Select agent</string>
     <string name="chat_select_model">Select model</string>
     <string name="chat_permission_title">Permission required</string>

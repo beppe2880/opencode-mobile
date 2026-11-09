@@ -106,6 +106,8 @@
     <string name="chat_session_deleted">Эта сессия удалена</string>
     <string name="chat_agent">Агент</string>
     <string name="chat_model">Модель</string>
+    <string name="chat_model_description">Модель: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">Модель: %1$s (%2$s), усилие %3$s</string>
     <string name="chat_select_agent">Выбрать агента</string>
     <string name="chat_select_model">Выбрать модель</string>
     <string name="chat_permission_title">Требуется разрешение</string>

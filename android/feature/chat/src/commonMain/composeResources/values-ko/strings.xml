@@ -79,6 +79,8 @@
     <string name="chat_session_deleted">삭제된 세션입니다</string>
     <string name="chat_agent">에이전트</string>
     <string name="chat_model">모델</string>
+    <string name="chat_model_description">모델: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">모델: %1$s (%2$s), 추론 수준 %3$s</string>
     <string name="chat_select_agent">에이전트 선택</string>
     <string name="chat_select_model">모델 선택</string>
     <string name="chat_permission_title">권한 필요</string>

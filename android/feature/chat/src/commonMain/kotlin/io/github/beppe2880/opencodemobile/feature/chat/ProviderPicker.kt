@@ -48,13 +48,6 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_search
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_status_connected
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_anthropic
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_github_copilot
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_google
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_openai
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_opencode
-import io.github.beppe2880.opencodemobile.feature.chat.resources.provider_opencode_go
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
@@ -138,7 +131,7 @@ internal fun ProviderPicker(state: ProviderConnectionState, onEvent: (ProviderCo
                         title = provider.name,
                         onClick = { onEvent(ProviderConnectionEvent.Select(provider.id)) },
                         modifier = Modifier.testTag("provider_select_${provider.id}"),
-                        leading = { ProviderMark(provider.id) },
+                        leading = { ProviderListMark(provider.id) },
                         trailing = {
                             if (provider.connected) OcBadge(stringResource(Res.string.chat_providers_status_connected), c.success)
                         },
@@ -149,19 +142,11 @@ internal fun ProviderPicker(state: ProviderConnectionState, onEvent: (ProviderCo
     }
 }
 
+/** The provider's logo; providers without one get a generic icon in this list. */
 @Composable
-private fun ProviderMark(id: String) {
-    val resource = when (id) {
-        "opencode" -> Res.drawable.provider_opencode
-        "opencode-go" -> Res.drawable.provider_opencode_go
-        "openai" -> Res.drawable.provider_openai
-        "github-copilot" -> Res.drawable.provider_github_copilot
-        "anthropic" -> Res.drawable.provider_anthropic
-        "google" -> Res.drawable.provider_google
-        else -> null
-    }
-    if (resource != null) {
-        Icon(painterResource(resource), contentDescription = null, modifier = Modifier.size(24.dp), tint = OcTheme.colors.iconBase)
+private fun ProviderListMark(id: String) {
+    if (providerMarkResource(id) != null) {
+        ProviderMark(id, id, size = 24.dp)
     } else {
         Icon(Icons.Outlined.Hub, contentDescription = null, modifier = Modifier.size(24.dp), tint = OcTheme.colors.iconMuted)
     }

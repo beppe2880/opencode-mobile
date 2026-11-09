@@ -198,9 +198,9 @@ fun ComposerPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }
         OcCustomizable(SettingsPart.SelectionTiming, preview) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs), verticalAlignment = Alignment.CenterVertically) {
                     OcChip(text = "Plan", onClick = {}, dotColor = c.agents.forAgent("plan"), selected = true)
-                    OcChip(text = "Claude Sonnet 5", onClick = {}, secondaryText = "Anthropic", selected = true)
+                    ModelButton(SampleData.sonnet.copy(variant = "high"), ModelLabel("Claude Sonnet 5", "Anthropic"), onClick = {})
                 }
                 Caption(
                     if (preview.settings.selectionApply == SelectionApply.NextMessage) Res.string.chat_preview_selection_next

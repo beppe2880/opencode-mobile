@@ -39,10 +39,8 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.AttachFile
-import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Terminal
@@ -105,7 +103,6 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_composer_p
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_listening
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_start
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_stop
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_model
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_queue
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_remove_attachment
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_send
@@ -265,7 +262,7 @@ internal fun Composer(
             AnimatedVisibility(visible = box == BoxMode.Editor || box == BoxMode.Held) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                     // Selectors take only the space the stop/send buttons leave; on narrow phones the
-                    // model chip shrinks and ellipsizes instead of pushing the buttons off screen.
+                    // model button shrinks and ellipsizes instead of pushing the buttons off screen.
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically,
@@ -273,13 +270,10 @@ internal fun Composer(
                     ) {
                         AttachButton(onAttachPhoto, onAttachFile)
                         AgentSelector(state.agents, state.agent, onSelect = { onEvent(ChatEvent.SelectAgent(it)) })
-                        OcChip(
-                            text = (state.modelLabel?.name ?: stringResource(Res.string.chat_model)) +
-                                state.model?.variant?.let { " · $it" }.orEmpty(),
-                            secondaryText = state.modelLabel?.provider,
+                        ModelButton(
+                            model = state.model,
+                            label = state.modelLabel,
                             onClick = { onEvent(ChatEvent.ModelSheet(true)) },
-                            leadingIcon = Icons.Outlined.AutoAwesome,
-                            trailingIcon = Icons.Outlined.ExpandMore,
                             modifier = Modifier
                                 .weight(1f, fill = false)
                                 .widthIn(max = 280.dp)

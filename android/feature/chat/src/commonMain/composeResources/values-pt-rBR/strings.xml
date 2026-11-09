@@ -88,6 +88,8 @@
     <string name="chat_session_deleted">Esta sessão foi excluída</string>
     <string name="chat_agent">Agente</string>
     <string name="chat_model">Modelo</string>
+    <string name="chat_model_description">Modelo: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">Modelo: %1$s (%2$s), esforço %3$s</string>
     <string name="chat_select_agent">Selecionar agente</string>
     <string name="chat_select_model">Selecionar modelo</string>
     <string name="chat_permission_title">Permissão necessária</string>
