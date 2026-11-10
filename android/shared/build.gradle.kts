@@ -15,6 +15,7 @@ kotlin {
         minSdk = 26
         compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) }
         androidResources { enable = true }
+        withHostTest {}
     }
     listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
@@ -47,6 +48,9 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
         androidMain.dependencies {
             // Keeps the AndroidX patch releases newer than the one JetBrains' navigation maps to.
