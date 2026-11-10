@@ -132,6 +132,9 @@ private fun markdownColors(c: OcColors): MarkdownColors = DefaultMarkdownColors(
     inlineCodeBackground = c.layer02,
     dividerColor = c.markdown?.horizontalRule ?: c.borderBase,
     tableBackground = if (c.isDark) c.layer01 else c.layer02,
+    // Search matches in the text; the app does not highlight any yet.
+    highlightText = c.warning.fg,
+    highlightBackground = c.warning.bg,
 )
 
 /**
