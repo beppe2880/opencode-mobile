@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0](https://github.com/beppe2880/opencode-mobile/compare/v0.12.0...v0.13.0) (2026-11-09)
+
+
+### Features
+
+* **chat:** Open and Stop from the running chips popover ([#167](https://github.com/beppe2880/opencode-mobile/issues/167)) ([a9f2d55](https://github.com/beppe2880/opencode-mobile/commit/a9f2d5584dedd004772490d2392be8371e8cddd7))
+* **chat:** Show images and files read by tools inline ([#164](https://github.com/beppe2880/opencode-mobile/issues/164)) ([44bba4f](https://github.com/beppe2880/opencode-mobile/commit/44bba4f922b2d66c387a5d79ed72d204dab420c4))
+
+
+### Bug fixes
+
+* **chat:** Opening a demo chat no longer crashes release builds ([#170](https://github.com/beppe2880/opencode-mobile/issues/170)) ([2126c0c](https://github.com/beppe2880/opencode-mobile/commit/2126c0c957ac0a06057a142a409a3e9de18200f7))
+
 ## [0.12.0](https://github.com/beppe2880/opencode-mobile/compare/v0.11.0...v0.12.0) (2026-11-09)
 
 
