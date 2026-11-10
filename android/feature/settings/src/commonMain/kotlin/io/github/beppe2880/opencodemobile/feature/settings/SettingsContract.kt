@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -144,7 +145,7 @@ sealed interface SettingsEvent {
     data class ChatHeaderLineChanged(val line: ChatHeaderLine) : SettingsEvent
     data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
     data class ChatHeaderStyleChanged(val style: ChatHeaderStyle) : SettingsEvent
-    data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
+    data class ChatSwipeChanged(val swipe: ChatSwipe) : SettingsEvent
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
     data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent

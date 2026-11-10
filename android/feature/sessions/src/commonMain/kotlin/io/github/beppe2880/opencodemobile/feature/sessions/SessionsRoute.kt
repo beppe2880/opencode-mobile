@@ -24,6 +24,8 @@ fun SessionsRoute(
     banner: @Composable () -> Unit = {},
     /** The offline demo: sample sessions, no server behind them. */
     demo: Boolean = false,
+    /** Shown in the drawer over a chat (see [SessionsScreen]). */
+    inDrawer: Boolean = false,
 ) {
     val viewModel: SessionsViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -56,5 +58,6 @@ fun SessionsRoute(
         snackbarHostState = snackbar,
         banner = banner,
         demo = demo,
+        inDrawer = inDrawer,
     )
 }

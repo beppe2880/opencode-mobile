@@ -2,6 +2,8 @@ package io.github.beppe2880.opencodemobile.navigation
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.DragIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,6 +41,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -48,6 +56,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -66,6 +75,8 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
+import io.github.beppe2880.opencodemobile.feature.chat.SessionDrawerPull
+import io.github.beppe2880.opencodemobile.feature.chat.drawerSettlesOpen
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
@@ -80,6 +91,7 @@ import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session_message
+import io.github.beppe2880.opencodemobile.shared.resources.app_session_drawer
 import io.github.beppe2880.opencodemobile.shared.resources.app_share_discard
 import io.github.beppe2880.opencodemobile.shared.resources.app_share_needs_server
 import io.github.beppe2880.opencodemobile.shared.resources.app_show_sessions
@@ -229,19 +241,33 @@ fun AppNavHost(
         }
         composable<ChatDestination> { entry ->
             val args = entry.toRoute<ChatDestination>()
-            ChatRoute(
-                sessionId = args.sessionId,
-                onBack = { navController.popBackStack() },
-                onOpenSession = navController::openChat,
-                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
-                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
-                onSwitchSession = {
-                    // Replaces this chat, so Back still returns to the session list.
-                    navController.navigate(ChatDestination(it)) {
-                        popUpTo<ChatDestination> { inclusive = true }
-                    }
-                },
-            )
+            val switchSession: (String) -> Unit = {
+                // Replaces this chat, so Back still returns to the session list.
+                navController.navigate(ChatDestination(it)) {
+                    popUpTo<ChatDestination> { inclusive = true }
+                }
+            }
+            // Shares the list's ViewModel with the session list below in the back stack.
+            val sessionsEntry = remember(entry) { runCatching { navController.getBackStackEntry(SessionsDestination) }.getOrNull() }
+            // Always there, so the chat stays in place when the swipe setting changes: the chat
+            // pulls the drawer only while its live settings choose it.
+            SessionDrawerHost(
+                currentSessionId = args.sessionId,
+                sessionsOwner = sessionsEntry,
+                demo = isDemo,
+                onOpenChat = switchSession,
+                onOpenSettings = { navController.navigate(SettingsDestination()) },
+            ) { drawer ->
+                ChatRoute(
+                    sessionId = args.sessionId,
+                    onBack = { navController.popBackStack() },
+                    onOpenSession = navController::openChat,
+                    onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                    onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
+                    onSwitchSession = switchSession,
+                    sessionDrawer = drawer,
+                )
+            }
         }
         composable<SettingsDestination> { entry ->
             val area = entry.toRoute<SettingsDestination>().area
@@ -281,8 +307,10 @@ private fun NavController.openChat(sessionId: String) {
 /**
  * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
  * side by side. Tapping the handle on the divider hides the list to give the chat the whole
- * width; dragging it resizes the list, and the share of the width is saved. Back shows a hidden
- * list again (unless turned off in Settings) before it leaves the app.
+ * width; dragging it resizes the list, and the share of the width is saved. With the chat list
+ * swipe ([ChatSwipe.SessionDrawer]) the chat's swipe hides and shows the list instead, following
+ * the finger, and the handle only resizes it. Back shows a hidden list again (unless turned off in
+ * Settings) before it leaves the app.
  */
 @Composable
 private fun SessionsListDetail(
@@ -324,19 +352,55 @@ private fun SessionsListDetail(
             var fraction by remember(appSettings.listPaneFraction) { mutableStateOf(appSettings.listPaneFraction) }
             val shownWidth = fraction?.let { (windowWidth * it).coerceIn(ListPaneMinWidth, maxListWidth) }
                 ?: (windowWidth * DEFAULT_LIST_PANE_FRACTION).coerceIn(ListPaneDefaultMinWidth, ListPaneDefaultMaxWidth)
-            // Without the handle there is no way to bring a hidden list back.
-            val hidden = listHidden && appSettings.listPaneHandle
+            // With the chat list swipe, the chat's swipe hides and shows the list instead of the
+            // handle's button; the handle is left only for resizing it.
+            val swipeToggles = appSettings.chatSwipe == ChatSwipe.SessionDrawer
+            val current = selected?.takeIf { selectedServerId == activeServerId }
+            // Without the handle, or the chat swiping it, there is no way to bring a hidden list back.
+            val hidden = listHidden && (appSettings.listPaneHandle || (swipeToggles && current != null))
             val target = if (hidden) 0.dp else shownWidth
             val animatedWidth = remember { Animatable(target, Dp.VectorConverter) }
             var dragWidth by remember { mutableStateOf<Dp?>(null) }
-            LaunchedEffect(target) { animatedWidth.animateTo(target) }
+            LaunchedEffect(target) {
+                // Already on its way there, settling a swipe with the finger's velocity.
+                if (animatedWidth.isRunning && animatedWidth.targetValue == target) return@LaunchedEffect
+                animatedWidth.animateTo(target)
+            }
             val listWidth = dragWidth ?: animatedWidth.value
             val scope = rememberCoroutineScope()
             val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
             val density = LocalDensity.current
-            val current = selected?.takeIf { selectedServerId == activeServerId }
             // Registered before the panes, so handlers inside the chat still get Back first.
             OcBackHandler(enabled = hidden && appSettings.backShowsList) { listHidden = false }
+            val currentShownWidth by rememberUpdatedState(shownWidth)
+            // The chat's swipe moves the list with the finger, both ways, up to its chosen width,
+            // and settles it shown or hidden like the chat list drawer on phones.
+            val swipeList = remember(density) {
+                object : SessionDrawerPull {
+                    override fun drag(delta: Float) {
+                        val width = (dragWidth ?: animatedWidth.value) + with(density) { delta.toDp() }
+                        dragWidth = width.coerceIn(0.dp, currentShownWidth)
+                    }
+
+                    override fun release(velocity: Float) {
+                        val dropped = dragWidth ?: return
+                        val shown = currentShownWidth
+                        val show = drawerSettlesOpen(dropped.value, shown.value, with(density) { velocity.toDp() }.value, DrawerFlingVelocity.value)
+                        val settled = if (show) shown else 0.dp
+                        scope.launch {
+                            // Continues from where the finger left the list, without a jump.
+                            animatedWidth.snapTo(dropped)
+                            dragWidth = null
+                            listHidden = !show
+                            animatedWidth.animateTo(
+                                settled,
+                                spring(stiffness = DRAWER_SETTLE_STIFFNESS, visibilityThreshold = Dp.VisibilityThreshold),
+                                initialVelocity = with(density) { velocity.toDp() },
+                            )
+                        }
+                    }
+                }
+            }
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
@@ -362,6 +426,8 @@ private fun SessionsListDetail(
                         onOpenTerminal = onOpenTerminal,
                         onOpenFile = onOpenFile,
                         onSwitchSession = select,
+                        // The list is beside the chat: the drawer swipe hides it or pulls it back.
+                        sessionDrawer = swipeList.takeIf { swipeToggles },
                         modifier = Modifier.weight(1f),
                     )
                 } else {
@@ -381,6 +447,7 @@ private fun SessionsListDetail(
             if (appSettings.listPaneHandle) ListPaneHandle(
                 listHidden = hidden,
                 onToggle = { listHidden = !listHidden },
+                resizeOnly = swipeToggles,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .offset(x = (listWidth - HandleWidth / 2).coerceAtLeast(0.dp))
@@ -415,9 +482,42 @@ private fun SessionsListDetail(
     }
 }
 
+/**
+ * The handle on the divider: dragging it resizes the list, tapping its arrow hides or shows it.
+ * When [resizeOnly] (the chat's swipe hides and shows the list) it is a plain grip, and screen
+ * readers hide or show the list through its actions.
+ */
 @Composable
-private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, resizeOnly: Boolean, modifier: Modifier = Modifier) {
     val c = OcTheme.colors
+    if (resizeOnly) {
+        val label = stringResource(Res.string.app_session_drawer)
+        val action = stringResource(if (listHidden) Res.string.app_show_sessions else Res.string.app_hide_sessions)
+        val currentOnToggle by rememberUpdatedState(onToggle)
+        Surface(
+            shape = RoundedCornerShape(OcRadius.md),
+            color = c.layer02,
+            border = BorderStroke(1.dp, c.borderBase),
+            modifier = modifier
+                .size(width = HandleWidth, height = 48.dp)
+                .editable(SettingsPart.SplitView, LocalEditMode.current)
+                .semantics {
+                    contentDescription = label
+                    customActions = listOf(
+                        CustomAccessibilityAction(action) {
+                            currentOnToggle()
+                            true
+                        },
+                    )
+                }
+                .testTag("sessions_pane_handle"),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(Icons.Outlined.DragIndicator, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(18.dp))
+            }
+        }
+        return
+    }
     Surface(
         onClick = onToggle,
         shape = RoundedCornerShape(OcRadius.md),
@@ -439,13 +539,15 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
 private val HandleWidth = 24.dp
 
 /**
- * The banner of a new app release, at the top of the session list. The live demo never looks for
- * releases: it shows a sample of the notice instead, to reach its options.
+ * The banner of a new app release, under the search of the session list, above the sessions;
+ * tapping it opens the update sheet ([UpdateSheetRoute]). The live demo never looks for releases:
+ * it shows a sample of the notice instead, to reach its options.
  */
 @Composable
 private fun UpdateBanner() {
     val editMode = LocalEditMode.current
-    val modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateNotice, editMode)
+    // The list header above already leaves a gap.
+    val modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, bottom = OcSpacing.md).editable(SettingsPart.UpdateNotice, editMode)
     if (editMode != null) {
         val style = koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle().value.updateNotice
         UpdateNoticeSample(style, koinInject<AppInfo>().updateTarget, modifier, compact = true)

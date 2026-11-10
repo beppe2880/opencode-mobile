@@ -367,6 +367,18 @@ enum class ChatHeaderStyle { Icons, Short, Full }
  */
 enum class ToolMediaSize { Hidden, Small, Medium, Large }
 
+/** What a horizontal swipe in a chat does. */
+enum class ChatSwipe {
+    /** Left or right opens the next or previous session of the list. */
+    SwitchChats,
+
+    /** Left to right opens the session list in a drawer over the chat (narrow windows only). */
+    SessionDrawer,
+
+    /** Nothing. */
+    Off,
+}
+
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
@@ -426,8 +438,8 @@ data class AppSettings(
     val confirmStopCommand: Boolean = true,
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
-    /** Horizontal swipes in a chat open the previous or next session of the list. */
-    val swipeBetweenChats: Boolean = true,
+    /** What a horizontal swipe in a chat does. */
+    val chatSwipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */

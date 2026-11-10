@@ -59,7 +59,7 @@
     <string name="oc_part_voice">الإدخال الصوتي</string>
     <string name="oc_part_new_chat">محادثة جديدة</string>
     <string name="oc_part_session_rows">صفوف الجلسات</string>
-    <string name="oc_part_swipe">التنقل بالسحب بين المحادثات</string>
+    <string name="oc_part_swipe">التنقل بالسحب في المحادثة</string>
     <string name="oc_part_split">القائمة بجانب المحادثة</string>
     <string name="oc_part_key_bar">شريط المفاتيح</string>
     <string name="oc_part_keyboard">لوحة المفاتيح</string>

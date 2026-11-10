@@ -59,7 +59,7 @@
     <string name="oc_part_voice">语音输入</string>
     <string name="oc_part_new_chat">新建聊天</string>
     <string name="oc_part_session_rows">会话行</string>
-    <string name="oc_part_swipe">滑动切换聊天</string>
+    <string name="oc_part_swipe">在聊天中滑动</string>
     <string name="oc_part_split">聊天旁的列表</string>
     <string name="oc_part_key_bar">快捷键栏</string>
     <string name="oc_part_keyboard">键盘</string>

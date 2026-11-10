@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">Quais alterações a folha mostra primeiro</string>
     <string name="settings_header_opens_folder">Alterações da pasta</string>
     <string name="settings_header_opens_session">Alterações da sessão</string>
-    <string name="settings_swipe_chats">Deslizar entre conversas</string>
+    <string name="settings_swipe_chats">Deslizar em uma conversa</string>
     <string name="settings_swipe_chats_sub">Deslize para a esquerda ou direita em uma conversa para abrir a próxima sessão ou a anterior na lista</string>
+    <string name="settings_swipe_chats_switch">Próxima / anterior conversa</string>
+    <string name="settings_swipe_chats_drawer">Abrir lista de conversas</string>
+    <string name="settings_swipe_chats_off">Desativado</string>
+    <string name="settings_swipe_chats_drawer_sub">Deslize para a direita em uma conversa para mostrar a lista de conversas sobre ela; toque em uma conversa para abri-la</string>
+    <string name="settings_swipe_chats_off_sub">Deslizar para os lados em uma conversa não faz nada</string>
     <string name="settings_group_activity">Agrupar raciocínio e ferramentas</string>
     <string name="settings_group_activity_sub">Mostrar raciocínios e chamadas de ferramentas consecutivos em uma única linha</string>
     <string name="settings_group_thoughts">Agrupar raciocínios consecutivos</string>
@@ -241,6 +246,13 @@
     <string name="update_notes_features">Recursos</string>
     <string name="update_notes_fixes">Correções de bugs</string>
     <string name="update_notes_breaking">Mudanças incompatíveis</string>
+    <string name="update_banner_open">Mostrar a atualização</string>
+    <string name="update_sheet_view_changelog">Ver novidades</string>
+    <string name="update_sheet_hide_changelog">Ocultar novidades</string>
+    <string name="update_check">Verificar atualizações</string>
+    <string name="update_check_checking">Verificando atualizações…</string>
+    <string name="update_check_latest">Você está na versão mais recente (%1$s)</string>
+    <string name="update_check_failed">Não foi possível acessar o GitHub. Verifique sua conexão e tente novamente.</string>
     <string name="settings_split_view">Chat ao lado da lista</string>
     <string name="settings_split_view_sub">Em telas largas, mostrar o chat aberto ao lado da lista de sessões. Arraste a alça do divisor para redimensionar a lista.</string>
     <string name="settings_list_width">Largura da lista de sessões</string>
@@ -287,6 +299,7 @@
     <string name="settings_summary_grouped">Atividade agrupada</string>
     <string name="settings_summary_cost">Custo</string>
     <string name="settings_summary_swipe">Deslizar</string>
+    <string name="settings_summary_swipe_drawer">Deslizar para lista de conversas</string>
     <string name="settings_summary_apply">Mudanças: %1$s</string>
     <string name="settings_summary_new_chats">Novos chats: %1$s</string>
     <string name="settings_summary_no_key">Sem chave de API</string>

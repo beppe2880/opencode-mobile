@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -73,6 +74,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_su
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_share_menu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe_drawer
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_large
@@ -283,7 +285,8 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
             s.showReasoning to Res.string.settings_summary_reasoning,
             s.groupActivity to Res.string.settings_summary_grouped,
             s.showCost to Res.string.settings_summary_cost,
-            s.swipeBetweenChats to Res.string.settings_summary_swipe,
+            (s.chatSwipe == ChatSwipe.SwitchChats) to Res.string.settings_summary_swipe,
+            (s.chatSwipe == ChatSwipe.SessionDrawer) to Res.string.settings_summary_swipe_drawer,
         )
         SettingsArea.LiveActivity -> if (!s.followRunningTools) {
             listOf(res(Res.string.settings_summary_off))

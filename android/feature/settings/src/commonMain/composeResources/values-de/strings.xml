@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">Welche Änderungen das Blatt zuerst zeigt</string>
     <string name="settings_header_opens_folder">Änderungen im Ordner</string>
     <string name="settings_header_opens_session">Änderungen der Sitzung</string>
-    <string name="settings_swipe_chats">Zwischen Chats wischen</string>
+    <string name="settings_swipe_chats">In einem Chat wischen</string>
     <string name="settings_swipe_chats_sub">Wische im Chat nach links oder rechts, um die nächste oder vorherige Sitzung der Liste zu öffnen</string>
+    <string name="settings_swipe_chats_switch">Nächster / vorheriger Chat</string>
+    <string name="settings_swipe_chats_drawer">Chatliste öffnen</string>
+    <string name="settings_swipe_chats_off">Aus</string>
+    <string name="settings_swipe_chats_drawer_sub">Im Chat nach rechts wischen, um die Chatliste darüber anzuzeigen; tippe auf einen Chat, um ihn zu öffnen</string>
+    <string name="settings_swipe_chats_off_sub">Seitliches Wischen im Chat bewirkt nichts</string>
     <string name="settings_group_activity">Denkprozess und Werkzeuge gruppieren</string>
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_group_thoughts">Aufeinanderfolgende Denkprozesse gruppieren</string>
@@ -241,6 +246,13 @@
     <string name="update_notes_features">Funktionen</string>
     <string name="update_notes_fixes">Fehlerbehebungen</string>
     <string name="update_notes_breaking">Inkompatible Änderungen</string>
+    <string name="update_banner_open">Update anzeigen</string>
+    <string name="update_sheet_view_changelog">Neuerungen anzeigen</string>
+    <string name="update_sheet_hide_changelog">Neuerungen ausblenden</string>
+    <string name="update_check">Nach Updates suchen</string>
+    <string name="update_check_checking">Suche nach Updates…</string>
+    <string name="update_check_latest">Du verwendest die neueste Version (%1$s)</string>
+    <string name="update_check_failed">GitHub ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.</string>
     <string name="settings_split_view">Chat neben der Liste</string>
     <string name="settings_split_view_sub">Auf breiten Bildschirmen den geöffneten Chat neben der Sitzungsliste anzeigen. Ziehe den Griff am Trenner, um die Liste in der Größe anzupassen.</string>
     <string name="settings_list_width">Breite der Sitzungsliste</string>
@@ -287,6 +299,7 @@
     <string name="settings_summary_grouped">Gruppierte Aktivität</string>
     <string name="settings_summary_cost">Kosten</string>
     <string name="settings_summary_swipe">Wischen</string>
+    <string name="settings_summary_swipe_drawer">Wischen für Chatliste</string>
     <string name="settings_summary_apply">Änderungen: %1$s</string>
     <string name="settings_summary_new_chats">Neue Chats: %1$s</string>
     <string name="settings_summary_no_key">Kein API-Schlüssel</string>

@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">Les modifications affichées en premier dans la feuille</string>
     <string name="settings_header_opens_folder">Modifications du dossier</string>
     <string name="settings_header_opens_session">Modifications de la session</string>
-    <string name="settings_swipe_chats">Balayer entre les discussions</string>
+    <string name="settings_swipe_chats">Balayer dans une discussion</string>
     <string name="settings_swipe_chats_sub">Balayez une discussion à gauche ou à droite pour ouvrir la session suivante ou précédente de la liste</string>
+    <string name="settings_swipe_chats_switch">Discussion suivante / précédente</string>
+    <string name="settings_swipe_chats_drawer">Ouvrir la liste des discussions</string>
+    <string name="settings_swipe_chats_off">Désactivé</string>
+    <string name="settings_swipe_chats_drawer_sub">Balayez une discussion vers la droite pour afficher la liste des discussions par-dessus ; touchez une discussion pour l’ouvrir</string>
+    <string name="settings_swipe_chats_off_sub">Balayer latéralement une discussion ne fait rien</string>
     <string name="settings_group_activity">Regrouper réflexion et outils</string>
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_group_thoughts">Regrouper les réflexions consécutives</string>
@@ -241,6 +246,13 @@
     <string name="update_notes_features">Fonctionnalités</string>
     <string name="update_notes_fixes">Corrections de bugs</string>
     <string name="update_notes_breaking">Changements incompatibles</string>
+    <string name="update_banner_open">Afficher la mise à jour</string>
+    <string name="update_sheet_view_changelog">Voir les nouveautés</string>
+    <string name="update_sheet_hide_changelog">Masquer les nouveautés</string>
+    <string name="update_check">Rechercher les mises à jour</string>
+    <string name="update_check_checking">Recherche de mises à jour…</string>
+    <string name="update_check_latest">Vous utilisez la dernière version (%1$s)</string>
+    <string name="update_check_failed">Impossible de joindre GitHub. Vérifiez votre connexion et réessayez.</string>
     <string name="settings_split_view">Chat à côté de la liste</string>
     <string name="settings_split_view_sub">Sur grand écran, afficher le chat ouvert à côté de la liste des sessions. Faites glisser la poignée du séparateur pour redimensionner la liste.</string>
     <string name="settings_list_width">Largeur de la liste des sessions</string>
@@ -287,6 +299,7 @@
     <string name="settings_summary_grouped">Activité groupée</string>
     <string name="settings_summary_cost">Coût</string>
     <string name="settings_summary_swipe">Balayage</string>
+    <string name="settings_summary_swipe_drawer">Balayage pour la liste des discussions</string>
     <string name="settings_summary_apply">Changements : %1$s</string>
     <string name="settings_summary_new_chats">Nouveaux chats : %1$s</string>
     <string name="settings_summary_no_key">Aucune clé API</string>

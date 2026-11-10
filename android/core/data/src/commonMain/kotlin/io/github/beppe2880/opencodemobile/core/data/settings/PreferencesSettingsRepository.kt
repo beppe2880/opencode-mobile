@@ -4,6 +4,7 @@ import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.HEADER_OPENS_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
@@ -70,7 +71,9 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_HEADER_LINE, next.chatHeaderLine.name)
         prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
         prefs.putString(KEY_HEADER_STYLE, next.chatHeaderStyle.name)
-        prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
+        prefs.putString(KEY_CHAT_SWIPE, next.chatSwipe.name)
+        // Kept for older versions of the app, which only had the switch.
+        prefs.putBoolean(KEY_SWIPE_CHATS, next.chatSwipe != ChatSwipe.Off)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
@@ -147,7 +150,9 @@ internal class PreferencesSettingsRepository(
             chatHeaderLine = ChatHeaderLine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_LINE) } ?: defaults.chatHeaderLine,
             chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
             headerOpens = HEADER_OPENS_CHOICES.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_OPENS) } ?: defaults.headerOpens,
-            swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
+            chatSwipe = ChatSwipe.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_CHAT_SWIPE) }
+                // Before the choice there was a switch: off stays off.
+                ?: if (prefs.getBooleanOrNull(KEY_SWIPE_CHATS) == false) ChatSwipe.Off else defaults.chatSwipe,
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
@@ -229,7 +234,10 @@ internal class PreferencesSettingsRepository(
         const val KEY_HEADER_LINE = "chat_header_line"
         const val KEY_HEADER_OPENS = "chat_header_opens"
         const val KEY_HEADER_STYLE = "chat_header_style"
+
+        /** The former "Swipe between chats" switch; false reads as [ChatSwipe.Off] until a choice is written. */
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
+        const val KEY_CHAT_SWIPE = "chat_swipe"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
         const val KEY_RUNNING_CHIPS = "running_chips"

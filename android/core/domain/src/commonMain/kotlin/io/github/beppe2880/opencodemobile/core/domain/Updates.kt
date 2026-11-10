@@ -23,19 +23,27 @@ interface UpdateRepository {
      */
     suspend fun availableUpdate(installedVersion: String): AppUpdate?
 
+    /**
+     * Asks GitHub now, for "Check for updates": ignores the once-a-day limit and a dismissed
+     * version, and keeps the releases found for the next [availableUpdate]. Null when the
+     * installed version is the newest (or is not a release version); a failure when GitHub
+     * cannot be reached.
+     */
+    suspend fun checkNow(installedVersion: String): Result<AppUpdate?>
+
     /** Hides [release] and older ones; a newer release is shown again. */
     suspend fun dismiss(release: AppRelease)
 }
 
 /** How the app announces a newer release when it opens. */
 enum class UpdateNoticeStyle {
-    /** A sheet with what changed, once per app start. */
+    /** A sheet with what changed, once per app start, then the banner as a reminder. */
     Window,
 
-    /** A notice above the session list. */
+    /** A notice above the sessions in the list. */
     Banner,
 
-    /** Never looks for new releases. */
+    /** Never looks for new releases on its own; "Check for updates" still does. */
     Off,
 }
 

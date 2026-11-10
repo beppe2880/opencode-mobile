@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
@@ -98,7 +99,8 @@ data class ChatState(
     /** Neighbors in the session list, reached by swiping right (previous) or left (next). */
     val previousSession: SessionPeek? = null,
     val nextSession: SessionPeek? = null,
-    val swipeEnabled: Boolean = true,
+    /** What a horizontal swipe does (setting). */
+    val swipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The server transcript has been loaded at least once (cached content may show before). */
     val synced: Boolean = false,
     /** Older history may exist above the oldest loaded message. */
@@ -178,7 +180,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,
     showCost = s.showCost,
-    swipeEnabled = s.swipeBetweenChats,
+    swipe = s.chatSwipe,
     agentColorOutline = s.agentColorOutline,
     closeModelPickerOnSelect = s.closeModelPickerOnSelect,
     dictation = s.dictation,
@@ -293,8 +295,14 @@ data class ChangesPanel(
     val error: UiText? = null,
 )
 
-/** An image shown full screen; [dataUri] is null while it is fetched or when that [failed]. */
-data class ImagePreview(val name: String?, val dataUri: String?, val failed: Boolean = false)
+/**
+ * Images shown full screen, opened at [index]: those of one prompt, one tool group or the
+ * composer, so swiping goes to the others.
+ */
+data class ImagePreview(val images: List<PreviewImage>, val index: Int = 0)
+
+/** One image of the viewer; [dataUri] is null while it is fetched or when that [failed]. */
+data class PreviewImage(val name: String?, val dataUri: String?, val failed: Boolean = false)
 
 /** A completion offered above the composer. */
 sealed interface Suggestion {
@@ -358,7 +366,7 @@ sealed interface ChatEvent {
     /** Opens a file of the server read-only; [path] is absolute or relative to the session folder. */
     data class OpenFile(val path: String) : ChatEvent
 
-    /** Replaces this chat with a neighbor in the session list (swipe). */
+    /** Replaces this chat with a neighbor in the session list (swipe); only with [ChatSwipe.SwitchChats]. */
     data class SwitchSession(val sessionId: String) : ChatEvent
 
     /** The user scrolled near the oldest loaded message. */
@@ -394,6 +402,9 @@ sealed interface ChatEvent {
 
     /** A card of a tool's image is on screen without its content: fetch the call's files. */
     data class LoadToolMedia(val messageId: String, val callId: String) : ChatEvent
+
+    /** The viewer shows its [index]th image: fetched when the cache dropped it. */
+    data class PreviewPage(val index: Int) : ChatEvent
     data object ClosePreview : ChatEvent
 
     /** A picked file could not be read or is too large. */

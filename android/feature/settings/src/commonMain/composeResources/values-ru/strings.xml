@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">Какие изменения панель показывает первыми</string>
     <string name="settings_header_opens_folder">Изменения папки</string>
     <string name="settings_header_opens_session">Изменения сессии</string>
-    <string name="settings_swipe_chats">Перелистывать чаты</string>
+    <string name="settings_swipe_chats">Перелистывание в чате</string>
     <string name="settings_swipe_chats_sub">Смахните в чате влево или вправо, чтобы открыть следующую или предыдущую сессию в списке</string>
+    <string name="settings_swipe_chats_switch">Следующий / предыдущий чат</string>
+    <string name="settings_swipe_chats_drawer">Открыть список чатов</string>
+    <string name="settings_swipe_chats_off">Выкл.</string>
+    <string name="settings_swipe_chats_drawer_sub">Проведите вправо по чату, чтобы поверх него показать список чатов; нажмите на чат, чтобы открыть его</string>
+    <string name="settings_swipe_chats_off_sub">Боковые свайпы в чате ничего не делают</string>
     <string name="settings_group_activity">Группировать рассуждения и инструменты</string>
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
     <string name="settings_group_thoughts">Группировать идущие подряд рассуждения</string>
@@ -247,6 +252,13 @@
     <string name="update_notes_features">Новые функции</string>
     <string name="update_notes_fixes">Исправления ошибок</string>
     <string name="update_notes_breaking">Несовместимые изменения</string>
+    <string name="update_banner_open">Показать обновление</string>
+    <string name="update_sheet_view_changelog">Показать, что нового</string>
+    <string name="update_sheet_hide_changelog">Скрыть, что нового</string>
+    <string name="update_check">Проверить обновления</string>
+    <string name="update_check_checking">Проверка обновлений…</string>
+    <string name="update_check_latest">У вас последняя версия (%1$s)</string>
+    <string name="update_check_failed">Не удалось связаться с GitHub. Проверьте подключение и попробуйте снова.</string>
     <string name="settings_split_view">Чат рядом со списком</string>
     <string name="settings_split_view_sub">На широких экранах показывать открытый чат рядом со списком сессий. Перетащите ручку разделителя, чтобы изменить размер списка.</string>
     <string name="settings_list_width">Ширина списка сессий</string>
@@ -293,6 +305,7 @@
     <string name="settings_summary_grouped">Группировка активности</string>
     <string name="settings_summary_cost">Стоимость</string>
     <string name="settings_summary_swipe">Свайп</string>
+    <string name="settings_summary_swipe_drawer">Свайп для списка чатов</string>
     <string name="settings_summary_apply">Изменения: %1$s</string>
     <string name="settings_summary_new_chats">Новые чаты: %1$s</string>
     <string name="settings_summary_no_key">Нет ключа API</string>

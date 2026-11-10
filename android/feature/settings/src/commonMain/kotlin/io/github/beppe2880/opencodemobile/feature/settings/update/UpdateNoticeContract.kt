@@ -17,13 +17,38 @@ data class UpdateNoticeState(
     val installedVersion: String = "",
     /** What changed in each release since [installedVersion] that has notes, newest first. */
     val changes: List<VersionChanges> = emptyList(),
-    /** The sheet is open: at most once per app start, with [UpdateNoticeStyle.Window] and [changes] to show. */
+    /**
+     * The sheet is open: on its own at most once per app start, with [UpdateNoticeStyle.Window]
+     * and [changes] to show; on demand from the banner or "Check for updates".
+     */
     val sheetVisible: Boolean = false,
+    /** The sheet lists [changes]: at once when it opens as the window, else after "View changelog". */
+    val changelogVisible: Boolean = false,
+    /** Where "Check for updates" in Settings is. */
+    val check: UpdateCheck = UpdateCheck.Idle,
 ) {
-    /** The banner, or in place of the window while no release has notes to show. */
+    /**
+     * The banner above the sessions: with [UpdateNoticeStyle.Banner], and with
+     * [UpdateNoticeStyle.Window] once the window was closed (or while there are no notes to show
+     * in it), as a reminder until the version is skipped or installed. Never while the sheet is open.
+     */
     val bannerVisible: Boolean
-        get() = release != null && action != null &&
-            (style == UpdateNoticeStyle.Banner || (style == UpdateNoticeStyle.Window && changes.isEmpty()))
+        get() = release != null && action != null && style != UpdateNoticeStyle.Off && !sheetVisible
+}
+
+/** "Check for updates" in Settings. */
+sealed interface UpdateCheck {
+    /** Not asked yet, or the update it found is in the sheet. */
+    data object Idle : UpdateCheck
+
+    /** Asking GitHub. */
+    data object Checking : UpdateCheck
+
+    /** The installed version is the newest. */
+    data object UpToDate : UpdateCheck
+
+    /** GitHub could not be reached. */
+    data object Failed : UpdateCheck
 }
 
 /** The release notes of one version, read from its GitHub release. */
@@ -37,8 +62,17 @@ sealed interface UpdateNoticeEvent {
     /** Skip this version: hidden until a newer one. */
     data object Dismiss : UpdateNoticeEvent
 
-    /** Close the sheet until the next app start. */
+    /** Close the sheet; with a banner style the banner stays as a reminder. */
     data object Later : UpdateNoticeEvent
+
+    /** The banner was tapped: open the sheet. */
+    data object ShowSheet : UpdateNoticeEvent
+
+    /** Show or hide what changed in the sheet. */
+    data object ToggleChangelog : UpdateNoticeEvent
+
+    /** Ask GitHub now, whatever the notice style, the daily limit or a skipped version. */
+    data object CheckNow : UpdateNoticeEvent
 }
 
 sealed interface UpdateNoticeEffect {

@@ -59,7 +59,7 @@
     <string name="oc_part_voice">Entrada de voz</string>
     <string name="oc_part_new_chat">Nova conversa</string>
     <string name="oc_part_session_rows">Linhas de sessões</string>
-    <string name="oc_part_swipe">Deslizar entre conversas</string>
+    <string name="oc_part_swipe">Deslizar em uma conversa</string>
     <string name="oc_part_split">Lista ao lado do chat</string>
     <string name="oc_part_key_bar">Barra de teclas</string>
     <string name="oc_part_keyboard">Teclado</string>

@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
@@ -73,7 +74,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ChatHeaderLineChanged(ChatHeaderLine.BranchFiles))
         vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
         vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
-        vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
+        vm.onEvent(SettingsEvent.ChatSwipeChanged(ChatSwipe.SessionDrawer))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
         vm.onEvent(SettingsEvent.RunningChipsChanged(false))
@@ -133,7 +134,7 @@ class SettingsViewModelTest {
                 chatHeaderLine = ChatHeaderLine.BranchFiles,
                 headerOpens = ChangesScope.Session,
                 chatHeaderStyle = ChatHeaderStyle.Short,
-                swipeBetweenChats = false,
+                chatSwipe = ChatSwipe.SessionDrawer,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
                 runningChips = false,

@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">シートで最初に表示する変更</string>
     <string name="settings_header_opens_folder">フォルダの変更</string>
     <string name="settings_header_opens_session">セッションの変更</string>
-    <string name="settings_swipe_chats">スワイプでチャットを切り替え</string>
+    <string name="settings_swipe_chats">チャット内でスワイプ</string>
     <string name="settings_swipe_chats_sub">チャットを左右にスワイプして一覧の次または前のセッションを開く</string>
+    <string name="settings_swipe_chats_switch">次／前のチャットに切り替え</string>
+    <string name="settings_swipe_chats_drawer">チャット一覧を開く</string>
+    <string name="settings_swipe_chats_off">オフ</string>
+    <string name="settings_swipe_chats_drawer_sub">チャットを右にスワイプすると、その上にチャット一覧を表示します。チャットをタップすると開きます</string>
+    <string name="settings_swipe_chats_off_sub">チャットを横にスワイプしても何も起こりません</string>
     <string name="settings_group_activity">思考とツールをまとめる</string>
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
     <string name="settings_group_thoughts">連続する思考をまとめる</string>
@@ -238,6 +243,13 @@
     <string name="update_notes_features">機能</string>
     <string name="update_notes_fixes">バグ修正</string>
     <string name="update_notes_breaking">互換性のない変更</string>
+    <string name="update_banner_open">アップデートを表示</string>
+    <string name="update_sheet_view_changelog">新機能を表示</string>
+    <string name="update_sheet_hide_changelog">新機能を隠す</string>
+    <string name="update_check">アップデートを確認</string>
+    <string name="update_check_checking">アップデートを確認中…</string>
+    <string name="update_check_latest">最新バージョンを使用中です（%1$s）</string>
+    <string name="update_check_failed">GitHub に接続できませんでした。接続を確認して、もう一度お試しください。</string>
     <string name="settings_split_view">チャットをリストの横に表示</string>
     <string name="settings_split_view_sub">横長の画面では、開いているチャットをセッション一覧の横に表示します。仕切り線のハンドルをドラッグして一覧の幅を変更できます。</string>
     <string name="settings_list_width">セッション一覧の幅</string>
@@ -284,6 +296,7 @@
     <string name="settings_summary_grouped">まとめたアクティビティ</string>
     <string name="settings_summary_cost">費用</string>
     <string name="settings_summary_swipe">スワイプ</string>
+    <string name="settings_summary_swipe_drawer">スワイプでチャット一覧</string>
     <string name="settings_summary_apply">変更: %1$s</string>
     <string name="settings_summary_new_chats">新しいチャット: %1$s</string>
     <string name="settings_summary_no_key">APIキーなし</string>

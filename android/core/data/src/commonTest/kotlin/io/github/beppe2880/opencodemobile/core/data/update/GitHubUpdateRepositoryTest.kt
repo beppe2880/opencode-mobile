@@ -12,6 +12,7 @@ import kotlinx.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class GitHubUpdateRepositoryTest {
 
@@ -148,6 +149,50 @@ class GitHubUpdateRepositoryTest {
         repository().availableUpdate("0.9.0")
         assertNull(prefs.getStringOrNull(KEY_VERSION))
         assertNull(prefs.getStringOrNull(KEY_URL))
+    }
+
+    @Test
+    fun checkNowAsksGithubWithinTheDayAndKeepsWhatItFound() = runTest {
+        val repository = repository()
+        repository.availableUpdate("0.9.0")
+        published = listOf(release("1.1.0"), release("1.0.0"))
+        now += 1
+
+        assertEquals(Result.success(update("1.1.0", "1.0.0")), repository.checkNow("0.9.0"))
+        assertEquals(2, fetches)
+        // The automatic check now uses the releases found, and waits another day from now.
+        assertEquals(update("1.1.0", "1.0.0"), repository().availableUpdate("0.9.0"))
+        now += CHECK_INTERVAL_MS - 1
+        repository.availableUpdate("0.9.0")
+        assertEquals(2, fetches)
+    }
+
+    @Test
+    fun checkNowOffersADismissedReleaseWithoutForgettingTheDismissal() = runTest {
+        val repository = repository()
+        repository.dismiss(release("1.0.0"))
+        assertNull(repository.availableUpdate("0.9.0"))
+
+        assertEquals(Result.success(update("1.0.0")), repository.checkNow("0.9.0"))
+        assertNull(repository.availableUpdate("0.9.0"))
+    }
+
+    @Test
+    fun checkNowOnTheNewestVersionFindsNothing() = runTest {
+        assertEquals(Result.success(null), repository().checkNow("1.0.0"))
+        assertEquals(Result.success(null), repository().checkNow("dev"))
+        assertEquals(1, fetches)
+    }
+
+    @Test
+    fun checkNowReportsAFailureAndKeepsTheLastReleases() = runTest {
+        val repository = repository()
+        repository.availableUpdate("0.9.0")
+        failing = true
+
+        val result = repository.checkNow("0.9.0")
+        assertTrue(result.isFailure)
+        assertEquals(update("1.0.0"), repository.availableUpdate("0.9.0"))
     }
 
     @Test

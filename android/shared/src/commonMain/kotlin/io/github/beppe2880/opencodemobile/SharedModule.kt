@@ -19,7 +19,6 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
@@ -37,9 +36,11 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
     viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }
     viewModel { UsageViewModel(get(), get()) }
-    // The update sheet is offered once per app run.
+    // The update sheet is offered once per app run; an update found by "Check for updates" is
+    // shared with the session list.
     single { UpdateSheetSession() }
-    viewModelOf(::UpdateNoticeViewModel)
+    // Settings passes false: there the sheet only opens for "Check for updates".
+    viewModel { params -> UpdateNoticeViewModel(get(), get(), get(), get(), automatic = params.getOrNull<Boolean>() ?: true) }
     viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
     // Home screen widget: Glance on Android, WidgetKit on iOS.

@@ -96,8 +96,13 @@
     <string name="settings_header_opens_sub">面板优先显示哪些更改</string>
     <string name="settings_header_opens_folder">文件夹更改</string>
     <string name="settings_header_opens_session">会话更改</string>
-    <string name="settings_swipe_chats">滑动切换聊天</string>
+    <string name="settings_swipe_chats">在聊天中滑动</string>
     <string name="settings_swipe_chats_sub">在聊天中左右滑动，打开列表中的下一个或上一个会话</string>
+    <string name="settings_swipe_chats_switch">切换到下一个/上一个聊天</string>
+    <string name="settings_swipe_chats_drawer">打开聊天列表</string>
+    <string name="settings_swipe_chats_off">关闭</string>
+    <string name="settings_swipe_chats_drawer_sub">在聊天中向右滑动，即可在其上方显示聊天列表；点击聊天即可打开</string>
+    <string name="settings_swipe_chats_off_sub">在聊天中左右滑动不会有任何效果</string>
     <string name="settings_group_activity">合并思考和工具</string>
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
     <string name="settings_group_thoughts">合并连续的思考</string>
@@ -238,6 +243,13 @@
     <string name="update_notes_features">新功能</string>
     <string name="update_notes_fixes">问题修复</string>
     <string name="update_notes_breaking">不兼容的更改</string>
+    <string name="update_banner_open">显示更新</string>
+    <string name="update_sheet_view_changelog">查看更新内容</string>
+    <string name="update_sheet_hide_changelog">隐藏更新内容</string>
+    <string name="update_check">检查更新</string>
+    <string name="update_check_checking">正在检查更新…</string>
+    <string name="update_check_latest">当前已是最新版本（%1$s）</string>
+    <string name="update_check_failed">无法连接 GitHub。请检查网络连接后重试。</string>
     <string name="settings_split_view">聊天与列表并排</string>
     <string name="settings_split_view_sub">在宽屏上，将打开的聊天显示在会话列表旁边。拖动分隔线上的手柄可调整列表大小。</string>
     <string name="settings_list_width">会话列表宽度</string>
@@ -284,6 +296,7 @@
     <string name="settings_summary_grouped">合并活动</string>
     <string name="settings_summary_cost">费用</string>
     <string name="settings_summary_swipe">滑动</string>
+    <string name="settings_summary_swipe_drawer">滑动查看聊天列表</string>
     <string name="settings_summary_apply">更改：%1$s</string>
     <string name="settings_summary_new_chats">新聊天：%1$s</string>
     <string name="settings_summary_no_key">无 API 密钥</string>
