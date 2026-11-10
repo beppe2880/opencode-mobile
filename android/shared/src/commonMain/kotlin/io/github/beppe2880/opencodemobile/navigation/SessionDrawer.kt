@@ -51,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.SessionDrawerPull
+import io.github.beppe2880.opencodemobile.feature.chat.drawerSettlesOpen
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_session_drawer
@@ -64,8 +65,14 @@ import kotlin.math.roundToInt
 private const val DRAWER_FRACTION = 0.85f
 private val DrawerMaxWidth = 360.dp
 
-/** A release faster than this toward a side settles the drawer on that side, wherever it is. */
-private val FlingVelocity = 400.dp
+/**
+ * Per second: a release faster than this toward a side settles the drawer on that side, wherever
+ * it is. Also used by the session list beside the chat on wide screens.
+ */
+internal val DrawerFlingVelocity = 400.dp
+
+/** Stiffness of the spring that settles the drawer, and the list beside the chat, after a release. */
+internal const val DRAWER_SETTLE_STIFFNESS = 600f
 
 /**
  * Where the chat list drawer is: [position] goes from 0 (closed) to [width] (open), in pixels.
@@ -94,11 +101,7 @@ internal class SessionDrawerState(private val scope: CoroutineScope, private val
     }
 
     override fun release(velocity: Float) {
-        val open = when {
-            velocity > flingVelocity -> true
-            velocity < -flingVelocity -> false
-            else -> position >= width / 2
-        }
+        val open = drawerSettlesOpen(position, width, velocity, flingVelocity)
         settle(if (open) width else 0f, velocity)
     }
 
@@ -117,7 +120,7 @@ internal class SessionDrawerState(private val scope: CoroutineScope, private val
     private fun settle(target: Float, velocity: Float = 0f) {
         settling?.cancel()
         settling = scope.launch {
-            animate(position, target, velocity, spring(stiffness = 600f)) { value, _ -> position = value }
+            animate(position, target, velocity, spring(stiffness = DRAWER_SETTLE_STIFFNESS)) { value, _ -> position = value }
         }
     }
 }
@@ -143,7 +146,7 @@ internal fun SessionDrawerHost(
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     // Not saved: a chat shown again (Back from Settings, recreation) starts with the list closed.
-    val drawer = remember(density) { SessionDrawerState(scope, with(density) { FlingVelocity.toPx() }) }
+    val drawer = remember(density) { SessionDrawerState(scope, with(density) { DrawerFlingVelocity.toPx() }) }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val toEnd = if (rtl) -1f else 1f
     val sheetFocus = remember { FocusRequester() }
