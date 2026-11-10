@@ -61,6 +61,8 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_close_prev
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_image_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_message_actions
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_open_image
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
@@ -83,10 +85,36 @@ internal expect fun decodeImage(bytes: ByteArray, maxSide: Int): ImageBitmap?
 /** Full-screen dialog drawn behind the system bars. */
 internal expect fun edgeToEdgeDialogProperties(): DialogProperties
 
+/**
+ * Thumbnails decoded recently, by data URI: a row created again shows them at once instead of
+ * blinking while they decode, as when a sent prompt is confirmed under its server id.
+ */
+private object Thumbnails {
+    private const val MAX = 12
+    private val lock = SynchronizedObject()
+
+    // Least recently used first.
+    private val bitmaps = LinkedHashMap<String, ImageBitmap>()
+
+    fun get(dataUri: String): ImageBitmap? = synchronized(lock) { bitmaps.remove(dataUri)?.also { bitmaps[dataUri] = it } }
+
+    fun put(dataUri: String, bitmap: ImageBitmap) {
+        synchronized(lock) {
+            bitmaps.remove(dataUri)
+            bitmaps[dataUri] = bitmap
+            if (bitmaps.size > MAX) bitmaps.remove(bitmaps.keys.first())
+        }
+    }
+}
+
 @Composable
-private fun rememberDataImage(dataUri: String?, maxSide: Int): ImageBitmap? {
-    val image by produceState<ImageBitmap?>(null, dataUri) {
-        value = dataUri?.let { withContext(Dispatchers.Default) { decodeDataImage(it, maxSide) } }
+private fun rememberDataImage(dataUri: String?, maxSide: Int, cached: Boolean = false): ImageBitmap? {
+    val initial = remember { if (cached) dataUri?.let(Thumbnails::get) else null }
+    val image by produceState(initial, dataUri) {
+        val known = if (cached) dataUri?.let(Thumbnails::get) else null
+        value = known ?: dataUri?.let { uri ->
+            withContext(Dispatchers.Default) { decodeDataImage(uri, maxSide) }?.also { if (cached) Thumbnails.put(uri, it) }
+        }
     }
     return image
 }
@@ -101,7 +129,7 @@ internal fun ImageThumbnail(
     onLongClick: (() -> Unit)? = null,
 ) {
     val c = OcTheme.colors
-    val bitmap = rememberDataImage(dataUri, maxSide = 256)
+    val bitmap = rememberDataImage(dataUri, maxSide = 256, cached = true)
     Box(
         modifier = modifier
             .size(size)

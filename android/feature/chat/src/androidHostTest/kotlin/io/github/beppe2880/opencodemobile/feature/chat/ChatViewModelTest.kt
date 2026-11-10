@@ -1987,6 +1987,125 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `images of a prompt show while it uploads and stay when the server confirms it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        val shown = listOf(ImageAttachment("shot.png", "image/png", photo.uri))
+        chat.promptGate = CompletableDeferred()
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+
+        // The upload is still running.
+        assertEquals(listOf("look" to PromptDelivery.Steer), chat.prompts)
+        val sending = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertTrue(sending.pending)
+        assertTrue(sending.sending)
+        assertEquals(shown, sending.images)
+
+        chat.promptGate!!.complete(Unit)
+        events.flow.emit(ServerEvent.InboxEnqueued("s1", "msg_9", "look", 50))
+        runCurrent()
+        val queued = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", queued.key)
+        assertTrue(queued.pending)
+        assertFalse(queued.sending)
+        assertEquals(shown, queued.images)
+        assertEquals(1, queued.attachments)
+
+        // The server's copy comes without the payload, which the cache drops.
+        chat.transcript += Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.InboxDelivered("s1", "msg_9"))
+        advanceUntilIdle()
+        val confirmed = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", confirmed.key)
+        assertFalse(confirmed.pending)
+        assertEquals(shown, confirmed.images)
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a delivered prompt keeps showing its images while the server copy has none yet`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        val shown = listOf(ImageAttachment("shot.png", "image/png", photo.uri))
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        events.flow.emit(ServerEvent.InboxEnqueued("s1", "msg_9", "look", 50))
+        events.flow.emit(ServerEvent.InboxDelivered("s1", "msg_9"))
+        // The first reload has the prompt before its file parts.
+        chat.transcript += Message.User("msg_9", 50, "look")
+        advanceUntilIdle()
+        val early = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", early.key)
+        assertFalse(early.pending)
+        assertEquals(shown, early.images)
+
+        // A later reload has them, without the payload the cache drops.
+        chat.transcript = chat.transcript.dropLast(1) +
+            Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.StepEnded("s1", "a9", "stop", 0.0, TokenUsage(), 60))
+        advanceUntilIdle()
+        assertEquals(shown, vm.state.value.items.filterIsInstance<ChatItem.User>().last().images)
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a prompt confirmed by a reload before its inbox event keeps the images it sent`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        // Without its images at first, then with them but without their payload.
+        chat.transcript += Message.User("msg_9", 50, "look")
+        advanceUntilIdle()
+        var users = vm.state.value.items.filterIsInstance<ChatItem.User>()
+        assertEquals(listOf("u1", "msg_9"), users.map { it.key })
+        assertEquals(listOf(photo.uri), users.last().images.map { it.dataUri })
+
+        chat.transcript = chat.transcript.dropLast(1) +
+            Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.StepEnded("s1", "a9", "stop", 0.0, TokenUsage(), 60))
+        advanceUntilIdle()
+        users = vm.state.value.items.filterIsInstance<ChatItem.User>()
+        assertEquals(listOf("u1", "msg_9"), users.map { it.key })
+        assertEquals(listOf(photo.uri), users.last().images.map { it.dataUri })
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a prompt of images alone shows at once and returns to the composer when it fails`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        chat.promptGate = CompletableDeferred()
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+
+        val sending = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("", sending.text)
+        assertTrue(sending.sending)
+        assertEquals(listOf(photo.uri), sending.images.map { it.dataUri })
+        assertTrue(vm.state.value.attachments.isEmpty())
+
+        chat.promptGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.items.none { it is ChatItem.User && it.pending })
+        assertEquals(listOf("u1"), vm.state.value.items.filterIsInstance<ChatItem.User>().map { it.key })
+        assertEquals(listOf(photo), vm.state.value.attachments)
+        assertEquals("", vm.state.value.draft)
+    }
+
+    @Test
     fun `failed send restores the draft and removes the pending prompt`() = runTest(main.testDispatcher) {
         chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
         val vm = vm()
@@ -2407,6 +2526,9 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         return stopResult
     }
     var promptResult: Result<Unit> = Result.success(Unit)
+
+    /** When set, [prompt] (the upload) waits for it. */
+    var promptGate: CompletableDeferred<Unit>? = null
     var switchResult: Result<Unit> = Result.success(Unit)
     val prompts = mutableListOf<Pair<String, PromptDelivery>>()
     val replies = mutableListOf<Pair<String, PermissionDecision>>()
@@ -2458,6 +2580,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         prompts += text to delivery
         calls += "prompt:$text"
         sentAttachments += attachments
+        promptGate?.await()
         return promptResult
     }
 

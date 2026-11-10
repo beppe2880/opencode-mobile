@@ -41,7 +41,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,6 +73,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_copy_respo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_interrupted
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_message_actions
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_queued
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_sending
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_shell_exit
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thinking
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_thought
@@ -81,6 +86,9 @@ import org.jetbrains.compose.resources.stringResource
 
 /** Lines of tool and shell output shown before "Show more" (setting). */
 internal val LocalOutputLines = staticCompositionLocalOf { 12 }
+
+/** Prompts not delivered yet are dimmed: their text and images. */
+private const val PENDING_ALPHA = 0.75f
 
 @Composable
 internal fun UserBubble(
@@ -98,7 +106,10 @@ internal fun UserBubble(
     ) {
         if (item.images.isNotEmpty()) {
             Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()).padding(bottom = OcSpacing.xs),
+                modifier = Modifier
+                    .alpha(if (item.pending) PENDING_ALPHA else 1f)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(bottom = OcSpacing.xs),
                 horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {
                 item.images.forEachIndexed { index, image ->
@@ -113,7 +124,7 @@ internal fun UserBubble(
             }
         }
         val bubble = Modifier
-            .alpha(if (item.pending) 0.75f else 1f)
+            .alpha(if (item.pending) PENDING_ALPHA else 1f)
             .clip(RoundedCornerShape(OcRadius.lg))
             .background(c.userBubbleBg)
         if (item.text.isBlank() && item.images.isNotEmpty()) {
@@ -169,10 +180,7 @@ internal fun UserBubble(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {
-                if (item.pending) {
-                    Icon(Icons.Outlined.Schedule, null, tint = c.textFaint, modifier = Modifier.size(12.dp))
-                    Text(stringResource(Res.string.chat_queued), style = MaterialTheme.typography.labelSmall, color = c.textFaint)
-                }
+                if (item.pending) PendingLabel(item)
                 if (files > 0) {
                     Text(
                         pluralStringResource(Res.plurals.chat_attachments, files, files),
@@ -182,6 +190,35 @@ internal fun UserBubble(
                 }
             }
         }
+    }
+}
+
+/**
+ * The state of a prompt not delivered yet: "Sending…" with a spinner (still when the system asks
+ * for less motion) until the server has it, then "Queued" until the session takes it. Announced
+ * politely when it appears or changes.
+ */
+@Composable
+private fun PendingLabel(item: ChatItem.User) {
+    val c = OcTheme.colors
+    val reducedMotion = rememberReducedMotion()
+    Row(
+        modifier = Modifier
+            .testTag("chat_user_pending_${item.key}")
+            .semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        if (item.sending && !reducedMotion) {
+            OcSpinner(Modifier.clearAndSetSemantics { }, size = 12.dp, color = c.textFaint)
+        } else {
+            Icon(Icons.Outlined.Schedule, null, tint = c.textFaint, modifier = Modifier.size(12.dp))
+        }
+        Text(
+            stringResource(if (item.sending) Res.string.chat_sending else Res.string.chat_queued),
+            style = MaterialTheme.typography.labelSmall,
+            color = c.textFaint,
+        )
     }
 }
 
