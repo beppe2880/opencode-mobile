@@ -516,8 +516,8 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
                 },
             ),
             choices = listOf(
-                OcSegment(ChatSwipe.SwitchChats, stringResource(Res.string.settings_swipe_chats_switch), "settings_swipe_chats_next_previous"),
                 OcSegment(ChatSwipe.SessionDrawer, stringResource(Res.string.settings_swipe_chats_drawer), "settings_swipe_chats_drawer"),
+                OcSegment(ChatSwipe.SwitchChats, stringResource(Res.string.settings_swipe_chats_switch), "settings_swipe_chats_next_previous"),
                 OcSegment(ChatSwipe.Off, stringResource(Res.string.settings_swipe_chats_off), "settings_swipe_chats_off"),
             ),
             selected = settings.chatSwipe,

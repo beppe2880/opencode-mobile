@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Quais alterações a folha mostra primeiro</string>
     <string name="settings_header_opens_folder">Alterações da pasta</string>
     <string name="settings_header_opens_session">Alterações da sessão</string>
-    <string name="settings_swipe_chats">Deslizar entre conversas</string>
+    <string name="settings_swipe_chats">Deslizar em uma conversa</string>
     <string name="settings_swipe_chats_sub">Deslize para a esquerda ou direita em uma conversa para abrir a próxima sessão ou a anterior na lista</string>
     <string name="settings_swipe_chats_switch">Próxima / anterior conversa</string>
     <string name="settings_swipe_chats_drawer">Abrir lista de conversas</string>

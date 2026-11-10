@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Which changes the sheet shows first</string>
     <string name="settings_header_opens_folder">Folder changes</string>
     <string name="settings_header_opens_session">Session changes</string>
-    <string name="settings_swipe_chats">Swipe between chats</string>
+    <string name="settings_swipe_chats">Swipe in a chat</string>
     <string name="settings_swipe_chats_sub">Swipe left or right on a chat to open the next or previous session in the list</string>
     <string name="settings_swipe_chats_switch">Next / previous chat</string>
     <string name="settings_swipe_chats_drawer">Open chat list</string>

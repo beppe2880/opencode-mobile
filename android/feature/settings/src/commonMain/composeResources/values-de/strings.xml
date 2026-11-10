@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Welche Änderungen das Blatt zuerst zeigt</string>
     <string name="settings_header_opens_folder">Änderungen im Ordner</string>
     <string name="settings_header_opens_session">Änderungen der Sitzung</string>
-    <string name="settings_swipe_chats">Zwischen Chats wischen</string>
+    <string name="settings_swipe_chats">In einem Chat wischen</string>
     <string name="settings_swipe_chats_sub">Wische im Chat nach links oder rechts, um die nächste oder vorherige Sitzung der Liste zu öffnen</string>
     <string name="settings_swipe_chats_switch">Nächster / vorheriger Chat</string>
     <string name="settings_swipe_chats_drawer">Chatliste öffnen</string>

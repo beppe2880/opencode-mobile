@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Quali modifiche mostra per prima la scheda</string>
     <string name="settings_header_opens_folder">Modifiche della cartella</string>
     <string name="settings_header_opens_session">Modifiche della sessione</string>
-    <string name="settings_swipe_chats">Scorri tra le chat</string>
+    <string name="settings_swipe_chats">Scorri in una chat</string>
     <string name="settings_swipe_chats_sub">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente della lista</string>
     <string name="settings_swipe_chats_switch">Chat successiva / precedente</string>
     <string name="settings_swipe_chats_drawer">Apri elenco chat</string>

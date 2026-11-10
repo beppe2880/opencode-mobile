@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Qué cambios muestra primero la hoja</string>
     <string name="settings_header_opens_folder">Cambios de la carpeta</string>
     <string name="settings_header_opens_session">Cambios de la sesión</string>
-    <string name="settings_swipe_chats">Deslizar entre chats</string>
+    <string name="settings_swipe_chats">Deslizar en un chat</string>
     <string name="settings_swipe_chats_sub">Desliza a izquierda o derecha en un chat para abrir la sesión siguiente o anterior de la lista</string>
     <string name="settings_swipe_chats_switch">Chat siguiente / anterior</string>
     <string name="settings_swipe_chats_drawer">Abrir lista de chats</string>

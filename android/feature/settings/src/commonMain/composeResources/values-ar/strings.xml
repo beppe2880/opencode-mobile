@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">التغييرات التي تعرضها الورقة أولًا</string>
     <string name="settings_header_opens_folder">تغييرات المجلد</string>
     <string name="settings_header_opens_session">تغييرات الجلسة</string>
-    <string name="settings_swipe_chats">السحب بين المحادثات</string>
+    <string name="settings_swipe_chats">السحب في المحادثة</string>
     <string name="settings_swipe_chats_sub">اسحب يمينًا أو يسارًا في المحادثة لفتح الجلسة التالية أو السابقة في القائمة</string>
     <string name="settings_swipe_chats_switch">المحادثة التالية / السابقة</string>
     <string name="settings_swipe_chats_drawer">فتح قائمة المحادثات</string>

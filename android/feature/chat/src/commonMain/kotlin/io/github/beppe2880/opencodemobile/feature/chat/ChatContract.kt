@@ -99,7 +99,7 @@ data class ChatState(
     val previousSession: SessionPeek? = null,
     val nextSession: SessionPeek? = null,
     /** What a horizontal swipe does (setting). */
-    val swipe: ChatSwipe = ChatSwipe.SwitchChats,
+    val swipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The server transcript has been loaded at least once (cached content may show before). */
     val synced: Boolean = false,
     /** Older history may exist above the oldest loaded message. */

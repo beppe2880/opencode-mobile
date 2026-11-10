@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">シートで最初に表示する変更</string>
     <string name="settings_header_opens_folder">フォルダの変更</string>
     <string name="settings_header_opens_session">セッションの変更</string>
-    <string name="settings_swipe_chats">スワイプでチャットを切り替え</string>
+    <string name="settings_swipe_chats">チャット内でスワイプ</string>
     <string name="settings_swipe_chats_sub">チャットを左右にスワイプして一覧の次または前のセッションを開く</string>
     <string name="settings_swipe_chats_switch">次／前のチャットに切り替え</string>
     <string name="settings_swipe_chats_drawer">チャット一覧を開く</string>

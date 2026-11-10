@@ -890,6 +890,7 @@ class ChatViewModelTest {
 
     @Test
     fun `neighbors follow the session list order and swiping switches session`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SwitchChats)
         val sessions = FakeSessions(model, order = listOf("s0", "s1", "s2"), titles = mapOf("s0" to "Newer", "s2" to "Older"))
         val vm = vm(sessions)
         advanceUntilIdle()
@@ -907,6 +908,9 @@ class ChatViewModelTest {
 
     @Test
     fun `the swipe setting chooses between switching chats, the chat list drawer and nothing`() = runTest(main.testDispatcher) {
+        // The chat list is the default.
+        assertEquals(ChatSwipe.SessionDrawer, AppSettings().chatSwipe)
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SwitchChats)
         val vm = vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
         advanceUntilIdle()
         assertEquals(ChatSwipe.SwitchChats, vm.state.value.swipe)
