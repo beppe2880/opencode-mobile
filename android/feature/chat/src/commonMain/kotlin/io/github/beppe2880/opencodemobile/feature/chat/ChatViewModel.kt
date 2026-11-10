@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
@@ -293,7 +294,7 @@ class ChatViewModel(
                 sendEffect(ChatEffect.OpenSession(event.sessionId))
             }
             is ChatEvent.OpenFile -> sendEffect(ChatEffect.OpenFile(currentState.directory, event.path))
-            is ChatEvent.SwitchSession -> sendEffect(ChatEffect.SwitchSession(event.sessionId))
+            is ChatEvent.SwitchSession -> if (currentState.swipe == ChatSwipe.SwitchChats) sendEffect(ChatEffect.SwitchSession(event.sessionId))
             ChatEvent.LoadOlder -> loadOlder()
             // Not part of the state: only read back when the chat opens again.
             is ChatEvent.ScrollMoved -> scroll.put(sessionId, event.anchor)

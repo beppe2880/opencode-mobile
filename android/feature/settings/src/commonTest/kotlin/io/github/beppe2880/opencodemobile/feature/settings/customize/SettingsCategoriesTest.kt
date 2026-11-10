@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -16,6 +17,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_de
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_off
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe_drawer
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_cloud
@@ -167,6 +170,18 @@ class SettingsCategoriesTest {
         assertEquals(listOf(UiText.Raw("Desk"), UiText.Raw("Laptop")), active)
         val demo = summary(SettingsArea.Servers, SettingsState(servers = servers), wide = false, demo = true)
         assertEquals(listOf(UiText.Resource(Res.string.settings_demo_server)), demo)
+    }
+
+    @Test
+    fun chatSummaryNamesTheSwipeChoice() {
+        val swipe = UiText.Resource(Res.string.settings_summary_swipe)
+        val drawer = UiText.Resource(Res.string.settings_summary_swipe_drawer)
+        val switching = summaryOf(SettingsArea.Chat, AppSettings())
+        assertTrue(swipe in switching && drawer !in switching)
+        val list = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.SessionDrawer))
+        assertTrue(drawer in list && swipe !in list)
+        val off = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.Off))
+        assertTrue(swipe !in off && drawer !in off)
     }
 
     private fun summaryOf(area: SettingsArea, settings: AppSettings) = summary(area, SettingsState(settings = settings), wide = false)

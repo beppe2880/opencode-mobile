@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">Session changes</string>
     <string name="settings_swipe_chats">Swipe between chats</string>
     <string name="settings_swipe_chats_sub">Swipe left or right on a chat to open the next or previous session in the list</string>
+    <string name="settings_swipe_chats_switch">Next / previous chat</string>
+    <string name="settings_swipe_chats_drawer">Open chat list</string>
+    <string name="settings_swipe_chats_off">Off</string>
+    <string name="settings_swipe_chats_drawer_sub">Swipe right on a chat to show the chat list over it; tap a chat to open it</string>
+    <string name="settings_swipe_chats_off_sub">Swiping sideways on a chat does nothing</string>
     <string name="settings_group_activity">Group thinking and tools</string>
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
     <string name="settings_group_thoughts">Group consecutive thoughts</string>
@@ -287,6 +292,7 @@
     <string name="settings_summary_grouped">Grouped activity</string>
     <string name="settings_summary_cost">Cost</string>
     <string name="settings_summary_swipe">Swipe</string>
+    <string name="settings_summary_swipe_drawer">Swipe for chat list</string>
     <string name="settings_summary_apply">Changes: %1$s</string>
     <string name="settings_summary_new_chats">New chats: %1$s</string>
     <string name="settings_summary_no_key">No API key</string>

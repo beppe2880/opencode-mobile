@@ -54,6 +54,7 @@
     <string name="sessions_untitled">未命名会话</string>
     <string name="sessions_preview_swipe_on">在聊天中左右滑动，打开下一个或上一个会话</string>
     <string name="sessions_preview_swipe_off">关闭：返回列表以打开其他会话</string>
+    <string name="sessions_preview_swipe_drawer">在聊天中向右滑动，即可在其上方显示聊天列表</string>
     <string name="sessions_preview_wide">在展开的折叠屏和平板上</string>
     <string name="sessions_preview_split_off">聊天在列表上方打开，宽屏上也是如此</string>
     <string name="sessions_preview_back_list">列表隐藏时按返回键会再次显示列表</string>

@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">Cambios de la sesión</string>
     <string name="settings_swipe_chats">Deslizar entre chats</string>
     <string name="settings_swipe_chats_sub">Desliza a izquierda o derecha en un chat para abrir la sesión siguiente o anterior de la lista</string>
+    <string name="settings_swipe_chats_switch">Chat siguiente / anterior</string>
+    <string name="settings_swipe_chats_drawer">Abrir lista de chats</string>
+    <string name="settings_swipe_chats_off">Desactivado</string>
+    <string name="settings_swipe_chats_drawer_sub">Desliza a la derecha en un chat para mostrar la lista de chats encima; toca un chat para abrirlo</string>
+    <string name="settings_swipe_chats_off_sub">Deslizar de lado en un chat no hace nada</string>
     <string name="settings_group_activity">Agrupar razonamiento y herramientas</string>
     <string name="settings_group_activity_sub">Mostrar razonamientos y llamadas a herramientas consecutivos en una sola fila</string>
     <string name="settings_group_thoughts">Agrupar razonamientos consecutivos</string>
@@ -287,6 +292,7 @@
     <string name="settings_summary_grouped">Actividad agrupada</string>
     <string name="settings_summary_cost">Coste</string>
     <string name="settings_summary_swipe">Deslizar</string>
+    <string name="settings_summary_swipe_drawer">Deslizar para lista de chats</string>
     <string name="settings_summary_apply">Cambios: %1$s</string>
     <string name="settings_summary_new_chats">Chats nuevos: %1$s</string>
     <string name="settings_summary_no_key">Sin clave de API</string>

@@ -54,6 +54,7 @@
     <string name="sessions_untitled">Sessione senza titolo</string>
     <string name="sessions_preview_swipe_on">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente</string>
     <string name="sessions_preview_swipe_off">Disattivato: torna all’elenco per aprire un’altra sessione</string>
+    <string name="sessions_preview_swipe_drawer">Scorri verso destra in una chat per mostrare sopra di essa l’elenco delle chat</string>
     <string name="sessions_preview_wide">Su pieghevoli aperti e tablet</string>
     <string name="sessions_preview_split_off">La chat si apre sopra l’elenco, anche sugli schermi larghi</string>
     <string name="sessions_preview_back_list">Indietro con l’elenco nascosto lo mostra di nuovo</string>

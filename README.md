@@ -102,7 +102,7 @@ Screenshots and recordings may show earlier versions of the app.
 ### Pick up where you left off
 
 - **Cached transcripts** and incremental sync for large conversations.
-- **Swipe between chats**, with saved drafts and remembered reading positions.
+- **Swipe between chats** or into a chat list drawer, with saved drafts and remembered reading positions.
 - **Multiple saved servers**, QR pairing and discovery on your Wi-Fi network.
 - **Usage statistics** by day and model: cost, tokens and activity over 1, 7 or 30 days.
 - **Home screen widgets** for running and recent sessions.

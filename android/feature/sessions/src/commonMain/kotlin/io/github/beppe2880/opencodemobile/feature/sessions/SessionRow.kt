@@ -66,6 +66,8 @@ internal fun SessionRow(
     compact: Boolean = false,
     /** What runs under the session; null when the setting hides running work (only the dot shows). */
     work: RunningWork? = RunningWork(),
+    /** Off where the same swipe closes the list (the drawer over a chat); delete stays in the actions. */
+    swipeToDelete: Boolean = true,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -81,6 +83,7 @@ internal fun SessionRow(
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
+        gesturesEnabled = swipeToDelete,
         modifier = modifier,
         onDismiss = {
             currentOnDelete()
