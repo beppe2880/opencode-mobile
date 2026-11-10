@@ -44,6 +44,8 @@ fun UpdateNoticeSample(style: UpdateNoticeStyle, target: UpdateTarget, modifier:
         action = target.actionFor(release),
         style = style,
         installedVersion = "1.3.0",
+        // As the window opens on its own: with what changed.
+        changelogVisible = true,
         changes = listOf(
             VersionChanges(
                 release.version,

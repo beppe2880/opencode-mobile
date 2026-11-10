@@ -246,6 +246,13 @@
     <string name="update_notes_features">Funciones</string>
     <string name="update_notes_fixes">Correcciones de errores</string>
     <string name="update_notes_breaking">Cambios incompatibles</string>
+    <string name="update_banner_open">Mostrar la actualización</string>
+    <string name="update_sheet_view_changelog">Ver novedades</string>
+    <string name="update_sheet_hide_changelog">Ocultar novedades</string>
+    <string name="update_check">Buscar actualizaciones</string>
+    <string name="update_check_checking">Buscando actualizaciones…</string>
+    <string name="update_check_latest">Tienes la versión más reciente (%1$s)</string>
+    <string name="update_check_failed">No se pudo conectar con GitHub. Comprueba tu conexión e inténtalo de nuevo.</string>
     <string name="settings_split_view">Chat junto a la lista</string>
     <string name="settings_split_view_sub">En pantallas anchas, muestra el chat abierto junto a la lista de sesiones. Arrastra el tirador del divisor para cambiar el tamaño de la lista.</string>
     <string name="settings_list_width">Ancho de la lista de sesiones</string>

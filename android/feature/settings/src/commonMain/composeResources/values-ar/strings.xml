@@ -258,6 +258,13 @@
     <string name="update_notes_features">الميزات</string>
     <string name="update_notes_fixes">إصلاحات الأخطاء</string>
     <string name="update_notes_breaking">التغييرات غير المتوافقة</string>
+    <string name="update_banner_open">عرض التحديث</string>
+    <string name="update_sheet_view_changelog">عرض ما الجديد</string>
+    <string name="update_sheet_hide_changelog">إخفاء ما الجديد</string>
+    <string name="update_check">التحقق من التحديثات</string>
+    <string name="update_check_checking">جارٍ التحقق من التحديثات…</string>
+    <string name="update_check_latest">أنت على أحدث إصدار (%1$s)</string>
+    <string name="update_check_failed">تعذّر الوصول إلى GitHub. تحقّق من اتصالك وحاول مرة أخرى.</string>
     <string name="settings_split_view">الدردشة بجانب القائمة</string>
     <string name="settings_split_view_sub">على الشاشات العريضة، اعرض الدردشة المفتوحة بجانب قائمة الجلسات. اسحب مقبض الفاصل لتغيير حجم القائمة.</string>
     <string name="settings_list_width">عرض قائمة الجلسات</string>

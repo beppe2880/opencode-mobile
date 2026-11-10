@@ -118,6 +118,7 @@ val fakeDataModule = module {
     single<UpdateRepository> {
         object : UpdateRepository {
             override suspend fun availableUpdate(installedVersion: String): AppUpdate? = null
+            override suspend fun checkNow(installedVersion: String): Result<AppUpdate?> = Result.success(null)
             override suspend fun dismiss(release: AppRelease) = Unit
         }
     }

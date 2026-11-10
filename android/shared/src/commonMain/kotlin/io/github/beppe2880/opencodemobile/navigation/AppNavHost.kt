@@ -539,13 +539,15 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, resizeOnly
 private val HandleWidth = 24.dp
 
 /**
- * The banner of a new app release, at the top of the session list. The live demo never looks for
- * releases: it shows a sample of the notice instead, to reach its options.
+ * The banner of a new app release, under the search of the session list, above the sessions;
+ * tapping it opens the update sheet ([UpdateSheetRoute]). The live demo never looks for releases:
+ * it shows a sample of the notice instead, to reach its options.
  */
 @Composable
 private fun UpdateBanner() {
     val editMode = LocalEditMode.current
-    val modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, top = OcSpacing.md).editable(SettingsPart.UpdateNotice, editMode)
+    // The list header above already leaves a gap.
+    val modifier = Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, bottom = OcSpacing.md).editable(SettingsPart.UpdateNotice, editMode)
     if (editMode != null) {
         val style = koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle().value.updateNotice
         UpdateNoticeSample(style, koinInject<AppInfo>().updateTarget, modifier, compact = true)

@@ -194,6 +194,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_vo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_waveform_sub
+import io.github.beppe2880.opencodemobile.feature.settings.update.LocalUpdateCheck
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
@@ -574,23 +575,27 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.NotifyPermissions -> switch(settings.notifyPermissions, SettingsEvent::NotifyPermissionsChanged)()
         SettingOption.NotifyQuestions -> switch(settings.notifyQuestions, SettingsEvent::NotifyQuestionsChanged)()
         SettingOption.NotifyFinished -> switch(settings.notifyFinished, SettingsEvent::NotifyFinishedChanged)()
-        SettingOption.UpdateNotice -> ChoiceRow(
-            title = title,
-            subtitle = stringResource(
-                when (settings.updateNotice) {
-                    UpdateNoticeStyle.Window -> Res.string.settings_update_notice_window_sub
-                    UpdateNoticeStyle.Banner -> Res.string.settings_update_notice_banner_sub
-                    UpdateNoticeStyle.Off -> Res.string.settings_update_notice_off_sub
-                },
-            ),
-            choices = listOf(
-                OcSegment(UpdateNoticeStyle.Window, stringResource(Res.string.settings_update_notice_window), "settings_update_notice_window"),
-                OcSegment(UpdateNoticeStyle.Banner, stringResource(Res.string.settings_update_notice_banner), "settings_update_notice_banner"),
-                OcSegment(UpdateNoticeStyle.Off, stringResource(Res.string.settings_update_notice_off), "settings_update_notice_off"),
-            ),
-            selected = settings.updateNotice,
-            onSelect = { onEvent(SettingsEvent.UpdateNoticeChanged(it)) },
-        )
+        SettingOption.UpdateNotice -> androidx.compose.foundation.layout.Column(modifier) {
+            ChoiceRow(
+                title = title,
+                subtitle = stringResource(
+                    when (settings.updateNotice) {
+                        UpdateNoticeStyle.Window -> Res.string.settings_update_notice_window_sub
+                        UpdateNoticeStyle.Banner -> Res.string.settings_update_notice_banner_sub
+                        UpdateNoticeStyle.Off -> Res.string.settings_update_notice_off_sub
+                    },
+                ),
+                choices = listOf(
+                    OcSegment(UpdateNoticeStyle.Window, stringResource(Res.string.settings_update_notice_window), "settings_update_notice_window"),
+                    OcSegment(UpdateNoticeStyle.Banner, stringResource(Res.string.settings_update_notice_banner), "settings_update_notice_banner"),
+                    OcSegment(UpdateNoticeStyle.Off, stringResource(Res.string.settings_update_notice_off), "settings_update_notice_off"),
+                ),
+                selected = settings.updateNotice,
+                onSelect = { onEvent(SettingsEvent.UpdateNoticeChanged(it)) },
+            )
+            // Also with Off: that only stops the automatic checks.
+            LocalUpdateCheck.current?.invoke()
+        }
     }
 }
 

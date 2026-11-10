@@ -246,6 +246,13 @@
     <string name="update_notes_features">Fonctionnalités</string>
     <string name="update_notes_fixes">Corrections de bugs</string>
     <string name="update_notes_breaking">Changements incompatibles</string>
+    <string name="update_banner_open">Afficher la mise à jour</string>
+    <string name="update_sheet_view_changelog">Voir les nouveautés</string>
+    <string name="update_sheet_hide_changelog">Masquer les nouveautés</string>
+    <string name="update_check">Rechercher les mises à jour</string>
+    <string name="update_check_checking">Recherche de mises à jour…</string>
+    <string name="update_check_latest">Vous utilisez la dernière version (%1$s)</string>
+    <string name="update_check_failed">Impossible de joindre GitHub. Vérifiez votre connexion et réessayez.</string>
     <string name="settings_split_view">Chat à côté de la liste</string>
     <string name="settings_split_view_sub">Sur grand écran, afficher le chat ouvert à côté de la liste des sessions. Faites glisser la poignée du séparateur pour redimensionner la liste.</string>
     <string name="settings_list_width">Largeur de la liste des sessions</string>

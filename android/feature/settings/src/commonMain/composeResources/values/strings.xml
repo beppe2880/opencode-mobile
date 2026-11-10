@@ -246,6 +246,13 @@
     <string name="update_notes_features">Features</string>
     <string name="update_notes_fixes">Bug fixes</string>
     <string name="update_notes_breaking">Breaking changes</string>
+    <string name="update_banner_open">Show the update</string>
+    <string name="update_sheet_view_changelog">View changelog</string>
+    <string name="update_sheet_hide_changelog">Hide changelog</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_check_checking">Checking for updates…</string>
+    <string name="update_check_latest">You're on the latest version (%1$s)</string>
+    <string name="update_check_failed">Couldn't reach GitHub. Check your connection and try again.</string>
     <string name="settings_split_view">Chat beside the list</string>
     <string name="settings_split_view_sub">On wide screens, show the open chat next to the session list. Drag the handle on the divider to resize the list.</string>
     <string name="settings_list_width">Session list width</string>

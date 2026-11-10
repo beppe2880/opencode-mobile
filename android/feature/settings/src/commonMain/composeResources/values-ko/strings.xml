@@ -243,6 +243,13 @@
     <string name="update_notes_features">기능</string>
     <string name="update_notes_fixes">버그 수정</string>
     <string name="update_notes_breaking">호환성이 깨지는 변경</string>
+    <string name="update_banner_open">업데이트 보기</string>
+    <string name="update_sheet_view_changelog">새로운 기능 보기</string>
+    <string name="update_sheet_hide_changelog">새로운 기능 숨기기</string>
+    <string name="update_check">업데이트 확인</string>
+    <string name="update_check_checking">업데이트 확인 중…</string>
+    <string name="update_check_latest">최신 버전을 사용 중입니다(%1$s)</string>
+    <string name="update_check_failed">GitHub에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.</string>
     <string name="settings_split_view">목록 옆에 채팅 표시</string>
     <string name="settings_split_view_sub">넓은 화면에서 열린 채팅을 세션 목록 옆에 표시합니다. 구분선의 핸들을 끌어 목록 크기를 조정하세요.</string>
     <string name="settings_list_width">세션 목록 너비</string>
