@@ -178,6 +178,8 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
         SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
+        // "Check for updates" is under this choice.
+        SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
         else -> emptyList()
     }
 

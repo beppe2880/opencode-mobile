@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
 import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaPreviewContent
+import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateCheckHost
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -46,5 +47,8 @@ fun SettingsRoute(
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()
         }
     }
-    SettingsScreen(state = state, onEvent = viewModel::onEvent, preview = preview, modifier = modifier, demo = demo, onOpenLiveDemo = onOpenLiveDemo)
+    // The demo's update repository never finds one: the check works and says so.
+    UpdateCheckHost {
+        SettingsScreen(state = state, onEvent = viewModel::onEvent, preview = preview, modifier = modifier, demo = demo, onOpenLiveDemo = onOpenLiveDemo)
+    }
 }

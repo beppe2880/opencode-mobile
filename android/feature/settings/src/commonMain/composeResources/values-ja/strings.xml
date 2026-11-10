@@ -243,6 +243,13 @@
     <string name="update_notes_features">機能</string>
     <string name="update_notes_fixes">バグ修正</string>
     <string name="update_notes_breaking">互換性のない変更</string>
+    <string name="update_banner_open">アップデートを表示</string>
+    <string name="update_sheet_view_changelog">新機能を表示</string>
+    <string name="update_sheet_hide_changelog">新機能を隠す</string>
+    <string name="update_check">アップデートを確認</string>
+    <string name="update_check_checking">アップデートを確認中…</string>
+    <string name="update_check_latest">最新バージョンを使用中です（%1$s）</string>
+    <string name="update_check_failed">GitHub に接続できませんでした。接続を確認して、もう一度お試しください。</string>
     <string name="settings_split_view">チャットをリストの横に表示</string>
     <string name="settings_split_view_sub">横長の画面では、開いているチャットをセッション一覧の横に表示します。仕切り線のハンドルをドラッグして一覧の幅を変更できます。</string>
     <string name="settings_list_width">セッション一覧の幅</string>

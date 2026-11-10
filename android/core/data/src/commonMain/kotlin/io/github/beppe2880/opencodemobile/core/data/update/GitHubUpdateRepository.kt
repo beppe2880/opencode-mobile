@@ -18,6 +18,7 @@ import kotlin.time.Clock
  * Checks [fetchReleases] (the GitHub API, one request for the recent releases) at most once
  * every [CHECK_INTERVAL_MS] and keeps the releases found in [prefs], with the version dismissed
  * by the user. A check that fails is not counted, so an offline launch is retried at the next one.
+ * [checkNow] asks at once and counts as the day's check when it succeeds.
  */
 internal class GitHubUpdateRepository(
     private val fetchReleases: suspend () -> List<AppRelease>,
@@ -31,16 +32,33 @@ internal class GitHubUpdateRepository(
         // Builds without a release version (local or CI builds) never look for updates.
         if (AppVersion.parse(installedVersion) == null) return null
         val known = if (checkDue()) check() else stored()
-        val newer = known
-            .filter { AppVersion.isUpdate(it.version, installedVersion) }
-            .sortedByDescending { AppVersion.parse(it.version) }
+        val newer = newer(known, installedVersion)
         val latest = newer.firstOrNull()?.takeUnless(::isDismissed) ?: return null
         AppUpdate(latest, newer)
+    }
+
+    override suspend fun checkNow(installedVersion: String): Result<AppUpdate?> = mutex.withLock {
+        if (AppVersion.parse(installedVersion) == null) return Result.success(null)
+        val releases = try {
+            fetchReleases()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+        save(releases)
+        // A skipped version is offered again: the user asked.
+        val newer = newer(releases, installedVersion)
+        Result.success(newer.firstOrNull()?.let { AppUpdate(it, newer) })
     }
 
     override suspend fun dismiss(release: AppRelease) = mutex.withLock {
         prefs.putString(KEY_DISMISSED, release.version)
     }
+
+    private fun newer(releases: List<AppRelease>, installedVersion: String): List<AppRelease> = releases
+        .filter { AppVersion.isUpdate(it.version, installedVersion) }
+        .sortedByDescending { AppVersion.parse(it.version) }
 
     private fun checkDue(): Boolean {
         val last = prefs.getLongOrNull(KEY_CHECKED_AT) ?: return true
@@ -57,6 +75,12 @@ internal class GitHubUpdateRepository(
         } catch (_: Exception) {
             return stored()
         }
+        save(releases)
+        return releases
+    }
+
+    /** Keeps [releases] as found now by a check. */
+    private fun save(releases: List<AppRelease>) {
         prefs.putLong(KEY_CHECKED_AT, now())
         prefs.remove(KEY_VERSION)
         prefs.remove(KEY_URL)
@@ -66,7 +90,6 @@ internal class GitHubUpdateRepository(
             val stored = releases.map { StoredRelease(it.version, it.url, it.notes) }
             prefs.putString(KEY_RELEASES, StoreJson.encodeToString(StoredReleases, stored))
         }
-        return releases
     }
 
     private fun stored(): List<AppRelease> {

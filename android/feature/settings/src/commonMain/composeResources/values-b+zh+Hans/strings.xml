@@ -243,6 +243,13 @@
     <string name="update_notes_features">新功能</string>
     <string name="update_notes_fixes">问题修复</string>
     <string name="update_notes_breaking">不兼容的更改</string>
+    <string name="update_banner_open">显示更新</string>
+    <string name="update_sheet_view_changelog">查看更新内容</string>
+    <string name="update_sheet_hide_changelog">隐藏更新内容</string>
+    <string name="update_check">检查更新</string>
+    <string name="update_check_checking">正在检查更新…</string>
+    <string name="update_check_latest">当前已是最新版本（%1$s）</string>
+    <string name="update_check_failed">无法连接 GitHub。请检查网络连接后重试。</string>
     <string name="settings_split_view">聊天与列表并排</string>
     <string name="settings_split_view_sub">在宽屏上，将打开的聊天显示在会话列表旁边。拖动分隔线上的手柄可调整列表大小。</string>
     <string name="settings_list_width">会话列表宽度</string>

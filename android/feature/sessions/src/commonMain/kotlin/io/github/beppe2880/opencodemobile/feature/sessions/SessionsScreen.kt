@@ -130,7 +130,7 @@ fun SessionsScreen(
     selectedSessionId: String? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     nowProvider: () -> Long = { Clock.System.now().toEpochMilliseconds() },
-    /** Drawn above the list header, such as the app update notice; may draw nothing. */
+    /** Drawn under the list header (project filter and search), above the sessions, such as the app update notice; may draw nothing. */
     banner: @Composable () -> Unit = {},
     /** The offline demo: the top bar names it instead of showing a connection. */
     demo: Boolean = false,
@@ -198,11 +198,11 @@ fun SessionsScreen(
             ) {
                 item(key = "header", contentType = "header") {
                     // In the first item: a banner appearing later pushes the list down instead
-                    // of opening above the scroll position.
+                    // of opening above the scroll position. Under the search, right above the chats.
                     Column {
                         state.sharing?.let { ShareChoice(it, onEvent) }
-                        banner()
                         ListHeader(state, onEvent)
+                        banner()
                     }
                 }
                 when {

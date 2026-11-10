@@ -52,18 +52,20 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.update_note
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_notes_features
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_notes_fixes
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_release_notes
+import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_hide_changelog
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_later
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_skip
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_versions_description
+import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_view_changelog
 import io.github.beppe2880.opencodemobile.feature.settings.resources.update_sheet_whats_new
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * The sheet announcing a newer release with what changed, shown once per app start when the
- * update notice is a window; draws nothing otherwise. Shares its ViewModel with
+ * The sheet announcing a newer release: on its own once per app start when the update notice is
+ * a window, or when the banner is tapped; draws nothing otherwise. Shares its ViewModel with
  * [UpdateNoticeRoute] in the same screen.
  */
 @Composable
@@ -92,8 +94,10 @@ fun UpdateSheet(state: UpdateNoticeState, onEvent: (UpdateNoticeEvent) -> Unit) 
 }
 
 /**
- * Title, versions, "What's new" and the actions; also drawn by the Settings preview. With
- * [scrollNotes] the notes scroll between the title and the actions, which stay in sight.
+ * Title, versions, "What's new" while [UpdateNoticeState.changelogVisible], and the actions:
+ * update, show or hide the changelog (when there are notes), later, skip. Also drawn by the
+ * Settings preview. With [scrollNotes] the notes scroll between the title and the actions, which
+ * stay in sight.
  */
 @Composable
 fun UpdateSheetContent(
@@ -128,21 +132,24 @@ fun UpdateSheetContent(
                     .testTag("update_sheet_versions"),
             )
         }
-        Text(
-            stringResource(Res.string.update_sheet_whats_new),
-            style = MaterialTheme.typography.titleSmall,
-            color = c.textBase,
-            modifier = Modifier.padding(top = OcSpacing.lg, bottom = OcSpacing.xs).semantics { heading() },
-        )
-        Column(
-            (if (scrollNotes) Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()) else Modifier)
-                .testTag("update_sheet_notes"),
-        ) {
-            val several = state.changes.size > 1
-            state.changes.forEach { changes -> VersionNotes(changes, showVersion = several) }
+        val hasChanges = state.changes.isNotEmpty()
+        if (hasChanges && state.changelogVisible) {
+            Text(
+                stringResource(Res.string.update_sheet_whats_new),
+                style = MaterialTheme.typography.titleSmall,
+                color = c.textBase,
+                modifier = Modifier.padding(top = OcSpacing.lg, bottom = OcSpacing.xs).semantics { heading() },
+            )
+            Column(
+                (if (scrollNotes) Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()) else Modifier)
+                    .testTag("update_sheet_notes"),
+            ) {
+                val several = state.changes.size > 1
+                state.changes.forEach { changes -> VersionNotes(changes, showVersion = several) }
+            }
+            // Marks where the notes scroll under the actions.
+            OcDivider(Modifier.padding(top = OcSpacing.sm))
         }
-        // Marks where the notes scroll under the actions.
-        OcDivider(Modifier.padding(top = OcSpacing.sm))
         Column(Modifier.padding(top = OcSpacing.md), verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
             OcButton(
                 text = stringResource(
@@ -155,6 +162,14 @@ fun UpdateSheetContent(
                 onClick = { onEvent(UpdateNoticeEvent.Open) },
                 modifier = Modifier.fillMaxWidth().testTag("update_sheet_open"),
             )
+            if (hasChanges) {
+                OcButton(
+                    text = stringResource(if (state.changelogVisible) Res.string.update_sheet_hide_changelog else Res.string.update_sheet_view_changelog),
+                    onClick = { onEvent(UpdateNoticeEvent.ToggleChangelog) },
+                    variant = OcButtonVariant.Secondary,
+                    modifier = Modifier.fillMaxWidth().testTag("update_sheet_changelog"),
+                )
+            }
             OcButton(
                 text = stringResource(Res.string.update_sheet_later),
                 onClick = { onEvent(UpdateNoticeEvent.Later) },
@@ -236,6 +251,7 @@ private fun UpdateSheetContentPreview() {
                 release = release,
                 action = UpdateTarget.Android.actionFor(release),
                 installedVersion = "0.8.0",
+                changelogVisible = true,
                 changes = listOf(
                     VersionChanges(
                         "0.9.0",
