@@ -9,6 +9,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -103,6 +104,12 @@ class ChatViewModel(
 
     /** Messages whose images were requested in this chat; a failure is retried on reopen. */
     private val imageRequests = HashSet<String>()
+
+    /**
+     * Images of prompts sent from here, by the server id of the prompt, shown in its place until
+     * the server's copy has its own: it may come without them for a while ([withSentImages]).
+     */
+    private val sentImages = HashMap<String, List<ImageAttachment>>()
 
     /** Tool calls whose files were requested in this chat ([ToolMedia.fetchKey]). */
     private val toolMediaRequests = HashSet<String>()
@@ -548,6 +555,7 @@ class ChatViewModel(
             revertMessageId = s.revertMessageId
             pendingForms.await().onSuccess(::showForms)
             val server = transcriptResult.getOrThrow()
+            keepSentImages(server)
             messages = olderThan(server) + TranscriptReducer.merge(server, localPending(server))
             val lastAssistant = messages.lastOrNull { it is Message.Assistant } as? Message.Assistant
             val activeIds = active.await().getOrNull()
@@ -624,7 +632,8 @@ class ChatViewModel(
      * their image payload (too big to store), so a missing one is fetched with its message.
      */
     private fun openImage(messageId: String, index: Int) {
-        val prompt = (messages.firstOrNull { it.id == messageId } as? Message.User)?.images ?: return
+        val message = messages.firstOrNull { it.id == messageId } as? Message.User ?: return
+        val prompt = withSentImages(message).images
         if (index !in prompt.indices) return
         val fetched = images.get(messageId)
         openPreview(
@@ -797,6 +806,7 @@ class ChatViewModel(
     private fun reloadMessages() {
         viewModelScope.launch {
             chat.messages(sessionId).onSuccess { server ->
+                keepSentImages(server)
                 messages = olderThan(server) + TranscriptReducer.merge(server, localPending(server))
                 updateState { it.copy(recentModels = recentModels()) }
                 rebuild()
@@ -881,8 +891,16 @@ class ChatViewModel(
                 refreshChangedFiles()
             }
             is ServerEvent.InboxEnqueued -> {
-                messages = messages.filterNot { it is Message.User && it.id.startsWith(LOCAL_PREFIX) && it.text == event.text }
-                applyEvent(event)
+                val sent = messages.filter { it is Message.User && it.id.startsWith(LOCAL_PREFIX) && it.text == event.text }
+                // The inbox entry takes the local prompt's place with its images and files, in
+                // one update, so the thumbnails do not blink.
+                val local = sent.firstOrNull() as? Message.User
+                messages = TranscriptReducer.reduce(messages - sent.toSet(), event).map { message ->
+                    if (local == null || message !is Message.User || message.id != event.inboxId || message.attachments > 0) return@map message
+                    if (local.images.isNotEmpty()) sentImages[message.id] = local.images
+                    message.copy(attachments = local.attachments, images = local.images, files = local.files)
+                }
+                rebuild()
                 refreshQueue()
             }
             is ServerEvent.InboxDelivered, is ServerEvent.InboxCancelled, is ServerEvent.InboxDeliveryChanged -> {
@@ -1122,7 +1140,7 @@ class ChatViewModel(
         val shown = if (queuedIds.isEmpty()) visible else visible.filterNot { it is Message.User && it.id in queuedIds }
         followShells(shown)
         val items = ChatItemsBuilder.build(
-            withLiveOutput(withToolMedia(withImages(shown))),
+            withLiveOutput(withToolMedia(withImages(withSentImages(shown)))),
             state.running,
             showReasoning,
             state.models::labelFor,
@@ -1149,6 +1167,44 @@ class ChatViewModel(
         }
         // The revert point is older than the loaded history: bring it in so the chat is not blank.
         if (revertMessageId != null && visible.isEmpty() && messages.isNotEmpty()) loadOlder()
+    }
+
+    /**
+     * Prompts sent from here already have their images on the device, so the thumbnails do not
+     * blink when a prompt is confirmed. Local prompts are matched to their copies in [server] by
+     * text like [localPending] (inbox ones were matched by id when enqueued) and shown with
+     * their images until the server's copy has its own ([withSentImages]). Then the images go to
+     * [images], as the message cache drops their payload, instead of being fetched again.
+     */
+    private fun keepSentImages(server: List<Message>) {
+        val recent = server.takeLast(LOCAL_MATCH_WINDOW).filterIsInstance<Message.User>()
+        messages.forEach { sent ->
+            if (sent !is Message.User || sent.images.isEmpty() || !sent.id.startsWith(LOCAL_PREFIX)) return@forEach
+            recent.lastOrNull { it.text.trim() == sent.text }?.let { confirmed -> sentImages.getOrPut(confirmed.id) { sent.images } }
+        }
+        if (sentImages.isEmpty()) return
+        val users = server.filterIsInstance<Message.User>().filter { it.id in sentImages }.associateBy { it.id }
+        sentImages.entries.removeAll { (id, sent) ->
+            val confirmed = users[id] ?: return@removeAll false
+            // The same images in the same order; mentioned image files would add more on the server.
+            if (confirmed.images.size == sent.size && confirmed.images.any { it.dataUri == null }) images.put(id, sent.map { it.dataUri })
+            confirmed.images.size >= sent.size
+        }
+    }
+
+    /** [withSentImages] of each message. */
+    private fun withSentImages(visible: List<Message>): List<Message> =
+        if (sentImages.isEmpty()) visible else visible.map { if (it is Message.User) withSentImages(it) else it }
+
+    /** [message] with the images it was sent with from here, while the server's copy lacks them or their payload. */
+    private fun withSentImages(message: Message.User): Message.User {
+        val sent = sentImages[message.id] ?: return message
+        return when {
+            message.images.size < sent.size -> message.copy(images = sent)
+            message.images.size == sent.size && message.images.any { it.dataUri == null } ->
+                message.copy(images = message.images.mapIndexed { i, image -> image.copy(dataUri = image.dataUri ?: sent[i].dataUri) })
+            else -> message
+        }
     }
 
     /** Local optimistic prompts and live streaming state not yet reflected by [server]. */
@@ -1191,6 +1247,8 @@ class ChatViewModel(
             text,
             pending = true,
             attachments = attachments.size,
+            // Shown at once, while they upload.
+            images = attachments.sentImages(),
             files = attachments.filter { it.mention != null }.map { it.uri.removePrefix("file://") },
         )
         val reverted = takeReverted()
@@ -1349,7 +1407,8 @@ class ChatViewModel(
     }
 
     /** The images of an undone prompt, back in the composer like its text; those not available are skipped. */
-    private suspend fun restoredImages(message: Message.User): List<PromptAttachment> {
+    private suspend fun restoredImages(undone: Message.User): List<PromptAttachment> {
+        val message = withSentImages(undone)
         if (message.images.isEmpty()) return emptyList()
         val known = message.images.map { it.dataUri }
         val uris = if (known.all { it != null }) known
@@ -1754,7 +1813,6 @@ class ChatViewModel(
     }
 
     private companion object {
-        const val LOCAL_PREFIX = "local-"
         const val RELOAD_DEBOUNCE_MS = 400L
         const val SHELL_ENDED = "session.shell.ended"
         const val LOCAL_MATCH_WINDOW = 10
@@ -1769,6 +1827,16 @@ class ChatViewModel(
         /** Newest messages cached for the neighbors in the list: about a screen of transcript. */
         const val NEIGHBOR_MESSAGES = 50
     }
+}
+
+/** Id prefix of prompts sent from here that the server has not acknowledged yet. */
+internal const val LOCAL_PREFIX = "local-"
+
+/** The uploaded images of a prompt, as its transcript row shows them. */
+private fun List<PromptAttachment>.sentImages(): List<ImageAttachment> = mapNotNull { attachment ->
+    val mime = attachment.mime?.takeIf { it.startsWith("image/") }
+    if (attachment.mention != null || mime == null || !attachment.uri.startsWith("data:", ignoreCase = true)) null
+    else ImageAttachment(attachment.name, mime, attachment.uri)
 }
 
 private fun Set<String>.toggle(id: String, present: Boolean): Set<String> = if (present) this + id else this - id
