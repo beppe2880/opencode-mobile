@@ -1520,7 +1520,10 @@ class ChatViewModelTest {
         assertEquals(listOf("u1"), chat.imageRequests)
 
         vm.onEvent(ChatEvent.OpenImage("u1", 1))
-        assertEquals(ImagePreview("b.png", "data:image/png;base64,BBBB"), vm.state.value.preview)
+        assertEquals(
+            ImagePreview(listOf(PreviewImage("a.png", "data:image/png;base64,AAAA"), PreviewImage("b.png", "data:image/png;base64,BBBB")), index = 1),
+            vm.state.value.preview,
+        )
         vm.onEvent(ChatEvent.ClosePreview)
         assertEquals(null, vm.state.value.preview)
         assertEquals(listOf("u1"), chat.imageRequests)
@@ -1534,10 +1537,10 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.OpenImage("u1", 0))
-        assertEquals(ImagePreview("b.png", null), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("b.png", null))), vm.state.value.preview)
         advanceUntilIdle()
 
-        assertEquals(ImagePreview("b.png", null, failed = true), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("b.png", null, failed = true))), vm.state.value.preview)
     }
 
     private fun readTool(vararg files: ToolFile) = Message.Assistant(
@@ -1572,7 +1575,7 @@ class ChatViewModelTest {
         assertTrue(after.fetchKey in vm.state.value.toolMediaLoaded)
 
         vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
-        assertEquals(ImagePreview("shot.png", "data:image/png;base64,AAAA"), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", "data:image/png;base64,AAAA"))), vm.state.value.preview)
         assertEquals(listOf("a1/c1"), chat.toolFileRequests)
     }
 
@@ -1591,7 +1594,7 @@ class ChatViewModelTest {
 
         vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
         advanceUntilIdle()
-        assertEquals(ImagePreview("shot.png", null, failed = true), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", null, failed = true))), vm.state.value.preview)
     }
 
     @Test
@@ -1601,8 +1604,98 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
-        assertEquals(ImagePreview("shot.png", "data:image/png;base64,AAAA"), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", "data:image/png;base64,AAAA"))), vm.state.value.preview)
         assertEquals(emptyList<String>(), chat.toolFileRequests)
+    }
+
+    @Test
+    fun `a prompt's images open together and missing ones are fetched once as pages show`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(
+            Message.User(
+                "u1", 0, "look", attachments = 3,
+                images = listOf(
+                    ImageAttachment("a.png", "image/png", "data:image/png;base64,AAAA"),
+                    ImageAttachment("b.png", "image/png", null),
+                    ImageAttachment("c.png", "image/png", null),
+                ),
+            ),
+        )
+        // The thumbnails' fetch fails, so the viewer fetches again.
+        chat.images = Result.failure(OpenCodeError.Unreachable("down"))
+        val vm = vm()
+        advanceUntilIdle()
+        chat.images = Result.success(listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB", "data:image/png;base64,CCCC"))
+        val before = chat.imageRequests.size
+
+        vm.onEvent(ChatEvent.OpenImage("u1", 0))
+        advanceUntilIdle()
+        // The opened image is here: nothing is fetched until a missing one shows.
+        assertEquals(before, chat.imageRequests.size)
+        assertEquals(listOf("a.png", "b.png", "c.png"), vm.state.value.preview!!.images.map { it.name })
+        assertEquals(0, vm.state.value.preview!!.index)
+
+        vm.onEvent(ChatEvent.PreviewPage(1))
+        vm.onEvent(ChatEvent.PreviewPage(2))
+        advanceUntilIdle()
+
+        assertEquals(before + 1, chat.imageRequests.size)
+        val preview = vm.state.value.preview!!
+        assertEquals(2, preview.index)
+        assertEquals(
+            listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB", "data:image/png;base64,CCCC"),
+            preview.images.map { it.dataUri },
+        )
+    }
+
+    @Test
+    fun `the images of one tool group open together across tool calls`() = runTest(main.testDispatcher) {
+        val first = Part.Tool(
+            "c1", "read", ToolStatus.Completed, "{}", output = "Image read successfully",
+            files = listOf(ToolFile("data:image/png;base64,", "image/png", "one.png")),
+        )
+        val second = Part.Tool(
+            "c2", "read", ToolStatus.Completed, "{}", output = "Image read successfully",
+            files = listOf(
+                ToolFile("data:image/png;base64,BBBB", "image/png", "two.png"),
+                ToolFile("data:text/plain;base64,QQ==", "text/plain", "notes.txt"),
+            ),
+        )
+        chat.transcript = listOf(
+            Message.User("u1", 0, "look"),
+            Message.Assistant(id = "a1", createdAt = 1, agent = "build", model = model, completedAt = 3, parts = listOf(first, second)),
+        )
+        chat.toolFiles = Result.success(listOf("data:image/png;base64,AAAA"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c2", 0))
+        val opened = vm.state.value.preview!!
+        // The text file is not an image: only the two images, opened at the second.
+        assertEquals(listOf("one.png", "two.png"), opened.images.map { it.name })
+        assertEquals(1, opened.index)
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+
+        vm.onEvent(ChatEvent.PreviewPage(0))
+        advanceUntilIdle()
+
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+        assertEquals(listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB"), vm.state.value.preview!!.images.map { it.dataUri })
+    }
+
+    @Test
+    fun `the composer's images open together at the tapped one`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val a = PromptAttachment("data:image/png;base64,AAAA", "a.png", "image/png")
+        val note = PromptAttachment("data:text/plain;base64,QQ==", "note.txt", "text/plain")
+        val b = PromptAttachment("data:image/png;base64,BBBB", "b.png", "image/png")
+        vm.onEvent(ChatEvent.AddAttachments(listOf(a, note, b)))
+
+        vm.onEvent(ChatEvent.PreviewAttachment(b.uri))
+
+        assertEquals(ImagePreview(listOf(PreviewImage("a.png", a.uri), PreviewImage("b.png", b.uri)), index = 1), vm.state.value.preview)
+        vm.onEvent(ChatEvent.ClosePreview)
+        assertEquals(null, vm.state.value.preview)
     }
 
     @Test

@@ -202,7 +202,11 @@ fun ChatScreen(
         }
     }
     state.preview?.let { preview ->
-        ImagePreviewDialog(preview, onDismiss = { onEvent(ChatEvent.ClosePreview) })
+        ImagePreviewDialog(
+            preview = preview,
+            onPage = { onEvent(ChatEvent.PreviewPage(it)) },
+            onDismiss = { onEvent(ChatEvent.ClosePreview) },
+        )
     }
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
