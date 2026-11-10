@@ -273,7 +273,7 @@ private fun VoicePreview(settings: AppSettings) {
                         RecorderBar(
                             elapsedMs = 7_000,
                             level = { previewLevel(start.elapsedNow().inWholeMilliseconds) },
-                            reducedMotion = rememberReducedMotion(),
+                            reducedMotion = OcTheme.reducedMotion,
                             onCancel = {},
                             onConfirm = {},
                         )

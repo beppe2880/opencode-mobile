@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -76,13 +77,18 @@ fun OcButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
         ) {
-            when {
-                loading -> CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp,
-                    color = colors.textMuted,
-                )
-                leadingIcon != null -> Icon(leadingIcon, contentDescription = null, modifier = Modifier.size(18.dp))
+            // The spinner crossfades with the icon it replaces (or in, without one).
+            if (loading || leadingIcon != null) {
+                OcCrossfade(loading, label = "button_loading") { busy ->
+                    when {
+                        busy -> CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = colors.textMuted,
+                        )
+                        leadingIcon != null -> Icon(leadingIcon, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
             }
             Text(text = text, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -143,8 +149,11 @@ fun OcRoundIconButton(
                 contentColor = if (enabled) content else colors.textFaint,
                 modifier = Modifier.size(size),
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(18.dp))
+                // A new icon (Send while running, arrow otherwise) crossfades with the old one.
+                OcCrossfade(icon, label = "round_icon") { shown ->
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(shown, contentDescription = contentDescription, modifier = Modifier.size(18.dp))
+                    }
                 }
             }
         }

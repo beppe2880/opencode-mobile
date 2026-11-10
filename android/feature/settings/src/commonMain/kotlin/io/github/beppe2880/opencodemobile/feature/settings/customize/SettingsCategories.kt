@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
@@ -36,6 +37,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_de
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_agent_model
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_cloud
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_gestures
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_motion
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_output
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_transcript
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_wide
@@ -62,6 +64,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_su
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_grouped
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_keyboard
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_new_chats
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_animations
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_notice
@@ -106,6 +109,7 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Servers, SettingsArea.About -> emptyList()
         SettingsArea.Appearance -> listOf(
             OptionGroup(null, listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize)),
+            OptionGroup(Res.string.settings_group_motion, listOf(SettingOption.Animations, SettingOption.AnimationSpeed)),
             OptionGroup(
                 Res.string.settings_group_wide,
                 listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList),
@@ -274,6 +278,7 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
             res(s.theme.labelRes),
             OpenCodeThemes.byId(s.openCodeTheme)?.let { UiText.Raw(it.displayName) },
             res(textSizeLabel(s.chatTextScale)),
+            if (s.animations == AnimationMode.Off) res(Res.string.settings_summary_no_animations) else null,
             if (wide && s.splitView) res(Res.string.settings_summary_split) else null,
         )
         SettingsArea.Chat -> on(

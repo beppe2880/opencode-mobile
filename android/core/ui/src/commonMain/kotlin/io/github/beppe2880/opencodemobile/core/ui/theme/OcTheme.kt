@@ -19,7 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.ui.platform.rememberSystemReducedMotion
 
 /** 4dp based spacing scale. */
 @Immutable
@@ -76,6 +79,23 @@ object OcTheme {
         get() = LocalOcColors.current.markdown
     val spacing: OcSpacing get() = OcSpacing
     val radius: OcRadius get() = OcRadius
+
+    /** How motion plays (less motion, speed): pass it to the [OcMotion] builders. */
+    val motion: MotionConfig
+        @Composable @ReadOnlyComposable
+        get() = LocalMotion.current ?: MotionConfig()
+
+    /** Motion is reduced (by the system or the Animations setting): transitions are instant, loops stand still. */
+    val reducedMotion: Boolean
+        @Composable @ReadOnlyComposable
+        get() = motion.reduced
+}
+
+/** The motion the Animations settings ask for, following the system's less-motion setting where they say so. */
+@Composable
+fun rememberMotionConfig(mode: AnimationMode, speed: AnimationSpeed): MotionConfig {
+    val systemReduced = rememberSystemReducedMotion()
+    return remember(mode, speed, systemReduced) { motionConfig(mode, speed, systemReduced) }
 }
 
 @Composable
@@ -95,10 +115,21 @@ fun ThemeMode.isDark(): Boolean = when (this) {
 fun OcTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     openCodeTheme: String? = null,
+    /**
+     * How motion plays ([rememberMotionConfig] from the Animations settings). Null keeps the one of
+     * an enclosing theme (previews, swatches) or, at the root, follows the system's less-motion setting.
+     */
+    motion: MotionConfig? = null,
     content: @Composable () -> Unit,
 ) {
     val colors = remember(openCodeTheme, darkTheme) { ocColors(openCodeTheme, darkTheme) }
-    CompositionLocalProvider(LocalOcColors provides colors, LocalOcMono provides ocMonoTypography()) {
+    val systemReduced = rememberSystemReducedMotion()
+    val resolved = motion ?: LocalMotion.current ?: MotionConfig(reduced = systemReduced)
+    CompositionLocalProvider(
+        LocalOcColors provides colors,
+        LocalOcMono provides ocMonoTypography(),
+        LocalMotion provides resolved,
+    ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(),
             typography = ocMaterialTypography(),

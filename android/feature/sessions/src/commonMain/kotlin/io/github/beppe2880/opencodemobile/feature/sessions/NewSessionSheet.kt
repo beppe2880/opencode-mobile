@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSearchField
@@ -54,6 +56,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.core.ui.theme.ocPageTransition
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_agent
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_create
@@ -79,18 +82,26 @@ internal fun NewSessionSheet(
     projects: List<Project>,
     onEvent: (SessionsEvent) -> Unit,
 ) {
+    val motion = OcTheme.motion
     OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissNewSession) }, testTag = "sessions_new_sheet") {
-        if (state.pickingModel) {
-            OcModelPicker(
-                models = state.models,
-                selected = state.effectiveModel,
-                recent = state.recentModels,
-                onSelect = { onEvent(SessionsEvent.NewSessionModel(it)) },
-                onBack = { onEvent(SessionsEvent.NewSessionModelPicker(false)) },
-                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-            )
-        } else {
-            NewSessionForm(state, projects, onEvent)
+        // The model picker opens like a page over the form and goes back the same way.
+        AnimatedContent(
+            targetState = state.pickingModel,
+            transitionSpec = { ocPageTransition(forward = targetState, motion = motion) },
+            label = "new_session_page",
+        ) { picking ->
+            if (picking) {
+                OcModelPicker(
+                    models = state.models,
+                    selected = state.effectiveModel,
+                    recent = state.recentModels,
+                    onSelect = { onEvent(SessionsEvent.NewSessionModel(it)) },
+                    onBack = { onEvent(SessionsEvent.NewSessionModelPicker(false)) },
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                )
+            } else {
+                NewSessionForm(state, projects, onEvent)
+            }
         }
     }
 }
@@ -185,7 +196,8 @@ internal fun NewSessionForm(
                 onClick = { onEvent(SessionsEvent.NewSessionDirectory(if (state.customDirectory) state.directory else "", custom = true)) },
                 modifier = Modifier.testTag("sessions_new_other_directory"),
             )
-            if (state.customDirectory || projects.none { it.directory == state.directory }) {
+            // Unrolls under "Other folder" when it is chosen.
+            OcExpandable(visible = state.customDirectory || projects.none { it.directory == state.directory }, label = "new_session_path") {
                 OcTextField(
                     value = state.directory,
                     onValueChange = { onEvent(SessionsEvent.NewSessionDirectory(it, custom = true)) },

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -113,7 +115,8 @@ internal fun FileDiffView(
                 onOpenFile = onOpenFile,
             )
         }
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
+        // "Show more" unrolls the lines downward inside the frame, and "Show less" rolls them back.
+        BoxWithConstraints(Modifier.fillMaxWidth().animateContentSize(OcMotion.sizeSpec(OcTheme.motion))) {
             val viewport = maxWidth
             SelectionContainer {
                 Column(

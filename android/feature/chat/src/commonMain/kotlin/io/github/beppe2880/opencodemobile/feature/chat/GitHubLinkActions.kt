@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.platform.testTag
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
+import io.github.beppe2880.opencodemobile.core.ui.components.animateChevronRotation
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -110,7 +112,8 @@ private fun GitHubLinksMenu(links: List<GitHubLink>, partId: String, onCopy: (St
             onClick = { open = true },
             tint = c.iconMuted,
             iconSize = 16.dp,
-            modifier = Modifier.size(32.dp).testTag("tool_row_github_menu_$partId"),
+            // Turns up while its menu is open, like the other disclosure chevrons.
+            modifier = Modifier.size(32.dp).rotate(animateChevronRotation(open)).testTag("tool_row_github_menu_$partId"),
         )
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, containerColor = c.bgBase, modifier = Modifier.exposeTestTags()) {
             links.forEachIndexed { index, link ->

@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentMod
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
@@ -113,6 +115,8 @@ class PreferencesRepositoriesTest {
             voiceRecordingStyle = VoiceRecordingStyle.Compact,
             voiceHoldToRecord = true,
             toolMediaSize = ToolMediaSize.Large,
+            animations = AnimationMode.Off,
+            animationSpeed = AnimationSpeed.Slow,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -175,6 +179,29 @@ class PreferencesRepositoriesTest {
     }
 
     @Test
+    fun `animations follow the system at normal speed and keep every choice`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        fun read() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
+        assertEquals(AnimationMode.System, read().animations)
+        assertEquals(AnimationSpeed.Normal, read().animationSpeed)
+
+        for (mode in AnimationMode.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(animations = mode) }
+            assertEquals(mode.name, prefs.values["animations"])
+            assertEquals(mode, read().animations)
+        }
+        for (speed in AnimationSpeed.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(animationSpeed = speed) }
+            assertEquals(speed.name, prefs.values["animation_speed"])
+            assertEquals(speed, read().animationSpeed)
+        }
+
+        prefs.edit().putString("animations", "Sometimes").putString("animation_speed", "Ludicrous").commit()
+        assertEquals(AnimationMode.System, read().animations)
+        assertEquals(AnimationSpeed.Normal, read().animationSpeed)
+    }
+
+    @Test
     fun `a theme no longer shipped reads as none`() {
         val prefs = InMemoryPreferences()
         prefs.edit().putString("opencode_theme", "retired").commit()
@@ -198,6 +225,8 @@ class PreferencesRepositoriesTest {
             .putFloat("settings_preview_fraction", 3f)
             .putString("update_notice", "Popup")
             .putString("tool_media_size", "Huge")
+            .putString("animations", "Sometimes")
+            .putString("animation_speed", "Ludicrous")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value

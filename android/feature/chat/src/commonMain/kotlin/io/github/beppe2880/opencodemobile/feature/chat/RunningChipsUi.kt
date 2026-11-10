@@ -1,6 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -61,6 +64,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -83,13 +87,16 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
+import io.github.beppe2880.opencodemobile.core.ui.components.OcCrossfade
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_close
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_running
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -142,15 +149,34 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
  * polling and stopping are the Running sheet's (ChatViewModel); only what is shown differs.
  */
 
-/** The chips, left aligned; the popover of the open list is anchored above them. */
+/**
+ * The chips, left aligned; the popover of the open list is anchored above them. The bar grows in
+ * above the composer when work starts and folds away when it ends.
+ */
 @Composable
 internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, modifier: Modifier = Modifier) {
     val chips = runningChips(state.work, state.runningChips)
-    if (chips.isEmpty()) return
+    val motion = OcTheme.motion
+    // The last chips stay drawn while the bar folds away. Always composed, so that it grows in.
+    val shown = rememberLastNonNull(chips.takeIf { it.isNotEmpty() })
+    AnimatedVisibility(
+        visible = chips.isNotEmpty(),
+        modifier = modifier,
+        enter = OcMotion.expandEnter(motion),
+        exit = OcMotion.collapseExit(motion),
+        label = "running_chips",
+    ) {
+        if (shown != null) RunningChipsAnchor(state, shown, onEvent)
+    }
+}
+
+@Composable
+private fun RunningChipsAnchor(state: ChatState, chips: List<RunningChip>, onEvent: (ChatEvent) -> Unit) {
     val focus = LocalFocusManager.current
+    val motion = OcTheme.motion
     var anchorWidth by remember { mutableIntStateOf(0) }
     Box(
-        modifier
+        Modifier
             .fillMaxWidth()
             .editable(SettingsPart.PendingCards, LocalEditMode.current)
             .onSizeChanged { anchorWidth = it.width },
@@ -160,34 +186,79 @@ internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, mod
             focus.clearFocus()
             onEvent(ChatEvent.ShowRunningList(group))
         }
-        val panel = state.runningPanel
-        if (panel != null && panel.item == null) {
+        val listGroup = state.runningPanel?.takeIf { it.item == null }?.group
+        // The popover stays composed while it closes, showing the group it was opened for.
+        val shownGroup = rememberLastNonNull(listGroup)
+        val popover = remember { MutableTransitionState(false) }
+        popover.targetState = listGroup != null
+        if (shownGroup != null && (popover.currentState || popover.targetState)) {
             val gap = with(LocalDensity.current) { OcSpacing.xs.roundToPx() }
             // A Stop's confirmation shows over the list: touching it must not close the list.
             val confirming = state.confirmingStop != null || state.confirmingStopAgent != null || state.confirmingStopAll != null
+            // Closing, it no longer takes focus or touches: the chat is usable at once.
+            val interactive = !confirming && listGroup != null
+            // Above the chips at their start edge: it grows out of them and shrinks back into them.
+            val origin = OcMotion.anchoredOrigin(above = true, layoutDirection = LocalLayoutDirection.current)
             Popup(
                 popupPositionProvider = remember(gap) { AboveAnchor(gap) },
-                onDismissRequest = { onEvent(ChatEvent.ShowRunningList(null)) },
-                properties = PopupProperties(focusable = !confirming, dismissOnBackPress = !confirming, dismissOnClickOutside = !confirming),
+                onDismissRequest = { if (listGroup != null) onEvent(ChatEvent.ShowRunningList(null)) },
+                properties = PopupProperties(focusable = interactive, dismissOnBackPress = interactive, dismissOnClickOutside = interactive),
             ) {
-                RunningListPopover(
-                    state = state,
-                    group = panel.group,
-                    width = with(LocalDensity.current) { anchorWidth.toDp() },
-                    onEvent = onEvent,
-                )
+                AnimatedVisibility(
+                    visibleState = popover,
+                    enter = OcMotion.popoverEnter(origin, motion),
+                    exit = OcMotion.popoverExit(origin, motion),
+                    label = "running_popover",
+                ) {
+                    RunningListPopover(
+                        state = state,
+                        group = shownGroup,
+                        width = with(LocalDensity.current) { anchorWidth.toDp() },
+                        onEvent = onEvent,
+                    )
+                }
             }
         }
     }
 }
 
-/** The chips alone, also drawn by the Settings preview. */
+/**
+ * The chips alone, also drawn by the Settings preview. A chip that starts or stops while the
+ * other runs fades and slides in or out at its place, the other one moving over.
+ */
 @Composable
 internal fun RunningChipRow(chips: List<RunningChip>, onClick: (RunningGroup) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
-        chips.forEach { chip -> RunningChipView(chip, onClick = { onClick(chip.group) }) }
+    val motion = OcTheme.motion
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        // Always in this order (runningChips), so each group keeps its place.
+        RUNNING_CHIP_ORDER.forEachIndexed { index, group ->
+            val chip = chips.firstOrNull { it.group == group }
+            // Composed even while its group does not run, so that its chip slides in when it starts.
+            val shown = rememberLastNonNull(chip)
+            AnimatedVisibility(
+                visible = chip != null,
+                enter = OcMotion.inlineEnter(motion, from = Alignment.Start),
+                exit = OcMotion.inlineExit(motion, towards = Alignment.Start),
+                label = "running_chip_${group.tagName}",
+            ) {
+                // The gap before a chip belongs to it, so it comes and goes with the chip before it.
+                val gap by animateDpAsState(
+                    if (index > 0 && chips.any { it.group != group }) OcSpacing.sm else 0.dp,
+                    OcMotion.spec(OcMotion.SHORT_MS, motion),
+                    label = "running_chip_gap",
+                )
+                if (shown != null) {
+                    Box(Modifier.padding(start = gap)) {
+                        // A chip sliding away no longer opens its (now empty) list.
+                        RunningChipView(shown, onClick = { if (chip != null) onClick(shown.group) })
+                    }
+                }
+            }
+        }
     }
 }
+
+private val RUNNING_CHIP_ORDER = listOf(RunningGroup.Commands, RunningGroup.Agents)
 
 @Composable
 private fun RunningChipView(chip: RunningChip, onClick: () -> Unit) {
@@ -408,7 +479,9 @@ private fun RunningStopButton(text: String, stopping: Boolean, spinner: Boolean,
         elevation = null,
         modifier = modifier.heightIn(min = 44.dp),
     ) {
-        if (spinner) OcSpinner(color = c.danger.fg) else Text(text, maxLines = 1)
+        OcCrossfade(spinner, label = "running_stop") { busy ->
+            if (busy) OcSpinner(color = c.danger.fg) else Text(text, maxLines = 1)
+        }
     }
 }
 
@@ -596,7 +669,7 @@ private fun ItemFooter(state: ChatState, panel: RunningPanel, item: RunningEntry
  */
 @Composable
 internal fun RunningDots(color: Color, modifier: Modifier = Modifier, height: Dp = 12.dp) {
-    val reduced = rememberReducedMotion()
+    val reduced = OcTheme.reducedMotion
     val frame: State<Float> = if (reduced) {
         remember { mutableFloatStateOf(0f) }
     } else {

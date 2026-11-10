@@ -50,6 +50,8 @@ class EditModeTest {
         val withoutElement = setOf(
             // The whole app, not one element.
             SettingOption.Theme,
+            SettingOption.Animations,
+            SettingOption.AnimationSpeed,
             SettingOption.SwipeChats,
             // Only while an agent works.
             SettingOption.FollowRunning,

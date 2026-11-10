@@ -1,6 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -42,9 +43,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import io.github.beppe2880.opencodemobile.core.ui.components.OcCrossfade
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.text.formatDuration
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -97,7 +101,7 @@ internal fun ToolsGroup(
             tools = item.tools,
             onCopy = onCopy,
         )
-        AnimatedVisibility(visible = open) {
+        OcExpandable(visible = open, label = "tools_group") {
             Column(
                 modifier = Modifier
                     .padding(top = OcSpacing.xs)
@@ -169,7 +173,7 @@ internal fun ActivityGroup(
             tools = item.tools,
             onCopy = onCopy,
         )
-        AnimatedVisibility(visible = open) {
+        OcExpandable(visible = open, label = "activity_group") {
             Column(
                 modifier = Modifier.padding(start = OcSpacing.md, top = OcSpacing.xs),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
@@ -255,14 +259,20 @@ private fun GroupSummary(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
                 )
-                when {
-                    running -> OcSpinner(size = 10.dp)
-                    failed -> Icon(
-                        Icons.Outlined.ErrorOutline,
-                        stringResource(Res.string.chat_tool_failed),
-                        tint = c.danger.fg,
-                        modifier = Modifier.size(14.dp),
-                    )
+                // A spinner turning into the failure mark crossfades; nothing shows once all went well.
+                if (running || failed) {
+                    OcCrossfade(running, label = "group_status") { busy ->
+                        if (busy) {
+                            OcSpinner(size = 10.dp)
+                        } else {
+                            Icon(
+                                Icons.Outlined.ErrorOutline,
+                                stringResource(Res.string.chat_tool_failed),
+                                tint = c.danger.fg,
+                                modifier = Modifier.size(14.dp),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -364,7 +374,7 @@ private fun ToolRow(
             }
         }
         // A running tool has nothing to show until its output starts arriving.
-        AnimatedVisibility(visible = open && !(running && tool.output.isNullOrEmpty())) {
+        OcExpandable(visible = open && !(running && tool.output.isNullOrEmpty()), label = "tool_output") {
             if (tool.diffs.isNotEmpty() && tool.error == null) {
                 // Patches change several files and have no button of their own: each diff gets one.
                 ToolDiffs(tool, directory, full, onToggleFull, onOpenFile.takeIf { file == null })
@@ -389,13 +399,20 @@ private fun ToolDiffs(tool: Part.Tool, directory: String, full: Boolean, onToggl
     }
 }
 
+/** Spinner while the tool runs, then a check or an error mark crossfading in its place. */
 @Composable
 private fun ToolStatusIcon(status: ToolStatus) {
     val c = OcTheme.colors
-    when (status) {
-        ToolStatus.Streaming, ToolStatus.Running -> OcSpinner(size = 12.dp)
-        ToolStatus.Completed -> Icon(Icons.Outlined.CheckCircle, null, tint = c.success.fg, modifier = Modifier.size(14.dp))
-        ToolStatus.Error -> Icon(Icons.Outlined.ErrorOutline, null, tint = c.danger.fg, modifier = Modifier.size(14.dp))
+    // Streaming and running look the same: no crossfade between them.
+    val shown = if (status == ToolStatus.Streaming) ToolStatus.Running else status
+    OcCrossfade(shown, Modifier.size(14.dp), label = "tool_status") { current ->
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            when (current) {
+                ToolStatus.Streaming, ToolStatus.Running -> OcSpinner(size = 12.dp)
+                ToolStatus.Completed -> Icon(Icons.Outlined.CheckCircle, null, tint = c.success.fg, modifier = Modifier.size(14.dp))
+                ToolStatus.Error -> Icon(Icons.Outlined.ErrorOutline, null, tint = c.danger.fg, modifier = Modifier.size(14.dp))
+            }
+        }
     }
 }
 
@@ -412,10 +429,13 @@ private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit,
         live -> lines.takeLast(previewLines).joinToString("\n")
         else -> lines.take(previewLines).joinToString("\n")
     }
+    val motion = OcTheme.motion
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm)
+            // "Show more" grows the box downward; live output just grows, line by line.
+            .then(if (live) Modifier else Modifier.animateContentSize(OcMotion.sizeSpec(motion)))
             .background(if (tool.error != null) c.danger.bg else c.layer01, RoundedCornerShape(OcRadius.md)),
     ) {
         SelectionContainer {

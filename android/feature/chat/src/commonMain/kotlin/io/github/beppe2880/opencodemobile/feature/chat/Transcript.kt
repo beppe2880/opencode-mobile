@@ -1,10 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -58,12 +56,15 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -195,6 +196,10 @@ internal fun Transcript(
     val followed = remember(state.sessionId) { mutableStateSetOf<String>() }
     LaunchedEffect(liveGroupKey) { liveGroupKey?.let(followed::add) }
     val keptOpen: (String) -> Boolean = { key -> state.keepLiveStepsOpen && key != liveGroupKey && key in followed }
+    val motion = OcTheme.motion
+    // Rows that arrive once the chat is on screen fade in; the rows of the opening chat do not.
+    // Never a placement animation (it would fight following the end) nor a fade out.
+    val rowFadeIn = if (restored && !motion.reduced) OcMotion.spec<Float>(OcMotion.MEDIUM_MS, motion, OcMotion.Enter) else null
     TranscriptLocals(state) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
@@ -213,18 +218,25 @@ internal fun Transcript(
                         onEvent = onEvent,
                         onCopy = onCopy,
                         cache = cache,
-                        modifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter),
+                        modifier = Modifier
+                            .animateItem(fadeInSpec = rowFadeIn, placementSpec = null, fadeOutSpec = null)
+                            .widthIn(max = OcSpacing.contentMaxWidth)
+                            .fillMaxWidth()
+                            .padding(horizontal = OcSpacing.gutter),
                         liveGroupKey = liveGroupKey,
                         keptOpen = keptOpen,
                         onUserActions = { actionsFor = it },
                     )
                 }
             }
+            // Grows out of the bottom edge it is pinned to; the arrow and "New messages" crossfade.
+            val jumpOrigin = TransformOrigin(0.5f, 1f)
             AnimatedVisibility(
                 visible = !stickToBottom,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut(),
+                enter = OcMotion.popEnter(motion, jumpOrigin),
+                exit = OcMotion.popExit(motion, jumpOrigin),
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
+                label = "jump_to_latest",
             ) {
                 val jump = {
                     stickToBottom = false
@@ -237,27 +249,34 @@ internal fun Transcript(
                     }
                     Unit
                 }
-                if (hasNew) {
-                    OcChip(
-                        text = stringResource(Res.string.chat_new_messages),
-                        onClick = jump,
-                        selected = true,
-                        leadingIcon = Icons.Outlined.ArrowDownward,
-                        modifier = Modifier
-                            .shadow(2.dp, RoundedCornerShape(OcRadius.md))
-                            .testTag("chat_new_messages_button"),
-                    )
-                } else {
-                    OcRoundIconButton(
-                        icon = Icons.Outlined.ArrowDownward,
-                        contentDescription = stringResource(Res.string.chat_jump_latest),
-                        onClick = jump,
-                        container = OcTheme.colors.bgBase,
-                        content = OcTheme.colors.iconBase,
-                        modifier = Modifier
-                            .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
-                            .testTag("chat_jump_latest_button"),
-                    )
+                AnimatedContent(
+                    targetState = hasNew,
+                    transitionSpec = { OcMotion.swap(motion, clip = false) },
+                    contentAlignment = Alignment.BottomCenter,
+                    label = "jump_to_latest_kind",
+                ) { news ->
+                    if (news) {
+                        OcChip(
+                            text = stringResource(Res.string.chat_new_messages),
+                            onClick = jump,
+                            selected = true,
+                            leadingIcon = Icons.Outlined.ArrowDownward,
+                            modifier = Modifier
+                                .shadow(2.dp, RoundedCornerShape(OcRadius.md))
+                                .testTag("chat_new_messages_button"),
+                        )
+                    } else {
+                        OcRoundIconButton(
+                            icon = Icons.Outlined.ArrowDownward,
+                            contentDescription = stringResource(Res.string.chat_jump_latest),
+                            onClick = jump,
+                            container = OcTheme.colors.bgBase,
+                            content = OcTheme.colors.iconBase,
+                            modifier = Modifier
+                                .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
+                                .testTag("chat_jump_latest_button"),
+                        )
+                    }
                 }
             }
         }
@@ -396,7 +415,7 @@ internal fun TranscriptItem(
 
 /**
  * A tool group with the files its tools returned right under it, folded or not, so a screenshot
- * the agent read shows without opening the group. Without files the group is drawn alone.
+ * the agent read shows without opening the group. Files the tools return later grow in under it.
  */
 @Composable
 private fun WithToolMedia(
@@ -406,27 +425,26 @@ private fun WithToolMedia(
     modifier: Modifier,
     group: @Composable (Modifier) -> Unit,
 ) {
-    if (media.isEmpty()) {
-        group(modifier)
-        return
-    }
     val uriHandler = LocalUriHandler.current
+    val shown = rememberLastNonNull(media.takeIf { it.isNotEmpty() })
     Column(modifier) {
         group(Modifier)
-        ToolMediaStrip(
-            media = media,
-            size = state.toolMediaSize,
-            loaded = state.toolMediaLoaded,
-            onLoad = { onEvent(ChatEvent.LoadToolMedia(it.messageId, it.callId)) },
-            onOpen = { item, target ->
-                when (target) {
-                    MediaOpen.Viewer -> onEvent(ChatEvent.OpenToolImage(item.messageId, item.callId, item.index))
-                    is MediaOpen.ServerFile -> onEvent(ChatEvent.OpenFile(target.path))
-                    // A malformed link or no app to open it: nothing happens, as for links in text.
-                    is MediaOpen.Web -> runCatching { uriHandler.openUri(target.url) }
-                }
-            },
-        )
+        OcExpandable(visible = media.isNotEmpty(), label = "tool_media") {
+            ToolMediaStrip(
+                media = shown.orEmpty(),
+                size = state.toolMediaSize,
+                loaded = state.toolMediaLoaded,
+                onLoad = { onEvent(ChatEvent.LoadToolMedia(it.messageId, it.callId)) },
+                onOpen = { item, target ->
+                    when (target) {
+                        MediaOpen.Viewer -> onEvent(ChatEvent.OpenToolImage(item.messageId, item.callId, item.index))
+                        is MediaOpen.ServerFile -> onEvent(ChatEvent.OpenFile(target.path))
+                        // A malformed link or no app to open it: nothing happens, as for links in text.
+                        is MediaOpen.Web -> runCatching { uriHandler.openUri(target.url) }
+                    }
+                },
+            )
+        }
     }
 }
 

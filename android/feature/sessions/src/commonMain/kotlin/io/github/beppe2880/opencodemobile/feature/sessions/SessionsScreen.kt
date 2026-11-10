@@ -55,6 +55,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
@@ -78,6 +79,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -170,6 +172,10 @@ fun SessionsScreen(
             val listState = rememberLazyListState()
             // Narrower than any phone: the list sits beside the chat.
             val compact = with(LocalDensity.current) { listWidthPx.toDp() } < CompactListWidth
+            // Sessions that arrive, move or go fade and slide with the motion tokens.
+            val motion = OcTheme.motion
+            val rowFade = OcMotion.spec<Float>(OcMotion.SHORT_MS, motion)
+            val rowPlacement = OcMotion.spec<IntOffset>(OcMotion.MEDIUM_MS, motion)
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize().onSizeChanged { listWidthPx = it.width }.testTag("sessions_list"),
@@ -197,7 +203,10 @@ fun SessionsScreen(
                     state.isEmpty -> item(key = "empty") { EmptyContent(state, onEvent) }
                     else -> state.groups.forEach { group ->
                         item(key = "group-${group.bucket}", contentType = "group") {
-                            OcSectionHeader(stringResource(group.bucket.label()), Modifier.padding(top = OcSpacing.sm))
+                            OcSectionHeader(
+                                stringResource(group.bucket.label()),
+                                Modifier.animateItem(rowFade, rowPlacement, rowFade).padding(top = OcSpacing.sm),
+                            )
                         }
                         items(group.sessions, key = { it.id }, contentType = { "session" }) { session ->
                             SessionRow(
@@ -208,7 +217,7 @@ fun SessionsScreen(
                                 onClick = { onEvent(SessionsEvent.Open(session.id)) },
                                 onLongClick = { onEvent(SessionsEvent.ShowActions(session)) },
                                 onSwipeDelete = { onEvent(SessionsEvent.RequestDelete(session)) },
-                                modifier = Modifier.animateItem().editable(SettingsPart.SessionRows, LocalEditMode.current),
+                                modifier = Modifier.animateItem(rowFade, rowPlacement, rowFade).editable(SettingsPart.SessionRows, LocalEditMode.current),
                                 compact = compact,
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
                             )

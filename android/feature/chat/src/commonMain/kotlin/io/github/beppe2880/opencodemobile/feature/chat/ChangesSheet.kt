@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -29,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -39,11 +39,13 @@ import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegmentedControl
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
+import io.github.beppe2880.opencodemobile.core.ui.components.animateChevronRotation
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -197,13 +199,14 @@ private fun ChangedFile(
                 )
             }
             Icon(
-                if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                Icons.Outlined.ExpandMore,
                 contentDescription = null,
                 tint = c.iconMuted,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(18.dp).rotate(animateChevronRotation(expanded)),
             )
         }
-        if (expanded) {
+        // The diff unrolls from its file row and rolls back into it.
+        OcExpandable(visible = expanded, label = "changed_file") {
             FileDiffView(diff = file, directory = directory, full = full, onToggleFull = onToggleFull, showHeader = false)
         }
     }

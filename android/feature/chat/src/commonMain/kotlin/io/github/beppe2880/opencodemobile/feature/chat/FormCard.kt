@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSwitchRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextField
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -94,21 +96,24 @@ internal fun FormCard(
     val collapse by rememberUpdatedState(onCollapse)
     // Keeps the fields' own state (a number typed as "3.", scroll) while the card is folded.
     val saved = rememberSaveableStateHolder()
+    val motion = OcTheme.motion
     OcCard(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize()
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag("form_card"),
         color = if (c.isDark) c.layer01 else c.info.bg,
         borderColor = c.info.border,
         shape = RoundedCornerShape(OcRadius.xl),
     ) {
-        if (collapsed) {
-            CollapsedForm(form, pendingCount, onExpand = { collapse(false) })
-        } else {
-            saved.SaveableStateProvider(form.id) {
-                ExpandedForm(form, answers, pendingCount, submitting, { collapse(true) }, onAnswer, onSubmit, onDismiss)
+        // The bar and the open card crossfade while the card grows up from the composer or shrinks back.
+        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(motion) }, label = "form_card") { folded ->
+            if (folded) {
+                CollapsedForm(form, pendingCount, onExpand = { collapse(false) })
+            } else {
+                saved.SaveableStateProvider(form.id) {
+                    ExpandedForm(form, answers, pendingCount, submitting, { collapse(true) }, onAnswer, onSubmit, onDismiss)
+                }
             }
         }
     }
@@ -149,6 +154,8 @@ private fun ExpandedForm(
         Text(form.title, style = MaterialTheme.typography.titleSmall, color = c.textBase)
         Column(
             modifier = Modifier
+                // A field shown by an earlier answer makes room smoothly.
+                .animateContentSize(OcMotion.sizeSpec(OcTheme.motion))
                 .heightIn(max = 320.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(OcSpacing.md),

@@ -46,8 +46,11 @@ import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -94,54 +97,73 @@ internal fun BottomArea(
             ConnectionState.Unauthorized -> Res.string.chat_unauthorized to c.danger.fg
             ConnectionState.Connected, ConnectionState.Connecting -> null
         }
-        offline?.let { (message, color) ->
-            Row(
-                modifier = Modifier.fillMaxWidth().testTag("chat_offline_banner"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs, Alignment.CenterHorizontally),
-            ) {
-                Icon(Icons.Outlined.CloudOff, null, tint = color, modifier = Modifier.size(14.dp))
-                Text(stringResource(message), style = MaterialTheme.typography.labelSmall, color = color)
+        // Each part above the composer grows in when it appears and folds away when it goes, so the
+        // transcript makes room smoothly; what it showed stays drawn while it folds.
+        val shownOffline = rememberLastNonNull(offline)
+        OcExpandable(visible = offline != null, label = "chat_offline") {
+            shownOffline?.let { (message, color) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().testTag("chat_offline_banner"),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs, Alignment.CenterHorizontally),
+                ) {
+                    Icon(Icons.Outlined.CloudOff, null, tint = color, modifier = Modifier.size(14.dp))
+                    Text(stringResource(message), style = MaterialTheme.typography.labelSmall, color = color)
+                }
             }
         }
-        state.permissions.firstOrNull()?.let { request ->
-            PermissionCard(
-                request = request,
-                pendingCount = state.permissions.size,
-                replying = state.replyingPermission == request.id,
-                collapsed = state.isPermissionCollapsed(request.id),
-                onCollapse = { onEvent(ChatEvent.CollapsePermission(request.id, it)) },
-                onReply = { onEvent(ChatEvent.ReplyPermission(request.id, it)) },
-                modifier = Modifier.editable(SettingsPart.PendingCards, editMode),
-            )
-        }
-        if (state.permissions.isEmpty()) {
-            state.forms.firstOrNull()?.let { form ->
-                FormCard(
-                    form = form,
-                    answers = state.formAnswers,
-                    pendingCount = state.forms.size,
-                    submitting = state.submittingForm,
-                    collapsed = state.isFormCollapsed(form.id),
-                    onCollapse = { onEvent(ChatEvent.CollapseForm(form.id, it)) },
-                    onAnswer = { key, answer -> onEvent(ChatEvent.FormAnswerChanged(key, answer)) },
-                    onSubmit = { onEvent(ChatEvent.SubmitForm) },
-                    onDismiss = { onEvent(ChatEvent.DismissForm) },
+        val permission = state.permissions.firstOrNull()
+        val shownPermission = rememberLastNonNull(permission)
+        OcExpandable(visible = permission != null, label = "chat_permission") {
+            shownPermission?.let { request ->
+                PermissionCard(
+                    request = request,
+                    pendingCount = state.permissions.size.coerceAtLeast(1),
+                    replying = state.replyingPermission == request.id,
+                    collapsed = state.isPermissionCollapsed(request.id),
+                    onCollapse = { onEvent(ChatEvent.CollapsePermission(request.id, it)) },
+                    // Folding away once answered, it no longer replies.
+                    onReply = { if (permission != null) onEvent(ChatEvent.ReplyPermission(request.id, it)) },
                     modifier = Modifier.editable(SettingsPart.PendingCards, editMode),
                 )
             }
         }
-        state.backgroundable?.let { work ->
-            BackgroundHint(work, onMove = { onEvent(ChatEvent.MoveToBackground) })
+        val form = state.forms.firstOrNull()?.takeIf { state.permissions.isEmpty() }
+        val shownForm = rememberLastNonNull(form)
+        OcExpandable(visible = form != null, label = "chat_form") {
+            shownForm?.let { shown ->
+                FormCard(
+                    form = shown,
+                    answers = state.formAnswers,
+                    pendingCount = state.forms.size.coerceAtLeast(1),
+                    submitting = state.submittingForm,
+                    collapsed = state.isFormCollapsed(shown.id),
+                    onCollapse = { onEvent(ChatEvent.CollapseForm(shown.id, it)) },
+                    onAnswer = { key, answer -> onEvent(ChatEvent.FormAnswerChanged(key, answer)) },
+                    onSubmit = { if (state.forms.isNotEmpty()) onEvent(ChatEvent.SubmitForm) },
+                    onDismiss = { if (state.forms.isNotEmpty()) onEvent(ChatEvent.DismissForm) },
+                    modifier = Modifier.editable(SettingsPart.PendingCards, editMode),
+                )
+            }
         }
-        if (state.revertedCount > 0) {
-            RevertBanner(state.revertedCount, onRestore = { onEvent(ChatEvent.RestoreRevert) })
+        val backgroundable = rememberLastNonNull(state.backgroundable)
+        OcExpandable(visible = state.backgroundable != null, label = "chat_backgroundable") {
+            backgroundable?.let { work ->
+                BackgroundHint(work, onMove = { if (state.backgroundable != null) onEvent(ChatEvent.MoveToBackground) })
+            }
         }
-        if (state.queued.isNotEmpty()) {
-            QueuedPrompts(state.queued, onEvent)
+        val reverted = rememberLastNonNull(state.revertedCount.takeIf { it > 0 })
+        OcExpandable(visible = state.revertedCount > 0, label = "chat_reverted") {
+            RevertBanner(reverted ?: 0, onRestore = { onEvent(ChatEvent.RestoreRevert) })
         }
-        if (state.suggestions.isNotEmpty()) {
-            SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
+        val queued = rememberLastNonNull(state.queued.takeIf { it.isNotEmpty() })
+        OcExpandable(visible = state.queued.isNotEmpty(), label = "chat_queue") {
+            QueuedPrompts(queued.orEmpty(), onEvent)
+        }
+        val suggestions = rememberLastNonNull(state.suggestions.takeIf { it.isNotEmpty() })
+        OcExpandable(visible = state.suggestions.isNotEmpty(), label = "chat_suggestions") {
+            // A list folding away after a pick takes no second one.
+            SuggestionList(suggestions.orEmpty(), onPick = { if (state.suggestions.isNotEmpty()) onEvent(ChatEvent.PickSuggestion(it)) })
         }
         // Part of this column, so the transcript above ends before them and is never covered.
         RunningChipsBar(state, onEvent)
@@ -162,13 +184,22 @@ internal fun BottomArea(
 /** Appears once [work] has run for a few seconds, like the TUI's ctrl+b hint. */
 @Composable
 private fun BackgroundHint(work: BackgroundableWork, onMove: () -> Unit) {
-    var visible by remember(work.key) { mutableStateOf(false) }
+    // Already due when the chat opens: shown at once, without growing in.
+    var visible by remember(work.key) { mutableStateOf(hintDelayLeft(work) <= 0) }
     LaunchedEffect(work.key) {
-        val elapsed = work.startedAt?.let { Clock.System.now().toEpochMilliseconds() - it } ?: 0L
-        delay((BackgroundableWork.HINT_DELAY_MS - elapsed).coerceAtLeast(0))
+        delay(hintDelayLeft(work))
         visible = true
     }
-    if (!visible) return
+    OcExpandable(visible = visible, label = "chat_background_hint") { BackgroundHintRow(onMove) }
+}
+
+private fun hintDelayLeft(work: BackgroundableWork): Long {
+    val elapsed = work.startedAt?.let { Clock.System.now().toEpochMilliseconds() - it } ?: 0L
+    return (BackgroundableWork.HINT_DELAY_MS - elapsed).coerceAtLeast(0)
+}
+
+@Composable
+private fun BackgroundHintRow(onMove: () -> Unit) {
     val c = OcTheme.colors
     Row(
         modifier = Modifier
@@ -227,6 +258,7 @@ private fun RevertBanner(count: Int, onRestore: () -> Unit) {
 @Composable
 private fun QueuedPrompts(queued: List<QueuedPrompt>, onEvent: (ChatEvent) -> Unit) {
     val c = OcTheme.colors
+    val motion = OcTheme.motion
     OcCard(modifier = Modifier.fillMaxWidth().testTag("chat_queue"), shape = RoundedCornerShape(OcRadius.lg)) {
         Row(
             modifier = Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.sm),
@@ -244,6 +276,12 @@ private fun QueuedPrompts(queued: List<QueuedPrompt>, onEvent: (ChatEvent) -> Un
             items(queued, key = { it.id }) { prompt ->
                 Row(
                     modifier = Modifier
+                        // A prompt sent or removed makes the others slide over instead of jumping.
+                        .animateItem(
+                            fadeInSpec = OcMotion.spec(OcMotion.SHORT_MS, motion),
+                            placementSpec = OcMotion.spec(OcMotion.MEDIUM_MS, motion),
+                            fadeOutSpec = OcMotion.spec(OcMotion.SHORT_MS, motion),
+                        )
                         .fillMaxWidth()
                         .padding(start = OcSpacing.md, end = OcSpacing.xxs)
                         .testTag("chat_queued_${prompt.id}"),

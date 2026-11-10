@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -28,6 +29,10 @@ class SettingOptionsTest {
         assertEquals(SettingsArea.Appearance, SettingOption.TextSize.area)
         // The OpenCode theme opens at the theme, and the messages it colors offer it too.
         assertEquals(SettingsPart.Theme, SettingOption.OpenCodeTheme.part)
+        // Animations concern the whole app, like the theme.
+        assertEquals(SettingsPart.Theme, SettingOption.Animations.part)
+        assertEquals(SettingsPart.Theme, SettingOption.AnimationSpeed.part)
+        assertEquals(SettingsArea.Appearance, SettingOption.AnimationSpeed.area)
         assertTrue(SettingOption.OpenCodeTheme in SettingsPart.Messages.options)
         assertEquals(SettingsPart.Thoughts, SettingOption.GroupActivity.part)
         assertEquals(SettingsArea.LiveActivity, SettingOption.LiveInterval.area)
@@ -85,6 +90,9 @@ class SettingOptionsTest {
         assertFalse(SettingOption.LiveThinking.appliesTo(AppSettings(followRunningTools = false)))
         assertFalse(SettingOption.LiveInterval.appliesTo(AppSettings(liveShell = false)))
         assertFalse(SettingOption.BackShowsList.appliesTo(AppSettings(listPaneHandle = false)))
+        assertFalse(SettingOption.AnimationSpeed.appliesTo(AppSettings(animations = AnimationMode.Off)))
+        assertTrue(SettingOption.AnimationSpeed.appliesTo(AppSettings(animations = AnimationMode.On)))
+        assertEquals(SettingOption.Animations, SettingOption.AnimationSpeed.requires)
         assertFalse(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = false))
         assertTrue(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = true))
     }

@@ -16,6 +16,7 @@ no hard-coded colors outside `theme/OcColors.kt`.
 | `OcTheme.markdown` | The markdown colors of the active OpenCode theme, null without one. |
 | `OcTheme.mono` | IBM Plex Mono styles: `code`, `codeSmall`, `label`. |
 | `OcSpacing`, `OcRadius` | Spacing and corner scales. |
+| `OcMotion`, `OcTheme.motion`, `OcTheme.reducedMotion` | Motion tokens and transitions (below); the `MotionConfig` (less motion, speed) the builders take; whether motion is reduced. |
 
 Material components keep working because the token set is mapped onto `MaterialTheme.colorScheme`
 (`primary = bg-accent`, `surface = bg-base`, `background = bg-deep`, `outlineVariant = border-base`,
@@ -118,6 +119,42 @@ Without a theme `diff` holds the colors the diff always had (state colors, `laye
 Cards use `lg` radius with a 1dp `borderBase` hairline and no elevation; only the composer and FAB
 have a subtle 2dp shadow. Touch targets are at least 48dp (icon buttons, rows) even when the visual
 control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
+
+## Motion (`theme/OcMotion.kt`, `components/OcAnimated.kt`)
+
+Short, standard-eased tweens, no springs, the same on Android and iOS. Motion shows where a change
+comes from; it never delays reading.
+
+| Token | Value | Use |
+|---|---|---|
+| `SHORT_MS` | 150 | Icons, chips, popovers, crossfades, anything leaving |
+| `MEDIUM_MS` | 220 | Expanding and collapsing, cards appearing, size changes |
+| `LONG_MS` | 300 | Page changes (`ocPageTransition`) |
+| `Standard` / `Enter` / `Exit` | FastOutSlowIn / LinearOutSlowIn / FastOutLinearIn | Moving / entering / leaving |
+
+| Pattern | API |
+|---|---|
+| Content under a header (tool groups and output, thinking, diffs, settings panels, banners and cards above the composer): grows from the header downward and folds back | `OcExpandable(visible)` (`expandEnter` / `collapseExit`); a container whose content changes size uses `animateContentSize(OcMotion.sizeSpec(OcTheme.motion))` |
+| Disclosure chevrons turn with the content | `animateChevronRotation(expanded)` |
+| Popovers anchored to something scale and fade from the anchor's side | `popoverEnter/Exit(OcMotion.anchoredOrigin(above, layoutDirection))`; Material `DropdownMenu` already does this |
+| Controls appearing in a row (Send, Stop, running chips) | `inlineEnter` / `inlineExit` |
+| One state replacing another (spinner and check, folded and open card) | `OcCrossfade(state)`, `AnimatedContent` with `OcMotion.swap(motion)` |
+| New rows of a lazy list | `Modifier.animateItem` with token specs; the transcript only fades in rows that arrive after it is shown, without placement animation, so following the end and the reading position are unaffected |
+
+Nothing animates the state it is first composed with (`AnimatedVisibility(visible)` and
+`animate*AsState` start at their target), so opening a chat or scrolling back shows open groups open.
+Content that animates out keeps its last value with `rememberLastNonNull`.
+
+Every `OcMotion` builder takes the `MotionConfig` of `OcTheme.motion`: `reduced` makes it instant
+and `scale` multiplies every duration and delay (`OcMotion.scaledDuration`). Looping decorations
+(`OcPulsingDot`, `OcSkeleton`, the running dots, the voice waveform) stand still with
+`OcTheme.reducedMotion` and keep their own pace.
+
+The app root passes `rememberMotionConfig(settings.animations, settings.animationSpeed)` to `OcTheme`
+(Settings → Appearance → Motion): Animations "System" follows `rememberSystemReducedMotion()` (an
+animator duration scale of 0 on Android, "Remove animations", followed live; Reduce Motion on iOS,
+read at start), "On" always animates, "Off" never does; Animation speed is Fast 0.6×, Normal 1×,
+Slow 1.6×. A nested `OcTheme` without `motion` (previews, swatches) keeps the enclosing one.
 
 ## Components (`core/ui/components`)
 

@@ -35,6 +35,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDarkTheme
+import io.github.beppe2880.opencodemobile.core.ui.theme.rememberMotionConfig
 import io.github.beppe2880.opencodemobile.feature.settings.customize.LiveEditHost
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import org.koin.compose.KoinIsolatedContext
@@ -66,7 +67,8 @@ fun DemoHost(
         onDispose { applyStyle(realDarkTheme) }
     }
     KoinIsolatedContext(container) {
-        OcTheme(darkTheme = dark, openCodeTheme = preferences.openCodeTheme) {
+        val motion = rememberMotionConfig(preferences.animations, preferences.animationSpeed)
+        OcTheme(darkTheme = dark, openCodeTheme = preferences.openCodeTheme, motion = motion) {
             // Destination BackHandlers take precedence; back from the demo root exits it.
             BackHandler(onBack = onExit)
             Column(

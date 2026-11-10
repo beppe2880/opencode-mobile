@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
@@ -13,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_animations
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_off
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
@@ -46,9 +48,19 @@ class SettingsCategoriesTest {
     @Test
     fun theCategoriesTheIssueAskedFor() {
         assertEquals(
-            listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize, SettingOption.SplitView),
-            SettingsArea.Appearance.options.take(4),
+            listOf(
+                SettingOption.Theme,
+                SettingOption.OpenCodeTheme,
+                SettingOption.TextSize,
+                SettingOption.Animations,
+                SettingOption.AnimationSpeed,
+                SettingOption.SplitView,
+            ),
+            SettingsArea.Appearance.options.take(6),
         )
+        // Animations have a group of their own; the speed nests under the choice that turns them off.
+        assertEquals(listOf(SettingOption.Animations, SettingOption.AnimationSpeed), SettingOption.Animations.group.options)
+        assertEquals(1, SettingOption.AnimationSpeed.depthIn(SettingOption.AnimationSpeed.group))
         assertEquals(SettingsArea.Chat, SettingOption.SwipeChats.area)
         assertEquals(SettingsArea.Chat, SettingOption.QuestionsCollapsed.area)
         // Right after the tool row options of the transcript group.
@@ -92,7 +104,14 @@ class SettingsCategoriesTest {
 
         // The list beside the chat only on wide windows.
         val narrow = visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = false)
-        assertEquals(listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize), narrow.flatMap { it.options })
+        assertEquals(
+            listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize, SettingOption.Animations, SettingOption.AnimationSpeed),
+            narrow.flatMap { it.options },
+        )
+        // Without animations there is no speed to pick.
+        val still = visibleGroups(SettingsArea.Appearance, AppSettings(animations = AnimationMode.Off), true, wide = false).flatMap { it.options }
+        assertTrue(SettingOption.Animations in still && SettingOption.AnimationSpeed !in still)
+        assertEquals(SettingOption.Animations, SettingOption.AnimationSpeed.anchor(AppSettings(animations = AnimationMode.Off), true))
         assertTrue(SettingOption.BackShowsList in visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = true).flatMap { it.options })
         assertFalse(SettingOption.ListWidth in visibleGroups(SettingsArea.Appearance, AppSettings(splitView = false), true, wide = true).flatMap { it.options })
 
@@ -152,6 +171,12 @@ class SettingsCategoriesTest {
             summaryOf(SettingsArea.Appearance, AppSettings(theme = ThemeMode.Dark, openCodeTheme = theme.id)),
         )
         assertEquals(2, summaryOf(SettingsArea.Appearance, AppSettings(openCodeTheme = "retired")).size)
+        // Animations only show when they are off; following the system or on is the expected case.
+        assertEquals(2, summaryOf(SettingsArea.Appearance, AppSettings(animations = AnimationMode.On)).size)
+        assertEquals(
+            UiText.Resource(Res.string.settings_summary_no_animations),
+            summaryOf(SettingsArea.Appearance, AppSettings(animations = AnimationMode.Off)).last(),
+        )
         val wide = summary(SettingsArea.Appearance, SettingsState(), wide = true)
         assertEquals(UiText.Resource(Res.string.settings_summary_split), wide.last())
         val off = listOf(UiText.Resource(Res.string.settings_summary_off))

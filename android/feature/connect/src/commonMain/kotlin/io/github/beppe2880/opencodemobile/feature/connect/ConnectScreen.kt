@@ -1,6 +1,5 @@
 package io.github.beppe2880.opencodemobile.feature.connect
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +62,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCard
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcLogo
@@ -366,7 +366,7 @@ private fun ManualSection(state: ConnectState, onEvent: (ConnectEvent) -> Unit, 
             modifier = Modifier.testTag("connect_url_field"),
         )
         val publicCleartext = remember(state.url) { isPublicCleartext(state.url) }
-        AnimatedVisibility(visible = publicCleartext) {
+        OcExpandable(visible = publicCleartext, label = "connect_cleartext") {
             Row(
                 modifier = Modifier.fillMaxWidth().testTag("connect_cleartext_warning"),
                 horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
@@ -442,7 +442,7 @@ private fun ProbeLine(state: ConnectState) {
         state.probe is ProbeResult.Failed -> Triple(state.probe.message.resolve(), c.danger.fg, Icons.Outlined.ErrorOutline)
         else -> Triple(null, c.textMuted, null)
     }
-    AnimatedVisibility(visible = text != null || state.probing) {
+    OcExpandable(visible = text != null || state.probing, label = "connect_probe") {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

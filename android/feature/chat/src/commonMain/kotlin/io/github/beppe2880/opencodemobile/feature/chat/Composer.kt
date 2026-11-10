@@ -10,7 +10,6 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -85,6 +84,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
+import io.github.beppe2880.opencodemobile.core.ui.components.OcExpandable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcRoundIconButton
@@ -92,6 +92,9 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
+import io.github.beppe2880.opencodemobile.core.ui.theme.MotionConfig
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -143,7 +146,8 @@ internal fun Composer(
 ) {
     val c = OcTheme.colors
     val haptics = LocalHapticFeedback.current
-    val reducedMotion = rememberReducedMotion()
+    val motion = OcTheme.motion
+    val reducedMotion = motion.reduced
     val cloud = voice?.cloud
     // A light tick when a cloud recording starts and when it ends.
     val recording = cloud is CloudVoicePhase.Recording
@@ -169,6 +173,7 @@ internal fun Composer(
     // The outline takes the selected agent's color, like the agent dot in the selector.
     val agentColor by animateColorAsState(
         if (state.agentColorOutline) c.agents.forAgent(state.agent ?: state.agents.firstOrNull()?.id ?: "build") else c.borderStrong,
+        animationSpec = OcMotion.spec(OcMotion.MEDIUM_MS, motion),
         label = "composer_outline",
     )
     Surface(
@@ -179,13 +184,15 @@ internal fun Composer(
         shadowElevation = 2.dp,
     ) {
         Column(Modifier.padding(start = OcSpacing.md, end = OcSpacing.xs, top = OcSpacing.sm, bottom = OcSpacing.xs)) {
-            AnimatedVisibility(visible = state.running && state.draft.isNotBlank() && !state.isShell) {
+            OcExpandable(visible = state.running && state.draft.isNotBlank() && !state.isShell, label = "composer_delivery") {
                 DeliveryToggle(state.delivery, onSelect = { onEvent(ChatEvent.DeliveryChanged(it)) })
             }
-            AnimatedVisibility(visible = state.isShell) { ShellHint(state.directory) }
-            if (state.uploads.isNotEmpty()) {
+            OcExpandable(visible = state.isShell, label = "composer_shell_hint") { ShellHint(state.directory) }
+            // The last chips stay while the row folds away after the last one is removed.
+            val uploads = rememberLastNonNull(state.uploads.takeIf { it.isNotEmpty() })
+            OcExpandable(visible = state.uploads.isNotEmpty(), label = "composer_attachments") {
                 AttachmentChips(
-                    state.uploads,
+                    uploads.orEmpty(),
                     onRemove = { onEvent(ChatEvent.RemoveAttachment(it)) },
                     onPreview = { onEvent(ChatEvent.PreviewAttachment(it)) },
                 )
@@ -210,7 +217,7 @@ internal fun Composer(
             // "Transcribing…" line, then the text again with the transcript at the cursor.
             AnimatedContent(
                 targetState = box,
-                transitionSpec = { voiceBoxTransition(reducedMotion) },
+                transitionSpec = { voiceBoxTransition(motion) },
                 label = "composer_box",
             ) { mode ->
                 when (mode) {
@@ -255,11 +262,13 @@ internal fun Composer(
                 }
             }
             val strip = cloud != null && cloud != CloudVoicePhase.Idle && (voice.style == VoiceRecordingStyle.Compact || cloud is CloudVoicePhase.Failed)
-            AnimatedVisibility(visible = strip) {
-                if (cloud != null && cloud != CloudVoicePhase.Idle) VoiceStrip(cloud, voice.provider, onVoice)
+            // The last phase stays while the strip folds away.
+            val stripPhase = rememberLastNonNull(cloud?.takeIf { it != CloudVoicePhase.Idle })
+            OcExpandable(visible = strip, label = "composer_voice_strip") {
+                if (stripPhase != null) VoiceStrip(stripPhase, voice?.provider.orEmpty(), onVoice)
             }
             // Hidden while the box records with a tap; kept while the microphone is held, it is under the finger.
-            AnimatedVisibility(visible = box == BoxMode.Editor || box == BoxMode.Held) {
+            OcExpandable(visible = box == BoxMode.Editor || box == BoxMode.Held, label = "composer_actions") {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                     // Selectors take only the space the stop/send buttons leave; on narrow phones the
                     // model button shrinks and ellipsizes instead of pushing the buttons off screen.
@@ -307,7 +316,13 @@ internal fun Composer(
                             }
                         }
                     }
-                    if (state.running) {
+                    // Stop and Send scale and fade in and out at their place; the selectors make room.
+                    AnimatedVisibility(
+                        visible = state.running,
+                        enter = OcMotion.inlineEnter(motion),
+                        exit = OcMotion.inlineExit(motion),
+                        label = "composer_stop",
+                    ) {
                         OcRoundIconButton(
                             icon = Icons.Filled.Stop,
                             contentDescription = stringResource(Res.string.chat_stop),
@@ -321,7 +336,12 @@ internal fun Composer(
                             modifier = Modifier.testTag("chat_stop_button"),
                         )
                     }
-                    if (!state.running || state.draft.isNotBlank()) {
+                    AnimatedVisibility(
+                        visible = !state.running || state.draft.isNotBlank(),
+                        enter = OcMotion.inlineEnter(motion),
+                        exit = OcMotion.inlineExit(motion),
+                        label = "composer_send",
+                    ) {
                         OcRoundIconButton(
                             icon = if (state.running) Icons.AutoMirrored.Outlined.Send else Icons.Outlined.ArrowUpward,
                             contentDescription = stringResource(Res.string.chat_send),
@@ -346,16 +366,22 @@ private enum class BoxMode { Editor, Recorder, Held, Transcribing }
  * The text and the recorder replace each other with a short fade and scale; going from the
  * recorder to "Transcribing…" the waveform shrinks into the line. Instant with reduced motion.
  */
-private fun AnimatedContentTransitionScope<BoxMode>.voiceBoxTransition(reducedMotion: Boolean): ContentTransform {
-    if (reducedMotion) return (EnterTransition.None togetherWith ExitTransition.None).using(SizeTransform(clip = false) { _, _ -> snap() })
-    val enter = fadeIn(tween(220, delayMillis = 80)) + scaleIn(tween(220, delayMillis = 80), initialScale = 0.94f)
+private fun AnimatedContentTransitionScope<BoxMode>.voiceBoxTransition(motion: MotionConfig): ContentTransform {
+    if (motion.reduced) return (EnterTransition.None togetherWith ExitTransition.None).using(SizeTransform(clip = false) { _, _ -> snap() })
+    val medium = OcMotion.MEDIUM_MS
+    val enter = fadeIn(OcMotion.spec(medium, motion, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS)) +
+        scaleIn(OcMotion.spec(medium, motion, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS), initialScale = 0.94f)
     val exit = if (initialState == BoxMode.Recorder && targetState == BoxMode.Transcribing) {
-        fadeOut(tween(180)) + scaleOut(tween(220), targetScale = 0.4f)
+        fadeOut(OcMotion.spec(OcMotion.SHORT_MS, motion, OcMotion.Exit)) + scaleOut(OcMotion.spec(medium, motion, OcMotion.Exit), targetScale = 0.4f)
     } else {
-        fadeOut(tween(100))
+        fadeOut(OcMotion.spec(VOICE_EXIT_MS, motion, OcMotion.Exit))
     }
-    return (enter togetherWith exit).using(SizeTransform(clip = false))
+    return (enter togetherWith exit).using(SizeTransform(clip = false) { _, _ -> OcMotion.spec(medium, motion) })
 }
+
+/** The new content of the box waits for the old one to be mostly gone, which leaves quickly. */
+private const val VOICE_ENTER_DELAY_MS = 80
+private const val VOICE_EXIT_MS = 100
 
 /** Starts or stops dictation; while listening it fills with the accent color and pulses with the voice. */
 @Composable
