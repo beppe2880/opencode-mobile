@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
@@ -118,6 +119,8 @@ fun ChatScreen(
     onVoice: (VoiceInputEvent) -> Unit = {},
     onHoldVoice: () -> Unit = {},
     showBack: Boolean = true,
+    /** The host's session list drawer, which [ChatSwipe.SessionDrawer] swipes pull open; null where there is none. */
+    sessionDrawer: SessionDrawerPull? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     listState: LazyListState = rememberLazyListState(),
     markdownCache: MarkdownCache = rememberMarkdownCache(),
@@ -162,7 +165,9 @@ fun ChatScreen(
                 SessionSwipe(
                     previous = state.previousSession,
                     next = state.nextSession,
-                    enabled = state.swipeEnabled,
+                    // Without a drawer here (the list is beside the chat) the drawer swipe does nothing.
+                    mode = state.swipe,
+                    drawer = sessionDrawer,
                     onSwitch = { onEvent(ChatEvent.SwitchSession(it)) },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 ) {

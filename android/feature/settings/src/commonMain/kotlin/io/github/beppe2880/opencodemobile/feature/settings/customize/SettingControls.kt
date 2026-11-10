@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
@@ -141,7 +142,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_drawer
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_drawer_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_switch
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard
@@ -500,7 +506,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             onSelect = { onEvent(SettingsEvent.ShareOpensChanged(it)) },
         )
         SettingOption.RunningInList -> switch(settings.showRunningWorkInList, SettingsEvent::RunningInListChanged)()
-        SettingOption.SwipeChats -> switch(settings.swipeBetweenChats, SettingsEvent::SwipeBetweenChatsChanged)()
+        SettingOption.SwipeChats -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.chatSwipe) {
+                    ChatSwipe.SwitchChats -> Res.string.settings_swipe_chats_sub
+                    ChatSwipe.SessionDrawer -> Res.string.settings_swipe_chats_drawer_sub
+                    ChatSwipe.Off -> Res.string.settings_swipe_chats_off_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(ChatSwipe.SwitchChats, stringResource(Res.string.settings_swipe_chats_switch), "settings_swipe_chats_next_previous"),
+                OcSegment(ChatSwipe.SessionDrawer, stringResource(Res.string.settings_swipe_chats_drawer), "settings_swipe_chats_drawer"),
+                OcSegment(ChatSwipe.Off, stringResource(Res.string.settings_swipe_chats_off), "settings_swipe_chats_off"),
+            ),
+            selected = settings.chatSwipe,
+            onSelect = { onEvent(SettingsEvent.ChatSwipeChanged(it)) },
+        )
         SettingOption.SplitView -> switch(settings.splitView, SettingsEvent::SplitViewChanged)()
         SettingOption.ListWidth -> {
             val fraction = settings.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION

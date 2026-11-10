@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">Änderungen der Sitzung</string>
     <string name="settings_swipe_chats">Zwischen Chats wischen</string>
     <string name="settings_swipe_chats_sub">Wische im Chat nach links oder rechts, um die nächste oder vorherige Sitzung der Liste zu öffnen</string>
+    <string name="settings_swipe_chats_switch">Nächster / vorheriger Chat</string>
+    <string name="settings_swipe_chats_drawer">Chatliste öffnen</string>
+    <string name="settings_swipe_chats_off">Aus</string>
+    <string name="settings_swipe_chats_drawer_sub">Im Chat nach rechts wischen, um die Chatliste darüber anzuzeigen; tippe auf einen Chat, um ihn zu öffnen</string>
+    <string name="settings_swipe_chats_off_sub">Seitliches Wischen im Chat bewirkt nichts</string>
     <string name="settings_group_activity">Denkprozess und Werkzeuge gruppieren</string>
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_group_thoughts">Aufeinanderfolgende Denkprozesse gruppieren</string>
@@ -287,6 +292,7 @@
     <string name="settings_summary_grouped">Gruppierte Aktivität</string>
     <string name="settings_summary_cost">Kosten</string>
     <string name="settings_summary_swipe">Wischen</string>
+    <string name="settings_summary_swipe_drawer">Wischen für Chatliste</string>
     <string name="settings_summary_apply">Änderungen: %1$s</string>
     <string name="settings_summary_new_chats">Neue Chats: %1$s</string>
     <string name="settings_summary_no_key">Kein API-Schlüssel</string>

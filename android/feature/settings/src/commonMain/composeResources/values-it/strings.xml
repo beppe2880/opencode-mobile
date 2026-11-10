@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">Modifiche della sessione</string>
     <string name="settings_swipe_chats">Scorri tra le chat</string>
     <string name="settings_swipe_chats_sub">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente della lista</string>
+    <string name="settings_swipe_chats_switch">Chat successiva / precedente</string>
+    <string name="settings_swipe_chats_drawer">Apri elenco chat</string>
+    <string name="settings_swipe_chats_off">Disattivato</string>
+    <string name="settings_swipe_chats_drawer_sub">Scorri verso destra su una chat per mostrare sopra di essa l’elenco delle chat; tocca una chat per aprirla</string>
+    <string name="settings_swipe_chats_off_sub">Scorrere di lato su una chat non fa nulla</string>
     <string name="settings_group_activity">Raggruppa ragionamento e strumenti</string>
     <string name="settings_group_activity_sub">Mostra in un'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
     <string name="settings_group_thoughts">Raggruppa ragionamenti consecutivi</string>
@@ -287,6 +292,7 @@
     <string name="settings_summary_grouped">Attività raggruppata</string>
     <string name="settings_summary_cost">Costo</string>
     <string name="settings_summary_swipe">Scorrimento</string>
+    <string name="settings_summary_swipe_drawer">Scorri per elenco chat</string>
     <string name="settings_summary_apply">Modifiche: %1$s</string>
     <string name="settings_summary_new_chats">Nuove chat: %1$s</string>
     <string name="settings_summary_no_key">Nessuna chiave API</string>

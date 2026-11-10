@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">تغييرات الجلسة</string>
     <string name="settings_swipe_chats">السحب بين المحادثات</string>
     <string name="settings_swipe_chats_sub">اسحب يمينًا أو يسارًا في المحادثة لفتح الجلسة التالية أو السابقة في القائمة</string>
+    <string name="settings_swipe_chats_switch">المحادثة التالية / السابقة</string>
+    <string name="settings_swipe_chats_drawer">فتح قائمة المحادثات</string>
+    <string name="settings_swipe_chats_off">إيقاف</string>
+    <string name="settings_swipe_chats_drawer_sub">اسحب يسارًا على المحادثة لعرض قائمة المحادثات فوقها؛ اضغط على محادثة لفتحها</string>
+    <string name="settings_swipe_chats_off_sub">التمرير الجانبي على المحادثة لا يفعل شيئًا</string>
     <string name="settings_group_activity">تجميع التفكير والأدوات</string>
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
     <string name="settings_group_thoughts">تجميع التفكير المتتابع</string>
@@ -299,6 +304,7 @@
     <string name="settings_summary_grouped">نشاط مجمّع</string>
     <string name="settings_summary_cost">التكلفة</string>
     <string name="settings_summary_swipe">السحب</string>
+    <string name="settings_summary_swipe_drawer">السحب لعرض قائمة المحادثات</string>
     <string name="settings_summary_apply">التغييرات: %1$s</string>
     <string name="settings_summary_new_chats">دردشات جديدة: %1$s</string>
     <string name="settings_summary_no_key">بلا مفتاح API</string>

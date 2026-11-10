@@ -45,6 +45,8 @@ fun ChatRoute(
     onOpenSession: (String) -> Unit = {},
     /** Replaces this chat with another session of the list (swipe). */
     onSwitchSession: (String) -> Unit = {},
+    /** The session list drawer over the chat, pulled by a swipe when chosen in Settings; null where there is none. */
+    sessionDrawer: SessionDrawerPull? = null,
     /** Opens a shell in the folder of the session. */
     onOpenTerminal: (String) -> Unit = {},
     /** Opens a file read-only: the session folder and the path, absolute or relative to it. */
@@ -214,6 +216,7 @@ fun ChatRoute(
         // Without the permission yet, the dialog takes the press: after it a tap records.
         onHoldVoice = { startCloud(VoiceInputEvent.Hold) },
         showBack = showBack,
+        sessionDrawer = sessionDrawer,
         snackbarHostState = snackbar,
         listState = listState,
         onShare = share,

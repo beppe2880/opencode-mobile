@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">세션 변경</string>
     <string name="settings_swipe_chats">스와이프로 채팅 전환</string>
     <string name="settings_swipe_chats_sub">채팅에서 좌우로 스와이프하여 목록의 다음 또는 이전 세션 열기</string>
+    <string name="settings_swipe_chats_switch">다음 / 이전 채팅</string>
+    <string name="settings_swipe_chats_drawer">채팅 목록 열기</string>
+    <string name="settings_swipe_chats_off">끔</string>
+    <string name="settings_swipe_chats_drawer_sub">채팅에서 오른쪽으로 스와이프하면 그 위에 채팅 목록이 표시됩니다. 채팅을 탭하면 열립니다</string>
+    <string name="settings_swipe_chats_off_sub">채팅에서 좌우로 스와이프해도 아무 일도 일어나지 않습니다</string>
     <string name="settings_group_activity">생각과 도구 묶기</string>
     <string name="settings_group_activity_sub">연속된 생각과 도구 호출을 하나의 행으로 표시</string>
     <string name="settings_group_thoughts">연속된 생각 묶기</string>
@@ -284,6 +289,7 @@
     <string name="settings_summary_grouped">묶인 활동</string>
     <string name="settings_summary_cost">비용</string>
     <string name="settings_summary_swipe">스와이프</string>
+    <string name="settings_summary_swipe_drawer">스와이프로 채팅 목록</string>
     <string name="settings_summary_apply">변경: %1$s</string>
     <string name="settings_summary_new_chats">새 채팅: %1$s</string>
     <string name="settings_summary_no_key">API 키 없음</string>

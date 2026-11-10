@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">会话更改</string>
     <string name="settings_swipe_chats">滑动切换聊天</string>
     <string name="settings_swipe_chats_sub">在聊天中左右滑动，打开列表中的下一个或上一个会话</string>
+    <string name="settings_swipe_chats_switch">切换到下一个/上一个聊天</string>
+    <string name="settings_swipe_chats_drawer">打开聊天列表</string>
+    <string name="settings_swipe_chats_off">关闭</string>
+    <string name="settings_swipe_chats_drawer_sub">在聊天中向右滑动，即可在其上方显示聊天列表；点击聊天即可打开</string>
+    <string name="settings_swipe_chats_off_sub">在聊天中左右滑动不会有任何效果</string>
     <string name="settings_group_activity">合并思考和工具</string>
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
     <string name="settings_group_thoughts">合并连续的思考</string>
@@ -284,6 +289,7 @@
     <string name="settings_summary_grouped">合并活动</string>
     <string name="settings_summary_cost">费用</string>
     <string name="settings_summary_swipe">滑动</string>
+    <string name="settings_summary_swipe_drawer">滑动查看聊天列表</string>
     <string name="settings_summary_apply">更改：%1$s</string>
     <string name="settings_summary_new_chats">新聊天：%1$s</string>
     <string name="settings_summary_no_key">无 API 密钥</string>

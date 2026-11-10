@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
@@ -61,6 +62,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -901,6 +903,43 @@ class ChatViewModelTest {
         val alone = vm(FakeSessions(model, order = listOf("x")))
         assertNull(alone.state.value.previousSession)
         assertNull(alone.state.value.nextSession)
+    }
+
+    @Test
+    fun `the swipe setting chooses between switching chats, the chat list drawer and nothing`() = runTest(main.testDispatcher) {
+        val vm = vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SwitchChats, vm.state.value.swipe)
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch {
+            vm.effect.collect { if (it is ChatEffect.SwitchSession) effects += it }
+        }
+
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertEquals(listOf<ChatEffect>(ChatEffect.SwitchSession("s2")), effects)
+
+        // Changed in Settings while the chat is open: the drawer pulls the list, never switching session.
+        effects.clear()
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SessionDrawer)
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SessionDrawer, vm.state.value.swipe)
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertTrue(effects.isEmpty())
+        // A chat opened afterwards starts with the new choice.
+        val later = vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SessionDrawer, later.state.value.swipe)
+
+        // Off: nothing.
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.Off)
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.Off, vm.state.value.swipe)
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertTrue(effects.isEmpty())
+        collector.cancel()
     }
 
     @Test

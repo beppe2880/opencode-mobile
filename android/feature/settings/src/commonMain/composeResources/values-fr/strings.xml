@@ -98,6 +98,11 @@
     <string name="settings_header_opens_session">Modifications de la session</string>
     <string name="settings_swipe_chats">Balayer entre les discussions</string>
     <string name="settings_swipe_chats_sub">Balayez une discussion à gauche ou à droite pour ouvrir la session suivante ou précédente de la liste</string>
+    <string name="settings_swipe_chats_switch">Discussion suivante / précédente</string>
+    <string name="settings_swipe_chats_drawer">Ouvrir la liste des discussions</string>
+    <string name="settings_swipe_chats_off">Désactivé</string>
+    <string name="settings_swipe_chats_drawer_sub">Balayez une discussion vers la droite pour afficher la liste des discussions par-dessus ; touchez une discussion pour l’ouvrir</string>
+    <string name="settings_swipe_chats_off_sub">Balayer latéralement une discussion ne fait rien</string>
     <string name="settings_group_activity">Regrouper réflexion et outils</string>
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_group_thoughts">Regrouper les réflexions consécutives</string>
@@ -287,6 +292,7 @@
     <string name="settings_summary_grouped">Activité groupée</string>
     <string name="settings_summary_cost">Coût</string>
     <string name="settings_summary_swipe">Balayage</string>
+    <string name="settings_summary_swipe_drawer">Balayage pour la liste des discussions</string>
     <string name="settings_summary_apply">Changements : %1$s</string>
     <string name="settings_summary_new_chats">Nouveaux chats : %1$s</string>
     <string name="settings_summary_no_key">Aucune clé API</string>

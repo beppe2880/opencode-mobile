@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
@@ -97,7 +98,8 @@ data class ChatState(
     /** Neighbors in the session list, reached by swiping right (previous) or left (next). */
     val previousSession: SessionPeek? = null,
     val nextSession: SessionPeek? = null,
-    val swipeEnabled: Boolean = true,
+    /** What a horizontal swipe does (setting). */
+    val swipe: ChatSwipe = ChatSwipe.SwitchChats,
     /** The server transcript has been loaded at least once (cached content may show before). */
     val synced: Boolean = false,
     /** Older history may exist above the oldest loaded message. */
@@ -177,7 +179,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,
     showCost = s.showCost,
-    swipeEnabled = s.swipeBetweenChats,
+    swipe = s.chatSwipe,
     agentColorOutline = s.agentColorOutline,
     dictation = s.dictation,
     permissionsCollapsedByDefault = s.permissionsCollapsed,
@@ -362,7 +364,7 @@ sealed interface ChatEvent {
     /** Opens a file of the server read-only; [path] is absolute or relative to the session folder. */
     data class OpenFile(val path: String) : ChatEvent
 
-    /** Replaces this chat with a neighbor in the session list (swipe). */
+    /** Replaces this chat with a neighbor in the session list (swipe); only with [ChatSwipe.SwitchChats]. */
     data class SwitchSession(val sessionId: String) : ChatEvent
 
     /** The user scrolled near the oldest loaded message. */

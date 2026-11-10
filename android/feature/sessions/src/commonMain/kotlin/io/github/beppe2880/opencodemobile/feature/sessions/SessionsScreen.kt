@@ -45,6 +45,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -133,6 +134,11 @@ fun SessionsScreen(
     banner: @Composable () -> Unit = {},
     /** The offline demo: the top bar names it instead of showing a connection. */
     demo: Boolean = false,
+    /**
+     * Shown in a drawer over a chat: the list first scrolls to [selectedSessionId], and rows do
+     * not swipe to delete since that swipe closes the drawer (delete stays in the row actions).
+     */
+    inDrawer: Boolean = false,
 ) {
     val c = OcTheme.colors
     val now by produceState(nowProvider()) {
@@ -173,6 +179,16 @@ fun SessionsScreen(
         ) {
             var listWidthPx by remember { mutableIntStateOf(Int.MAX_VALUE) }
             val listState = rememberLazyListState()
+            if (inDrawer && selectedSessionId != null) {
+                var revealed by remember(selectedSessionId) { mutableStateOf(false) }
+                LaunchedEffect(selectedSessionId, state.groups, state.loading) {
+                    if (revealed || state.loading || state.error != null) return@LaunchedEffect
+                    val index = sessionRowIndex(state.groups, selectedSessionId) ?: return@LaunchedEffect
+                    revealed = true
+                    // One item above, so the row is not stuck under the top edge.
+                    if (listState.layoutInfo.visibleItemsInfo.none { it.key == selectedSessionId }) listState.scrollToItem((index - 1).coerceAtLeast(0))
+                }
+            }
             // Narrower than any phone: the list sits beside the chat.
             val compact = with(LocalDensity.current) { listWidthPx.toDp() } < CompactListWidth
             LazyColumn(
@@ -216,6 +232,7 @@ fun SessionsScreen(
                                 modifier = Modifier.animateItem().editable(SettingsPart.SessionRows, LocalEditMode.current),
                                 compact = compact,
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
+                                swipeToDelete = !inDrawer,
                             )
                         }
                     }
@@ -224,6 +241,18 @@ fun SessionsScreen(
         }
     }
     SessionsOverlays(state, onEvent)
+}
+
+/** Position of [sessionId]'s row in the list: after the header item, each group has its header and rows; null when absent. */
+internal fun sessionRowIndex(groups: List<SessionGroup>, sessionId: String): Int? {
+    var index = 1
+    for (group in groups) {
+        index++
+        val row = group.sessions.indexOfFirst { it.id == sessionId }
+        if (row >= 0) return index + row
+        index += group.sessions.size
+    }
+    return null
 }
 
 @Composable

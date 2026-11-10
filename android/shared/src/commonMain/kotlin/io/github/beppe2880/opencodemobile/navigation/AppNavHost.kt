@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +67,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
+import io.github.beppe2880.opencodemobile.feature.chat.SessionDrawerPull
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
@@ -229,19 +231,33 @@ fun AppNavHost(
         }
         composable<ChatDestination> { entry ->
             val args = entry.toRoute<ChatDestination>()
-            ChatRoute(
-                sessionId = args.sessionId,
-                onBack = { navController.popBackStack() },
-                onOpenSession = navController::openChat,
-                onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
-                onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
-                onSwitchSession = {
-                    // Replaces this chat, so Back still returns to the session list.
-                    navController.navigate(ChatDestination(it)) {
-                        popUpTo<ChatDestination> { inclusive = true }
-                    }
-                },
-            )
+            val switchSession: (String) -> Unit = {
+                // Replaces this chat, so Back still returns to the session list.
+                navController.navigate(ChatDestination(it)) {
+                    popUpTo<ChatDestination> { inclusive = true }
+                }
+            }
+            // Shares the list's ViewModel with the session list below in the back stack.
+            val sessionsEntry = remember(entry) { runCatching { navController.getBackStackEntry(SessionsDestination) }.getOrNull() }
+            // Always there, so the chat stays in place when the swipe setting changes: the chat
+            // pulls the drawer only while its live settings choose it.
+            SessionDrawerHost(
+                currentSessionId = args.sessionId,
+                sessionsOwner = sessionsEntry,
+                demo = isDemo,
+                onOpenChat = switchSession,
+                onOpenSettings = { navController.navigate(SettingsDestination()) },
+            ) { drawer ->
+                ChatRoute(
+                    sessionId = args.sessionId,
+                    onBack = { navController.popBackStack() },
+                    onOpenSession = navController::openChat,
+                    onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
+                    onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
+                    onSwitchSession = switchSession,
+                    sessionDrawer = drawer,
+                )
+            }
         }
         composable<SettingsDestination> { entry ->
             val area = entry.toRoute<SettingsDestination>().area
@@ -337,6 +353,33 @@ private fun SessionsListDetail(
             val current = selected?.takeIf { selectedServerId == activeServerId }
             // Registered before the panes, so handlers inside the chat still get Back first.
             OcBackHandler(enabled = hidden && appSettings.backShowsList) { listHidden = false }
+            val currentShownWidth by rememberUpdatedState(shownWidth)
+            // The chat's drawer swipe drags a hidden list back out, like the handle does.
+            val revealList = remember(hidden, density) {
+                if (!hidden) {
+                    null
+                } else {
+                    object : SessionDrawerPull {
+                        override fun drag(delta: Float) {
+                            val width = (dragWidth ?: animatedWidth.value) + with(density) { delta.toDp() }
+                            dragWidth = width.coerceIn(0.dp, currentShownWidth)
+                        }
+
+                        override fun release(velocity: Float) {
+                            val dropped = dragWidth ?: return
+                            val flung = with(density) { velocity.toDp() } > RevealFlingVelocity
+                            scope.launch {
+                                animatedWidth.snapTo(dropped)
+                                dragWidth = null
+                                val reveal = dropped >= currentShownWidth / 2 || (flung && dropped > 0.dp)
+                                // Shown: the width animates to the list's from where it was left.
+                                if (reveal) listHidden = false
+                                if (!reveal) animatedWidth.animateTo(0.dp)
+                            }
+                        }
+                    }
+                }
+            }
             Row(Modifier.fillMaxSize()) {
                 // Kept composed while hidden, so the list keeps its scroll position.
                 SessionsRoute(
@@ -362,6 +405,8 @@ private fun SessionsListDetail(
                         onOpenTerminal = onOpenTerminal,
                         onOpenFile = onOpenFile,
                         onSwitchSession = select,
+                        // The list is beside the chat: the drawer swipe only pulls a hidden list back.
+                        sessionDrawer = revealList,
                         modifier = Modifier.weight(1f),
                     )
                 } else {
@@ -437,6 +482,9 @@ private fun ListPaneHandle(listHidden: Boolean, onToggle: () -> Unit, modifier: 
 }
 
 private val HandleWidth = 24.dp
+
+/** Per second: a faster release of the chat's drawer swipe shows a hidden list wherever it was. */
+private val RevealFlingVelocity = 400.dp
 
 /**
  * The banner of a new app release, at the top of the session list. The live demo never looks for

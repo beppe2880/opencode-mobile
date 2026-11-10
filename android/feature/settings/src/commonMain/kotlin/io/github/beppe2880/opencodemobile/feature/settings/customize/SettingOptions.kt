@@ -54,7 +54,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ShareMenu(listOf("showInShareMenu")),
     ShareOpens(listOf("shareOpens"), requires = ShareMenu),
     RunningInList(listOf("showRunningWorkInList")),
-    SwipeChats(listOf("swipeBetweenChats")),
+    SwipeChats(listOf("chatSwipe")),
     SplitView(listOf("splitView")),
     ListWidth(listOf("listPaneFraction"), requires = SplitView),
     ListHandle(listOf("listPaneHandle"), requires = SplitView),
@@ -177,6 +177,7 @@ internal val SettingOption.searchKeywords: List<String>
     get() = when (this) {
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
+        SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
         else -> emptyList()
     }
 

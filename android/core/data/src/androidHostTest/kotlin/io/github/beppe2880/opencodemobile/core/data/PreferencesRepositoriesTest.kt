@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
@@ -114,6 +115,7 @@ class PreferencesRepositoriesTest {
             voiceRecordingStyle = VoiceRecordingStyle.Compact,
             voiceHoldToRecord = true,
             toolMediaSize = ToolMediaSize.Large,
+            chatSwipe = ChatSwipe.SessionDrawer,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -225,6 +227,30 @@ class PreferencesRepositoriesTest {
         assertEquals(false, prefs.values["check_for_updates"])
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(updateNotice = UpdateNoticeStyle.Banner) }
         assertEquals(true, prefs.values["check_for_updates"])
+    }
+
+    @Test
+    fun `the former swipe switch becomes the swipe choice`() = runBlocking {
+        fun swipeWith(edit: (android.content.SharedPreferences.Editor) -> Unit): ChatSwipe {
+            val prefs = InMemoryPreferences()
+            prefs.edit().also(edit).commit()
+            return PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.chatSwipe
+        }
+        assertEquals(ChatSwipe.SwitchChats, swipeWith { it.putBoolean("swipe_between_chats", true) })
+        assertEquals(ChatSwipe.Off, swipeWith { it.putBoolean("swipe_between_chats", false) })
+        assertEquals(ChatSwipe.SwitchChats, swipeWith { })
+        // Once chosen, the choice wins over the former switch; an unknown one falls back.
+        assertEquals(ChatSwipe.SessionDrawer, swipeWith { it.putBoolean("swipe_between_chats", false).putString("chat_swipe", "SessionDrawer") })
+        assertEquals(ChatSwipe.SwitchChats, swipeWith { it.putString("chat_swipe", "Pager") })
+
+        val prefs = InMemoryPreferences()
+        for (choice in ChatSwipe.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(chatSwipe = choice) }
+            assertEquals(choice.name, prefs.values["chat_swipe"])
+            // Older versions of the app still read the switch.
+            assertEquals(choice != ChatSwipe.Off, prefs.values["swipe_between_chats"])
+            assertEquals(choice, PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.chatSwipe)
+        }
     }
 
     @Test
