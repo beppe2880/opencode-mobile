@@ -236,12 +236,13 @@ class PreferencesRepositoriesTest {
             prefs.edit().also(edit).commit()
             return PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.chatSwipe
         }
-        assertEquals(ChatSwipe.SwitchChats, swipeWith { it.putBoolean("swipe_between_chats", true) })
+        // The chat list is the default, also for whoever had the switch on; off stays off.
+        assertEquals(ChatSwipe.SessionDrawer, swipeWith { it.putBoolean("swipe_between_chats", true) })
         assertEquals(ChatSwipe.Off, swipeWith { it.putBoolean("swipe_between_chats", false) })
-        assertEquals(ChatSwipe.SwitchChats, swipeWith { })
+        assertEquals(ChatSwipe.SessionDrawer, swipeWith { })
         // Once chosen, the choice wins over the former switch; an unknown one falls back.
-        assertEquals(ChatSwipe.SessionDrawer, swipeWith { it.putBoolean("swipe_between_chats", false).putString("chat_swipe", "SessionDrawer") })
-        assertEquals(ChatSwipe.SwitchChats, swipeWith { it.putString("chat_swipe", "Pager") })
+        assertEquals(ChatSwipe.SwitchChats, swipeWith { it.putBoolean("swipe_between_chats", false).putString("chat_swipe", "SwitchChats") })
+        assertEquals(ChatSwipe.SessionDrawer, swipeWith { it.putString("chat_swipe", "Pager") })
 
         val prefs = InMemoryPreferences()
         for (choice in ChatSwipe.entries) {

@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Les modifications affichées en premier dans la feuille</string>
     <string name="settings_header_opens_folder">Modifications du dossier</string>
     <string name="settings_header_opens_session">Modifications de la session</string>
-    <string name="settings_swipe_chats">Balayer entre les discussions</string>
+    <string name="settings_swipe_chats">Balayer dans une discussion</string>
     <string name="settings_swipe_chats_sub">Balayez une discussion à gauche ou à droite pour ouvrir la session suivante ou précédente de la liste</string>
     <string name="settings_swipe_chats_switch">Discussion suivante / précédente</string>
     <string name="settings_swipe_chats_drawer">Ouvrir la liste des discussions</string>

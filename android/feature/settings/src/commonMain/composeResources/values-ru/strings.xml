@@ -96,7 +96,7 @@
     <string name="settings_header_opens_sub">Какие изменения панель показывает первыми</string>
     <string name="settings_header_opens_folder">Изменения папки</string>
     <string name="settings_header_opens_session">Изменения сессии</string>
-    <string name="settings_swipe_chats">Перелистывать чаты</string>
+    <string name="settings_swipe_chats">Перелистывание в чате</string>
     <string name="settings_swipe_chats_sub">Смахните в чате влево или вправо, чтобы открыть следующую или предыдущую сессию в списке</string>
     <string name="settings_swipe_chats_switch">Следующий / предыдущий чат</string>
     <string name="settings_swipe_chats_drawer">Открыть список чатов</string>

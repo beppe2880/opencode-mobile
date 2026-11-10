@@ -176,9 +176,9 @@ class SettingsCategoriesTest {
     fun chatSummaryNamesTheSwipeChoice() {
         val swipe = UiText.Resource(Res.string.settings_summary_swipe)
         val drawer = UiText.Resource(Res.string.settings_summary_swipe_drawer)
-        val switching = summaryOf(SettingsArea.Chat, AppSettings())
+        val switching = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.SwitchChats))
         assertTrue(swipe in switching && drawer !in switching)
-        val list = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.SessionDrawer))
+        val list = summaryOf(SettingsArea.Chat, AppSettings())
         assertTrue(drawer in list && swipe !in list)
         val off = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.Off))
         assertTrue(swipe !in off && drawer !in off)

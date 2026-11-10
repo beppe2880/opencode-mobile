@@ -59,7 +59,7 @@
     <string name="oc_part_voice">Голосовой ввод</string>
     <string name="oc_part_new_chat">Новый чат</string>
     <string name="oc_part_session_rows">Строки сессий</string>
-    <string name="oc_part_swipe">Перелистывать чаты</string>
+    <string name="oc_part_swipe">Перелистывание в чате</string>
     <string name="oc_part_split">Список рядом с чатом</string>
     <string name="oc_part_key_bar">Панель клавиш</string>
     <string name="oc_part_keyboard">Клавиатура</string>

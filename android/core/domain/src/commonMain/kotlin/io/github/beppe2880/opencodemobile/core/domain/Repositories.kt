@@ -439,7 +439,7 @@ data class AppSettings(
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */
-    val chatSwipe: ChatSwipe = ChatSwipe.SwitchChats,
+    val chatSwipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */
