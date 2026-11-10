@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
+import io.github.beppe2880.opencodemobile.core.domain.ServerPaths
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -503,33 +504,49 @@ class SessionsViewModel(
     }
 
     private fun browseFolders() {
-        if (currentState.newSession == null) return
-        val start = "/home"
+        val new = currentState.newSession ?: return
+        val start = browseStart(new.directory.trim(), currentState)
         val recent = serverId?.let(folderPreferences::recentFolders).orEmpty()
-        updateNew { it.copy(browser = FolderBrowserState(path = start, recent = recent)) }
-        loadFolders(start, fallbackToServer = true)
+        updateNew { it.copy(browser = FolderBrowserState(path = start.orEmpty(), recent = recent)) }
+        loadFolders(start)
     }
 
-    private fun loadFolders(path: String?, fallbackToServer: Boolean = false) {
-        if (currentState.newSession?.browser == null) return
+    /**
+     * The parent of the selected directory, else of the latest visible project's directory, so
+     * siblings are one tap away; null (the server's folder) without an absolute one.
+     */
+    private fun browseStart(directory: String, state: SessionsState): String? {
+        val near = directory.takeIf(ServerPaths::isAbsolute)
+            ?: state.visibleProjects.firstOrNull { ServerPaths.isAbsolute(it.directory) }?.directory
+            ?: return null
+        return ServerPaths.parent(near) ?: ServerPaths.normalize(near)
+    }
+
+    /** Until the start folder is listed, loads fall back to the server's folder and set the start. */
+    private fun loadFolders(path: String?) {
+        val browser = currentState.newSession?.browser ?: return
+        val starting = browser.start == null
         browseJob?.cancel()
         updateNew { it.copy(browser = it.browser?.copy(loading = true, error = null)) }
         browseJob = viewModelScope.launch {
             var result = catalog.listFolders(path)
             ensureActive()
-            if (result.isFailure && fallbackToServer) result = catalog.listFolders(null)
+            if (result.isFailure && starting && path != null) result = catalog.listFolders(null)
             ensureActive()
             result.fold(
                 onSuccess = { listing ->
                     updateNew {
                         it.copy(
-                            browser = it.browser?.copy(
-                                path = listing.path,
-                                parent = listing.parent,
-                                folders = listing.folders,
-                                loading = false,
-                                error = null,
-                            ),
+                            browser = it.browser?.let { current ->
+                                current.copy(
+                                    path = listing.path,
+                                    parent = listing.parent,
+                                    folders = listing.folders,
+                                    loading = false,
+                                    error = null,
+                                    start = current.start ?: listing.path,
+                                )
+                            },
                         )
                     }
                 },
@@ -578,7 +595,7 @@ class SessionsViewModel(
 
     /**
      * A session counts as hidden when its own directory is hidden or when its project's directory
-     * is: the list keeps one project per directory, so the session's project may have been dropped.
+     * is: a session in a subfolder of a hidden project (`/same/sub` of `/same`) is hidden too.
      */
     private fun isHidden(session: Session, state: SessionsState): Boolean =
         session.directory in state.hiddenDirectories ||

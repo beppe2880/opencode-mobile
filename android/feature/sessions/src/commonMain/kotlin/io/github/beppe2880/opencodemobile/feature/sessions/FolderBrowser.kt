@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.ServerPaths
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
@@ -93,14 +94,13 @@ internal fun FolderBrowser(
     }
     // Back climbs one folder until the start folder (or the root), then returns to the form.
     val goBack = {
-        val parent = state.parent
-        onEvent(if (parent != null && state.path != BROWSE_START) SessionsEvent.BrowseTo(parent) else SessionsEvent.CloseFolderBrowser)
+        onEvent(state.backTo?.let { SessionsEvent.BrowseTo(it) } ?: SessionsEvent.CloseFolderBrowser)
     }
     OcBackHandler(onBack = goBack)
     // Dot-folders stay hidden until the eye shows them.
     var showDotFolders by rememberSaveable { mutableStateOf(false) }
     val folders = remember(state.folders, showDotFolders) { if (showDotFolders) state.folders else state.folders.filterNot { it.startsWith(".") } }
-    val recent = if (state.path == BROWSE_START) state.recent else emptyList()
+    val recent = if (state.atStart) state.recent else emptyList()
     Column(modifier = modifier.fillMaxWidth().testTag("sessions_browse")) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = OcSpacing.sm),
@@ -181,7 +181,7 @@ internal fun FolderBrowser(
             itemsIndexed(folders, key = { _, name -> name }) { index, name ->
                 FolderRow(
                     name = name,
-                    onClick = { onEvent(SessionsEvent.BrowseTo(childPath(state.path, name))) },
+                    onClick = { onEvent(SessionsEvent.BrowseTo(ServerPaths.child(state.path, name))) },
                     modifier = Modifier.testTag("sessions_browse_folder_$index"),
                 )
                 OcDivider()
@@ -200,11 +200,14 @@ internal fun FolderBrowser(
     }
 }
 
-/** The path as tappable segments; the server icon opens the root. Scrolls to keep the current folder in view. */
+/** The path as tappable segments; the server icon opens the path's root. Scrolls to keep the current folder in view. */
 @Composable
 private fun PathCrumbs(path: String, onOpen: (String) -> Unit) {
     val c = OcTheme.colors
-    val segments = remember(path) { pathSegments(path) }
+    val segments = remember(path) { ServerPaths.segments(path) }
+    // Without a path yet, "/" still reaches the root of the server's own drive.
+    val root = remember(path) { ServerPaths.root(path) ?: "/" }
+    val separator = remember(path) { ServerPaths.separator(path).toString() }
     val listState = rememberLazyListState()
     LaunchedEffect(segments) { listState.scrollToItem(segments.size) }
     LazyRow(
@@ -215,13 +218,13 @@ private fun PathCrumbs(path: String, onOpen: (String) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.xxs),
     ) {
         item("root") {
-            Crumb(current = segments.isEmpty() && path.isNotBlank(), onClick = { onOpen("/") }, modifier = Modifier.testTag("sessions_browse_root")) {
-                Icon(Icons.Outlined.Dns, contentDescription = "/", tint = c.iconMuted, modifier = Modifier.size(14.dp))
+            Crumb(current = segments.isEmpty() && path.isNotBlank(), onClick = { onOpen(root) }, modifier = Modifier.testTag("sessions_browse_root")) {
+                Icon(Icons.Outlined.Dns, contentDescription = root, tint = c.iconMuted, modifier = Modifier.size(14.dp))
             }
         }
         itemsIndexed(segments) { index, (name, full) ->
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xxs)) {
-                Text("/", style = OcTheme.mono.codeSmall, color = c.textFaint)
+                Text(separator, style = OcTheme.mono.codeSmall, color = c.textFaint)
                 val current = index == segments.lastIndex
                 Crumb(current = current, onClick = { onOpen(full) }, modifier = Modifier.testTag("sessions_browse_crumb_$index")) {
                     Text(
@@ -353,7 +356,7 @@ private fun RecentFolders(
                     Icon(Icons.Outlined.History, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(18.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            pathSegments(path).lastOrNull()?.first ?: path,
+                            ServerPaths.name(path) ?: path,
                             style = MaterialTheme.typography.bodyMedium,
                             color = c.textBase,
                             maxLines = 1,
@@ -403,14 +406,3 @@ internal fun BrowseButton(onClick: () -> Unit) {
         }
     }
 }
-
-/** "/a/b" -> [("a", "/a"), ("b", "/a/b")]; "/" and "" -> []. */
-internal fun pathSegments(path: String): List<Pair<String, String>> {
-    val parts = path.trim('/').split('/').filter { it.isNotEmpty() }
-    return parts.mapIndexed { i, name -> name to "/" + parts.take(i + 1).joinToString("/") }
-}
-
-/** Where the browser opens (see SessionsViewModel); back stops here. */
-private const val BROWSE_START = "/home"
-
-internal fun childPath(parent: String, name: String): String = if (parent.endsWith("/")) parent + name else "$parent/$name"

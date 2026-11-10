@@ -24,7 +24,15 @@ data class FolderBrowserState(
     val loading: Boolean = true,
     val error: UiText? = null,
     val recent: List<String> = emptyList(),
-)
+    /** The folder the browser opened at once listed; back stops there and recent folders show there. */
+    val start: String? = null,
+) {
+    /** Recent folders are offered here: at the start folder, or while it is not listed yet. */
+    val atStart: Boolean get() = start == null || path == start
+
+    /** Where back goes: one folder up until the start folder or a root, then null (back closes the browser). */
+    val backTo: String? get() = parent?.takeIf { path != start }
+}
 
 @Immutable
 data class NewSessionState(

@@ -523,6 +523,23 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `a session in a subfolder of a hidden project is never the default directory`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = listOf(
+            Project("same", "/same", null, null, 5),
+            Project("other", "/p/today", null, null, 3),
+        )
+        sessions.listResult = Result.success(listOf(session("sub", now).copy(projectId = "same", directory = "/same/sub")))
+        folders.setDirectoryHidden("s1", "/same", true)
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
     fun `hiding a project keeps custom directories and other selected directories`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -635,7 +652,7 @@ class SessionsViewModelTest {
     }
 
     @Test
-    fun `the folder browser opens at home regardless of a typed absolute directory`() = runTest(main.testDispatcher) {
+    fun `the folder browser starts at the parent of a typed absolute directory`() = runTest(main.testDispatcher) {
         val home = FolderListing("/home", "/", listOf("dev"))
         catalog.folderLoad = { Result.success(home) }
         val vm = vm()
@@ -648,25 +665,83 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf("/home"), catalog.folderRequests)
-        assertEquals(FolderBrowserState("/home", "/", listOf("dev"), loading = false), vm.state.value.newSession!!.browser)
+        assertEquals(FolderBrowserState("/home", "/", listOf("dev"), loading = false, start = "/home"), vm.state.value.newSession!!.browser)
     }
 
     @Test
-    fun `a relative directory starts browsing at home and falls back when home is unavailable`() = runTest(main.testDispatcher) {
-        catalog.folderLoad = { path ->
-            if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
-        }
+    fun `the folder browser starts at the parent of the preselected directory`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals("/p/today", newSession(vm).directory)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("/p"), catalog.folderRequests)
+    }
+
+    @Test
+    fun `a windows directory starts browsing at its windows parent`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
         newSession(vm)
-        vm.onEvent(SessionsEvent.NewSessionDirectory("projects/app", custom = true))
-
+        vm.onEvent(SessionsEvent.NewSessionDirectory("C:\\Users\\dev\\proj", custom = true))
         vm.onEvent(SessionsEvent.BrowseFolders)
-        assertEquals(FolderBrowserState(path = "/home"), vm.state.value.newSession!!.browser)
         advanceUntilIdle()
 
-        assertEquals(listOf("/home", null), catalog.folderRequests)
-        assertEquals("/home/dev", vm.state.value.newSession!!.browser!!.path)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("D:\\", custom = true))
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("C:\\Users\\dev", "D:\\"), catalog.folderRequests)
+    }
+
+    @Test
+    fun `a relative directory starts at the parent of the latest visible project and falls back when it is unavailable`() =
+        runTest(main.testDispatcher) {
+            sessions.serverProjects = listOf(
+                Project("hidden", "/work/api", null, null, 9),
+                Project("relative", "notes", null, null, 7),
+                Project("visible", "/srv/site/web", null, null, 5),
+                Project("older", "/old/app", null, null, 1),
+            )
+            folders.setDirectoryHidden("s1", "/work/api", true)
+            catalog.folderLoad = { path ->
+                if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
+            }
+            val vm = vm()
+            advanceUntilIdle()
+            newSession(vm)
+            vm.onEvent(SessionsEvent.NewSessionDirectory("projects/app", custom = true))
+
+            vm.onEvent(SessionsEvent.BrowseFolders)
+            assertEquals(FolderBrowserState(path = "/srv/site"), vm.state.value.newSession!!.browser)
+            advanceUntilIdle()
+
+            assertEquals(listOf("/srv/site", null), catalog.folderRequests)
+            val browser = vm.state.value.newSession!!.browser!!
+            assertEquals("/home/dev", browser.path)
+            assertEquals("/home/dev", browser.start)
+        }
+
+    @Test
+    fun `without an absolute directory or visible project the browser starts at the server folder`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = emptyList()
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("", custom = true))
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        assertEquals(FolderBrowserState(path = ""), vm.state.value.newSession!!.browser)
+        assertTrue(vm.state.value.newSession!!.browser!!.atStart)
+        advanceUntilIdle()
+
+        assertEquals(listOf<String?>(null), catalog.folderRequests)
+        assertEquals(
+            FolderBrowserState(serverFolder.path, serverFolder.parent, serverFolder.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
     }
 
     @Test
@@ -677,14 +752,15 @@ class SessionsViewModelTest {
         val vm = vm()
         advanceUntilIdle()
         newSession(vm)
-        vm.onEvent(SessionsEvent.NewSessionDirectory("/missing", custom = true))
+        vm.onEvent(SessionsEvent.NewSessionDirectory("/missing/app", custom = true))
 
         vm.onEvent(SessionsEvent.BrowseFolders)
         advanceUntilIdle()
 
-        assertEquals(listOf("/home", null), catalog.folderRequests)
+        assertEquals(listOf("/missing", null), catalog.folderRequests)
         val browser = vm.state.value.newSession!!.browser!!
         assertEquals("/home/dev", browser.path)
+        assertEquals("/home/dev", browser.start)
         assertFalse(browser.loading)
         assertEquals(null, browser.error)
     }
@@ -700,13 +776,65 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.BrowseFolders)
         advanceUntilIdle()
 
-        assertEquals(listOf("/home", null), catalog.folderRequests)
-        assertEquals(FolderBrowserState(path = "/home", loading = false, error = error.toUiText()), vm.state.value.newSession!!.browser)
+        assertEquals(listOf("/p", null), catalog.folderRequests)
+        assertEquals(FolderBrowserState(path = "/p", loading = false, error = error.toUiText()), vm.state.value.newSession!!.browser)
 
         vm.onEvent(SessionsEvent.NewSessionDirectory("", custom = true))
         vm.onEvent(SessionsEvent.BrowseFolders)
         advanceUntilIdle()
-        assertEquals(listOf("/home", null, "/home", null), catalog.folderRequests)
+        assertEquals(listOf("/p", null, "/p", null), catalog.folderRequests)
+    }
+
+    @Test
+    fun `retrying a failed start keeps the server folder fallback and sets the start`() = runTest(main.testDispatcher) {
+        catalog.folderLoad = { Result.failure(OpenCodeError.Unreachable("offline")) }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        catalog.folderLoad = { path ->
+            if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
+        }
+
+        vm.onEvent(SessionsEvent.BrowseTo(vm.state.value.newSession!!.browser!!.path))
+        advanceUntilIdle()
+
+        assertEquals(listOf("/p", null, "/p", null), catalog.folderRequests)
+        assertEquals(
+            FolderBrowserState(serverFolder.path, serverFolder.parent, serverFolder.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
+    }
+
+    @Test
+    fun `back climbs to the start folder and recent folders show only there`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", "/work")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val start = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, start.start)
+        assertTrue(start.atStart)
+        assertEquals(null, start.backTo)
+
+        catalog.folderLoad = { Result.success(FolderListing("/home/dev/projects", "/home/dev", listOf("app"))) }
+        vm.onEvent(SessionsEvent.BrowseTo("/home/dev/projects"))
+        advanceUntilIdle()
+        val inside = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, inside.start)
+        assertFalse(inside.atStart)
+        assertEquals("/home/dev", inside.backTo)
+
+        catalog.folderLoad = { Result.success(FolderListing("/", null, listOf("home"))) }
+        vm.onEvent(SessionsEvent.BrowseTo("/"))
+        advanceUntilIdle()
+        val root = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, root.start)
+        assertFalse(root.atStart)
+        assertEquals(null, root.backTo)
     }
 
     @Test
@@ -725,7 +853,10 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listing.path, catalog.folderRequests.last())
-        assertEquals(FolderBrowserState(listing.path, listing.parent, listing.folders, loading = false), vm.state.value.newSession!!.browser)
+        assertEquals(
+            FolderBrowserState(listing.path, listing.parent, listing.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
     }
 
     @Test
@@ -743,7 +874,7 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(before.copy(error = error.toUiText()), vm.state.value.newSession!!.browser)
-        assertEquals(listOf("/home", "/missing"), catalog.folderRequests)
+        assertEquals(listOf("/p", "/missing"), catalog.folderRequests)
 
         catalog.folderLoad = { Result.success(serverFolder) }
         vm.onEvent(SessionsEvent.BrowseTo(null))
@@ -852,7 +983,7 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(new, vm.state.value.newSession)
-        assertEquals(listOf("/home"), catalog.folderRequests)
+        assertEquals(listOf("/p"), catalog.folderRequests)
     }
 
     @Test
@@ -869,18 +1000,18 @@ class SessionsViewModelTest {
         runCurrent()
         vm.onEvent(SessionsEvent.BrowseTo("/next"))
         runCurrent()
-        assertEquals(listOf("/home"), catalog.folderCancellations)
+        assertEquals(listOf("/p"), catalog.folderCancellations)
 
         vm.onEvent(SessionsEvent.CloseFolderBrowser)
         runCurrent()
-        assertEquals(listOf("/home", "/next"), catalog.folderCancellations)
+        assertEquals(listOf("/p", "/next"), catalog.folderCancellations)
         assertEquals(null, vm.state.value.newSession!!.browser)
 
         vm.onEvent(SessionsEvent.BrowseFolders)
         runCurrent()
         vm.onEvent(SessionsEvent.DismissNewSession)
         runCurrent()
-        assertEquals(listOf("/home", "/next", "/home"), catalog.folderCancellations)
+        assertEquals(listOf("/p", "/next", "/p"), catalog.folderCancellations)
         gate.complete(Unit)
         advanceUntilIdle()
         assertEquals(null, vm.state.value.newSession)

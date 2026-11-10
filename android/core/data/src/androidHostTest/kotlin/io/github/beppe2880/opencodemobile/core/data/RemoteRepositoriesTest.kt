@@ -346,6 +346,75 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `a windows server folder lists in windows style also with forward slashes`() = runBlocking {
+        val catalog = RemoteCatalogRepository(graph.clients)
+        server.enqueue(json("""{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[{"path":"src\\","type":"directory"}]}"""))
+        server.enqueue(json("""{"location":{"directory":"C:/Users/dev/proj"},"data":[{"path":"src\\","type":"directory"}]}"""))
+
+        repeat(2) {
+            assertEquals(FolderListing("C:\\Users\\dev\\proj", "C:\\Users\\dev", listOf("src")), catalog.listFolders(null).getOrThrow())
+        }
+    }
+
+    @Test
+    fun `a windows drive root lists plain names from server relative entries`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[
+                    {"path":"..\\..\\..\\Windows\\","type":"directory"},
+                    {"path":"..\\..\\..\\src\\","type":"directory"},
+                    {"path":"..\\..\\","type":"directory"},
+                    {"path":"..\\..\\..\\..\\","type":"directory"},
+                    {"path":"..\\..\\..\\pagefile.sys","type":"file"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("C:\\", null, listOf("src", "Users", "Windows")),
+            RemoteCatalogRepository(graph.clients).listFolders("/").getOrThrow(),
+        )
+        assertEquals("/", server.takeRequest().requestUrl!!.queryParameter("path"))
+    }
+
+    @Test
+    fun `a windows ancestor of the server folder names the server folder and its siblings`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[
+                    {"path":"..\\src\\","type":"directory"},
+                    {"path":".\\","type":"directory"},
+                    {"path":"","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("C:\\Users\\dev", "C:\\Users", listOf("proj", "src")),
+            RemoteCatalogRepository(graph.clients).listFolders("C:\\Users\\dev").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `a folder on another windows drive keeps absolute entries`() = runBlocking {
+        server.enqueue(json("""{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[{"path":"D:\\work\\src\\","type":"directory"}]}"""))
+
+        assertEquals(
+            FolderListing("D:\\work", "D:\\", listOf("src")),
+            RemoteCatalogRepository(graph.clients).listFolders("D:\\work").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `a missing windows folder is a failure`() = runBlocking {
+        server.enqueue(json("""{"_tag":"FileNotFoundError","path":"C:\\home"}""").setResponseCode(404))
+
+        assertTrue(RemoteCatalogRepository(graph.clients).listFolders("/home").isFailure)
+    }
+
+    @Test
     fun `a missing folder is a failure`() = runBlocking {
         server.enqueue(json("""{"_tag":"FileNotFoundError","path":"/missing"}""").setResponseCode(404))
 
