@@ -57,7 +57,10 @@ class SettingsCategoriesTest {
         assertEquals(transcript.indexOf(SettingOption.FullCommands) + 1, transcript.indexOf(SettingOption.ToolMediaSize))
         assertEquals(0, SettingOption.ToolMediaSize.depthIn(SettingOption.ToolMediaSize.group))
         assertEquals(SettingsArea.LiveActivity, SettingOption.OutputLines.area)
-        assertEquals(listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.NewChatModel), SettingsArea.Composer.options)
+        assertEquals(
+            listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.NewChatModel),
+            SettingsArea.Composer.options,
+        )
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)
         assertEquals(listOf(SettingOption.RunningInList, SettingOption.ConfirmStop), SettingsArea.Sessions.options)
         assertEquals(listOf(SettingOption.UpdateNotice), SettingsArea.Updates.options)

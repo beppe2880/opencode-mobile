@@ -338,4 +338,6 @@
     <string name="settings_use_hint">Use the demo as usual</string>
     <string name="settings_edit_close">Close options</string>
     <string name="settings_edit_more">All options in %1$s</string>
+    <string name="settings_close_model_picker">Close picker after choosing a model</string>
+    <string name="settings_close_model_picker_sub">Turn off to choose the model and reasoning together, then tap Done to close.</string>
 </resources>

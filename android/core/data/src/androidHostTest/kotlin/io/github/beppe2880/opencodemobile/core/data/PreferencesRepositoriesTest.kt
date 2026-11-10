@@ -27,6 +27,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PreferencesRepositoriesTest {
@@ -98,6 +99,7 @@ class PreferencesRepositoriesTest {
             listPaneFraction = 0.35f,
             listPaneHandle = false,
             selectionApply = SelectionApply.Immediately,
+            closeModelPickerOnSelect = false,
             newChatModel = NewChatModel.ServerDefault,
             updateNotice = UpdateNoticeStyle.Banner,
             showInShareMenu = false,
@@ -121,6 +123,8 @@ class PreferencesRepositoriesTest {
 
         assertEquals(changed, reopened)
         assertEquals(false, prefs.values["running_chips"])
+        assertEquals(false, prefs.values["close_model_picker_on_select"])
+        assertTrue(AppSettings().closeModelPickerOnSelect)
         assertEquals(AppSettings(), PreferencesSettingsRepository(SharedPreferencesSettings(InMemoryPreferences())).settings.value)
     }
 

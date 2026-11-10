@@ -197,6 +197,7 @@ fun ChatScreen(
                 onSelect = { onEvent(ChatEvent.SelectModel(it)) },
                 onSelectVariant = { onEvent(ChatEvent.SelectVariant(it)) },
                 providerMark = { id, name -> ProviderMark(id, name, size = 20.dp) },
+                onDone = if (state.closeModelPickerOnSelect) null else ({ onEvent(ChatEvent.ModelSheet(false)) }),
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }

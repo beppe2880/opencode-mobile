@@ -90,4 +90,5 @@
     </plurals>
     <string name="oc_share_nothing">لا يوجد ما يمكن مشاركته: يقبل OpenCode النصوص والروابط والصور</string>
     <string name="oc_shared_truncated">كان النص طويلًا جدًا فاختُصر</string>
+    <string name="oc_models_done">تم</string>
 </resources>

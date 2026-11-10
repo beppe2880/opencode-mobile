@@ -448,6 +448,8 @@ data class AppSettings(
     val voiceHoldToRecord: Boolean = false,
     /** When agent and model changes in a chat reach the server. */
     val selectionApply: SelectionApply = SelectionApply.NextMessage,
+    /** Close the chat's model picker on a model tap; otherwise keep it open for reasoning. */
+    val closeModelPickerOnSelect: Boolean = true,
     /** The model a new chat starts with. */
     val newChatModel: NewChatModel = NewChatModel.LastUsed,
     /** Other apps can share text, links and images to OpenCode (Android share menu). */

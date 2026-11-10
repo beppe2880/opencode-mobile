@@ -82,4 +82,5 @@
     </plurals>
     <string name="oc_share_nothing">Nothing to share: OpenCode accepts text, links and images</string>
     <string name="oc_shared_truncated">The text was too long and was shortened</string>
+    <string name="oc_models_done">Done</string>
 </resources>

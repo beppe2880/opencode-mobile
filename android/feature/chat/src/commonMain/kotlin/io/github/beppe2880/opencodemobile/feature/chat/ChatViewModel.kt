@@ -1560,7 +1560,7 @@ class ChatViewModel(
 
     private fun selectModel(model: ModelRef) {
         val previous = currentState.model
-        updateState { it.copy(modelSheetOpen = false) }
+        if (currentState.closeModelPickerOnSelect) updateState { it.copy(modelSheetOpen = false) }
         // Picking the same model again keeps its variant; another model starts from its default.
         if (model.key != previous?.key) switchModel(model.copy(variant = null))
     }

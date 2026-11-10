@@ -50,6 +50,7 @@ data class ChatState(
     val models: List<ModelInfo> = emptyList(),
     val recentModels: List<ModelRef> = emptyList(),
     val modelSheetOpen: Boolean = false,
+    val closeModelPickerOnSelect: Boolean = true,
     /** Keys whose expansion differs from the default (see [isExpanded]). */
     val toggled: Set<String> = emptySet(),
     val expandToolsByDefault: Boolean = false,
@@ -179,6 +180,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     showCost = s.showCost,
     swipeEnabled = s.swipeBetweenChats,
     agentColorOutline = s.agentColorOutline,
+    closeModelPickerOnSelect = s.closeModelPickerOnSelect,
     dictation = s.dictation,
     permissionsCollapsedByDefault = s.permissionsCollapsed,
     questionsCollapsedByDefault = s.questionsCollapsed,

@@ -50,6 +50,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     VoiceStyle(listOf("voiceRecordingStyle"), requires = VoiceMode),
     VoiceHold(listOf("voiceHoldToRecord"), requires = VoiceMode),
     SelectionApply(listOf("selectionApply")),
+    CloseModelPickerOnSelect(listOf("closeModelPickerOnSelect")),
     NewChatModel(listOf("newChatModel")),
     ShareMenu(listOf("showInShareMenu")),
     ShareOpens(listOf("shareOpens"), requires = ShareMenu),
@@ -118,7 +119,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
         SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
         SettingsPart.VoiceInput -> VOICE_OPTIONS
-        SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.AgentOutline)
+        SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.AgentOutline)
         // Sharing from other apps opens the new chat sheet: the live demo reaches sharing there.
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
         SettingsPart.ShareTarget -> listOf(SettingOption.ShareMenu, SettingOption.ShareOpens)
@@ -177,6 +178,7 @@ internal val SettingOption.searchKeywords: List<String>
     get() = when (this) {
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
+        SettingOption.CloseModelPickerOnSelect -> listOf("model", "picker", "reasoning", "default", "close")
         else -> emptyList()
     }
 
