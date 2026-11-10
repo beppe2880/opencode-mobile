@@ -1,5 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
+/** A folder on the server's machine with its child folders, for picking a new session's directory. */
+data class FolderListing(val path: String, val parent: String?, val folders: List<String>)
+
 /** A file read from the server, as much of it as the viewer shows. */
 sealed interface FileContent {
     /** Total size of the file in bytes. */

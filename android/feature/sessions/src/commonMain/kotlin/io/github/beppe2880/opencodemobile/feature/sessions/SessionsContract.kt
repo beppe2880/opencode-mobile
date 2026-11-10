@@ -17,9 +17,21 @@ enum class DayBucket { Today, Yesterday, ThisWeek, Older }
 data class SessionGroup(val bucket: DayBucket, val sessions: List<Session>)
 
 @Immutable
+data class FolderBrowserState(
+    val path: String = "",
+    val parent: String? = null,
+    val folders: List<String> = emptyList(),
+    val loading: Boolean = true,
+    val error: UiText? = null,
+    val recent: List<String> = emptyList(),
+)
+
+@Immutable
 data class NewSessionState(
     val directory: String = "",
     val customDirectory: Boolean = false,
+    /** Open while the user browses the server's folders. */
+    val browser: FolderBrowserState? = null,
     val agents: List<Agent> = emptyList(),
     val models: List<ModelInfo> = emptyList(),
     /** Models last used on this device, then those of the most recently updated sessions; listed first in the picker. */
@@ -49,6 +61,7 @@ data class SessionsState(
     val connection: ConnectionState = ConnectionState.Disconnected,
     val query: String = "",
     val projects: List<Project> = emptyList(),
+    val hiddenProjects: Set<String> = emptySet(),
     val directoryFilter: String? = null,
     val groups: List<SessionGroup> = emptyList(),
     val running: Set<String> = emptySet(),
@@ -69,6 +82,7 @@ data class SessionsState(
     val deleting: Session? = null,
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
+    val visibleProjects: List<Project> get() = projects.filter { it.id !in hiddenProjects }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
 
@@ -77,6 +91,8 @@ sealed interface SessionsEvent {
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent
+    data class HideProject(val projectId: String) : SessionsEvent
+    data class UnhideProject(val projectId: String) : SessionsEvent
     data class Open(val sessionId: String) : SessionsEvent
     data object OpenSettings : SessionsEvent
 
@@ -91,6 +107,16 @@ sealed interface SessionsEvent {
     data object StartNewSession : SessionsEvent
     data object DismissNewSession : SessionsEvent
     data class NewSessionDirectory(val directory: String, val custom: Boolean) : SessionsEvent
+    data object BrowseFolders : SessionsEvent
+
+    /** Null opens the server's own folder. */
+    data class BrowseTo(val path: String?) : SessionsEvent
+    data object CloseFolderBrowser : SessionsEvent
+    data object PickBrowsedFolder : SessionsEvent
+
+    /** Picks [path] (e.g. a recent folder) without browsing to it first. */
+    data class PickFolder(val path: String) : SessionsEvent
+
     data class NewSessionAgent(val agent: String) : SessionsEvent
     data class NewSessionModelPicker(val open: Boolean) : SessionsEvent
     data class NewSessionModel(val model: ModelRef) : SessionsEvent

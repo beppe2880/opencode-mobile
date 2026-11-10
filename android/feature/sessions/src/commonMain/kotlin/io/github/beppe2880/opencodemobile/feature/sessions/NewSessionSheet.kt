@@ -1,7 +1,10 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,12 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CreateNewFolder
+import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -27,12 +33,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,6 +78,9 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ne
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_project_search_empty
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_show_all
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_unhide
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_projects_hidden
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_choose
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discard
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_new
@@ -78,6 +92,8 @@ internal fun NewSessionSheet(
     state: NewSessionState,
     projects: List<Project>,
     onEvent: (SessionsEvent) -> Unit,
+    /** Ids of the projects hidden on this device. */
+    hidden: Set<String> = emptySet(),
 ) {
     OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissNewSession) }, testTag = "sessions_new_sheet") {
         if (state.pickingModel) {
@@ -89,8 +105,14 @@ internal fun NewSessionSheet(
                 onBack = { onEvent(SessionsEvent.NewSessionModelPicker(false)) },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
+        } else if (state.browser != null) {
+            FolderBrowser(
+                state = state.browser,
+                onEvent = onEvent,
+                modifier = Modifier.imePadding().windowInsetsPadding(WindowInsets.navigationBars),
+            )
         } else {
-            NewSessionForm(state, projects, onEvent)
+            NewSessionForm(state, projects, onEvent, hidden = hidden)
         }
     }
 }
@@ -102,6 +124,8 @@ internal fun NewSessionForm(
     onEvent: (SessionsEvent) -> Unit,
     /** False for the preview in Settings: no own scrolling or insets, and no directories. */
     inSheet: Boolean = true,
+    /** Ids of the projects hidden on this device: listed under "Hidden (N)", not selectable. */
+    hidden: Set<String> = emptySet(),
 ) {
     val c = OcTheme.colors
     Column(
@@ -134,11 +158,16 @@ internal fun NewSessionForm(
         if (inSheet) {
             Label(stringResource(Res.string.sessions_new_directory))
             var showAll by rememberSaveable { mutableStateOf(false) }
+            var showHidden by rememberSaveable { mutableStateOf(false) }
             // Local UI state like showAll: the sheet leaves composition when it closes, which resets it.
             var query by rememberSaveable { mutableStateOf("") }
-            val searchable = projects.size > COLLAPSED_PROJECTS
+            val shown = projects.filter { it.id !in hidden }
+            val hiddenProjects = projects.filter { it.id in hidden }
+            val searchable = shown.size > COLLAPSED_PROJECTS
             val searching = searchable && query.isNotBlank()
-            val visible = visibleProjects(projects, if (searchable) query else "", showAll, state.directory)
+            val visible = visibleProjects(shown, if (searchable) query else "", showAll, state.directory)
+            // While searching, hidden matches show inline (dimmed) so they can be found and unhidden.
+            val hiddenMatches = if (searching) visibleProjects(hiddenProjects, query, showAll = true, selectedDirectory = "") else emptyList()
             if (searchable) {
                 OcSearchField(
                     value = query,
@@ -147,7 +176,7 @@ internal fun NewSessionForm(
                     modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_project_search"),
                 )
             }
-            if (searching && visible.isEmpty()) {
+            if (searching && visible.isEmpty() && hiddenMatches.isEmpty()) {
                 Text(
                     stringResource(Res.string.sessions_new_project_search_empty),
                     style = MaterialTheme.typography.bodySmall,
@@ -163,20 +192,26 @@ internal fun NewSessionForm(
                     path = project.directory,
                     selected = !state.customDirectory && state.directory == project.directory,
                     onClick = { onEvent(SessionsEvent.NewSessionDirectory(project.directory, custom = false)) },
+                    onHide = { onEvent(SessionsEvent.HideProject(project.id)) },
                     modifier = Modifier.testTag("sessions_new_project_${project.id}"),
                 )
             }
-            if (!searching && visible.size < projects.size) {
-                Text(
-                    text = stringResource(Res.string.sessions_new_show_all, projects.size),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = c.textAccent,
-                    modifier = Modifier
-                        .clickable(role = Role.Button) { showAll = true }
-                        .heightIn(min = 48.dp)
-                        .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md)
-                        .testTag("sessions_new_show_all"),
+            hiddenMatches.forEach { project -> HiddenProjectRow(project, onEvent) }
+            // One footer at a time: "Show all" while collapsed, then "Hidden (N)" once everything is listed.
+            if (!searching && visible.size < shown.size) {
+                FooterLink(
+                    text = stringResource(Res.string.sessions_new_show_all, shown.size),
+                    onClick = { showAll = true },
+                    modifier = Modifier.testTag("sessions_new_show_all"),
                 )
+            } else if (!searching && hiddenProjects.isNotEmpty()) {
+                FooterLink(
+                    text = stringResource(Res.string.sessions_projects_hidden, hiddenProjects.size),
+                    onClick = { showHidden = !showHidden },
+                    trailingIcon = if (showHidden) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                    modifier = Modifier.testTag("sessions_new_hidden_toggle"),
+                )
+                if (showHidden) hiddenProjects.forEach { project -> HiddenProjectRow(project, onEvent) }
             }
             DirectoryOption(
                 title = stringResource(Res.string.sessions_new_other_directory),
@@ -193,6 +228,7 @@ internal fun NewSessionForm(
                     placeholder = stringResource(Res.string.sessions_new_path_placeholder),
                     mono = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done, autoCorrectEnabled = false),
+                    trailingIcon = { BrowseButton { onEvent(SessionsEvent.BrowseFolders) } },
                     modifier = Modifier.padding(horizontal = OcSpacing.lg).testTag("sessions_new_path_field"),
                 )
             }
@@ -276,38 +312,122 @@ private fun Label(text: String) {
 }
 
 @Composable
+private fun FooterLink(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    trailingIcon: ImageVector? = null,
+) {
+    val c = OcTheme.colors
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .heightIn(min = 48.dp)
+            .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        Text(text, style = MaterialTheme.typography.labelLarge, color = c.textAccent)
+        if (trailingIcon != null) Icon(trailingIcon, contentDescription = null, tint = c.textAccent, modifier = Modifier.size(18.dp))
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
 private fun DirectoryOption(
     title: String,
     path: String?,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Offered on long press; null for rows that cannot be hidden. */
+    onHide: (() -> Unit)? = null,
 ) {
     val c = OcTheme.colors
+    var menu by remember { mutableStateOf(false) }
+    val hideLabel = stringResource(Res.string.sessions_project_hide)
+    Box(modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { this.selected = selected }
+                .combinedClickable(
+                    role = Role.RadioButton,
+                    onClick = onClick,
+                    onLongClick = onHide?.let { { menu = true } },
+                    onLongClickLabel = onHide?.let { hideLabel },
+                )
+                .heightIn(min = 48.dp)
+                .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
+        ) {
+            if (path != null) {
+                OcProjectAvatar(title)
+            } else {
+                Icon(Icons.Outlined.CreateNewFolder, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(20.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (path != null) {
+                    Text(path, style = OcTheme.mono.codeSmall, color = c.textFaint, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
+            RadioButton(
+                selected = selected,
+                onClick = null,
+                colors = RadioButtonDefaults.colors(selectedColor = c.bgAccent, unselectedColor = c.iconMuted),
+            )
+        }
+        if (onHide != null) {
+            ProjectMenu(expanded = menu, onDismiss = { menu = false }, onHide = onHide)
+        }
+    }
+}
+
+/** The long-press menu of a project row. */
+@Composable
+internal fun ProjectMenu(expanded: Boolean, onDismiss: () -> Unit, onHide: () -> Unit) {
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss, containerColor = OcTheme.colors.bgBase) {
+        DropdownMenuItem(
+            text = { Text(stringResource(Res.string.sessions_project_hide)) },
+            leadingIcon = { Icon(Icons.Outlined.VisibilityOff, contentDescription = null, tint = OcTheme.colors.iconBase) },
+            onClick = {
+                onDismiss()
+                onHide()
+            },
+            modifier = Modifier.testTag("sessions_project_hide"),
+        )
+    }
+}
+
+/** A hidden project: dimmed, not selectable, with Unhide. */
+@Composable
+private fun HiddenProjectRow(project: Project, onEvent: (SessionsEvent) -> Unit) {
+    val c = OcTheme.colors
+    val title = project.displayName
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .heightIn(min = 48.dp)
-            .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs),
+            .padding(start = OcSpacing.lg, end = OcSpacing.sm, top = OcSpacing.xs, bottom = OcSpacing.xs)
+            .testTag("sessions_new_hidden_${project.id}"),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
     ) {
-        if (path != null) {
-            OcProjectAvatar(title)
-        } else {
-            Icon(Icons.Outlined.CreateNewFolder, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(20.dp))
-        }
-        Column(Modifier.weight(1f)) {
+        Box(Modifier.alpha(0.5f)) { OcProjectAvatar(title) }
+        Column(Modifier.weight(1f).alpha(0.6f)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (path != null) {
-                Text(path, style = OcTheme.mono.codeSmall, color = c.textFaint, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+            Text(project.directory, style = OcTheme.mono.codeSmall, color = c.textFaint, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        RadioButton(
-            selected = selected,
-            onClick = null,
-            colors = RadioButtonDefaults.colors(selectedColor = c.bgAccent, unselectedColor = c.iconMuted),
+        Icon(Icons.Outlined.VisibilityOff, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
+        OcButton(
+            text = stringResource(Res.string.sessions_project_unhide),
+            onClick = { onEvent(SessionsEvent.UnhideProject(project.id)) },
+            variant = OcButtonVariant.Ghost,
+            compact = true,
+            modifier = Modifier.testTag("sessions_new_unhide_${project.id}"),
         )
     }
 }

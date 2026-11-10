@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data.catalog
 
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
+import io.github.beppe2880.opencodemobile.api.models.FileSystemEntry
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.nowMillis
@@ -8,6 +9,7 @@ import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
+import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
@@ -81,6 +83,31 @@ internal class RemoteCatalogRepository(
         }.data.mapNotNull { it.path }
     }
 
+    override suspend fun listFolders(path: String?): Result<FolderListing> = resultOf {
+        val api = clients.active().files
+        // No location: browsing must not open a workspace for each folder.
+        val response = awaitBody { api.fsList(path = path) }
+        val base = response.location?.directory
+        val listedPath = normalizeFolderPath(path ?: requireNotNull(base))
+        val names = response.data.filter { it.type == FileSystemEntry.Type.DIRECTORY }
+            .mapNotNull { entry ->
+                val entryPath = entry.path ?: return@mapNotNull null
+                if (base == null) return@mapNotNull folderName(entryPath)
+                val absolute = if (entryPath.startsWith('/')) entryPath else "$base/$entryPath"
+                val segments = mutableListOf<String>()
+                absolute.split('/').forEach { segment ->
+                    when (segment) {
+                        "", "." -> Unit
+                        ".." -> if (segments.isNotEmpty()) segments.removeAt(segments.lastIndex)
+                        else -> segments += segment
+                    }
+                }
+                val resolved = "/${segments.joinToString("/")}"
+                if (resolved == "/" || resolved == listedPath) null else folderName(resolved)
+            }
+        FolderListing(listedPath, folderParent(listedPath), sortFolderNames(names))
+    }
+
     /**
      * Provider display names; models stay usable with raw IDs when the lookup fails.
      * The response also carries provider settings such as API keys: keep only id and name.
@@ -103,3 +130,12 @@ internal class RemoteCatalogRepository(
         const val CATALOG_TTL_MS = 5 * 60_000L
     }
 }
+
+private fun normalizeFolderPath(path: String): String = path.trimEnd('/').ifEmpty { "/" }
+
+private fun folderParent(path: String): String? = if (path == "/") null else path.substringBeforeLast('/').ifEmpty { "/" }
+
+private fun folderName(path: String?): String? = path?.trimEnd('/')?.substringAfterLast('/')?.takeIf { it.isNotBlank() }
+
+private fun sortFolderNames(names: List<String>): List<String> =
+    names.sortedWith(compareBy<String> { it.startsWith('.') }.thenBy { it.lowercase() })
