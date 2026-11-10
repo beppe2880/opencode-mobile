@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.15.0](https://github.com/beppe2880/opencode-mobile/compare/v0.14.0...v0.15.0) (2026-11-10)
+
+
+### Features
+
+* **chat:** Make model picker auto-close configurable ([#176](https://github.com/beppe2880/opencode-mobile/issues/176)) ([180c65e](https://github.com/beppe2880/opencode-mobile/commit/180c65e1ba79fc99e5fc772575caf699576347ff))
+* **chat:** Make the chat list the default swipe ([#184](https://github.com/beppe2880/opencode-mobile/issues/184)) ([9edbd77](https://github.com/beppe2880/opencode-mobile/commit/9edbd77ae221e8d30bee041512fd7e061d0f3ae1))
+* **chat:** Open the chat list as a side panel by swiping right ([#181](https://github.com/beppe2880/opencode-mobile/issues/181)) ([8454609](https://github.com/beppe2880/opencode-mobile/commit/8454609dfac1899a2774889eba0369991c8cd709))
+* **chat:** Show prompts with images immediately while they are sending ([#180](https://github.com/beppe2880/opencode-mobile/issues/180)) ([4dd499a](https://github.com/beppe2880/opencode-mobile/commit/4dd499a4f3e3c7b2be635f92ebfab4d943222fc0))
+* **chat:** Swipe between images in the full-screen viewer ([#177](https://github.com/beppe2880/opencode-mobile/issues/177)) ([1f48957](https://github.com/beppe2880/opencode-mobile/commit/1f4895791d125d7af7962af67bc562657cb0b97a))
+* **sessions:** Hide and show the side list with the chat swipe on wide windows ([#183](https://github.com/beppe2880/opencode-mobile/issues/183)) ([a47acb2](https://github.com/beppe2880/opencode-mobile/commit/a47acb243d06425d73a3377c3430483d18e43eb8))
+* **settings:** Check for updates on demand and a clearer update banner ([#186](https://github.com/beppe2880/opencode-mobile/issues/186)) ([62e279a](https://github.com/beppe2880/opencode-mobile/commit/62e279af703a7f2c5628f639c90c3cd25fd12f97))
+
 ## [0.14.0](https://github.com/beppe2880/opencode-mobile/compare/v0.13.0...v0.14.0) (2026-11-10)
 
 
