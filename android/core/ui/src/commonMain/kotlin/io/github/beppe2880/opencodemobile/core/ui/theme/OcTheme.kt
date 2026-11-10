@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.ui.platform.rememberSystemReducedMotion
 
@@ -77,12 +79,23 @@ object OcTheme {
         get() = LocalOcColors.current.markdown
     val spacing: OcSpacing get() = OcSpacing
     val radius: OcRadius get() = OcRadius
-    val motion: OcMotion get() = OcMotion
 
-    /** The system asks for less motion: [OcMotion] specs built with it are instant. */
+    /** How motion plays (less motion, speed): pass it to the [OcMotion] builders. */
+    val motion: MotionConfig
+        @Composable @ReadOnlyComposable
+        get() = LocalMotion.current ?: MotionConfig()
+
+    /** Motion is reduced (by the system or the Animations setting): transitions are instant, loops stand still. */
     val reducedMotion: Boolean
         @Composable @ReadOnlyComposable
-        get() = LocalReducedMotion.current
+        get() = motion.reduced
+}
+
+/** The motion the Animations settings ask for, following the system's less-motion setting where they say so. */
+@Composable
+fun rememberMotionConfig(mode: AnimationMode, speed: AnimationSpeed): MotionConfig {
+    val systemReduced = rememberSystemReducedMotion()
+    return remember(mode, speed, systemReduced) { motionConfig(mode, speed, systemReduced) }
 }
 
 @Composable
@@ -102,15 +115,20 @@ fun ThemeMode.isDark(): Boolean = when (this) {
 fun OcTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     openCodeTheme: String? = null,
-    /** Less motion: every [OcMotion] transition is instant. Follows the system setting by default. */
-    reducedMotion: Boolean = rememberSystemReducedMotion(),
+    /**
+     * How motion plays ([rememberMotionConfig] from the Animations settings). Null keeps the one of
+     * an enclosing theme (previews, swatches) or, at the root, follows the system's less-motion setting.
+     */
+    motion: MotionConfig? = null,
     content: @Composable () -> Unit,
 ) {
     val colors = remember(openCodeTheme, darkTheme) { ocColors(openCodeTheme, darkTheme) }
+    val systemReduced = rememberSystemReducedMotion()
+    val resolved = motion ?: LocalMotion.current ?: MotionConfig(reduced = systemReduced)
     CompositionLocalProvider(
         LocalOcColors provides colors,
         LocalOcMono provides ocMonoTypography(),
-        LocalReducedMotion provides reducedMotion,
+        LocalMotion provides resolved,
     ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(),

@@ -156,14 +156,14 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 @Composable
 internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, modifier: Modifier = Modifier) {
     val chips = runningChips(state.work, state.runningChips)
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     // The last chips stay drawn while the bar folds away. Always composed, so that it grows in.
     val shown = rememberLastNonNull(chips.takeIf { it.isNotEmpty() })
     AnimatedVisibility(
         visible = chips.isNotEmpty(),
         modifier = modifier,
-        enter = OcMotion.expandEnter(reduced),
-        exit = OcMotion.collapseExit(reduced),
+        enter = OcMotion.expandEnter(motion),
+        exit = OcMotion.collapseExit(motion),
         label = "running_chips",
     ) {
         if (shown != null) RunningChipsAnchor(state, shown, onEvent)
@@ -173,7 +173,7 @@ internal fun RunningChipsBar(state: ChatState, onEvent: (ChatEvent) -> Unit, mod
 @Composable
 private fun RunningChipsAnchor(state: ChatState, chips: List<RunningChip>, onEvent: (ChatEvent) -> Unit) {
     val focus = LocalFocusManager.current
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     var anchorWidth by remember { mutableIntStateOf(0) }
     Box(
         Modifier
@@ -206,8 +206,8 @@ private fun RunningChipsAnchor(state: ChatState, chips: List<RunningChip>, onEve
             ) {
                 AnimatedVisibility(
                     visibleState = popover,
-                    enter = OcMotion.popoverEnter(origin, reduced),
-                    exit = OcMotion.popoverExit(origin, reduced),
+                    enter = OcMotion.popoverEnter(origin, motion),
+                    exit = OcMotion.popoverExit(origin, motion),
                     label = "running_popover",
                 ) {
                     RunningListPopover(
@@ -228,7 +228,7 @@ private fun RunningChipsAnchor(state: ChatState, chips: List<RunningChip>, onEve
  */
 @Composable
 internal fun RunningChipRow(chips: List<RunningChip>, onClick: (RunningGroup) -> Unit) {
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     Row(verticalAlignment = Alignment.CenterVertically) {
         // Always in this order (runningChips), so each group keeps its place.
         RUNNING_CHIP_ORDER.forEachIndexed { index, group ->
@@ -237,14 +237,14 @@ internal fun RunningChipRow(chips: List<RunningChip>, onClick: (RunningGroup) ->
             val shown = rememberLastNonNull(chip)
             AnimatedVisibility(
                 visible = chip != null,
-                enter = OcMotion.inlineEnter(reduced, from = Alignment.Start),
-                exit = OcMotion.inlineExit(reduced, towards = Alignment.Start),
+                enter = OcMotion.inlineEnter(motion, from = Alignment.Start),
+                exit = OcMotion.inlineExit(motion, towards = Alignment.Start),
                 label = "running_chip_${group.tagName}",
             ) {
                 // The gap before a chip belongs to it, so it comes and goes with the chip before it.
                 val gap by animateDpAsState(
                     if (index > 0 && chips.any { it.group != group }) OcSpacing.sm else 0.dp,
-                    OcMotion.spec(OcMotion.SHORT_MS, reduced),
+                    OcMotion.spec(OcMotion.SHORT_MS, motion),
                     label = "running_chip_gap",
                 )
                 if (shown != null) {

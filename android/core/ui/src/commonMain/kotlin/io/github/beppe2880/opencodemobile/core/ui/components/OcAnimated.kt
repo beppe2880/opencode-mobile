@@ -27,12 +27,12 @@ fun OcExpandable(
     label: String = "OcExpandable",
     content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) {
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     AnimatedVisibility(
         visible = visible,
         modifier = modifier,
-        enter = OcMotion.expandEnter(reduced),
-        exit = OcMotion.collapseExit(reduced),
+        enter = OcMotion.expandEnter(motion),
+        exit = OcMotion.collapseExit(motion),
         label = label,
         content = content,
     )
@@ -46,7 +46,7 @@ fun OcExpandable(
 fun animateChevronRotation(expanded: Boolean, collapsedDegrees: Float = 0f, expandedDegrees: Float = 180f): Float {
     val rotation by animateFloatAsState(
         targetValue = if (expanded) expandedDegrees else collapsedDegrees,
-        animationSpec = OcMotion.spec(OcMotion.MEDIUM_MS, OcTheme.reducedMotion),
+        animationSpec = OcMotion.spec(OcMotion.MEDIUM_MS, OcTheme.motion),
         label = "chevron",
     )
     return rotation
@@ -58,7 +58,7 @@ fun <T> OcCrossfade(state: T, modifier: Modifier = Modifier, label: String = "Oc
     Crossfade(
         targetState = state,
         modifier = modifier,
-        animationSpec = OcMotion.spec(OcMotion.SHORT_MS, OcTheme.reducedMotion),
+        animationSpec = OcMotion.spec(OcMotion.SHORT_MS, OcTheme.motion),
         label = label,
         content = content,
     )

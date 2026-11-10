@@ -186,11 +186,11 @@ fun SettingsScreen(
             }
         } else {
             OcBackHandler(enabled = state.area != null) { onEvent(SettingsEvent.CloseArea) }
-            val reduced = OcTheme.reducedMotion
+            val motion = OcTheme.motion
             // A category opens like a page from the end and Back returns from the start.
             AnimatedContent(
                 targetState = state.area,
-                transitionSpec = { ocPageTransition(forward = targetState != null, reduced = reduced) },
+                transitionSpec = { ocPageTransition(forward = targetState != null, motion = motion) },
                 label = "settings_area",
             ) { area ->
                 when {

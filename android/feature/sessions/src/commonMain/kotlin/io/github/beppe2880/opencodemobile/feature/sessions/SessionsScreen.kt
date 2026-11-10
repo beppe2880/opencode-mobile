@@ -173,9 +173,9 @@ fun SessionsScreen(
             // Narrower than any phone: the list sits beside the chat.
             val compact = with(LocalDensity.current) { listWidthPx.toDp() } < CompactListWidth
             // Sessions that arrive, move or go fade and slide with the motion tokens.
-            val reduced = OcTheme.reducedMotion
-            val rowFade = OcMotion.spec<Float>(OcMotion.SHORT_MS, reduced)
-            val rowPlacement = OcMotion.spec<IntOffset>(OcMotion.MEDIUM_MS, reduced)
+            val motion = OcTheme.motion
+            val rowFade = OcMotion.spec<Float>(OcMotion.SHORT_MS, motion)
+            val rowPlacement = OcMotion.spec<IntOffset>(OcMotion.MEDIUM_MS, motion)
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize().onSizeChanged { listWidthPx = it.width }.testTag("sessions_list"),

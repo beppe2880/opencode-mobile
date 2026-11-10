@@ -196,10 +196,10 @@ internal fun Transcript(
     val followed = remember(state.sessionId) { mutableStateSetOf<String>() }
     LaunchedEffect(liveGroupKey) { liveGroupKey?.let(followed::add) }
     val keptOpen: (String) -> Boolean = { key -> state.keepLiveStepsOpen && key != liveGroupKey && key in followed }
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     // Rows that arrive once the chat is on screen fade in; the rows of the opening chat do not.
     // Never a placement animation (it would fight following the end) nor a fade out.
-    val rowFadeIn = if (restored && !reduced) OcMotion.spec<Float>(OcMotion.MEDIUM_MS, false, OcMotion.Enter) else null
+    val rowFadeIn = if (restored && !motion.reduced) OcMotion.spec<Float>(OcMotion.MEDIUM_MS, motion, OcMotion.Enter) else null
     TranscriptLocals(state) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
@@ -233,8 +233,8 @@ internal fun Transcript(
             val jumpOrigin = TransformOrigin(0.5f, 1f)
             AnimatedVisibility(
                 visible = !stickToBottom,
-                enter = OcMotion.popEnter(reduced, jumpOrigin),
-                exit = OcMotion.popExit(reduced, jumpOrigin),
+                enter = OcMotion.popEnter(motion, jumpOrigin),
+                exit = OcMotion.popExit(motion, jumpOrigin),
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
                 label = "jump_to_latest",
             ) {
@@ -251,7 +251,7 @@ internal fun Transcript(
                 }
                 AnimatedContent(
                     targetState = hasNew,
-                    transitionSpec = { OcMotion.swap(reduced, clip = false) },
+                    transitionSpec = { OcMotion.swap(motion, clip = false) },
                     contentAlignment = Alignment.BottomCenter,
                     label = "jump_to_latest_kind",
                 ) { news ->

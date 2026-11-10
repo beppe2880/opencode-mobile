@@ -61,7 +61,7 @@ internal fun PermissionCard(
 ) {
     val c = OcTheme.colors
     val collapse by rememberUpdatedState(onCollapse)
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     OcCard(
         modifier = modifier
             .fillMaxWidth()
@@ -72,7 +72,7 @@ internal fun PermissionCard(
         shape = RoundedCornerShape(OcRadius.xl),
     ) {
         // The bar and the open card crossfade while the card grows up from the composer or shrinks back.
-        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(reduced) }, label = "permission_card") { folded ->
+        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(motion) }, label = "permission_card") { folded ->
             if (folded) {
                 CollapsedPermission(request, pendingCount, onExpand = { collapse(false) })
             } else {

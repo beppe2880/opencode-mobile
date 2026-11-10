@@ -82,12 +82,12 @@ internal fun NewSessionSheet(
     projects: List<Project>,
     onEvent: (SessionsEvent) -> Unit,
 ) {
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissNewSession) }, testTag = "sessions_new_sheet") {
         // The model picker opens like a page over the form and goes back the same way.
         AnimatedContent(
             targetState = state.pickingModel,
-            transitionSpec = { ocPageTransition(forward = targetState, reduced = reduced) },
+            transitionSpec = { ocPageTransition(forward = targetState, motion = motion) },
             label = "new_session_page",
         ) { picking ->
             if (picking) {

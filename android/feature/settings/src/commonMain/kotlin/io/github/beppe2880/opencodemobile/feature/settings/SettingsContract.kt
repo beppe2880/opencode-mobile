@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.compose.runtime.Immutable
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
@@ -135,6 +137,8 @@ sealed interface SettingsEvent {
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent
     data class ChatTextScaleChanged(val scale: Float) : SettingsEvent
+    data class AnimationsChanged(val mode: AnimationMode) : SettingsEvent
+    data class AnimationSpeedChanged(val speed: AnimationSpeed) : SettingsEvent
 
     /** The OpenCode theme picked by its id; null for none (the app's own colors). */
     data class OpenCodeThemeChanged(val id: String?) : SettingsEvent

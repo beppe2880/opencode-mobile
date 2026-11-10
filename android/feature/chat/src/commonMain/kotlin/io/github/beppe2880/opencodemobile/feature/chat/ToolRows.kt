@@ -429,13 +429,13 @@ private fun ToolOutput(tool: Part.Tool, full: Boolean, onToggleFull: () -> Unit,
         live -> lines.takeLast(previewLines).joinToString("\n")
         else -> lines.take(previewLines).joinToString("\n")
     }
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.sm)
             // "Show more" grows the box downward; live output just grows, line by line.
-            .then(if (live) Modifier else Modifier.animateContentSize(OcMotion.sizeSpec(reduced)))
+            .then(if (live) Modifier else Modifier.animateContentSize(OcMotion.sizeSpec(motion)))
             .background(if (tool.error != null) c.danger.bg else c.layer01, RoundedCornerShape(OcRadius.md)),
     ) {
         SelectionContainer {

@@ -96,7 +96,7 @@ internal fun FormCard(
     val collapse by rememberUpdatedState(onCollapse)
     // Keeps the fields' own state (a number typed as "3.", scroll) while the card is folded.
     val saved = rememberSaveableStateHolder()
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     OcCard(
         modifier = modifier
             .fillMaxWidth()
@@ -107,7 +107,7 @@ internal fun FormCard(
         shape = RoundedCornerShape(OcRadius.xl),
     ) {
         // The bar and the open card crossfade while the card grows up from the composer or shrinks back.
-        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(reduced) }, label = "form_card") { folded ->
+        AnimatedContent(targetState = collapsed, transitionSpec = { OcMotion.swap(motion) }, label = "form_card") { folded ->
             if (folded) {
                 CollapsedForm(form, pendingCount, onExpand = { collapse(false) })
             } else {
@@ -155,7 +155,7 @@ private fun ExpandedForm(
         Column(
             modifier = Modifier
                 // A field shown by an earlier answer makes room smoothly.
-                .animateContentSize(OcMotion.sizeSpec(OcTheme.reducedMotion))
+                .animateContentSize(OcMotion.sizeSpec(OcTheme.motion))
                 .heightIn(max = 320.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(OcSpacing.md),

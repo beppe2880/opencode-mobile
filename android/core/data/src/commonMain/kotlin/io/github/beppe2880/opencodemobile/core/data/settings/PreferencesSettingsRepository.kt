@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.data.settings
 
 import com.russhwolf.settings.Settings
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -62,6 +64,8 @@ internal class PreferencesSettingsRepository(
         prefs.putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
+        prefs.putString(KEY_ANIMATIONS, next.animations.name)
+        prefs.putString(KEY_ANIMATION_SPEED, next.animationSpeed.name)
         val openCodeTheme = next.openCodeTheme
         if (openCodeTheme == null) prefs.remove(KEY_OPENCODE_THEME) else prefs.putString(KEY_OPENCODE_THEME, openCodeTheme)
         // Read once into the theme; a choice of None must not bring it back.
@@ -139,6 +143,8 @@ internal class PreferencesSettingsRepository(
             keepLiveStepsOpen = prefs.getBoolean(KEY_KEEP_LIVE_OPEN, defaults.keepLiveStepsOpen),
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
+            animations = AnimationMode.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_ANIMATIONS) } ?: defaults.animations,
+            animationSpeed = AnimationSpeed.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_ANIMATION_SPEED) } ?: defaults.animationSpeed,
             // Before the themes there was a "Colored markdown" switch, which used the OpenCode theme.
             openCodeTheme = (prefs.getStringOrNull(KEY_OPENCODE_THEME) ?: OPENCODE_THEME.takeIf { prefs.getBoolean(KEY_COLORED_MARKDOWN, false) })
                 ?.takeIf { it in themes },
@@ -216,6 +222,8 @@ internal class PreferencesSettingsRepository(
         const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
+        const val KEY_ANIMATIONS = "animations"
+        const val KEY_ANIMATION_SPEED = "animation_speed"
         const val KEY_OPENCODE_THEME = "opencode_theme"
 
         /** The former "Colored markdown" switch; true reads as [OPENCODE_THEME] until a theme is written. */

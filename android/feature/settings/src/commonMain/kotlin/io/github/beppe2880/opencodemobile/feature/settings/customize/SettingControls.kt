@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -40,6 +42,18 @@ import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animation_speed
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animation_speed_fast
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animation_speed_normal
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animation_speed_slow
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animation_speed_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_off_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_on
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_on_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_animations_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
@@ -197,6 +211,8 @@ internal val SettingOption.titleRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme
         SettingOption.TextSize -> Res.string.settings_text_size
+        SettingOption.Animations -> Res.string.settings_animations
+        SettingOption.AnimationSpeed -> Res.string.settings_animation_speed
         SettingOption.OpenCodeTheme -> Res.string.settings_opencode_theme
         SettingOption.HeaderLine -> Res.string.settings_header_line
         SettingOption.HeaderStyle -> Res.string.settings_header_style
@@ -256,6 +272,8 @@ internal val SettingOption.descriptionRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme_sub
         SettingOption.TextSize -> Res.string.settings_text_size_sub
+        SettingOption.Animations -> Res.string.settings_animations_sub
+        SettingOption.AnimationSpeed -> Res.string.settings_animation_speed_sub
         SettingOption.OpenCodeTheme -> Res.string.settings_opencode_theme_sub
         SettingOption.HeaderLine -> Res.string.settings_header_line_all_sub
         SettingOption.HeaderStyle -> Res.string.settings_header_style_icons_sub
@@ -338,6 +356,34 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             choices = TEXT_SCALE_CHOICES.mapIndexed { i, scale -> OcSegment(scale, stringResource(TEXT_SIZE_LABELS[i]), "settings_text_size_$i") },
             selected = settings.chatTextScale,
             onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
+        )
+        SettingOption.Animations -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.animations) {
+                    AnimationMode.System -> Res.string.settings_animations_sub
+                    AnimationMode.On -> Res.string.settings_animations_on_sub
+                    AnimationMode.Off -> Res.string.settings_animations_off_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(AnimationMode.System, stringResource(Res.string.settings_animations_system), "settings_animations_system"),
+                OcSegment(AnimationMode.On, stringResource(Res.string.settings_animations_on), "settings_animations_on"),
+                OcSegment(AnimationMode.Off, stringResource(Res.string.settings_animations_off), "settings_animations_off"),
+            ),
+            selected = settings.animations,
+            onSelect = { onEvent(SettingsEvent.AnimationsChanged(it)) },
+        )
+        SettingOption.AnimationSpeed -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(AnimationSpeed.Fast, stringResource(Res.string.settings_animation_speed_fast), "settings_animation_speed_fast"),
+                OcSegment(AnimationSpeed.Normal, stringResource(Res.string.settings_animation_speed_normal), "settings_animation_speed_normal"),
+                OcSegment(AnimationSpeed.Slow, stringResource(Res.string.settings_animation_speed_slow), "settings_animation_speed_slow"),
+            ),
+            selected = settings.animationSpeed,
+            onSelect = { onEvent(SettingsEvent.AnimationSpeedChanged(it)) },
         )
         SettingOption.OpenCodeTheme -> OpenCodeThemeControl(title, subtitle, settings.openCodeTheme, onEvent, modifier)
         SettingOption.HeaderLine -> ChoiceRow(
@@ -576,6 +622,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
 private val SettingOption.tag: String
     get() = when (this) {
         SettingOption.OpenCodeTheme -> "opencode_theme"
+        SettingOption.AnimationSpeed -> "animation_speed"
         SettingOption.ShowReasoning -> "show_reasoning"
         SettingOption.GroupThoughts -> "group_thoughts"
         SettingOption.GroupActivity -> "group_activity"

@@ -93,6 +93,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.components.rememberLastNonNull
+import io.github.beppe2880.opencodemobile.core.ui.theme.MotionConfig
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcMotion
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -145,7 +146,8 @@ internal fun Composer(
 ) {
     val c = OcTheme.colors
     val haptics = LocalHapticFeedback.current
-    val reducedMotion = OcTheme.reducedMotion
+    val motion = OcTheme.motion
+    val reducedMotion = motion.reduced
     val cloud = voice?.cloud
     // A light tick when a cloud recording starts and when it ends.
     val recording = cloud is CloudVoicePhase.Recording
@@ -171,7 +173,7 @@ internal fun Composer(
     // The outline takes the selected agent's color, like the agent dot in the selector.
     val agentColor by animateColorAsState(
         if (state.agentColorOutline) c.agents.forAgent(state.agent ?: state.agents.firstOrNull()?.id ?: "build") else c.borderStrong,
-        animationSpec = OcMotion.spec(OcMotion.MEDIUM_MS, reducedMotion),
+        animationSpec = OcMotion.spec(OcMotion.MEDIUM_MS, motion),
         label = "composer_outline",
     )
     Surface(
@@ -215,7 +217,7 @@ internal fun Composer(
             // "Transcribing…" line, then the text again with the transcript at the cursor.
             AnimatedContent(
                 targetState = box,
-                transitionSpec = { voiceBoxTransition(reducedMotion) },
+                transitionSpec = { voiceBoxTransition(motion) },
                 label = "composer_box",
             ) { mode ->
                 when (mode) {
@@ -317,8 +319,8 @@ internal fun Composer(
                     // Stop and Send scale and fade in and out at their place; the selectors make room.
                     AnimatedVisibility(
                         visible = state.running,
-                        enter = OcMotion.inlineEnter(reducedMotion),
-                        exit = OcMotion.inlineExit(reducedMotion),
+                        enter = OcMotion.inlineEnter(motion),
+                        exit = OcMotion.inlineExit(motion),
                         label = "composer_stop",
                     ) {
                         OcRoundIconButton(
@@ -336,8 +338,8 @@ internal fun Composer(
                     }
                     AnimatedVisibility(
                         visible = !state.running || state.draft.isNotBlank(),
-                        enter = OcMotion.inlineEnter(reducedMotion),
-                        exit = OcMotion.inlineExit(reducedMotion),
+                        enter = OcMotion.inlineEnter(motion),
+                        exit = OcMotion.inlineExit(motion),
                         label = "composer_send",
                     ) {
                         OcRoundIconButton(
@@ -364,17 +366,17 @@ private enum class BoxMode { Editor, Recorder, Held, Transcribing }
  * The text and the recorder replace each other with a short fade and scale; going from the
  * recorder to "Transcribing…" the waveform shrinks into the line. Instant with reduced motion.
  */
-private fun AnimatedContentTransitionScope<BoxMode>.voiceBoxTransition(reducedMotion: Boolean): ContentTransform {
-    if (reducedMotion) return (EnterTransition.None togetherWith ExitTransition.None).using(SizeTransform(clip = false) { _, _ -> snap() })
+private fun AnimatedContentTransitionScope<BoxMode>.voiceBoxTransition(motion: MotionConfig): ContentTransform {
+    if (motion.reduced) return (EnterTransition.None togetherWith ExitTransition.None).using(SizeTransform(clip = false) { _, _ -> snap() })
     val medium = OcMotion.MEDIUM_MS
-    val enter = fadeIn(OcMotion.spec(medium, false, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS)) +
-        scaleIn(OcMotion.spec(medium, false, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS), initialScale = 0.94f)
+    val enter = fadeIn(OcMotion.spec(medium, motion, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS)) +
+        scaleIn(OcMotion.spec(medium, motion, OcMotion.Enter, delayMs = VOICE_ENTER_DELAY_MS), initialScale = 0.94f)
     val exit = if (initialState == BoxMode.Recorder && targetState == BoxMode.Transcribing) {
-        fadeOut(OcMotion.spec(OcMotion.SHORT_MS, false, OcMotion.Exit)) + scaleOut(OcMotion.spec(medium, false, OcMotion.Exit), targetScale = 0.4f)
+        fadeOut(OcMotion.spec(OcMotion.SHORT_MS, motion, OcMotion.Exit)) + scaleOut(OcMotion.spec(medium, motion, OcMotion.Exit), targetScale = 0.4f)
     } else {
-        fadeOut(OcMotion.spec(VOICE_EXIT_MS, false, OcMotion.Exit))
+        fadeOut(OcMotion.spec(VOICE_EXIT_MS, motion, OcMotion.Exit))
     }
-    return (enter togetherWith exit).using(SizeTransform(clip = false) { _, _ -> OcMotion.spec(medium, false) })
+    return (enter togetherWith exit).using(SizeTransform(clip = false) { _, _ -> OcMotion.spec(medium, motion) })
 }
 
 /** The new content of the box waits for the old one to be mostly gone, which leaves quickly. */

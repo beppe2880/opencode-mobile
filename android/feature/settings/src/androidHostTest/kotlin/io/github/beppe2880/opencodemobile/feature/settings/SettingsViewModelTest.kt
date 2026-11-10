@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
+import io.github.beppe2880.opencodemobile.core.domain.AnimationSpeed
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
@@ -93,6 +95,8 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
         vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
+        vm.onEvent(SettingsEvent.AnimationsChanged(AnimationMode.On))
+        vm.onEvent(SettingsEvent.AnimationSpeedChanged(AnimationSpeed.Fast))
         vm.onEvent(SettingsEvent.OpenCodeThemeChanged("opencode"))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
@@ -127,6 +131,8 @@ class SettingsViewModelTest {
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
+                animations = AnimationMode.On,
+                animationSpeed = AnimationSpeed.Fast,
                 openCodeTheme = "opencode",
                 showCost = false,
                 chatHeaderLine = ChatHeaderLine.BranchFiles,

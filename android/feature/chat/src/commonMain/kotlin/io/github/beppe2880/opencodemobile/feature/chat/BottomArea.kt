@@ -258,7 +258,7 @@ private fun RevertBanner(count: Int, onRestore: () -> Unit) {
 @Composable
 private fun QueuedPrompts(queued: List<QueuedPrompt>, onEvent: (ChatEvent) -> Unit) {
     val c = OcTheme.colors
-    val reduced = OcTheme.reducedMotion
+    val motion = OcTheme.motion
     OcCard(modifier = Modifier.fillMaxWidth().testTag("chat_queue"), shape = RoundedCornerShape(OcRadius.lg)) {
         Row(
             modifier = Modifier.padding(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.sm),
@@ -278,9 +278,9 @@ private fun QueuedPrompts(queued: List<QueuedPrompt>, onEvent: (ChatEvent) -> Un
                     modifier = Modifier
                         // A prompt sent or removed makes the others slide over instead of jumping.
                         .animateItem(
-                            fadeInSpec = OcMotion.spec(OcMotion.SHORT_MS, reduced),
-                            placementSpec = OcMotion.spec(OcMotion.MEDIUM_MS, reduced),
-                            fadeOutSpec = OcMotion.spec(OcMotion.SHORT_MS, reduced),
+                            fadeInSpec = OcMotion.spec(OcMotion.SHORT_MS, motion),
+                            placementSpec = OcMotion.spec(OcMotion.MEDIUM_MS, motion),
+                            fadeOutSpec = OcMotion.spec(OcMotion.SHORT_MS, motion),
                         )
                         .fillMaxWidth()
                         .padding(start = OcSpacing.md, end = OcSpacing.xxs)

@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
+import io.github.beppe2880.opencodemobile.core.domain.AnimationMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
@@ -14,6 +15,8 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     Theme(listOf("theme")),
     OpenCodeTheme(listOf("openCodeTheme")),
     TextSize(listOf("chatTextScale")),
+    Animations(listOf("animations")),
+    AnimationSpeed(listOf("animationSpeed"), requires = Animations),
     HeaderLine(listOf("chatHeaderLine")),
     HeaderStyle(listOf("chatHeaderStyle")),
     HeaderOpens(listOf("headerOpens")),
@@ -82,7 +85,8 @@ internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks",
 /** Every option of this part of a preview, applying or not. */
 val SettingsPart.options: List<SettingOption>
     get() = when (this) {
-        SettingsPart.Theme -> listOf(SettingOption.Theme, SettingOption.OpenCodeTheme)
+        // How the whole app looks and moves.
+        SettingsPart.Theme -> listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.Animations, SettingOption.AnimationSpeed)
         // The theme also colors the markdown of answers.
         SettingsPart.TextSize -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Header -> listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)
@@ -155,6 +159,7 @@ val VOICE_OPTIONS: List<SettingOption> = listOf(
  */
 fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = settings.notifications): Boolean = when (this) {
     SettingOption.HeaderStyle, SettingOption.HeaderOpens -> settings.chatHeaderLine != ChatHeaderLine.Folder
+    SettingOption.AnimationSpeed -> settings.animations != AnimationMode.Off
     SettingOption.KeepLiveOpen, SettingOption.LiveThinking, SettingOption.LiveShell, SettingOption.LiveEdits,
     SettingOption.LiveReads, SettingOption.LiveOther,
     -> settings.followRunningTools
@@ -177,6 +182,8 @@ internal val SettingOption.searchKeywords: List<String>
     get() = when (this) {
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
+        SettingOption.Animations -> listOf("animation", "motion", "reduce motion", "transition", "accessibility")
+        SettingOption.AnimationSpeed -> listOf("animation", "motion", "speed", "duration", "fast", "slow")
         else -> emptyList()
     }
 

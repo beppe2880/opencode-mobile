@@ -116,7 +116,7 @@ internal fun FileDiffView(
             )
         }
         // "Show more" unrolls the lines downward inside the frame, and "Show less" rolls them back.
-        BoxWithConstraints(Modifier.fillMaxWidth().animateContentSize(OcMotion.sizeSpec(OcTheme.reducedMotion))) {
+        BoxWithConstraints(Modifier.fillMaxWidth().animateContentSize(OcMotion.sizeSpec(OcTheme.motion))) {
             val viewport = maxWidth
             SelectionContainer {
                 Column(

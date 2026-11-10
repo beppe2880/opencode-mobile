@@ -317,6 +317,15 @@ interface CatalogRepository {
 
 enum class ThemeMode { System, Light, Dark }
 
+/**
+ * Whether the app animates: [System] follows the system's less-motion setting (Android
+ * animations off, iOS Reduce Motion), [On] animates even then, [Off] never does.
+ */
+enum class AnimationMode { System, On, Off }
+
+/** How fast animations play: [scale] multiplies every duration and delay. */
+enum class AnimationSpeed(val scale: Float) { Fast(0.6f), Normal(1f), Slow(1.6f) }
+
 /** When an agent, model or reasoning level picked in a chat reaches the server. */
 enum class SelectionApply {
     /** Kept in the composer and applied right before the next prompt, like the OpenCode TUI. */
@@ -384,6 +393,10 @@ data class AppSettings(
     val keepLiveStepsOpen: Boolean = false,
     /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
     val chatTextScale: Float = 1f,
+    /** Whether the app animates: following the system's less-motion setting, always, or never. */
+    val animations: AnimationMode = AnimationMode.System,
+    /** With [animations] not off: how fast animations play. */
+    val animationSpeed: AnimationSpeed = AnimationSpeed.Normal,
     /**
      * Id of the OpenCode terminal theme the app takes its colors from (markdown included); null
      * keeps the app's own colors. One of [OpenCodeThemeIds].
