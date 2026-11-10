@@ -291,8 +291,14 @@ data class ChangesPanel(
     val error: UiText? = null,
 )
 
-/** An image shown full screen; [dataUri] is null while it is fetched or when that [failed]. */
-data class ImagePreview(val name: String?, val dataUri: String?, val failed: Boolean = false)
+/**
+ * Images shown full screen, opened at [index]: those of one prompt, one tool group or the
+ * composer, so swiping goes to the others.
+ */
+data class ImagePreview(val images: List<PreviewImage>, val index: Int = 0)
+
+/** One image of the viewer; [dataUri] is null while it is fetched or when that [failed]. */
+data class PreviewImage(val name: String?, val dataUri: String?, val failed: Boolean = false)
 
 /** A completion offered above the composer. */
 sealed interface Suggestion {
@@ -392,6 +398,9 @@ sealed interface ChatEvent {
 
     /** A card of a tool's image is on screen without its content: fetch the call's files. */
     data class LoadToolMedia(val messageId: String, val callId: String) : ChatEvent
+
+    /** The viewer shows its [index]th image: fetched when the cache dropped it. */
+    data class PreviewPage(val index: Int) : ChatEvent
     data object ClosePreview : ChatEvent
 
     /** A picked file could not be read or is too large. */
