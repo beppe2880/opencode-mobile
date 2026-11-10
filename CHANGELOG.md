@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/beppe2880/opencode-mobile/compare/v0.13.0...v0.14.0) (2026-11-10)
+
+
+### Features
+
+* **sessions:** Browse server folders when starting a session ([#173](https://github.com/beppe2880/opencode-mobile/issues/173)) ([50adb1b](https://github.com/beppe2880/opencode-mobile/commit/50adb1b7a4b7ed1f9744c258329b789c64283a99))
+
 ## [0.13.0](https://github.com/beppe2880/opencode-mobile/compare/v0.12.0...v0.13.0) (2026-11-09)
 
 
