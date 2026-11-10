@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">Projektverzeichnis</string>
     <string name="sessions_new_other_directory">Anderes Verzeichnis</string>
     <string name="sessions_new_path_label">Absoluter Pfad</string>
+    <string name="sessions_browse">Durchsuchen</string>
+    <string name="sessions_browse_title">Ordner auswählen</string>
+    <string name="sessions_browse_use">Diesen Ordner verwenden</string>
+    <string name="sessions_browse_empty">Keine Ordner vorhanden</string>
+    <string name="sessions_browse_retry">Erneut versuchen</string>
+    <string name="sessions_browse_back">Zurück</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">Agent</string>
     <string name="sessions_new_model">Modell</string>
@@ -43,9 +49,12 @@
     <string name="sessions_actions_title">Sitzungsaktionen</string>
     <string name="sessions_running_a11y">Der Agent arbeitet</string>
     <string name="sessions_new_show_all">Alle %1$d Projekte anzeigen</string>
+    <string name="sessions_new_project_search">Projekte suchen</string>
+    <string name="sessions_new_project_search_empty">Keine passenden Projekte</string>
     <string name="sessions_untitled">Unbenannte Sitzung</string>
     <string name="sessions_preview_swipe_on">Im Chat nach links oder rechts wischen, um die nächste oder vorherige Sitzung zu öffnen</string>
     <string name="sessions_preview_swipe_off">Aus: Zur Liste zurückkehren, um eine andere Sitzung zu öffnen</string>
+    <string name="sessions_preview_swipe_drawer">Im Chat nach rechts wischen, um die Chatliste darüber anzuzeigen</string>
     <string name="sessions_preview_wide">Auf aufgeklappten Foldables und Tablets</string>
     <string name="sessions_preview_split_off">Der Chat öffnet sich über der Liste, auch auf breiten Bildschirmen</string>
     <string name="sessions_preview_back_list">Zurück bei ausgeblendeter Liste zeigt sie wieder an</string>
@@ -58,4 +67,11 @@
     <string name="sessions_preview_share_new">Text, Links und Bilder aus anderen Apps öffnen dieses Blatt</string>
     <string name="sessions_preview_share_choose">Text, Links und Bilder aus anderen Apps fragen zuerst nach einem Chat oder öffnen dieses Blatt</string>
     <string name="sessions_preview_share_off">OpenCode ist nicht im Teilen-Menü anderer Apps</string>
+    <string name="sessions_project_hide">Projekt ausblenden</string>
+    <string name="sessions_project_unhide">Einblenden</string>
+    <string name="sessions_projects_hidden">Ausgeblendet (%1$d)</string>
+    <string name="sessions_browse_show_hidden">Versteckte Ordner anzeigen</string>
+    <string name="sessions_browse_hide_hidden">Versteckte Ordner ausblenden</string>
+    <string name="sessions_browse_recent">Zuletzt verwendete Ordner</string>
+    <string name="sessions_browse_pick">Verwenden</string>
 </resources>

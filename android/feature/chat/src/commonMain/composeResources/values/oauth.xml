@@ -1,0 +1,7 @@
+<resources>
+    <string name="chat_provider_browser_waiting">Complete sign-in in your browser, then return here. Credentials are transferred securely to this server and are not saved on your phone. Closing this panel cancels sign-in.</string>
+    <string name="chat_provider_secure">Browser sign-in requires an HTTPS server connection. Update the saved server address before continuing.</string>
+    <string name="chat_provider_device">Continue with device code</string>
+    <string name="chat_provider_browser">Open browser to authorize</string>
+    <string name="chat_provider_computer">This method is not supported on mobile yet. Use the computer or another method.</string>
+</resources>

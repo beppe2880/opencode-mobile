@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
@@ -46,6 +47,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.ToolFile
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
@@ -60,6 +62,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -162,6 +165,63 @@ class ChatViewModelTest {
         advanceTimeBy(20_000)
         runCurrent()
         assertEquals(reads, chat.runningReads)
+    }
+
+    @Test
+    fun `a running chip opens its list then one shell that reads only its own output and stays once stopped`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(confirmStopCommand = false)
+        chat.runningCommands = listOf(
+            RunningCommand("shell", "npm test", "/repo", 1, "s1"),
+            RunningCommand("other", "watch", "/repo", 2, "s1"),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf(RunningChip(RunningGroup.Commands, 2)), runningChips(vm.state.value.work, vm.state.value.runningChips))
+
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        runCurrent()
+        assertEquals(RunningPanel(RunningGroup.Commands), vm.state.value.runningPanel)
+        assertTrue(chat.tailReads.isEmpty())
+
+        vm.onEvent(ChatEvent.ShowRunningItem(RunningGroup.Commands, "shell"))
+        runCurrent()
+        assertEquals("npm test", vm.state.value.runningPanel?.item?.label)
+        assertEquals(listOf("shell"), chat.tailReads)
+        assertEquals("last line", vm.state.value.workOutput["shell"])
+
+        vm.onEvent(ChatEvent.StopCommand("shell"))
+        runCurrent()
+        val panel = vm.state.value.runningPanel!!
+        assertEquals("shell", panel.item?.id)
+        assertNotNull(panel.endedAt)
+        // Its last output stays readable in the open sheet.
+        assertEquals("last line", vm.state.value.workOutput["shell"])
+
+        vm.onEvent(ChatEvent.CloseRunningItem)
+        assertNull(vm.state.value.runningPanel)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `with the running chips setting off nothing opens and an open list closes`() = runTest(main.testDispatcher) {
+        chat.runningCommands = listOf(RunningCommand("shell", "build", "/repo", 1, "s1"))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        assertEquals(RunningPanel(RunningGroup.Commands), vm.state.value.runningPanel)
+
+        settings.settings.value = AppSettings(runningChips = false)
+        runCurrent()
+        assertFalse(vm.state.value.runningChips)
+        assertNull(vm.state.value.runningPanel)
+        assertTrue(runningChips(vm.state.value.work, vm.state.value.runningChips).isEmpty())
+        vm.onEvent(ChatEvent.ShowRunningList(RunningGroup.Commands))
+        assertNull(vm.state.value.runningPanel)
+        vm.onEvent(ChatEvent.Visible(false))
     }
 
     @Test
@@ -281,7 +341,7 @@ class ChatViewModelTest {
         assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
 
         vm.onEvent(ChatEvent.StopAll(RunningGroup.Commands))
-        assertEquals(RunningGroup.Commands, vm.state.value.confirmingStopAll)
+        assertEquals(StopAllTarget.Group(RunningGroup.Commands), vm.state.value.confirmingStopAll)
         vm.onEvent(ChatEvent.DismissStopAll)
         assertNull(vm.state.value.confirmingStopAll)
         assertTrue(chat.stops.isEmpty())
@@ -316,7 +376,7 @@ class ChatViewModelTest {
         assertEquals(listOf("c1", "c2"), vm.state.value.work.agents.map { it.session.id })
 
         vm.onEvent(ChatEvent.StopAll(RunningGroup.Agents))
-        assertEquals(RunningGroup.Agents, vm.state.value.confirmingStopAll)
+        assertEquals(StopAllTarget.Group(RunningGroup.Agents), vm.state.value.confirmingStopAll)
         vm.onEvent(ChatEvent.ConfirmStopAll)
         runCurrent()
         assertEquals(setOf("c1", "c2"), chat.interrupts.toSet())
@@ -324,6 +384,51 @@ class ChatViewModelTest {
         assertTrue(vm.state.value.work.agents.isEmpty())
         assertTrue(vm.state.value.stoppingAgents.isEmpty())
         assertNull(vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.Visible(false))
+    }
+
+    @Test
+    fun `stop everything asks first then stops every subagent and command of this session and leaves unassigned ones`() = runTest(main.testDispatcher) {
+        val root = FakeSessions(model).get("s1").getOrThrow()
+        val children = listOf("c1", "c2").map { root.copy(id = it, parentId = "s1", title = "Child $it") }
+        val sessions = FakeSessions(model, others = children).apply { activeIds = setOf("s1", "c1", "c2") }
+        chat.onInterrupt = { sessions.activeIds -= it }
+        chat.runningCommands = listOf(
+            RunningCommand("build", "build", "/repo", 1, "s1"),
+            RunningCommand("watch", "watch", "/repo", 1),
+        )
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.Visible(true))
+        runCurrent()
+        assertEquals(listOf("c1", "c2"), vm.state.value.work.agents.map { it.session.id })
+        assertEquals(listOf("build"), vm.state.value.work.commands.map { it.id })
+
+        vm.onEvent(RunningStop.All.event)
+        assertEquals(StopAllTarget.Everything, vm.state.value.confirmingStopAll)
+        vm.onEvent(ChatEvent.DismissStopAll)
+        assertNull(vm.state.value.confirmingStopAll)
+        assertTrue(chat.interrupts.isEmpty())
+        assertTrue(chat.stops.isEmpty())
+
+        val gate = CompletableDeferred<Unit>()
+        chat.stopGate = gate
+        vm.onEvent(ChatEvent.StopAll(StopAllTarget.Everything))
+        vm.onEvent(ChatEvent.ConfirmStopAll)
+        runCurrent()
+        assertNull(vm.state.value.confirmingStopAll)
+        // Shells and subagents stop at once; Stop all spins while everything stops.
+        assertEquals(setOf("build"), vm.state.value.stoppingCommands)
+        assertTrue(RunningStop.Group(RunningGroup.Commands, 1).stopping(vm.state.value))
+        gate.complete(Unit)
+        runCurrent()
+        assertEquals(setOf("c1", "c2"), chat.interrupts.toSet())
+        assertFalse("s1" in chat.interrupts)
+        assertEquals(listOf("build"), chat.stops)
+        assertTrue(vm.state.value.work.isEmpty)
+        assertTrue(vm.state.value.stoppingCommands.isEmpty())
+        assertTrue(vm.state.value.stoppingAgents.isEmpty())
+        assertEquals(listOf("watch"), vm.state.value.unassignedCommands.map { it.id })
         vm.onEvent(ChatEvent.Visible(false))
     }
 
@@ -785,6 +890,7 @@ class ChatViewModelTest {
 
     @Test
     fun `neighbors follow the session list order and swiping switches session`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SwitchChats)
         val sessions = FakeSessions(model, order = listOf("s0", "s1", "s2"), titles = mapOf("s0" to "Newer", "s2" to "Older"))
         val vm = vm(sessions)
         advanceUntilIdle()
@@ -798,6 +904,46 @@ class ChatViewModelTest {
         val alone = vm(FakeSessions(model, order = listOf("x")))
         assertNull(alone.state.value.previousSession)
         assertNull(alone.state.value.nextSession)
+    }
+
+    @Test
+    fun `the swipe setting chooses between switching chats, the chat list drawer and nothing`() = runTest(main.testDispatcher) {
+        // The chat list is the default.
+        assertEquals(ChatSwipe.SessionDrawer, AppSettings().chatSwipe)
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SwitchChats)
+        val vm = vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SwitchChats, vm.state.value.swipe)
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch {
+            vm.effect.collect { if (it is ChatEffect.SwitchSession) effects += it }
+        }
+
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertEquals(listOf<ChatEffect>(ChatEffect.SwitchSession("s2")), effects)
+
+        // Changed in Settings while the chat is open: the drawer pulls the list, never switching session.
+        effects.clear()
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.SessionDrawer)
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SessionDrawer, vm.state.value.swipe)
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertTrue(effects.isEmpty())
+        // A chat opened afterwards starts with the new choice.
+        val later = vm(FakeSessions(model, order = listOf("s0", "s1", "s2")))
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.SessionDrawer, later.state.value.swipe)
+
+        // Off: nothing.
+        settings.settings.value = AppSettings(chatSwipe = ChatSwipe.Off)
+        advanceUntilIdle()
+        assertEquals(ChatSwipe.Off, vm.state.value.swipe)
+        vm.onEvent(ChatEvent.SwitchSession("s2"))
+        advanceUntilIdle()
+        assertTrue(effects.isEmpty())
+        collector.cancel()
     }
 
     @Test
@@ -926,7 +1072,12 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.DraftChanged("/"))
-        assertEquals(listOf("undo", "redo", "compact", "fork", "mcps", "review"), vm.state.value.suggestions.map { (it as Suggestion.Slash).name })
+        assertEquals(
+            listOf("new", "undo", "redo", "compact", "fork", "mcps", "connect", "review"),
+            vm.state.value.suggestions.map {
+                (it as Suggestion.Slash).name
+            },
+        )
         vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.last()))
         assertEquals("/review ", vm.state.value.draft)
 
@@ -941,6 +1092,18 @@ class ChatViewModelTest {
         vm.onEvent(ChatEvent.Send)
         advanceUntilIdle()
         assertEquals(listOf("/nope x" to PromptDelivery.Steer), chat.prompts)
+    }
+
+    @Test
+    fun `connect opens locally and never sends a prompt or server command`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/connect"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(ChatEffect.OpenProviders, vm.effect.first())
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
     }
 
     @Test
@@ -1031,6 +1194,92 @@ class ChatViewModelTest {
         assertEquals("", drafts.load("s2"))
         assertTrue(chat.prompts.isEmpty())
         assertEquals("", vm.state.value.draft)
+    }
+
+    @Test
+    fun `slash new creates in the same directory with server defaults and no copied history`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.AddAttachments(listOf(PromptAttachment("data:image/png;base64,AA==", "photo.png", "image/png"))))
+
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(listOf(Triple("/repo", null, null)), sessions.creates)
+        assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
+        assertTrue(sessions.forks.isEmpty())
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
+        assertTrue(chat.stops.isEmpty())
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+        assertEquals(1, vm.state.value.attachments.size)
+        assertEquals("", drafts.load("s-new"))
+        assertEquals("", vm.state.value.draft)
+        assertFalse(vm.state.value.creatingSession)
+    }
+
+    @Test
+    fun `picking new creates once while pending and does not send a prompt`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply { createGate = gate }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/ne"))
+        val suggestion = vm.state.value.suggestions.single()
+        vm.onEvent(ChatEvent.PickSuggestion(suggestion))
+        runCurrent()
+        assertTrue(vm.state.value.creatingSession)
+        assertFalse(vm.state.value.canSend)
+
+        vm.onEvent(ChatEvent.PickSuggestion(suggestion))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertEquals(1, sessions.creates.size)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
+        assertFalse(vm.state.value.creatingSession)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `failed new keeps the original chat and restores the command for retry`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { createResult = Result.failure(OpenCodeError.Unreachable("down")) }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertTrue(vm.effect.first() is ChatEffect.ShowMessage)
+        assertEquals("/new", vm.state.value.draft)
+        assertEquals(listOf("u1"), vm.state.value.items.map { it.key })
+        assertFalse(vm.state.value.creatingSession)
+        assertTrue(vm.state.value.canSend)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `failed new does not overwrite text typed while creating`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply {
+            createGate = gate
+            createResult = Result.failure(OpenCodeError.Unreachable("down"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("keep this"))
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertTrue(vm.effect.first() is ChatEffect.ShowMessage)
+        assertEquals("keep this", vm.state.value.draft)
+        assertFalse(vm.state.value.creatingSession)
     }
 
     @Test
@@ -1314,7 +1563,10 @@ class ChatViewModelTest {
         assertEquals(listOf("u1"), chat.imageRequests)
 
         vm.onEvent(ChatEvent.OpenImage("u1", 1))
-        assertEquals(ImagePreview("b.png", "data:image/png;base64,BBBB"), vm.state.value.preview)
+        assertEquals(
+            ImagePreview(listOf(PreviewImage("a.png", "data:image/png;base64,AAAA"), PreviewImage("b.png", "data:image/png;base64,BBBB")), index = 1),
+            vm.state.value.preview,
+        )
         vm.onEvent(ChatEvent.ClosePreview)
         assertEquals(null, vm.state.value.preview)
         assertEquals(listOf("u1"), chat.imageRequests)
@@ -1328,10 +1580,165 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         vm.onEvent(ChatEvent.OpenImage("u1", 0))
-        assertEquals(ImagePreview("b.png", null), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("b.png", null))), vm.state.value.preview)
         advanceUntilIdle()
 
-        assertEquals(ImagePreview("b.png", null, failed = true), vm.state.value.preview)
+        assertEquals(ImagePreview(listOf(PreviewImage("b.png", null, failed = true))), vm.state.value.preview)
+    }
+
+    private fun readTool(vararg files: ToolFile) = Message.Assistant(
+        id = "a1",
+        createdAt = 1,
+        agent = "build",
+        model = model,
+        completedAt = 3,
+        parts = listOf(Part.Tool("c1", "read", ToolStatus.Completed, "{}", output = "Image read successfully", files = files.toList())),
+    )
+
+    @Test
+    fun `tool images the cache dropped are fetched once when their card asks`() = runTest(main.testDispatcher) {
+        val stored = ToolFile("data:image/png;base64,", "image/png", "shot.png")
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(stored))
+        chat.toolFiles = Result.success(listOf("data:image/png;base64,AAAA"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        val before = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertEquals(stored, before.file)
+        // Nothing is fetched until a card is on screen.
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        advanceUntilIdle()
+
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+        val after = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertEquals("data:image/png;base64,AAAA", after.file.uri)
+        assertTrue(after.fetchKey in vm.state.value.toolMediaLoaded)
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", "data:image/png;base64,AAAA"))), vm.state.value.preview)
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+    }
+
+    @Test
+    fun `a tool image that cannot be fetched is marked loaded and its preview fails`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(ToolFile("data:image/png;base64,", "image/png", "shot.png")))
+        chat.toolFiles = Result.failure(OpenCodeError.Unreachable("down"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.LoadToolMedia("a1", "c1"))
+        advanceUntilIdle()
+        val media = vm.state.value.items.filterIsInstance<ChatItem.Tools>().single().media.single()
+        assertFalse(media.file.hasInlinePayload)
+        assertTrue(media.fetchKey in vm.state.value.toolMediaLoaded)
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        advanceUntilIdle()
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", null, failed = true))), vm.state.value.preview)
+    }
+
+    @Test
+    fun `an inline tool image opens without a request`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(Message.User("u1", 0, "look"), readTool(ToolFile("data:image/png;base64,AAAA", "image/png", "/repo/shot.png")))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c1", 0))
+        assertEquals(ImagePreview(listOf(PreviewImage("shot.png", "data:image/png;base64,AAAA"))), vm.state.value.preview)
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+    }
+
+    @Test
+    fun `a prompt's images open together and missing ones are fetched once as pages show`() = runTest(main.testDispatcher) {
+        chat.transcript = listOf(
+            Message.User(
+                "u1", 0, "look", attachments = 3,
+                images = listOf(
+                    ImageAttachment("a.png", "image/png", "data:image/png;base64,AAAA"),
+                    ImageAttachment("b.png", "image/png", null),
+                    ImageAttachment("c.png", "image/png", null),
+                ),
+            ),
+        )
+        // The thumbnails' fetch fails, so the viewer fetches again.
+        chat.images = Result.failure(OpenCodeError.Unreachable("down"))
+        val vm = vm()
+        advanceUntilIdle()
+        chat.images = Result.success(listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB", "data:image/png;base64,CCCC"))
+        val before = chat.imageRequests.size
+
+        vm.onEvent(ChatEvent.OpenImage("u1", 0))
+        advanceUntilIdle()
+        // The opened image is here: nothing is fetched until a missing one shows.
+        assertEquals(before, chat.imageRequests.size)
+        assertEquals(listOf("a.png", "b.png", "c.png"), vm.state.value.preview!!.images.map { it.name })
+        assertEquals(0, vm.state.value.preview!!.index)
+
+        vm.onEvent(ChatEvent.PreviewPage(1))
+        vm.onEvent(ChatEvent.PreviewPage(2))
+        advanceUntilIdle()
+
+        assertEquals(before + 1, chat.imageRequests.size)
+        val preview = vm.state.value.preview!!
+        assertEquals(2, preview.index)
+        assertEquals(
+            listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB", "data:image/png;base64,CCCC"),
+            preview.images.map { it.dataUri },
+        )
+    }
+
+    @Test
+    fun `the images of one tool group open together across tool calls`() = runTest(main.testDispatcher) {
+        val first = Part.Tool(
+            "c1", "read", ToolStatus.Completed, "{}", output = "Image read successfully",
+            files = listOf(ToolFile("data:image/png;base64,", "image/png", "one.png")),
+        )
+        val second = Part.Tool(
+            "c2", "read", ToolStatus.Completed, "{}", output = "Image read successfully",
+            files = listOf(
+                ToolFile("data:image/png;base64,BBBB", "image/png", "two.png"),
+                ToolFile("data:text/plain;base64,QQ==", "text/plain", "notes.txt"),
+            ),
+        )
+        chat.transcript = listOf(
+            Message.User("u1", 0, "look"),
+            Message.Assistant(id = "a1", createdAt = 1, agent = "build", model = model, completedAt = 3, parts = listOf(first, second)),
+        )
+        chat.toolFiles = Result.success(listOf("data:image/png;base64,AAAA"))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.OpenToolImage("a1", "c2", 0))
+        val opened = vm.state.value.preview!!
+        // The text file is not an image: only the two images, opened at the second.
+        assertEquals(listOf("one.png", "two.png"), opened.images.map { it.name })
+        assertEquals(1, opened.index)
+        assertEquals(emptyList<String>(), chat.toolFileRequests)
+
+        vm.onEvent(ChatEvent.PreviewPage(0))
+        advanceUntilIdle()
+
+        assertEquals(listOf("a1/c1"), chat.toolFileRequests)
+        assertEquals(listOf("data:image/png;base64,AAAA", "data:image/png;base64,BBBB"), vm.state.value.preview!!.images.map { it.dataUri })
+    }
+
+    @Test
+    fun `the composer's images open together at the tapped one`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val a = PromptAttachment("data:image/png;base64,AAAA", "a.png", "image/png")
+        val note = PromptAttachment("data:text/plain;base64,QQ==", "note.txt", "text/plain")
+        val b = PromptAttachment("data:image/png;base64,BBBB", "b.png", "image/png")
+        vm.onEvent(ChatEvent.AddAttachments(listOf(a, note, b)))
+
+        vm.onEvent(ChatEvent.PreviewAttachment(b.uri))
+
+        assertEquals(ImagePreview(listOf(PreviewImage("a.png", a.uri), PreviewImage("b.png", b.uri)), index = 1), vm.state.value.preview)
+        vm.onEvent(ChatEvent.ClosePreview)
+        assertEquals(null, vm.state.value.preview)
     }
 
     @Test
@@ -1620,6 +2027,125 @@ class ChatViewModelTest {
 
         assertTrue(vm.state.value.running)
         assertFalse(vm.state.value.stopping)
+    }
+
+    @Test
+    fun `images of a prompt show while it uploads and stay when the server confirms it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        val shown = listOf(ImageAttachment("shot.png", "image/png", photo.uri))
+        chat.promptGate = CompletableDeferred()
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+
+        // The upload is still running.
+        assertEquals(listOf("look" to PromptDelivery.Steer), chat.prompts)
+        val sending = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertTrue(sending.pending)
+        assertTrue(sending.sending)
+        assertEquals(shown, sending.images)
+
+        chat.promptGate!!.complete(Unit)
+        events.flow.emit(ServerEvent.InboxEnqueued("s1", "msg_9", "look", 50))
+        runCurrent()
+        val queued = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", queued.key)
+        assertTrue(queued.pending)
+        assertFalse(queued.sending)
+        assertEquals(shown, queued.images)
+        assertEquals(1, queued.attachments)
+
+        // The server's copy comes without the payload, which the cache drops.
+        chat.transcript += Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.InboxDelivered("s1", "msg_9"))
+        advanceUntilIdle()
+        val confirmed = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", confirmed.key)
+        assertFalse(confirmed.pending)
+        assertEquals(shown, confirmed.images)
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a delivered prompt keeps showing its images while the server copy has none yet`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        val shown = listOf(ImageAttachment("shot.png", "image/png", photo.uri))
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        events.flow.emit(ServerEvent.InboxEnqueued("s1", "msg_9", "look", 50))
+        events.flow.emit(ServerEvent.InboxDelivered("s1", "msg_9"))
+        // The first reload has the prompt before its file parts.
+        chat.transcript += Message.User("msg_9", 50, "look")
+        advanceUntilIdle()
+        val early = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("msg_9", early.key)
+        assertFalse(early.pending)
+        assertEquals(shown, early.images)
+
+        // A later reload has them, without the payload the cache drops.
+        chat.transcript = chat.transcript.dropLast(1) +
+            Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.StepEnded("s1", "a9", "stop", 0.0, TokenUsage(), 60))
+        advanceUntilIdle()
+        assertEquals(shown, vm.state.value.items.filterIsInstance<ChatItem.User>().last().images)
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a prompt confirmed by a reload before its inbox event keeps the images it sent`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        vm.onEvent(ChatEvent.DraftChanged("look"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        // Without its images at first, then with them but without their payload.
+        chat.transcript += Message.User("msg_9", 50, "look")
+        advanceUntilIdle()
+        var users = vm.state.value.items.filterIsInstance<ChatItem.User>()
+        assertEquals(listOf("u1", "msg_9"), users.map { it.key })
+        assertEquals(listOf(photo.uri), users.last().images.map { it.dataUri })
+
+        chat.transcript = chat.transcript.dropLast(1) +
+            Message.User("msg_9", 50, "look", attachments = 1, images = listOf(ImageAttachment("shot.png", "image/png", null)))
+        events.flow.emit(ServerEvent.StepEnded("s1", "a9", "stop", 0.0, TokenUsage(), 60))
+        advanceUntilIdle()
+        users = vm.state.value.items.filterIsInstance<ChatItem.User>()
+        assertEquals(listOf("u1", "msg_9"), users.map { it.key })
+        assertEquals(listOf(photo.uri), users.last().images.map { it.dataUri })
+        assertTrue(chat.imageRequests.isEmpty())
+    }
+
+    @Test
+    fun `a prompt of images alone shows at once and returns to the composer when it fails`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val photo = PromptAttachment("data:image/png;base64,AAAA", "shot.png", "image/png")
+        chat.promptGate = CompletableDeferred()
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.AddAttachments(listOf(photo)))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+
+        val sending = vm.state.value.items.filterIsInstance<ChatItem.User>().last()
+        assertEquals("", sending.text)
+        assertTrue(sending.sending)
+        assertEquals(listOf(photo.uri), sending.images.map { it.dataUri })
+        assertTrue(vm.state.value.attachments.isEmpty())
+
+        chat.promptGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.items.none { it is ChatItem.User && it.pending })
+        assertEquals(listOf("u1"), vm.state.value.items.filterIsInstance<ChatItem.User>().map { it.key })
+        assertEquals(listOf(photo), vm.state.value.attachments)
+        assertEquals("", vm.state.value.draft)
     }
 
     @Test
@@ -1995,7 +2521,14 @@ private class FakeSessions(
     }
     override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
     override fun browseOrder() = order
-    override suspend fun create(directory: String, agent: String?, model: ModelRef?) = Result.success(session)
+    val creates = mutableListOf<Triple<String, String?, ModelRef?>>()
+    var createGate: CompletableDeferred<Unit>? = null
+    var createResult: Result<Session> = Result.success(session.copy(id = "s-new", agent = "build", model = null))
+    override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
+        creates += Triple(directory, agent, model)
+        createGate?.await()
+        return createResult
+    }
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     val forks = mutableListOf<Pair<String, String?>>()
@@ -2036,6 +2569,9 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         return stopResult
     }
     var promptResult: Result<Unit> = Result.success(Unit)
+
+    /** When set, [prompt] (the upload) waits for it. */
+    var promptGate: CompletableDeferred<Unit>? = null
     var switchResult: Result<Unit> = Result.success(Unit)
     val prompts = mutableListOf<Pair<String, PromptDelivery>>()
     val replies = mutableListOf<Pair<String, PermissionDecision>>()
@@ -2062,6 +2598,12 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         imageRequests += messageId
         return images
     }
+    var toolFiles: Result<List<String?>> = Result.success(emptyList())
+    val toolFileRequests = mutableListOf<String>()
+    override suspend fun toolFileData(sessionId: String, directory: String, messageId: String, callId: String): Result<List<String?>> {
+        toolFileRequests += "$messageId/$callId"
+        return toolFiles
+    }
     val prefetched = mutableListOf<Pair<List<String>, Int>>()
     override suspend fun prefetch(sessionIds: List<String>, lastMessages: Int) {
         prefetched += sessionIds to lastMessages
@@ -2081,6 +2623,7 @@ private class FakeChat(var transcript: List<Message>) : ChatRepository {
         prompts += text to delivery
         calls += "prompt:$text"
         sentAttachments += attachments
+        promptGate?.await()
         return promptResult
     }
 

@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
@@ -18,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
@@ -72,9 +74,10 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ChatHeaderLineChanged(ChatHeaderLine.BranchFiles))
         vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
         vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
-        vm.onEvent(SettingsEvent.SwipeBetweenChatsChanged(false))
+        vm.onEvent(SettingsEvent.ChatSwipeChanged(ChatSwipe.SessionDrawer))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
+        vm.onEvent(SettingsEvent.RunningChipsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
         vm.onEvent(SettingsEvent.GroupThoughtsChanged(false))
@@ -84,12 +87,14 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.FollowRunningToolsChanged(false))
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
+        vm.onEvent(SettingsEvent.ToolMediaSizeChanged(ToolMediaSize.Small))
         vm.onEvent(SettingsEvent.TerminalOpenKeyboardChanged(false))
         vm.onEvent(SettingsEvent.TerminalFullscreenByDefaultChanged(true))
         vm.onEvent(SettingsEvent.OutputPreviewLinesChanged(24))
         vm.onEvent(SettingsEvent.LiveOutputIntervalChanged(1_500))
         vm.onEvent(SettingsEvent.KeepLiveStepsOpenChanged(true))
         vm.onEvent(SettingsEvent.ChatTextScaleChanged(0.85f))
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("opencode"))
         vm.onEvent(SettingsEvent.LiveThinkingChanged(false))
         vm.onEvent(SettingsEvent.LiveShellChanged(false))
         vm.onEvent(SettingsEvent.LiveEditsChanged(false))
@@ -116,19 +121,22 @@ class SettingsViewModelTest {
                 liveOther = true,
                 showFullCommands = true,
                 showToolDetails = false,
+                toolMediaSize = ToolMediaSize.Small,
                 terminalOpenKeyboard = false,
                 terminalFullscreenByDefault = true,
                 outputPreviewLines = 24,
                 liveOutputIntervalMs = 1_500,
                 keepLiveStepsOpen = true,
                 chatTextScale = 0.85f,
+                openCodeTheme = "opencode",
                 showCost = false,
                 chatHeaderLine = ChatHeaderLine.BranchFiles,
                 headerOpens = ChangesScope.Session,
                 chatHeaderStyle = ChatHeaderStyle.Short,
-                swipeBetweenChats = false,
+                chatSwipe = ChatSwipe.SessionDrawer,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
+                runningChips = false,
                 agentColorOutline = false,
                 dictation = false,
                 selectionApply = SelectionApply.Immediately,
@@ -145,6 +153,22 @@ class SettingsViewModelTest {
             settings.settings.value,
         )
         assertEquals(settings.settings.value, vm.state.value.settings)
+    }
+
+    @Test
+    fun `the OpenCode theme is none by default and goes back to none`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertNull(vm.state.value.settings.openCodeTheme)
+
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged("dracula"))
+        advanceUntilIdle()
+        assertEquals("dracula", settings.settings.value.openCodeTheme)
+        assertEquals("dracula", vm.state.value.settings.openCodeTheme)
+
+        vm.onEvent(SettingsEvent.OpenCodeThemeChanged(null))
+        advanceUntilIdle()
+        assertNull(settings.settings.value.openCodeTheme)
     }
 
     @Test

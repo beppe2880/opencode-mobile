@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">No se pudo preparar el acceso desde el navegador en el servidor (%1$s). Inténtalo de nuevo.</string>
+    <string name="oauth_error_callback">No se recibió una respuesta de autorización válida del navegador (%1$s). Inicia el acceso de nuevo.</string>
+    <string name="oauth_error_exchange">No se pudo intercambiar el código de autorización con el proveedor (%1$s). Inicia el acceso de nuevo.</string>
+    <string name="oauth_error_validation">No se pudo validar la respuesta del proveedor (%1$s). No se enviaron credenciales al servidor.</string>
+    <string name="oauth_error_import">No se pudo confirmar que las credenciales se guardaron en el servidor (%1$s). Comprueba la conexión y el estado del proveedor antes de reintentar.</string>
+    <string name="oauth_error_expired">El acceso desde el navegador caducó (%1$s). Inicia el acceso de nuevo.</string>
+    <string name="oauth_error_server_changed">El servidor seleccionado cambió durante el acceso (%1$s). Inicia el acceso de nuevo.</string>
+    <string name="oauth_error_unknown">No se pudo completar el acceso desde el navegador (%1$s). Inicia el acceso de nuevo.</string>
+</resources>

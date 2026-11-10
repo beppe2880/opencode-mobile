@@ -4,11 +4,12 @@ import androidx.compose.ui.graphics.Color
 
 /**
  * The 16 ANSI colors of the terminal: black, red, green, yellow, blue, magenta, cyan, white,
- * then their bright variants. The light set keeps every color readable on a light background,
- * where xterm's yellow and white disappear.
+ * then their bright variants. An OpenCode theme gives its own ([OcColors.ansi], from its hues);
+ * otherwise the light set keeps every color readable on a light background, where xterm's yellow
+ * and white disappear.
  */
 val OcColors.terminalAnsi: List<Color>
-    get() = if (isDark) DarkAnsi else LightAnsi
+    get() = ansi ?: if (isDark) DarkAnsi else LightAnsi
 
 private val DarkAnsi = listOf(
     Color(0xFF000000), Color(0xFFCD3131), Color(0xFF0DBC79), Color(0xFFE5E510),

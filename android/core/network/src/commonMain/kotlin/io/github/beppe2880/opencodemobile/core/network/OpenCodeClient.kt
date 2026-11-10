@@ -3,7 +3,9 @@ package io.github.beppe2880.opencodemobile.core.network
 import io.github.beppe2880.opencodemobile.api.apis.AgentApi
 import io.github.beppe2880.opencodemobile.api.apis.CommandApi
 import io.github.beppe2880.opencodemobile.api.apis.ConfigApi
+import io.github.beppe2880.opencodemobile.api.apis.CredentialApi
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
+import io.github.beppe2880.opencodemobile.api.apis.IntegrationApi
 import io.github.beppe2880.opencodemobile.api.apis.McpApi
 import io.github.beppe2880.opencodemobile.api.apis.ModelApi
 import io.github.beppe2880.opencodemobile.api.apis.PermissionApi
@@ -63,6 +65,11 @@ class OpenCodeClient internal constructor(
     val agents: AgentApi = AgentApi(baseUrl, http)
     val models: ModelApi = ModelApi(baseUrl, http)
     val providers: ProviderApi = ProviderApi(baseUrl, http)
+    val integrations: IntegrationApi = IntegrationApi(baseUrl, http)
+
+    // A 307/308 must never forward imported tokens to another endpoint or downgrade TLS.
+    private val credentialHttp = http.config { followRedirects = false }
+    val credentials: CredentialApi = CredentialApi(baseUrl, credentialHttp)
     val projects: ProjectApi = ProjectApi(baseUrl, http)
     val commands: CommandApi = CommandApi(baseUrl, http)
     val config: ConfigApi = ConfigApi(baseUrl, http)
@@ -209,7 +216,10 @@ class OpenCodeClient internal constructor(
     }
 
     /** Releases this client; the shared engine and its connections stay open for the others. */
-    fun close() = http.close()
+    fun close() {
+        credentialHttp.close()
+        http.close()
+    }
 
     companion object {
         /** Three missed server heartbeats (sent every 15 s). */

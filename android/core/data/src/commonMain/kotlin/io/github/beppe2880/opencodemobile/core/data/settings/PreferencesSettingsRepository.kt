@@ -4,10 +4,12 @@ import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.HEADER_OPENS_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
@@ -15,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -27,8 +30,14 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-/** Non-sensitive UI preferences. Unknown stored values fall back to [AppSettings] defaults. */
-internal class PreferencesSettingsRepository(private val prefs: Settings) : SettingsRepository {
+/**
+ * Non-sensitive UI preferences. Unknown stored values fall back to [AppSettings] defaults;
+ * [themes] tells the OpenCode themes that still exist.
+ */
+internal class PreferencesSettingsRepository(
+    private val prefs: Settings,
+    private val themes: OpenCodeThemeIds = OpenCodeThemeIds { true },
+) : SettingsRepository {
 
     private val mutex = Mutex()
 
@@ -49,17 +58,25 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         prefs.putBoolean(KEY_LIVE_OTHER, next.liveOther)
         prefs.putBoolean(KEY_FULL_COMMANDS, next.showFullCommands)
         prefs.putBoolean(KEY_TOOL_DETAILS, next.showToolDetails)
+        prefs.putString(KEY_TOOL_MEDIA_SIZE, next.toolMediaSize.name)
         prefs.putInt(KEY_OUTPUT_LINES, next.outputPreviewLines)
         prefs.putLong(KEY_LIVE_INTERVAL, next.liveOutputIntervalMs)
         prefs.putBoolean(KEY_KEEP_LIVE_OPEN, next.keepLiveStepsOpen)
         prefs.putFloat(KEY_TEXT_SCALE, next.chatTextScale)
+        val openCodeTheme = next.openCodeTheme
+        if (openCodeTheme == null) prefs.remove(KEY_OPENCODE_THEME) else prefs.putString(KEY_OPENCODE_THEME, openCodeTheme)
+        // Read once into the theme; a choice of None must not bring it back.
+        prefs.remove(KEY_COLORED_MARKDOWN)
         prefs.putBoolean(KEY_SHOW_COST, next.showCost)
         prefs.putString(KEY_HEADER_LINE, next.chatHeaderLine.name)
         prefs.putString(KEY_HEADER_OPENS, next.headerOpens.name)
         prefs.putString(KEY_HEADER_STYLE, next.chatHeaderStyle.name)
-        prefs.putBoolean(KEY_SWIPE_CHATS, next.swipeBetweenChats)
+        prefs.putString(KEY_CHAT_SWIPE, next.chatSwipe.name)
+        // Kept for older versions of the app, which only had the switch.
+        prefs.putBoolean(KEY_SWIPE_CHATS, next.chatSwipe != ChatSwipe.Off)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
+        prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putString(KEY_VOICE_ENGINE, next.voiceEngine.name)
@@ -117,6 +134,7 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             liveOther = prefs.getBoolean(KEY_LIVE_OTHER, defaults.liveOther),
             showFullCommands = prefs.getBoolean(KEY_FULL_COMMANDS, defaults.showFullCommands),
             showToolDetails = prefs.getBoolean(KEY_TOOL_DETAILS, defaults.showToolDetails),
+            toolMediaSize = ToolMediaSize.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_TOOL_MEDIA_SIZE) } ?: defaults.toolMediaSize,
             outputPreviewLines = prefs.getInt(KEY_OUTPUT_LINES, defaults.outputPreviewLines)
                 .takeIf { it in OUTPUT_LINE_CHOICES } ?: defaults.outputPreviewLines,
             liveOutputIntervalMs = prefs.getLong(KEY_LIVE_INTERVAL, defaults.liveOutputIntervalMs)
@@ -124,13 +142,19 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
             keepLiveStepsOpen = prefs.getBoolean(KEY_KEEP_LIVE_OPEN, defaults.keepLiveStepsOpen),
             chatTextScale = prefs.getFloat(KEY_TEXT_SCALE, defaults.chatTextScale)
                 .takeIf { it in TEXT_SCALE_CHOICES } ?: defaults.chatTextScale,
+            // Before the themes there was a "Colored markdown" switch, which used the OpenCode theme.
+            openCodeTheme = (prefs.getStringOrNull(KEY_OPENCODE_THEME) ?: OPENCODE_THEME.takeIf { prefs.getBoolean(KEY_COLORED_MARKDOWN, false) })
+                ?.takeIf { it in themes },
             showCost = prefs.getBoolean(KEY_SHOW_COST, defaults.showCost),
             chatHeaderLine = ChatHeaderLine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_LINE) } ?: defaults.chatHeaderLine,
             chatHeaderStyle = ChatHeaderStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_STYLE) } ?: defaults.chatHeaderStyle,
             headerOpens = HEADER_OPENS_CHOICES.firstOrNull { it.name == prefs.getStringOrNull(KEY_HEADER_OPENS) } ?: defaults.headerOpens,
-            swipeBetweenChats = prefs.getBoolean(KEY_SWIPE_CHATS, defaults.swipeBetweenChats),
+            chatSwipe = ChatSwipe.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_CHAT_SWIPE) }
+                // Before the choice there was a switch: off stays off.
+                ?: if (prefs.getBooleanOrNull(KEY_SWIPE_CHATS) == false) ChatSwipe.Off else defaults.chatSwipe,
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
+            runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             voiceEngine = VoiceEngine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_VOICE_ENGINE) } ?: defaults.voiceEngine,
@@ -192,17 +216,29 @@ internal class PreferencesSettingsRepository(private val prefs: Settings) : Sett
         const val KEY_LIVE_OTHER = "live_other"
         const val KEY_FULL_COMMANDS = "show_full_commands"
         const val KEY_TOOL_DETAILS = "show_tool_details"
+        const val KEY_TOOL_MEDIA_SIZE = "tool_media_size"
         const val KEY_OUTPUT_LINES = "output_preview_lines"
         const val KEY_LIVE_INTERVAL = "live_output_interval_ms"
         const val KEY_KEEP_LIVE_OPEN = "keep_live_steps_open"
         const val KEY_TEXT_SCALE = "chat_text_scale"
+        const val KEY_OPENCODE_THEME = "opencode_theme"
+
+        /** The former "Colored markdown" switch; true reads as [OPENCODE_THEME] until a theme is written. */
+        const val KEY_COLORED_MARKDOWN = "colored_markdown"
+
+        /** Id of OpenCode's default theme, the colors of the former switch. */
+        const val OPENCODE_THEME = "opencode"
         const val KEY_SHOW_COST = "show_cost"
         const val KEY_HEADER_LINE = "chat_header_line"
         const val KEY_HEADER_OPENS = "chat_header_opens"
         const val KEY_HEADER_STYLE = "chat_header_style"
+
+        /** The former "Swipe between chats" switch; false reads as [ChatSwipe.Off] until a choice is written. */
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
+        const val KEY_CHAT_SWIPE = "chat_swipe"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
+        const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
         const val KEY_VOICE_ENGINE = "voice_engine"

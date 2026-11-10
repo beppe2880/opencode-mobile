@@ -1,0 +1,14 @@
+<resources>
+    <string name="chat_providers_group_connected">Подключённые</string>
+    <string name="chat_providers_group_popular">Популярные</string>
+    <string name="chat_providers_group_other">Другие провайдеры</string>
+    <string name="chat_providers_status_connected">Подключён</string>
+    <string name="chat_providers">Подключить провайдера</string>
+    <string name="chat_providers_hint">Учётные данные сохраняются на этом сервере, а не на телефоне.</string>
+    <string name="chat_providers_search">Поиск провайдеров</string>
+    <string name="chat_providers_key">API-ключ</string>
+    <string name="chat_providers_save">Подключить</string>
+    <string name="chat_providers_connected">Учётные данные сохранены на сервере.</string>
+    <string name="chat_providers_error">Не удалось выполнить запрос. Проверьте соединение и обязательные поля и повторите попытку.</string>
+    <string name="chat_providers_empty">Нет подходящих интеграций.</string>
+</resources>

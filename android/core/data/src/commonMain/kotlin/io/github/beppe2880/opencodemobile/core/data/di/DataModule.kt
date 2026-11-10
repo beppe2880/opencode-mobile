@@ -7,12 +7,16 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomMessageCache
+import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesFolderPreferences
 import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentModelRepository
 import io.github.beppe2880.opencodemobile.core.data.catalog.RemoteCatalogRepository
 import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
+import io.github.beppe2880.opencodemobile.core.data.events.AppVisibility
 import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
+import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
+import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
@@ -28,7 +32,10 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
+import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -89,6 +96,7 @@ val dataModule = module {
                 withContext(Dispatchers.IO) {
                     PreferencesDraftRepository.clearServer(drafts, serverId)
                     PreferencesRecentModelRepository.clearServer(settings, serverId)
+                    PreferencesFolderPreferences.clearServer(settings, serverId)
                 }
             },
         )
@@ -100,10 +108,14 @@ val dataModule = module {
     single<TerminalRepository> { RemoteTerminalRepository(get(), network = get()) }
     single<FileRepository> { RemoteFileRepository(get()) }
     single<McpRepository> { RemoteMcpRepository(get()) }
+    single { BrowserOAuth(get(), get(SettingsStore), get<AppVisibility>().isVisible) }
+    single<IntegrationRepository> { RemoteIntegrationRepository(get(), get(), get()) }
     single<VcsRepository> { RemoteVcsRepository(get()) }
-    single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore)) }
+    // The theme catalog is in core:ui; the app's modules provide it.
+    single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore), get<OpenCodeThemeIds>()) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
+    single<FolderPreferences> { PreferencesFolderPreferences(get(SettingsStore)) }
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }
     single<SpeechToTextRepository> { CloudSpeechToTextRepository(get(SttKeysStore), get(), SpeechToTextClient(), ::appLanguage) }
     single<UpdateRepository> {

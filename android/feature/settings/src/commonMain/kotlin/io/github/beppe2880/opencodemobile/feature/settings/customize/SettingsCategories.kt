@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -14,7 +15,9 @@ import io.github.beppe2880.opencodemobile.core.domain.sttModel
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_header
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_running_line
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline
@@ -71,6 +74,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_su
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_share_menu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe_drawer
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_large
@@ -103,7 +107,7 @@ val SettingsArea.groups: List<OptionGroup>
     get() = when (this) {
         SettingsArea.Servers, SettingsArea.About -> emptyList()
         SettingsArea.Appearance -> listOf(
-            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.TextSize)),
+            OptionGroup(null, listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize)),
             OptionGroup(
                 Res.string.settings_group_wide,
                 listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList),
@@ -119,11 +123,13 @@ val SettingsArea.groups: List<OptionGroup>
                     SettingOption.ExpandTools,
                     SettingOption.ToolDetails,
                     SettingOption.FullCommands,
+                    SettingOption.ToolMediaSize,
                     SettingOption.ShowCost,
                 ),
             ),
             OptionGroup(UiRes.string.oc_part_header, listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)),
             OptionGroup(UiRes.string.oc_part_pending, listOf(SettingOption.QuestionsCollapsed, SettingOption.PermissionsCollapsed)),
+            OptionGroup(UiRes.string.oc_part_running_line, listOf(SettingOption.RunningChips)),
             OptionGroup(Res.string.settings_group_gestures, listOf(SettingOption.SwipeChats)),
         )
         SettingsArea.LiveActivity -> listOf(
@@ -268,6 +274,7 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
         }
         SettingsArea.Appearance -> listOfNotNull(
             res(s.theme.labelRes),
+            OpenCodeThemes.byId(s.openCodeTheme)?.let { UiText.Raw(it.displayName) },
             res(textSizeLabel(s.chatTextScale)),
             if (wide && s.splitView) res(Res.string.settings_summary_split) else null,
         )
@@ -275,7 +282,8 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
             s.showReasoning to Res.string.settings_summary_reasoning,
             s.groupActivity to Res.string.settings_summary_grouped,
             s.showCost to Res.string.settings_summary_cost,
-            s.swipeBetweenChats to Res.string.settings_summary_swipe,
+            (s.chatSwipe == ChatSwipe.SwitchChats) to Res.string.settings_summary_swipe,
+            (s.chatSwipe == ChatSwipe.SessionDrawer) to Res.string.settings_summary_swipe_drawer,
         )
         SettingsArea.LiveActivity -> if (!s.followRunningTools) {
             listOf(res(Res.string.settings_summary_off))

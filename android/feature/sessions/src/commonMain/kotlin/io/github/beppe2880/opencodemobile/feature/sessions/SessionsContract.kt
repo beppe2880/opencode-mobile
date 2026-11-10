@@ -17,9 +17,29 @@ enum class DayBucket { Today, Yesterday, ThisWeek, Older }
 data class SessionGroup(val bucket: DayBucket, val sessions: List<Session>)
 
 @Immutable
+data class FolderBrowserState(
+    val path: String = "",
+    val parent: String? = null,
+    val folders: List<String> = emptyList(),
+    val loading: Boolean = true,
+    val error: UiText? = null,
+    val recent: List<String> = emptyList(),
+    /** The folder the browser opened at once listed; back stops there and recent folders show there. */
+    val start: String? = null,
+) {
+    /** Recent folders are offered here: at the start folder, or while it is not listed yet. */
+    val atStart: Boolean get() = start == null || path == start
+
+    /** Where back goes: one folder up until the start folder or a root, then null (back closes the browser). */
+    val backTo: String? get() = parent?.takeIf { path != start }
+}
+
+@Immutable
 data class NewSessionState(
     val directory: String = "",
     val customDirectory: Boolean = false,
+    /** Open while the user browses the server's folders. */
+    val browser: FolderBrowserState? = null,
     val agents: List<Agent> = emptyList(),
     val models: List<ModelInfo> = emptyList(),
     /** Models last used on this device, then those of the most recently updated sessions; listed first in the picker. */
@@ -49,6 +69,7 @@ data class SessionsState(
     val connection: ConnectionState = ConnectionState.Disconnected,
     val query: String = "",
     val projects: List<Project> = emptyList(),
+    val hiddenDirectories: Set<String> = emptySet(),
     val directoryFilter: String? = null,
     val groups: List<SessionGroup> = emptyList(),
     val running: Set<String> = emptySet(),
@@ -69,6 +90,7 @@ data class SessionsState(
     val deleting: Session? = null,
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
+    val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
 
@@ -77,6 +99,8 @@ sealed interface SessionsEvent {
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent
+    data class HideProject(val directory: String) : SessionsEvent
+    data class UnhideProject(val directory: String) : SessionsEvent
     data class Open(val sessionId: String) : SessionsEvent
     data object OpenSettings : SessionsEvent
 
@@ -91,6 +115,16 @@ sealed interface SessionsEvent {
     data object StartNewSession : SessionsEvent
     data object DismissNewSession : SessionsEvent
     data class NewSessionDirectory(val directory: String, val custom: Boolean) : SessionsEvent
+    data object BrowseFolders : SessionsEvent
+
+    /** Null opens the server's own folder. */
+    data class BrowseTo(val path: String?) : SessionsEvent
+    data object CloseFolderBrowser : SessionsEvent
+    data object PickBrowsedFolder : SessionsEvent
+
+    /** Picks [path] (e.g. a recent folder) without browsing to it first. */
+    data class PickFolder(val path: String) : SessionsEvent
+
     data class NewSessionAgent(val agent: String) : SessionsEvent
     data class NewSessionModelPicker(val open: Boolean) : SessionsEvent
     data class NewSessionModel(val model: ModelRef) : SessionsEvent

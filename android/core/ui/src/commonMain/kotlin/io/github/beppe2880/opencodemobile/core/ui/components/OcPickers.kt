@@ -28,10 +28,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.Agent
@@ -47,6 +51,8 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_title
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_variant
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_variant_default
 import io.github.beppe2880.opencodemobile.core.ui.text.formatTokens
+import io.github.beppe2880.opencodemobile.core.ui.text.shortModelName
+import io.github.beppe2880.opencodemobile.core.ui.text.variantLabel
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import org.jetbrains.compose.resources.stringResource
@@ -84,7 +90,8 @@ fun OcAgentChips(
 
 /**
  * Searchable model list grouped by provider; [recent] models are listed first.
- * Filter text is local UI state.
+ * Filter text is local UI state. With a [providerMark] (provider id, provider name) each row
+ * starts with it and shows the short model name ([shortModelName]), plus the selected variant.
  */
 @Composable
 fun OcModelPicker(
@@ -95,6 +102,7 @@ fun OcModelPicker(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     onSelectVariant: ((String?) -> Unit)? = null,
+    providerMark: (@Composable (providerId: String, providerName: String) -> Unit)? = null,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val sections = remember(models, recent, query) { modelSections(models, recent, query) }
@@ -147,7 +155,14 @@ fun OcModelPicker(
                     OcSectionHeader(section.title ?: recentLabel)
                 }
                 items(section.models, key = { "${section.key}-${it.ref.key}" }) { model ->
-                    ModelRow(model = model, selected = model.ref.key == selected?.key, onClick = { onSelect(model.ref) })
+                    val isSelected = model.ref.key == selected?.key
+                    ModelRow(
+                        model = model,
+                        selected = isSelected,
+                        variant = selected?.variant?.takeIf { isSelected },
+                        mark = providerMark,
+                        onClick = { onSelect(model.ref) },
+                    )
                 }
             }
         }
@@ -175,7 +190,7 @@ private fun VariantRow(variants: List<String>, selected: String?, onSelect: (Str
             (listOf<String?>(null) + variants).forEach { variant ->
                 val isSelected = variant == selected
                 OcChip(
-                    text = variant ?: stringResource(Res.string.oc_models_variant_default),
+                    text = variant?.let(::variantLabel) ?: stringResource(Res.string.oc_models_variant_default),
                     onClick = { onSelect(variant) },
                     selected = isSelected,
                     leadingIcon = if (isSelected) Icons.Outlined.Check else null,
@@ -188,7 +203,13 @@ private fun VariantRow(variants: List<String>, selected: String?, onSelect: (Str
 }
 
 @Composable
-private fun ModelRow(model: ModelInfo, selected: Boolean, onClick: () -> Unit) {
+private fun ModelRow(
+    model: ModelInfo,
+    selected: Boolean,
+    variant: String?,
+    mark: (@Composable (providerId: String, providerName: String) -> Unit)?,
+    onClick: () -> Unit,
+) {
     val c = OcTheme.colors
     Row(
         modifier = Modifier
@@ -201,8 +222,13 @@ private fun ModelRow(model: ModelInfo, selected: Boolean, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
     ) {
+        if (mark != null) mark(model.providerId, model.providerName)
         Column(modifier = Modifier.weight(1f)) {
-            Text(model.name, style = MaterialTheme.typography.bodyMedium, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (mark == null) {
+                Text(model.name, style = MaterialTheme.typography.bodyMedium, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            } else {
+                OcModelName(name = shortModelName(model.name, model.providerId), variant = variant?.let(::variantLabel))
+            }
             Text(
                 text = "${model.providerName} · ${model.ref.id} · ${formatTokens(model.contextLimit)}",
                 style = OcTheme.mono.codeSmall,
@@ -214,6 +240,56 @@ private fun ModelRow(model: ModelInfo, selected: Boolean, onClick: () -> Unit) {
         if (selected) Icon(Icons.Outlined.Check, contentDescription = null, tint = c.textAccent, modifier = Modifier.size(18.dp))
     }
 }
+
+/**
+ * A model [name] followed by its [variant] in the muted color, on one line. When space is short
+ * the variant is ellipsized first, then the name: the name is measured first without a weight
+ * and takes what it needs, the variant only gets the width that is left.
+ */
+@Composable
+fun OcModelName(
+    name: String,
+    variant: String?,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
+    nameModifier: Modifier = Modifier,
+    variantModifier: Modifier = Modifier,
+    variantStyle: TextStyle = style,
+) {
+    val c = OcTheme.colors
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    // The variant shows, ellipsized if needed, only when at least its first letters fit next to
+    // the whole name: a bare "…" says nothing (screen readers get the full label anyway).
+    val variantMinWidth = remember(variant, variantStyle, density) {
+        variant?.let { measurer.measure(it.take(VARIANT_MIN_CHARS) + "…", variantStyle, maxLines = 1).size.width }
+    }
+    val gap = with(density) { OcSpacing.xs.roundToPx() }
+    Layout(
+        modifier = modifier,
+        content = {
+            Text(name, style = style, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = nameModifier)
+            if (variant != null) {
+                Text(variant, style = variantStyle, color = c.textMuted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = variantModifier)
+            }
+        },
+    ) { measurables, constraints ->
+        val loose = constraints.copy(minWidth = 0)
+        val namePlaceable = measurables[0].measure(loose)
+        val room = constraints.maxWidth - namePlaceable.width - gap
+        val variantPlaceable = measurables.getOrNull(1)?.takeIf { variantMinWidth != null && room >= variantMinWidth }
+            ?.measure(loose.copy(maxWidth = room))
+        val width = namePlaceable.width + (variantPlaceable?.let { gap + it.width } ?: 0)
+        val height = maxOf(namePlaceable.height, variantPlaceable?.height ?: 0)
+        layout(width.coerceAtLeast(constraints.minWidth), height) {
+            namePlaceable.placeRelative(0, (height - namePlaceable.height) / 2)
+            variantPlaceable?.placeRelative(namePlaceable.width + gap, (height - variantPlaceable.height) / 2)
+        }
+    }
+}
+
+/** Letters of the variant that must fit for it to show ("Med…"). */
+private const val VARIANT_MIN_CHARS = 3
 
 private const val RECENT = "\u0000recent"
 

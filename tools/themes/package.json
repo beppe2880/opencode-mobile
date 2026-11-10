@@ -1,0 +1,14 @@
+{
+  "name": "opencode-mobile-themes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "bun src/generate.ts generate",
+    "refresh": "bun src/generate.ts refresh",
+    "check": "bun src/generate.ts check",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@opencode/theme": "2.2.6"
+  }
+}

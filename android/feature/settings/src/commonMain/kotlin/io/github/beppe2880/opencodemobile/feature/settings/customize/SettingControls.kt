@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
@@ -24,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -103,6 +105,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_no
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_permissions_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_notify_questions_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_opencode_theme
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_opencode_theme_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_output_lines_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_permissions_collapsed
@@ -113,6 +117,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_re
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_fastest
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_normal
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_refresh_slow
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_chips
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_chips_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_running_in_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply
@@ -136,7 +142,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_split_view_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_drawer
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_drawer_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_switch
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard
@@ -153,6 +164,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_th
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_details_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_hidden
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_large
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_medium
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_small
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner_sub
@@ -186,6 +203,7 @@ internal val SettingOption.titleRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme
         SettingOption.TextSize -> Res.string.settings_text_size
+        SettingOption.OpenCodeTheme -> Res.string.settings_opencode_theme
         SettingOption.HeaderLine -> Res.string.settings_header_line
         SettingOption.HeaderStyle -> Res.string.settings_header_style
         SettingOption.HeaderOpens -> Res.string.settings_header_opens
@@ -195,10 +213,12 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ExpandTools -> Res.string.settings_expand_tools
         SettingOption.ToolDetails -> Res.string.settings_tool_details
         SettingOption.FullCommands -> Res.string.settings_full_commands
+        SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size
         SettingOption.OutputLines -> Res.string.settings_output_lines
         SettingOption.ShowCost -> Res.string.settings_show_cost
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed
         SettingOption.QuestionsCollapsed -> Res.string.settings_questions_collapsed
+        SettingOption.RunningChips -> Res.string.settings_running_chips
         SettingOption.ConfirmStop -> Res.string.settings_confirm_stop
         SettingOption.FollowRunning -> Res.string.settings_follow_running
         SettingOption.KeepLiveOpen -> Res.string.settings_keep_live_open
@@ -242,6 +262,7 @@ internal val SettingOption.descriptionRes: StringResource
     get() = when (this) {
         SettingOption.Theme -> Res.string.settings_theme_sub
         SettingOption.TextSize -> Res.string.settings_text_size_sub
+        SettingOption.OpenCodeTheme -> Res.string.settings_opencode_theme_sub
         SettingOption.HeaderLine -> Res.string.settings_header_line_all_sub
         SettingOption.HeaderStyle -> Res.string.settings_header_style_icons_sub
         SettingOption.HeaderOpens -> Res.string.settings_header_opens_sub
@@ -251,10 +272,12 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ExpandTools -> Res.string.settings_expand_tools_sub
         SettingOption.ToolDetails -> Res.string.settings_tool_details_sub
         SettingOption.FullCommands -> Res.string.settings_full_commands_sub
+        SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size_sub
         SettingOption.OutputLines -> Res.string.settings_output_lines_sub
         SettingOption.ShowCost -> Res.string.settings_show_cost_sub
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed_sub
         SettingOption.QuestionsCollapsed -> Res.string.settings_questions_collapsed_sub
+        SettingOption.RunningChips -> Res.string.settings_running_chips_sub
         SettingOption.ConfirmStop -> Res.string.settings_confirm_stop_sub
         SettingOption.FollowRunning -> Res.string.settings_follow_running_sub
         SettingOption.KeepLiveOpen -> Res.string.settings_keep_live_open_sub
@@ -322,6 +345,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             selected = settings.chatTextScale,
             onSelect = { onEvent(SettingsEvent.ChatTextScaleChanged(it)) },
         )
+        SettingOption.OpenCodeTheme -> OpenCodeThemeControl(title, subtitle, settings.openCodeTheme, onEvent, modifier)
         SettingOption.HeaderLine -> ChoiceRow(
             title = title,
             subtitle = stringResource(
@@ -372,6 +396,18 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.ExpandTools -> switch(settings.expandToolsByDefault, SettingsEvent::ExpandToolsChanged)()
         SettingOption.ToolDetails -> switch(settings.showToolDetails, SettingsEvent::ShowToolDetailsChanged)()
         SettingOption.FullCommands -> switch(settings.showFullCommands, SettingsEvent::ShowFullCommandsChanged)()
+        SettingOption.ToolMediaSize -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(ToolMediaSize.Hidden, stringResource(Res.string.settings_tool_media_size_hidden), "settings_tool_media_size_hidden"),
+                OcSegment(ToolMediaSize.Small, stringResource(Res.string.settings_tool_media_size_small), "settings_tool_media_size_small"),
+                OcSegment(ToolMediaSize.Medium, stringResource(Res.string.settings_tool_media_size_medium), "settings_tool_media_size_medium"),
+                OcSegment(ToolMediaSize.Large, stringResource(Res.string.settings_tool_media_size_large), "settings_tool_media_size_large"),
+            ),
+            selected = settings.toolMediaSize,
+            onSelect = { onEvent(SettingsEvent.ToolMediaSizeChanged(it)) },
+        )
         SettingOption.OutputLines -> ChoiceRow(
             title = title,
             subtitle = subtitle,
@@ -382,6 +418,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.ShowCost -> switch(settings.showCost, SettingsEvent::ShowCostChanged)()
         SettingOption.PermissionsCollapsed -> switch(settings.permissionsCollapsed, SettingsEvent::PermissionsCollapsedChanged)()
         SettingOption.QuestionsCollapsed -> switch(settings.questionsCollapsed, SettingsEvent::QuestionsCollapsedChanged)()
+        SettingOption.RunningChips -> switch(settings.runningChips, SettingsEvent::RunningChipsChanged)()
         SettingOption.ConfirmStop -> switch(settings.confirmStopCommand, SettingsEvent::ConfirmStopChanged)()
         SettingOption.FollowRunning -> switch(settings.followRunningTools, SettingsEvent::FollowRunningToolsChanged)()
         SettingOption.KeepLiveOpen -> switch(settings.keepLiveStepsOpen, SettingsEvent::KeepLiveStepsOpenChanged)()
@@ -469,7 +506,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             onSelect = { onEvent(SettingsEvent.ShareOpensChanged(it)) },
         )
         SettingOption.RunningInList -> switch(settings.showRunningWorkInList, SettingsEvent::RunningInListChanged)()
-        SettingOption.SwipeChats -> switch(settings.swipeBetweenChats, SettingsEvent::SwipeBetweenChatsChanged)()
+        SettingOption.SwipeChats -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.chatSwipe) {
+                    ChatSwipe.SwitchChats -> Res.string.settings_swipe_chats_sub
+                    ChatSwipe.SessionDrawer -> Res.string.settings_swipe_chats_drawer_sub
+                    ChatSwipe.Off -> Res.string.settings_swipe_chats_off_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(ChatSwipe.SessionDrawer, stringResource(Res.string.settings_swipe_chats_drawer), "settings_swipe_chats_drawer"),
+                OcSegment(ChatSwipe.SwitchChats, stringResource(Res.string.settings_swipe_chats_switch), "settings_swipe_chats_next_previous"),
+                OcSegment(ChatSwipe.Off, stringResource(Res.string.settings_swipe_chats_off), "settings_swipe_chats_off"),
+            ),
+            selected = settings.chatSwipe,
+            onSelect = { onEvent(SettingsEvent.ChatSwipeChanged(it)) },
+        )
         SettingOption.SplitView -> switch(settings.splitView, SettingsEvent::SplitViewChanged)()
         SettingOption.ListWidth -> {
             val fraction = settings.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION
@@ -544,15 +597,18 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
 /** Test tags keep the names the settings list used before the previews. */
 private val SettingOption.tag: String
     get() = when (this) {
+        SettingOption.OpenCodeTheme -> "opencode_theme"
         SettingOption.ShowReasoning -> "show_reasoning"
         SettingOption.GroupThoughts -> "group_thoughts"
         SettingOption.GroupActivity -> "group_activity"
         SettingOption.ExpandTools -> "expand_tools"
         SettingOption.ToolDetails -> "tool_details"
         SettingOption.FullCommands -> "full_commands"
+        SettingOption.ToolMediaSize -> "tool_media_size"
         SettingOption.ShowCost -> "show_cost"
         SettingOption.PermissionsCollapsed -> "permissions_collapsed"
         SettingOption.QuestionsCollapsed -> "questions_collapsed"
+        SettingOption.RunningChips -> "running_chips"
         SettingOption.ConfirmStop -> "confirm_stop"
         SettingOption.FollowRunning -> "follow_running"
         SettingOption.KeepLiveOpen -> "keep_live_open"

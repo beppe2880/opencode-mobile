@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -68,6 +69,11 @@ object OcTheme {
     val mono: OcMonoTypography
         @Composable @ReadOnlyComposable
         get() = LocalOcMono.current
+
+    /** The markdown colors of the active OpenCode theme; null renders markdown uncolored. */
+    val markdown: OcMarkdownPalette?
+        @Composable @ReadOnlyComposable
+        get() = LocalOcColors.current.markdown
     val spacing: OcSpacing get() = OcSpacing
     val radius: OcRadius get() = OcRadius
 }
@@ -79,12 +85,19 @@ fun ThemeMode.isDark(): Boolean = when (this) {
     ThemeMode.Dark -> true
 }
 
+/**
+ * The app theme. [openCodeTheme] is the id of an OpenCode terminal app theme ([OpenCodeThemes]):
+ * the whole app then takes its colors in the [darkTheme] mode, or its only mode, and
+ * [OcColors.isDark] (also the Material scheme) follows the theme rather than [darkTheme]. Null or
+ * an unknown id keeps the app's own colors.
+ */
 @Composable
 fun OcTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    openCodeTheme: String? = null,
     content: @Composable () -> Unit,
 ) {
-    val colors = if (darkTheme) OcDarkColors else OcLightColors
+    val colors = remember(openCodeTheme, darkTheme) { ocColors(openCodeTheme, darkTheme) }
     CompositionLocalProvider(LocalOcColors provides colors, LocalOcMono provides ocMonoTypography()) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(),

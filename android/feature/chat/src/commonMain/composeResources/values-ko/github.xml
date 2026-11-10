@@ -1,0 +1,16 @@
+<resources>
+    <string name="chat_github_open_issue">#%1$s 열기</string>
+    <string name="chat_github_open_pull">PR #%1$s 열기</string>
+    <string name="chat_github_open_new_pull">새 PR 열기</string>
+    <string name="chat_github_open_run">실행 %1$s 열기</string>
+    <string name="chat_github_open_commit">커밋 %1$s 열기</string>
+    <string name="chat_github_open_repo">%1$s 열기</string>
+    <string name="chat_github_issue_description">GitHub에서 이슈 %1$s 열기</string>
+    <string name="chat_github_pull_description">GitHub에서 풀 리퀘스트 %1$s 열기</string>
+    <string name="chat_github_new_pull_description">GitHub에서 새 풀 리퀘스트 열기</string>
+    <string name="chat_github_run_description">GitHub에서 워크플로 실행 %1$s 열기</string>
+    <string name="chat_github_commit_description">GitHub에서 커밋 %1$s 열기</string>
+    <string name="chat_github_repo_description">GitHub에서 %1$s 열기</string>
+    <string name="chat_github_copy_link">링크 복사</string>
+    <string name="chat_github_more_links">GitHub 링크 더 보기</string>
+</resources>

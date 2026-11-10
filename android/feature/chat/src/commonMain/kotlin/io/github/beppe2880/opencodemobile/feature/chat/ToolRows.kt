@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -78,6 +80,8 @@ internal fun ToolsGroup(
     inLiveGroup: Boolean = false,
     /** Rows open on their output when the group opens; tapping one folds it. */
     details: Boolean = false,
+    /** Copies a GitHub link of a row (long press on its "Open" action). */
+    onCopy: (String) -> Unit = {},
 ) {
     val c = OcTheme.colors
     // Work in progress stays open so it can be followed live; it folds back once done.
@@ -90,6 +94,8 @@ internal fun ToolsGroup(
             expanded = open,
             onToggle = { onToggle("g:${item.key}") },
             testTag = "chat_tools_${item.key}",
+            tools = item.tools,
+            onCopy = onCopy,
         )
         AnimatedVisibility(visible = open) {
             Column(
@@ -114,6 +120,7 @@ internal fun ToolsGroup(
                         live = live,
                         inLiveGroup = inLiveGroup,
                         fullCommand = fullCommands,
+                        onCopy = onCopy,
                     )
                 }
             }
@@ -139,6 +146,8 @@ internal fun ActivityGroup(
     inLiveGroup: Boolean = false,
     /** Inner tool groups open with every tool's output when this group opens. */
     details: Boolean = false,
+    /** Copies a GitHub link of a row (long press on its "Open" action). */
+    onCopy: (String) -> Unit = {},
 ) {
     val thinking = when {
         item.thoughts.isEmpty() -> null
@@ -157,6 +166,8 @@ internal fun ActivityGroup(
             expanded = open,
             onToggle = { onToggle("a:${item.key}") },
             testTag = "chat_activity_${item.key}",
+            tools = item.tools,
+            onCopy = onCopy,
         )
         AnimatedVisibility(visible = open) {
             Column(
@@ -191,6 +202,7 @@ internal fun ActivityGroup(
                             fullCommands = fullCommands,
                             inLiveGroup = inLiveGroup && entry === latestTools,
                             details = details,
+                            onCopy = onCopy,
                         )
                         else -> Unit
                     }
@@ -226,21 +238,35 @@ private fun GroupSummary(
     expanded: Boolean,
     onToggle: () -> Unit,
     testTag: String,
+    tools: List<Part.Tool>,
+    onCopy: (String) -> Unit,
 ) {
     val c = OcTheme.colors
-    DisclosureRow(expanded = expanded, onToggle = onToggle, testTag = testTag) {
-        Text(
-            summary,
-            style = MaterialTheme.typography.bodySmall,
-            color = c.textMuted,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false),
-        )
-        when {
-            running -> OcSpinner(size = 10.dp)
-            failed -> Icon(Icons.Outlined.ErrorOutline, stringResource(Res.string.chat_tool_failed), tint = c.danger.fg, modifier = Modifier.size(14.dp))
+    // Folded, the group offers the GitHub link its rows would show; open, each row has its own.
+    val github = remember(tools) { GitHubLinks.forTools(tools) }?.takeUnless { expanded }
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.weight(1f)) {
+            DisclosureRow(expanded = expanded, onToggle = onToggle, testTag = testTag) {
+                Text(
+                    summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = c.textMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                when {
+                    running -> OcSpinner(size = 10.dp)
+                    failed -> Icon(
+                        Icons.Outlined.ErrorOutline,
+                        stringResource(Res.string.chat_tool_failed),
+                        tint = c.danger.fg,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            }
         }
+        if (github != null) GitHubLinkActions(github.links, partId = github.partId, onCopy = onCopy)
     }
 }
 
@@ -257,10 +283,12 @@ private fun ToolRow(
     live: LiveFollow?,
     inLiveGroup: Boolean,
     fullCommand: Boolean,
+    onCopy: (String) -> Unit,
 ) {
     val c = OcTheme.colors
     val child = SessionInsights.childSession(tool)
     val file = ToolInfo.filePath(tool)
+    val github = remember(tool.name, tool.status == ToolStatus.Streaming, tool.input, tool.output, tool.error) { GitHubLinks.forTool(tool) }
     val argument = ToolInfo.primaryArgument(tool.input)?.let { arg ->
         if (directory.isNotEmpty() && arg.startsWith("$directory/")) arg.removePrefix("$directory/") else arg
     }
@@ -323,6 +351,7 @@ private fun ToolRow(
                         modifier = Modifier.size(36.dp).testTag("chat_open_subagent_${tool.callId}"),
                     )
                 }
+                if (github.isNotEmpty()) GitHubLinkActions(github, partId = tool.callId, onCopy = onCopy)
                 ToolStatusIcon(tool.status)
             }
             if (wrapArgument) {

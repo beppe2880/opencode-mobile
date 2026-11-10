@@ -82,7 +82,8 @@ fun ChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.Header, preview, Modifier.padding(OcSpacing.sm)) {
             Column {
                 PreviewTopBar(state)
-                if (preview.running) RunningLine(state.work, state.headerStyle, onClick = {})
+                // Hidden while the chips above the composer show what runs, as in the chat.
+                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = {})
             }
         }
         Transcript(state, preview, cache, liveGroupKey = state.liveGroupKey())
@@ -113,6 +114,9 @@ fun ChatPreview(preview: PartPreview, modifier: Modifier = Modifier) {
                         onSubmit = {},
                         onDismiss = {},
                     )
+                    // Right above the composer, like in the chat.
+                    val chips = runningChips(SampleData.runningWork, preview.settings.runningChips)
+                    if (chips.isNotEmpty()) RunningChipRow(chips, onClick = {})
                 }
             }
             OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }
@@ -129,7 +133,7 @@ fun AppearancePreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.Theme, preview, Modifier.padding(horizontal = OcSpacing.sm)) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.sm)) {
                 PreviewTopBar(state)
-                ThemeSwatches(preview.settings.theme)
+                ThemeSwatches(preview.settings.theme, preview.settings.openCodeTheme)
             }
         }
         OcCustomizable(SettingsPart.TextSize, preview, Modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.sm)) {
@@ -198,9 +202,9 @@ fun ComposerPreview(preview: PartPreview, modifier: Modifier = Modifier) {
         OcCustomizable(SettingsPart.ComposerBox, preview) { PreviewComposer(state) }
         OcCustomizable(SettingsPart.SelectionTiming, preview) {
             Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs), verticalAlignment = Alignment.CenterVertically) {
                     OcChip(text = "Plan", onClick = {}, dotColor = c.agents.forAgent("plan"), selected = true)
-                    OcChip(text = "Claude Sonnet 5", onClick = {}, secondaryText = "Anthropic", selected = true)
+                    ModelButton(SampleData.sonnet.copy(variant = "high"), ModelLabel("Claude Sonnet 5", "Anthropic"), onClick = {})
                 }
                 Caption(
                     if (preview.settings.selectionApply == SelectionApply.NextMessage) Res.string.chat_preview_selection_next
@@ -352,25 +356,25 @@ private fun Caption(text: StringResource, vararg args: Any) {
     )
 }
 
-/** The three themes, the chosen one outlined; each tile is drawn in its own colors. */
+/** The three themes, the chosen one outlined; each tile is drawn in its own colors, of [openCodeTheme] if any. */
 @Composable
-private fun ThemeSwatches(theme: ThemeMode) {
+private fun ThemeSwatches(theme: ThemeMode, openCodeTheme: String?) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = OcSpacing.gutter, end = OcSpacing.gutter, bottom = OcSpacing.sm),
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
-        Swatch(ThemeMode.System, Icons.Outlined.SettingsBrightness, theme, Modifier.weight(1f))
-        Swatch(ThemeMode.Light, Icons.Outlined.LightMode, theme, Modifier.weight(1f))
-        Swatch(ThemeMode.Dark, Icons.Outlined.DarkMode, theme, Modifier.weight(1f))
+        Swatch(ThemeMode.System, Icons.Outlined.SettingsBrightness, theme, openCodeTheme, Modifier.weight(1f))
+        Swatch(ThemeMode.Light, Icons.Outlined.LightMode, theme, openCodeTheme, Modifier.weight(1f))
+        Swatch(ThemeMode.Dark, Icons.Outlined.DarkMode, theme, openCodeTheme, Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun Swatch(mode: ThemeMode, icon: ImageVector, selected: ThemeMode, modifier: Modifier) {
+private fun Swatch(mode: ThemeMode, icon: ImageVector, selected: ThemeMode, openCodeTheme: String?, modifier: Modifier) {
     val accent = OcTheme.colors.textAccent
     val shape = RoundedCornerShape(OcRadius.md)
     val tile: @Composable (Boolean, Modifier) -> Unit = { dark, tileModifier ->
-        OcTheme(darkTheme = dark) {
+        OcTheme(darkTheme = dark, openCodeTheme = openCodeTheme) {
             val c = OcTheme.colors
             Column(tileModifier.fillMaxHeight().background(c.bgBase).padding(OcSpacing.xs), verticalArrangement = Arrangement.spacedBy(OcSpacing.xxs)) {
                 Box(Modifier.fillMaxWidth(0.7f).height(4.dp).background(c.textBase, RoundedCornerShape(2.dp)))

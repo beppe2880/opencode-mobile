@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
@@ -51,6 +52,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pr
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_share_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_share_off
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_split_off
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_swipe_drawer
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_swipe_off
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_swipe_on
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_preview_wide
@@ -68,11 +70,11 @@ fun SessionsPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     }
 }
 
-/** How swiping moves between chats. */
+/** What a swipe in a chat does: move between chats, show the chat list, or nothing. */
 @Composable
 fun SwipeChatsPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     OcCustomizable(SettingsPart.SwipeChats, preview, modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)) {
-        SwipeSketch(preview.settings.swipeBetweenChats)
+        if (preview.settings.chatSwipe == ChatSwipe.SessionDrawer) DrawerSketch() else SwipeSketch(preview.settings.chatSwipe == ChatSwipe.SwitchChats)
     }
 }
 
@@ -170,6 +172,44 @@ private fun SwipeSketch(on: Boolean) {
             MiniChat(sessions[2].title, Modifier.weight(0.6f).alpha(peek))
         }
         Caption(if (on) Res.string.sessions_preview_swipe_on else Res.string.sessions_preview_swipe_off)
+    }
+}
+
+/** The chat list drawn over the open chat, the current one highlighted, as a swipe opens it. */
+@Composable
+private fun DrawerSketch() {
+    val c = OcTheme.colors
+    val shape = RoundedCornerShape(OcRadius.md)
+    val sessions = SampleData.sessions
+    Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+        Box(Modifier.fillMaxWidth().height(88.dp).border(1.dp, c.borderStrong, shape).padding(OcSpacing.xxs)) {
+            MiniChat(sessions[1].title, Modifier.fillMaxWidth().fillMaxHeight())
+            Box(Modifier.matchParentSize().background(c.scrim, shape))
+            Column(
+                Modifier
+                    .fillMaxWidth(0.6f)
+                    .fillMaxHeight()
+                    .background(c.bgBase, shape)
+                    .padding(OcSpacing.xs)
+                    .testTag("swipe_drawer_sketch"),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xxs),
+            ) {
+                sessions.take(3).forEachIndexed { i, session ->
+                    Text(
+                        session.title,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = c.textBase,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(if (i == 1) c.layer02 else c.bgBase, RoundedCornerShape(2.dp))
+                            .padding(horizontal = OcSpacing.xxs),
+                    )
+                }
+            }
+        }
+        Caption(Res.string.sessions_preview_swipe_drawer)
     }
 }
 

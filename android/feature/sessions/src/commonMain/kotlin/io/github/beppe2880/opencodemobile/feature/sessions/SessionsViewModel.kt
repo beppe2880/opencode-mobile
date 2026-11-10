@@ -5,13 +5,16 @@ import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PendingShare
+import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
+import io.github.beppe2880.opencodemobile.core.domain.ServerPaths
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
@@ -30,6 +33,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_sh
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -50,6 +54,7 @@ class SessionsViewModel(
     private val settings: SettingsRepository,
     private val recents: RecentModelRepository,
     private val shares: ShareRepository,
+    private val folderPreferences: FolderPreferences,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -57,6 +62,8 @@ class SessionsViewModel(
     private var loadJob: Job? = null
     private var projectsJob: Job? = null
     private var debounceJob: Job? = null
+    private var browseJob: Job? = null
+    private var newSessionDirectoryCleared = false
     private var sessionList: List<Session> = emptyList()
     private var workVisible = false
     private var workPoll: Job? = null
@@ -125,6 +132,8 @@ class SessionsViewModel(
                 showCachedFirst = true
                 load(initial = false)
             }
+            is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
+            is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
             is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
@@ -137,6 +146,7 @@ class SessionsViewModel(
             // While a chat is picked for a share, a new session takes it.
             SessionsEvent.StartNewSession -> startNewSession(currentState.sharing)
             SessionsEvent.DismissNewSession -> {
+                browseJob?.cancel()
                 val shared = currentState.newSession?.shared
                 updateState { it.copy(newSession = null) }
                 // Opened by the share itself: closing it drops the share; picking a chat goes on.
@@ -144,6 +154,14 @@ class SessionsViewModel(
             }
             SessionsEvent.DiscardShare -> discardShare()
             is SessionsEvent.NewSessionDirectory -> updateNew { it.copy(directory = event.directory, customDirectory = event.custom, error = null) }
+            SessionsEvent.BrowseFolders -> browseFolders()
+            is SessionsEvent.BrowseTo -> loadFolders(event.path)
+            SessionsEvent.CloseFolderBrowser -> {
+                browseJob?.cancel()
+                updateNew { it.copy(browser = null) }
+            }
+            SessionsEvent.PickBrowsedFolder -> pickFolder(currentState.newSession?.browser?.path)
+            is SessionsEvent.PickFolder -> pickFolder(event.path)
             is SessionsEvent.NewSessionAgent -> updateNew { withDefaultModel(it.copy(agent = event.agent)) }
             is SessionsEvent.NewSessionModelPicker -> updateNew { it.copy(pickingModel = event.open) }
             is SessionsEvent.NewSessionModel -> updateNew { it.copy(model = event.model, pickingModel = false) }
@@ -161,12 +179,14 @@ class SessionsViewModel(
         loadJob?.cancel()
         projectsJob?.cancel()
         debounceJob?.cancel()
+        browseJob?.cancel()
         workJob?.cancel()
         sessionList = emptyList()
         updateState {
             it.copy(
                 query = "",
                 projects = emptyList(),
+                hiddenDirectories = id?.let(folderPreferences::hiddenDirectories).orEmpty(),
                 directoryFilter = id?.let(filters::get),
                 groups = emptyList(),
                 running = emptySet(),
@@ -217,7 +237,10 @@ class SessionsViewModel(
                 updateState { it.copy(sharing = null) }
                 startNewSession(share.content)
             }
-            ShareOpens.ChooseChat -> updateState { it.copy(sharing = share.content, newSession = null) }
+            ShareOpens.ChooseChat -> {
+                browseJob?.cancel()
+                updateState { it.copy(sharing = share.content, newSession = null) }
+            }
         }
     }
 
@@ -378,16 +401,23 @@ class SessionsViewModel(
             val id = serverId
             if (cachedFirst && id != null) {
                 sessions.cachedProjects(id)?.let { projects ->
-                    updateState { it.copy(projects = projects.sortedByDescending { p -> p.updatedAt }) }
+                    updateState { it.copy(projects = listed(projects)) }
                     fillNewSessionDirectory()
                 }
             }
             sessions.projects().onSuccess { projects ->
-                updateState { it.copy(projects = projects.sortedByDescending { p -> p.updatedAt }) }
+                updateState { it.copy(projects = listed(projects)) }
                 fillNewSessionDirectory()
             }
         }
     }
+
+    /**
+     * Most recent first, each folder once. OpenCode makes a project for every folder a session runs
+     * in; its built-in "global" project is no folder of its own, and asking for its "/" creates a real one.
+     */
+    private fun listed(projects: List<Project>): List<Project> =
+        projects.sortedByDescending { it.updatedAt }.filter { it.id != GLOBAL_PROJECT_ID }.distinctBy { it.directory }
 
     internal fun group(list: List<Session>): List<SessionGroup> {
         val today = localDate(clock())
@@ -444,13 +474,15 @@ class SessionsViewModel(
     }
 
     private fun startNewSession(shared: SharedContent? = null) {
+        browseJob?.cancel()
+        newSessionDirectoryCleared = false
         val state = currentState
-        val directory = state.directoryFilter
-            ?: sessionList.firstOrNull()?.directory
-            ?: state.projects.firstOrNull()?.directory
+        val directory = defaultDirectory(state)
             ?: ""
         val recent = (recents.recent() + sessionList.recentModels()).distinctBy { it.key }.take(RECENT_MODELS)
         updateState { it.copy(newSession = NewSessionState(directory = directory, recentModels = recent, shared = shared)) }
+        // Folders used since the last load are new projects: list them.
+        loadProjects()
         viewModelScope.launch {
             val dir = directory.ifBlank { null }
             // A config that cannot be read only skips its step.
@@ -471,6 +503,69 @@ class SessionsViewModel(
         }
     }
 
+    private fun browseFolders() {
+        val new = currentState.newSession ?: return
+        val start = browseStart(new.directory.trim(), currentState)
+        val recent = serverId?.let(folderPreferences::recentFolders).orEmpty()
+        updateNew { it.copy(browser = FolderBrowserState(path = start.orEmpty(), recent = recent)) }
+        loadFolders(start)
+    }
+
+    /**
+     * The parent of the selected directory, else of the latest visible project's directory, so
+     * siblings are one tap away; null (the server's folder) without an absolute one.
+     */
+    private fun browseStart(directory: String, state: SessionsState): String? {
+        val near = directory.takeIf(ServerPaths::isAbsolute)
+            ?: state.visibleProjects.firstOrNull { ServerPaths.isAbsolute(it.directory) }?.directory
+            ?: return null
+        return ServerPaths.parent(near) ?: ServerPaths.normalize(near)
+    }
+
+    /** Until the start folder is listed, loads fall back to the server's folder and set the start. */
+    private fun loadFolders(path: String?) {
+        val browser = currentState.newSession?.browser ?: return
+        val starting = browser.start == null
+        browseJob?.cancel()
+        updateNew { it.copy(browser = it.browser?.copy(loading = true, error = null)) }
+        browseJob = viewModelScope.launch {
+            var result = catalog.listFolders(path)
+            ensureActive()
+            if (result.isFailure && starting && path != null) result = catalog.listFolders(null)
+            ensureActive()
+            result.fold(
+                onSuccess = { listing ->
+                    updateNew {
+                        it.copy(
+                            browser = it.browser?.let { current ->
+                                current.copy(
+                                    path = listing.path,
+                                    parent = listing.parent,
+                                    folders = listing.folders,
+                                    loading = false,
+                                    error = null,
+                                    start = current.start ?: listing.path,
+                                )
+                            },
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    updateNew { it.copy(browser = it.browser?.copy(loading = false, error = error.toUiText())) }
+                },
+            )
+        }
+    }
+
+    /** Picks [path] for the new session, the browsed folder or a recent one, without browsing to it. */
+    private fun pickFolder(path: String?) {
+        if (currentState.newSession?.browser == null) return
+        if (path.isNullOrBlank()) return
+        serverId?.let { folderPreferences.folderPicked(it, path) }
+        browseJob?.cancel()
+        updateNew { it.copy(directory = path, customDirectory = true, error = null, browser = null) }
+    }
+
     /**
      * The model the new chat gets when none is picked, like OpenCode Desktop: the agent's
      * configured one, the server's configured one, then the last one used; each only when available. "Server default" in
@@ -488,12 +583,35 @@ class SessionsViewModel(
      */
     private fun fillNewSessionDirectory() {
         val new = currentState.newSession ?: return
-        if (new.directory.isNotBlank() || new.customDirectory) return
-        val directory = currentState.directoryFilter
-            ?: sessionList.firstOrNull()?.directory
-            ?: currentState.projects.firstOrNull()?.directory
-            ?: return
+        if (new.directory.isNotBlank() || new.customDirectory || newSessionDirectoryCleared) return
+        val directory = defaultDirectory(currentState) ?: return
         updateNew { it.copy(directory = directory) }
+    }
+
+    /** The filtered project, else the latest session's or the latest project's directory; never a hidden one. */
+    private fun defaultDirectory(state: SessionsState): String? = state.directoryFilter
+        ?: sessionList.firstOrNull { !isHidden(it, state) }?.directory
+        ?: state.visibleProjects.firstOrNull()?.directory
+
+    /**
+     * A session counts as hidden when its own directory is hidden or when its project's directory
+     * is: a session in a subfolder of a hidden project (`/same/sub` of `/same`) is hidden too.
+     */
+    private fun isHidden(session: Session, state: SessionsState): Boolean =
+        session.directory in state.hiddenDirectories ||
+            state.projects.any { it.id == session.projectId && it.directory in state.hiddenDirectories }
+
+    private fun setProjectHidden(directory: String, hidden: Boolean) {
+        val id = serverId ?: return
+        folderPreferences.setDirectoryHidden(id, directory, hidden)
+        updateState { it.copy(hiddenDirectories = folderPreferences.hiddenDirectories(id)) }
+        if (!hidden) return
+        val new = currentState.newSession
+        if (new != null && !new.customDirectory && new.directory == directory) {
+            newSessionDirectoryCleared = true
+            updateNew { it.copy(directory = "") }
+        }
+        if (currentState.directoryFilter == directory) onEvent(SessionsEvent.FilterChanged(null))
     }
 
     private fun create() {
@@ -507,9 +625,11 @@ class SessionsViewModel(
                         assignedShare = shares.pending.value?.id
                         shares.assign(session.id, serverId)
                     }
+                    browseJob?.cancel()
                     updateState { it.copy(newSession = null, sharing = null) }
                     sendEffect(SessionsEffect.OpenChat(session.id))
                     load(initial = false)
+                    loadProjects()
                 },
                 onFailure = { error -> updateNew { it.copy(creating = false, error = error.toUiText()) } },
             )
@@ -526,5 +646,6 @@ class SessionsViewModel(
         const val PREFETCH_MESSAGES = 2
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
+        const val GLOBAL_PROJECT_ID = "global"
     }
 }

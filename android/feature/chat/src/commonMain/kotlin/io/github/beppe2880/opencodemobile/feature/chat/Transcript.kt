@@ -50,6 +50,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -344,35 +345,41 @@ internal fun TranscriptItem(
             modifier = modifier,
             live = state.live,
         )
-        is ChatItem.Tools -> ToolsGroup(
-            item = item,
-            directory = state.directory,
-            expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
-            isExpanded = isExpanded,
-            onToggle = onToggle,
-            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-            modifier = modifier,
-            live = state.live,
-            fullCommands = state.showFullCommands,
-            inLiveGroup = item.key == liveGroupKey,
-            details = state.showToolDetails || keptOpen(item.key),
-        )
-        is ChatItem.Activity -> ActivityGroup(
-            item = item,
-            directory = state.directory,
-            expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
-            inLiveGroup = item.key == liveGroupKey,
-            details = state.showToolDetails || keptOpen(item.key),
-            defaultToolsExpanded = defaultToolsExpanded,
-            isExpanded = isExpanded,
-            onToggle = onToggle,
-            onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
-            onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
-            modifier = modifier,
-            live = state.live,
-            fullCommands = state.showFullCommands,
-        )
+        is ChatItem.Tools -> WithToolMedia(item.media, state, onEvent, modifier) { groupModifier ->
+            ToolsGroup(
+                item = item,
+                directory = state.directory,
+                expanded = state.isExpanded("g:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+                isExpanded = isExpanded,
+                onToggle = onToggle,
+                onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+                modifier = groupModifier,
+                live = state.live,
+                fullCommands = state.showFullCommands,
+                inLiveGroup = item.key == liveGroupKey,
+                details = state.showToolDetails || keptOpen(item.key),
+                onCopy = onCopy,
+            )
+        }
+        is ChatItem.Activity -> WithToolMedia(item.media, state, onEvent, modifier) { groupModifier ->
+            ActivityGroup(
+                item = item,
+                directory = state.directory,
+                expanded = state.isExpanded("a:${item.key}", defaultToolsExpanded || keptOpen(item.key)),
+                inLiveGroup = item.key == liveGroupKey,
+                details = state.showToolDetails || keptOpen(item.key),
+                defaultToolsExpanded = defaultToolsExpanded,
+                isExpanded = isExpanded,
+                onToggle = onToggle,
+                onOpenSession = { onEvent(ChatEvent.OpenSession(it)) },
+                onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
+                modifier = groupModifier,
+                live = state.live,
+                fullCommands = state.showFullCommands,
+                onCopy = onCopy,
+            )
+        }
         is ChatItem.Error -> ErrorRow(item, modifier)
         is ChatItem.Notice -> NoticeRow(
             item = item,
@@ -384,6 +391,42 @@ internal fun TranscriptItem(
         is ChatItem.Shell -> ShellBlock(item, modifier)
         is ChatItem.Footer -> TurnFooter(item, onCopy, modifier.padding(bottom = OcSpacing.md), showCost = state.showCost)
         is ChatItem.Working -> WorkingRow(modifier)
+    }
+}
+
+/**
+ * A tool group with the files its tools returned right under it, folded or not, so a screenshot
+ * the agent read shows without opening the group. Without files the group is drawn alone.
+ */
+@Composable
+private fun WithToolMedia(
+    media: List<ToolMedia>,
+    state: ChatState,
+    onEvent: (ChatEvent) -> Unit,
+    modifier: Modifier,
+    group: @Composable (Modifier) -> Unit,
+) {
+    if (media.isEmpty()) {
+        group(modifier)
+        return
+    }
+    val uriHandler = LocalUriHandler.current
+    Column(modifier) {
+        group(Modifier)
+        ToolMediaStrip(
+            media = media,
+            size = state.toolMediaSize,
+            loaded = state.toolMediaLoaded,
+            onLoad = { onEvent(ChatEvent.LoadToolMedia(it.messageId, it.callId)) },
+            onOpen = { item, target ->
+                when (target) {
+                    MediaOpen.Viewer -> onEvent(ChatEvent.OpenToolImage(item.messageId, item.callId, item.index))
+                    is MediaOpen.ServerFile -> onEvent(ChatEvent.OpenFile(target.path))
+                    // A malformed link or no app to open it: nothing happens, as for links in text.
+                    is MediaOpen.Web -> runCatching { uriHandler.openUri(target.url) }
+                }
+            },
+        )
     }
 }
 

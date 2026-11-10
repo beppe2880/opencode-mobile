@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.14.0](https://github.com/beppe2880/opencode-mobile/compare/v0.13.0...v0.14.0) (2026-11-10)
+
+
+### Features
+
+* **sessions:** Browse server folders when starting a session ([#173](https://github.com/beppe2880/opencode-mobile/issues/173)) ([50adb1b](https://github.com/beppe2880/opencode-mobile/commit/50adb1b7a4b7ed1f9744c258329b789c64283a99))
+
+## [0.13.0](https://github.com/beppe2880/opencode-mobile/compare/v0.12.0...v0.13.0) (2026-11-09)
+
+
+### Features
+
+* **chat:** Open and Stop from the running chips popover ([#167](https://github.com/beppe2880/opencode-mobile/issues/167)) ([a9f2d55](https://github.com/beppe2880/opencode-mobile/commit/a9f2d5584dedd004772490d2392be8371e8cddd7))
+* **chat:** Show images and files read by tools inline ([#164](https://github.com/beppe2880/opencode-mobile/issues/164)) ([44bba4f](https://github.com/beppe2880/opencode-mobile/commit/44bba4f922b2d66c387a5d79ed72d204dab420c4))
+
+
+### Bug fixes
+
+* **chat:** Opening a demo chat no longer crashes release builds ([#170](https://github.com/beppe2880/opencode-mobile/issues/170)) ([2126c0c](https://github.com/beppe2880/opencode-mobile/commit/2126c0c957ac0a06057a142a409a3e9de18200f7))
+
+## [0.12.0](https://github.com/beppe2880/opencode-mobile/compare/v0.11.0...v0.12.0) (2026-11-09)
+
+
+### Features
+
+* **chat:** Add /new to create a fresh session ([#152](https://github.com/beppe2880/opencode-mobile/issues/152)) ([8e923ef](https://github.com/beppe2880/opencode-mobile/commit/8e923ef33d325435a36f423c679f90f64080c424))
+* **chat:** Connect providers with API keys and OAuth ([#148](https://github.com/beppe2880/opencode-mobile/issues/148)) ([374ebd2](https://github.com/beppe2880/opencode-mobile/commit/374ebd2f819245076ccb27dfdbc263ef489ab349))
+* **chat:** Open GitHub links from tool rows ([#161](https://github.com/beppe2880/opencode-mobile/issues/161)) ([12861f6](https://github.com/beppe2880/opencode-mobile/commit/12861f60ef2741294589ab3734ff148800714f60))
+* **chat:** Show running shells and subagents as chips above the message box ([#162](https://github.com/beppe2880/opencode-mobile/issues/162)) ([2985748](https://github.com/beppe2880/opencode-mobile/commit/2985748ed75961c472bd14c9dd97fbec4b3671f5))
+* **chat:** Show the model as provider mark, short name and variant ([#163](https://github.com/beppe2880/opencode-mobile/issues/163)) ([8801197](https://github.com/beppe2880/opencode-mobile/commit/88011976d8bb9af43806d9b86b4c3514d8846b33))
+* **chat:** Stop all background commands and subagents from the Running sheet ([#146](https://github.com/beppe2880/opencode-mobile/issues/146)) ([ebbc6fd](https://github.com/beppe2880/opencode-mobile/commit/ebbc6fd67462ef87c9423a6474ca4c5b4bdf688b))
+* **sessions:** Search projects in the New session sheet ([#155](https://github.com/beppe2880/opencode-mobile/issues/155)) ([c46352c](https://github.com/beppe2880/opencode-mobile/commit/c46352c683e5c43838cf95727895bac9d29735ef))
+* **ui:** OpenCode themes for the whole app ([#156](https://github.com/beppe2880/opencode-mobile/issues/156)) ([6a13c73](https://github.com/beppe2880/opencode-mobile/commit/6a13c73f0d1d389c30fb94c8ede29ad51225997e))
+
+
+### Bug fixes
+
+* **ui:** Keep the cursor when typing in sheets on iOS ([#150](https://github.com/beppe2880/opencode-mobile/issues/150)) ([0155933](https://github.com/beppe2880/opencode-mobile/commit/015593305c6571182ce203f9f7b38184dd9a84ac))
+
+
+### Documentation
+
+* Showcase Android and iOS in the README ([#142](https://github.com/beppe2880/opencode-mobile/issues/142)) ([b4cafaa](https://github.com/beppe2880/opencode-mobile/commit/b4cafaa63c2bda4519dc776a041b62fe43b3d553))
+
 ## [0.11.0](https://github.com/beppe2880/opencode-mobile/compare/v0.10.0...v0.11.0) (2026-11-01)
 
 

@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">プロジェクトのディレクトリ</string>
     <string name="sessions_new_other_directory">別のディレクトリ</string>
     <string name="sessions_new_path_label">絶対パス</string>
+    <string name="sessions_browse">参照</string>
+    <string name="sessions_browse_title">フォルダーを選択</string>
+    <string name="sessions_browse_use">このフォルダーを使う</string>
+    <string name="sessions_browse_empty">フォルダーはありません</string>
+    <string name="sessions_browse_retry">再試行</string>
+    <string name="sessions_browse_back">戻る</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">エージェント</string>
     <string name="sessions_new_model">モデル</string>
@@ -43,9 +49,12 @@
     <string name="sessions_actions_title">セッション操作</string>
     <string name="sessions_running_a11y">エージェントが実行中です</string>
     <string name="sessions_new_show_all">全 %1$d 件のプロジェクトを表示</string>
+    <string name="sessions_new_project_search">プロジェクトを検索</string>
+    <string name="sessions_new_project_search_empty">一致するプロジェクトがありません</string>
     <string name="sessions_untitled">無題のセッション</string>
     <string name="sessions_preview_swipe_on">チャットで左右にスワイプすると、次または前のセッションを開きます</string>
     <string name="sessions_preview_swipe_off">オフ：リストに戻って別のセッションを開きます</string>
+    <string name="sessions_preview_swipe_drawer">チャットを右にスワイプすると、その上にチャット一覧を表示します</string>
     <string name="sessions_preview_wide">展開したフォルダブル端末とタブレットで</string>
     <string name="sessions_preview_split_off">ワイド画面でも、チャットはリストの上に開きます</string>
     <string name="sessions_preview_back_list">リストが非表示のときに戻るとリストが再表示されます</string>
@@ -58,4 +67,11 @@
     <string name="sessions_preview_share_new">他のアプリから共有されたテキスト、リンク、画像はこのシートを開きます</string>
     <string name="sessions_preview_share_choose">他のアプリから共有されたテキスト、リンク、画像は、まずチャットを選ぶよう求めるか、このシートを開きます</string>
     <string name="sessions_preview_share_off">OpenCodeは他のアプリの共有メニューに表示されません</string>
+    <string name="sessions_project_hide">プロジェクトを非表示</string>
+    <string name="sessions_project_unhide">再表示</string>
+    <string name="sessions_projects_hidden">非表示（%1$d）</string>
+    <string name="sessions_browse_show_hidden">隠しフォルダーを表示</string>
+    <string name="sessions_browse_hide_hidden">隠しフォルダーを非表示</string>
+    <string name="sessions_browse_recent">最近使ったフォルダー</string>
+    <string name="sessions_browse_pick">使う</string>
 </resources>

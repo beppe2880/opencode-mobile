@@ -33,6 +33,44 @@ data class OcAgentColors(
     }
 }
 
+/**
+ * Colors of a unified diff. The app's own themes derive them from the state colors; an OpenCode
+ * theme gives its `diff` tokens.
+ */
+@Immutable
+data class OcDiffColors(
+    /** The `+` marker of an added line. */
+    val added: Color,
+    /** The `-` marker of a removed line. */
+    val removed: Color,
+    /** The code of every line. */
+    val text: Color,
+    /** The text of a hunk header (`@@ -1,4 +1,5 @@`). */
+    val hunkText: Color,
+    val addedBackground: Color,
+    val removedBackground: Color,
+    val contextBackground: Color,
+    val hunkBackground: Color,
+    val lineNumber: Color,
+    /** Behind the line numbers of an added line; the line's own background in the app's themes. */
+    val lineNumberAddedBackground: Color,
+    val lineNumberRemovedBackground: Color,
+)
+
+/** Syntax colors of code, the `syntax` tokens of an OpenCode theme. */
+@Immutable
+data class OcSyntaxColors(
+    val comment: Color,
+    val keyword: Color,
+    val function: Color,
+    val variable: Color,
+    val string: Color,
+    val number: Color,
+    val type: Color,
+    val operator: Color,
+    val punctuation: Color,
+)
+
 /** Full OpenCode V2 token set. Use through [OcTheme.colors]. */
 @Immutable
 data class OcColors(
@@ -67,6 +105,29 @@ data class OcColors(
     val danger: OcStateColors,
     val info: OcStateColors,
     val agents: OcAgentColors,
+    /** Diff colors; by default the state colors the app always used. */
+    val diff: OcDiffColors = OcDiffColors(
+        added = success.fg,
+        removed = danger.fg,
+        text = textBase,
+        hunkText = textFaint,
+        addedBackground = success.bg,
+        removedBackground = danger.bg,
+        contextBackground = layer01,
+        hunkBackground = layer02,
+        lineNumber = textFaint,
+        lineNumberAddedBackground = success.bg,
+        lineNumberRemovedBackground = danger.bg,
+    ),
+    /**
+     * The markdown colors of an OpenCode theme; null (the app's own themes) renders markdown in the
+     * text color.
+     */
+    val markdown: OcMarkdownPalette? = null,
+    /** The syntax colors of an OpenCode theme; null highlights code with the Atom One theme. */
+    val syntax: OcSyntaxColors? = null,
+    /** The 16 ANSI colors of an OpenCode theme; null uses the app's sets, see [terminalAnsi]. */
+    val ansi: List<Color>? = null,
 )
 
 val OcLightColors = OcColors(

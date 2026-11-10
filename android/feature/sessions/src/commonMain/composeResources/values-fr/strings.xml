@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">Dossier du projet</string>
     <string name="sessions_new_other_directory">Autre dossier</string>
     <string name="sessions_new_path_label">Chemin absolu</string>
+    <string name="sessions_browse">Parcourir</string>
+    <string name="sessions_browse_title">Choisir un dossier</string>
+    <string name="sessions_browse_use">Utiliser ce dossier</string>
+    <string name="sessions_browse_empty">Aucun dossier ici</string>
+    <string name="sessions_browse_retry">Réessayer</string>
+    <string name="sessions_browse_back">Retour</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">Agent</string>
     <string name="sessions_new_model">Modèle</string>
@@ -43,9 +49,12 @@
     <string name="sessions_actions_title">Actions de la session</string>
     <string name="sessions_running_a11y">L’agent est en cours d’exécution</string>
     <string name="sessions_new_show_all">Afficher les %1$d projets</string>
+    <string name="sessions_new_project_search">Rechercher des projets</string>
+    <string name="sessions_new_project_search_empty">Aucun projet correspondant</string>
     <string name="sessions_untitled">Session sans titre</string>
     <string name="sessions_preview_swipe_on">Glissez vers la gauche ou la droite dans un chat pour ouvrir la session suivante ou précédente</string>
     <string name="sessions_preview_swipe_off">Désactivé : revenez à la liste pour ouvrir une autre session</string>
+    <string name="sessions_preview_swipe_drawer">Balayez une discussion vers la droite pour afficher la liste des discussions par-dessus</string>
     <string name="sessions_preview_wide">Sur les écrans pliables dépliés et les tablettes</string>
     <string name="sessions_preview_split_off">Le chat s’ouvre par-dessus la liste, y compris sur les grands écrans</string>
     <string name="sessions_preview_back_list">Retour avec la liste masquée l’affiche de nouveau</string>
@@ -58,4 +67,11 @@
     <string name="sessions_preview_share_new">Le texte, les liens et les images partagés depuis d’autres applications ouvrent cette feuille</string>
     <string name="sessions_preview_share_choose">Le texte, les liens et les images partagés depuis d’autres applications demandent d’abord un chat, ou ouvrent cette feuille</string>
     <string name="sessions_preview_share_off">OpenCode n’est pas dans le menu de partage des autres applications</string>
+    <string name="sessions_project_hide">Masquer le projet</string>
+    <string name="sessions_project_unhide">Réafficher</string>
+    <string name="sessions_projects_hidden">Masqués (%1$d)</string>
+    <string name="sessions_browse_show_hidden">Afficher les dossiers cachés</string>
+    <string name="sessions_browse_hide_hidden">Masquer les dossiers cachés</string>
+    <string name="sessions_browse_recent">Dossiers récents</string>
+    <string name="sessions_browse_pick">Utiliser</string>
 </resources>

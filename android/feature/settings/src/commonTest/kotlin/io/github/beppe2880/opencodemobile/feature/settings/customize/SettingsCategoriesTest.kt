@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -9,12 +10,15 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_off
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_split
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_swipe_drawer
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_text_default
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_cloud
@@ -44,9 +48,17 @@ class SettingsCategoriesTest {
 
     @Test
     fun theCategoriesTheIssueAskedFor() {
-        assertEquals(listOf(SettingOption.Theme, SettingOption.TextSize, SettingOption.SplitView), SettingsArea.Appearance.options.take(3))
+        assertEquals(
+            listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize, SettingOption.SplitView),
+            SettingsArea.Appearance.options.take(4),
+        )
         assertEquals(SettingsArea.Chat, SettingOption.SwipeChats.area)
         assertEquals(SettingsArea.Chat, SettingOption.QuestionsCollapsed.area)
+        // Right after the tool row options of the transcript group.
+        val transcript = SettingOption.ToolMediaSize.group.options
+        assertEquals(SettingsArea.Chat, SettingOption.ToolMediaSize.area)
+        assertEquals(transcript.indexOf(SettingOption.FullCommands) + 1, transcript.indexOf(SettingOption.ToolMediaSize))
+        assertEquals(0, SettingOption.ToolMediaSize.depthIn(SettingOption.ToolMediaSize.group))
         assertEquals(SettingsArea.LiveActivity, SettingOption.OutputLines.area)
         assertEquals(listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.NewChatModel), SettingsArea.Composer.options)
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)
@@ -83,7 +95,7 @@ class SettingsCategoriesTest {
 
         // The list beside the chat only on wide windows.
         val narrow = visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = false)
-        assertEquals(listOf(SettingOption.Theme, SettingOption.TextSize), narrow.flatMap { it.options })
+        assertEquals(listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize), narrow.flatMap { it.options })
         assertTrue(SettingOption.BackShowsList in visibleGroups(SettingsArea.Appearance, AppSettings(), true, wide = true).flatMap { it.options })
         assertFalse(SettingOption.ListWidth in visibleGroups(SettingsArea.Appearance, AppSettings(splitView = false), true, wide = true).flatMap { it.options })
 
@@ -136,6 +148,13 @@ class SettingsCategoriesTest {
             listOf(UiText.Resource(Res.string.settings_theme_dark), UiText.Resource(Res.string.settings_text_default)),
             summaryOf(SettingsArea.Appearance, AppSettings(theme = ThemeMode.Dark)),
         )
+        // The OpenCode theme by its name, after the light or dark mode; none says nothing.
+        val theme = OpenCodeThemes.all.first()
+        assertEquals(
+            listOf(UiText.Resource(Res.string.settings_theme_dark), UiText.Raw(theme.displayName), UiText.Resource(Res.string.settings_text_default)),
+            summaryOf(SettingsArea.Appearance, AppSettings(theme = ThemeMode.Dark, openCodeTheme = theme.id)),
+        )
+        assertEquals(2, summaryOf(SettingsArea.Appearance, AppSettings(openCodeTheme = "retired")).size)
         val wide = summary(SettingsArea.Appearance, SettingsState(), wide = true)
         assertEquals(UiText.Resource(Res.string.settings_summary_split), wide.last())
         val off = listOf(UiText.Resource(Res.string.settings_summary_off))
@@ -151,6 +170,18 @@ class SettingsCategoriesTest {
         assertEquals(listOf(UiText.Raw("Desk"), UiText.Raw("Laptop")), active)
         val demo = summary(SettingsArea.Servers, SettingsState(servers = servers), wide = false, demo = true)
         assertEquals(listOf(UiText.Resource(Res.string.settings_demo_server)), demo)
+    }
+
+    @Test
+    fun chatSummaryNamesTheSwipeChoice() {
+        val swipe = UiText.Resource(Res.string.settings_summary_swipe)
+        val drawer = UiText.Resource(Res.string.settings_summary_swipe_drawer)
+        val switching = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.SwitchChats))
+        assertTrue(swipe in switching && drawer !in switching)
+        val list = summaryOf(SettingsArea.Chat, AppSettings())
+        assertTrue(drawer in list && swipe !in list)
+        val off = summaryOf(SettingsArea.Chat, AppSettings(chatSwipe = ChatSwipe.Off))
+        assertTrue(swipe !in off && drawer !in off)
     }
 
     private fun summaryOf(area: SettingsArea, settings: AppSettings) = summary(area, SettingsState(settings = settings), wide = false)

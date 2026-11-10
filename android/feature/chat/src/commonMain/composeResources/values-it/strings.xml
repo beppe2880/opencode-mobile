@@ -88,6 +88,8 @@
     <string name="chat_session_deleted">Questa sessione è stata eliminata</string>
     <string name="chat_agent">Agente</string>
     <string name="chat_model">Modello</string>
+    <string name="chat_model_description">Modello: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">Modello: %1$s (%2$s), ragionamento %3$s</string>
     <string name="chat_select_agent">Seleziona agente</string>
     <string name="chat_select_model">Seleziona modello</string>
     <string name="chat_permission_title">Autorizzazione richiesta</string>
@@ -105,6 +107,7 @@
     <string name="chat_new_messages">Nuovi messaggi</string>
     <string name="chat_command_compact">Riassume la cronologia per liberare contesto</string>
     <string name="chat_command_fork">Copia questa sessione in una nuova</string>
+    <string name="chat_command_new">Avvia una nuova chat in questa directory</string>
     <string name="chat_context">Contesto</string>
     <string name="chat_context_tokens">%1$s token</string>
     <string name="chat_context_of">%1$d% di %2$s</string>
@@ -123,6 +126,9 @@
     <string name="chat_open_image">Apri immagine</string>
     <string name="chat_close_preview">Chiudi</string>
     <string name="chat_image_failed">Impossibile caricare l'immagine</string>
+    <string name="chat_tool_media_image">Immagine letta dall'agente: %1$s</string>
+    <string name="chat_tool_media_video">Video: %1$s, %2$s</string>
+    <string name="chat_tool_media_file">File dall'agente: %1$s, %2$s</string>
     <string name="chat_attachment_failed">Impossibile allegare il file (max 10 MB)</string>
     <string name="chat_dictation_start">Detta</string>
     <string name="chat_dictation_stop">Interrompi dettatura</string>
@@ -230,6 +236,42 @@
         <item quantity="one">Impossibile fermare %1$d sottoagente</item>
         <item quantity="other">Impossibile fermare %1$d sottoagenti</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shell</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agente</item>
+        <item quantity="other">%1$d agenti</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell in esecuzione</item>
+        <item quantity="other">%1$d shell in esecuzione</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agente in esecuzione</item>
+        <item quantity="other">%1$d agenti in esecuzione</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shell</string>
+    <string name="chat_running_list_agents">Agenti</string>
+    <string name="chat_running_status_running">In esecuzione · %1$s</string>
+    <string name="chat_running_status_exited">Terminata · %1$s</string>
+    <string name="chat_running_status_finished">Finito · %1$s</string>
+    <string name="chat_running_status_ended">Terminato</string>
+    <string name="chat_running_stop_shell">Ferma shell</string>
+    <string name="chat_running_stop_subagent">Ferma agente</string>
+    <string name="chat_running_copy_command">Copia comando</string>
+    <string name="chat_running_share">Condividi</string>
+    <string name="chat_running_open_session">Apri sessione</string>
+    <string name="chat_running_agent_untitled">Subagente</string>
+    <string name="chat_running_open">Apri</string>
+    <string name="chat_running_open_agent_description">Apri la sessione dell'agente: %1$s</string>
+    <string name="chat_running_open_shell_description">Apri l'output della shell: %1$s</string>
+    <string name="chat_running_stop_agents_label">Ferma gli agenti</string>
+    <string name="chat_running_stop_shells_label">Ferma le shell</string>
+    <string name="chat_running_stop_everything_description">Ferma tutto ciò che è in esecuzione</string>
+    <string name="chat_running_stop_everything_title">Fermare tutto ciò che è in esecuzione?</string>
+    <string name="chat_running_stop_everything_message">I subagenti vengono interrotti e i comandi avviati da questa sessione vengono terminati. Questa sessione e gli altri comandi del progetto continuano.</string>
     <string name="chat_preview_folds">I passaggi seguiti in diretta si ripiegano alla fine della risposta</string>
     <string name="chat_preview_kept_open">I passaggi seguiti in diretta restano aperti dopo la risposta</string>
     <string name="chat_preview_not_followed">I passaggi in esecuzione restano ripiegati finché non li apri</string>

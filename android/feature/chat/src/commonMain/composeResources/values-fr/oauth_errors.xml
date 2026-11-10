@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">Impossible de préparer la connexion par navigateur sur le serveur (%1$s). Réessayez.</string>
+    <string name="oauth_error_callback">Aucune réponse d'autorisation valide du navigateur n'a été reçue (%1$s). Recommencez la connexion.</string>
+    <string name="oauth_error_exchange">Impossible d'échanger le code d'autorisation avec le fournisseur (%1$s). Recommencez la connexion.</string>
+    <string name="oauth_error_validation">Impossible de vérifier la réponse du fournisseur (%1$s). Aucun identifiant n'a été envoyé au serveur.</string>
+    <string name="oauth_error_import">Impossible de confirmer l'enregistrement des identifiants sur le serveur (%1$s). Vérifiez la connexion et l'état du fournisseur avant de réessayer.</string>
+    <string name="oauth_error_expired">La connexion par navigateur a expiré (%1$s). Recommencez la connexion.</string>
+    <string name="oauth_error_server_changed">Le serveur sélectionné a changé pendant la connexion (%1$s). Recommencez la connexion.</string>
+    <string name="oauth_error_unknown">Impossible de terminer la connexion par navigateur (%1$s). Recommencez la connexion.</string>
+</resources>

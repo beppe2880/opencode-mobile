@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -14,6 +15,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
@@ -122,6 +124,7 @@ sealed interface SettingsEvent {
     data class LiveReadsChanged(val enabled: Boolean) : SettingsEvent
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
+    data class ToolMediaSizeChanged(val size: ToolMediaSize) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalOpenKeyboardChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalFullscreenByDefaultChanged(val enabled: Boolean) : SettingsEvent
@@ -133,15 +136,19 @@ sealed interface SettingsEvent {
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent
     data class ChatTextScaleChanged(val scale: Float) : SettingsEvent
+
+    /** The OpenCode theme picked by its id; null for none (the app's own colors). */
+    data class OpenCodeThemeChanged(val id: String?) : SettingsEvent
     data object RequestReset : SettingsEvent
     data object ConfirmReset : SettingsEvent
     data class ShowCostChanged(val enabled: Boolean) : SettingsEvent
     data class ChatHeaderLineChanged(val line: ChatHeaderLine) : SettingsEvent
     data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
     data class ChatHeaderStyleChanged(val style: ChatHeaderStyle) : SettingsEvent
-    data class SwipeBetweenChatsChanged(val enabled: Boolean) : SettingsEvent
+    data class ChatSwipeChanged(val swipe: ChatSwipe) : SettingsEvent
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
+    data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class VoiceEngineChanged(val engine: VoiceEngine) : SettingsEvent

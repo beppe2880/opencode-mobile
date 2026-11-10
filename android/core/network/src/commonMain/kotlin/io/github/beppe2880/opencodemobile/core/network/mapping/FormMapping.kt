@@ -27,7 +27,7 @@ fun FormInfo.toDomain(): Form {
     return Form(id = id, sessionId = sessionID, title = title, fields = visible, presetAnswers = preset)
 }
 
-private fun ApiField.isHidden(): Boolean = when (this) {
+fun ApiField.isHidden(): Boolean = when (this) {
     is ApiField.StringWrapper -> value.hidden
     is ApiField.BooleanWrapper -> value.hidden
     is ApiField.MultiselectWrapper -> value.hidden
@@ -36,12 +36,13 @@ private fun ApiField.isHidden(): Boolean = when (this) {
     is ApiField.ExternalWrapper -> false
 } == true
 
-private fun ApiField.toDomain(): FormField = when (this) {
+fun ApiField.toDomain(): FormField = when (this) {
     is ApiField.StringWrapper -> with(value) {
         FormField.Text(
             key = key, title = title, description = description, required = required == true,
             conditions = `when`.toConditions(), options = options.toOptions(), custom = custom == true,
             placeholder = placeholder, default = default,
+            minLength = minLength?.toInt(), maxLength = maxLength?.toInt(), pattern = pattern,
         )
     }
     is ApiField.BooleanWrapper -> with(value) {

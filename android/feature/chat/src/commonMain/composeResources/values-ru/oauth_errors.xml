@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">Не удалось подготовить вход через браузер на сервере (%1$s). Повторите попытку.</string>
+    <string name="oauth_error_callback">Не получен корректный ответ авторизации от браузера (%1$s). Начните вход заново.</string>
+    <string name="oauth_error_exchange">Не удалось обменять код авторизации у поставщика (%1$s). Начните вход заново.</string>
+    <string name="oauth_error_validation">Не удалось проверить ответ поставщика (%1$s). Учётные данные не переданы серверу.</string>
+    <string name="oauth_error_import">Не удалось подтвердить сохранение учётных данных на сервере (%1$s). Перед повторной попыткой проверьте соединение и состояние поставщика.</string>
+    <string name="oauth_error_expired">Время входа через браузер истекло (%1$s). Начните вход заново.</string>
+    <string name="oauth_error_server_changed">Выбранный сервер изменился во время входа (%1$s). Начните вход заново.</string>
+    <string name="oauth_error_unknown">Не удалось завершить вход через браузер (%1$s). Начните вход заново.</string>
+</resources>

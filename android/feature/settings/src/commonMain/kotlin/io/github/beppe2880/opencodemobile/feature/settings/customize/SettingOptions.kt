@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
  */
 enum class SettingOption(val fields: List<String>, val requires: SettingOption? = null) {
     Theme(listOf("theme")),
+    OpenCodeTheme(listOf("openCodeTheme")),
     TextSize(listOf("chatTextScale")),
     HeaderLine(listOf("chatHeaderLine")),
     HeaderStyle(listOf("chatHeaderStyle")),
@@ -22,10 +23,12 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ExpandTools(listOf("expandToolsByDefault")),
     ToolDetails(listOf("showToolDetails")),
     FullCommands(listOf("showFullCommands")),
+    ToolMediaSize(listOf("toolMediaSize")),
     OutputLines(listOf("outputPreviewLines")),
     ShowCost(listOf("showCost")),
     PermissionsCollapsed(listOf("permissionsCollapsed")),
     QuestionsCollapsed(listOf("questionsCollapsed")),
+    RunningChips(listOf("runningChips")),
     ConfirmStop(listOf("confirmStopCommand")),
     FollowRunning(listOf("followRunningTools")),
     KeepLiveOpen(listOf("keepLiveStepsOpen"), requires = FollowRunning),
@@ -51,7 +54,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ShareMenu(listOf("showInShareMenu")),
     ShareOpens(listOf("shareOpens"), requires = ShareMenu),
     RunningInList(listOf("showRunningWorkInList")),
-    SwipeChats(listOf("swipeBetweenChats")),
+    SwipeChats(listOf("chatSwipe")),
     SplitView(listOf("splitView")),
     ListWidth(listOf("listPaneFraction"), requires = SplitView),
     ListHandle(listOf("listPaneHandle"), requires = SplitView),
@@ -79,15 +82,17 @@ internal val UNLISTED_FIELDS = setOf("notificationsIntroShown", "showEditMarks",
 /** Every option of this part of a preview, applying or not. */
 val SettingsPart.options: List<SettingOption>
     get() = when (this) {
-        SettingsPart.Theme -> listOf(SettingOption.Theme)
-        SettingsPart.TextSize -> listOf(SettingOption.TextSize)
+        SettingsPart.Theme -> listOf(SettingOption.Theme, SettingOption.OpenCodeTheme)
+        // The theme also colors the markdown of answers.
+        SettingsPart.TextSize -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Header -> listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)
-        SettingsPart.Messages -> listOf(SettingOption.TextSize)
+        SettingsPart.Messages -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Thoughts -> listOf(SettingOption.ShowReasoning, SettingOption.GroupThoughts, SettingOption.GroupActivity)
         SettingsPart.Tools -> listOf(
             SettingOption.ExpandTools,
             SettingOption.ToolDetails,
             SettingOption.FullCommands,
+            SettingOption.ToolMediaSize,
             SettingOption.OutputLines,
             SettingOption.GroupActivity,
         )
@@ -98,10 +103,12 @@ val SettingsPart.options: List<SettingOption>
             SettingOption.ExpandTools,
             SettingOption.ToolDetails,
             SettingOption.FullCommands,
+            SettingOption.ToolMediaSize,
             SettingOption.OutputLines,
         )
         SettingsPart.Footer -> listOf(SettingOption.ShowCost)
-        SettingsPart.PendingCards -> listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed)
+        // Everything above the composer: the pending cards and the running chips.
+        SettingsPart.PendingCards -> listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed, SettingOption.RunningChips)
         SettingsPart.RunningLine -> listOf(SettingOption.ConfirmStop)
         SettingsPart.LiveStep -> listOf(SettingOption.FollowRunning, SettingOption.KeepLiveOpen)
         SettingsPart.LiveThinking -> listOf(SettingOption.LiveThinking)
@@ -164,6 +171,15 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ShareOpens -> supported && settings.showInShareMenu
     else -> true
 }
+
+/** Words search also finds the option by in every language, besides its translated texts. */
+internal val SettingOption.searchKeywords: List<String>
+    get() = when (this) {
+        SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
+        SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
+        SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
+        else -> emptyList()
+    }
 
 /** Whether the option exists on this platform: nothing can be shared to the iOS app yet. */
 val SettingOption.supported: Boolean

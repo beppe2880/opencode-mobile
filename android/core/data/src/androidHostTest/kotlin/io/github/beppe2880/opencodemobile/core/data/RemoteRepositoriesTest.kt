@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -210,6 +211,218 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `folder listings extract child names from server-relative paths and put dot folders last`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"/srv/opencode/project"},"data":[
+                    {"path":"../../../home/u/Zoo/","type":"directory"},
+                    {"path":"../../../home/u/.zsh/","type":"directory"},
+                    {"path":"../../../home/u/alpha/","type":"directory"},
+                    {"path":"../../../home/u/README.md","type":"file"},
+                    {"path":"../../../home/u/.Cache/","type":"directory"},
+                    {"path":"../../../home/u/Beta/","type":"directory"},
+                    {"path":"/","type":"directory"},
+                    {"path":"  ","type":"directory"},
+                    {"path":null,"type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        val listing = RemoteCatalogRepository(graph.clients).listFolders("/home/u///").getOrThrow()
+
+        assertEquals(FolderListing("/home/u", "/home", listOf("alpha", "Beta", "Zoo", ".Cache", ".zsh")), listing)
+        val request = server.takeRequest().requestUrl!!
+        assertEquals("/api/fs/list", request.encodedPath)
+        assertEquals(setOf("path"), request.queryParameterNames)
+        assertEquals("/home/u///", request.queryParameter("path"))
+    }
+
+    @Test
+    fun `browsing an ancestor names its child from the resolved server relative path`() = runBlocking {
+        server.enqueue(json("""{"location":{"directory":"/home/dev/bots"},"data":[{"path":"../","type":"directory"}]}"""))
+
+        assertEquals(
+            FolderListing("/home", "/", listOf("dev")),
+            RemoteCatalogRepository(graph.clients).listFolders("/home").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `browsing the server parent names dot folders and the server folder itself`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"/home/dev/bots"},"data":[
+                    {"path":"../.android/","type":"directory"},
+                    {"path":"./","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("/home/dev", "/home", listOf("bots", ".android")),
+            RemoteCatalogRepository(graph.clients).listFolders("/home/dev").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `root children resolve ancestor segments and never traverse above root`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"/home/dev/bots"},"data":[
+                    {"path":"../../","type":"directory"},
+                    {"path":"../../../boot/","type":"directory"},
+                    {"path":"../../../.././../","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("/", null, listOf("boot", "home")),
+            RemoteCatalogRepository(graph.clients).listFolders("/").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `empty entries name the server folder as a child but self entries are excluded`() = runBlocking {
+        val catalog = RemoteCatalogRepository(graph.clients)
+        server.enqueue(json("""{"location":{"directory":"/home/dev/bots"},"data":[{"path":"","type":"directory"}]}"""))
+
+        assertEquals(listOf("bots"), catalog.listFolders("/home/dev").getOrThrow().folders)
+
+        server.enqueue(
+            json(
+                """{"location":{"directory":"/home/dev/bots"},"data":[
+                    {"path":"./","type":"directory"},
+                    {"path":"","type":"directory"},
+                    {"path":"../bots//./","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+        assertEquals(emptyList<String>(), catalog.listFolders("/home/dev/bots/").getOrThrow().folders)
+    }
+
+    @Test
+    fun `folder entries without a response location keep the last segment rule`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":null,"data":[
+                    {"path":"../.cache/","type":"directory"},
+                    {"path":"../alpha/","type":"directory"},
+                    {"path":"","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("/home", "/", listOf("alpha", ".cache")),
+            RemoteCatalogRepository(graph.clients).listFolders("/home").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `a null folder path lists the server folder without a location`() = runBlocking {
+        server.enqueue(json("""{"location":{"directory":"/srv/opencode/"},"data":[{"path":"src/","type":"directory"}]}"""))
+
+        assertEquals(
+            FolderListing("/srv/opencode", "/srv", listOf("src")),
+            RemoteCatalogRepository(graph.clients).listFolders(null).getOrThrow(),
+        )
+        assertEquals("/api/fs/list", server.takeRequest().path)
+    }
+
+    @Test
+    fun `root has no parent and a top level folder has root as its parent`() = runBlocking {
+        val catalog = RemoteCatalogRepository(graph.clients)
+        repeat(2) { server.enqueue(json("""{"location":{"directory":"/srv/opencode"},"data":[]}""")) }
+
+        assertEquals(FolderListing("/", null, emptyList()), catalog.listFolders("/").getOrThrow())
+        assertEquals(FolderListing("/home", "/", emptyList()), catalog.listFolders("/home").getOrThrow())
+        repeat(2) { assertEquals(setOf("path"), server.takeRequest().requestUrl!!.queryParameterNames) }
+    }
+
+    @Test
+    fun `a windows server folder lists in windows style also with forward slashes`() = runBlocking {
+        val catalog = RemoteCatalogRepository(graph.clients)
+        server.enqueue(json("""{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[{"path":"src\\","type":"directory"}]}"""))
+        server.enqueue(json("""{"location":{"directory":"C:/Users/dev/proj"},"data":[{"path":"src\\","type":"directory"}]}"""))
+
+        repeat(2) {
+            assertEquals(FolderListing("C:\\Users\\dev\\proj", "C:\\Users\\dev", listOf("src")), catalog.listFolders(null).getOrThrow())
+        }
+    }
+
+    @Test
+    fun `a windows drive root lists plain names from server relative entries`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[
+                    {"path":"..\\..\\..\\Windows\\","type":"directory"},
+                    {"path":"..\\..\\..\\src\\","type":"directory"},
+                    {"path":"..\\..\\","type":"directory"},
+                    {"path":"..\\..\\..\\..\\","type":"directory"},
+                    {"path":"..\\..\\..\\pagefile.sys","type":"file"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("C:\\", null, listOf("src", "Users", "Windows")),
+            RemoteCatalogRepository(graph.clients).listFolders("/").getOrThrow(),
+        )
+        assertEquals("/", server.takeRequest().requestUrl!!.queryParameter("path"))
+    }
+
+    @Test
+    fun `a windows ancestor of the server folder names the server folder and its siblings`() = runBlocking {
+        server.enqueue(
+            json(
+                """{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[
+                    {"path":"..\\src\\","type":"directory"},
+                    {"path":".\\","type":"directory"},
+                    {"path":"","type":"directory"}
+                ]}
+                """.trimIndent(),
+            ),
+        )
+
+        assertEquals(
+            FolderListing("C:\\Users\\dev", "C:\\Users", listOf("proj", "src")),
+            RemoteCatalogRepository(graph.clients).listFolders("C:\\Users\\dev").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `a folder on another windows drive keeps absolute entries`() = runBlocking {
+        server.enqueue(json("""{"location":{"directory":"C:\\Users\\dev\\proj"},"data":[{"path":"D:\\work\\src\\","type":"directory"}]}"""))
+
+        assertEquals(
+            FolderListing("D:\\work", "D:\\", listOf("src")),
+            RemoteCatalogRepository(graph.clients).listFolders("D:\\work").getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `a missing windows folder is a failure`() = runBlocking {
+        server.enqueue(json("""{"_tag":"FileNotFoundError","path":"C:\\home"}""").setResponseCode(404))
+
+        assertTrue(RemoteCatalogRepository(graph.clients).listFolders("/home").isFailure)
+    }
+
+    @Test
+    fun `a missing folder is a failure`() = runBlocking {
+        server.enqueue(json("""{"_tag":"FileNotFoundError","path":"/missing"}""").setResponseCode(404))
+
+        assertTrue(RemoteCatalogRepository(graph.clients).listFolders("/missing").isFailure)
+        assertEquals(setOf("path"), server.takeRequest().requestUrl!!.queryParameterNames)
+    }
+
+    @Test
     fun `the catalog is fetched once and reused until it expires`() = runBlocking {
         var now = 0L
         val catalog = RemoteCatalogRepository(graph.clients, clock = { now })
@@ -388,6 +601,34 @@ class RemoteRepositoriesTest {
     }
 
     @Test
+    fun `tool files come back inline, read by path or as null`() = runBlocking {
+        server.enqueue(
+            json(
+                """
+                {"data":{"id":"msg_a","time":{"created":1,"completed":3},"type":"assistant","agent":"build",
+                  "model":{"id":"m","providerID":"p"},
+                  "content":[{"type":"tool","id":"call_1","name":"read","time":{"created":1,"completed":2},
+                    "state":{"status":"completed","input":{},"content":[
+                      {"type":"text","text":"Image read successfully"},
+                      {"type":"file","uri":"data:image/png;base64,QUJD","mime":"image/png","name":"a.png"},
+                      {"type":"file","uri":"file:///repo/shots/b.png","mime":"image/png"},
+                      {"type":"file","uri":"data:application/pdf;base64,QUJD","mime":"application/pdf","name":"c.pdf"},
+                      {"type":"file","uri":"https://example.com/d.png","mime":"image/png"}
+                    ]}}]}}
+                """.trimIndent(),
+            ),
+        )
+        server.enqueue(MockResponse().setHeader("Content-Type", "image/png").setBody("XYZ"))
+
+        val files = RemoteChatRepository(graph.clients, InMemoryMessageCache()).toolFileData("ses_1", "/repo", "msg_a", "call_1").getOrThrow()
+
+        // Inline content is returned whatever its type; a web URL is not ours to load.
+        assertEquals(listOf("data:image/png;base64,QUJD", "data:image/png;base64,WFla", "data:application/pdf;base64,QUJD", null), files)
+        server.takeRequest()
+        assertEquals("/api/fs/read/shots/b.png?location%5Bdirectory%5D=%2Frepo", server.takeRequest().path)
+    }
+
+    @Test
     fun `rename and delete keep the session cache in sync`() = runBlocking {
         server.enqueue(json(fixture("session_get.json")))
         val repository = RemoteSessionRepository(graph.clients)
@@ -457,6 +698,24 @@ class RemoteRepositoriesTest {
         val models = RemoteCatalogRepository(graph.clients).models(null).getOrThrow()
 
         assertEquals("anthropic", models.first().providerName)
+    }
+
+    @Test
+    fun `connecting a provider invalidates model caches in all folders of that server`() = runBlocking {
+        server.dispatcher = catalogDispatcher(json("""{"location":{"directory":"/tmp/x"},"data":[]}"""))
+        val catalog = RemoteCatalogRepository(graph.clients)
+        catalog.models("/tmp/x").getOrThrow()
+        catalog.models("/tmp/y").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.models("/tmp/x").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.invalidateModels("other-server")
+        catalog.models("/tmp/x").getOrThrow()
+        assertEquals(4, server.requestCount)
+        catalog.invalidateModels("s1")
+        catalog.models("/tmp/x").getOrThrow()
+        catalog.models("/tmp/y").getOrThrow()
+        assertEquals(8, server.requestCount)
     }
 
     @Test

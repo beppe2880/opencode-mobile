@@ -34,6 +34,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.core.ui.theme.isDark
+import io.github.beppe2880.opencodemobile.core.ui.theme.isDarkTheme
 import io.github.beppe2880.opencodemobile.feature.settings.customize.LiveEditHost
 import io.github.beppe2880.opencodemobile.navigation.AppNavHost
 import org.koin.compose.KoinIsolatedContext
@@ -54,17 +55,18 @@ fun DemoHost(
     val settings = remember(container) { container.koin.get<SettingsRepository>() }
     val preferences by settings.settings.collectAsStateWithLifecycle()
     val dark = preferences.theme.isDark()
+    val barsDark = isDarkTheme(preferences.openCodeTheme, dark)
     val activity = LocalActivity.current as? ComponentActivity
-    DisposableEffect(activity, dark, realDarkTheme) {
+    DisposableEffect(activity, barsDark, realDarkTheme) {
         fun applyStyle(isDark: Boolean) {
             val style = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { isDark }
             activity?.enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
         }
-        applyStyle(dark)
+        applyStyle(barsDark)
         onDispose { applyStyle(realDarkTheme) }
     }
     KoinIsolatedContext(container) {
-        OcTheme(darkTheme = dark) {
+        OcTheme(darkTheme = dark, openCodeTheme = preferences.openCodeTheme) {
             // Destination BackHandlers take precedence; back from the demo root exits it.
             BackHandler(onBack = onExit)
             Column(

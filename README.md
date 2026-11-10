@@ -102,11 +102,12 @@ Screenshots and recordings may show earlier versions of the app.
 ### Pick up where you left off
 
 - **Cached transcripts** and incremental sync for large conversations.
-- **Swipe between chats**, with saved drafts and remembered reading positions.
+- **Swipe right for the chat list** (or between chats), with saved drafts and remembered reading positions.
 - **Multiple saved servers**, QR pairing and discovery on your Wi-Fi network.
 - **Usage statistics** by day and model: cost, tokens and activity over 1, 7 or 30 days.
 - **Home screen widgets** for running and recent sessions.
-- **Light and dark themes**, phone and larger-screen layouts, and the familiar OpenCode typography.
+- **Light and dark themes**, optionally in the colors of an OpenCode terminal theme (markdown
+  included), phone and larger-screen layouts, and the familiar OpenCode typography.
 
 Available in **11 languages**: English, Italian, Spanish, French, German, Brazilian Portuguese,
 Russian, Simplified Chinese, Japanese, Korean and Arabic.

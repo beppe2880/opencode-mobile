@@ -1,0 +1,14 @@
+<resources>
+    <string name="chat_providers_group_connected">المتصلون</string>
+    <string name="chat_providers_group_popular">الشائعون</string>
+    <string name="chat_providers_group_other">مزودون آخرون</string>
+    <string name="chat_providers_status_connected">متصل</string>
+    <string name="chat_providers">ربط مزوّد</string>
+    <string name="chat_providers_hint">تُحفظ بيانات الاعتماد على هذا الخادم وليس على هاتفك.</string>
+    <string name="chat_providers_search">البحث عن المزوّدين</string>
+    <string name="chat_providers_key">مفتاح API</string>
+    <string name="chat_providers_save">ربط</string>
+    <string name="chat_providers_connected">تم حفظ بيانات الاعتماد على الخادم.</string>
+    <string name="chat_providers_error">تعذّر إكمال الطلب. تحقّق من الاتصال والحقول المطلوبة ثم أعد المحاولة.</string>
+    <string name="chat_providers_empty">لا توجد تكاملات مطابقة.</string>
+</resources>

@@ -1,0 +1,14 @@
+<resources>
+    <string name="chat_providers_group_connected">Connected</string>
+    <string name="chat_providers_group_popular">Popular</string>
+    <string name="chat_providers_group_other">Other providers</string>
+    <string name="chat_providers_status_connected">Connected</string>
+    <string name="chat_providers">Connect provider</string>
+    <string name="chat_providers_hint">Credentials are saved on this server, not on your phone.</string>
+    <string name="chat_providers_search">Search providers</string>
+    <string name="chat_providers_key">API key</string>
+    <string name="chat_providers_save">Connect</string>
+    <string name="chat_providers_connected">Credentials saved on the server.</string>
+    <string name="chat_providers_error">Could not complete the request. Check the connection and required fields, then try again.</string>
+    <string name="chat_providers_empty">No matching integrations available.</string>
+</resources>

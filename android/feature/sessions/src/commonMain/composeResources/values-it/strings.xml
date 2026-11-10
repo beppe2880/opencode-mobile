@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">Cartella del progetto</string>
     <string name="sessions_new_other_directory">Altra cartella</string>
     <string name="sessions_new_path_label">Percorso assoluto</string>
+    <string name="sessions_browse">Sfoglia</string>
+    <string name="sessions_browse_title">Scegli cartella</string>
+    <string name="sessions_browse_use">Usa questa cartella</string>
+    <string name="sessions_browse_empty">Nessuna cartella qui</string>
+    <string name="sessions_browse_retry">Riprova</string>
+    <string name="sessions_browse_back">Indietro</string>
     <string name="sessions_new_path_placeholder">/home/io/progetto</string>
     <string name="sessions_new_agent">Agente</string>
     <string name="sessions_new_model">Modello</string>
@@ -43,9 +49,12 @@
     <string name="sessions_actions_title">Azioni sessione</string>
     <string name="sessions_running_a11y">L'agente è in esecuzione</string>
     <string name="sessions_new_show_all">Mostra tutti i %1$d progetti</string>
+    <string name="sessions_new_project_search">Cerca progetti</string>
+    <string name="sessions_new_project_search_empty">Nessun progetto trovato</string>
     <string name="sessions_untitled">Sessione senza titolo</string>
     <string name="sessions_preview_swipe_on">Scorri a sinistra o a destra in una chat per aprire la sessione successiva o precedente</string>
     <string name="sessions_preview_swipe_off">Disattivato: torna all’elenco per aprire un’altra sessione</string>
+    <string name="sessions_preview_swipe_drawer">Scorri verso destra in una chat per mostrare sopra di essa l’elenco delle chat</string>
     <string name="sessions_preview_wide">Su pieghevoli aperti e tablet</string>
     <string name="sessions_preview_split_off">La chat si apre sopra l’elenco, anche sugli schermi larghi</string>
     <string name="sessions_preview_back_list">Indietro con l’elenco nascosto lo mostra di nuovo</string>
@@ -58,4 +67,11 @@
     <string name="sessions_preview_share_new">Testo, link e immagini condivisi da altre app aprono questo pannello</string>
     <string name="sessions_preview_share_choose">Testo, link e immagini condivisi da altre app chiedono prima una chat, oppure aprono questo pannello</string>
     <string name="sessions_preview_share_off">OpenCode non è nel menu di condivisione delle altre app</string>
+    <string name="sessions_project_hide">Nascondi progetto</string>
+    <string name="sessions_project_unhide">Mostra</string>
+    <string name="sessions_projects_hidden">Nascosti (%1$d)</string>
+    <string name="sessions_browse_show_hidden">Mostra cartelle nascoste</string>
+    <string name="sessions_browse_hide_hidden">Nascondi cartelle nascoste</string>
+    <string name="sessions_browse_recent">Cartelle recenti</string>
+    <string name="sessions_browse_pick">Usa</string>
 </resources>

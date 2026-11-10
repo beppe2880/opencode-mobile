@@ -182,10 +182,10 @@ internal fun FileDiffHeader(diff: FileDiff, directory: String, modifier: Modifie
 @Composable
 private fun DiffLineRow(line: DiffLine, numberWidth: Int, c: OcColors) {
     val background = when (line.kind) {
-        DiffLineKind.Added -> c.success.bg
-        DiffLineKind.Removed -> c.danger.bg
-        DiffLineKind.Hunk -> c.layer02
-        DiffLineKind.Context -> c.layer01
+        DiffLineKind.Added -> c.diff.addedBackground
+        DiffLineKind.Removed -> c.diff.removedBackground
+        DiffLineKind.Hunk -> c.diff.hunkBackground
+        DiffLineKind.Context -> c.diff.contextBackground
     }
     Text(
         text = remember(line, numberWidth, c) { diffLineText(line, numberWidth, c) },
@@ -200,21 +200,21 @@ private fun DiffLineRow(line: DiffLine, numberWidth: Int, c: OcColors) {
 
 private fun diffLineText(line: DiffLine, numberWidth: Int, c: OcColors): AnnotatedString = buildAnnotatedString {
     if (line.kind == DiffLineKind.Hunk) {
-        withStyle(SpanStyle(color = c.textFaint)) { append(line.text) }
+        withStyle(SpanStyle(color = c.diff.hunkText)) { append(line.text) }
         return@buildAnnotatedString
     }
-    withStyle(SpanStyle(color = c.textFaint)) {
+    withStyle(SpanStyle(color = c.diff.lineNumber)) {
         append((line.oldLine?.toString() ?: "").padStart(numberWidth))
         append(" ")
         append((line.newLine?.toString() ?: "").padStart(numberWidth))
         append("  ")
     }
     when (line.kind) {
-        DiffLineKind.Added -> withStyle(SpanStyle(color = c.success.fg)) { append("+ ") }
-        DiffLineKind.Removed -> withStyle(SpanStyle(color = c.danger.fg)) { append("- ") }
+        DiffLineKind.Added -> withStyle(SpanStyle(color = c.diff.added)) { append("+ ") }
+        DiffLineKind.Removed -> withStyle(SpanStyle(color = c.diff.removed)) { append("- ") }
         else -> append("  ")
     }
-    withStyle(SpanStyle(color = c.textBase)) { append(line.text.replace("\t", "    ")) }
+    withStyle(SpanStyle(color = c.diff.text)) { append(line.text.replace("\t", "    ")) }
 }
 
 @PreviewLightDark

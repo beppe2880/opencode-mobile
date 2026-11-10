@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data.catalog
 
 import io.github.beppe2880.opencodemobile.api.apis.FilesystemApi
+import io.github.beppe2880.opencodemobile.api.models.FileSystemEntry
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.nowMillis
@@ -8,8 +9,10 @@ import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.Command
+import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.ServerPaths
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.mapping.configuredModel
 import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
@@ -26,11 +29,20 @@ internal class RemoteCatalogRepository(
      * Agents, models and commands rarely change and every chat needs them: they are kept per
      * server, folder and kind for [CATALOG_TTL_MS], so switching chats does not reload them.
      */
-    private val memo = ConcurrentMap<String, Pair<Long, Any>>()
+    private data class MemoKey(val serverId: String?, val kind: String, val directory: String?, val revision: Any?)
+    private val memo = ConcurrentMap<MemoKey, Pair<Long, Any>>()
+    private val modelRevisions = ConcurrentMap<String, Any>()
+
+    override fun invalidateModels(serverId: String) {
+        // A model read started before invalidation must not repopulate the current cache.
+        modelRevisions[serverId] = Any()
+        memo.removeMatching { it.serverId == serverId && it.kind == "models" }
+    }
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : Any> remembered(kind: String, directory: String?, load: suspend () -> T): Result<T> {
-        val key = "${clients.activeIdOrNull()}|$kind|${directory.orEmpty()}"
+        val serverId = clients.activeIdOrNull()
+        val key = MemoKey(serverId, kind, directory, if (kind == "models" && serverId != null) modelRevisions[serverId] else null)
         memo[key]?.let { (at, value) -> if (clock() - at < CATALOG_TTL_MS) return Result.success(value as T) }
         return resultOf { load() }.onSuccess { memo[key] = clock() to it }
     }
@@ -72,6 +84,29 @@ internal class RemoteCatalogRepository(
         }.data.mapNotNull { it.path }
     }
 
+    override suspend fun listFolders(path: String?): Result<FolderListing> = resultOf {
+        val api = clients.active().files
+        // No location: browsing must not open a workspace for each folder.
+        val response = awaitBody { api.fsList(path = path) }
+        // The server lists entries relative to its own folder, in its own path style.
+        val base = response.location?.directory?.takeIf { it.isNotBlank() }
+        val listedPath = when {
+            base == null -> ServerPaths.normalize(requireNotNull(path))
+            path == null -> ServerPaths.normalize(base)
+            else -> ServerPaths.resolve(base, path)
+        }
+        val names = response.data.filter { it.type == FileSystemEntry.Type.DIRECTORY }
+            .mapNotNull { entry ->
+                val entryPath = entry.path ?: return@mapNotNull null
+                if (base == null) return@mapNotNull ServerPaths.name(entryPath)
+                val resolved = ServerPaths.resolve(base, entryPath)
+                if (resolved == listedPath || ServerPaths.parent(resolved) == null) null else ServerPaths.name(resolved)
+            }
+            .filter { it.isNotBlank() && it != ".." }
+            .distinct()
+        FolderListing(listedPath, ServerPaths.parent(listedPath), sortFolderNames(names))
+    }
+
     /**
      * Provider display names; models stay usable with raw IDs when the lookup fails.
      * The response also carries provider settings such as API keys: keep only id and name.
@@ -94,3 +129,6 @@ internal class RemoteCatalogRepository(
         const val CATALOG_TTL_MS = 5 * 60_000L
     }
 }
+
+private fun sortFolderNames(names: List<String>): List<String> =
+    names.sortedWith(compareBy<String> { it.startsWith('.') }.thenBy { it.lowercase() })

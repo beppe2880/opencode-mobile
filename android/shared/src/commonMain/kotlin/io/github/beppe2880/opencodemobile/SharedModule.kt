@@ -1,7 +1,10 @@
 package io.github.beppe2880.opencodemobile
 
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
+import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
+import io.github.beppe2880.opencodemobile.feature.chat.ProviderConnectionViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ScrollMemory
 import io.github.beppe2880.opencodemobile.feature.chat.VoiceInputViewModel
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectViewModel
@@ -22,13 +25,16 @@ import org.koin.dsl.module
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
 fun sharedModule(appInfo: AppInfo): Module = module {
     single { appInfo }
+    // Stored ids of themes no longer shipped read as none (PreferencesSettingsRepository).
+    single<OpenCodeThemeIds> { OpenCodeThemeIds { OpenCodeThemes.byId(it) != null } }
     viewModel { ConnectViewModel(get(), get()) }
-    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
     viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
+    viewModel { ProviderConnectionViewModel(get(), get(), get()) }
     viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }
     viewModel { UsageViewModel(get(), get()) }
     // The update sheet is offered once per app run.

@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,6 +45,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +61,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
+import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
@@ -100,6 +105,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_label
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_title
@@ -128,6 +134,11 @@ fun SessionsScreen(
     banner: @Composable () -> Unit = {},
     /** The offline demo: the top bar names it instead of showing a connection. */
     demo: Boolean = false,
+    /**
+     * Shown in a drawer over a chat: the list first scrolls to [selectedSessionId], and rows do
+     * not swipe to delete since that swipe closes the drawer (delete stays in the row actions).
+     */
+    inDrawer: Boolean = false,
 ) {
     val c = OcTheme.colors
     val now by produceState(nowProvider()) {
@@ -168,6 +179,16 @@ fun SessionsScreen(
         ) {
             var listWidthPx by remember { mutableIntStateOf(Int.MAX_VALUE) }
             val listState = rememberLazyListState()
+            if (inDrawer && selectedSessionId != null) {
+                var revealed by remember(selectedSessionId) { mutableStateOf(false) }
+                LaunchedEffect(selectedSessionId, state.groups, state.loading) {
+                    if (revealed || state.loading || state.error != null) return@LaunchedEffect
+                    val index = sessionRowIndex(state.groups, selectedSessionId) ?: return@LaunchedEffect
+                    revealed = true
+                    // One item above, so the row is not stuck under the top edge.
+                    if (listState.layoutInfo.visibleItemsInfo.none { it.key == selectedSessionId }) listState.scrollToItem((index - 1).coerceAtLeast(0))
+                }
+            }
             // Narrower than any phone: the list sits beside the chat.
             val compact = with(LocalDensity.current) { listWidthPx.toDp() } < CompactListWidth
             LazyColumn(
@@ -211,6 +232,7 @@ fun SessionsScreen(
                                 modifier = Modifier.animateItem().editable(SettingsPart.SessionRows, LocalEditMode.current),
                                 compact = compact,
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
+                                swipeToDelete = !inDrawer,
                             )
                         }
                     }
@@ -219,6 +241,18 @@ fun SessionsScreen(
         }
     }
     SessionsOverlays(state, onEvent)
+}
+
+/** Position of [sessionId]'s row in the list: after the header item, each group has its header and rows; null when absent. */
+internal fun sessionRowIndex(groups: List<SessionGroup>, sessionId: String): Int? {
+    var index = 1
+    for (group in groups) {
+        index++
+        val row = group.sessions.indexOfFirst { it.id == sessionId }
+        if (row >= 0) return index + row
+        index += group.sessions.size
+    }
+    return null
 }
 
 @Composable
@@ -288,22 +322,43 @@ private fun ProjectFilter(state: SessionsState, onEvent: (SessionsEvent) -> Unit
                 },
                 modifier = Modifier.testTag("sessions_project_all"),
             )
-            state.projects.forEach { project ->
-                DropdownMenuItem(
-                    text = {
-                        Column {
-                            Text(project.displayName, style = MaterialTheme.typography.bodyMedium)
-                            Text(project.directory, style = OcTheme.mono.codeSmall, color = OcTheme.colors.textFaint)
-                        }
-                    },
+            state.visibleProjects.forEach { project ->
+                FilterProjectItem(
+                    project = project,
                     onClick = {
                         expanded = false
                         onEvent(SessionsEvent.FilterChanged(project.directory))
                     },
-                    modifier = Modifier.testTag("sessions_project_${project.id}"),
+                    onHide = { onEvent(SessionsEvent.HideProject(project.directory)) },
                 )
             }
         }
+    }
+}
+
+/** A project in the filter menu; long press offers Hide project. DropdownMenuItem has no long click. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FilterProjectItem(project: Project, onClick: () -> Unit, onHide: () -> Unit) {
+    var menu by remember { mutableStateOf(false) }
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = { menu = true },
+                    onLongClickLabel = stringResource(Res.string.sessions_project_hide),
+                )
+                .heightIn(min = 48.dp)
+                .padding(horizontal = 12.dp, vertical = OcSpacing.xs)
+                .testTag("sessions_project_${project.id}"),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(project.displayName, style = MaterialTheme.typography.bodyMedium, color = OcTheme.colors.textBase)
+            Text(project.directory, style = OcTheme.mono.codeSmall, color = OcTheme.colors.textFaint)
+        }
+        ProjectMenu(expanded = menu, onDismiss = { menu = false }, onHide = onHide)
     }
 }
 
@@ -401,7 +456,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
         )
     }
     state.newSession?.let { new ->
-        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent)
+        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent, hidden = state.hiddenDirectories)
     }
 }
 

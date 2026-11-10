@@ -26,6 +26,9 @@ class SettingOptionsTest {
         assertEquals(SettingOption.entries.toSet(), SettingsPart.entries.flatMap { it.options }.toSet())
         assertEquals(SettingsPart.TextSize, SettingOption.TextSize.part)
         assertEquals(SettingsArea.Appearance, SettingOption.TextSize.area)
+        // The OpenCode theme opens at the theme, and the messages it colors offer it too.
+        assertEquals(SettingsPart.Theme, SettingOption.OpenCodeTheme.part)
+        assertTrue(SettingOption.OpenCodeTheme in SettingsPart.Messages.options)
         assertEquals(SettingsPart.Thoughts, SettingOption.GroupActivity.part)
         assertEquals(SettingsArea.LiveActivity, SettingOption.LiveInterval.area)
         assertEquals(SettingsArea.Appearance, SettingOption.BackShowsList.area)
@@ -36,13 +39,34 @@ class SettingOptionsTest {
     @Test
     fun eachPartOffersOnlyItsOwnOptions() {
         assertEquals(listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens), SettingsPart.Header.options)
-        assertEquals(listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed), SettingsPart.PendingCards.options)
+        assertEquals(
+            listOf(SettingOption.PermissionsCollapsed, SettingOption.QuestionsCollapsed, SettingOption.RunningChips),
+            SettingsPart.PendingCards.options,
+        )
+        // The running chips sit above the composer like the pending cards, in the chat's category.
+        assertEquals(SettingsPart.PendingCards, SettingOption.RunningChips.part)
+        assertEquals(SettingsArea.Chat, SettingOption.RunningChips.area)
         assertEquals(listOf(SettingOption.AgentOutline, SettingOption.Dictation), SettingsPart.ComposerBox.options)
         assertEquals(SettingsPart.VoiceInput, SettingOption.Dictation.part)
         assertEquals(SettingsPart.VoiceInput, SettingOption.VoiceKey.part)
         assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines), SettingsPart.LiveShell.options)
         assertEquals(listOf(SettingOption.UpdateNotice), SettingsPart.UpdateNotice.options)
         assertTrue(SettingsPart.Activity.options.containsAll(SettingsPart.Thoughts.options + SettingsPart.Tools.options))
+        // The images read by the agent show under the tool rows, grouped or not.
+        assertEquals(
+            listOf(
+                SettingOption.ExpandTools,
+                SettingOption.ToolDetails,
+                SettingOption.FullCommands,
+                SettingOption.ToolMediaSize,
+                SettingOption.OutputLines,
+                SettingOption.GroupActivity,
+            ),
+            SettingsPart.Tools.options,
+        )
+        assertTrue(SettingOption.ToolMediaSize in SettingsPart.Activity.options)
+        assertEquals(SettingsPart.Tools, SettingOption.ToolMediaSize.part)
+        assertTrue(SettingOption.ToolMediaSize.appliesTo(AppSettings()))
     }
 
     @Test

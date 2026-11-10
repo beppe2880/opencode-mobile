@@ -3,13 +3,19 @@ package io.github.beppe2880.opencodemobile.core.ui.markdown
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import com.mikepenz.markdown.compose.LocalMarkdownTypography
+import com.mikepenz.markdown.compose.components.CurrentComponentsBridge
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeBlock
 import com.mikepenz.markdown.compose.elements.MarkdownHighlightedCodeFence
@@ -19,13 +25,16 @@ import com.mikepenz.markdown.compose.elements.MarkdownTableRow
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.model.DefaultMarkdownColors
 import com.mikepenz.markdown.model.DefaultMarkdownTypography
+import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
+import com.mikepenz.markdown.model.markdownAnnotator
 import dev.snipme.highlights.Highlights
-import dev.snipme.highlights.model.SyntaxThemes
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcMarkdownPalette
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcMonoTypography
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import org.intellij.markdown.MarkdownElementTypes
 
 /**
  * Renders assistant markdown with highlighted code fences (with copy header).
@@ -41,11 +50,31 @@ fun OcMarkdown(
     val colors = OcTheme.colors
     val typography = MaterialTheme.typography
     val mono = OcTheme.mono
-    val highlights = remember(colors.isDark) {
-        Highlights.Builder().theme(SyntaxThemes.atom(darkMode = colors.isDark))
+    val highlights = remember(colors.isDark, colors.syntax) {
+        Highlights.Builder().theme(syntaxTheme(colors.syntax, colors.isDark))
     }
-    val components = remember(highlights) {
+    // The active OpenCode theme's markdown colors; the app's own themes have none.
+    val palette = colors.markdown
+    val mdColors = remember(colors) { markdownColors(colors) }
+    val mdTypography = remember(typography, colors, mono) { markdownTypography(typography, mono, colors, palette) }
+    // The renderer lays out the paragraphs of a quote like any other, with the paragraph style of
+    // the current typography: colored quotes provide one whose text is the quote style.
+    val quoteTypography = remember(typography, colors, mono) {
+        palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true) }
+    }
+    val annotator = remember(palette) {
+        if (palette != null) coloredAnnotator(palette) else markdownAnnotator()
+    }
+    val components = remember(highlights, quoteTypography) {
+        val defaultBlockQuote = CurrentComponentsBridge.blockQuote
         markdownComponents(
+            blockQuote = if (quoteTypography == null) {
+                defaultBlockQuote
+            } else {
+                { model ->
+                    CompositionLocalProvider(LocalMarkdownTypography provides quoteTypography) { defaultBlockQuote(model) }
+                }
+            },
             codeFence = {
                 MarkdownHighlightedCodeFence(
                     content = it.content,
@@ -86,46 +115,106 @@ fun OcMarkdown(
             },
         )
     }
-    val mdColors = remember(colors) { markdownColors(colors) }
-    val mdTypography = remember(typography, colors, mono) { markdownTypography(typography, mono, colors) }
     val state = cache.stateFor(id, content)
     Markdown(
         state = state,
         colors = mdColors,
         typography = mdTypography,
         components = components,
+        annotator = annotator,
         modifier = modifier,
     )
 }
 
 private fun markdownColors(c: OcColors): MarkdownColors = DefaultMarkdownColors(
-    text = c.textBase,
+    text = c.markdown?.text ?: c.textBase,
     codeBackground = if (c.isDark) c.layer01 else c.layer02,
     inlineCodeBackground = c.layer02,
-    dividerColor = c.borderBase,
+    dividerColor = c.markdown?.horizontalRule ?: c.borderBase,
     tableBackground = if (c.isDark) c.layer01 else c.layer02,
 )
 
-private fun markdownTypography(t: Typography, mono: OcMonoTypography, c: OcColors): MarkdownTypography {
+/**
+ * The text styles of markdown; with a [palette] (an OpenCode theme) the text, headings, inline
+ * code, link text, quotes, list markers and code block text take its colors like in the OpenCode
+ * terminal app. [quoteText] gives the text the quote style, for the content of a quote: inline
+ * code, links and (through the annotator) bold and italic text inside keep their own colors.
+ */
+internal fun markdownTypography(
+    t: Typography,
+    mono: OcMonoTypography,
+    c: OcColors,
+    palette: OcMarkdownPalette?,
+    quoteText: Boolean = false,
+): MarkdownTypography {
     val body: TextStyle = t.bodyMedium.copy(color = c.textBase)
+    val inlineCode = body.merge(mono.code.copy(fontSize = body.fontSize * 0.92f))
+    if (palette == null) {
+        return DefaultMarkdownTypography(
+            h1 = t.titleLarge,
+            h2 = t.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            h3 = t.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            h4 = t.titleSmall,
+            h5 = body,
+            h6 = body,
+            text = body,
+            code = mono.codeSmall,
+            inlineCode = inlineCode,
+            quote = body.copy(color = c.textMuted),
+            paragraph = body,
+            ordered = body,
+            bullet = body,
+            list = body,
+            textLink = TextLinkStyles(
+                style = body.copy(color = c.textAccent, textDecoration = TextDecoration.Underline).toSpanStyle(),
+            ),
+            table = t.bodySmall,
+        )
+    }
+    val paragraph = body.copy(color = palette.text)
+    fun TextStyle.heading() = copy(color = palette.heading, fontWeight = FontWeight.Bold)
+    val quote = paragraph.copy(color = palette.blockQuote, fontStyle = FontStyle.Italic)
+    val text = if (quoteText) quote else paragraph
     return DefaultMarkdownTypography(
-        h1 = t.titleLarge,
-        h2 = t.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
-        h3 = t.titleSmall.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
-        h4 = t.titleSmall,
-        h5 = body,
-        h6 = body,
-        text = body,
-        code = mono.codeSmall,
-        inlineCode = body.merge(mono.code.copy(fontSize = body.fontSize * 0.92f)),
-        quote = body.copy(color = c.textMuted),
-        paragraph = body,
-        ordered = body,
-        bullet = body,
-        list = body,
+        h1 = t.titleLarge.heading().copy(textDecoration = TextDecoration.Underline),
+        h2 = t.titleMedium.heading(),
+        h3 = t.titleSmall.heading(),
+        h4 = t.titleSmall.heading(),
+        h5 = paragraph.heading(),
+        h6 = paragraph.heading(),
+        text = text,
+        code = mono.codeSmall.copy(color = palette.codeBlock),
+        inlineCode = inlineCode.copy(color = palette.inlineCode),
+        quote = quote,
+        paragraph = text,
+        // The list renderers draw their marker (number or bullet) with these styles and the
+        // item content as paragraphs.
+        ordered = paragraph.copy(color = palette.listNumber),
+        bullet = paragraph.copy(color = palette.listBullet),
+        list = text,
         textLink = TextLinkStyles(
-            style = body.copy(color = c.textAccent, textDecoration = TextDecoration.Underline).toSpanStyle(),
+            style = paragraph.copy(color = palette.linkText, textDecoration = TextDecoration.Underline).toSpanStyle(),
         ),
-        table = t.bodySmall,
+        table = t.bodySmall.copy(color = palette.text),
     )
 }
+
+/**
+ * Colors bold and italic text with [palette]. The renderer styles them itself (bold, italic)
+ * without a hook for the color, so the color is pushed when it reaches the node and popped at its
+ * closing delimiter, the node's last child: both styles then end at the same place.
+ */
+private fun coloredAnnotator(palette: OcMarkdownPalette): MarkdownAnnotator = markdownAnnotator { _, child ->
+    when (child.type) {
+        MarkdownElementTypes.STRONG -> pushStyle(SpanStyle(color = palette.strong, fontWeight = FontWeight.Bold))
+        MarkdownElementTypes.EMPH -> pushStyle(SpanStyle(color = palette.emphasis, fontStyle = FontStyle.Italic))
+        else -> {
+            val parent = child.parent
+            if (parent != null && parent.type in COLORED_SPANS && child === parent.children.lastOrNull()) pop()
+        }
+    }
+    // The renderer still handles every node: it appends the text and its own bold or italic.
+    false
+}
+
+private val COLORED_SPANS = setOf(MarkdownElementTypes.STRONG, MarkdownElementTypes.EMPH)

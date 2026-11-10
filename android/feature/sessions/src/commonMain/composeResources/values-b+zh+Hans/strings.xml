@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">项目目录</string>
     <string name="sessions_new_other_directory">其他目录</string>
     <string name="sessions_new_path_label">绝对路径</string>
+    <string name="sessions_browse">浏览</string>
+    <string name="sessions_browse_title">选择文件夹</string>
+    <string name="sessions_browse_use">使用此文件夹</string>
+    <string name="sessions_browse_empty">此处没有文件夹</string>
+    <string name="sessions_browse_retry">重试</string>
+    <string name="sessions_browse_back">返回</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">智能体</string>
     <string name="sessions_new_model">模型</string>
@@ -43,9 +49,12 @@
     <string name="sessions_actions_title">会话操作</string>
     <string name="sessions_running_a11y">智能体正在运行</string>
     <string name="sessions_new_show_all">显示全部 %1$d 个项目</string>
+    <string name="sessions_new_project_search">搜索项目</string>
+    <string name="sessions_new_project_search_empty">没有匹配的项目</string>
     <string name="sessions_untitled">未命名会话</string>
     <string name="sessions_preview_swipe_on">在聊天中左右滑动，打开下一个或上一个会话</string>
     <string name="sessions_preview_swipe_off">关闭：返回列表以打开其他会话</string>
+    <string name="sessions_preview_swipe_drawer">在聊天中向右滑动，即可在其上方显示聊天列表</string>
     <string name="sessions_preview_wide">在展开的折叠屏和平板上</string>
     <string name="sessions_preview_split_off">聊天在列表上方打开，宽屏上也是如此</string>
     <string name="sessions_preview_back_list">列表隐藏时按返回键会再次显示列表</string>
@@ -58,4 +67,11 @@
     <string name="sessions_preview_share_new">从其他应用分享的文本、链接和图片会打开此面板</string>
     <string name="sessions_preview_share_choose">从其他应用分享的文本、链接和图片会先询问选择聊天，或打开此面板</string>
     <string name="sessions_preview_share_off">OpenCode 不在其他应用的分享菜单中</string>
+    <string name="sessions_project_hide">隐藏项目</string>
+    <string name="sessions_project_unhide">取消隐藏</string>
+    <string name="sessions_projects_hidden">已隐藏（%1$d）</string>
+    <string name="sessions_browse_show_hidden">显示隐藏文件夹</string>
+    <string name="sessions_browse_hide_hidden">隐藏隐藏文件夹</string>
+    <string name="sessions_browse_recent">最近使用的文件夹</string>
+    <string name="sessions_browse_pick">使用</string>
 </resources>

@@ -59,7 +59,7 @@
     <string name="oc_part_voice">Saisie vocale</string>
     <string name="oc_part_new_chat">Nouveau chat</string>
     <string name="oc_part_session_rows">Lignes des sessions</string>
-    <string name="oc_part_swipe">Balayer entre les discussions</string>
+    <string name="oc_part_swipe">Balayer dans une discussion</string>
     <string name="oc_part_split">Liste à côté du chat</string>
     <string name="oc_part_key_bar">Barre de touches</string>
     <string name="oc_part_keyboard">Clavier</string>

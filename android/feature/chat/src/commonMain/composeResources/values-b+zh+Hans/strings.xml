@@ -79,6 +79,8 @@
     <string name="chat_session_deleted">此会话已删除</string>
     <string name="chat_agent">智能体</string>
     <string name="chat_model">模型</string>
+    <string name="chat_model_description">模型：%1$s（%2$s）</string>
+    <string name="chat_model_description_variant">模型：%1$s（%2$s），推理强度 %3$s</string>
     <string name="chat_select_agent">选择智能体</string>
     <string name="chat_select_model">选择模型</string>
     <string name="chat_permission_title">需要授权</string>
@@ -96,6 +98,7 @@
     <string name="chat_new_messages">新消息</string>
     <string name="chat_command_compact">总结历史记录以释放上下文</string>
     <string name="chat_command_fork">将此会话复制到新会话</string>
+    <string name="chat_command_new">在此目录中开始新对话</string>
     <string name="chat_context">上下文</string>
     <string name="chat_context_tokens">%1$s 个 token</string>
     <string name="chat_context_of">%2$s 的 %1$d%</string>
@@ -114,6 +117,9 @@
     <string name="chat_open_image">打开图片</string>
     <string name="chat_close_preview">关闭</string>
     <string name="chat_image_failed">无法加载图片</string>
+    <string name="chat_tool_media_image">智能体读取的图片：%1$s</string>
+    <string name="chat_tool_media_video">视频：%1$s，%2$s</string>
+    <string name="chat_tool_media_file">来自智能体的文件：%1$s，%2$s</string>
     <string name="chat_attachment_failed">无法添加附件（最大 10 MB）</string>
     <string name="chat_dictation_start">听写</string>
     <string name="chat_dictation_stop">停止听写</string>
@@ -215,6 +221,38 @@
     <plurals name="chat_running_stop_agents_failed">
         <item quantity="other">无法停止 %1$d 个子代理</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="other">%1$d 个 Shell</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="other">%1$d 个代理</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="other">%1$d 个 Shell 正在运行</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="other">%1$d 个代理正在运行</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shell</string>
+    <string name="chat_running_list_agents">代理</string>
+    <string name="chat_running_status_running">运行中 · %1$s</string>
+    <string name="chat_running_status_exited">已退出 · %1$s</string>
+    <string name="chat_running_status_finished">已完成 · %1$s</string>
+    <string name="chat_running_status_ended">已结束</string>
+    <string name="chat_running_stop_shell">停止 Shell</string>
+    <string name="chat_running_stop_subagent">停止代理</string>
+    <string name="chat_running_copy_command">复制命令</string>
+    <string name="chat_running_share">分享</string>
+    <string name="chat_running_open_session">打开会话</string>
+    <string name="chat_running_agent_untitled">子代理</string>
+    <string name="chat_running_open">打开</string>
+    <string name="chat_running_open_agent_description">打开代理会话：%1$s</string>
+    <string name="chat_running_open_shell_description">打开 Shell 输出：%1$s</string>
+    <string name="chat_running_stop_agents_label">停止代理</string>
+    <string name="chat_running_stop_shells_label">停止 Shell</string>
+    <string name="chat_running_stop_everything_description">停止所有正在运行的工作</string>
+    <string name="chat_running_stop_everything_title">停止所有正在运行的工作？</string>
+    <string name="chat_running_stop_everything_message">子代理将被中断，此会话启动的命令将被结束。此会话和项目中的其他命令会继续运行。</string>
     <string name="chat_preview_folds">实时跟随的步骤在回答结束后会折叠</string>
     <string name="chat_preview_kept_open">实时跟随的步骤在回答结束后保持展开</string>
     <string name="chat_preview_not_followed">运行中的步骤保持折叠，直到你打开它们</string>

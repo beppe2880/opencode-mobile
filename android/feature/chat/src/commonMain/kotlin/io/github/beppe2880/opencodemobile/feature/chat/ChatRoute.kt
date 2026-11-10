@@ -5,11 +5,15 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +26,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
 import kotlinx.coroutines.launch
@@ -40,6 +45,8 @@ fun ChatRoute(
     onOpenSession: (String) -> Unit = {},
     /** Replaces this chat with another session of the list (swipe). */
     onSwitchSession: (String) -> Unit = {},
+    /** The session list drawer over the chat, pulled by a swipe when chosen in Settings; null where there is none. */
+    sessionDrawer: SessionDrawerPull? = null,
     /** Opens a shell in the folder of the session. */
     onOpenTerminal: (String) -> Unit = {},
     /** Opens a file read-only: the session folder and the path, absolute or relative to it. */
@@ -58,7 +65,36 @@ fun ChatRoute(
     }
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
+    val share = rememberTextShare()
     val scope = rememberCoroutineScope()
+    val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
+    val providerBrowser = LocalUriHandler.current
+    LifecycleStartEffect(providerModel) {
+        providerModel.onEvent(ProviderConnectionEvent.Visible(true))
+        onStopOrDispose { providerModel.onEvent(ProviderConnectionEvent.Visible(false)) }
+    }
+    var providersOpen by remember(sessionId) { mutableStateOf(false) }
+    val providerState by providerModel.state.collectAsStateWithLifecycle()
+    DisposableEffect(providerModel) {
+        onDispose { providerModel.onEvent(ProviderConnectionEvent.Close) }
+    }
+    CollectEffect(providerModel.effect) { effect ->
+        when (effect) {
+            ProviderConnectionEffect.Connected -> viewModel.onEvent(ChatEvent.ProvidersConnected)
+            ProviderConnectionEffect.Close -> providersOpen = false
+            is ProviderConnectionEffect.OpenBrowser -> {
+                if (runCatching { providerBrowser.openUri(effect.url) }.isFailure) {
+                    snackbar.showSnackbar(getString(Res.string.chat_providers_error))
+                }
+            }
+        }
+    }
+    if (providersOpen) {
+        ProviderConnectionSheet(providerState, providerModel::onEvent) {
+            providerModel.onEvent(ProviderConnectionEvent.Close)
+            providersOpen = false
+        }
+    }
     // Per session: in list + detail the same route shows another session after a swipe.
     val listState = rememberSaveable(sessionId, saver = LazyListState.Saver) { LazyListState() }
 
@@ -117,6 +153,10 @@ fun ChatRoute(
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
+            ChatEffect.OpenProviders -> {
+                providerModel.onEvent(ProviderConnectionEvent.Open(state.directory))
+                providersOpen = true
+            }
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
             ChatEffect.NavigateBack -> onBack()
             ChatEffect.PromptSent -> {
@@ -176,7 +216,9 @@ fun ChatRoute(
         // Without the permission yet, the dialog takes the press: after it a tap records.
         onHoldVoice = { startCloud(VoiceInputEvent.Hold) },
         showBack = showBack,
+        sessionDrawer = sessionDrawer,
         snackbarHostState = snackbar,
         listState = listState,
+        onShare = share,
     )
 }

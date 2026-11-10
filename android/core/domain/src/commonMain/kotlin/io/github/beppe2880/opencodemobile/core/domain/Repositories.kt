@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 sealed class OpenCodeError(message: String, cause: Throwable? = null) : Exception(message, cause) {
     /** Credentials rejected (HTTP 401). */
-    class Unauthorized(message: String = "Authentication failed") : OpenCodeError(message)
+    class Unauthorized(message: String = "Authentication failed", val httpStatus: Int? = null) : OpenCodeError(message)
 
     /** Server could not be reached (DNS, refused, timeout, TLS). */
     class Unreachable(message: String, cause: Throwable? = null) : OpenCodeError(message, cause)
@@ -21,7 +21,7 @@ sealed class OpenCodeError(message: String, cause: Throwable? = null) : Exceptio
     /** Pairing code expired, already used or invalid. */
     class PairingFailed(message: String) : OpenCodeError(message)
 
-    class NotFound(message: String) : OpenCodeError(message)
+    class NotFound(message: String, val httpStatus: Int? = null) : OpenCodeError(message)
 
     /** Any other HTTP or decoding failure. [tag] is the server `_tag` when present. */
     class Server(val status: Int, val tag: String?, message: String) : OpenCodeError(message)
@@ -132,6 +132,20 @@ interface RecentModelRepository {
     fun used(model: ModelRef)
 }
 
+interface FolderPreferences {
+    /** Project directories hidden on this device for [serverId]. */
+    fun hiddenDirectories(serverId: String): Set<String>
+    fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean)
+
+    /** Folders last picked in the folder browser for [serverId], most recent first, at most [RECENT_FOLDERS]. */
+    fun recentFolders(serverId: String): List<String>
+
+    /** [path] moves to the front; duplicates removed; list capped at [RECENT_FOLDERS]. */
+    fun folderPicked(serverId: String, path: String)
+}
+
+const val RECENT_FOLDERS = 5
+
 enum class PromptDelivery { Steer, Queue }
 
 /** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
@@ -178,6 +192,16 @@ interface ChatRepository {
      * referenced by path) keeps its place as a null.
      */
     suspend fun messageImages(sessionId: String, messageId: String): Result<List<String?>> = Result.success(emptyList())
+
+    /**
+     * The content of the files tool call [callId] of [messageId] returned, as `data:` URIs, one
+     * entry per [Part.Tool.files] in order. Inline content is fetched again with its message;
+     * images referenced by server path (absolute, `file://` or relative to [directory]) are read
+     * through the file API. An entry is null when its content is not available (another type, a
+     * web URL, too large or unreadable).
+     */
+    suspend fun toolFileData(sessionId: String, directory: String, messageId: String, callId: String): Result<List<String?>> =
+        Result.success(emptyList())
 
     /** Stores the last [lastMessages] of sessions not cached yet so they open instantly. Never fails. */
     suspend fun prefetch(sessionIds: List<String>, lastMessages: Int = 2) {}
@@ -283,6 +307,9 @@ interface ChatRepository {
 }
 
 interface CatalogRepository {
+    /** Drop cached models after provider connection, including other folders on this server. */
+    fun invalidateModels(serverId: String) {}
+
     /** Agents available in [directory]; hidden and subagent-only agents are included and flagged. */
     suspend fun agents(directory: String?): Result<List<Agent>>
 
@@ -300,6 +327,9 @@ interface CatalogRepository {
 
     /** Project files matching [query], as paths relative to [directory]. */
     suspend fun findFiles(directory: String, query: String): Result<List<String>> = Result.success(emptyList())
+
+    /** Child folders of [path] (absolute) on the server's machine; null lists the server's own folder. */
+    suspend fun listFolders(path: String?): Result<FolderListing> = Result.success(FolderListing("/", null, emptyList()))
 }
 
 enum class ThemeMode { System, Light, Dark }
@@ -330,6 +360,24 @@ enum class ChatHeaderLine { FolderBranchFiles, BranchFiles, Folder }
 
 /** Icons before the folder, branch and count; or the same as short ("4 files") or full words ("4 files changed"). */
 enum class ChatHeaderStyle { Icons, Short, Full }
+
+/**
+ * How big images a tool returned (a screenshot the agent read) show under their tool row:
+ * [Hidden] keeps only the file chip, which still opens the image.
+ */
+enum class ToolMediaSize { Hidden, Small, Medium, Large }
+
+/** What a horizontal swipe in a chat does. */
+enum class ChatSwipe {
+    /** Left or right opens the next or previous session of the list. */
+    SwitchChats,
+
+    /** Left to right opens the session list in a drawer over the chat (narrow windows only). */
+    SessionDrawer,
+
+    /** Nothing. */
+    Off,
+}
 
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
@@ -365,10 +413,17 @@ data class AppSettings(
     val keepLiveStepsOpen: Boolean = false,
     /** Text size of the chat transcript relative to the system one; one of [TEXT_SCALE_CHOICES]. */
     val chatTextScale: Float = 1f,
+    /**
+     * Id of the OpenCode terminal theme the app takes its colors from (markdown included); null
+     * keeps the app's own colors. One of [OpenCodeThemeIds].
+     */
+    val openCodeTheme: String? = null,
     /** Opening a tool group shows each tool's output or diff, not only its name. */
     val showToolDetails: Boolean = true,
     /** Long commands and paths in tool rows wrap instead of being cut to one line. */
     val showFullCommands: Boolean = false,
+    /** How big images read by the agent show under their tool row. */
+    val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** What the line under the chat title shows. */
@@ -381,8 +436,10 @@ data class AppSettings(
     val showRunningWorkInList: Boolean = true,
     /** Stopping a background command from the Running sheet asks first. */
     val confirmStopCommand: Boolean = true,
-    /** Horizontal swipes in a chat open the previous or next session of the list. */
-    val swipeBetweenChats: Boolean = true,
+    /** Chips above the composer count the running shells and subagents, and open them. */
+    val runningChips: Boolean = true,
+    /** What a horizontal swipe in a chat does. */
+    val chatSwipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */
@@ -465,6 +522,14 @@ val LIST_PANE_FRACTION_RANGE = 0.25f..0.6f
 
 /** Share of the window width taken by the session list until it is changed. */
 const val DEFAULT_LIST_PANE_FRACTION = 0.4f
+
+/**
+ * The OpenCode themes this build ships, by id (the catalog lives in `core:ui`): a stored id of a
+ * removed theme reads as none.
+ */
+fun interface OpenCodeThemeIds {
+    operator fun contains(id: String): Boolean
+}
 
 interface SettingsRepository {
     val settings: StateFlow<AppSettings>

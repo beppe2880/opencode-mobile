@@ -19,6 +19,7 @@ precedence over this file.
 | `iosApp/` | Xcode project of the iOS app; hosts the `Shared` framework built from `android/shared` | `android/AGENTS.md` |
 | `api/` | Pinned server contract: `openapi.json`, `OPENCODE_VERSION` | This file |
 | `tools/api-gen/` | Spec preprocessing for the generator (Bun) | This file |
+| `tools/themes/` | OpenCode TUI themes (pinned `@opencode/theme` + assets) → generated `core/ui/.../theme/generated/OpenCodeThemes.kt`; `bun run refresh` / `generate` / `check` | `docs/design-system.md` |
 | `.maestro/` | Android end-to-end test flows (testing only) | `.maestro/AGENTS.md` |
 | `docs/` | Design system, font licenses, README screenshots (planned work: GitHub issues) | - |
 | `.github/` | CI, release, PR title and template checks, issue templates | `CONTRIBUTING.md` |

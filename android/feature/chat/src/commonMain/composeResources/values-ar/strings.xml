@@ -124,6 +124,8 @@
     <string name="chat_session_deleted">تم حذف هذه الجلسة</string>
     <string name="chat_agent">الوكيل</string>
     <string name="chat_model">النموذج</string>
+    <string name="chat_model_description">النموذج: %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">النموذج: %1$s (%2$s)، مستوى الجهد %3$s</string>
     <string name="chat_select_agent">اختيار الوكيل</string>
     <string name="chat_select_model">اختيار النموذج</string>
     <string name="chat_permission_title">يلزم إذن</string>
@@ -141,6 +143,7 @@
     <string name="chat_new_messages">رسائل جديدة</string>
     <string name="chat_command_compact">تلخيص السجل لتحرير مساحة السياق</string>
     <string name="chat_command_fork">نسخ هذه الجلسة إلى جلسة جديدة</string>
+    <string name="chat_command_new">بدء محادثة جديدة في هذا المجلد</string>
     <string name="chat_context">السياق</string>
     <string name="chat_context_tokens">%1$s رمز</string>
     <string name="chat_context_of">%1$d% من %2$s</string>
@@ -159,6 +162,9 @@
     <string name="chat_open_image">فتح الصورة</string>
     <string name="chat_close_preview">إغلاق</string>
     <string name="chat_image_failed">تعذر تحميل الصورة</string>
+    <string name="chat_tool_media_image">صورة قرأها الوكيل: %1$s</string>
+    <string name="chat_tool_media_video">فيديو: %1$s، %2$s</string>
+    <string name="chat_tool_media_file">ملف من الوكيل: %1$s، %2$s</string>
     <string name="chat_attachment_failed">تعذر إرفاق الملف (الحد الأقصى 10 MB)</string>
     <string name="chat_dictation_start">الإملاء الصوتي</string>
     <string name="chat_dictation_stop">إيقاف الإملاء</string>
@@ -290,6 +296,58 @@
         <item quantity="many">تعذر إيقاف %1$d وكيلاً فرعياً</item>
         <item quantity="other">تعذر إيقاف %1$d وكيل فرعي</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="zero">%1$d صدفة</item>
+        <item quantity="one">صدفة واحدة (%1$d)</item>
+        <item quantity="two">صدفتان (%1$d)</item>
+        <item quantity="few">%1$d صدفات</item>
+        <item quantity="many">%1$d صدفة</item>
+        <item quantity="other">%1$d صدفة</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="zero">%1$d وكيل</item>
+        <item quantity="one">وكيل واحد (%1$d)</item>
+        <item quantity="two">وكيلان (%1$d)</item>
+        <item quantity="few">%1$d وكلاء</item>
+        <item quantity="many">%1$d وكيلاً</item>
+        <item quantity="other">%1$d وكيل</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="zero">%1$d صدفة قيد التشغيل</item>
+        <item quantity="one">صدفة واحدة قيد التشغيل (%1$d)</item>
+        <item quantity="two">صدفتان قيد التشغيل (%1$d)</item>
+        <item quantity="few">%1$d صدفات قيد التشغيل</item>
+        <item quantity="many">%1$d صدفة قيد التشغيل</item>
+        <item quantity="other">%1$d صدفة قيد التشغيل</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="zero">%1$d وكيل قيد التشغيل</item>
+        <item quantity="one">وكيل واحد قيد التشغيل (%1$d)</item>
+        <item quantity="two">وكيلان قيد التشغيل (%1$d)</item>
+        <item quantity="few">%1$d وكلاء قيد التشغيل</item>
+        <item quantity="many">%1$d وكيلاً قيد التشغيل</item>
+        <item quantity="other">%1$d وكيل قيد التشغيل</item>
+    </plurals>
+    <string name="chat_running_list_shells">الصدفات</string>
+    <string name="chat_running_list_agents">الوكلاء</string>
+    <string name="chat_running_status_running">قيد التشغيل · %1$s</string>
+    <string name="chat_running_status_exited">انتهت · %1$s</string>
+    <string name="chat_running_status_finished">اكتمل · %1$s</string>
+    <string name="chat_running_status_ended">انتهى</string>
+    <string name="chat_running_stop_shell">إيقاف الصدفة</string>
+    <string name="chat_running_stop_subagent">إيقاف الوكيل</string>
+    <string name="chat_running_copy_command">نسخ الأمر</string>
+    <string name="chat_running_share">مشاركة</string>
+    <string name="chat_running_open_session">فتح الجلسة</string>
+    <string name="chat_running_agent_untitled">وكيل فرعي</string>
+    <string name="chat_running_open">فتح</string>
+    <string name="chat_running_open_agent_description">فتح جلسة الوكيل: %1$s</string>
+    <string name="chat_running_open_shell_description">فتح مخرجات الصدفة: %1$s</string>
+    <string name="chat_running_stop_agents_label">إيقاف الوكلاء</string>
+    <string name="chat_running_stop_shells_label">إيقاف الصدفات</string>
+    <string name="chat_running_stop_everything_description">إيقاف كل ما يعمل</string>
+    <string name="chat_running_stop_everything_title">إيقاف كل ما يعمل؟</string>
+    <string name="chat_running_stop_everything_message">تتم مقاطعة الوكلاء الفرعيين وإنهاء الأوامر التي بدأتها هذه الجلسة. تستمر هذه الجلسة والأوامر الأخرى في المشروع في العمل.</string>
     <string name="chat_preview_folds">الخطوات التي تتابعها مباشرة تُطوى عند انتهاء الرد</string>
     <string name="chat_preview_kept_open">الخطوات التي تتابعها مباشرة تبقى مفتوحة بعد الرد</string>
     <string name="chat_preview_not_followed">تبقى خطوات التشغيل مطوية حتى تفتحها</string>

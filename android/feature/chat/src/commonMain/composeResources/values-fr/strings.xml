@@ -88,6 +88,8 @@
     <string name="chat_session_deleted">Cette session a été supprimée</string>
     <string name="chat_agent">Agent</string>
     <string name="chat_model">Modèle</string>
+    <string name="chat_model_description">Modèle : %1$s (%2$s)</string>
+    <string name="chat_model_description_variant">Modèle : %1$s (%2$s), effort %3$s</string>
     <string name="chat_select_agent">Choisir un agent</string>
     <string name="chat_select_model">Choisir un modèle</string>
     <string name="chat_permission_title">Autorisation requise</string>
@@ -105,6 +107,7 @@
     <string name="chat_new_messages">Nouveaux messages</string>
     <string name="chat_command_compact">Résumer l’historique pour libérer du contexte</string>
     <string name="chat_command_fork">Copier cette session dans une nouvelle</string>
+    <string name="chat_command_new">Démarrer une nouvelle discussion dans ce dossier</string>
     <string name="chat_context">Contexte</string>
     <string name="chat_context_tokens">%1$s jetons</string>
     <string name="chat_context_of">%1$d% de %2$s</string>
@@ -123,6 +126,9 @@
     <string name="chat_open_image">Ouvrir l’image</string>
     <string name="chat_close_preview">Fermer</string>
     <string name="chat_image_failed">Impossible de charger l’image</string>
+    <string name="chat_tool_media_image">Image lue par l’agent : %1$s</string>
+    <string name="chat_tool_media_video">Vidéo : %1$s, %2$s</string>
+    <string name="chat_tool_media_file">Fichier de l’agent : %1$s, %2$s</string>
     <string name="chat_attachment_failed">Impossible de joindre le fichier (10 Mo max.)</string>
     <string name="chat_dictation_start">Dicter</string>
     <string name="chat_dictation_stop">Arrêter la dictée</string>
@@ -230,6 +236,42 @@
         <item quantity="one">Impossible d’arrêter %1$d sous-agent</item>
         <item quantity="other">Impossible d’arrêter %1$d sous-agents</item>
     </plurals>
+    <plurals name="chat_running_chip_shells">
+        <item quantity="one">%1$d shell</item>
+        <item quantity="other">%1$d shells</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents">
+        <item quantity="one">%1$d agent</item>
+        <item quantity="other">%1$d agents</item>
+    </plurals>
+    <plurals name="chat_running_chip_shells_description">
+        <item quantity="one">%1$d shell en cours</item>
+        <item quantity="other">%1$d shells en cours</item>
+    </plurals>
+    <plurals name="chat_running_chip_agents_description">
+        <item quantity="one">%1$d agent en cours</item>
+        <item quantity="other">%1$d agents en cours</item>
+    </plurals>
+    <string name="chat_running_list_shells">Shells</string>
+    <string name="chat_running_list_agents">Agents</string>
+    <string name="chat_running_status_running">En cours · %1$s</string>
+    <string name="chat_running_status_exited">Terminé · %1$s</string>
+    <string name="chat_running_status_finished">Fini · %1$s</string>
+    <string name="chat_running_status_ended">Terminé</string>
+    <string name="chat_running_stop_shell">Arrêter le shell</string>
+    <string name="chat_running_stop_subagent">Arrêter l’agent</string>
+    <string name="chat_running_copy_command">Copier la commande</string>
+    <string name="chat_running_share">Partager</string>
+    <string name="chat_running_open_session">Ouvrir la session</string>
+    <string name="chat_running_agent_untitled">Sous-agent</string>
+    <string name="chat_running_open">Ouvrir</string>
+    <string name="chat_running_open_agent_description">Ouvrir la session de l’agent : %1$s</string>
+    <string name="chat_running_open_shell_description">Ouvrir la sortie du shell : %1$s</string>
+    <string name="chat_running_stop_agents_label">Arrêter les agents</string>
+    <string name="chat_running_stop_shells_label">Arrêter les shells</string>
+    <string name="chat_running_stop_everything_description">Arrêter tout ce qui s’exécute</string>
+    <string name="chat_running_stop_everything_title">Arrêter tout ce qui s’exécute ?</string>
+    <string name="chat_running_stop_everything_message">Les sous-agents sont interrompus et les commandes lancées par cette session sont arrêtées. Cette session et les autres commandes du projet continuent.</string>
     <string name="chat_preview_folds">Les étapes suivies en direct se replient à la fin de la réponse</string>
     <string name="chat_preview_kept_open">Les étapes suivies en direct restent ouvertes après la réponse</string>
     <string name="chat_preview_not_followed">Les étapes en cours restent repliées jusqu’à ce que vous les ouvriez</string>

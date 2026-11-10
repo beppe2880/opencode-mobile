@@ -23,7 +23,62 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.ToolFile
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import kotlin.io.encoding.Base64
+
+/** A 160 × 100 picture of an app screen as a 24-bit BMP `data:` URI, for [SampleData.screenshot]. */
+private fun screenshotDataUri(): String {
+    val width = 160
+    val height = 100
+    val row = (width * 3 + 3) / 4 * 4
+    val pixels = row * height
+    val bytes = ByteArray(BMP_HEADER + pixels)
+    fun put16(at: Int, value: Int) {
+        bytes[at] = value.toByte()
+        bytes[at + 1] = (value ushr 8).toByte()
+    }
+    fun put32(at: Int, value: Int) {
+        for (i in 0 until 4) bytes[at + i] = (value ushr (8 * i)).toByte()
+    }
+    bytes[0] = 'B'.code.toByte()
+    bytes[1] = 'M'.code.toByte()
+    put32(2, bytes.size)
+    put32(10, BMP_HEADER)
+    put32(14, 40)
+    put32(18, width)
+    // Positive height: rows are stored bottom-up.
+    put32(22, height)
+    put16(26, 1)
+    put16(28, 24)
+    put32(34, pixels)
+    put32(38, 2835)
+    put32(42, 2835)
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val rgb = screenshotPixel(x, y)
+            val at = BMP_HEADER + (height - 1 - y) * row + x * 3
+            bytes[at] = rgb.toByte()
+            bytes[at + 1] = (rgb ushr 8).toByte()
+            bytes[at + 2] = (rgb ushr 16).toByte()
+        }
+    }
+    return "data:image/bmp;base64," + Base64.encode(bytes)
+}
+
+/** File and info headers of a BMP. */
+private const val BMP_HEADER = 54
+
+/** The made-up screen's colors: they are the picture's content, not app colors. */
+private fun screenshotPixel(x: Int, y: Int): Int = when {
+    y < 14 -> 0x2B2F3A
+    y in 26..29 && x in 12 until 132 -> 0xC8CCD4
+    y in 38..41 && x in 12 until 108 -> 0xC8CCD4
+    y in 50..53 && x in 12 until 120 -> 0xC8CCD4
+    y in 64..71 && x in 12 until 124 -> 0xE5484D
+    y in 82..92 && x in 104 until 148 -> 0x3B82F6
+    else -> 0xF4F5F7
+}
 
 /** Realistic sample data for previews and the debug fake data layer. */
 object SampleData {
@@ -150,8 +205,16 @@ object SampleData {
     )
 
     /**
+     * A small made-up screenshot of the shop app (title bar, text lines, an error, a button), as
+     * the `read` tool returns images: inline in a `data:` URI. An uncompressed BMP, so it can be
+     * drawn here without an encoder. Declared before the transcripts that use it.
+     */
+    val screenshot: ToolFile = ToolFile(screenshotDataUri(), "image/bmp", "/home/user/code/shop/screenshots/cart.bmp")
+
+    /**
      * One short turn with something for every chat display setting: two thoughts in a row, a
-     * shell command with a long output, a read, the answer and its cost (the chat customizer).
+     * shell command with a long output, reads (one of a screenshot), the answer and its cost
+     * (the chat customizer).
      */
     val customizeTranscript: List<Message> = listOf(
         Message.User("msg_c_u1", NOW - 4 * MINUTE, "Run the cart tests and fix whatever fails."),
@@ -175,6 +238,16 @@ object SampleData {
                     completedAt = NOW - 4 * MINUTE + 9_500,
                 ),
                 Part.Tool("call_c2", "read", ToolStatus.Completed, """{"filePath":"/home/user/code/shop/src/cart/Coupon.kt"}""", output = "15:     fun apply(subtotal: Long): Long = subtotal - subtotal * percent / 100", startedAt = NOW - 4 * MINUTE + 9_600, completedAt = NOW - 4 * MINUTE + 9_700),
+                Part.Tool(
+                    "call_c3",
+                    "read",
+                    ToolStatus.Completed,
+                    """{"filePath":"/home/user/code/shop/screenshots/cart.bmp"}""",
+                    output = "Image read successfully",
+                    startedAt = NOW - 4 * MINUTE + 9_800,
+                    completedAt = NOW - 4 * MINUTE + 9_900,
+                    files = listOf(screenshot),
+                ),
                 Part.Text(2, "One test fails: `Coupon.apply` rounds the discount up instead of down. I'll fix it, clear the build folder and run the tests again."),
             ),
             completedAt = NOW - 4 * MINUTE + 14_000,

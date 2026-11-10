@@ -1,0 +1,10 @@
+<resources>
+    <string name="oauth_error_prepare">تعذر تجهيز تسجيل الدخول عبر المتصفح على الخادم (%1$s). حاول مجددًا.</string>
+    <string name="oauth_error_callback">تعذر تلقي استجابة تفويض صالحة من المتصفح (%1$s). ابدأ تسجيل الدخول مجددًا.</string>
+    <string name="oauth_error_exchange">تعذر تبادل رمز التفويض مع المزوّد (%1$s). ابدأ تسجيل الدخول مجددًا.</string>
+    <string name="oauth_error_validation">تعذر التحقق من استجابة تسجيل الدخول من المزوّد (%1$s). لم تُرسل أي بيانات اعتماد إلى الخادم.</string>
+    <string name="oauth_error_import">تعذر تأكيد حفظ بيانات الاعتماد على الخادم (%1$s). تحقق من الاتصال وحالة المزوّد قبل المحاولة مجددًا.</string>
+    <string name="oauth_error_expired">انتهت مهلة تسجيل الدخول عبر المتصفح (%1$s). ابدأ تسجيل الدخول مجددًا.</string>
+    <string name="oauth_error_server_changed">تغير الخادم المحدد أثناء تسجيل الدخول (%1$s). ابدأ تسجيل الدخول مجددًا.</string>
+    <string name="oauth_error_unknown">تعذر إكمال تسجيل الدخول عبر المتصفح (%1$s). ابدأ تسجيل الدخول مجددًا.</string>
+</resources>

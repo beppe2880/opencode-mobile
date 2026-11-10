@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
@@ -91,6 +92,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_titl
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_branch_description
@@ -117,9 +119,13 @@ fun ChatScreen(
     onVoice: (VoiceInputEvent) -> Unit = {},
     onHoldVoice: () -> Unit = {},
     showBack: Boolean = true,
+    /** The host's session list drawer, which [ChatSwipe.SessionDrawer] swipes pull open; null where there is none. */
+    sessionDrawer: SessionDrawerPull? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     listState: LazyListState = rememberLazyListState(),
     markdownCache: MarkdownCache = rememberMarkdownCache(),
+    /** Shares text through the system; null hides sharing. */
+    onShare: ((String) -> Unit)? = null,
 ) {
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
@@ -138,9 +144,10 @@ fun ChatScreen(
                     onHeaderChanges = { onEvent(ChatEvent.OpenHeaderChanges) },
                     onTerminal = { onEvent(ChatEvent.OpenTerminal) },
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
+                    onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
-                if (!state.work.isEmpty) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
+                if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -158,7 +165,9 @@ fun ChatScreen(
                 SessionSwipe(
                     previous = state.previousSession,
                     next = state.nextSession,
-                    enabled = state.swipeEnabled,
+                    // Without a drawer here (the list is beside the chat) the drawer swipe does nothing.
+                    mode = state.swipe,
+                    drawer = sessionDrawer,
                     onSwitch = { onEvent(ChatEvent.SwitchSession(it)) },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 ) {
@@ -192,16 +201,26 @@ fun ChatScreen(
                 recent = state.recentModels,
                 onSelect = { onEvent(ChatEvent.SelectModel(it)) },
                 onSelectVariant = { onEvent(ChatEvent.SelectVariant(it)) },
+                providerMark = { id, name -> ProviderMark(id, name, size = 20.dp) },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }
     }
     state.preview?.let { preview ->
-        ImagePreviewDialog(preview, onDismiss = { onEvent(ChatEvent.ClosePreview) })
+        ImagePreviewDialog(
+            preview = preview,
+            onPage = { onEvent(ChatEvent.PreviewPage(it)) },
+            onDismiss = { onEvent(ChatEvent.ClosePreview) },
+        )
     }
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
     if (state.workOpen) RunningSheet(state, onEvent)
+    state.runningPanel?.let { panel ->
+        panel.item?.let { item -> RunningItemSheet(state, panel, item, onEvent, onCopy, onShare) }
+    }
+    // After the sheets, so a confirmation shows over the one that asked for it.
+    RunningStopDialogs(state, onEvent)
     if (contextOpen) {
         ContextSheet(
             context = state.context,
@@ -223,6 +242,7 @@ internal fun ChatTopBar(
     onTerminal: () -> Unit,
     onMcps: () -> Unit,
     onRunning: () -> Unit,
+    onProviders: () -> Unit = {},
     applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
@@ -296,6 +316,12 @@ internal fun ChatTopBar(
                             onRunning()
                         },
                         modifier = Modifier.testTag("chat_running_menu_item"),
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.chat_providers)) },
+                        onClick = { menuOpen = false; onProviders() },
+                        enabled = state.directory.isNotEmpty(),
+                        modifier = Modifier.testTag("chat_providers_menu_item"),
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.chat_mcps)) },

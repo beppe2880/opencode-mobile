@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.Command
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
@@ -21,6 +22,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 @Immutable
@@ -64,6 +66,8 @@ data class ChatState(
     val showToolDetails: Boolean = true,
     /** Tool rows wrap long commands and paths (setting). */
     val showFullCommands: Boolean = false,
+    /** How big images read by tools show under their row (setting). */
+    val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
     /** The microphone button of the composer (setting). */
@@ -85,6 +89,7 @@ data class ChatState(
     val revertedCount: Int = 0,
     val reverting: Boolean = false,
     val forking: Boolean = false,
+    val creatingSession: Boolean = false,
     /** Blocking work the user can move to the background; the hint shows once it runs long. */
     val backgroundable: BackgroundableWork? = null,
     /** Context the next step will use; null before the first reply or right after a compaction. */
@@ -93,7 +98,8 @@ data class ChatState(
     /** Neighbors in the session list, reached by swiping right (previous) or left (next). */
     val previousSession: SessionPeek? = null,
     val nextSession: SessionPeek? = null,
-    val swipeEnabled: Boolean = true,
+    /** What a horizontal swipe does (setting). */
+    val swipe: ChatSwipe = ChatSwipe.SessionDrawer,
     /** The server transcript has been loaded at least once (cached content may show before). */
     val synced: Boolean = false,
     /** Older history may exist above the oldest loaded message. */
@@ -103,6 +109,11 @@ data class ChatState(
     val olderFailed: Boolean = false,
     /** Full-screen image open over the chat. */
     val preview: ImagePreview? = null,
+    /**
+     * Tool calls ([ToolMedia.fetchKey]) whose files were fetched in this chat, successfully or
+     * not: their images that still have no content show as file chips.
+     */
+    val toolMediaLoaded: Set<String> = emptySet(),
     /** Where the user left this chat last time; null opens it at the bottom. */
     val savedScroll: ScrollMemory.Anchor? = null,
     /** Prompts queued to run after the current work, oldest first; shown above the composer. */
@@ -124,10 +135,14 @@ data class ChatState(
     val stoppingAgents: Set<String> = emptySet(),
     /** The subagent whose Stop waits for confirmation; null when none. */
     val confirmingStopAgent: String? = null,
-    /** The group whose "Stop all" waits for confirmation; null when none. */
-    val confirmingStopAll: RunningGroup? = null,
+    /** What a "Stop all" waiting for confirmation stops; null when none. */
+    val confirmingStopAll: StopAllTarget? = null,
     /** Server clock minus device clock, for elapsed times of server timestamps. */
     val clockOffsetMs: Long = 0L,
+    /** Chips above the composer count what runs (setting). */
+    val runningChips: Boolean = true,
+    /** The list or item the running chips opened; null when closed. */
+    val runningPanel: RunningPanel? = null,
     /** The branch line under the title; null while unknown, empty or turned off (setting). */
     val vcs: VcsLine? = null,
     /** How the header line is written (setting). */
@@ -140,7 +155,7 @@ data class ChatState(
     /** The draft is a `!command` for the session's shell. */
     val isShell: Boolean get() = Completions.shell(draft) != null
     val canSend: Boolean get() = when {
-        sending || reverting -> false
+        sending || reverting || creatingSession -> false
         isShell -> !Completions.shell(draft).isNullOrEmpty()
         else -> draft.isNotBlank() || uploads.isNotEmpty()
     }
@@ -159,16 +174,19 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     live = LiveFollow.of(s),
     showFullCommands = s.showFullCommands,
     showToolDetails = s.showToolDetails,
+    toolMediaSize = s.toolMediaSize,
     outputPreviewLines = s.outputPreviewLines,
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,
     showCost = s.showCost,
-    swipeEnabled = s.swipeBetweenChats,
+    swipe = s.chatSwipe,
     agentColorOutline = s.agentColorOutline,
     dictation = s.dictation,
     permissionsCollapsedByDefault = s.permissionsCollapsed,
     questionsCollapsedByDefault = s.questionsCollapsed,
     headerStyle = s.chatHeaderStyle,
+    runningChips = s.runningChips,
+    runningPanel = runningPanel.takeIf { s.runningChips },
 )
 
 /** The folder name of the header line, when [line] includes it. */
@@ -182,6 +200,14 @@ data class SessionPeek(val id: String, val title: String)
  * attributed to this session (never the unassigned ones).
  */
 enum class RunningGroup { Agents, Commands }
+
+/** What a "Stop all" stops: every item of one [Group], or [Everything] that runs. */
+sealed interface StopAllTarget {
+    data class Group(val group: RunningGroup) : StopAllTarget
+
+    /** The subagents and the commands of this session (never the unassigned ones). */
+    data object Everything : StopAllTarget
+}
 
 /**
  * The project's [folder] name (null when the setting leaves it out), [branch] (null on a
@@ -267,8 +293,14 @@ data class ChangesPanel(
     val error: UiText? = null,
 )
 
-/** An image shown full screen; [dataUri] is null while it is fetched or when that [failed]. */
-data class ImagePreview(val name: String?, val dataUri: String?, val failed: Boolean = false)
+/**
+ * Images shown full screen, opened at [index]: those of one prompt, one tool group or the
+ * composer, so swiping goes to the others.
+ */
+data class ImagePreview(val images: List<PreviewImage>, val index: Int = 0)
+
+/** One image of the viewer; [dataUri] is null while it is fetched or when that [failed]. */
+data class PreviewImage(val name: String?, val dataUri: String?, val failed: Boolean = false)
 
 /** A completion offered above the composer. */
 sealed interface Suggestion {
@@ -301,10 +333,19 @@ sealed interface ChatEvent {
     data object ConfirmStopAgent : ChatEvent
     data object DismissStopAgent : ChatEvent
 
-    /** Stops every running item of [group]; always asks for confirmation first. */
-    data class StopAll(val group: RunningGroup) : ChatEvent
+    /** Stops every running item of [target]; always asks for confirmation first. */
+    data class StopAll(val target: StopAllTarget) : ChatEvent {
+        constructor(group: RunningGroup) : this(StopAllTarget.Group(group))
+    }
     data object ConfirmStopAll : ChatEvent
     data object DismissStopAll : ChatEvent
+
+    /** Opens the list of a running chip above the composer; null closes it. */
+    data class ShowRunningList(val group: RunningGroup?) : ChatEvent
+
+    /** Opens one running item of the chips in its sheet. */
+    data class ShowRunningItem(val group: RunningGroup, val id: String) : ChatEvent
+    data object CloseRunningItem : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent
@@ -323,7 +364,7 @@ sealed interface ChatEvent {
     /** Opens a file of the server read-only; [path] is absolute or relative to the session folder. */
     data class OpenFile(val path: String) : ChatEvent
 
-    /** Replaces this chat with a neighbor in the session list (swipe). */
+    /** Replaces this chat with a neighbor in the session list (swipe); only with [ChatSwipe.SwitchChats]. */
     data class SwitchSession(val sessionId: String) : ChatEvent
 
     /** The user scrolled near the oldest loaded message. */
@@ -353,6 +394,15 @@ sealed interface ChatEvent {
 
     /** Opens the [index]th image of a sent prompt full screen. */
     data class OpenImage(val messageId: String, val index: Int) : ChatEvent
+
+    /** Opens the [index]th image tool call [callId] of [messageId] returned full screen. */
+    data class OpenToolImage(val messageId: String, val callId: String, val index: Int) : ChatEvent
+
+    /** A card of a tool's image is on screen without its content: fetch the call's files. */
+    data class LoadToolMedia(val messageId: String, val callId: String) : ChatEvent
+
+    /** The viewer shows its [index]th image: fetched when the cache dropped it. */
+    data class PreviewPage(val index: Int) : ChatEvent
     data object ClosePreview : ChatEvent
 
     /** A picked file could not be read or is too large. */
@@ -378,6 +428,8 @@ sealed interface ChatEvent {
     /** The header line was tapped: opens the folder or the session changes (setting). */
     data object OpenHeaderChanges : ChatEvent
     data object OpenMcps : ChatEvent
+    data object OpenProviders : ChatEvent
+    data object ProvidersConnected : ChatEvent
     data object CloseMcps : ChatEvent
     data object RefreshMcps : ChatEvent
     data class SetMcpConnected(val name: String, val connected: Boolean) : ChatEvent
@@ -396,6 +448,7 @@ sealed interface ChatEvent {
 }
 
 sealed interface ChatEffect {
+    data object OpenProviders : ChatEffect
     data class ShowMessage(val message: UiText) : ChatEffect
     data object NavigateBack : ChatEffect
     data object PromptSent : ChatEffect
