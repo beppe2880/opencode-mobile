@@ -21,6 +21,8 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileContent
 import io.github.beppe2880.opencodemobile.core.domain.FileDiff
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderListing
+import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
@@ -39,6 +41,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
+import io.github.beppe2880.opencodemobile.core.domain.RECENT_FOLDERS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
@@ -108,6 +111,7 @@ val fakeDataModule = module {
     single<SettingsRepository> { FakeSettings() }
     single<DraftRepository> { FakeDrafts() }
     single<RecentModelRepository> { FakeRecentModels() }
+    single<FolderPreferences> { FakeFolderPreferences() }
     // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
     single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }
@@ -510,6 +514,18 @@ internal class FakeCatalog : CatalogRepository {
     override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(SampleData.agents)
     override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(SampleData.models)
     override suspend fun configuredModel(directory: String?): Result<ModelRef?> = Result.success(SampleData.sonnet)
+    override suspend fun listFolders(path: String?): Result<FolderListing> {
+        val directory = (path ?: "/home/dev").trimEnd('/').ifEmpty { "/" }
+        val folders = when (directory) {
+            "/" -> listOf("home")
+            "/home" -> listOf("dev")
+            "/home/dev" -> listOf("Documents", "projects", ".config")
+            "/home/dev/projects" -> listOf("opencode-mobile", "scratch", "website")
+            else -> emptyList()
+        }
+        val parent = if (directory == "/") null else directory.substringBeforeLast('/').ifEmpty { "/" }
+        return Result.success(FolderListing(directory, parent, folders))
+    }
 }
 
 internal class FakeDrafts : DraftRepository {
@@ -525,6 +541,20 @@ internal class FakeRecentModels : RecentModelRepository {
     override fun recent(): List<ModelRef> = models
     override fun used(model: ModelRef) {
         models = (listOf(model) + models).distinctBy { it.key }
+    }
+}
+
+internal class FakeFolderPreferences : FolderPreferences {
+    private val hidden = mutableMapOf<String, Set<String>>()
+    private val recent = mutableMapOf<String, List<String>>()
+    override fun hiddenDirectories(serverId: String): Set<String> = hidden[serverId].orEmpty()
+    override fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean) {
+        val current = hiddenDirectories(serverId)
+        this.hidden[serverId] = if (hidden) current + directory else current - directory
+    }
+    override fun recentFolders(serverId: String): List<String> = recent[serverId].orEmpty()
+    override fun folderPicked(serverId: String, path: String) {
+        recent[serverId] = (listOf(path) + recentFolders(serverId)).distinct().take(RECENT_FOLDERS)
     }
 }
 

@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomMessageCache
+import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesFolderPreferences
 import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentModelRepository
 import io.github.beppe2880.opencodemobile.core.data.catalog.RemoteCatalogRepository
 import io.github.beppe2880.opencodemobile.core.data.chat.RemoteChatRepository
@@ -31,6 +32,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
@@ -94,6 +96,7 @@ val dataModule = module {
                 withContext(Dispatchers.IO) {
                     PreferencesDraftRepository.clearServer(drafts, serverId)
                     PreferencesRecentModelRepository.clearServer(settings, serverId)
+                    PreferencesFolderPreferences.clearServer(settings, serverId)
                 }
             },
         )
@@ -112,6 +115,7 @@ val dataModule = module {
     single<SettingsRepository> { PreferencesSettingsRepository(get(SettingsStore), get<OpenCodeThemeIds>()) }
     single<DraftRepository> { PreferencesDraftRepository(get(DraftsStore), get()) }
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
+    single<FolderPreferences> { PreferencesFolderPreferences(get(SettingsStore)) }
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }
     single<SpeechToTextRepository> { CloudSpeechToTextRepository(get(SttKeysStore), get(), SpeechToTextClient(), ::appLanguage) }
     single<UpdateRepository> {

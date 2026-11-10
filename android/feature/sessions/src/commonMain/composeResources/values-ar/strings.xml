@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">مجلد المشروع</string>
     <string name="sessions_new_other_directory">مجلد آخر</string>
     <string name="sessions_new_path_label">المسار المطلق</string>
+    <string name="sessions_browse">تصفح</string>
+    <string name="sessions_browse_title">اختيار مجلد</string>
+    <string name="sessions_browse_use">استخدام هذا المجلد</string>
+    <string name="sessions_browse_empty">لا توجد مجلدات هنا</string>
+    <string name="sessions_browse_retry">إعادة المحاولة</string>
+    <string name="sessions_browse_back">رجوع</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">الوكيل</string>
     <string name="sessions_new_model">النموذج</string>
@@ -60,4 +66,11 @@
     <string name="sessions_preview_share_new">النصوص والروابط والصور المشارَكة من تطبيقات أخرى تفتح هذه اللوحة</string>
     <string name="sessions_preview_share_choose">النصوص والروابط والصور المشارَكة من تطبيقات أخرى تطلب أولًا محادثة، أو تفتح هذه اللوحة</string>
     <string name="sessions_preview_share_off">OpenCode غير موجود في قائمة المشاركة في التطبيقات الأخرى</string>
+    <string name="sessions_project_hide">إخفاء المشروع</string>
+    <string name="sessions_project_unhide">إظهار</string>
+    <string name="sessions_projects_hidden">المخفية (%1$d)</string>
+    <string name="sessions_browse_show_hidden">إظهار المجلدات المخفية</string>
+    <string name="sessions_browse_hide_hidden">إخفاء المجلدات المخفية</string>
+    <string name="sessions_browse_recent">المجلدات الأخيرة</string>
+    <string name="sessions_browse_pick">استخدام</string>
 </resources>

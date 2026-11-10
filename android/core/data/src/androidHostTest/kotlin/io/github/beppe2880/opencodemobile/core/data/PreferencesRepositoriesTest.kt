@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data
 
 import com.russhwolf.settings.SharedPreferencesSettings
+import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesFolderPreferences
 import io.github.beppe2880.opencodemobile.core.data.catalog.PreferencesRecentModelRepository
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
@@ -268,6 +269,71 @@ class PreferencesRepositoriesTest {
 
         PreferencesRecentModelRepository.clearServer(SharedPreferencesSettings(prefs), "s1")
         assertEquals(emptyList<ModelRef>(), recents.recent())
+    }
+
+    @Test
+    fun `hidden project directories persist per server and can be unhidden`() {
+        val prefs = SharedPreferencesSettings(InMemoryPreferences())
+        val folders = PreferencesFolderPreferences(prefs)
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
+
+        folders.setDirectoryHidden("s1", "/p", true)
+        folders.setDirectoryHidden("s1", "/q", true)
+        folders.setDirectoryHidden("s1", "/p", true)
+        folders.setDirectoryHidden("s2", "/p", true)
+        val restored = PreferencesFolderPreferences(prefs)
+        assertEquals(setOf("/p", "/q"), restored.hiddenDirectories("s1"))
+        restored.setDirectoryHidden("s1", "/p", false)
+        assertEquals(setOf("/q"), folders.hiddenDirectories("s1"))
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s2"))
+    }
+
+    @Test
+    fun `picked folders persist per server with deduplication and a limit of five`() {
+        val prefs = SharedPreferencesSettings(InMemoryPreferences())
+        val folders = PreferencesFolderPreferences(prefs)
+        assertEquals(emptyList<String>(), folders.recentFolders("s1"))
+        (1..6).forEach { folders.folderPicked("s1", "/folder/$it") }
+        folders.folderPicked("s1", "/folder/3")
+        folders.folderPicked("s2", "/other")
+
+        val restored = PreferencesFolderPreferences(prefs)
+        assertEquals(listOf("/folder/3", "/folder/6", "/folder/5", "/folder/4", "/folder/2"), restored.recentFolders("s1"))
+        assertEquals(listOf("/other"), restored.recentFolders("s2"))
+    }
+
+    @Test
+    fun `malformed folder preferences read as empty and oversized recent lists are bounded`() {
+        val prefs = SharedPreferencesSettings(InMemoryPreferences())
+        val folders = PreferencesFolderPreferences(prefs)
+        prefs.putString("hidden_projects/s1", "not json")
+        prefs.putString("recent_folders/s1", "[null]")
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
+        assertEquals(emptyList<String>(), folders.recentFolders("s1"))
+        folders.setDirectoryHidden("s1", "/p", true)
+        folders.folderPicked("s1", "/work")
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s1"))
+        assertEquals(listOf("/work"), folders.recentFolders("s1"))
+
+        prefs.putString("recent_folders/s1", """["/a","/b","/a","/c","/d","/e","/f"]""")
+        assertEquals(listOf("/a", "/b", "/c", "/d", "/e"), folders.recentFolders("s1"))
+    }
+
+    @Test
+    fun `removing a server clears only its folder preferences`() {
+        val prefs = SharedPreferencesSettings(InMemoryPreferences())
+        val folders = PreferencesFolderPreferences(prefs)
+        listOf("s1", "s2").forEach {
+            folders.setDirectoryHidden(it, "/p", true)
+            folders.folderPicked(it, "/work")
+        }
+
+        PreferencesFolderPreferences.clearServer(prefs, "s1")
+
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
+        assertEquals(emptyList<String>(), folders.recentFolders("s1"))
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s2"))
+        assertEquals(listOf("/work"), folders.recentFolders("s2"))
     }
 
     @Test

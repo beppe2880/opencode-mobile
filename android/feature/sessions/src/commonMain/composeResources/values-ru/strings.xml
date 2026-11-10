@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">Каталог проекта</string>
     <string name="sessions_new_other_directory">Другой каталог</string>
     <string name="sessions_new_path_label">Абсолютный путь</string>
+    <string name="sessions_browse">Обзор</string>
+    <string name="sessions_browse_title">Выбрать папку</string>
+    <string name="sessions_browse_use">Использовать эту папку</string>
+    <string name="sessions_browse_empty">Здесь нет папок</string>
+    <string name="sessions_browse_retry">Повторить</string>
+    <string name="sessions_browse_back">Назад</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">Агент</string>
     <string name="sessions_new_model">Модель</string>
@@ -60,4 +66,11 @@
     <string name="sessions_preview_share_new">Текст, ссылки и изображения, отправленные из других приложений, открывают этот лист</string>
     <string name="sessions_preview_share_choose">Текст, ссылки и изображения из других приложений сначала предлагают выбрать чат или открывают этот лист</string>
     <string name="sessions_preview_share_off">OpenCode не отображается в меню «Поделиться» других приложений</string>
+    <string name="sessions_project_hide">Скрыть проект</string>
+    <string name="sessions_project_unhide">Показать</string>
+    <string name="sessions_projects_hidden">Скрытые (%1$d)</string>
+    <string name="sessions_browse_show_hidden">Показывать скрытые папки</string>
+    <string name="sessions_browse_hide_hidden">Скрыть скрытые папки</string>
+    <string name="sessions_browse_recent">Недавние папки</string>
+    <string name="sessions_browse_pick">Выбрать</string>
 </resources>

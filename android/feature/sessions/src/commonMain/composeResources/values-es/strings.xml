@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">Carpeta del proyecto</string>
     <string name="sessions_new_other_directory">Otra carpeta</string>
     <string name="sessions_new_path_label">Ruta absoluta</string>
+    <string name="sessions_browse">Explorar</string>
+    <string name="sessions_browse_title">Elegir carpeta</string>
+    <string name="sessions_browse_use">Usar esta carpeta</string>
+    <string name="sessions_browse_empty">No hay carpetas aquí</string>
+    <string name="sessions_browse_retry">Reintentar</string>
+    <string name="sessions_browse_back">Atrás</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">Agente</string>
     <string name="sessions_new_model">Modelo</string>
@@ -60,4 +66,11 @@
     <string name="sessions_preview_share_new">El texto, los enlaces y las imágenes compartidos desde otras apps abren esta hoja</string>
     <string name="sessions_preview_share_choose">El texto, los enlaces y las imágenes compartidos desde otras apps primero piden un chat o abren esta hoja</string>
     <string name="sessions_preview_share_off">OpenCode no aparece en el menú de compartir de otras apps</string>
+    <string name="sessions_project_hide">Ocultar proyecto</string>
+    <string name="sessions_project_unhide">Mostrar</string>
+    <string name="sessions_projects_hidden">Ocultos (%1$d)</string>
+    <string name="sessions_browse_show_hidden">Mostrar carpetas ocultas</string>
+    <string name="sessions_browse_hide_hidden">Ocultar carpetas ocultas</string>
+    <string name="sessions_browse_recent">Carpetas recientes</string>
+    <string name="sessions_browse_pick">Usar</string>
 </resources>

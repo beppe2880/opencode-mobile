@@ -8,6 +8,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.FolderListing
+import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -19,6 +21,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
+import io.github.beppe2880.opencodemobile.core.domain.RECENT_FOLDERS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
@@ -34,6 +37,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,8 +82,9 @@ class SessionsViewModelTest {
     private val recents = FakeRecents()
     private var catalog = FakeCatalog()
     private val shares = FakeShares()
+    private val folders = FakeFolderPreferences()
 
-    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, clock = { now }, zone = zone)
+    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, folders, clock = { now }, zone = zone)
 
     private fun SessionsState.ids() = groups.flatMap { g -> g.sessions.map { it.id } }
 
@@ -389,6 +395,628 @@ class SessionsViewModelTest {
         assertEquals("/tmp/x", vm.state.value.newSession!!.directory)
     }
 
+    @Test
+    fun `hiding and unhiding project directories persists while keeping the complete project list`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val projects = vm.state.value.projects
+
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
+        assertEquals(projects, vm.state.value.projects)
+        assertTrue(vm.state.value.visibleProjects.isEmpty())
+        val restored = vm()
+        advanceUntilIdle()
+        assertEquals(setOf("/p/today"), restored.state.value.hiddenDirectories)
+
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
+
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
+        assertEquals(emptySet<String>(), vm.state.value.hiddenDirectories)
+        assertEquals(projects, vm.state.value.visibleProjects)
+    }
+
+    @Test
+    fun `hiding the filtered project clears the filter and reloads the current search`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.QueryChanged("work"))
+        vm.onEvent(SessionsEvent.FilterChanged("/p/today"))
+        advanceUntilIdle()
+        assertEquals("/p/today", sessions.lastDirectory)
+
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        advanceUntilIdle()
+
+        assertEquals(null, vm.state.value.directoryFilter)
+        assertEquals(null, sessions.lastDirectory)
+        assertEquals("work", sessions.lastSearch)
+        assertEquals("work", vm.state.value.query)
+    }
+
+    @Test
+    fun `hiding the selected project clears the new session selection through reloads`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.FilterChanged("/p/today"))
+        advanceUntilIdle()
+        assertEquals("/p/today", newSession(vm).directory)
+
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        advanceUntilIdle()
+
+        assertEquals("", vm.state.value.newSession!!.directory)
+        assertFalse(vm.state.value.newSession!!.customDirectory)
+        vm.onEvent(SessionsEvent.Refresh)
+        advanceUntilIdle()
+        assertEquals("", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `projects skip the global project and list each directory once, most recent first`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = listOf(
+            Project("global", "/", null, null, 9),
+            Project("old", "/same", null, null, 1),
+            Project("new", "/same", null, null, 5),
+            Project("p", "/p/today", null, null, 3),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+
+        assertEquals(listOf("new", "p"), vm.state.value.projects.map { it.id })
+    }
+
+    @Test
+    fun `opening a new session reloads projects`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.serverProjects = sessions.serverProjects + Project("bin", "/home/u/bin", null, null, 10)
+
+        newSession(vm)
+
+        assertEquals("bin", vm.state.value.projects.first().id)
+    }
+
+    @Test
+    fun `a new session never defaults to the directory of a hidden project`() = runTest(main.testDispatcher) {
+        folders.setDirectoryHidden("s1", "/p/today", true)
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+
+        // Every session and project belongs to the hidden project "p": nothing is preselected.
+        assertEquals("", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `hiding a directory hides every project in it and never defaults to it`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = listOf(
+            Project("old", "/same", null, null, 1),
+            Project("new", "/same", null, null, 5),
+            Project("other", "/p/today", null, null, 3),
+        )
+        sessions.listResult = Result.success(
+            listOf(
+                session("new", now - hour).copy(projectId = "new", directory = "/same"),
+                session("old", now - 2 * hour).copy(projectId = "old", directory = "/same"),
+            ),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(listOf("new", "other"), vm.state.value.projects.map { it.id })
+
+        vm.onEvent(SessionsEvent.HideProject("/same"))
+        advanceUntilIdle()
+
+        assertEquals(setOf("/same"), vm.state.value.hiddenDirectories)
+        // Both projects of the directory are hidden although only one of them is listed.
+        assertEquals(listOf("other"), vm.state.value.visibleProjects.map { it.id })
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+
+        // The session of the dropped duplicate "old" is skipped like the listed one.
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `a session in a subfolder of a hidden project is never the default directory`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = listOf(
+            Project("same", "/same", null, null, 5),
+            Project("other", "/p/today", null, null, 3),
+        )
+        sessions.listResult = Result.success(listOf(session("sub", now).copy(projectId = "same", directory = "/same/sub")))
+        folders.setDirectoryHidden("s1", "/same", true)
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `hiding a project keeps custom directories and other selected directories`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("/p/today", custom = true))
+
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+        assertTrue(vm.state.value.newSession!!.customDirectory)
+
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
+        vm.onEvent(SessionsEvent.NewSessionDirectory("/other", custom = false))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        assertEquals("/other", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
+    fun `switching servers reloads hidden directories and keeps their preferences separate`() = runTest(main.testDispatcher) {
+        folders.setDirectoryHidden("s1", "/p/today", true)
+        folders.setDirectoryHidden("s2", "/q", true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
+
+        servers.activate("s2")
+        advanceUntilIdle()
+        assertEquals(setOf("/q"), vm.state.value.hiddenDirectories)
+        assertEquals(listOf("p"), vm.state.value.visibleProjects.map { it.id })
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        assertEquals(setOf("/p/today", "/q"), folders.hiddenDirectories("s2"))
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
+        assertEquals(setOf("/q"), folders.hiddenDirectories("s2"))
+
+        servers.activate("s1")
+        advanceUntilIdle()
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
+    }
+
+    @Test
+    fun `the folder browser keeps current server recents while navigating`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", "/first")
+        folders.folderPicked("s1", "/second")
+        folders.folderPicked("s2", "/other")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        assertEquals(listOf("/second", "/first"), vm.state.value.newSession!!.browser!!.recent)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.BrowseTo("/another"))
+        advanceUntilIdle()
+        assertEquals(listOf("/second", "/first"), vm.state.value.newSession!!.browser!!.recent)
+        assertEquals(listOf("/second", "/first"), folders.recentFolders("s1"))
+
+        servers.activate("s2")
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        assertEquals(listOf("/other"), vm.state.value.newSession!!.browser!!.recent)
+    }
+
+    @Test
+    fun `picking a browsed folder moves it to the current server recents`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", serverFolder.path)
+        folders.folderPicked("s1", "/older")
+        folders.folderPicked("s2", "/other")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.PickBrowsedFolder)
+
+        assertEquals(null, vm.state.value.newSession!!.browser)
+        assertEquals(listOf(serverFolder.path, "/older"), folders.recentFolders("s1"))
+        assertEquals(listOf("/other"), folders.recentFolders("s2"))
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        assertEquals(listOf(serverFolder.path, "/older"), vm.state.value.newSession!!.browser!!.recent)
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `without an active server folder preferences are unchanged and browser recents are empty`() = runTest(main.testDispatcher) {
+        folders.setDirectoryHidden("s1", "/p/today", true)
+        folders.folderPicked("s1", "/work")
+        servers.activate("missing")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val new = vm.state.value.newSession
+        assertEquals(emptyList<String>(), new!!.browser!!.recent)
+
+        vm.onEvent(SessionsEvent.HideProject("/q"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
+        vm.onEvent(SessionsEvent.PickBrowsedFolder)
+
+        assertEquals(emptySet<String>(), vm.state.value.hiddenDirectories)
+        val picked = vm.state.value.newSession!!
+        assertEquals(new!!.browser!!.path, picked.directory)
+        assertTrue(picked.customDirectory)
+        assertEquals(null, picked.browser)
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
+        assertEquals(listOf("/work"), folders.recentFolders("s1"))
+    }
+
+    @Test
+    fun `the folder browser starts at the parent of a typed absolute directory`() = runTest(main.testDispatcher) {
+        val home = FolderListing("/home", "/", listOf("dev"))
+        catalog.folderLoad = { Result.success(home) }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("  /home/dev  ", custom = true))
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        assertEquals(FolderBrowserState(path = "/home"), vm.state.value.newSession!!.browser)
+        advanceUntilIdle()
+
+        assertEquals(listOf("/home"), catalog.folderRequests)
+        assertEquals(FolderBrowserState("/home", "/", listOf("dev"), loading = false, start = "/home"), vm.state.value.newSession!!.browser)
+    }
+
+    @Test
+    fun `the folder browser starts at the parent of the preselected directory`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals("/p/today", newSession(vm).directory)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("/p"), catalog.folderRequests)
+    }
+
+    @Test
+    fun `a windows directory starts browsing at its windows parent`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("C:\\Users\\dev\\proj", custom = true))
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.NewSessionDirectory("D:\\", custom = true))
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("C:\\Users\\dev", "D:\\"), catalog.folderRequests)
+    }
+
+    @Test
+    fun `a relative directory starts at the parent of the latest visible project and falls back when it is unavailable`() =
+        runTest(main.testDispatcher) {
+            sessions.serverProjects = listOf(
+                Project("hidden", "/work/api", null, null, 9),
+                Project("relative", "notes", null, null, 7),
+                Project("visible", "/srv/site/web", null, null, 5),
+                Project("older", "/old/app", null, null, 1),
+            )
+            folders.setDirectoryHidden("s1", "/work/api", true)
+            catalog.folderLoad = { path ->
+                if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
+            }
+            val vm = vm()
+            advanceUntilIdle()
+            newSession(vm)
+            vm.onEvent(SessionsEvent.NewSessionDirectory("projects/app", custom = true))
+
+            vm.onEvent(SessionsEvent.BrowseFolders)
+            assertEquals(FolderBrowserState(path = "/srv/site"), vm.state.value.newSession!!.browser)
+            advanceUntilIdle()
+
+            assertEquals(listOf("/srv/site", null), catalog.folderRequests)
+            val browser = vm.state.value.newSession!!.browser!!
+            assertEquals("/home/dev", browser.path)
+            assertEquals("/home/dev", browser.start)
+        }
+
+    @Test
+    fun `without an absolute directory or visible project the browser starts at the server folder`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = emptyList()
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("", custom = true))
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        assertEquals(FolderBrowserState(path = ""), vm.state.value.newSession!!.browser)
+        assertTrue(vm.state.value.newSession!!.browser!!.atStart)
+        advanceUntilIdle()
+
+        assertEquals(listOf<String?>(null), catalog.folderRequests)
+        assertEquals(
+            FolderBrowserState(serverFolder.path, serverFolder.parent, serverFolder.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
+    }
+
+    @Test
+    fun `an unavailable starting folder falls back to the server folder`() = runTest(main.testDispatcher) {
+        catalog.folderLoad = { path ->
+            if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
+        }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("/missing/app", custom = true))
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("/missing", null), catalog.folderRequests)
+        val browser = vm.state.value.newSession!!.browser!!
+        assertEquals("/home/dev", browser.path)
+        assertEquals("/home/dev", browser.start)
+        assertFalse(browser.loading)
+        assertEquals(null, browser.error)
+    }
+
+    @Test
+    fun `a failed fallback is shown after only one retry`() = runTest(main.testDispatcher) {
+        val error = OpenCodeError.Unreachable("offline")
+        catalog.folderLoad = { Result.failure(error) }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        assertEquals(listOf("/p", null), catalog.folderRequests)
+        assertEquals(FolderBrowserState(path = "/p", loading = false, error = error.toUiText()), vm.state.value.newSession!!.browser)
+
+        vm.onEvent(SessionsEvent.NewSessionDirectory("", custom = true))
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        assertEquals(listOf("/p", null, "/p", null), catalog.folderRequests)
+    }
+
+    @Test
+    fun `retrying a failed start keeps the server folder fallback and sets the start`() = runTest(main.testDispatcher) {
+        catalog.folderLoad = { Result.failure(OpenCodeError.Unreachable("offline")) }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        catalog.folderLoad = { path ->
+            if (path != null) Result.failure(OpenCodeError.NotFound(path)) else Result.success(serverFolder)
+        }
+
+        vm.onEvent(SessionsEvent.BrowseTo(vm.state.value.newSession!!.browser!!.path))
+        advanceUntilIdle()
+
+        assertEquals(listOf("/p", null, "/p", null), catalog.folderRequests)
+        assertEquals(
+            FolderBrowserState(serverFolder.path, serverFolder.parent, serverFolder.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
+    }
+
+    @Test
+    fun `back climbs to the start folder and recent folders show only there`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", "/work")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val start = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, start.start)
+        assertTrue(start.atStart)
+        assertEquals(null, start.backTo)
+
+        catalog.folderLoad = { Result.success(FolderListing("/home/dev/projects", "/home/dev", listOf("app"))) }
+        vm.onEvent(SessionsEvent.BrowseTo("/home/dev/projects"))
+        advanceUntilIdle()
+        val inside = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, inside.start)
+        assertFalse(inside.atStart)
+        assertEquals("/home/dev", inside.backTo)
+
+        catalog.folderLoad = { Result.success(FolderListing("/", null, listOf("home"))) }
+        vm.onEvent(SessionsEvent.BrowseTo("/"))
+        advanceUntilIdle()
+        val root = vm.state.value.newSession!!.browser!!
+        assertEquals(serverFolder.path, root.start)
+        assertFalse(root.atStart)
+        assertEquals(null, root.backTo)
+    }
+
+    @Test
+    fun `browsing to a folder keeps the current listing while loading then replaces it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val before = vm.state.value.newSession!!.browser!!
+        val listing = FolderListing("/home/dev/projects", "/home/dev", listOf("app", "website"))
+        catalog.folderLoad = { Result.success(listing) }
+
+        vm.onEvent(SessionsEvent.BrowseTo(listing.path))
+        assertEquals(before.copy(loading = true), vm.state.value.newSession!!.browser)
+        advanceUntilIdle()
+
+        assertEquals(listing.path, catalog.folderRequests.last())
+        assertEquals(
+            FolderBrowserState(listing.path, listing.parent, listing.folders, loading = false, start = serverFolder.path),
+            vm.state.value.newSession!!.browser,
+        )
+    }
+
+    @Test
+    fun `a failed navigation keeps the listing and a new load clears its error`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val before = vm.state.value.newSession!!.browser!!
+        val error = OpenCodeError.NotFound("/missing")
+        catalog.folderLoad = { Result.failure(error) }
+
+        vm.onEvent(SessionsEvent.BrowseTo("/missing"))
+        advanceUntilIdle()
+
+        assertEquals(before.copy(error = error.toUiText()), vm.state.value.newSession!!.browser)
+        assertEquals(listOf("/p", "/missing"), catalog.folderRequests)
+
+        catalog.folderLoad = { Result.success(serverFolder) }
+        vm.onEvent(SessionsEvent.BrowseTo(null))
+        assertEquals(before.copy(loading = true), vm.state.value.newSession!!.browser)
+        advanceUntilIdle()
+        assertEquals(null, catalog.folderRequests.last())
+        assertEquals(before, vm.state.value.newSession!!.browser)
+    }
+
+    @Test
+    fun `picking the browsed folder sets a custom directory and closes the browser`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        sessions.listResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        vm.onEvent(SessionsEvent.CreateSession)
+        advanceUntilIdle()
+        assertNotNull(vm.state.value.newSession!!.error)
+
+        vm.onEvent(SessionsEvent.PickBrowsedFolder)
+
+        val new = vm.state.value.newSession!!
+        assertEquals("/home/dev", new.directory)
+        assertTrue(new.customDirectory)
+        assertEquals(null, new.error)
+        assertEquals(null, new.browser)
+    }
+
+    @Test
+    fun `picking without a browser or with a blank path does nothing`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val new = newSession(vm)
+        vm.onEvent(SessionsEvent.PickBrowsedFolder)
+        assertEquals(new, vm.state.value.newSession)
+        vm.onEvent(SessionsEvent.NewSessionDirectory("", custom = true))
+        catalog.folderLoad = { Result.success(FolderListing("", null, emptyList())) }
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val loading = vm.state.value.newSession
+
+        vm.onEvent(SessionsEvent.PickBrowsedFolder)
+
+        assertEquals(loading, vm.state.value.newSession)
+        vm.onEvent(SessionsEvent.CloseFolderBrowser)
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `picking a recent folder sets the directory and moves it to the front`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", "/older")
+        folders.folderPicked("s1", "/oldest")
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.PickFolder("/older"))
+
+        val new = vm.state.value.newSession!!
+        assertEquals("/older", new.directory)
+        assertTrue(new.customDirectory)
+        assertEquals(null, new.error)
+        assertEquals(null, new.browser)
+        assertEquals(listOf("/older", "/oldest"), folders.recentFolders("s1"))
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        assertEquals(listOf("/older", "/oldest"), vm.state.value.newSession!!.browser!!.recent)
+    }
+
+    @Test
+    fun `picking a folder without a browser or with a blank path does nothing`() = runTest(main.testDispatcher) {
+        folders.folderPicked("s1", "/work")
+        val vm = vm()
+        advanceUntilIdle()
+        val new = newSession(vm)
+
+        vm.onEvent(SessionsEvent.PickFolder("/elsewhere"))
+
+        assertEquals(new, vm.state.value.newSession)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+        val browsing = vm.state.value.newSession
+
+        vm.onEvent(SessionsEvent.PickFolder("   "))
+
+        assertEquals(browsing, vm.state.value.newSession)
+        assertEquals(listOf("/work"), folders.recentFolders("s1"))
+    }
+
+    @Test
+    fun `closing the browser keeps the directory and ignores navigation until reopened`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val new = newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.CloseFolderBrowser)
+        vm.onEvent(SessionsEvent.BrowseTo("/ignored"))
+        advanceUntilIdle()
+
+        assertEquals(new, vm.state.value.newSession)
+        assertEquals(listOf("/p"), catalog.folderRequests)
+    }
+
+    @Test
+    fun `new navigation and closing the browser or sheet cancel pending folder loads`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        catalog.folderLoad = {
+            gate.await()
+            Result.success(serverFolder)
+        }
+        val vm = vm()
+        advanceUntilIdle()
+        newSession(vm)
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        runCurrent()
+        vm.onEvent(SessionsEvent.BrowseTo("/next"))
+        runCurrent()
+        assertEquals(listOf("/p"), catalog.folderCancellations)
+
+        vm.onEvent(SessionsEvent.CloseFolderBrowser)
+        runCurrent()
+        assertEquals(listOf("/p", "/next"), catalog.folderCancellations)
+        assertEquals(null, vm.state.value.newSession!!.browser)
+
+        vm.onEvent(SessionsEvent.BrowseFolders)
+        runCurrent()
+        vm.onEvent(SessionsEvent.DismissNewSession)
+        runCurrent()
+        assertEquals(listOf("/p", "/next", "/p"), catalog.folderCancellations)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(null, vm.state.value.newSession)
+    }
+
     private val haiku = ModelRef("haiku", "anthropic")
     private val sonnet = ModelRef("sonnet", "anthropic", "high")
     private val opus = ModelRef("opus", "anthropic")
@@ -616,9 +1244,10 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     override suspend fun rename(sessionId: String, title: String): Result<Unit> = Result.success(Unit)
     override suspend fun delete(sessionId: String): Result<Unit> = deleteResult
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())
+    var serverProjects = listOf(Project("p", "/p/today", null, null, 0))
     override suspend fun projects(): Result<List<Project>> {
         gate?.await()
-        return Result.success(listOf(Project("p", "/p/today", null, null, 0)))
+        return Result.success(serverProjects)
     }
 }
 
@@ -666,10 +1295,24 @@ private class FakeCatalog(
     private val models: List<ModelInfo> = emptyList(),
     private val configured: Result<ModelRef?> = Result.success(null),
 ) : CatalogRepository {
+    val folderRequests = mutableListOf<String?>()
+    val folderCancellations = mutableListOf<String?>()
+    var folderLoad: suspend (String?) -> Result<FolderListing> = { Result.success(serverFolder) }
+    override suspend fun listFolders(path: String?): Result<FolderListing> {
+        folderRequests += path
+        return try {
+            folderLoad(path)
+        } catch (e: CancellationException) {
+            folderCancellations += path
+            throw e
+        }
+    }
     override suspend fun configuredModel(directory: String?): Result<ModelRef?> = configured
     override suspend fun agents(directory: String?): Result<List<Agent>> = Result.success(agents)
     override suspend fun models(directory: String?): Result<List<ModelInfo>> = Result.success(models)
 }
+
+private val serverFolder = FolderListing("/home/dev", "/home", listOf("projects"))
 
 private val shared = SharedContent(
     text = "Crash on start\nhttps://github.com/o/r/issues/1",
@@ -705,6 +1348,20 @@ private class FakeRecents : RecentModelRepository {
     override fun used(model: ModelRef) {
         models.removeAll { it.key == model.key }
         models.add(0, model)
+    }
+}
+
+private class FakeFolderPreferences : FolderPreferences {
+    private val hidden = mutableMapOf<String, Set<String>>()
+    private val recent = mutableMapOf<String, List<String>>()
+    override fun hiddenDirectories(serverId: String): Set<String> = hidden[serverId].orEmpty()
+    override fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean) {
+        val current = hiddenDirectories(serverId)
+        this.hidden[serverId] = if (hidden) current + directory else current - directory
+    }
+    override fun recentFolders(serverId: String): List<String> = recent[serverId].orEmpty()
+    override fun folderPicked(serverId: String, path: String) {
+        recent[serverId] = (listOf(path) + recentFolders(serverId)).distinct().take(RECENT_FOLDERS)
     }
 }
 

@@ -35,6 +35,12 @@
     <string name="sessions_new_directory">프로젝트 디렉터리</string>
     <string name="sessions_new_other_directory">다른 디렉터리</string>
     <string name="sessions_new_path_label">절대 경로</string>
+    <string name="sessions_browse">찾아보기</string>
+    <string name="sessions_browse_title">폴더 선택</string>
+    <string name="sessions_browse_use">이 폴더 사용</string>
+    <string name="sessions_browse_empty">여기에 폴더가 없습니다</string>
+    <string name="sessions_browse_retry">다시 시도</string>
+    <string name="sessions_browse_back">뒤로</string>
     <string name="sessions_new_path_placeholder">/home/me/project</string>
     <string name="sessions_new_agent">에이전트</string>
     <string name="sessions_new_model">모델</string>
@@ -60,4 +66,11 @@
     <string name="sessions_preview_share_new">다른 앱에서 공유한 텍스트, 링크, 이미지는 이 시트를 엽니다</string>
     <string name="sessions_preview_share_choose">다른 앱에서 공유한 텍스트, 링크, 이미지는 먼저 채팅을 고르라고 묻거나 이 시트를 엽니다</string>
     <string name="sessions_preview_share_off">OpenCode는 다른 앱의 공유 메뉴에 없습니다</string>
+    <string name="sessions_project_hide">프로젝트 숨기기</string>
+    <string name="sessions_project_unhide">숨김 해제</string>
+    <string name="sessions_projects_hidden">숨김 (%1$d)</string>
+    <string name="sessions_browse_show_hidden">숨김 폴더 표시</string>
+    <string name="sessions_browse_hide_hidden">숨김 폴더 감추기</string>
+    <string name="sessions_browse_recent">최근 폴더</string>
+    <string name="sessions_browse_pick">사용</string>
 </resources>

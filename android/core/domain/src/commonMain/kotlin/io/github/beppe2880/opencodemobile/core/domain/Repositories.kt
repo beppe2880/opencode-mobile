@@ -132,6 +132,20 @@ interface RecentModelRepository {
     fun used(model: ModelRef)
 }
 
+interface FolderPreferences {
+    /** Project directories hidden on this device for [serverId]. */
+    fun hiddenDirectories(serverId: String): Set<String>
+    fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean)
+
+    /** Folders last picked in the folder browser for [serverId], most recent first, at most [RECENT_FOLDERS]. */
+    fun recentFolders(serverId: String): List<String>
+
+    /** [path] moves to the front; duplicates removed; list capped at [RECENT_FOLDERS]. */
+    fun folderPicked(serverId: String, path: String)
+}
+
+const val RECENT_FOLDERS = 5
+
 enum class PromptDelivery { Steer, Queue }
 
 /** A page of a shell command's combined output; [cursor] is the byte offset after [text]. */
@@ -313,6 +327,9 @@ interface CatalogRepository {
 
     /** Project files matching [query], as paths relative to [directory]. */
     suspend fun findFiles(directory: String, query: String): Result<List<String>> = Result.success(emptyList())
+
+    /** Child folders of [path] (absolute) on the server's machine; null lists the server's own folder. */
+    suspend fun listFolders(path: String?): Result<FolderListing> = Result.success(FolderListing("/", null, emptyList()))
 }
 
 enum class ThemeMode { System, Light, Dark }

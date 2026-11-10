@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -57,6 +60,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
+import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
@@ -100,6 +104,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_label
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_title
@@ -288,22 +293,43 @@ private fun ProjectFilter(state: SessionsState, onEvent: (SessionsEvent) -> Unit
                 },
                 modifier = Modifier.testTag("sessions_project_all"),
             )
-            state.projects.forEach { project ->
-                DropdownMenuItem(
-                    text = {
-                        Column {
-                            Text(project.displayName, style = MaterialTheme.typography.bodyMedium)
-                            Text(project.directory, style = OcTheme.mono.codeSmall, color = OcTheme.colors.textFaint)
-                        }
-                    },
+            state.visibleProjects.forEach { project ->
+                FilterProjectItem(
+                    project = project,
                     onClick = {
                         expanded = false
                         onEvent(SessionsEvent.FilterChanged(project.directory))
                     },
-                    modifier = Modifier.testTag("sessions_project_${project.id}"),
+                    onHide = { onEvent(SessionsEvent.HideProject(project.directory)) },
                 )
             }
         }
+    }
+}
+
+/** A project in the filter menu; long press offers Hide project. DropdownMenuItem has no long click. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FilterProjectItem(project: Project, onClick: () -> Unit, onHide: () -> Unit) {
+    var menu by remember { mutableStateOf(false) }
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = { menu = true },
+                    onLongClickLabel = stringResource(Res.string.sessions_project_hide),
+                )
+                .heightIn(min = 48.dp)
+                .padding(horizontal = 12.dp, vertical = OcSpacing.xs)
+                .testTag("sessions_project_${project.id}"),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(project.displayName, style = MaterialTheme.typography.bodyMedium, color = OcTheme.colors.textBase)
+            Text(project.directory, style = OcTheme.mono.codeSmall, color = OcTheme.colors.textFaint)
+        }
+        ProjectMenu(expanded = menu, onDismiss = { menu = false }, onHide = onHide)
     }
 }
 
@@ -401,7 +427,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
         )
     }
     state.newSession?.let { new ->
-        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent)
+        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent, hidden = state.hiddenDirectories)
     }
 }
 
