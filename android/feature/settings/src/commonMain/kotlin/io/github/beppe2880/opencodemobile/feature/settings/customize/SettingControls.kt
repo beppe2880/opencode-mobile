@@ -43,6 +43,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_close_model_picker
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_close_model_picker_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_confirm_stop_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation
@@ -239,6 +241,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.VoiceStyle -> Res.string.settings_voice_style
         SettingOption.VoiceHold -> Res.string.settings_voice_hold
         SettingOption.SelectionApply -> Res.string.settings_selection_apply
+        SettingOption.CloseModelPickerOnSelect -> Res.string.settings_close_model_picker
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model
         SettingOption.ShareMenu -> Res.string.settings_share_menu
         SettingOption.ShareOpens -> Res.string.settings_share_opens
@@ -298,6 +301,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.VoiceStyle -> Res.string.settings_voice_style_waveform_sub
         SettingOption.VoiceHold -> Res.string.settings_voice_hold_sub
         SettingOption.SelectionApply -> Res.string.settings_selection_apply_sub
+        SettingOption.CloseModelPickerOnSelect -> Res.string.settings_close_model_picker_sub
         SettingOption.NewChatModel -> Res.string.settings_new_chat_model_sub
         SettingOption.ShareMenu -> Res.string.settings_share_menu_sub
         SettingOption.ShareOpens -> Res.string.settings_share_opens_sub
@@ -470,6 +474,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.VoiceLanguage -> switch(settings.sttLanguageHint, SettingsEvent::SttLanguageHintChanged)()
         SettingOption.VoiceStyle -> VoiceStyleControl(title, settings, onEvent)
         SettingOption.VoiceHold -> switch(settings.voiceHoldToRecord, SettingsEvent::VoiceHoldToRecordChanged)()
+        SettingOption.CloseModelPickerOnSelect -> switch(settings.closeModelPickerOnSelect, SettingsEvent::CloseModelPickerOnSelectChanged)()
         SettingOption.SelectionApply -> ChoiceRow(
             title = title,
             subtitle = subtitle,

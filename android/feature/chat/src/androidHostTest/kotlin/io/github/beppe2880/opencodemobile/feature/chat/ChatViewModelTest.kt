@@ -2280,6 +2280,88 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `model picker closes on model taps by default but not reasoning taps`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.closeModelPickerOnSelect)
+
+        vm.onEvent(ChatEvent.ModelSheet(true))
+        vm.onEvent(ChatEvent.SelectVariant("high"))
+        assertTrue(vm.state.value.modelSheetOpen)
+        vm.onEvent(ChatEvent.SelectModel(model))
+        assertFalse(vm.state.value.modelSheetOpen)
+        assertEquals("high", vm.state.value.model?.variant)
+
+        vm.onEvent(ChatEvent.ModelSheet(true))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic", "low")))
+        assertFalse(vm.state.value.modelSheetOpen)
+        assertEquals(ModelRef("sonnet", "anthropic"), vm.state.value.model)
+        assertTrue(chat.switched.isEmpty())
+    }
+
+    @Test
+    fun `manual closing keeps model and reasoning pending until send`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(closeModelPickerOnSelect = false)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.ModelSheet(true))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic", "low")))
+        assertTrue(vm.state.value.modelSheetOpen)
+        assertEquals(ModelRef("sonnet", "anthropic"), vm.state.value.model)
+        vm.onEvent(ChatEvent.SelectVariant("high"))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
+        assertTrue(vm.state.value.modelSheetOpen)
+        assertEquals("high", vm.state.value.model?.variant)
+        vm.onEvent(ChatEvent.ModelSheet(false))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.modelSheetOpen)
+        assertEquals(ModelRef("sonnet", "anthropic", "high"), vm.state.value.model)
+        assertTrue(chat.calls.isEmpty())
+
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("model:anthropic/sonnet/high", "prompt:go"), chat.calls)
+    }
+
+    @Test
+    fun `keeping the picker open does not defer immediate model changes`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(closeModelPickerOnSelect = false, selectionApply = SelectionApply.Immediately)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.ModelSheet(true))
+        vm.onEvent(ChatEvent.SelectModel(ModelRef("sonnet", "anthropic")))
+        vm.onEvent(ChatEvent.SelectVariant("high"))
+        advanceUntilIdle()
+        assertTrue(vm.state.value.modelSheetOpen)
+        assertEquals(listOf(ModelRef("sonnet", "anthropic"), ModelRef("sonnet", "anthropic", "high")), chat.switched)
+        vm.onEvent(ChatEvent.ModelSheet(false))
+        advanceUntilIdle()
+        assertEquals(2, chat.switched.size)
+    }
+
+    @Test
+    fun `picker closing preference changes live without altering the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        settings.settings.value = AppSettings(closeModelPickerOnSelect = false)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.closeModelPickerOnSelect)
+        vm.onEvent(ChatEvent.ModelSheet(true))
+        // Models without variants are selectable and can still be closed manually.
+        vm.onEvent(ChatEvent.SelectModel(model))
+        assertTrue(vm.state.value.modelSheetOpen)
+        vm.onEvent(ChatEvent.SelectVariant("high"))
+        settings.settings.value = AppSettings(closeModelPickerOnSelect = true)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.modelSheetOpen)
+        assertEquals("high", vm.state.value.model?.variant)
+        vm.onEvent(ChatEvent.SelectModel(model))
+        assertFalse(vm.state.value.modelSheetOpen)
+        assertEquals("high", vm.state.value.model?.variant)
+    }
+
+    @Test
     fun `immediately, a model switch failure rolls back`() = runTest(main.testDispatcher) {
         settings.settings.value = AppSettings(selectionApply = SelectionApply.Immediately)
         chat.switchResult = Result.failure(OpenCodeError.Server(500, null, "no"))

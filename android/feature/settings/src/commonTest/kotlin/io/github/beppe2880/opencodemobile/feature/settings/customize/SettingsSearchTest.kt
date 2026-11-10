@@ -19,7 +19,9 @@ class SettingsSearchTest {
         SettingOption.TerminalKeyboard to "Shows the keyboard with the terminal · Terminal",
     )
 
-    private fun search(query: String) = searchOptions(query, { titles[it] ?: it.name }, { descriptions[it].orEmpty() })
+    private fun search(query: String) = searchOptions(query, { titles[it] ?: it.name }, {
+        descriptions[it].orEmpty() + " " + it.searchKeywords.joinToString(" ")
+    })
 
     @Test
     fun blankQueriesFindNothing() {
@@ -55,5 +57,10 @@ class SettingsSearchTest {
     @Test
     fun descriptionsFindOptionsByTheirAreaAndPart() {
         assertEquals(listOf(SettingOption.ShowCost), search("footer"))
+    }
+
+    @Test
+    fun reasoningFindsTheModelPickerPreference() {
+        assertEquals(listOf(SettingOption.CloseModelPickerOnSelect), search("model reasoning"))
     }
 }

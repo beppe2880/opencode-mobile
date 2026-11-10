@@ -90,6 +90,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_VOICE_STYLE, next.voiceRecordingStyle.name)
         prefs.putBoolean(KEY_VOICE_HOLD, next.voiceHoldToRecord)
         prefs.putString(KEY_SELECTION_APPLY, next.selectionApply.name)
+        prefs.putBoolean(KEY_CLOSE_MODEL_PICKER, next.closeModelPickerOnSelect)
         prefs.putString(KEY_NEW_CHAT_MODEL, next.newChatModel.name)
         prefs.putBoolean(KEY_SHARE_MENU, next.showInShareMenu)
         prefs.putString(KEY_SHARE_OPENS, next.shareOpens.name)
@@ -169,6 +170,7 @@ internal class PreferencesSettingsRepository(
             voiceHoldToRecord = prefs.getBoolean(KEY_VOICE_HOLD, defaults.voiceHoldToRecord),
             selectionApply = SelectionApply.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SELECTION_APPLY) }
                 ?: defaults.selectionApply,
+            closeModelPickerOnSelect = prefs.getBoolean(KEY_CLOSE_MODEL_PICKER, defaults.closeModelPickerOnSelect),
             newChatModel = NewChatModel.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_NEW_CHAT_MODEL) }
                 ?: defaults.newChatModel,
             showInShareMenu = prefs.getBoolean(KEY_SHARE_MENU, defaults.showInShareMenu),
@@ -251,6 +253,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_VOICE_STYLE = "voice_recording_style"
         const val KEY_VOICE_HOLD = "voice_hold_to_record"
         const val KEY_SELECTION_APPLY = "selection_apply"
+        const val KEY_CLOSE_MODEL_PICKER = "close_model_picker_on_select"
         const val KEY_NEW_CHAT_MODEL = "new_chat_model"
         const val KEY_SHARE_MENU = "show_in_share_menu"
         const val KEY_SHARE_OPENS = "share_opens"

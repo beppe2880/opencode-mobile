@@ -167,6 +167,7 @@ sealed interface SettingsEvent {
     data object TestStt : SettingsEvent
     data object LoadSttModels : SettingsEvent
     data class SelectionApplyChanged(val apply: SelectionApply) : SettingsEvent
+    data class CloseModelPickerOnSelectChanged(val enabled: Boolean) : SettingsEvent
     data class NewChatModelChanged(val model: NewChatModel) : SettingsEvent
     data class ShowInShareMenuChanged(val enabled: Boolean) : SettingsEvent
     data class ShareOpensChanged(val opens: ShareOpens) : SettingsEvent

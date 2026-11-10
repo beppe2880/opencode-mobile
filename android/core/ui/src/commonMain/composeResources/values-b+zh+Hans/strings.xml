@@ -80,4 +80,5 @@
     </plurals>
     <string name="oc_share_nothing">没有可共享的内容：OpenCode 支持文本、链接和图片</string>
     <string name="oc_shared_truncated">文本过长，已被截短</string>
+    <string name="oc_models_done">完成</string>
 </resources>

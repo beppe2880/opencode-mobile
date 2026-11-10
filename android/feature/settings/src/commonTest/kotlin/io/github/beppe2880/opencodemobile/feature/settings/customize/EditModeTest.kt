@@ -35,6 +35,7 @@ class EditModeTest {
     @Test
     fun theElementsTheOwnerNamedOpenTheirOptions() {
         assertTrue(SettingOption.SelectionApply in SettingsPart.SelectionTiming.options, "agent chip")
+        assertTrue(SettingOption.CloseModelPickerOnSelect in SettingsPart.SelectionTiming.options, "model selector")
         assertTrue(SettingOption.HeaderStyle in SettingsPart.Header.options, "header line")
         assertTrue(SettingOption.GroupThoughts in SettingsPart.Thoughts.options, "thoughts row")
         assertTrue(SettingOption.FullCommands in SettingsPart.Tools.options, "tool row")

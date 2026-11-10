@@ -357,4 +357,6 @@
     <string name="settings_use_hint">Используйте демо как обычно</string>
     <string name="settings_edit_close">Закрыть параметры</string>
     <string name="settings_edit_more">Все параметры в разделе %1$s</string>
+    <string name="settings_close_model_picker">Закрывать список после выбора модели</string>
+    <string name="settings_close_model_picker_sub">Отключите, чтобы выбрать модель и уровень рассуждений вместе, затем нажмите «Готово» для закрытия.</string>
 </resources>

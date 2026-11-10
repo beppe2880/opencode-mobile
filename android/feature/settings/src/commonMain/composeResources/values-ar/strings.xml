@@ -363,4 +363,6 @@
     <string name="settings_use_hint">استخدم النسخة التجريبية كالمعتاد</string>
     <string name="settings_edit_close">إغلاق الخيارات</string>
     <string name="settings_edit_more">كل الخيارات في %1$s</string>
+    <string name="settings_close_model_picker">إغلاق القائمة بعد اختيار النموذج</string>
+    <string name="settings_close_model_picker_sub">عطّل هذا الخيار لاختيار النموذج ومستوى الاستدلال معًا، ثم اضغط على تم للإغلاق.</string>
 </resources>

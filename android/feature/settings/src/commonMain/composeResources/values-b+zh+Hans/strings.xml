@@ -348,4 +348,6 @@
     <string name="settings_use_hint">像平常一样使用演示</string>
     <string name="settings_edit_close">关闭选项</string>
     <string name="settings_edit_more">%1$s 中的所有选项</string>
+    <string name="settings_close_model_picker">选择模型后关闭选择器</string>
+    <string name="settings_close_model_picker_sub">关闭此选项可一起选择模型和推理级别，然后点按“完成”关闭。</string>
 </resources>

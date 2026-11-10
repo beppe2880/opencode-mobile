@@ -44,6 +44,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_done
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_empty
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_recent
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_models_search
@@ -103,6 +104,8 @@ fun OcModelPicker(
     onBack: (() -> Unit)? = null,
     onSelectVariant: ((String?) -> Unit)? = null,
     providerMark: (@Composable (providerId: String, providerName: String) -> Unit)? = null,
+    /** Only dismisses the picker; selections already take effect through their callbacks. */
+    onDone: (() -> Unit)? = null,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val sections = remember(models, recent, query) { modelSections(models, recent, query) }
@@ -126,8 +129,16 @@ fun OcModelPicker(
                 text = stringResource(Res.string.oc_models_title),
                 style = MaterialTheme.typography.titleSmall,
                 color = c.textBase,
-                modifier = Modifier.padding(start = if (onBack == null) OcSpacing.sm else 0.dp),
+                modifier = Modifier.weight(1f).padding(start = if (onBack == null) OcSpacing.sm else 0.dp),
             )
+            if (onDone != null) {
+                OcButton(
+                    text = stringResource(Res.string.oc_models_done),
+                    onClick = onDone,
+                    variant = OcButtonVariant.Ghost,
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("model_picker_done_button"),
+                )
+            }
         }
         if (onSelectVariant != null && variants.isNotEmpty()) {
             VariantRow(variants, selected?.variant, onSelectVariant)

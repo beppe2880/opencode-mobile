@@ -348,4 +348,6 @@
     <string name="settings_use_hint">いつものようにデモを使用します</string>
     <string name="settings_edit_close">オプションを閉じる</string>
     <string name="settings_edit_more">%1$s のすべてのオプション</string>
+    <string name="settings_close_model_picker">モデル選択後に選択画面を閉じる</string>
+    <string name="settings_close_model_picker_sub">オフにするとモデルと推論レベルをまとめて選べます。「完了」をタップして閉じます。</string>
 </resources>

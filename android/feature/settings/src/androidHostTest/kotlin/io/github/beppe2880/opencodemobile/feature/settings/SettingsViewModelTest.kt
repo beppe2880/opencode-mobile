@@ -101,6 +101,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.LiveReadsChanged(true))
         vm.onEvent(SettingsEvent.LiveOtherChanged(true))
         vm.onEvent(SettingsEvent.SelectionApplyChanged(SelectionApply.Immediately))
+        vm.onEvent(SettingsEvent.CloseModelPickerOnSelectChanged(false))
         vm.onEvent(SettingsEvent.NewChatModelChanged(NewChatModel.ServerDefault))
         vm.onEvent(SettingsEvent.UpdateNoticeChanged(UpdateNoticeStyle.Banner))
         vm.onEvent(SettingsEvent.ShowInShareMenuChanged(false))
@@ -140,6 +141,7 @@ class SettingsViewModelTest {
                 agentColorOutline = false,
                 dictation = false,
                 selectionApply = SelectionApply.Immediately,
+                closeModelPickerOnSelect = false,
                 newChatModel = NewChatModel.ServerDefault,
                 showInShareMenu = false,
                 shareOpens = ShareOpens.ChooseChat,

@@ -47,6 +47,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.VoiceRecordingStyleChanged -> copy(voiceRecordingStyle = event.style)
     is SettingsEvent.VoiceHoldToRecordChanged -> copy(voiceHoldToRecord = event.enabled)
     is SettingsEvent.SelectionApplyChanged -> copy(selectionApply = event.apply)
+    is SettingsEvent.CloseModelPickerOnSelectChanged -> copy(closeModelPickerOnSelect = event.enabled)
     is SettingsEvent.NewChatModelChanged -> copy(newChatModel = event.model)
     is SettingsEvent.ShowInShareMenuChanged -> copy(showInShareMenu = event.enabled)
     is SettingsEvent.ShareOpensChanged -> copy(shareOpens = event.opens)

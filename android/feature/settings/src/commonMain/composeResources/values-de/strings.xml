@@ -351,4 +351,6 @@
     <string name="settings_use_hint">Verwende die Demo wie gewohnt</string>
     <string name="settings_edit_close">Optionen schließen</string>
     <string name="settings_edit_more">Alle Optionen in %1$s</string>
+    <string name="settings_close_model_picker">Auswahl nach der Modellwahl schließen</string>
+    <string name="settings_close_model_picker_sub">Deaktivieren, um Modell und Denkaufwand gemeinsam zu wählen. Danach mit Fertig schließen.</string>
 </resources>

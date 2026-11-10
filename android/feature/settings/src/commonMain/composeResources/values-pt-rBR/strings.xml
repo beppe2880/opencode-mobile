@@ -351,4 +351,6 @@
     <string name="settings_use_hint">Use a demo normalmente</string>
     <string name="settings_edit_close">Fechar opções</string>
     <string name="settings_edit_more">Todas as opções em %1$s</string>
+    <string name="settings_close_model_picker">Fechar o seletor ao escolher um modelo</string>
+    <string name="settings_close_model_picker_sub">Desative para escolher o modelo e o raciocínio juntos e depois toque em Concluído para fechar.</string>
 </resources>

@@ -80,4 +80,5 @@
     </plurals>
     <string name="oc_share_nothing">공유할 항목이 없습니다: OpenCode는 텍스트, 링크, 이미지를 받습니다</string>
     <string name="oc_shared_truncated">텍스트가 너무 길어 줄였습니다</string>
+    <string name="oc_models_done">완료</string>
 </resources>
