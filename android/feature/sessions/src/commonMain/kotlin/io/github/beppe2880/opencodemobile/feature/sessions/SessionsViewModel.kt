@@ -131,8 +131,8 @@ class SessionsViewModel(
                 showCachedFirst = true
                 load(initial = false)
             }
-            is SessionsEvent.HideProject -> setProjectHidden(event.projectId, hidden = true)
-            is SessionsEvent.UnhideProject -> setProjectHidden(event.projectId, hidden = false)
+            is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
+            is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
             is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
@@ -185,7 +185,7 @@ class SessionsViewModel(
             it.copy(
                 query = "",
                 projects = emptyList(),
-                hiddenProjects = id?.let(folderPreferences::hiddenProjects).orEmpty(),
+                hiddenDirectories = id?.let(folderPreferences::hiddenDirectories).orEmpty(),
                 directoryFilter = id?.let(filters::get),
                 groups = emptyList(),
                 running = emptySet(),
@@ -571,23 +571,30 @@ class SessionsViewModel(
         updateNew { it.copy(directory = directory) }
     }
 
-    /** The filtered project, else the latest session's or the latest project's directory; never a hidden project's. */
+    /** The filtered project, else the latest session's or the latest project's directory; never a hidden one. */
     private fun defaultDirectory(state: SessionsState): String? = state.directoryFilter
-        ?: sessionList.firstOrNull { it.projectId !in state.hiddenProjects }?.directory
+        ?: sessionList.firstOrNull { !isHidden(it, state) }?.directory
         ?: state.visibleProjects.firstOrNull()?.directory
 
-    private fun setProjectHidden(projectId: String, hidden: Boolean) {
+    /**
+     * A session counts as hidden when its own directory is hidden or when its project's directory
+     * is: the list keeps one project per directory, so the session's project may have been dropped.
+     */
+    private fun isHidden(session: Session, state: SessionsState): Boolean =
+        session.directory in state.hiddenDirectories ||
+            state.projects.any { it.id == session.projectId && it.directory in state.hiddenDirectories }
+
+    private fun setProjectHidden(directory: String, hidden: Boolean) {
         val id = serverId ?: return
-        folderPreferences.setProjectHidden(id, projectId, hidden)
-        updateState { it.copy(hiddenProjects = folderPreferences.hiddenProjects(id)) }
-        val project = currentState.projects.firstOrNull { it.id == projectId } ?: return
+        folderPreferences.setDirectoryHidden(id, directory, hidden)
+        updateState { it.copy(hiddenDirectories = folderPreferences.hiddenDirectories(id)) }
         if (!hidden) return
         val new = currentState.newSession
-        if (new != null && !new.customDirectory && new.directory == project.directory) {
+        if (new != null && !new.customDirectory && new.directory == directory) {
             newSessionDirectoryCleared = true
             updateNew { it.copy(directory = "") }
         }
-        if (currentState.directoryFilter == project.directory) onEvent(SessionsEvent.FilterChanged(null))
+        if (currentState.directoryFilter == directory) onEvent(SessionsEvent.FilterChanged(null))
     }
 
     private fun create() {

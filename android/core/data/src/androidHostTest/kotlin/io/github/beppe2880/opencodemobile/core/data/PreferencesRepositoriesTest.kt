@@ -272,20 +272,20 @@ class PreferencesRepositoriesTest {
     }
 
     @Test
-    fun `hidden projects persist per server and can be unhidden`() {
+    fun `hidden project directories persist per server and can be unhidden`() {
         val prefs = SharedPreferencesSettings(InMemoryPreferences())
         val folders = PreferencesFolderPreferences(prefs)
-        assertEquals(emptySet<String>(), folders.hiddenProjects("s1"))
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
 
-        folders.setProjectHidden("s1", "p", true)
-        folders.setProjectHidden("s1", "q", true)
-        folders.setProjectHidden("s1", "p", true)
-        folders.setProjectHidden("s2", "p", true)
+        folders.setDirectoryHidden("s1", "/p", true)
+        folders.setDirectoryHidden("s1", "/q", true)
+        folders.setDirectoryHidden("s1", "/p", true)
+        folders.setDirectoryHidden("s2", "/p", true)
         val restored = PreferencesFolderPreferences(prefs)
-        assertEquals(setOf("p", "q"), restored.hiddenProjects("s1"))
-        restored.setProjectHidden("s1", "p", false)
-        assertEquals(setOf("q"), folders.hiddenProjects("s1"))
-        assertEquals(setOf("p"), folders.hiddenProjects("s2"))
+        assertEquals(setOf("/p", "/q"), restored.hiddenDirectories("s1"))
+        restored.setDirectoryHidden("s1", "/p", false)
+        assertEquals(setOf("/q"), folders.hiddenDirectories("s1"))
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s2"))
     }
 
     @Test
@@ -308,11 +308,11 @@ class PreferencesRepositoriesTest {
         val folders = PreferencesFolderPreferences(prefs)
         prefs.putString("hidden_projects/s1", "not json")
         prefs.putString("recent_folders/s1", "[null]")
-        assertEquals(emptySet<String>(), folders.hiddenProjects("s1"))
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
         assertEquals(emptyList<String>(), folders.recentFolders("s1"))
-        folders.setProjectHidden("s1", "p", true)
+        folders.setDirectoryHidden("s1", "/p", true)
         folders.folderPicked("s1", "/work")
-        assertEquals(setOf("p"), folders.hiddenProjects("s1"))
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s1"))
         assertEquals(listOf("/work"), folders.recentFolders("s1"))
 
         prefs.putString("recent_folders/s1", """["/a","/b","/a","/c","/d","/e","/f"]""")
@@ -324,15 +324,15 @@ class PreferencesRepositoriesTest {
         val prefs = SharedPreferencesSettings(InMemoryPreferences())
         val folders = PreferencesFolderPreferences(prefs)
         listOf("s1", "s2").forEach {
-            folders.setProjectHidden(it, "p", true)
+            folders.setDirectoryHidden(it, "/p", true)
             folders.folderPicked(it, "/work")
         }
 
         PreferencesFolderPreferences.clearServer(prefs, "s1")
 
-        assertEquals(emptySet<String>(), folders.hiddenProjects("s1"))
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
         assertEquals(emptyList<String>(), folders.recentFolders("s1"))
-        assertEquals(setOf("p"), folders.hiddenProjects("s2"))
+        assertEquals(setOf("/p"), folders.hiddenDirectories("s2"))
         assertEquals(listOf("/work"), folders.recentFolders("s2"))
     }
 

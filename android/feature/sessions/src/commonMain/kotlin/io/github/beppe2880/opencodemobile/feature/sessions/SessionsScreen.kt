@@ -300,7 +300,7 @@ private fun ProjectFilter(state: SessionsState, onEvent: (SessionsEvent) -> Unit
                         expanded = false
                         onEvent(SessionsEvent.FilterChanged(project.directory))
                     },
-                    onHide = { onEvent(SessionsEvent.HideProject(project.id)) },
+                    onHide = { onEvent(SessionsEvent.HideProject(project.directory)) },
                 )
             }
         }
@@ -427,7 +427,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
         )
     }
     state.newSession?.let { new ->
-        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent, hidden = state.hiddenProjects)
+        NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent, hidden = state.hiddenDirectories)
     }
 }
 

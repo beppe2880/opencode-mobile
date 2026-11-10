@@ -61,7 +61,7 @@ data class SessionsState(
     val connection: ConnectionState = ConnectionState.Disconnected,
     val query: String = "",
     val projects: List<Project> = emptyList(),
-    val hiddenProjects: Set<String> = emptySet(),
+    val hiddenDirectories: Set<String> = emptySet(),
     val directoryFilter: String? = null,
     val groups: List<SessionGroup> = emptyList(),
     val running: Set<String> = emptySet(),
@@ -82,7 +82,7 @@ data class SessionsState(
     val deleting: Session? = null,
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
-    val visibleProjects: List<Project> get() = projects.filter { it.id !in hiddenProjects }
+    val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
 
@@ -91,8 +91,8 @@ sealed interface SessionsEvent {
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent
-    data class HideProject(val projectId: String) : SessionsEvent
-    data class UnhideProject(val projectId: String) : SessionsEvent
+    data class HideProject(val directory: String) : SessionsEvent
+    data class UnhideProject(val directory: String) : SessionsEvent
     data class Open(val sessionId: String) : SessionsEvent
     data object OpenSettings : SessionsEvent
 

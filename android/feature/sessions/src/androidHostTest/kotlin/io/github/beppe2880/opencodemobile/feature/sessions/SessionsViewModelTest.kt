@@ -396,25 +396,25 @@ class SessionsViewModelTest {
     }
 
     @Test
-    fun `hiding and unhiding projects persists while keeping the complete project list`() = runTest(main.testDispatcher) {
+    fun `hiding and unhiding project directories persists while keeping the complete project list`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
         val projects = vm.state.value.projects
 
-        vm.onEvent(SessionsEvent.HideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
 
-        assertEquals(setOf("p"), folders.hiddenProjects("s1"))
-        assertEquals(setOf("p"), vm.state.value.hiddenProjects)
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
         assertEquals(projects, vm.state.value.projects)
         assertTrue(vm.state.value.visibleProjects.isEmpty())
         val restored = vm()
         advanceUntilIdle()
-        assertEquals(setOf("p"), restored.state.value.hiddenProjects)
+        assertEquals(setOf("/p/today"), restored.state.value.hiddenDirectories)
 
-        vm.onEvent(SessionsEvent.UnhideProject("p"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
 
-        assertEquals(emptySet<String>(), folders.hiddenProjects("s1"))
-        assertEquals(emptySet<String>(), vm.state.value.hiddenProjects)
+        assertEquals(emptySet<String>(), folders.hiddenDirectories("s1"))
+        assertEquals(emptySet<String>(), vm.state.value.hiddenDirectories)
         assertEquals(projects, vm.state.value.visibleProjects)
     }
 
@@ -427,7 +427,7 @@ class SessionsViewModelTest {
         advanceUntilIdle()
         assertEquals("/p/today", sessions.lastDirectory)
 
-        vm.onEvent(SessionsEvent.HideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
         advanceUntilIdle()
 
         assertEquals(null, vm.state.value.directoryFilter)
@@ -444,7 +444,7 @@ class SessionsViewModelTest {
         advanceUntilIdle()
         assertEquals("/p/today", newSession(vm).directory)
 
-        vm.onEvent(SessionsEvent.HideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
         advanceUntilIdle()
 
         assertEquals("", vm.state.value.newSession!!.directory)
@@ -481,7 +481,7 @@ class SessionsViewModelTest {
 
     @Test
     fun `a new session never defaults to the directory of a hidden project`() = runTest(main.testDispatcher) {
-        folders.setProjectHidden("s1", "p", true)
+        folders.setDirectoryHidden("s1", "/p/today", true)
         val vm = vm()
         advanceUntilIdle()
 
@@ -493,43 +493,73 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `hiding a directory hides every project in it and never defaults to it`() = runTest(main.testDispatcher) {
+        sessions.serverProjects = listOf(
+            Project("old", "/same", null, null, 1),
+            Project("new", "/same", null, null, 5),
+            Project("other", "/p/today", null, null, 3),
+        )
+        sessions.listResult = Result.success(
+            listOf(
+                session("new", now - hour).copy(projectId = "new", directory = "/same"),
+                session("old", now - 2 * hour).copy(projectId = "old", directory = "/same"),
+            ),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(listOf("new", "other"), vm.state.value.projects.map { it.id })
+
+        vm.onEvent(SessionsEvent.HideProject("/same"))
+        advanceUntilIdle()
+
+        assertEquals(setOf("/same"), vm.state.value.hiddenDirectories)
+        // Both projects of the directory are hidden although only one of them is listed.
+        assertEquals(listOf("other"), vm.state.value.visibleProjects.map { it.id })
+        vm.onEvent(SessionsEvent.StartNewSession)
+        advanceUntilIdle()
+
+        // The session of the dropped duplicate "old" is skipped like the listed one.
+        assertEquals("/p/today", vm.state.value.newSession!!.directory)
+    }
+
+    @Test
     fun `hiding a project keeps custom directories and other selected directories`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
         newSession(vm)
         vm.onEvent(SessionsEvent.NewSessionDirectory("/p/today", custom = true))
 
-        vm.onEvent(SessionsEvent.HideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
         assertEquals("/p/today", vm.state.value.newSession!!.directory)
         assertTrue(vm.state.value.newSession!!.customDirectory)
 
-        vm.onEvent(SessionsEvent.UnhideProject("p"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
         vm.onEvent(SessionsEvent.NewSessionDirectory("/other", custom = false))
-        vm.onEvent(SessionsEvent.HideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
         assertEquals("/other", vm.state.value.newSession!!.directory)
     }
 
     @Test
-    fun `switching servers reloads hidden projects and keeps their preferences separate`() = runTest(main.testDispatcher) {
-        folders.setProjectHidden("s1", "p", true)
-        folders.setProjectHidden("s2", "q", true)
+    fun `switching servers reloads hidden directories and keeps their preferences separate`() = runTest(main.testDispatcher) {
+        folders.setDirectoryHidden("s1", "/p/today", true)
+        folders.setDirectoryHidden("s2", "/q", true)
         val vm = vm()
         advanceUntilIdle()
-        assertEquals(setOf("p"), vm.state.value.hiddenProjects)
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
 
         servers.activate("s2")
         advanceUntilIdle()
-        assertEquals(setOf("q"), vm.state.value.hiddenProjects)
+        assertEquals(setOf("/q"), vm.state.value.hiddenDirectories)
         assertEquals(listOf("p"), vm.state.value.visibleProjects.map { it.id })
-        vm.onEvent(SessionsEvent.HideProject("p"))
-        assertEquals(setOf("p", "q"), folders.hiddenProjects("s2"))
-        assertEquals(setOf("p"), folders.hiddenProjects("s1"))
-        vm.onEvent(SessionsEvent.UnhideProject("p"))
-        assertEquals(setOf("q"), folders.hiddenProjects("s2"))
+        vm.onEvent(SessionsEvent.HideProject("/p/today"))
+        assertEquals(setOf("/p/today", "/q"), folders.hiddenDirectories("s2"))
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
+        assertEquals(setOf("/q"), folders.hiddenDirectories("s2"))
 
         servers.activate("s1")
         advanceUntilIdle()
-        assertEquals(setOf("p"), vm.state.value.hiddenProjects)
+        assertEquals(setOf("/p/today"), vm.state.value.hiddenDirectories)
     }
 
     @Test
@@ -580,7 +610,7 @@ class SessionsViewModelTest {
 
     @Test
     fun `without an active server folder preferences are unchanged and browser recents are empty`() = runTest(main.testDispatcher) {
-        folders.setProjectHidden("s1", "p", true)
+        folders.setDirectoryHidden("s1", "/p/today", true)
         folders.folderPicked("s1", "/work")
         servers.activate("missing")
         val vm = vm()
@@ -591,16 +621,16 @@ class SessionsViewModelTest {
         val new = vm.state.value.newSession
         assertEquals(emptyList<String>(), new!!.browser!!.recent)
 
-        vm.onEvent(SessionsEvent.HideProject("q"))
-        vm.onEvent(SessionsEvent.UnhideProject("p"))
+        vm.onEvent(SessionsEvent.HideProject("/q"))
+        vm.onEvent(SessionsEvent.UnhideProject("/p/today"))
         vm.onEvent(SessionsEvent.PickBrowsedFolder)
 
-        assertEquals(emptySet<String>(), vm.state.value.hiddenProjects)
+        assertEquals(emptySet<String>(), vm.state.value.hiddenDirectories)
         val picked = vm.state.value.newSession!!
         assertEquals(new!!.browser!!.path, picked.directory)
         assertTrue(picked.customDirectory)
         assertEquals(null, picked.browser)
-        assertEquals(setOf("p"), folders.hiddenProjects("s1"))
+        assertEquals(setOf("/p/today"), folders.hiddenDirectories("s1"))
         assertEquals(listOf("/work"), folders.recentFolders("s1"))
     }
 
@@ -1193,10 +1223,10 @@ private class FakeRecents : RecentModelRepository {
 private class FakeFolderPreferences : FolderPreferences {
     private val hidden = mutableMapOf<String, Set<String>>()
     private val recent = mutableMapOf<String, List<String>>()
-    override fun hiddenProjects(serverId: String): Set<String> = hidden[serverId].orEmpty()
-    override fun setProjectHidden(serverId: String, projectId: String, hidden: Boolean) {
-        val current = hiddenProjects(serverId)
-        this.hidden[serverId] = if (hidden) current + projectId else current - projectId
+    override fun hiddenDirectories(serverId: String): Set<String> = hidden[serverId].orEmpty()
+    override fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean) {
+        val current = hiddenDirectories(serverId)
+        this.hidden[serverId] = if (hidden) current + directory else current - directory
     }
     override fun recentFolders(serverId: String): List<String> = recent[serverId].orEmpty()
     override fun folderPicked(serverId: String, path: String) {

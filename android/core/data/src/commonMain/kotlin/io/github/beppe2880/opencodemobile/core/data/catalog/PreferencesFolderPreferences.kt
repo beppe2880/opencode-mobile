@@ -8,13 +8,13 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-/** Hidden projects and picked folders in app-private preferences, per saved server. */
+/** Hidden project directories and picked folders in app-private preferences, per saved server. */
 internal class PreferencesFolderPreferences(private val prefs: Settings) : FolderPreferences {
-    override fun hiddenProjects(serverId: String): Set<String> = read("$HIDDEN_PREFIX$serverId").toSet()
+    override fun hiddenDirectories(serverId: String): Set<String> = read("$HIDDEN_PREFIX$serverId").toSet()
 
-    override fun setProjectHidden(serverId: String, projectId: String, hidden: Boolean) {
-        val current = hiddenProjects(serverId)
-        val next = if (hidden) current + projectId else current - projectId
+    override fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean) {
+        val current = hiddenDirectories(serverId)
+        val next = if (hidden) current + directory else current - directory
         prefs.putString("$HIDDEN_PREFIX$serverId", Json.encodeToString(Entries, next.toList()))
     }
 

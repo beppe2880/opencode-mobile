@@ -92,7 +92,7 @@ internal fun NewSessionSheet(
     state: NewSessionState,
     projects: List<Project>,
     onEvent: (SessionsEvent) -> Unit,
-    /** Ids of the projects hidden on this device. */
+    /** Directories of the projects hidden on this device. */
     hidden: Set<String> = emptySet(),
 ) {
     OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissNewSession) }, testTag = "sessions_new_sheet") {
@@ -124,7 +124,7 @@ internal fun NewSessionForm(
     onEvent: (SessionsEvent) -> Unit,
     /** False for the preview in Settings: no own scrolling or insets, and no directories. */
     inSheet: Boolean = true,
-    /** Ids of the projects hidden on this device: listed under "Hidden (N)", not selectable. */
+    /** Directories of the projects hidden on this device: listed under "Hidden (N)", not selectable. */
     hidden: Set<String> = emptySet(),
 ) {
     val c = OcTheme.colors
@@ -161,13 +161,13 @@ internal fun NewSessionForm(
             var showHidden by rememberSaveable { mutableStateOf(false) }
             // Local UI state like showAll: the sheet leaves composition when it closes, which resets it.
             var query by rememberSaveable { mutableStateOf("") }
-            val shown = projects.filter { it.id !in hidden }
-            val hiddenProjects = projects.filter { it.id in hidden }
+            val shown = projects.filter { it.directory !in hidden }
+            val hiddenRows = projects.filter { it.directory in hidden }
             val searchable = shown.size > COLLAPSED_PROJECTS
             val searching = searchable && query.isNotBlank()
             val visible = visibleProjects(shown, if (searchable) query else "", showAll, state.directory)
             // While searching, hidden matches show inline (dimmed) so they can be found and unhidden.
-            val hiddenMatches = if (searching) visibleProjects(hiddenProjects, query, showAll = true, selectedDirectory = "") else emptyList()
+            val hiddenMatches = if (searching) visibleProjects(hiddenRows, query, showAll = true, selectedDirectory = "") else emptyList()
             if (searchable) {
                 OcSearchField(
                     value = query,
@@ -192,7 +192,7 @@ internal fun NewSessionForm(
                     path = project.directory,
                     selected = !state.customDirectory && state.directory == project.directory,
                     onClick = { onEvent(SessionsEvent.NewSessionDirectory(project.directory, custom = false)) },
-                    onHide = { onEvent(SessionsEvent.HideProject(project.id)) },
+                    onHide = { onEvent(SessionsEvent.HideProject(project.directory)) },
                     modifier = Modifier.testTag("sessions_new_project_${project.id}"),
                 )
             }
@@ -204,14 +204,14 @@ internal fun NewSessionForm(
                     onClick = { showAll = true },
                     modifier = Modifier.testTag("sessions_new_show_all"),
                 )
-            } else if (!searching && hiddenProjects.isNotEmpty()) {
+            } else if (!searching && hiddenRows.isNotEmpty()) {
                 FooterLink(
-                    text = stringResource(Res.string.sessions_projects_hidden, hiddenProjects.size),
+                    text = stringResource(Res.string.sessions_projects_hidden, hiddenRows.size),
                     onClick = { showHidden = !showHidden },
                     trailingIcon = if (showHidden) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
                     modifier = Modifier.testTag("sessions_new_hidden_toggle"),
                 )
-                if (showHidden) hiddenProjects.forEach { project -> HiddenProjectRow(project, onEvent) }
+                if (showHidden) hiddenRows.forEach { project -> HiddenProjectRow(project, onEvent) }
             }
             DirectoryOption(
                 title = stringResource(Res.string.sessions_new_other_directory),
@@ -424,7 +424,7 @@ private fun HiddenProjectRow(project: Project, onEvent: (SessionsEvent) -> Unit)
         Icon(Icons.Outlined.VisibilityOff, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(16.dp))
         OcButton(
             text = stringResource(Res.string.sessions_project_unhide),
-            onClick = { onEvent(SessionsEvent.UnhideProject(project.id)) },
+            onClick = { onEvent(SessionsEvent.UnhideProject(project.directory)) },
             variant = OcButtonVariant.Ghost,
             compact = true,
             modifier = Modifier.testTag("sessions_new_unhide_${project.id}"),

@@ -547,10 +547,10 @@ internal class FakeRecentModels : RecentModelRepository {
 internal class FakeFolderPreferences : FolderPreferences {
     private val hidden = mutableMapOf<String, Set<String>>()
     private val recent = mutableMapOf<String, List<String>>()
-    override fun hiddenProjects(serverId: String): Set<String> = hidden[serverId].orEmpty()
-    override fun setProjectHidden(serverId: String, projectId: String, hidden: Boolean) {
-        val current = hiddenProjects(serverId)
-        this.hidden[serverId] = if (hidden) current + projectId else current - projectId
+    override fun hiddenDirectories(serverId: String): Set<String> = hidden[serverId].orEmpty()
+    override fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean) {
+        val current = hiddenDirectories(serverId)
+        this.hidden[serverId] = if (hidden) current + directory else current - directory
     }
     override fun recentFolders(serverId: String): List<String> = recent[serverId].orEmpty()
     override fun folderPicked(serverId: String, path: String) {

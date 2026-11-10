@@ -133,9 +133,9 @@ interface RecentModelRepository {
 }
 
 interface FolderPreferences {
-    /** Project ids hidden on this device for [serverId]. */
-    fun hiddenProjects(serverId: String): Set<String>
-    fun setProjectHidden(serverId: String, projectId: String, hidden: Boolean)
+    /** Project directories hidden on this device for [serverId]. */
+    fun hiddenDirectories(serverId: String): Set<String>
+    fun setDirectoryHidden(serverId: String, directory: String, hidden: Boolean)
 
     /** Folders last picked in the folder browser for [serverId], most recent first, at most [RECENT_FOLDERS]. */
     fun recentFolders(serverId: String): List<String>
