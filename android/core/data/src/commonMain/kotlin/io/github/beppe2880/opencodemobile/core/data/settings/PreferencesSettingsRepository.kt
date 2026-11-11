@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.HEADER_OPENS_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
@@ -18,6 +19,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -110,6 +113,10 @@ internal class PreferencesSettingsRepository(
         prefs.putBoolean(KEY_SPLIT_VIEW, next.splitView)
         prefs.putBoolean(KEY_LIST_PANE_HANDLE, next.listPaneHandle)
         prefs.putBoolean(KEY_BACK_SHOWS_LIST, next.backShowsList)
+        prefs.putString(KEY_UNFOLDED_LAYOUT, next.unfoldedLayout.name)
+        prefs.putString(KEY_UNFOLD_OPEN_CHAT, next.unfoldOpenChat.name)
+        prefs.putString(KEY_FOLD_OPEN_CHAT, next.foldOpenChat.name)
+        prefs.putBoolean(KEY_LIST_SWIPE, next.listSwipe)
         val fraction = next.listPaneFraction
         if (fraction == null) prefs.remove(KEY_LIST_PANE_FRACTION) else prefs.putFloat(KEY_LIST_PANE_FRACTION, fraction)
         prefs.putString(KEY_UPDATE_NOTICE, next.updateNotice.name)
@@ -192,6 +199,10 @@ internal class PreferencesSettingsRepository(
                 // Before the choice there was a switch: off stays off.
                 ?: if (prefs.getBooleanOrNull(KEY_CHECK_UPDATES) == false) UpdateNoticeStyle.Off else defaults.updateNotice,
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
+            unfoldedLayout = UnfoldedLayout.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLDED_LAYOUT) } ?: defaults.unfoldedLayout,
+            unfoldOpenChat = UnfoldChat.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLD_OPEN_CHAT) } ?: defaults.unfoldOpenChat,
+            foldOpenChat = FoldChat.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_FOLD_OPEN_CHAT) } ?: defaults.foldOpenChat,
+            listSwipe = prefs.getBoolean(KEY_LIST_SWIPE, defaults.listSwipe),
             showEditMarks = prefs.getBoolean(KEY_EDIT_MARKS, defaults.showEditMarks),
             settingsStyle = SettingsStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SETTINGS_STYLE) } ?: defaults.settingsStyle,
             settingsPreviewFraction = prefs.getFloatOrNull(KEY_PREVIEW_FRACTION)?.takeIf { it in 0f..1f },
@@ -275,6 +286,10 @@ internal class PreferencesSettingsRepository(
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_UPDATE_NOTICE = "update_notice"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
+        const val KEY_UNFOLDED_LAYOUT = "unfolded_layout"
+        const val KEY_UNFOLD_OPEN_CHAT = "unfold_open_chat"
+        const val KEY_FOLD_OPEN_CHAT = "fold_open_chat"
+        const val KEY_LIST_SWIPE = "list_swipe"
         const val KEY_EDIT_MARKS = "settings_edit_marks"
         const val KEY_SETTINGS_STYLE = "settings_style"
         const val KEY_PREVIEW_FRACTION = "settings_preview_fraction"

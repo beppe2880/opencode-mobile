@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
@@ -21,6 +22,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
@@ -107,6 +110,13 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ShowInShareMenuChanged(false))
         vm.onEvent(SettingsEvent.ShareOpensChanged(ShareOpens.ChooseChat))
         vm.onEvent(SettingsEvent.BackShowsListChanged(false))
+        vm.onEvent(SettingsEvent.UnfoldedLayoutChanged(UnfoldedLayout.ListPanel))
+        vm.onEvent(SettingsEvent.UnfoldOpenChatChanged(UnfoldChat.FullScreen))
+        vm.onEvent(SettingsEvent.FoldOpenChatChanged(FoldChat.ShowList))
+        vm.onEvent(SettingsEvent.ListSwipeChanged(false))
+        vm.onEvent(SettingsEvent.ListPaneFractionChanged(0.5f))
+        // Reset to default.
+        vm.onEvent(SettingsEvent.ListPaneFractionChanged(null))
         advanceUntilIdle()
 
         assertEquals(
@@ -151,6 +161,10 @@ class SettingsViewModelTest {
                 permissionsCollapsed = true,
                 updateNotice = UpdateNoticeStyle.Banner,
                 backShowsList = false,
+                unfoldedLayout = UnfoldedLayout.ListPanel,
+                unfoldOpenChat = UnfoldChat.FullScreen,
+                foldOpenChat = FoldChat.ShowList,
+                listSwipe = false,
             ),
             settings.settings.value,
         )

@@ -379,6 +379,33 @@ enum class ChatSwipe {
     Off,
 }
 
+/** How a wide window (an unfolded foldable, a tablet) shows the session list and the open chat. */
+enum class UnfoldedLayout {
+    /** The list beside the chat. */
+    SideBySide,
+
+    /** The chat full screen, as on phones; the list opens over it in a panel. */
+    ListPanel,
+}
+
+/** What a chat open full screen does when the window becomes wide (a foldable unfolded). */
+enum class UnfoldChat {
+    /** It moves beside the session list. */
+    BesideList,
+
+    /** It stays full screen above the list. */
+    FullScreen,
+}
+
+/** What the chat open beside the list does when the window becomes narrow (a foldable folded). */
+enum class FoldChat {
+    /** It stays open, full screen. */
+    KeepChat,
+
+    /** The session list shows; the chat closes. */
+    ShowList,
+}
+
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
@@ -511,6 +538,17 @@ data class AppSettings(
     val updateNotice: UpdateNoticeStyle = UpdateNoticeStyle.Window,
     /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
     val backShowsList: Boolean = true,
+    /** With [splitView]: whether wide windows put the list beside the chat or in a panel over it. */
+    val unfoldedLayout: UnfoldedLayout = UnfoldedLayout.SideBySide,
+    /** With the list beside the chat: what a chat open full screen does when the window widens. */
+    val unfoldOpenChat: UnfoldChat = UnfoldChat.BesideList,
+    /** With the list beside the chat: what the chat beside it does when the window narrows. */
+    val foldOpenChat: FoldChat = FoldChat.KeepChat,
+    /**
+     * With [splitView], on wide windows: a swipe on the chat hides and shows the session list
+     * (beside it, or its panel), whatever [chatSwipe] chooses.
+     */
+    val listSwipe: Boolean = true,
     /** The previews in Settings outline the parts that can be tapped and mark them with a pencil. */
     val showEditMarks: Boolean = true,
     /** How Settings opens: the classic list or the previews of each group. */
@@ -518,6 +556,9 @@ data class AppSettings(
     /** Share of the height the preview takes above its options on narrow screens; 0 hides it, null for the default. */
     val settingsPreviewFraction: Float? = null,
 )
+
+/** Wide windows show the session list beside the chat: [AppSettings.splitView] with [UnfoldedLayout.SideBySide]. */
+val AppSettings.listBesideChat: Boolean get() = splitView && unfoldedLayout == UnfoldedLayout.SideBySide
 
 /** Share of the window width the session list can be given from Settings. */
 val LIST_PANE_FRACTION_RANGE = 0.25f..0.6f

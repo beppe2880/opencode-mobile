@@ -31,6 +31,7 @@
     <string name="oc_area_live">实时活动</string>
     <string name="oc_area_composer">消息框</string>
     <string name="oc_area_sessions">会话</string>
+    <string name="oc_area_large_screens">折叠屏和大屏幕</string>
     <string name="oc_area_terminal">终端</string>
     <string name="oc_area_notifications">通知</string>
     <string name="oc_area_updates">更新</string>

@@ -59,7 +59,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -208,12 +207,12 @@ fun AppNavHost(
     }
 
     // A chat opened full screen while the window was narrow (a folded foldable) moves beside the
-    // list when the window becomes wide again, as if it had been selected there. The list keeps
-    // whether it was hidden; screens above that chat stay until they close.
+    // list when the window becomes wide again, as if it had been selected there, unless Settings
+    // keep it full screen. The list keeps whether it was hidden; screens above that chat stay until they close.
     val appSettings by koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle()
     val density = LocalDensity.current
     var width by remember { mutableStateOf<Dp?>(null) }
-    val split = width?.let { it >= ListDetailMinWidth && appSettings.splitView }
+    val split = width?.let { appSettings.showsSplit(it >= ListDetailMinWidth) }
     var wasSplit by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var waitingForChat by rememberSaveable { mutableStateOf(false) }
     // Handed to the session list, which selects it and clears it.
@@ -224,7 +223,7 @@ fun AppNavHost(
         val widened = now && wasSplit == false
         wasSplit = now
         val top = navController.currentBackStackEntry ?: return@LaunchedEffect
-        val step = splitStep(now, widened, waitingForChat, top.route(), navController.previousBackStackEntry?.route())
+        val step = splitStep(now, widened, waitingForChat, top.route(), navController.previousBackStackEntry?.route(), appSettings.unfoldOpenChat)
         waitingForChat = step.waiting
         step.selectChat?.let {
             pendingSelection = it
@@ -284,7 +283,8 @@ fun AppNavHost(
             // Shares the list's ViewModel with the session list below in the back stack.
             val sessionsEntry = remember(entry) { runCatching { navController.getBackStackEntry(SessionsDestination) }.getOrNull() }
             // Always there, so the chat stays in place when the swipe setting changes: the chat
-            // pulls the drawer only while its live settings choose it.
+            // pulls the drawer only while its live settings choose it, or on wide windows showing
+            // the chat list panel instead of the list beside the chat.
             SessionDrawerHost(
                 currentSessionId = args.sessionId,
                 sessionsOwner = sessionsEntry,
@@ -300,6 +300,8 @@ fun AppNavHost(
                     onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
                     onSwitchSession = switchSession,
                     sessionDrawer = drawer,
+                    // Reads the window width state here, so the choice follows folding and unfolding.
+                    drawerSwipe = appSettings.swipeShowsList(width?.let { it >= ListDetailMinWidth } == true),
                 )
             }
         }
@@ -349,10 +351,11 @@ private fun NavBackStackEntry.route(): Any = when {
 /**
  * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
  * side by side. Tapping the handle on the divider hides the list to give the chat the whole
- * width; dragging it resizes the list, and the share of the width is saved. With the chat list
- * swipe ([ChatSwipe.SessionDrawer]) the chat's swipe hides and shows the list instead, following
- * the finger, and the handle only resizes it. Back shows a hidden list again (unless turned off in
- * Settings) before it leaves the app.
+ * width; dragging it resizes the list, and the share of the width is saved. With the list swipe
+ * ([io.github.beppe2880.opencodemobile.core.domain.AppSettings.listSwipe]) the chat's swipe hides
+ * and shows the list instead, following the finger, whatever the chat swipe choice, and the handle
+ * only resizes it. Back shows a hidden list again (unless turned off in Settings) before it leaves
+ * the app. With the chat list panel chosen for wide windows, this is the phone layout.
  */
 @Composable
 private fun SessionsListDetail(
@@ -388,12 +391,17 @@ private fun SessionsListDetail(
     // Outside the list, which may scroll the banner slot away; the demos never look for updates.
     if (!demo) UpdateSheetRoute()
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        val split = maxWidth >= ListDetailMinWidth && appSettings.splitView
+        val split = appSettings.showsSplit(maxWidth >= ListDetailMinWidth)
         // When the window narrows (a foldable folded) the chat beside the list goes full screen
-        // above it, so Back returns to the list; turning split view off in Settings does not.
+        // above it, so Back returns to the list, or closes, as chosen in Settings; turning the
+        // list beside the chat off in Settings does neither.
         var wasSplit by rememberSaveable { mutableStateOf(split) }
         LaunchedEffect(split) {
-            if (wasSplit && !split && appSettings.splitView && current != null) onOpenChatFullScreen(current)
+            when (foldStep(wasSplit, split, chatOpen = current != null, appSettings)) {
+                FoldStep.OpenFullScreen -> current?.let(onOpenChatFullScreen)
+                FoldStep.CloseChat -> select(null)
+                FoldStep.None -> Unit
+            }
             wasSplit = split
         }
         if (!split) {
@@ -412,9 +420,9 @@ private fun SessionsListDetail(
             var fraction by remember(appSettings.listPaneFraction) { mutableStateOf(appSettings.listPaneFraction) }
             val shownWidth = fraction?.let { (windowWidth * it).coerceIn(ListPaneMinWidth, maxListWidth) }
                 ?: (windowWidth * DEFAULT_LIST_PANE_FRACTION).coerceIn(ListPaneDefaultMinWidth, ListPaneDefaultMaxWidth)
-            // With the chat list swipe, the chat's swipe hides and shows the list instead of the
-            // handle's button; the handle is left only for resizing it.
-            val swipeToggles = appSettings.chatSwipe == ChatSwipe.SessionDrawer
+            // With the list swipe, the chat's swipe hides and shows the list instead of the
+            // handle's button, whatever the chat swipe choice; the handle is left only for resizing it.
+            val swipeToggles = appSettings.swipeShowsList(wide = true)
             // Without the handle, or the chat swiping it, there is no way to bring a hidden list back.
             val hidden = listHidden && (appSettings.listPaneHandle || (swipeToggles && current != null))
             val target = if (hidden) 0.dp else shownWidth
@@ -485,8 +493,9 @@ private fun SessionsListDetail(
                         onOpenTerminal = onOpenTerminal,
                         onOpenFile = onOpenFile,
                         onSwitchSession = select,
-                        // The list is beside the chat: the drawer swipe hides it or pulls it back.
+                        // The list is beside the chat: the swipe hides it or pulls it back.
                         sessionDrawer = swipeList.takeIf { swipeToggles },
+                        drawerSwipe = swipeToggles,
                         modifier = Modifier.weight(1f),
                     )
                 } else {

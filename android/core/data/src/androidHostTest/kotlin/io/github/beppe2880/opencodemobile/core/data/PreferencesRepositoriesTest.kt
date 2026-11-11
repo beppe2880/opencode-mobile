@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
@@ -20,6 +21,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -106,6 +109,10 @@ class PreferencesRepositoriesTest {
             showInShareMenu = false,
             shareOpens = ShareOpens.ChooseChat,
             backShowsList = false,
+            unfoldedLayout = UnfoldedLayout.ListPanel,
+            unfoldOpenChat = UnfoldChat.FullScreen,
+            foldOpenChat = FoldChat.ShowList,
+            listSwipe = false,
             showEditMarks = false,
             settingsStyle = SettingsStyle.Preview,
             settingsPreviewFraction = 0.25f,
@@ -205,6 +212,9 @@ class PreferencesRepositoriesTest {
             .putFloat("settings_preview_fraction", 3f)
             .putString("update_notice", "Popup")
             .putString("tool_media_size", "Huge")
+            .putString("unfolded_layout", "Stacked")
+            .putString("unfold_open_chat", "Maybe")
+            .putString("fold_open_chat", "Close")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
@@ -256,6 +266,34 @@ class PreferencesRepositoriesTest {
             assertEquals(choice != ChatSwipe.Off, prefs.values["swipe_between_chats"])
             assertEquals(choice, PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.chatSwipe)
         }
+    }
+
+    @Test
+    fun `foldable settings keep today's behaviour until changed and are stored under their own keys`() = runBlocking {
+        val defaults = AppSettings()
+        assertEquals(UnfoldedLayout.SideBySide, defaults.unfoldedLayout)
+        assertEquals(UnfoldChat.BesideList, defaults.unfoldOpenChat)
+        assertEquals(FoldChat.KeepChat, defaults.foldOpenChat)
+        assertTrue(defaults.listSwipe)
+
+        val prefs = InMemoryPreferences()
+        // Installs from before the category keep the list options where they were stored.
+        prefs.edit().putBoolean("split_view", false).putBoolean("list_pane_handle", false).putFloat("list_pane_fraction", 0.3f).commit()
+        val upgraded = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value
+        assertEquals(defaults.copy(splitView = false, listPaneHandle = false, listPaneFraction = 0.3f), upgraded)
+
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update {
+            it.copy(unfoldedLayout = UnfoldedLayout.ListPanel, unfoldOpenChat = UnfoldChat.FullScreen, foldOpenChat = FoldChat.ShowList, listSwipe = false)
+        }
+        assertEquals("ListPanel", prefs.values["unfolded_layout"])
+        assertEquals("FullScreen", prefs.values["unfold_open_chat"])
+        assertEquals("ShowList", prefs.values["fold_open_chat"])
+        assertEquals(false, prefs.values["list_swipe"])
+
+        // Reset to default removes the saved width.
+        PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(listPaneFraction = null) }
+        assertFalse(prefs.contains("list_pane_fraction"))
+        assertNull(PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.listPaneFraction)
     }
 
     @Test

@@ -60,6 +60,16 @@ class SettingsSearchTest {
     }
 
     @Test
+    fun foldablesFindTheLargeScreenOptions() {
+        assertEquals(
+            listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout, SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat),
+            search("foldable"),
+        )
+        // Both swipes, the chat's and the one of the list beside it.
+        assertEquals(listOf(SettingOption.SwipeChats, SettingOption.ListSwipe), search("swipe sidebar"))
+    }
+
+    @Test
     fun reasoningFindsTheModelPickerPreference() {
         assertEquals(listOf(SettingOption.CloseModelPickerOnSelect), search("model reasoning"))
     }

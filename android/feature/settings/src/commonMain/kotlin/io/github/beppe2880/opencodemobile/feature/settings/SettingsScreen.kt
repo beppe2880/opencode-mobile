@@ -98,7 +98,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.AreaScreen
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOption
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
 import io.github.beppe2880.opencodemobile.feature.settings.customize.area
-import io.github.beppe2880.opencodemobile.feature.settings.customize.availableIn
 import io.github.beppe2880.opencodemobile.feature.settings.customize.description
 import io.github.beppe2880.opencodemobile.feature.settings.customize.descriptionRes
 import io.github.beppe2880.opencodemobile.feature.settings.customize.group
@@ -169,10 +168,10 @@ fun SettingsScreen(
     val homeState = rememberLazyListState()
     BoxWithConstraints(modifier) {
         val wide = maxWidth >= ListDetailMinWidth
-        // The split view options only do something where the app can show the chat beside the list.
-        val wideWindow = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= SplitViewMinWidth
+        // The large screen options only do something where the app can show the chat beside the list.
+        val wideWindow = isWideWindow()
         val home: @Composable (selected: SettingsArea?, onBack: () -> Unit, homeModifier: Modifier) -> Unit = { selected, onBack, homeModifier ->
-            SettingsHome(state, onEvent, preview, areas, demo, wideWindow, onOpenLiveDemo, homeState, selected, onBack, homeModifier)
+            SettingsHome(state, onEvent, preview, areas, demo, onOpenLiveDemo, homeState, selected, onBack, homeModifier)
         }
         if (list && wide) {
             // Categories on the left, the open one (or the first) on the right; Back leaves Settings.
@@ -240,6 +239,10 @@ private val ListPaneMaxWidth = 360.dp
 /** Matches the width at which the app shows the chat beside the session list. */
 private val SplitViewMinWidth = 600.dp
 
+/** Whether the app window is wide enough for the chat beside the session list (an unfolded foldable, a tablet). */
+@Composable
+internal fun isWideWindow(): Boolean = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= SplitViewMinWidth
+
 /**
  * The first screen of Settings, in the style the user picked at its top, with a search for any
  * category or option under it: in the List style one row per category with its current values;
@@ -253,7 +256,6 @@ private fun SettingsHome(
     preview: AreaPreviewContent,
     areas: List<SettingsArea>,
     demo: Boolean,
-    wideWindow: Boolean,
     onOpenLiveDemo: (() -> Unit)?,
     listState: LazyListState,
     /** The category open beside the list on wide windows. */
@@ -285,7 +287,7 @@ private fun SettingsHome(
             val width = minOf(maxWidth, 840.dp)
             val columns = ((width - OcSpacing.gutter * 2) / AreaCardMinWidth).toInt().coerceIn(2, 4)
             val previewed = areas.filter { SettingsPart.of(it).isNotEmpty() }
-            val results = searchResults(state.query, areas, list, wideWindow)
+            val results = searchResults(state.query, areas)
             LazyColumn(
                 state = listState,
                 modifier = Modifier.widthIn(max = if (list) 640.dp else 840.dp).fillMaxSize().testTag("settings_list"),
@@ -322,7 +324,7 @@ private fun SettingsHome(
                     return@LazyColumn
                 }
                 if (list) {
-                    categoryRows(areas, state, onEvent, wideWindow, demo, selected)
+                    categoryRows(areas, state, onEvent, demo, selected)
                     return@LazyColumn
                 }
                 item(key = "areas_title") { SectionTitle(stringResource(Res.string.settings_areas)) }
@@ -382,11 +384,11 @@ private class SearchHits(val areas: List<SettingsArea>, val options: List<Settin
 
 /**
  * Categories and options matching [query] among [areas], or null while the query is blank.
- * Options are found by their title, description, category, group (List) and part (Preview);
- * in the List style only those its pages can show here ([wideWindow] for the split view).
+ * Options of this platform are found by their title, description, category, group (List) and
+ * part (Preview); the large screen ones also on narrow windows, where their page says when they apply.
  */
 @Composable
-private fun searchResults(query: String, areas: List<SettingsArea>, list: Boolean, wideWindow: Boolean): SearchHits? {
+private fun searchResults(query: String, areas: List<SettingsArea>): SearchHits? {
     if (query.isBlank()) return null
     val areaNames = areas.associateWith { it.label() }
     val areaDescriptions = areas.associateWith { stringResource(it.description) }
@@ -402,7 +404,7 @@ private fun searchResults(query: String, areas: List<SettingsArea>, list: Boolea
     return SearchHits(
         areas = searchAreas(query, areas, { areaNames.getValue(it) }, { areaDescriptions.getValue(it) }),
         options = searchOptions(query, { titles.getValue(it) }, { descriptions.getValue(it) })
-            .filter { it.area in areas && if (list) it.availableIn(wideWindow) else it.supported },
+            .filter { it.area in areas && it.supported },
     )
 }
 

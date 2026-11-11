@@ -121,6 +121,8 @@ fun ChatScreen(
     showBack: Boolean = true,
     /** The host's session list drawer, which [ChatSwipe.SessionDrawer] swipes pull open; null where there is none. */
     sessionDrawer: SessionDrawerPull? = null,
+    /** The swipe pulls [sessionDrawer] whatever [ChatState.swipe] chooses: the session list on wide windows. */
+    drawerSwipe: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     listState: LazyListState = rememberLazyListState(),
     markdownCache: MarkdownCache = rememberMarkdownCache(),
@@ -165,8 +167,8 @@ fun ChatScreen(
                 SessionSwipe(
                     previous = state.previousSession,
                     next = state.nextSession,
-                    // Without a drawer here (the list is beside the chat) the drawer swipe does nothing.
-                    mode = state.swipe,
+                    // Without a drawer here the drawer swipe does nothing.
+                    mode = if (drawerSwipe && sessionDrawer != null) ChatSwipe.SessionDrawer else state.swipe,
                     drawer = sessionDrawer,
                     onSwitch = { onEvent(ChatEvent.SwitchSession(it)) },
                     modifier = Modifier.weight(1f).fillMaxWidth(),

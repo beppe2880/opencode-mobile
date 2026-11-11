@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
+import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.LIST_PANE_FRACTION_RANGE
 import io.github.beppe2880.opencodemobile.core.domain.LIVE_INTERVAL_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
@@ -26,6 +27,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -52,6 +55,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_di
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_dictation_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_expand_tools_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fold_open_chat
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fold_open_chat_keep
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fold_open_chat_list
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_fold_open_chat_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_follow_running_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_full_commands
@@ -82,7 +89,10 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ke
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_swipe
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_swipe_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width_reset
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_width_value
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits
@@ -172,6 +182,16 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_to
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_medium
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_small
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_tool_media_size_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfold_open_chat
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfold_open_chat_beside
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfold_open_chat_full
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfold_open_chat_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_panel
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_panel_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_side
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_side_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner_sub
@@ -251,6 +271,10 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ListWidth -> Res.string.settings_list_width
         SettingOption.ListHandle -> Res.string.settings_list_handle
         SettingOption.BackShowsList -> Res.string.settings_back_shows_list
+        SettingOption.UnfoldedLayout -> Res.string.settings_unfolded_layout
+        SettingOption.UnfoldOpenChat -> Res.string.settings_unfold_open_chat
+        SettingOption.FoldOpenChat -> Res.string.settings_fold_open_chat
+        SettingOption.ListSwipe -> Res.string.settings_list_swipe
         SettingOption.TerminalKeys -> Res.string.settings_terminal_keys
         SettingOption.TerminalKeyboard -> Res.string.settings_terminal_keyboard
         SettingOption.TerminalFullscreen -> Res.string.settings_terminal_fullscreen
@@ -311,6 +335,10 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ListWidth -> Res.string.settings_list_width_sub
         SettingOption.ListHandle -> Res.string.settings_list_handle_sub
         SettingOption.BackShowsList -> Res.string.settings_back_shows_list_sub
+        SettingOption.UnfoldedLayout -> Res.string.settings_unfolded_layout_sub
+        SettingOption.UnfoldOpenChat -> Res.string.settings_unfold_open_chat_sub
+        SettingOption.FoldOpenChat -> Res.string.settings_fold_open_chat_sub
+        SettingOption.ListSwipe -> Res.string.settings_list_swipe_sub
         SettingOption.TerminalKeys -> Res.string.settings_terminal_keys_sub
         SettingOption.TerminalKeyboard -> Res.string.settings_terminal_keyboard_sub
         SettingOption.TerminalFullscreen -> Res.string.settings_terminal_fullscreen_sub
@@ -530,7 +558,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             onSelect = { onEvent(SettingsEvent.ChatSwipeChanged(it)) },
         )
         SettingOption.SplitView -> switch(settings.splitView, SettingsEvent::SplitViewChanged)()
-        SettingOption.ListWidth -> {
+        SettingOption.ListWidth -> androidx.compose.foundation.layout.Column(modifier) {
             val fraction = settings.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION
             OcSliderRow(
                 title = title,
@@ -541,11 +569,59 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
                 // 5% steps.
                 steps = ((LIST_PANE_FRACTION_RANGE.endInclusive - LIST_PANE_FRACTION_RANGE.start) * 20).roundToInt() - 1,
                 valueLabel = stringResource(Res.string.settings_list_width_value, (fraction * 100).roundToInt()),
-                modifier = modifier.testTag("settings_list_width_slider"),
+                modifier = Modifier.testTag("settings_list_width_slider"),
+            )
+            // Also changed by dragging the divider; the default follows the window width within bounds.
+            OcButton(
+                text = stringResource(Res.string.settings_list_width_reset),
+                onClick = { onEvent(SettingsEvent.ListPaneFractionChanged(null)) },
+                variant = OcButtonVariant.Secondary,
+                compact = true,
+                enabled = settings.listPaneFraction != null,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = OcSpacing.sm, bottom = OcSpacing.sm)
+                    .testTag("settings_list_width_reset"),
             )
         }
+        SettingOption.UnfoldedLayout -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.unfoldedLayout) {
+                    UnfoldedLayout.SideBySide -> Res.string.settings_unfolded_layout_side_sub
+                    UnfoldedLayout.ListPanel -> Res.string.settings_unfolded_layout_panel_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(UnfoldedLayout.SideBySide, stringResource(Res.string.settings_unfolded_layout_side), "settings_unfolded_layout_side"),
+                OcSegment(UnfoldedLayout.ListPanel, stringResource(Res.string.settings_unfolded_layout_panel), "settings_unfolded_layout_panel"),
+            ),
+            selected = settings.unfoldedLayout,
+            onSelect = { onEvent(SettingsEvent.UnfoldedLayoutChanged(it)) },
+        )
+        SettingOption.UnfoldOpenChat -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(UnfoldChat.BesideList, stringResource(Res.string.settings_unfold_open_chat_beside), "settings_unfold_open_chat_beside"),
+                OcSegment(UnfoldChat.FullScreen, stringResource(Res.string.settings_unfold_open_chat_full), "settings_unfold_open_chat_full"),
+            ),
+            selected = settings.unfoldOpenChat,
+            onSelect = { onEvent(SettingsEvent.UnfoldOpenChatChanged(it)) },
+        )
+        SettingOption.FoldOpenChat -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(FoldChat.KeepChat, stringResource(Res.string.settings_fold_open_chat_keep), "settings_fold_open_chat_keep"),
+                OcSegment(FoldChat.ShowList, stringResource(Res.string.settings_fold_open_chat_list), "settings_fold_open_chat_list"),
+            ),
+            selected = settings.foldOpenChat,
+            onSelect = { onEvent(SettingsEvent.FoldOpenChatChanged(it)) },
+        )
         SettingOption.ListHandle -> switch(settings.listPaneHandle, SettingsEvent::ListPaneHandleChanged)()
         SettingOption.BackShowsList -> switch(settings.backShowsList, SettingsEvent::BackShowsListChanged)()
+        SettingOption.ListSwipe -> switch(settings.listSwipe, SettingsEvent::ListSwipeChanged)()
         SettingOption.TerminalKeys -> Row(
             modifier = modifier
                 .fillMaxWidth()
@@ -642,6 +718,10 @@ private val SettingOption.tag: String
         SettingOption.SplitView -> "split_view"
         SettingOption.ListHandle -> "list_handle"
         SettingOption.BackShowsList -> "back_shows_list"
+        SettingOption.UnfoldedLayout -> "unfolded_layout"
+        SettingOption.UnfoldOpenChat -> "unfold_open_chat"
+        SettingOption.FoldOpenChat -> "fold_open_chat"
+        SettingOption.ListSwipe -> "list_swipe"
         SettingOption.TerminalKeyboard -> "terminal_keyboard"
         SettingOption.TerminalFullscreen -> "terminal_fullscreen"
         SettingOption.Notifications -> "notifications"

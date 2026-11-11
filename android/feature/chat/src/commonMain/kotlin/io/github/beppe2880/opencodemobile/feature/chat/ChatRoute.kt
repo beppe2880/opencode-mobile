@@ -47,6 +47,8 @@ fun ChatRoute(
     onSwitchSession: (String) -> Unit = {},
     /** The session list drawer over the chat, pulled by a swipe when chosen in Settings; null where there is none. */
     sessionDrawer: SessionDrawerPull? = null,
+    /** The swipe pulls [sessionDrawer] whatever the chat swipe chosen in Settings (wide windows). */
+    drawerSwipe: Boolean = false,
     /** Opens a shell in the folder of the session. */
     onOpenTerminal: (String) -> Unit = {},
     /** Opens a file read-only: the session folder and the path, absolute or relative to it. */
@@ -217,6 +219,7 @@ fun ChatRoute(
         onHoldVoice = { startCloud(VoiceInputEvent.Hold) },
         showBack = showBack,
         sessionDrawer = sessionDrawer,
+        drawerSwipe = drawerSwipe,
         snackbarHostState = snackbar,
         listState = listState,
         onShare = share,

@@ -77,8 +77,10 @@ import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.feature.settings.NarrowWindowNote
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsEvent
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
+import io.github.beppe2880.opencodemobile.feature.settings.isWideWindow
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_marks_hide
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_marks_show
@@ -356,6 +358,7 @@ private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (Sett
                 .padding(start = OcSpacing.xs, top = OcSpacing.sm)
                 .semantics { heading() },
         )
+        if (part.area == SettingsArea.LargeScreens && !isWideWindow()) NarrowWindowNote()
         PartOptionsCard(part, state, onEvent, highlighted = selected)
     }
 }

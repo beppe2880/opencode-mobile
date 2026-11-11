@@ -31,6 +31,7 @@
     <string name="oc_area_live">실시간 활동</string>
     <string name="oc_area_composer">메시지 상자</string>
     <string name="oc_area_sessions">세션</string>
+    <string name="oc_area_large_screens">폴더블 및 대형 화면</string>
     <string name="oc_area_terminal">터미널</string>
     <string name="oc_area_notifications">알림</string>
     <string name="oc_area_updates">업데이트</string>

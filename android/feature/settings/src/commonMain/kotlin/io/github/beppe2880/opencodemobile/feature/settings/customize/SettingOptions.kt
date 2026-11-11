@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.domain.listBesideChat
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 
 /**
@@ -57,9 +58,15 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     RunningInList(listOf("showRunningWorkInList")),
     SwipeChats(listOf("chatSwipe")),
     SplitView(listOf("splitView")),
-    ListWidth(listOf("listPaneFraction"), requires = SplitView),
-    ListHandle(listOf("listPaneHandle"), requires = SplitView),
+
+    /** Its panel choice turns off the options of the list beside the chat. */
+    UnfoldedLayout(listOf("unfoldedLayout"), requires = SplitView),
+    ListWidth(listOf("listPaneFraction"), requires = UnfoldedLayout),
+    ListHandle(listOf("listPaneHandle"), requires = UnfoldedLayout),
     BackShowsList(listOf("backShowsList"), requires = ListHandle),
+    UnfoldOpenChat(listOf("unfoldOpenChat"), requires = UnfoldedLayout),
+    FoldOpenChat(listOf("foldOpenChat"), requires = UnfoldedLayout),
+    ListSwipe(listOf("listSwipe"), requires = SplitView),
     TerminalKeys(listOf("terminalKeys")),
     TerminalKeyboard(listOf("terminalOpenKeyboard")),
     TerminalFullscreen(listOf("terminalFullscreenByDefault")),
@@ -126,7 +133,7 @@ val SettingsPart.options: List<SettingOption>
         // The running work the rows count, and stopping it.
         SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats)
-        SettingsPart.SplitView -> listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList)
+        SettingsPart.SplitView -> LARGE_SCREEN_OPTIONS
         SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard)
         SettingsPart.TerminalKeyboard -> listOf(SettingOption.TerminalKeyboard)
         SettingsPart.TerminalFullscreen -> listOf(SettingOption.TerminalFullscreen)
@@ -149,6 +156,18 @@ val VOICE_OPTIONS: List<SettingOption> = listOf(
     SettingOption.VoiceHold,
 )
 
+/** The list beside the chat, folding and unfolding, the divider and the swipe, in the order Settings lists them. */
+val LARGE_SCREEN_OPTIONS: List<SettingOption> = listOf(
+    SettingOption.SplitView,
+    SettingOption.UnfoldedLayout,
+    SettingOption.ListWidth,
+    SettingOption.UnfoldOpenChat,
+    SettingOption.FoldOpenChat,
+    SettingOption.ListHandle,
+    SettingOption.BackShowsList,
+    SettingOption.ListSwipe,
+)
+
 /**
  * Whether the option changes anything with [settings]: a folder path alone has no style and is
  * not a line to tap, and the kinds of a switched off feature are hidden. [notificationsOn] is the
@@ -160,8 +179,9 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.LiveReads, SettingOption.LiveOther,
     -> settings.followRunningTools
     SettingOption.LiveInterval -> settings.followRunningTools && settings.liveShell
-    SettingOption.ListWidth, SettingOption.ListHandle -> settings.splitView
-    SettingOption.BackShowsList -> settings.splitView && settings.listPaneHandle
+    SettingOption.UnfoldedLayout, SettingOption.ListSwipe -> settings.splitView
+    SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat -> settings.listBesideChat
+    SettingOption.BackShowsList -> settings.listBesideChat && settings.listPaneHandle
     SettingOption.NotifyPermissions, SettingOption.NotifyQuestions, SettingOption.NotifyFinished -> notificationsOn
     SettingOption.VoiceMode -> settings.dictation
     SettingOption.VoiceProvider, SettingOption.VoiceModel, SettingOption.VoiceKey, SettingOption.VoiceLanguage,
@@ -180,6 +200,9 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
         SettingOption.CloseModelPickerOnSelect -> listOf("model", "picker", "reasoning", "default", "close")
         SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
+        SettingOption.SplitView, SettingOption.UnfoldedLayout -> listOf("split", "tablet", "foldable", "wide", "sidebar")
+        SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat -> listOf("fold", "unfold", "foldable", "split")
+        SettingOption.ListSwipe -> listOf("swipe", "gesture", "sidebar", "split")
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
         else -> emptyList()
