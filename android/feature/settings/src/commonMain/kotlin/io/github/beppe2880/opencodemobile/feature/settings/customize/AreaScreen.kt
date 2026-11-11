@@ -78,7 +78,7 @@ import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
-import io.github.beppe2880.opencodemobile.feature.settings.NarrowWindowNote
+import io.github.beppe2880.opencodemobile.feature.settings.LargeScreensNotice
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsEvent
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.isWideWindow
@@ -362,7 +362,7 @@ private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (Sett
                 .padding(start = OcSpacing.xs, top = OcSpacing.sm)
                 .semantics { heading() },
         )
-        if (part.area == SettingsArea.LargeScreens && !isWideWindow()) NarrowWindowNote()
+        if (part.area == SettingsArea.LargeScreens) LargeScreensNotice(screen, isWideWindow())
         PartOptionsCard(part, state, onEvent, screen, highlighted = selected)
     }
 }

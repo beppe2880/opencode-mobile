@@ -277,6 +277,8 @@
     <string name="settings_list_swipe">スワイプでリストを隠す・表示</string>
     <string name="settings_list_swipe_sub">ワイド画面では、チャットを左にスワイプしてセッション一覧を隠し、右にスワイプして表示します。チャットのスワイプ動作には関係ありません</string>
     <string name="settings_large_screens_narrow">これらの設定は、折りたたみ端末を展開したときやタブレットなど、画面が広い場合に適用されます</string>
+    <string name="settings_unfold_prompt_title">展開して完全な体験を</string>
+    <string name="settings_unfold_prompt_body">これらの設定は、大画面でのアプリの表示を決めます。端末を展開して、その効果をご確認ください。</string>
     <string name="settings_demo_server">デモ</string>
     <string name="settings_demo_server_hint">サンプルセッション · サーバーなし</string>
     <string name="settings_theme_sub">アプリ全体の配色</string>

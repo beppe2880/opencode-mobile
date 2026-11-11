@@ -280,6 +280,8 @@
     <string name="settings_list_swipe">Balayer pour masquer et afficher la liste</string>
     <string name="settings_list_swipe_sub">Sur les grands écrans, balayez vers la gauche sur le chat pour masquer la liste des sessions et vers la droite pour l'afficher, quelle que soit l'action de balayage du chat</string>
     <string name="settings_large_screens_narrow">Ces réglages s'appliquent lorsque l'écran est large, comme un pliable déplié ou une tablette</string>
+    <string name="settings_unfold_prompt_title">Dépliez pour profiter de l'expérience complète</string>
+    <string name="settings_unfold_prompt_body">Ces réglages façonnent l'application sur grand écran. Dépliez votre téléphone pour les voir en action.</string>
     <string name="settings_demo_server">Démo</string>
     <string name="settings_demo_server_hint">Sessions d'exemple · aucun serveur</string>
     <string name="settings_theme_sub">Couleurs de toute l’application</string>

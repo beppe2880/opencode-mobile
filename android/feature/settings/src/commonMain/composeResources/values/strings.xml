@@ -280,6 +280,8 @@
     <string name="settings_list_swipe">Swipe to hide and show the list</string>
     <string name="settings_list_swipe_sub">On wide screens, swipe left on the chat to hide the session list and right to show it, whatever the chat swipe does</string>
     <string name="settings_large_screens_narrow">These settings apply when the screen is wide, like an unfolded foldable or a tablet</string>
+    <string name="settings_unfold_prompt_title">Unfold for the full experience</string>
+    <string name="settings_unfold_prompt_body">These settings shape the app on the big screen. Unfold your phone to see them in action.</string>
     <string name="settings_demo_server">Demo</string>
     <string name="settings_demo_server_hint">Sample sessions · no server</string>
     <string name="settings_theme_sub">Colors of the whole app</string>

@@ -280,6 +280,8 @@
     <string name="settings_list_swipe">Scorri per nascondere e mostrare l'elenco</string>
     <string name="settings_list_swipe_sub">Sugli schermi larghi, scorri a sinistra sulla chat per nascondere l'elenco delle sessioni e a destra per mostrarlo, qualunque cosa faccia lo scorrimento della chat</string>
     <string name="settings_large_screens_narrow">Queste impostazioni si applicano quando lo schermo è largo, come un pieghevole aperto o un tablet</string>
+    <string name="settings_unfold_prompt_title">Apri per l'esperienza completa</string>
+    <string name="settings_unfold_prompt_body">Queste impostazioni definiscono come appare l'app sullo schermo grande. Apri il telefono per vederle in azione.</string>
     <string name="settings_demo_server">Demo</string>
     <string name="settings_demo_server_hint">Sessioni di esempio · nessun server</string>
     <string name="settings_theme_sub">Colori dell'intera app</string>

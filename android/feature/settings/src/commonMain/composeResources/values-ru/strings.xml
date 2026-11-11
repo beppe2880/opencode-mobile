@@ -286,6 +286,8 @@
     <string name="settings_list_swipe">Свайп, чтобы скрывать и показывать список</string>
     <string name="settings_list_swipe_sub">На широких экранах свайп влево по чату скрывает список сессий, а вправо показывает его, независимо от действия свайпа в чате</string>
     <string name="settings_large_screens_narrow">Эти настройки действуют, когда экран широкий, например у раскрытого складного устройства или планшета</string>
+    <string name="settings_unfold_prompt_title">Раскройте для полного опыта</string>
+    <string name="settings_unfold_prompt_body">Эти настройки определяют работу приложения на большом экране. Раскройте телефон, чтобы увидеть их в действии.</string>
     <string name="settings_demo_server">Демо</string>
     <string name="settings_demo_server_hint">Примеры сессий · без сервера</string>
     <string name="settings_theme_sub">Цвета всего приложения</string>

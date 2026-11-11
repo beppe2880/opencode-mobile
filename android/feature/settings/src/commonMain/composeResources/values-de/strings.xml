@@ -280,6 +280,8 @@
     <string name="settings_list_swipe">Liste mit Wischen ein- und ausblenden</string>
     <string name="settings_list_swipe_sub">Auf großen Bildschirmen die Sitzungsliste mit Wischen nach links auf dem Chat ausblenden und mit Wischen nach rechts einblenden, unabhängig von der Wischaktion im Chat</string>
     <string name="settings_large_screens_narrow">Diese Einstellungen gelten bei breitem Bildschirm, etwa bei einem entfalteten Falt-Gerät oder einem Tablet</string>
+    <string name="settings_unfold_prompt_title">Zum vollen Erlebnis entfalten</string>
+    <string name="settings_unfold_prompt_body">Diese Einstellungen gestalten die App auf dem großen Bildschirm. Entfalte dein Telefon, um sie in Aktion zu sehen.</string>
     <string name="settings_demo_server">Demo</string>
     <string name="settings_demo_server_hint">Beispielsitzungen · kein Server</string>
     <string name="settings_theme_sub">Farben der gesamten App</string>

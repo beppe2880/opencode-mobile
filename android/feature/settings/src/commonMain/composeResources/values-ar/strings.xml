@@ -292,6 +292,8 @@
     <string name="settings_list_swipe">التمرير لإخفاء القائمة وإظهارها</string>
     <string name="settings_list_swipe_sub">على الشاشات العريضة، مرّر يمينًا على المحادثة لإخفاء قائمة الجلسات ويسارًا لإظهارها، بغض النظر عن إجراء التمرير في المحادثة</string>
     <string name="settings_large_screens_narrow">تُطبَّق هذه الإعدادات عند اتساع الشاشة، مثل جهاز قابل للطي مفتوح أو جهاز لوحي</string>
+    <string name="settings_unfold_prompt_title">افرد جهازك للحصول على التجربة الكاملة</string>
+    <string name="settings_unfold_prompt_body">تُحدِّد هذه الإعدادات شكل التطبيق على الشاشة الكبيرة. افرد هاتفك لترى تأثيرها في العمل.</string>
     <string name="settings_demo_server">تجريبي</string>
     <string name="settings_demo_server_hint">جلسات تجريبية · بدون خادم</string>
     <string name="settings_theme_sub">ألوان التطبيق بأكمله</string>

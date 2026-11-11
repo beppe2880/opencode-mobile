@@ -254,7 +254,7 @@ private fun CategoryOptions(
         highlight.animateTo(0f, tween(HIGHLIGHT_FADE_MS))
     }
     Column(Modifier.onGloballyPositioned { page = it }) {
-        if (area == SettingsArea.LargeScreens && !wide) NarrowWindowNote(Modifier.padding(bottom = OcSpacing.lg))
+        if (area == SettingsArea.LargeScreens) LargeScreensNotice(screen, wide, Modifier.padding(bottom = OcSpacing.lg))
         visibleGroups(area, state.settings, state.notificationsOn, screen).forEach { group ->
             val content: @Composable () -> Unit = {
                 OcCard {
@@ -287,7 +287,7 @@ private fun CategoryOptions(
     }
 }
 
-/** On a narrow window (a folded foldable, a tablet in split screen): the large screen options wait for a wide one. */
+/** On a narrow window that unfolding would not widen (a tablet in split screen): the large screen options wait for a wide one. */
 @Composable
 internal fun NarrowWindowNote(modifier: Modifier = Modifier) {
     val c = OcTheme.colors

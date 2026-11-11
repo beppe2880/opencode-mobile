@@ -277,6 +277,8 @@
     <string name="settings_list_swipe">스와이프로 목록 숨기기와 표시</string>
     <string name="settings_list_swipe_sub">넓은 화면에서 채팅을 왼쪽으로 스와이프하면 세션 목록이 숨겨지고, 오른쪽으로 스와이프하면 다시 표시됩니다. 채팅의 스와이프 동작과는 무관합니다</string>
     <string name="settings_large_screens_narrow">이 설정은 펼쳐진 폴더블이나 태블릿처럼 화면이 넓을 때 적용됩니다</string>
+    <string name="settings_unfold_prompt_title">펼치면 전체 경험을 할 수 있어요</string>
+    <string name="settings_unfold_prompt_body">이 설정은 큰 화면에서 앱의 모습을 결정합니다. 기기를 펼쳐서 직접 확인해 보세요.</string>
     <string name="settings_demo_server">데모</string>
     <string name="settings_demo_server_hint">샘플 세션 · 서버 없음</string>
     <string name="settings_theme_sub">앱 전체의 색상</string>

@@ -280,6 +280,8 @@
     <string name="settings_list_swipe">Deslize para ocultar e mostrar a lista</string>
     <string name="settings_list_swipe_sub">Em telas largas, deslize para a esquerda no chat para ocultar a lista de sessões e para a direita para mostrá-la, independentemente do que o deslizar do chat faz</string>
     <string name="settings_large_screens_narrow">Estas configurações valem quando a tela é larga, como em um dobrável desdobrado ou em um tablet</string>
+    <string name="settings_unfold_prompt_title">Desdobre para a experiência completa</string>
+    <string name="settings_unfold_prompt_body">Essas configurações definem como o app aparece na tela grande. Desdobre o celular para ver isso em ação.</string>
     <string name="settings_demo_server">Demo</string>
     <string name="settings_demo_server_hint">Sessões de exemplo · sem servidor</string>
     <string name="settings_theme_sub">Cores de todo o app</string>

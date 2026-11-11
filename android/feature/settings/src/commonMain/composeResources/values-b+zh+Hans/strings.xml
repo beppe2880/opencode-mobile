@@ -277,6 +277,8 @@
     <string name="settings_list_swipe">滑动以隐藏和显示列表</string>
     <string name="settings_list_swipe_sub">在宽屏上，在聊天中向左滑动可隐藏会话列表，向右滑动可显示，与聊天的滑动功能无关</string>
     <string name="settings_large_screens_narrow">这些设置在屏幕较宽时生效，例如展开的折叠屏或平板</string>
+    <string name="settings_unfold_prompt_title">展开以获得完整体验</string>
+    <string name="settings_unfold_prompt_body">这些设置会影响应用在大屏幕上的呈现。展开手机即可看到实际效果。</string>
     <string name="settings_demo_server">演示</string>
     <string name="settings_demo_server_hint">示例会话 · 无服务器</string>
     <string name="settings_theme_sub">应用的整体颜色</string>
