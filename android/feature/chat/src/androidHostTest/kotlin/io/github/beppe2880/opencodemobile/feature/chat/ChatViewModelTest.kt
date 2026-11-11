@@ -46,6 +46,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.ToolFile
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
@@ -944,6 +945,22 @@ class ChatViewModelTest {
         advanceUntilIdle()
         assertTrue(effects.isEmpty())
         collector.cancel()
+    }
+
+    @Test
+    fun `the swipe sensitivity follows the setting while the chat is open`() = runTest(main.testDispatcher) {
+        assertEquals(SwipeSensitivity.Medium, AppSettings().swipeSensitivity)
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(SwipeSensitivity.Medium, vm.state.value.swipeSensitivity)
+
+        settings.settings.value = AppSettings(swipeSensitivity = SwipeSensitivity.High)
+        advanceUntilIdle()
+        assertEquals(SwipeSensitivity.High, vm.state.value.swipeSensitivity)
+
+        settings.settings.value = AppSettings(swipeSensitivity = SwipeSensitivity.Low)
+        advanceUntilIdle()
+        assertEquals(SwipeSensitivity.Low, vm.state.value.swipeSensitivity)
     }
 
     @Test

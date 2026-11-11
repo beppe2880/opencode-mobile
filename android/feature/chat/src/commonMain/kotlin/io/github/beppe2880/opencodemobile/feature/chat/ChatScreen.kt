@@ -172,6 +172,7 @@ fun ChatScreen(
                     drawer = sessionDrawer,
                     onSwitch = { onEvent(ChatEvent.SwitchSession(it)) },
                     modifier = Modifier.weight(1f).fillMaxWidth(),
+                    sensitivity = state.swipeSensitivity,
                 ) {
                     when {
                         state.loading -> TranscriptSkeleton()

@@ -135,7 +135,7 @@ val SettingsArea.groups: List<OptionGroup>
             OptionGroup(UiRes.string.oc_part_header, listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)),
             OptionGroup(UiRes.string.oc_part_pending, listOf(SettingOption.QuestionsCollapsed, SettingOption.PermissionsCollapsed)),
             OptionGroup(UiRes.string.oc_part_running_line, listOf(SettingOption.RunningChips)),
-            OptionGroup(Res.string.settings_group_gestures, listOf(SettingOption.SwipeChats)),
+            OptionGroup(Res.string.settings_group_gestures, listOf(SettingOption.SwipeChats, SettingOption.SwipeSensitivity)),
         )
         SettingsArea.LiveActivity -> listOf(
             OptionGroup(

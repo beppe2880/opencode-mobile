@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Desativado</string>
     <string name="settings_swipe_chats_drawer_sub">Deslize para a direita em uma conversa para mostrar a lista de conversas sobre ela; toque em uma conversa para abri-la</string>
     <string name="settings_swipe_chats_off_sub">Deslizar para os lados em uma conversa não faz nada</string>
+    <string name="settings_swipe_sensitivity">Sensibilidade do deslize</string>
+    <string name="settings_swipe_sensitivity_low">Baixa</string>
+    <string name="settings_swipe_sensitivity_medium">Média</string>
+    <string name="settings_swipe_sensitivity_high">Alta</string>
+    <string name="settings_swipe_sensitivity_low_sub">Um deslize longo e claramente lateral abre ou fecha a lista de conversas, para que a rolagem não faça isso</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Deslize além da metade da lista de conversas, ou dê um toque rápido, para abri-la ou fechá-la</string>
+    <string name="settings_swipe_sensitivity_high_sub">Um deslize curto ou suave abre ou fecha a lista de conversas</string>
     <string name="settings_group_activity">Agrupar raciocínio e ferramentas</string>
     <string name="settings_group_activity_sub">Mostrar raciocínios e chamadas de ferramentas consecutivos em uma única linha</string>
     <string name="settings_group_thoughts">Agrupar raciocínios consecutivos</string>

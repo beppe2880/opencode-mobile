@@ -16,6 +16,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
@@ -77,6 +78,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_CHAT_SWIPE, next.chatSwipe.name)
         // Kept for older versions of the app, which only had the switch.
         prefs.putBoolean(KEY_SWIPE_CHATS, next.chatSwipe != ChatSwipe.Off)
+        prefs.putString(KEY_SWIPE_SENSITIVITY, next.swipeSensitivity.name)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
@@ -160,6 +162,8 @@ internal class PreferencesSettingsRepository(
             chatSwipe = ChatSwipe.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_CHAT_SWIPE) }
                 // Before the choice there was a switch: off stays off.
                 ?: if (prefs.getBooleanOrNull(KEY_SWIPE_CHATS) == false) ChatSwipe.Off else defaults.chatSwipe,
+            swipeSensitivity = SwipeSensitivity.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SWIPE_SENSITIVITY) }
+                ?: defaults.swipeSensitivity,
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
@@ -249,6 +253,7 @@ internal class PreferencesSettingsRepository(
         /** The former "Swipe between chats" switch; false reads as [ChatSwipe.Off] until a choice is written. */
         const val KEY_SWIPE_CHATS = "swipe_between_chats"
         const val KEY_CHAT_SWIPE = "chat_swipe"
+        const val KEY_SWIPE_SENSITIVITY = "swipe_sensitivity"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
         const val KEY_RUNNING_CHIPS = "running_chips"

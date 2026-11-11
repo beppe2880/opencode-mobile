@@ -24,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
@@ -160,6 +161,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sw
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_chats_switch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_high
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_high_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_low
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_low_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_medium
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_swipe_sensitivity_medium_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_fullscreen_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_terminal_keyboard
@@ -267,6 +275,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ShareOpens -> Res.string.settings_share_opens
         SettingOption.RunningInList -> Res.string.settings_running_in_list
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats
+        SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity
         SettingOption.SplitView -> Res.string.settings_split_view
         SettingOption.ListWidth -> Res.string.settings_list_width
         SettingOption.ListHandle -> Res.string.settings_list_handle
@@ -331,6 +340,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ShareOpens -> Res.string.settings_share_opens_sub
         SettingOption.RunningInList -> Res.string.settings_running_in_list_sub
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats_sub
+        SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity_medium_sub
         SettingOption.SplitView -> Res.string.settings_split_view_sub
         SettingOption.ListWidth -> Res.string.settings_list_width_sub
         SettingOption.ListHandle -> Res.string.settings_list_handle_sub
@@ -557,6 +567,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             selected = settings.chatSwipe,
             onSelect = { onEvent(SettingsEvent.ChatSwipeChanged(it)) },
         )
+        SettingOption.SwipeSensitivity -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.swipeSensitivity) {
+                    SwipeSensitivity.Low -> Res.string.settings_swipe_sensitivity_low_sub
+                    SwipeSensitivity.Medium -> Res.string.settings_swipe_sensitivity_medium_sub
+                    SwipeSensitivity.High -> Res.string.settings_swipe_sensitivity_high_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(SwipeSensitivity.Low, stringResource(Res.string.settings_swipe_sensitivity_low), "settings_swipe_sensitivity_low"),
+                OcSegment(SwipeSensitivity.Medium, stringResource(Res.string.settings_swipe_sensitivity_medium), "settings_swipe_sensitivity_medium"),
+                OcSegment(SwipeSensitivity.High, stringResource(Res.string.settings_swipe_sensitivity_high), "settings_swipe_sensitivity_high"),
+            ),
+            selected = settings.swipeSensitivity,
+            onSelect = { onEvent(SettingsEvent.SwipeSensitivityChanged(it)) },
+        )
         SettingOption.SplitView -> switch(settings.splitView, SettingsEvent::SplitViewChanged)()
         SettingOption.ListWidth -> androidx.compose.foundation.layout.Column(modifier) {
             val fraction = settings.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION
@@ -715,6 +742,7 @@ private val SettingOption.tag: String
         SettingOption.RunningInList -> "running_in_list"
         SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"
+        SettingOption.SwipeSensitivity -> "swipe_sensitivity"
         SettingOption.SplitView -> "split_view"
         SettingOption.ListHandle -> "list_handle"
         SettingOption.BackShowsList -> "back_shows_list"

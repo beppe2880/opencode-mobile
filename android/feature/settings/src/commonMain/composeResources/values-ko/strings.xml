@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">끔</string>
     <string name="settings_swipe_chats_drawer_sub">채팅에서 오른쪽으로 스와이프하면 그 위에 채팅 목록이 표시됩니다. 채팅을 탭하면 열립니다</string>
     <string name="settings_swipe_chats_off_sub">채팅에서 좌우로 스와이프해도 아무 일도 일어나지 않습니다</string>
+    <string name="settings_swipe_sensitivity">스와이프 민감도</string>
+    <string name="settings_swipe_sensitivity_low">낮음</string>
+    <string name="settings_swipe_sensitivity_medium">보통</string>
+    <string name="settings_swipe_sensitivity_high">높음</string>
+    <string name="settings_swipe_sensitivity_low_sub">길고 뚜렷하게 옆으로 스와이프해야 채팅 목록이 열리거나 닫혀서, 스크롤할 때는 열리지 않습니다</string>
+    <string name="settings_swipe_sensitivity_medium_sub">채팅 목록의 절반이 넘도록 스와이프하거나 빠르게 튕기듯 스와이프하면 열리거나 닫힙니다</string>
+    <string name="settings_swipe_sensitivity_high_sub">짧거나 가볍게 스와이프하면 채팅 목록이 열리거나 닫힙니다</string>
     <string name="settings_group_activity">생각과 도구 묶기</string>
     <string name="settings_group_activity_sub">연속된 생각과 도구 호출을 하나의 행으로 표시</string>
     <string name="settings_group_thoughts">연속된 생각 묶기</string>

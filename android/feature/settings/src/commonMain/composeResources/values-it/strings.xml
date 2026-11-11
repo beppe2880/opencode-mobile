@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Disattivato</string>
     <string name="settings_swipe_chats_drawer_sub">Scorri verso destra su una chat per mostrare sopra di essa l’elenco delle chat; tocca una chat per aprirla</string>
     <string name="settings_swipe_chats_off_sub">Scorrere di lato su una chat non fa nulla</string>
+    <string name="settings_swipe_sensitivity">Sensibilità dello scorrimento</string>
+    <string name="settings_swipe_sensitivity_low">Bassa</string>
+    <string name="settings_swipe_sensitivity_medium">Media</string>
+    <string name="settings_swipe_sensitivity_high">Alta</string>
+    <string name="settings_swipe_sensitivity_low_sub">Solo uno scorrimento lungo e chiaramente laterale apre o chiude l’elenco chat, così lo scorrimento normale non lo attiva</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Scorri oltre metà dell’elenco chat, o con un gesto rapido, per aprirlo o chiuderlo</string>
+    <string name="settings_swipe_sensitivity_high_sub">Uno scorrimento breve o leggero apre o chiude l’elenco chat</string>
     <string name="settings_group_activity">Raggruppa ragionamento e strumenti</string>
     <string name="settings_group_activity_sub">Mostra in un'unica riga i ragionamenti e le chiamate agli strumenti senza testo in mezzo</string>
     <string name="settings_group_thoughts">Raggruppa ragionamenti consecutivi</string>

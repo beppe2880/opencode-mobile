@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Desactivado</string>
     <string name="settings_swipe_chats_drawer_sub">Desliza a la derecha en un chat para mostrar la lista de chats encima; toca un chat para abrirlo</string>
     <string name="settings_swipe_chats_off_sub">Deslizar de lado en un chat no hace nada</string>
+    <string name="settings_swipe_sensitivity">Sensibilidad al deslizamiento</string>
+    <string name="settings_swipe_sensitivity_low">Baja</string>
+    <string name="settings_swipe_sensitivity_medium">Media</string>
+    <string name="settings_swipe_sensitivity_high">Alta</string>
+    <string name="settings_swipe_sensitivity_low_sub">Un deslizamiento largo y claramente lateral abre o cierra la lista de chats, para que el desplazamiento no lo haga</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Desliza más de la mitad de la lista de chats, o haz un gesto rápido, para abrirla o cerrarla</string>
+    <string name="settings_swipe_sensitivity_high_sub">Un deslizamiento corto o suave abre o cierra la lista de chats</string>
     <string name="settings_group_activity">Agrupar razonamiento y herramientas</string>
     <string name="settings_group_activity_sub">Mostrar razonamientos y llamadas a herramientas consecutivos en una sola fila</string>
     <string name="settings_group_thoughts">Agrupar razonamientos consecutivos</string>

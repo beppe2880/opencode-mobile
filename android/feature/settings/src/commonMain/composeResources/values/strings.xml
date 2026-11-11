@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Off</string>
     <string name="settings_swipe_chats_drawer_sub">Swipe right on a chat to show the chat list over it; tap a chat to open it</string>
     <string name="settings_swipe_chats_off_sub">Swiping sideways on a chat does nothing</string>
+    <string name="settings_swipe_sensitivity">Swipe sensitivity</string>
+    <string name="settings_swipe_sensitivity_low">Low</string>
+    <string name="settings_swipe_sensitivity_medium">Medium</string>
+    <string name="settings_swipe_sensitivity_high">High</string>
+    <string name="settings_swipe_sensitivity_low_sub">A long, clearly sideways swipe opens or closes the chat list, so scrolling does not</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Swipe past half of the chat list, or flick, to open or close it</string>
+    <string name="settings_swipe_sensitivity_high_sub">A short or gentle swipe opens or closes the chat list</string>
     <string name="settings_group_activity">Group thinking and tools</string>
     <string name="settings_group_activity_sub">Show thoughts and tool calls with nothing in between as a single row</string>
     <string name="settings_group_thoughts">Group consecutive thoughts</string>

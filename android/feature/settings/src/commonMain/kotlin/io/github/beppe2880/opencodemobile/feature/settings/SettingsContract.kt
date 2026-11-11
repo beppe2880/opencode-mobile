@@ -15,6 +15,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
@@ -155,6 +156,7 @@ sealed interface SettingsEvent {
     data class HeaderOpensChanged(val scope: ChangesScope) : SettingsEvent
     data class ChatHeaderStyleChanged(val style: ChatHeaderStyle) : SettingsEvent
     data class ChatSwipeChanged(val swipe: ChatSwipe) : SettingsEvent
+    data class SwipeSensitivityChanged(val sensitivity: SwipeSensitivity) : SettingsEvent
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
     data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent

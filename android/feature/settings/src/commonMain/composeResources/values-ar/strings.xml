@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">إيقاف</string>
     <string name="settings_swipe_chats_drawer_sub">اسحب يسارًا على المحادثة لعرض قائمة المحادثات فوقها؛ اضغط على محادثة لفتحها</string>
     <string name="settings_swipe_chats_off_sub">التمرير الجانبي على المحادثة لا يفعل شيئًا</string>
+    <string name="settings_swipe_sensitivity">حساسية السحب</string>
+    <string name="settings_swipe_sensitivity_low">منخفضة</string>
+    <string name="settings_swipe_sensitivity_medium">متوسطة</string>
+    <string name="settings_swipe_sensitivity_high">عالية</string>
+    <string name="settings_swipe_sensitivity_low_sub">السحب الطويل والواضح جانبيًا يفتح قائمة المحادثات أو يغلقها، حتى لا يحدث ذلك عند التمرير</string>
+    <string name="settings_swipe_sensitivity_medium_sub">اسحب لتجاوز نصف قائمة المحادثات، أو بحركة سريعة، لفتحها أو إغلاقها</string>
+    <string name="settings_swipe_sensitivity_high_sub">السحب القصير أو اللطيف يفتح قائمة المحادثات أو يغلقها</string>
     <string name="settings_group_activity">تجميع التفكير والأدوات</string>
     <string name="settings_group_activity_sub">عرض التفكير واستدعاءات الأدوات المتتابعة في صف واحد</string>
     <string name="settings_group_thoughts">تجميع التفكير المتتابع</string>

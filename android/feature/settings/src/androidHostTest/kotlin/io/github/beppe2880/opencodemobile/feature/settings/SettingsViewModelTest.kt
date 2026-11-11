@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
@@ -78,6 +79,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.HeaderOpensChanged(ChangesScope.Session))
         vm.onEvent(SettingsEvent.ChatHeaderStyleChanged(ChatHeaderStyle.Short))
         vm.onEvent(SettingsEvent.ChatSwipeChanged(ChatSwipe.SessionDrawer))
+        vm.onEvent(SettingsEvent.SwipeSensitivityChanged(SwipeSensitivity.Low))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
         vm.onEvent(SettingsEvent.RunningChipsChanged(false))
@@ -145,6 +147,7 @@ class SettingsViewModelTest {
                 headerOpens = ChangesScope.Session,
                 chatHeaderStyle = ChatHeaderStyle.Short,
                 chatSwipe = ChatSwipe.SessionDrawer,
+                swipeSensitivity = SwipeSensitivity.Low,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
                 runningChips = false,

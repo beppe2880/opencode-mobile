@@ -36,6 +36,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.HeaderOpensChanged -> copy(headerOpens = event.scope)
     is SettingsEvent.ChatHeaderStyleChanged -> copy(chatHeaderStyle = event.style)
     is SettingsEvent.ChatSwipeChanged -> copy(chatSwipe = event.swipe)
+    is SettingsEvent.SwipeSensitivityChanged -> copy(swipeSensitivity = event.sensitivity)
     is SettingsEvent.RunningInListChanged -> copy(showRunningWorkInList = event.enabled)
     is SettingsEvent.ConfirmStopChanged -> copy(confirmStopCommand = event.enabled)
     is SettingsEvent.RunningChipsChanged -> copy(runningChips = event.enabled)

@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Выкл.</string>
     <string name="settings_swipe_chats_drawer_sub">Проведите вправо по чату, чтобы поверх него показать список чатов; нажмите на чат, чтобы открыть его</string>
     <string name="settings_swipe_chats_off_sub">Боковые свайпы в чате ничего не делают</string>
+    <string name="settings_swipe_sensitivity">Чувствительность свайпа</string>
+    <string name="settings_swipe_sensitivity_low">Низкая</string>
+    <string name="settings_swipe_sensitivity_medium">Средняя</string>
+    <string name="settings_swipe_sensitivity_high">Высокая</string>
+    <string name="settings_swipe_sensitivity_low_sub">Длинный, явно горизонтальный свайп открывает или закрывает список чатов, а прокрутка — нет</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Смахните больше половины списка чатов или быстро смахните, чтобы открыть или закрыть его</string>
+    <string name="settings_swipe_sensitivity_high_sub">Короткий или плавный свайп открывает или закрывает список чатов</string>
     <string name="settings_group_activity">Группировать рассуждения и инструменты</string>
     <string name="settings_group_activity_sub">Показывать идущие подряд рассуждения и вызовы инструментов одной строкой</string>
     <string name="settings_group_thoughts">Группировать идущие подряд рассуждения</string>

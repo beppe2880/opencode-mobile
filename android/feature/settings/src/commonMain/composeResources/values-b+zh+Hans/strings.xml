@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">关闭</string>
     <string name="settings_swipe_chats_drawer_sub">在聊天中向右滑动，即可在其上方显示聊天列表；点击聊天即可打开</string>
     <string name="settings_swipe_chats_off_sub">在聊天中左右滑动不会有任何效果</string>
+    <string name="settings_swipe_sensitivity">滑动灵敏度</string>
+    <string name="settings_swipe_sensitivity_low">低</string>
+    <string name="settings_swipe_sensitivity_medium">中</string>
+    <string name="settings_swipe_sensitivity_high">高</string>
+    <string name="settings_swipe_sensitivity_low_sub">只有较长且明显横向的滑动才会打开或关闭聊天列表，滚动时不会误触发</string>
+    <string name="settings_swipe_sensitivity_medium_sub">滑过聊天列表的一半以上，或快速轻扫，即可打开或关闭它</string>
+    <string name="settings_swipe_sensitivity_high_sub">短促或轻柔的滑动即可打开或关闭聊天列表</string>
     <string name="settings_group_activity">合并思考和工具</string>
     <string name="settings_group_activity_sub">将连续的思考和工具调用显示为一行</string>
     <string name="settings_group_thoughts">合并连续的思考</string>
