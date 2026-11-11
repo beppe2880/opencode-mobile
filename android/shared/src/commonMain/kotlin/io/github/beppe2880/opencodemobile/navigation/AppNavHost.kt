@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -49,11 +50,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
@@ -204,7 +207,36 @@ fun AppNavHost(
         onNewSessionOpened()
     }
 
-    NavHost(navController = navController, startDestination = start, modifier = modifier) {
+    // A chat opened full screen while the window was narrow (a folded foldable) moves beside the
+    // list when the window becomes wide again, as if it had been selected there. The list keeps
+    // whether it was hidden; screens above that chat stay until they close.
+    val appSettings by koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle()
+    val density = LocalDensity.current
+    var width by remember { mutableStateOf<Dp?>(null) }
+    val split = width?.let { it >= ListDetailMinWidth && appSettings.splitView }
+    var wasSplit by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var waitingForChat by rememberSaveable { mutableStateOf(false) }
+    // Handed to the session list, which selects it and clears it.
+    var pendingSelection by rememberSaveable { mutableStateOf<String?>(null) }
+    val topEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(split, topEntry) {
+        val now = split ?: return@LaunchedEffect
+        val widened = now && wasSplit == false
+        wasSplit = now
+        val top = navController.currentBackStackEntry ?: return@LaunchedEffect
+        val step = splitStep(now, widened, waitingForChat, top.route(), navController.previousBackStackEntry?.route())
+        waitingForChat = step.waiting
+        step.selectChat?.let {
+            pendingSelection = it
+            navController.popBackStack(SessionsDestination, inclusive = false)
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = start,
+        modifier = modifier.onSizeChanged { width = with(density) { it.width.toDp() } },
+    ) {
         composable<ConnectDestination> { entry ->
             val args = entry.toRoute<ConnectDestination>()
             ConnectRoute(
@@ -235,6 +267,8 @@ fun AppNavHost(
                 onOpenSettings = { navController.navigate(SettingsDestination()) },
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
+                selectSession = pendingSelection,
+                onSessionSelected = { pendingSelection = null },
                 onOpenTerminal = { navController.navigate(TerminalDestination(it)) },
                 onOpenFile = { directory, path -> navController.navigate(FileDestination(directory, path)) },
             )
@@ -304,6 +338,14 @@ private fun NavController.openChat(sessionId: String) {
     navigate(ChatDestination(sessionId))
 }
 
+/** The route of this entry for [splitStep]: the list, a chat, Connect, or another screen. */
+private fun NavBackStackEntry.route(): Any = when {
+    destination.hasRoute<SessionsDestination>() -> SessionsDestination
+    destination.hasRoute<ChatDestination>() -> toRoute<ChatDestination>()
+    destination.hasRoute<ConnectDestination>() -> toRoute<ConnectDestination>()
+    else -> destination
+}
+
 /**
  * Phone: sessions list only. Expanded width (unless turned off in Settings): list + chat detail
  * side by side. Tapping the handle on the divider hides the list to give the chat the whole
@@ -321,6 +363,9 @@ private fun SessionsListDetail(
     onOpenFile: (String, String) -> Unit,
     openNewSession: Boolean,
     onNewSessionOpened: () -> Unit,
+    /** A chat to select beside the list (moved there from full screen when the window widened). */
+    selectSession: String?,
+    onSessionSelected: () -> Unit,
 ) {
     val settingsRepository = koinInject<SettingsRepository>()
     val appSettings by settingsRepository.settings.collectAsStateWithLifecycle()
@@ -332,11 +377,26 @@ private fun SessionsListDetail(
         selected = it
         selectedServerId = activeServerId
     }
+    LaunchedEffect(selectSession) {
+        if (selectSession == null) return@LaunchedEffect
+        select(selectSession)
+        onSessionSelected()
+    }
+    // Shown at once, before the effect above stores it, so the old selection never flashes.
+    val current = selectSession ?: selected?.takeIf { selectedServerId == activeServerId }
     var listHidden by rememberSaveable { mutableStateOf(false) }
     // Outside the list, which may scroll the banner slot away; the demos never look for updates.
     if (!demo) UpdateSheetRoute()
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        if (maxWidth < ListDetailMinWidth || !appSettings.splitView) {
+        val split = maxWidth >= ListDetailMinWidth && appSettings.splitView
+        // When the window narrows (a foldable folded) the chat beside the list goes full screen
+        // above it, so Back returns to the list; turning split view off in Settings does not.
+        var wasSplit by rememberSaveable { mutableStateOf(split) }
+        LaunchedEffect(split) {
+            if (wasSplit && !split && appSettings.splitView && current != null) onOpenChatFullScreen(current)
+            wasSplit = split
+        }
+        if (!split) {
             SessionsRoute(
                 onOpenChat = onOpenChatFullScreen,
                 onOpenSettings = onOpenSettings,
@@ -355,7 +415,6 @@ private fun SessionsListDetail(
             // With the chat list swipe, the chat's swipe hides and shows the list instead of the
             // handle's button; the handle is left only for resizing it.
             val swipeToggles = appSettings.chatSwipe == ChatSwipe.SessionDrawer
-            val current = selected?.takeIf { selectedServerId == activeServerId }
             // Without the handle, or the chat swiping it, there is no way to bring a hidden list back.
             val hidden = listHidden && (appSettings.listPaneHandle || (swipeToggles && current != null))
             val target = if (hidden) 0.dp else shownWidth
