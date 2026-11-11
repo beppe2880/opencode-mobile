@@ -22,6 +22,7 @@ import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
 import io.github.beppe2880.opencodemobile.core.domain.RunningCommand
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
@@ -101,6 +102,8 @@ data class ChatState(
     val nextSession: SessionPeek? = null,
     /** What a horizontal swipe does (setting). */
     val swipe: ChatSwipe = ChatSwipe.SessionDrawer,
+    /** How easily the [ChatSwipe.SessionDrawer] swipe starts pulling the chat list (setting). */
+    val swipeSensitivity: SwipeSensitivity = SwipeSensitivity.Medium,
     /** The server transcript has been loaded at least once (cached content may show before). */
     val synced: Boolean = false,
     /** Older history may exist above the oldest loaded message. */
@@ -181,6 +184,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     chatTextScale = s.chatTextScale,
     showCost = s.showCost,
     swipe = s.chatSwipe,
+    swipeSensitivity = s.swipeSensitivity,
     agentColorOutline = s.agentColorOutline,
     closeModelPickerOnSelect = s.closeModelPickerOnSelect,
     dictation = s.dictation,

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -48,10 +47,14 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
+import io.github.beppe2880.opencodemobile.feature.chat.DrawerSwipeTuning
 import io.github.beppe2880.opencodemobile.feature.chat.SessionDrawerPull
+import io.github.beppe2880.opencodemobile.feature.chat.detectDrawerDrag
 import io.github.beppe2880.opencodemobile.feature.chat.drawerSettlesOpen
+import io.github.beppe2880.opencodemobile.feature.chat.drawerTuning
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_session_drawer
@@ -65,26 +68,27 @@ import kotlin.math.roundToInt
 private const val DRAWER_FRACTION = 0.85f
 private val DrawerMaxWidth = 360.dp
 
-/**
- * Per second: a release faster than this toward a side settles the drawer on that side, wherever
- * it is. Also used by the session list beside the chat on wide screens.
- */
-internal val DrawerFlingVelocity = 400.dp
-
 /** Stiffness of the spring that settles the drawer, and the list beside the chat, after a release. */
 internal const val DRAWER_SETTLE_STIFFNESS = 600f
 
 /**
  * Where the chat list drawer is: [position] goes from 0 (closed) to [width] (open), in pixels.
- * Drags move it with the finger; a release settles it open or closed by velocity, else by
- * whether it is past half its width.
+ * Drags move it with the finger; a release settles it open or closed by velocity, else by how
+ * far the drag went from where it started, both as [tuning] says ([flingVelocity] in pixels).
  */
 @Stable
-internal class SessionDrawerState(private val scope: CoroutineScope, private val flingVelocity: Float) : SessionDrawerPull {
+internal class SessionDrawerState(private val scope: CoroutineScope) : SessionDrawerPull {
     var width by mutableFloatStateOf(0f)
         private set
     var position by mutableFloatStateOf(0f)
         private set
+
+    /** The swipe sensitivity in use; set by the host as the setting changes. */
+    var tuning: DrawerSwipeTuning = DrawerSwipeTuning.Medium
+    var flingVelocity: Float = 0f
+
+    /** Whether the drag in progress started from the open side; null between drags. */
+    private var dragFromOpen: Boolean? = null
 
     /** Partly or fully on screen: the list is composed. */
     val visible by derivedStateOf { position > 0f }
@@ -97,11 +101,14 @@ internal class SessionDrawerState(private val scope: CoroutineScope, private val
 
     override fun drag(delta: Float) {
         settling?.cancel()
+        if (dragFromOpen == null) dragFromOpen = width > 0f && position >= width / 2
         position = (position + delta).coerceIn(0f, width)
     }
 
     override fun release(velocity: Float) {
-        val open = drawerSettlesOpen(position, width, velocity, flingVelocity)
+        val fromOpen = dragFromOpen ?: (width > 0f && position >= width / 2)
+        dragFromOpen = null
+        val open = drawerSettlesOpen(position, width, velocity, flingVelocity, tuning.settleShare, fromOpen)
         settle(if (open) width else 0f, velocity)
     }
 
@@ -139,6 +146,7 @@ internal fun SessionDrawerHost(
     currentSessionId: String,
     sessionsOwner: ViewModelStoreOwner?,
     demo: Boolean,
+    sensitivity: SwipeSensitivity,
     onOpenChat: (String) -> Unit,
     onOpenSettings: () -> Unit,
     content: @Composable (drawer: SessionDrawerPull) -> Unit,
@@ -146,7 +154,12 @@ internal fun SessionDrawerHost(
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     // Not saved: a chat shown again (Back from Settings, recreation) starts with the list closed.
-    val drawer = remember(density) { SessionDrawerState(scope, with(density) { DrawerFlingVelocity.toPx() }) }
+    val drawer = remember { SessionDrawerState(scope) }
+    val tuning = sensitivity.drawerTuning
+    SideEffect {
+        drawer.tuning = tuning
+        drawer.flingVelocity = with(density) { tuning.flingVelocity.toPx() }
+    }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val toEnd = if (rtl) -1f else 1f
     val sheetFocus = remember { FocusRequester() }
@@ -172,7 +185,7 @@ internal fun SessionDrawerHost(
         }
         // Composed only while partly or fully on screen, so the list refreshes only then. The
         // drag sits on this box, which does not move, rather than on the moving panel.
-        if (drawer.visible) Box(Modifier.fillMaxSize().drawerDrag(drawer, toEnd)) {
+        if (drawer.visible) Box(Modifier.fillMaxSize().drawerDrag(drawer, toEnd, tuning)) {
             Box(
                 Modifier
                     .fillMaxSize()
@@ -227,11 +240,12 @@ internal fun SessionDrawerHost(
 
 /**
  * Horizontal drags over the drawer or its scrim move it; [toEnd] is the sign of a move toward
- * the end edge. Must sit on a node that does not move with the drawer.
+ * the end edge, [tuning] when a drag starts. Must sit on a node that does not move with the drawer.
  */
-private fun Modifier.drawerDrag(drawer: SessionDrawerState, toEnd: Float): Modifier = pointerInput(drawer, toEnd) {
+private fun Modifier.drawerDrag(drawer: SessionDrawerState, toEnd: Float, tuning: DrawerSwipeTuning): Modifier = pointerInput(drawer, toEnd, tuning) {
     val velocity = VelocityTracker()
-    detectHorizontalDragGestures(
+    detectDrawerDrag(
+        tuning = tuning,
         onDragStart = { velocity.resetTracking() },
         onDragEnd = { drawer.release(velocity.calculateVelocity().x * toEnd) },
         onDragCancel = { drawer.release(0f) },

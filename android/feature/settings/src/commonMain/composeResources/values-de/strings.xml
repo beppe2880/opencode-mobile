@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Aus</string>
     <string name="settings_swipe_chats_drawer_sub">Im Chat nach rechts wischen, um die Chatliste darüber anzuzeigen; tippe auf einen Chat, um ihn zu öffnen</string>
     <string name="settings_swipe_chats_off_sub">Seitliches Wischen im Chat bewirkt nichts</string>
+    <string name="settings_swipe_sensitivity">Wischempfindlichkeit</string>
+    <string name="settings_swipe_sensitivity_low">Niedrig</string>
+    <string name="settings_swipe_sensitivity_medium">Mittel</string>
+    <string name="settings_swipe_sensitivity_high">Hoch</string>
+    <string name="settings_swipe_sensitivity_low_sub">Nur ein langer, deutlich seitlicher Wisch öffnet oder schließt die Chatliste, damit Scrollen nicht</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Über die Hälfte der Chatliste wischen oder schnell wischen, um sie zu öffnen oder zu schließen</string>
+    <string name="settings_swipe_sensitivity_high_sub">Ein kurzer oder sanfter Wisch öffnet oder schließt die Chatliste</string>
     <string name="settings_group_activity">Denkprozess und Werkzeuge gruppieren</string>
     <string name="settings_group_activity_sub">Aufeinanderfolgende Denkprozesse und Werkzeugaufrufe in einer Zeile anzeigen</string>
     <string name="settings_group_thoughts">Aufeinanderfolgende Denkprozesse gruppieren</string>

@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">Désactivé</string>
     <string name="settings_swipe_chats_drawer_sub">Balayez une discussion vers la droite pour afficher la liste des discussions par-dessus ; touchez une discussion pour l’ouvrir</string>
     <string name="settings_swipe_chats_off_sub">Balayer latéralement une discussion ne fait rien</string>
+    <string name="settings_swipe_sensitivity">Sensibilité du balayage</string>
+    <string name="settings_swipe_sensitivity_low">Faible</string>
+    <string name="settings_swipe_sensitivity_medium">Moyenne</string>
+    <string name="settings_swipe_sensitivity_high">Élevée</string>
+    <string name="settings_swipe_sensitivity_low_sub">Un balayage long et nettement latéral ouvre ou ferme la liste des discussions, sans que le défilement le fasse</string>
+    <string name="settings_swipe_sensitivity_medium_sub">Balayez au-delà de la moitié de la liste des discussions, ou faites un geste rapide, pour l’ouvrir ou la fermer</string>
+    <string name="settings_swipe_sensitivity_high_sub">Un balayage court ou doux ouvre ou ferme la liste des discussions</string>
     <string name="settings_group_activity">Regrouper réflexion et outils</string>
     <string name="settings_group_activity_sub">Afficher les réflexions et appels d’outils consécutifs sur une seule ligne</string>
     <string name="settings_group_thoughts">Regrouper les réflexions consécutives</string>

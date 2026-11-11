@@ -52,6 +52,7 @@ class EditModeTest {
             // The whole app, not one element.
             SettingOption.Theme,
             SettingOption.SwipeChats,
+            SettingOption.SwipeSensitivity,
             // Only while an agent works.
             SettingOption.FollowRunning,
             SettingOption.KeepLiveOpen,

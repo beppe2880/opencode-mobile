@@ -406,6 +406,13 @@ enum class FoldChat {
     ShowList,
 }
 
+/**
+ * How easily the chat's swipe pulls the chat list ([ChatSwipe.SessionDrawer]) open or closed:
+ * [High] starts sooner and settles after a shorter drag or slower fling, [Low] needs a longer,
+ * clearly horizontal drag. [Medium] is the original behaviour.
+ */
+enum class SwipeSensitivity { Low, Medium, High }
+
 /** Scopes the chat header line can open. */
 val HEADER_OPENS_CHOICES = listOf(ChangesScope.Folder, ChangesScope.Session)
 
@@ -467,6 +474,8 @@ data class AppSettings(
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */
     val chatSwipe: ChatSwipe = ChatSwipe.SessionDrawer,
+    /** With [ChatSwipe.SessionDrawer]: how easily the swipe opens and closes the chat list. */
+    val swipeSensitivity: SwipeSensitivity = SwipeSensitivity.Medium,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
     /** A microphone button in the composer dictates through the system speech recognizer. */

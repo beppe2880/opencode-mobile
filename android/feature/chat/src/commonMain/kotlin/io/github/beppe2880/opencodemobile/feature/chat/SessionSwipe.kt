@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -73,9 +74,11 @@ internal fun SessionSwipe(
     drawer: SessionDrawerPull?,
     onSwitch: (String) -> Unit,
     modifier: Modifier = Modifier,
+    sensitivity: SwipeSensitivity = SwipeSensitivity.Medium,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val pullDrawer = drawer?.takeIf { mode == ChatSwipe.SessionDrawer }
+    val tuning = sensitivity.drawerTuning
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val switching = mode == ChatSwipe.SwitchChats && (previous != null || next != null)
     val offset = remember { Animatable(0f) }
@@ -87,7 +90,7 @@ internal fun SessionSwipe(
         else -> null
     }
     val gesture = when {
-        pullDrawer != null -> Modifier.pointerInput(pullDrawer, rtl) { pullDrawerGesture(pullDrawer, toEnd = if (rtl) -1f else 1f) }
+        pullDrawer != null -> Modifier.pointerInput(pullDrawer, rtl, tuning) { pullDrawerGesture(pullDrawer, toEnd = if (rtl) -1f else 1f, tuning) }
         switching -> Modifier.switchGesture(offset, previous, next, threshold, onSwitch)
         else -> Modifier
     }
@@ -119,14 +122,15 @@ internal fun SessionSwipe(
 
 /**
  * Feeds horizontal drags to [drawer], in pixels toward the end edge ([toEnd] is the sign of a
- * move toward it), and the release velocity. Drags starting within [EDGE_GUARD] of the start
- * edge are left alone.
+ * move toward it), and the release velocity, once the drag started as [tuning] says. Drags
+ * starting within [EDGE_GUARD] of the start edge are left alone.
  */
-private suspend fun PointerInputScope.pullDrawerGesture(drawer: SessionDrawerPull, toEnd: Float) {
+private suspend fun PointerInputScope.pullDrawerGesture(drawer: SessionDrawerPull, toEnd: Float, tuning: DrawerSwipeTuning) {
     val guard = EDGE_GUARD.toPx()
     var ignored = false
     val velocity = VelocityTracker()
-    detectHorizontalDragGestures(
+    detectDrawerDrag(
+        tuning = tuning,
         onDragStart = { start ->
             velocity.resetTracking()
             ignored = (if (toEnd > 0) start.x else size.width - start.x) < guard
@@ -134,7 +138,7 @@ private suspend fun PointerInputScope.pullDrawerGesture(drawer: SessionDrawerPul
         onDragEnd = { if (!ignored) drawer.release(velocity.calculateVelocity().x * toEnd) },
         onDragCancel = { if (!ignored) drawer.release(0f) },
         onHorizontalDrag = { change, delta ->
-            if (ignored) return@detectHorizontalDragGestures
+            if (ignored) return@detectDrawerDrag
             change.consume()
             velocity.addPosition(change.uptimeMillis, change.position)
             drawer.drag(delta * toEnd)

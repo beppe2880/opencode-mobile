@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
+import io.github.beppe2880.opencodemobile.core.domain.SwipeSensitivity
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
@@ -125,6 +126,7 @@ class PreferencesRepositoriesTest {
             voiceHoldToRecord = true,
             toolMediaSize = ToolMediaSize.Large,
             chatSwipe = ChatSwipe.SessionDrawer,
+            swipeSensitivity = SwipeSensitivity.High,
         )
         PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { changed }
 
@@ -189,6 +191,22 @@ class PreferencesRepositoriesTest {
     }
 
     @Test
+    fun `swipe sensitivity starts at medium and keeps every choice`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        fun sensitivity() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.swipeSensitivity
+        assertEquals(SwipeSensitivity.Medium, sensitivity())
+
+        for (choice in SwipeSensitivity.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(swipeSensitivity = choice) }
+            assertEquals(choice.name, prefs.values["swipe_sensitivity"])
+            assertEquals(choice, sensitivity())
+        }
+
+        prefs.edit().putString("swipe_sensitivity", "Extreme").commit()
+        assertEquals(SwipeSensitivity.Medium, sensitivity())
+    }
+
+    @Test
     fun `a theme no longer shipped reads as none`() {
         val prefs = InMemoryPreferences()
         prefs.edit().putString("opencode_theme", "retired").commit()
@@ -215,6 +233,7 @@ class PreferencesRepositoriesTest {
             .putString("unfolded_layout", "Stacked")
             .putString("unfold_open_chat", "Maybe")
             .putString("fold_open_chat", "Close")
+            .putString("swipe_sensitivity", "Extreme")
             .commit()
 
         val settings = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value

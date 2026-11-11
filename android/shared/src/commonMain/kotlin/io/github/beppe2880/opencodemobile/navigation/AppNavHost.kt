@@ -79,6 +79,7 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.ChatRoute
 import io.github.beppe2880.opencodemobile.feature.chat.SessionDrawerPull
 import io.github.beppe2880.opencodemobile.feature.chat.drawerSettlesOpen
+import io.github.beppe2880.opencodemobile.feature.chat.drawerTuning
 import io.github.beppe2880.opencodemobile.feature.connect.ConnectRoute
 import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
@@ -282,6 +283,7 @@ fun AppNavHost(
             }
             // Shares the list's ViewModel with the session list below in the back stack.
             val sessionsEntry = remember(entry) { runCatching { navController.getBackStackEntry(SessionsDestination) }.getOrNull() }
+            val swipeSensitivity = koinInject<SettingsRepository>().settings.collectAsStateWithLifecycle().value.swipeSensitivity
             // Always there, so the chat stays in place when the swipe setting changes: the chat
             // pulls the drawer only while its live settings choose it, or on wide windows showing
             // the chat list panel instead of the list beside the chat.
@@ -289,6 +291,7 @@ fun AppNavHost(
                 currentSessionId = args.sessionId,
                 sessionsOwner = sessionsEntry,
                 demo = isDemo,
+                sensitivity = swipeSensitivity,
                 onOpenChat = switchSession,
                 onOpenSettings = { navController.navigate(SettingsDestination()) },
             ) { drawer ->
@@ -440,19 +443,32 @@ private fun SessionsListDetail(
             // Registered before the panes, so handlers inside the chat still get Back first.
             OcBackHandler(enabled = hidden && appSettings.backShowsList) { listHidden = false }
             val currentShownWidth by rememberUpdatedState(shownWidth)
+            val currentTuning by rememberUpdatedState(appSettings.swipeSensitivity.drawerTuning)
             // The chat's swipe moves the list with the finger, both ways, up to its chosen width,
             // and settles it shown or hidden like the chat list drawer on phones.
             val swipeList = remember(density) {
                 object : SessionDrawerPull {
+                    /** Whether the drag in progress started with the list shown. */
+                    private var fromShown = false
+
                     override fun drag(delta: Float) {
-                        val width = (dragWidth ?: animatedWidth.value) + with(density) { delta.toDp() }
-                        dragWidth = width.coerceIn(0.dp, currentShownWidth)
+                        val from = dragWidth ?: animatedWidth.value
+                        if (dragWidth == null) fromShown = from >= currentShownWidth / 2
+                        dragWidth = (from + with(density) { delta.toDp() }).coerceIn(0.dp, currentShownWidth)
                     }
 
                     override fun release(velocity: Float) {
                         val dropped = dragWidth ?: return
                         val shown = currentShownWidth
-                        val show = drawerSettlesOpen(dropped.value, shown.value, with(density) { velocity.toDp() }.value, DrawerFlingVelocity.value)
+                        val tuning = currentTuning
+                        val show = drawerSettlesOpen(
+                            position = dropped.value,
+                            width = shown.value,
+                            velocity = with(density) { velocity.toDp() }.value,
+                            flingVelocity = tuning.flingVelocity.value,
+                            settleShare = tuning.settleShare,
+                            fromOpen = fromShown,
+                        )
                         val settled = if (show) shown else 0.dp
                         scope.launch {
                             // Continues from where the finger left the list, without a jump.

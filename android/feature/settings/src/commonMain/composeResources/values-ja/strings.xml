@@ -103,6 +103,13 @@
     <string name="settings_swipe_chats_off">オフ</string>
     <string name="settings_swipe_chats_drawer_sub">チャットを右にスワイプすると、その上にチャット一覧を表示します。チャットをタップすると開きます</string>
     <string name="settings_swipe_chats_off_sub">チャットを横にスワイプしても何も起こりません</string>
+    <string name="settings_swipe_sensitivity">スワイプの感度</string>
+    <string name="settings_swipe_sensitivity_low">低</string>
+    <string name="settings_swipe_sensitivity_medium">中</string>
+    <string name="settings_swipe_sensitivity_high">高</string>
+    <string name="settings_swipe_sensitivity_low_sub">長く明らかに横方向へスワイプしたときだけチャット一覧が開閉します。スクロールでは開閉しません</string>
+    <string name="settings_swipe_sensitivity_medium_sub">チャット一覧の半分を超えてスワイプするか、はじくように素早くスワイプすると開閉します</string>
+    <string name="settings_swipe_sensitivity_high_sub">短い、または軽いスワイプでチャット一覧を開閉します</string>
     <string name="settings_group_activity">思考とツールをまとめる</string>
     <string name="settings_group_activity_sub">連続する思考とツール呼び出しを1つの行にまとめて表示</string>
     <string name="settings_group_thoughts">連続する思考をまとめる</string>

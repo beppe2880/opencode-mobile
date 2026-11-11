@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
+import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
@@ -97,6 +98,17 @@ class SettingOptionsTest {
         assertEquals(SettingOption.UnfoldedLayout, SettingOption.FoldOpenChat.requires)
         assertFalse(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = false))
         assertTrue(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = true))
+    }
+
+    @Test
+    fun swipeSensitivityShowsOnlyWithTheChatListSwipe() {
+        assertEquals(SettingOption.SwipeChats, SettingOption.SwipeSensitivity.requires)
+        assertEquals(SettingsPart.SwipeChats, SettingOption.SwipeSensitivity.part)
+        assertEquals(SettingsArea.Chat, SettingOption.SwipeSensitivity.area)
+        assertTrue(SettingOption.SwipeSensitivity.appliesTo(AppSettings(chatSwipe = ChatSwipe.SessionDrawer)))
+        assertFalse(SettingOption.SwipeSensitivity.appliesTo(AppSettings(chatSwipe = ChatSwipe.SwitchChats)))
+        assertFalse(SettingOption.SwipeSensitivity.appliesTo(AppSettings(chatSwipe = ChatSwipe.Off)))
+        assertTrue(SettingOption.SwipeSensitivity.searchKeywords.containsAll(listOf("swipe", "sensitivity", "gesture")))
     }
 
     @Test
