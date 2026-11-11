@@ -239,7 +239,8 @@ class SseEventRepositoryTest {
     fun `network recovering cuts the reconnect wait`() = runBlocking {
         repository = repository(backoff = Backoff(initialMillis = 60_000, maxMillis = 60_000))
         server.enqueue(MockResponse().setResponseCode(503).setHeadersDelay(100, TimeUnit.MILLISECONDS))
-        server.enqueue(stream("ses_1"))
+        // Kept open: a closed stream lets a third request race the request count below.
+        server.enqueue(stream("ses_1", open = true))
         val connected = scope.async { repository.events.first() }
 
         withTimeout(5_000) { repository.connection.first { it == ConnectionState.Reconnecting } }
