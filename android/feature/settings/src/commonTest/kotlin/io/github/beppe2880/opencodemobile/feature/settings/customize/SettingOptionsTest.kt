@@ -4,6 +4,7 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import kotlin.test.Test
@@ -31,8 +32,10 @@ class SettingOptionsTest {
         assertTrue(SettingOption.OpenCodeTheme in SettingsPart.Messages.options)
         assertEquals(SettingsPart.Thoughts, SettingOption.GroupActivity.part)
         assertEquals(SettingsArea.LiveActivity, SettingOption.LiveInterval.area)
-        assertEquals(SettingsArea.Appearance, SettingOption.BackShowsList.area)
+        assertEquals(SettingsArea.LargeScreens, SettingOption.BackShowsList.area)
         assertEquals(SettingsPart.SplitView, SettingOption.BackShowsList.part)
+        assertEquals(SettingsArea.LargeScreens, SettingsPart.SplitView.area)
+        assertTrue(LARGE_SCREEN_OPTIONS.all { it.part == SettingsPart.SplitView && it.area == SettingsArea.LargeScreens })
         assertEquals(SettingsArea.Terminal, SettingOption.TerminalKeys.area)
     }
 
@@ -85,6 +88,13 @@ class SettingOptionsTest {
         assertFalse(SettingOption.LiveThinking.appliesTo(AppSettings(followRunningTools = false)))
         assertFalse(SettingOption.LiveInterval.appliesTo(AppSettings(liveShell = false)))
         assertFalse(SettingOption.BackShowsList.appliesTo(AppSettings(listPaneHandle = false)))
+        // The chat list panel has no divider, width or fold and unfold moves; the swipe still opens it.
+        val panel = AppSettings(unfoldedLayout = UnfoldedLayout.ListPanel)
+        listOf(SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList, SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat)
+            .forEach { assertFalse(it.appliesTo(panel), "$it") }
+        assertTrue(SettingOption.ListSwipe.appliesTo(panel) && SettingOption.UnfoldedLayout.appliesTo(panel))
+        assertFalse(SettingOption.ListSwipe.appliesTo(AppSettings(splitView = false)))
+        assertEquals(SettingOption.UnfoldedLayout, SettingOption.FoldOpenChat.requires)
         assertFalse(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = false))
         assertTrue(SettingOption.NotifyQuestions.appliesTo(defaults, notificationsOn = true))
     }

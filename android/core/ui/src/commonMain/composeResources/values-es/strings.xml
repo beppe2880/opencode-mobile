@@ -31,6 +31,7 @@
     <string name="oc_area_live">Actividad en vivo</string>
     <string name="oc_area_composer">Cuadro del mensaje</string>
     <string name="oc_area_sessions">Sesiones</string>
+    <string name="oc_area_large_screens">Plegables y pantallas grandes</string>
     <string name="oc_area_terminal">Terminal</string>
     <string name="oc_area_notifications">Notificaciones</string>
     <string name="oc_area_updates">Actualizaciones</string>

@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.DEFAULT_LIST_PANE_FRACTION
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -9,9 +10,11 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.TEXT_SCALE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_header
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
@@ -25,6 +28,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_appearance_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_chat_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_composer_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_large_screens_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_live_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_notifications_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_servers_sub
@@ -36,10 +40,12 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_agent_model
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_cloud
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_divider
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_folding
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_gestures
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_layout
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_output
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_transcript
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_wide
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_edits
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_other
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_reads
@@ -62,6 +68,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_su
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_fullscreen
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_grouped
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_keyboard
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_list_width
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_new_chats
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_key
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_no_server
@@ -83,6 +90,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_te
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_dark
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_light
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_theme_system
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_panel
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_off
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_window
@@ -90,6 +98,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_vo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_cloud
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_mode_system
 import org.jetbrains.compose.resources.StringResource
+import kotlin.math.roundToInt
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 /*
@@ -108,10 +117,6 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Servers, SettingsArea.About -> emptyList()
         SettingsArea.Appearance -> listOf(
             OptionGroup(null, listOf(SettingOption.Theme, SettingOption.OpenCodeTheme, SettingOption.TextSize)),
-            OptionGroup(
-                Res.string.settings_group_wide,
-                listOf(SettingOption.SplitView, SettingOption.ListWidth, SettingOption.ListHandle, SettingOption.BackShowsList),
-            ),
         )
         SettingsArea.Chat -> listOf(
             OptionGroup(
@@ -170,6 +175,11 @@ val SettingsArea.groups: List<OptionGroup>
             ),
         )
         SettingsArea.Sessions -> listOf(OptionGroup(null, listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)))
+        SettingsArea.LargeScreens -> listOf(
+            OptionGroup(Res.string.settings_group_layout, listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout, SettingOption.ListWidth)),
+            OptionGroup(Res.string.settings_group_folding, listOf(SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat)),
+            OptionGroup(Res.string.settings_group_divider, listOf(SettingOption.ListHandle, SettingOption.BackShowsList, SettingOption.ListSwipe)),
+        )
         SettingsArea.Sharing -> listOf(OptionGroup(null, listOf(SettingOption.ShareMenu, SettingOption.ShareOpens)))
         SettingsArea.Notifications -> listOf(
             OptionGroup(
@@ -205,35 +215,35 @@ val SettingOption.parent: SettingOption?
 /** How deep the option is nested under its parents within [group]. */
 fun SettingOption.depthIn(group: OptionGroup): Int = generateSequence(parent) { it.parent }.takeWhile { it in group.options }.count()
 
-/** Options about the session list beside the chat: they only do something on wide windows. */
-val SettingOption.wideOnly: Boolean
-    get() = this == SettingOption.SplitView || this == SettingOption.ListWidth || this == SettingOption.ListHandle || this == SettingOption.BackShowsList
-
-/** Whether the option can be shown in this window: on this platform and, for the split view, wide enough. */
-fun SettingOption.availableIn(wide: Boolean): Boolean = supported && (wide || !wideOnly)
-
 /**
- * The categories this platform has, in order: sharing to the app only exists on Android,
- * notifications where [notifications] are supported.
+ * The categories this device has, in order: sharing to the app only exists on Android,
+ * notifications where [notifications] are supported, and foldable and large screens where the
+ * [screen] can give the app a wide window (a foldable even while folded, a tablet), not on phones.
  */
-fun visibleAreas(notifications: Boolean, sharing: Boolean = shareTargetSupported): List<SettingsArea> =
+fun visibleAreas(notifications: Boolean, screen: ScreenCapabilities, sharing: Boolean = shareTargetSupported): List<SettingsArea> =
     SettingsArea.entries.filter { area ->
         when (area) {
             SettingsArea.Notifications -> notifications
             SettingsArea.Sharing -> sharing
+            SettingsArea.LargeScreens -> screen.largeScreen
             else -> true
         }
     }
 
 /**
- * The groups of [area] as its page shows them with the current settings: only the options that
- * apply (dependent ones appear under their parent once it allows them) and the groups left with any.
+ * The groups of [area] as its page shows them with the current settings: only the options this
+ * device has (see [availableOn]) that apply (dependent ones appear under their parent once it
+ * allows them) and the groups left with any. The large screen options show on narrow windows too,
+ * to be set before unfolding.
  */
-fun visibleGroups(area: SettingsArea, settings: AppSettings, notificationsOn: Boolean, wide: Boolean): List<OptionGroup> =
+fun visibleGroups(area: SettingsArea, settings: AppSettings, notificationsOn: Boolean, screen: ScreenCapabilities): List<OptionGroup> =
     area.groups.mapNotNull { group ->
-        val shown = group.options.filter { it.availableIn(wide) && it.appliesTo(settings, notificationsOn) }
+        val shown = group.options.filter { it.availableOn(screen) && it.appliesTo(settings, notificationsOn) }
         if (shown.isEmpty()) null else OptionGroup(group.title, shown)
     }
+
+/** Whether a search can offer the option: in one of the categories shown, [areas], and on this device. */
+fun SettingOption.findableIn(areas: List<SettingsArea>, screen: ScreenCapabilities): Boolean = area in areas && availableOn(screen)
 
 /**
  * Where to point at [option] on its page: the option itself when it is shown, or else the
@@ -252,6 +262,7 @@ val SettingsArea.description: StringResource
         SettingsArea.Composer -> Res.string.settings_area_composer_sub
         SettingsArea.VoiceInput -> Res.string.settings_area_voice_sub
         SettingsArea.Sessions -> Res.string.settings_area_sessions_sub
+        SettingsArea.LargeScreens -> Res.string.settings_area_large_screens_sub
         SettingsArea.Sharing -> Res.string.settings_area_sharing_sub
         SettingsArea.Terminal -> Res.string.settings_area_terminal_sub
         SettingsArea.Notifications -> Res.string.settings_area_notifications_sub
@@ -261,10 +272,9 @@ val SettingsArea.description: StringResource
 
 /**
  * The current values of [area] in a few words, joined into one line by its row on the first
- * page; empty when there is nothing to say, and the row shows [description] instead. [wide] says
- * whether the split view can show.
+ * page; empty when there is nothing to say, and the row shows [description] instead.
  */
-fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boolean = false): List<UiText> {
+fun summary(area: SettingsArea, state: SettingsState, demo: Boolean = false): List<UiText> {
     val s = state.settings
     fun res(id: StringResource, vararg args: Any) = UiText.Resource(id, args.toList())
     fun on(vararg features: Pair<Boolean, StringResource>) = features.filter { it.first }.map { res(it.second) }
@@ -279,7 +289,6 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
             res(s.theme.labelRes),
             OpenCodeThemes.byId(s.openCodeTheme)?.let { UiText.Raw(it.displayName) },
             res(textSizeLabel(s.chatTextScale)),
-            if (wide && s.splitView) res(Res.string.settings_summary_split) else null,
         )
         SettingsArea.Chat -> on(
             s.showReasoning to Res.string.settings_summary_reasoning,
@@ -323,6 +332,14 @@ fun summary(area: SettingsArea, state: SettingsState, wide: Boolean, demo: Boole
             s.showRunningWorkInList to Res.string.settings_summary_running,
             s.confirmStopCommand to Res.string.settings_summary_confirm_stop,
         )
+        SettingsArea.LargeScreens -> when {
+            !s.splitView -> listOf(res(Res.string.settings_summary_off))
+            s.unfoldedLayout == UnfoldedLayout.ListPanel -> listOf(res(Res.string.settings_unfolded_layout_panel))
+            else -> listOf(
+                res(Res.string.settings_summary_split),
+                res(Res.string.settings_summary_list_width, ((s.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION) * 100).roundToInt()),
+            )
+        }
         SettingsArea.Sharing -> if (!s.showInShareMenu) {
             listOf(res(Res.string.settings_summary_off))
         } else {

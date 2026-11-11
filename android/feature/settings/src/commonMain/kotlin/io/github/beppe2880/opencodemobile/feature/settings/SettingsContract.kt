@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
@@ -17,6 +18,8 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
+import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -129,9 +132,15 @@ sealed interface SettingsEvent {
     data class TerminalOpenKeyboardChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalFullscreenByDefaultChanged(val enabled: Boolean) : SettingsEvent
     data class SplitViewChanged(val enabled: Boolean) : SettingsEvent
-    data class ListPaneFractionChanged(val fraction: Float) : SettingsEvent
+
+    /** The share of the width taken by the list beside the chat; null for the default. */
+    data class ListPaneFractionChanged(val fraction: Float?) : SettingsEvent
     data class ListPaneHandleChanged(val enabled: Boolean) : SettingsEvent
     data class BackShowsListChanged(val enabled: Boolean) : SettingsEvent
+    data class UnfoldedLayoutChanged(val layout: UnfoldedLayout) : SettingsEvent
+    data class UnfoldOpenChatChanged(val choice: UnfoldChat) : SettingsEvent
+    data class FoldOpenChatChanged(val choice: FoldChat) : SettingsEvent
+    data class ListSwipeChanged(val enabled: Boolean) : SettingsEvent
     data class OutputPreviewLinesChanged(val lines: Int) : SettingsEvent
     data class LiveOutputIntervalChanged(val millis: Long) : SettingsEvent
     data class KeepLiveStepsOpenChanged(val enabled: Boolean) : SettingsEvent

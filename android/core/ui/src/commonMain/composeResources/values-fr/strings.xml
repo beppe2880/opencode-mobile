@@ -31,6 +31,7 @@
     <string name="oc_area_live">Activité en direct</string>
     <string name="oc_area_composer">Champ de message</string>
     <string name="oc_area_sessions">Sessions</string>
+    <string name="oc_area_large_screens">Pliables et grands écrans</string>
     <string name="oc_area_terminal">Terminal</string>
     <string name="oc_area_notifications">Notifications</string>
     <string name="oc_area_updates">Mises à jour</string>

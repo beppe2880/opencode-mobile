@@ -21,10 +21,7 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalPreview
  */
 internal val settingsPreviews: AreaPreviewContent = { area, preview, modifier ->
     when (area) {
-        SettingsArea.Appearance -> Column(modifier) {
-            AppearancePreview(preview)
-            SplitViewPreview(preview)
-        }
+        SettingsArea.Appearance -> AppearancePreview(preview, modifier)
         SettingsArea.Chat -> Column(modifier) {
             ChatPreview(preview)
             SwipeChatsPreview(preview)
@@ -36,6 +33,7 @@ internal val settingsPreviews: AreaPreviewContent = { area, preview, modifier ->
         }
         SettingsArea.VoiceInput -> VoiceInputPreview(preview, modifier)
         SettingsArea.Sessions -> SessionsPreview(preview, modifier)
+        SettingsArea.LargeScreens -> SplitViewPreview(preview, modifier)
         SettingsArea.Sharing -> SharingPreview(preview, modifier)
         SettingsArea.Terminal -> TerminalPreview(preview, modifier)
         // Drawn by Settings itself, or without a preview.

@@ -31,6 +31,7 @@
     <string name="oc_area_live">Live-Aktivität</string>
     <string name="oc_area_composer">Nachrichtenfeld</string>
     <string name="oc_area_sessions">Sitzungen</string>
+    <string name="oc_area_large_screens">Faltbare und große Bildschirme</string>
     <string name="oc_area_terminal">Terminal</string>
     <string name="oc_area_notifications">Benachrichtigungen</string>
     <string name="oc_area_updates">Updates</string>

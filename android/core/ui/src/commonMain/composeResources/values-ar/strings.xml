@@ -31,6 +31,7 @@
     <string name="oc_area_live">النشاط المباشر</string>
     <string name="oc_area_composer">صندوق الرسالة</string>
     <string name="oc_area_sessions">الجلسات</string>
+    <string name="oc_area_large_screens">الشاشات القابلة للطي والكبيرة</string>
     <string name="oc_area_terminal">الطرفية</string>
     <string name="oc_area_notifications">الإشعارات</string>
     <string name="oc_area_updates">التحديثات</string>

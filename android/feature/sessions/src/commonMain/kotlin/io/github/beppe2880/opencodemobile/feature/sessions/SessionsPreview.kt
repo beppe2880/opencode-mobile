@@ -38,6 +38,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
+import io.github.beppe2880.opencodemobile.core.domain.listBesideChat
 import io.github.beppe2880.opencodemobile.core.ui.components.OcCustomizable
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.PartPreview
@@ -84,7 +85,8 @@ fun SplitViewPreview(preview: PartPreview, modifier: Modifier = Modifier) {
     val s = preview.settings
     OcCustomizable(SettingsPart.SplitView, preview, modifier.padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)) {
         SplitSketch(
-            split = s.splitView,
+            // The chat list panel opens over the chat, as without the split view.
+            split = s.listBesideChat,
             fraction = (s.listPaneFraction ?: DEFAULT_LIST_PANE_FRACTION).coerceIn(LIST_PANE_FRACTION_RANGE),
             handle = s.listPaneHandle,
             backShowsList = s.backShowsList,

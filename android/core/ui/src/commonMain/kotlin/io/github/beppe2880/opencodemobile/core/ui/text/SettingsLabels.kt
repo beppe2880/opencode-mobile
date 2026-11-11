@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_about
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_appearance
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_chat
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_composer
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_large_screens
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_live
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_notifications
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_servers
@@ -65,6 +66,7 @@ private val SettingsArea.labelRes: StringResource
         SettingsArea.Composer -> Res.string.oc_area_composer
         SettingsArea.VoiceInput -> Res.string.oc_area_voice
         SettingsArea.Sessions -> Res.string.oc_area_sessions
+        SettingsArea.LargeScreens -> Res.string.oc_area_large_screens
         SettingsArea.Sharing -> Res.string.oc_area_sharing
         SettingsArea.Terminal -> Res.string.oc_area_terminal
         SettingsArea.Notifications -> Res.string.oc_area_notifications

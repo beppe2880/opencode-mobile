@@ -20,6 +20,9 @@ enum class SettingsArea {
     VoiceInput,
     Sessions,
 
+    /** The session list beside the chat on wide windows, and what folding and unfolding do. */
+    LargeScreens,
+
     /** Sharing from other apps to OpenCode (Android only). */
     Sharing,
     Notifications,
@@ -81,8 +84,8 @@ enum class SettingsPart(val area: SettingsArea) {
     SessionRows(SettingsArea.Sessions),
     SwipeChats(SettingsArea.Chat),
 
-    /** The session list beside the chat on wide screens. */
-    SplitView(SettingsArea.Appearance),
+    /** The session list beside the chat on wide screens, its divider, and folding and unfolding. */
+    SplitView(SettingsArea.LargeScreens),
 
     /** OpenCode in the share menu of other apps, and what sharing opens. */
     ShareTarget(SettingsArea.Sharing),

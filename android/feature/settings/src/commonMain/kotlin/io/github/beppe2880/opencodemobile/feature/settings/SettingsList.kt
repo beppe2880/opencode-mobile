@@ -7,15 +7,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -31,9 +34,12 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.SystemUpdate
+import androidx.compose.material.icons.outlined.TabletAndroid
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,9 +65,11 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.label
+import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.settings.customize.SettingOptionControl
@@ -71,6 +79,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.depthIn
 import io.github.beppe2880.opencodemobile.feature.settings.customize.description
 import io.github.beppe2880.opencodemobile.feature.settings.customize.summary
 import io.github.beppe2880.opencodemobile.feature.settings.customize.visibleGroups
+import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_large_screens_narrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -89,7 +99,6 @@ internal fun LazyListScope.categoryRows(
     areas: List<SettingsArea>,
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
-    wide: Boolean,
     demo: Boolean,
     /** The category shown beside the list on wide windows. */
     selected: SettingsArea?,
@@ -104,7 +113,7 @@ internal fun LazyListScope.categoryRows(
             OcCard(Modifier.padding(bottom = OcSpacing.sm)) {
                 card.forEachIndexed { j, area ->
                     if (j > 0) OcDivider()
-                    CategoryRow(area, state, onEvent, wide, demo, selected = area == selected)
+                    CategoryRow(area, state, onEvent, demo, selected = area == selected)
                 }
             }
         }
@@ -116,9 +125,9 @@ internal fun LazyListScope.categoryRows(
 }
 
 @Composable
-private fun CategoryRow(area: SettingsArea, state: SettingsState, onEvent: (SettingsEvent) -> Unit, wide: Boolean, demo: Boolean, selected: Boolean) {
+private fun CategoryRow(area: SettingsArea, state: SettingsState, onEvent: (SettingsEvent) -> Unit, demo: Boolean, selected: Boolean) {
     val c = OcTheme.colors
-    val values = summary(area, state, wide, demo).map { it.text() }
+    val values = summary(area, state, demo).map { it.text() }
     OcListRow(
         title = area.label(),
         subtitle = values.joinToString(" · ").ifEmpty { stringResource(area.description) },
@@ -149,6 +158,7 @@ internal val SettingsArea.icon: ImageVector
         SettingsArea.Composer -> Icons.Outlined.EditNote
         SettingsArea.VoiceInput -> Icons.Outlined.Mic
         SettingsArea.Sessions -> Icons.AutoMirrored.Outlined.ViewList
+        SettingsArea.LargeScreens -> Icons.Outlined.TabletAndroid
         SettingsArea.Sharing -> Icons.Outlined.Share
         SettingsArea.Notifications -> Icons.Outlined.Notifications
         SettingsArea.Terminal -> Icons.Outlined.Terminal
@@ -168,6 +178,7 @@ internal fun CategoryScreen(
     onEvent: (SettingsEvent) -> Unit,
     showBack: Boolean,
     wide: Boolean,
+    screen: ScreenCapabilities,
     demo: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -211,7 +222,7 @@ internal fun CategoryScreen(
                         AboutSection(state, onEvent, showUpdateNotice = false)
                         ResetSection(onEvent)
                     }
-                    else -> CategoryOptions(area, state, onEvent, wide, scroll)
+                    else -> CategoryOptions(area, state, onEvent, wide, screen, scroll)
                 }
             }
         }
@@ -219,7 +230,14 @@ internal fun CategoryScreen(
 }
 
 @Composable
-private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (SettingsEvent) -> Unit, wide: Boolean, scroll: ScrollState) {
+private fun CategoryOptions(
+    area: SettingsArea,
+    state: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
+    wide: Boolean,
+    screen: ScreenCapabilities,
+    scroll: ScrollState,
+) {
     val c = OcTheme.colors
     val target = state.focus?.takeIf { it.area == area }?.anchor(state.settings, state.notificationsOn)
     val highlight = remember(target) { Animatable(if (target != null) 1f else 0f) }
@@ -236,7 +254,8 @@ private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (
         highlight.animateTo(0f, tween(HIGHLIGHT_FADE_MS))
     }
     Column(Modifier.onGloballyPositioned { page = it }) {
-        visibleGroups(area, state.settings, state.notificationsOn, wide).forEach { group ->
+        if (area == SettingsArea.LargeScreens) LargeScreensNotice(screen, wide, Modifier.padding(bottom = OcSpacing.lg))
+        visibleGroups(area, state.settings, state.notificationsOn, screen).forEach { group ->
             val content: @Composable () -> Unit = {
                 OcCard {
                     group.options.forEachIndexed { i, option ->
@@ -265,6 +284,24 @@ private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (
             val title = group.title
             if (title != null) Section(stringResource(title), content) else Column(Modifier.padding(bottom = OcSpacing.lg)) { content() }
         }
+    }
+}
+
+/** On a narrow window that unfolding would not widen (a tablet in split screen): the large screen options wait for a wide one. */
+@Composable
+internal fun NarrowWindowNote(modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(c.layer01, RoundedCornerShape(OcRadius.lg))
+            .padding(OcSpacing.md)
+            .testTag("settings_large_screens_note"),
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Outlined.Info, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(18.dp))
+        Text(stringResource(Res.string.settings_large_screens_narrow), style = MaterialTheme.typography.bodySmall, color = c.textMuted)
     }
 }
 

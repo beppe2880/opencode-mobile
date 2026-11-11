@@ -31,6 +31,7 @@
     <string name="oc_area_live">Активность в реальном времени</string>
     <string name="oc_area_composer">Поле сообщения</string>
     <string name="oc_area_sessions">Сессии</string>
+    <string name="oc_area_large_screens">Складные и большие экраны</string>
     <string name="oc_area_terminal">Терминал</string>
     <string name="oc_area_notifications">Уведомления</string>
     <string name="oc_area_updates">Обновления</string>
