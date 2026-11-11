@@ -52,6 +52,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegment
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSegmentedControl
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
+import io.github.beppe2880.opencodemobile.core.ui.platform.rememberScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -156,7 +157,7 @@ private fun OptionsPanel(
                 )
             }
             Column(Modifier.verticalScroll(rememberScrollState()).padding(start = OcSpacing.md, end = OcSpacing.md, bottom = OcSpacing.md)) {
-                PartOptionsCard(part, state, onEvent, highlighted = false, inPreview = false)
+                PartOptionsCard(part, state, onEvent, rememberScreenCapabilities(), highlighted = false, inPreview = false)
                 if (onOpenArea != null) {
                     OcButton(
                         text = stringResource(Res.string.settings_edit_more, part.area.label()),

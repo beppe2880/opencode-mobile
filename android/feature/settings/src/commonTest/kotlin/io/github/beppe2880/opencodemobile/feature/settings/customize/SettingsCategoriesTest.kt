@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SttProvider
 import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
@@ -102,27 +103,58 @@ class SettingsCategoriesTest {
 
     @Test
     fun pagesShowOnlyWhatApplies() {
-        val phone = visibleGroups(SettingsArea.VoiceInput, AppSettings(), notificationsOn = true)
+        val phone = visibleGroups(SettingsArea.VoiceInput, AppSettings(), notificationsOn = true, ScreenCapabilities.Phone)
         assertEquals(listOf(listOf(SettingOption.Dictation, SettingOption.VoiceMode)), phone.map { it.options })
-        val cloud = visibleGroups(SettingsArea.VoiceInput, AppSettings(voiceEngine = VoiceEngine.Cloud), notificationsOn = true)
+        val cloud = visibleGroups(SettingsArea.VoiceInput, AppSettings(voiceEngine = VoiceEngine.Cloud), notificationsOn = true, ScreenCapabilities.Phone)
         assertEquals(VOICE_OPTIONS, cloud.flatMap { it.options })
-        val off = visibleGroups(SettingsArea.VoiceInput, AppSettings(dictation = false, voiceEngine = VoiceEngine.Cloud), notificationsOn = true)
+        val off = visibleGroups(
+            SettingsArea.VoiceInput,
+            AppSettings(dictation = false, voiceEngine = VoiceEngine.Cloud),
+            notificationsOn = true,
+            ScreenCapabilities.Phone,
+        )
         assertEquals(listOf(SettingOption.Dictation), off.flatMap { it.options })
 
-        // Every large screen option out of the box, on any window: they can be set before unfolding.
-        assertEquals(LARGE_SCREEN_OPTIONS, visibleGroups(SettingsArea.LargeScreens, AppSettings(), true).flatMap { it.options })
+        // Every large screen option out of the box on a foldable, folded or not: they can be set before unfolding.
+        assertEquals(LARGE_SCREEN_OPTIONS, largeScreenOptions(AppSettings(), ScreenCapabilities.Foldable))
         // Without the list beside the chat only its switch is left.
-        assertEquals(listOf(SettingOption.SplitView), visibleGroups(SettingsArea.LargeScreens, AppSettings(splitView = false), true).flatMap { it.options })
+        assertEquals(listOf(SettingOption.SplitView), largeScreenOptions(AppSettings(splitView = false), ScreenCapabilities.Foldable))
         // The chat list panel keeps only the layout choice and the swipe.
         assertEquals(
             listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout, SettingOption.ListSwipe),
-            visibleGroups(SettingsArea.LargeScreens, AppSettings(unfoldedLayout = UnfoldedLayout.ListPanel), true).flatMap { it.options },
+            largeScreenOptions(AppSettings(unfoldedLayout = UnfoldedLayout.ListPanel), ScreenCapabilities.Foldable),
         )
 
-        val folder = visibleGroups(SettingsArea.Chat, AppSettings(chatHeaderLine = ChatHeaderLine.Folder), true).flatMap { it.options }
+        val folder = visibleGroups(SettingsArea.Chat, AppSettings(chatHeaderLine = ChatHeaderLine.Folder), true, ScreenCapabilities.Phone)
+            .flatMap { it.options }
         assertTrue(SettingOption.HeaderLine in folder && SettingOption.HeaderStyle !in folder)
-        assertTrue(visibleGroups(SettingsArea.Servers, AppSettings(), true).isEmpty())
+        assertTrue(visibleGroups(SettingsArea.Servers, AppSettings(), true, ScreenCapabilities.Foldable).isEmpty())
     }
+
+    @Test
+    fun foldingAndUnfoldingOnlyOnFoldables() {
+        val foldable = visibleGroups(SettingsArea.LargeScreens, AppSettings(), true, ScreenCapabilities.Foldable)
+        assertEquals(3, foldable.size)
+        assertTrue(FOLDING_OPTIONS.all { it.availableOn(ScreenCapabilities.Foldable) })
+        // A tablet keeps the layout and the divider, without the group about folding.
+        val tablet = visibleGroups(SettingsArea.LargeScreens, AppSettings(), true, ScreenCapabilities.Tablet)
+        assertEquals(
+            listOf(
+                listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout, SettingOption.ListWidth),
+                listOf(SettingOption.ListHandle, SettingOption.BackShowsList, SettingOption.ListSwipe),
+            ),
+            tablet.map { it.options },
+        )
+        assertEquals(foldable.map { it.title } - SettingOption.UnfoldOpenChat.group.title, tablet.map { it.title })
+        // A phone has none of them.
+        assertTrue(largeScreenOptions(AppSettings(), ScreenCapabilities.Phone).isEmpty())
+        assertTrue(LARGE_SCREEN_OPTIONS.none { it.availableOn(ScreenCapabilities.Phone) })
+        // The other options do not depend on the screen.
+        assertTrue(SettingOption.entries.filter { it !in LARGE_SCREEN_OPTIONS }.all { it.availableOn(ScreenCapabilities.Phone) == it.supported })
+    }
+
+    private fun largeScreenOptions(settings: AppSettings, screen: ScreenCapabilities) =
+        visibleGroups(SettingsArea.LargeScreens, settings, true, screen).flatMap { it.options }
 
     @Test
     fun aHiddenOptionIsPointedAtThroughTheOptionThatBringsItBack() {
@@ -140,11 +172,21 @@ class SettingsCategoriesTest {
 
     @Test
     fun platformsListOnlyTheirCategories() {
-        assertEquals(SettingsArea.entries, visibleAreas(notifications = true, sharing = true))
-        val ios = visibleAreas(notifications = false, sharing = false)
-        assertFalse(SettingsArea.Sharing in ios || SettingsArea.Notifications in ios)
+        assertEquals(SettingsArea.entries, visibleAreas(notifications = true, ScreenCapabilities.Foldable, sharing = true))
+        val ios = visibleAreas(notifications = false, ScreenCapabilities.Phone, sharing = false)
+        assertFalse(SettingsArea.Sharing in ios || SettingsArea.Notifications in ios || SettingsArea.LargeScreens in ios)
         assertEquals(SettingsArea.Servers, ios.first())
         assertEquals(SettingsArea.About, ios.last())
+    }
+
+    @Test
+    fun largeScreensOnlyWhereTheAppCanGetAWideWindow() {
+        assertFalse(SettingsArea.LargeScreens in visibleAreas(notifications = true, ScreenCapabilities.Phone, sharing = true))
+        assertTrue(SettingsArea.LargeScreens in visibleAreas(notifications = true, ScreenCapabilities.Tablet, sharing = true))
+        // A foldable lists it while folded too: the options can be set before unfolding.
+        assertTrue(SettingsArea.LargeScreens in visibleAreas(notifications = true, ScreenCapabilities.Foldable, sharing = true))
+        // An iPad.
+        assertTrue(SettingsArea.LargeScreens in visibleAreas(notifications = false, ScreenCapabilities.Tablet, sharing = false))
     }
 
     @Test
@@ -220,8 +262,6 @@ class SettingsCategoriesTest {
             summaryOf(SettingsArea.LargeScreens, AppSettings(unfoldedLayout = UnfoldedLayout.ListPanel)),
         )
         assertEquals(listOf(UiText.Resource(Res.string.settings_summary_off)), summaryOf(SettingsArea.LargeScreens, AppSettings(splitView = false)))
-        // Shown on every device: the options can be set before unfolding.
-        assertTrue(SettingsArea.LargeScreens in visibleAreas(notifications = false, sharing = false))
     }
 
     private fun summaryOf(area: SettingsArea, settings: AppSettings) = summary(area, SettingsState(settings = settings))

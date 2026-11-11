@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -67,6 +68,20 @@ class SettingsSearchTest {
         )
         // Both swipes, the chat's and the one of the list beside it.
         assertEquals(listOf(SettingOption.SwipeChats, SettingOption.ListSwipe), search("swipe sidebar"))
+    }
+
+    @Test
+    fun onlyDevicesWithTheOptionsFindThem() {
+        fun findable(query: String, screen: ScreenCapabilities): List<SettingOption> {
+            val areas = visibleAreas(notifications = true, screen, sharing = true)
+            return search(query).filter { it.findableIn(areas, screen) }
+        }
+        assertEquals(search("foldable"), findable("foldable", ScreenCapabilities.Foldable))
+        // A tablet does not fold.
+        assertEquals(listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout), findable("foldable", ScreenCapabilities.Tablet))
+        // A phone has no wide window: only the chat's own swipe is left.
+        assertTrue(findable("foldable", ScreenCapabilities.Phone).isEmpty())
+        assertEquals(listOf(SettingOption.SwipeChats), findable("swipe sidebar", ScreenCapabilities.Phone))
     }
 
     @Test

@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.listBesideChat
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 
 /**
@@ -211,6 +212,22 @@ internal val SettingOption.searchKeywords: List<String>
 /** Whether the option exists on this platform: nothing can be shared to the iOS app yet. */
 val SettingOption.supported: Boolean
     get() = shareTargetSupported || (this != SettingOption.ShareMenu && this != SettingOption.ShareOpens)
+
+/** What folding and unfolding do with an open chat: only foldables have them. */
+val FOLDING_OPTIONS: List<SettingOption> = listOf(SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat)
+
+/**
+ * Whether the option can be shown on this device: it exists on this platform ([supported]), the
+ * large screen ones where the app can get a wide window, and those about folding on foldables.
+ */
+fun SettingOption.availableOn(screen: ScreenCapabilities): Boolean {
+    if (!supported) return false
+    return when (this) {
+        in FOLDING_OPTIONS -> screen.foldable
+        in LARGE_SCREEN_OPTIONS -> screen.largeScreen
+        else -> true
+    }
+}
 
 /**
  * Whether the preview shows this part with [settings]: grouped thinking and tools make one row,

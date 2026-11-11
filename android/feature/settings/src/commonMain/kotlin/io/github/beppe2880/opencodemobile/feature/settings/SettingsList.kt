@@ -65,6 +65,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.label
@@ -177,6 +178,7 @@ internal fun CategoryScreen(
     onEvent: (SettingsEvent) -> Unit,
     showBack: Boolean,
     wide: Boolean,
+    screen: ScreenCapabilities,
     demo: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -220,7 +222,7 @@ internal fun CategoryScreen(
                         AboutSection(state, onEvent, showUpdateNotice = false)
                         ResetSection(onEvent)
                     }
-                    else -> CategoryOptions(area, state, onEvent, wide, scroll)
+                    else -> CategoryOptions(area, state, onEvent, wide, screen, scroll)
                 }
             }
         }
@@ -228,7 +230,14 @@ internal fun CategoryScreen(
 }
 
 @Composable
-private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (SettingsEvent) -> Unit, wide: Boolean, scroll: ScrollState) {
+private fun CategoryOptions(
+    area: SettingsArea,
+    state: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
+    wide: Boolean,
+    screen: ScreenCapabilities,
+    scroll: ScrollState,
+) {
     val c = OcTheme.colors
     val target = state.focus?.takeIf { it.area == area }?.anchor(state.settings, state.notificationsOn)
     val highlight = remember(target) { Animatable(if (target != null) 1f else 0f) }
@@ -246,7 +255,7 @@ private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (
     }
     Column(Modifier.onGloballyPositioned { page = it }) {
         if (area == SettingsArea.LargeScreens && !wide) NarrowWindowNote(Modifier.padding(bottom = OcSpacing.lg))
-        visibleGroups(area, state.settings, state.notificationsOn).forEach { group ->
+        visibleGroups(area, state.settings, state.notificationsOn, screen).forEach { group ->
             val content: @Composable () -> Unit = {
                 OcCard {
                     group.options.forEachIndexed { i, option ->
@@ -278,7 +287,7 @@ private fun CategoryOptions(area: SettingsArea, state: SettingsState, onEvent: (
     }
 }
 
-/** On a narrow window (a folded foldable, a phone): the large screen options wait for a wide one. */
+/** On a narrow window (a folded foldable, a tablet in split screen): the large screen options wait for a wide one. */
 @Composable
 internal fun NarrowWindowNote(modifier: Modifier = Modifier) {
     val c = OcTheme.colors

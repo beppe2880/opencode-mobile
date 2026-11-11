@@ -72,6 +72,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.PartPreview
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.text.label
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -109,6 +110,8 @@ internal fun AreaScreen(
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
     content: AreaPreviewContent,
+    /** Leaves out the options this device has no use for, like those about folding on a tablet. */
+    screen: ScreenCapabilities,
     modifier: Modifier = Modifier,
 ) {
     val area = state.area ?: return
@@ -177,7 +180,7 @@ internal fun AreaScreen(
                     horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
                 ) {
                     frame(Modifier.weight(1f).fillMaxHeight().padding(bottom = OcSpacing.md))
-                    OptionsList(parts, state, onEvent, listState, tail, Modifier.weight(1f).widthIn(max = 520.dp).fillMaxHeight())
+                    OptionsList(parts, state, onEvent, screen, listState, tail, Modifier.weight(1f).widthIn(max = 520.dp).fillMaxHeight())
                 }
             } else {
                 StackedLayout(
@@ -185,7 +188,7 @@ internal fun AreaScreen(
                     fraction = state.settings.settingsPreviewFraction ?: PreviewSize.DEFAULT_FRACTION,
                     onFraction = { onEvent(SettingsEvent.PreviewFractionChanged(it)) },
                     frame = frame,
-                    options = { optionsModifier -> OptionsList(parts, state, onEvent, listState, tail, optionsModifier) },
+                    options = { optionsModifier -> OptionsList(parts, state, onEvent, screen, listState, tail, optionsModifier) },
                 )
             }
         }
@@ -327,6 +330,7 @@ private fun OptionsList(
     parts: List<SettingsPart>,
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
+    screen: ScreenCapabilities,
     listState: LazyListState,
     tail: Dp,
     modifier: Modifier,
@@ -337,13 +341,13 @@ private fun OptionsList(
         contentPadding = PaddingValues(start = OcSpacing.md, end = OcSpacing.md, top = OcSpacing.xs, bottom = tail),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.md),
     ) {
-        items(parts, key = { it.name }) { part -> PartOptions(part, state, onEvent) }
+        items(parts, key = { it.name }) { part -> PartOptions(part, state, onEvent, screen) }
     }
 }
 
 /** The name of [part] and its options as in the rest of Settings; options switched off by another one say which. */
 @Composable
-private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (SettingsEvent) -> Unit) {
+private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (SettingsEvent) -> Unit, screen: ScreenCapabilities) {
     val c = OcTheme.colors
     val selected = state.selected == part
     Column(verticalArrangement = Arrangement.spacedBy(OcSpacing.xs), modifier = Modifier.testTag("area_part_${part.name.lowercase()}")) {
@@ -359,7 +363,7 @@ private fun PartOptions(part: SettingsPart, state: SettingsState, onEvent: (Sett
                 .semantics { heading() },
         )
         if (part.area == SettingsArea.LargeScreens && !isWideWindow()) NarrowWindowNote()
-        PartOptionsCard(part, state, onEvent, highlighted = selected)
+        PartOptionsCard(part, state, onEvent, screen, highlighted = selected)
     }
 }
 
@@ -369,12 +373,13 @@ internal fun PartOptionsCard(
     part: SettingsPart,
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
+    screen: ScreenCapabilities,
     highlighted: Boolean,
     /** Says when the preview leaves the part out; not for the real screens of the live demo. */
     inPreview: Boolean = true,
 ) {
     val c = OcTheme.colors
-    val options = part.options.filter { it.supported }
+    val options = part.options.filter { it.availableOn(screen) }
     val shown = options.filter { it.appliesTo(state.settings, state.notificationsOn) }
     // The switch to turn on first: past the ones that do not apply themselves (live kinds before the interval).
     val needs = options.filterNot { it in shown }.mapNotNull { hidden ->

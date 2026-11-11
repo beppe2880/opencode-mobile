@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.sttModel
+import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_header
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_pending
@@ -215,28 +216,34 @@ val SettingOption.parent: SettingOption?
 fun SettingOption.depthIn(group: OptionGroup): Int = generateSequence(parent) { it.parent }.takeWhile { it in group.options }.count()
 
 /**
- * The categories this platform has, in order: sharing to the app only exists on Android,
- * notifications where [notifications] are supported.
+ * The categories this device has, in order: sharing to the app only exists on Android,
+ * notifications where [notifications] are supported, and foldable and large screens where the
+ * [screen] can give the app a wide window (a foldable even while folded, a tablet), not on phones.
  */
-fun visibleAreas(notifications: Boolean, sharing: Boolean = shareTargetSupported): List<SettingsArea> =
+fun visibleAreas(notifications: Boolean, screen: ScreenCapabilities, sharing: Boolean = shareTargetSupported): List<SettingsArea> =
     SettingsArea.entries.filter { area ->
         when (area) {
             SettingsArea.Notifications -> notifications
             SettingsArea.Sharing -> sharing
+            SettingsArea.LargeScreens -> screen.largeScreen
             else -> true
         }
     }
 
 /**
- * The groups of [area] as its page shows them with the current settings: only the options of this
- * platform that apply (dependent ones appear under their parent once it allows them) and the groups
- * left with any. The large screen options show on narrow windows too, to be set before unfolding.
+ * The groups of [area] as its page shows them with the current settings: only the options this
+ * device has (see [availableOn]) that apply (dependent ones appear under their parent once it
+ * allows them) and the groups left with any. The large screen options show on narrow windows too,
+ * to be set before unfolding.
  */
-fun visibleGroups(area: SettingsArea, settings: AppSettings, notificationsOn: Boolean): List<OptionGroup> =
+fun visibleGroups(area: SettingsArea, settings: AppSettings, notificationsOn: Boolean, screen: ScreenCapabilities): List<OptionGroup> =
     area.groups.mapNotNull { group ->
-        val shown = group.options.filter { it.supported && it.appliesTo(settings, notificationsOn) }
+        val shown = group.options.filter { it.availableOn(screen) && it.appliesTo(settings, notificationsOn) }
         if (shown.isEmpty()) null else OptionGroup(group.title, shown)
     }
+
+/** Whether a search can offer the option: in one of the categories shown, [areas], and on this device. */
+fun SettingOption.findableIn(areas: List<SettingsArea>, screen: ScreenCapabilities): Boolean = area in areas && availableOn(screen)
 
 /**
  * Where to point at [option] on its page: the option itself when it is shown, or else the
