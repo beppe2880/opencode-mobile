@@ -21,12 +21,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Difference
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.DropdownMenu
@@ -92,8 +94,11 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_titl
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pin
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pinned
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unpin
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_branch_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_detached
@@ -147,6 +152,7 @@ fun ChatScreen(
                     onTerminal = { onEvent(ChatEvent.OpenTerminal) },
                     onMcps = { onEvent(ChatEvent.OpenMcps) },
                     onProviders = { onEvent(ChatEvent.OpenProviders) },
+                    onPin = { onEvent(ChatEvent.SetPinned(it)) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                 )
                 if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
@@ -247,6 +253,8 @@ internal fun ChatTopBar(
     onMcps: () -> Unit,
     onRunning: () -> Unit,
     onProviders: () -> Unit = {},
+    /** Pins the session to the top of the session list (true) or unpins it. */
+    onPin: (Boolean) -> Unit = {},
     applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
@@ -283,6 +291,14 @@ internal fun ChatTopBar(
             null
         },
         titleAccessory = {
+            if (state.pinned) {
+                Icon(
+                    Icons.Filled.PushPin,
+                    contentDescription = stringResource(Res.string.chat_pinned),
+                    tint = c.textFaint,
+                    modifier = Modifier.size(14.dp).testTag("chat_pinned_mark"),
+                )
+            }
             if (state.running) OcPulsingDot(c.agents.forAgent(state.agent), Modifier.testTag("chat_running_indicator"))
         },
         actions = {
@@ -313,6 +329,15 @@ internal fun ChatTopBar(
                     containerColor = c.bgBase,
                     modifier = Modifier.exposeTestTags(),
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(if (state.pinned) Res.string.chat_unpin else Res.string.chat_pin)) },
+                        onClick = {
+                            menuOpen = false
+                            onPin(!state.pinned)
+                        },
+                        leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
+                        modifier = Modifier.testTag("chat_menu_pin"),
+                    )
                     DropdownMenuItem(
                         text = { Text(stringResource(UiRes.string.oc_running)) },
                         onClick = {

@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">Acceso caducado · vuelve a vincular</string>
     <string name="sessions_demo_server">Demo</string>
     <string name="sessions_demo_status">Sesiones de ejemplo · sin servidor</string>
+    <string name="sessions_pinned">Fijadas</string>
+    <string name="sessions_pin">Fijar</string>
+    <string name="sessions_unpin">Desfijar</string>
     <string name="sessions_rename">Renombrar</string>
     <string name="sessions_delete">Eliminar</string>
     <string name="sessions_rename_title">Renombrar sesión</string>

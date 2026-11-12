@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
@@ -105,6 +106,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_label
@@ -115,6 +118,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_se
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_this_week
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.StringResource
@@ -218,9 +222,13 @@ fun SessionsScreen(
                     state.isEmpty -> item(key = "empty") { EmptyContent(state, onEvent) }
                     else -> state.groups.forEach { group ->
                         item(key = "group-${group.bucket}", contentType = "group") {
-                            OcSectionHeader(stringResource(group.bucket.label()), Modifier.padding(top = OcSpacing.sm))
+                            OcSectionHeader(
+                                stringResource(group.bucket.label()),
+                                Modifier.padding(top = OcSpacing.sm).testTag("sessions_group_${group.bucket.name.lowercase()}"),
+                            )
                         }
                         items(group.sessions, key = { it.id }, contentType = { "session" }) { session ->
+                            val pinned = session.id in state.pinned
                             SessionRow(
                                 session = session,
                                 running = session.id in state.running,
@@ -233,6 +241,8 @@ fun SessionsScreen(
                                 compact = compact,
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
                                 swipeToDelete = !inDrawer,
+                                pinned = pinned,
+                                onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
                             )
                         }
                     }
@@ -400,6 +410,7 @@ private fun LazyListScope.skeletonItems() {
 }
 
 private fun DayBucket.label(): StringResource = when (this) {
+    DayBucket.Pinned -> Res.string.sessions_pinned
     DayBucket.Today -> Res.string.sessions_today
     DayBucket.Yesterday -> Res.string.sessions_yesterday
     DayBucket.ThisWeek -> Res.string.sessions_this_week
@@ -416,6 +427,13 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 color = OcTheme.colors.textBase,
                 maxLines = 2,
                 modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm),
+            )
+            val pinned = session.id in state.pinned
+            OcListRow(
+                title = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin),
+                onClick = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
+                leading = { Icon(Icons.Outlined.PushPin, null, tint = OcTheme.colors.iconBase) },
+                modifier = Modifier.testTag("sessions_action_pin"),
             )
             OcListRow(
                 title = stringResource(Res.string.sessions_rename),

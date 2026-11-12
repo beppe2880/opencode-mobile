@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
+import io.github.beppe2880.opencodemobile.core.domain.PinnedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.QueuedPrompt
@@ -79,6 +80,7 @@ class ChatViewModel(
     private val recents: RecentModelRepository,
     private val vcs: VcsRepository,
     private val shares: ShareRepository,
+    private val pins: PinnedSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
 
@@ -180,7 +182,11 @@ class ChatViewModel(
             sessionSelection(s.agent, s.model)
         }
         drafts.load(sessionId).takeIf { it.isNotEmpty() }?.let { text -> updateState { it.copy(draft = text) } }
-        updateState { it.copy(previousSession = neighbor(-1), nextSession = neighbor(+1)) }
+        updateState { it.copy(previousSession = neighbor(-1), nextSession = neighbor(+1), pinned = sessionId in pins.pinned()) }
+        viewModelScope.launch {
+            // Also pinned or unpinned from the session list while this chat is open beside it.
+            pins.changes.collect { updateState { it.copy(pinned = sessionId in pins.pinned()) } }
+        }
         viewModelScope.launch {
             // Every change of the composer text (typing, send, revert, picked mention) is kept.
             state.map { it.draft }.distinctUntilChanged().collect { drafts.save(sessionId, it) }
@@ -339,6 +345,10 @@ class ChatViewModel(
             ChatEvent.OpenHeaderChanges -> loadChanges(
                 if (headerOpens == ChangesScope.Folder && inRepository == true) ChangesScope.Folder else ChangesScope.Session,
             )
+            is ChatEvent.SetPinned -> {
+                pins.setPinned(sessionId, event.pinned)
+                updateState { it.copy(pinned = sessionId in pins.pinned()) }
+            }
             ChatEvent.OpenProviders -> if (currentState.directory.isNotEmpty()) sendEffect(ChatEffect.OpenProviders)
             ChatEvent.ProvidersConnected -> {
                 viewModelScope.launch {

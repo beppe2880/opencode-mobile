@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">Accesso scaduto · abbina di nuovo</string>
     <string name="sessions_demo_server">Demo</string>
     <string name="sessions_demo_status">Sessioni di esempio · nessun server</string>
+    <string name="sessions_pinned">Fissate</string>
+    <string name="sessions_pin">Fissa</string>
+    <string name="sessions_unpin">Non fissare più</string>
     <string name="sessions_rename">Rinomina</string>
     <string name="sessions_delete">Elimina</string>
     <string name="sessions_rename_title">Rinomina sessione</string>

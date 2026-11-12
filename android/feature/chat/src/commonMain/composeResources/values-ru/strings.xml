@@ -210,6 +210,9 @@
     <string name="chat_open_file">Открыть файл</string>
     <string name="chat_more">Другие действия</string>
     <string name="chat_mcps">Серверы MCP</string>
+    <string name="chat_pin">Закрепить</string>
+    <string name="chat_unpin">Открепить</string>
+    <string name="chat_pinned">Закреплена</string>
     <string name="chat_command_mcps">Управление подключениями MCP</string>
     <string name="chat_mcps_refresh">Обновить статус MCP</string>
     <string name="chat_mcps_runtime">Подключения действуют для проекта, а не только для этого чата. Изменения действуют до перезапуска сервера; конфигурация не меняется.</string>

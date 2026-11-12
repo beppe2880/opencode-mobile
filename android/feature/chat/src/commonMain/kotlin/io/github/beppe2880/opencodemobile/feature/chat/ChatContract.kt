@@ -30,6 +30,8 @@ import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 data class ChatState(
     val sessionId: String = "",
     val title: String = "",
+    /** Pinned to the top of the session list on this device. */
+    val pinned: Boolean = false,
     val directory: String = "",
     val agent: String? = null,
     val model: ModelRef? = null,
@@ -434,6 +436,9 @@ sealed interface ChatEvent {
     /** The header line was tapped: opens the folder or the session changes (setting). */
     data object OpenHeaderChanges : ChatEvent
     data object OpenMcps : ChatEvent
+
+    /** Pins the session to the top of the session list, or unpins it. */
+    data class SetPinned(val pinned: Boolean) : ChatEvent
     data object OpenProviders : ChatEvent
     data object ProvidersConnected : ChatEvent
     data object CloseMcps : ChatEvent

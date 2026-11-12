@@ -27,11 +27,11 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     // Stored ids of themes no longer shipped read as none (PreferencesSettingsRepository).
     single<OpenCodeThemeIds> { OpenCodeThemeIds { OpenCodeThemes.byId(it) != null } }
     viewModel { ConnectViewModel(get(), get()) }
-    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
-    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
     viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }

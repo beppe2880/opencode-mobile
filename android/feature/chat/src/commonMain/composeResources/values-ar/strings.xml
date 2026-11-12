@@ -232,6 +232,9 @@
     <string name="chat_open_file">فتح الملف</string>
     <string name="chat_more">خيارات أخرى</string>
     <string name="chat_mcps">خوادم MCP</string>
+    <string name="chat_pin">تثبيت</string>
+    <string name="chat_unpin">إلغاء التثبيت</string>
+    <string name="chat_pinned">مثبّتة</string>
     <string name="chat_command_mcps">إدارة اتصالات MCP</string>
     <string name="chat_mcps_refresh">تحديث حالة MCP</string>
     <string name="chat_mcps_runtime">تنطبق الاتصالات على هذا المشروع وليس هذه المحادثة فقط. تستمر التغييرات حتى إعادة تشغيل الخادم؛ ولا يتغير الإعداد.</string>
