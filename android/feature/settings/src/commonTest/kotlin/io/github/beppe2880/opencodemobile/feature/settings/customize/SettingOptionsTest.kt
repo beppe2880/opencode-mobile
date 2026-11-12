@@ -74,6 +74,19 @@ class SettingOptionsTest {
     }
 
     @Test
+    fun attachedImagesAreSetAtTheMessagesTheyShowAbove() {
+        assertEquals(listOf("attachedImageSize"), SettingOption.AttachedImageSize.fields)
+        assertEquals(SettingsPart.Messages, SettingOption.AttachedImageSize.part)
+        assertEquals(SettingsArea.Chat, SettingOption.AttachedImageSize.area)
+        assertEquals(null, SettingOption.AttachedImageSize.requires)
+        assertTrue(SettingOption.AttachedImageSize.appliesTo(AppSettings()))
+        assertTrue(SettingOption.AttachedImageSize.supported)
+        assertTrue(SettingOption.AttachedImageSize.searchKeywords.containsAll(listOf("attachment", "image", "photo")))
+        // The tool rows do not offer it.
+        assertFalse(SettingOption.AttachedImageSize in SettingsPart.Tools.options + SettingsPart.Activity.options)
+    }
+
+    @Test
     fun optionsApplyOnlyWhenTheirSwitchIsOn() {
         val defaults = AppSettings()
         // Out of the box every option of this platform has an effect, but the cloud voice ones (phone dictation is the default).

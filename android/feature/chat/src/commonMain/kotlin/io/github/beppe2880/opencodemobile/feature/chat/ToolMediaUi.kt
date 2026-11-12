@@ -63,9 +63,6 @@ import org.jetbrains.compose.resources.stringResource
 
 private val ChipMaxWidth = 280.dp
 
-/** Longer side, in pixels, images are decoded at for cards (the viewer decodes its own copy). */
-private const val CARD_DECODE_SIDE = 768
-
 /**
  * The files tools of one group returned, under the group's row whether it is folded or not:
  * one image as a card of part of the column width, several as a row of smaller cards, both as

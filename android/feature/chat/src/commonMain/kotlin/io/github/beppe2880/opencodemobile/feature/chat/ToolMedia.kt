@@ -206,6 +206,12 @@ internal val ToolMediaSize.bounds: MediaCardBounds?
         ToolMediaSize.Large -> MediaCardBounds(widthFraction = 1f, maxHeight = 520f, stripHeight = 220f)
     }
 
+/**
+ * Longer side, in pixels, images are decoded at for cards, read by a tool or attached to a
+ * prompt (the viewer decodes its own copy).
+ */
+internal const val CARD_DECODE_SIDE = 768
+
 /** Lowest card of a single image, in dp: very wide images are letterboxed. */
 internal const val MIN_CARD_HEIGHT = 48f
 

@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
@@ -47,9 +48,12 @@ class ChatPreviewTest {
                 outputPreviewLines = 6,
                 chatHeaderStyle = ChatHeaderStyle.Full,
                 toolMediaSize = ToolMediaSize.Large,
+                attachedImageSize = AttachedImageSize.Small,
             ),
         )
         assertEquals(ToolMediaSize.Large, state.toolMediaSize)
+        assertEquals(AttachedImageSize.Small, state.attachedImageSize)
+        assertEquals(AttachedImageSize.Medium, previewChatState(AppSettings(), running = false).attachedImageSize)
         assertFalse(state.showCost)
         assertFalse(state.agentColorOutline)
         assertEquals(1.3f, state.chatTextScale)

@@ -129,6 +129,7 @@ val SettingsArea.groups: List<OptionGroup>
                     SettingOption.ToolDetails,
                     SettingOption.FullCommands,
                     SettingOption.ToolMediaSize,
+                    SettingOption.AttachedImageSize,
                     SettingOption.ShowCost,
                 ),
             ),

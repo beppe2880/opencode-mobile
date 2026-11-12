@@ -326,6 +326,7 @@ internal fun TranscriptItem(
             modifier = modifier,
             onLongPress = if (item.pending || onUserActions == null) null else { { onUserActions(item.key) } },
             onOpenImage = { onEvent(ChatEvent.OpenImage(item.key, it)) },
+            imageSize = state.attachedImageSize,
             directory = state.directory,
             onOpenFile = { onEvent(ChatEvent.OpenFile(it)) },
         )

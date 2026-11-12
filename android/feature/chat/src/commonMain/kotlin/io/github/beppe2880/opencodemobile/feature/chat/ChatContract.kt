@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.feature.chat
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -72,6 +73,8 @@ data class ChatState(
     val showFullCommands: Boolean = false,
     /** How big images read by tools show under their row (setting). */
     val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
+    /** How big the images attached to a prompt show above its bubble (setting). */
+    val attachedImageSize: AttachedImageSize = AttachedImageSize.Medium,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
     /** The microphone button of the composer (setting). */
@@ -181,6 +184,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     showFullCommands = s.showFullCommands,
     showToolDetails = s.showToolDetails,
     toolMediaSize = s.toolMediaSize,
+    attachedImageSize = s.attachedImageSize,
     outputPreviewLines = s.outputPreviewLines,
     keepLiveStepsOpen = s.keepLiveStepsOpen,
     chatTextScale = s.chatTextScale,

@@ -400,6 +400,12 @@ enum class ChatHeaderStyle { Icons, Short, Full }
  */
 enum class ToolMediaSize { Hidden, Small, Medium, Large }
 
+/**
+ * How big the images attached to a prompt show above its bubble: [Thumbnails] is a row of small
+ * squares; [Small], [Medium] and [Large] are as big as the same [ToolMediaSize].
+ */
+enum class AttachedImageSize { Thumbnails, Small, Medium, Large }
+
 /** What a horizontal swipe in a chat does. */
 enum class ChatSwipe {
     /** Left or right opens the next or previous session of the list. */
@@ -491,6 +497,8 @@ data class AppSettings(
     val showFullCommands: Boolean = false,
     /** How big images read by the agent show under their tool row. */
     val toolMediaSize: ToolMediaSize = ToolMediaSize.Medium,
+    /** How big the images attached to a prompt show above its bubble; by default as big as [toolMediaSize]. */
+    val attachedImageSize: AttachedImageSize = AttachedImageSize.Medium,
     /** Cost of each turn in the turn footer. */
     val showCost: Boolean = true,
     /** What the line under the chat title shows. */

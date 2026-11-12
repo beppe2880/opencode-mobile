@@ -9,6 +9,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
@@ -98,32 +100,40 @@ internal fun UserBubble(
     onOpenImage: (Int) -> Unit = {},
     directory: String = "",
     onOpenFile: (String) -> Unit = {},
+    imageSize: AttachedImageSize = AttachedImageSize.Medium,
 ) {
     val c = OcTheme.colors
+    // The bubble and what is under it keep clear of the start edge; images use the transcript width.
+    val inset = Modifier.padding(start = 48.dp)
     Column(
-        modifier = modifier.fillMaxWidth().padding(start = 48.dp),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End,
     ) {
         if (item.images.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .alpha(if (item.pending) PENDING_ALPHA else 1f)
-                    .horizontalScroll(rememberScrollState())
-                    .padding(bottom = OcSpacing.xs),
-                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-            ) {
-                item.images.forEachIndexed { index, image ->
-                    ImageThumbnail(
-                        dataUri = image.dataUri,
-                        onClick = { onOpenImage(index) },
-                        // A prompt of images alone has no text bubble to long press.
-                        onLongClick = onLongPress?.takeIf { item.text.isBlank() },
-                        modifier = Modifier.testTag("chat_user_image_${item.key}_$index"),
-                    )
+            // Sized like the images read by tools, from the same width; several scroll sideways.
+            BoxWithConstraints(Modifier.alpha(if (item.pending) PENDING_ALPHA else 1f).padding(bottom = OcSpacing.xs)) {
+                val available = maxWidth
+                val gap = if (imageSize == AttachedImageSize.Thumbnails) OcSpacing.xs else OcSpacing.sm
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(gap),
+                ) {
+                    item.images.forEachIndexed { index, image ->
+                        ImageThumbnail(
+                            dataUri = image.dataUri,
+                            onClick = { onOpenImage(index) },
+                            size = imageSize,
+                            count = item.images.size,
+                            available = available,
+                            // A prompt of images alone has no text bubble to long press.
+                            onLongClick = onLongPress?.takeIf { item.text.isBlank() },
+                            modifier = Modifier.testTag("chat_user_image_${item.key}_$index"),
+                        )
+                    }
                 }
             }
         }
-        val bubble = Modifier
+        val bubble = inset
             .alpha(if (item.pending) PENDING_ALPHA else 1f)
             .clip(RoundedCornerShape(OcRadius.lg))
             .background(c.userBubbleBg)
@@ -157,7 +167,7 @@ internal fun UserBubble(
         }
         if (item.files.isNotEmpty()) {
             FlowRow(
-                modifier = Modifier.padding(top = OcSpacing.xs),
+                modifier = inset.padding(top = OcSpacing.xs),
                 horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs, Alignment.End),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {
@@ -176,7 +186,7 @@ internal fun UserBubble(
         val files = item.attachments - item.images.size - item.files.size
         if (item.pending || files > 0) {
             Row(
-                modifier = Modifier.padding(top = OcSpacing.xs),
+                modifier = inset.padding(top = OcSpacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
             ) {

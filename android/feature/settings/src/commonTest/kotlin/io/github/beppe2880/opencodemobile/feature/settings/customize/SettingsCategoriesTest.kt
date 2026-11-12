@@ -70,6 +70,9 @@ class SettingsCategoriesTest {
         assertEquals(SettingsArea.Chat, SettingOption.ToolMediaSize.area)
         assertEquals(transcript.indexOf(SettingOption.FullCommands) + 1, transcript.indexOf(SettingOption.ToolMediaSize))
         assertEquals(0, SettingOption.ToolMediaSize.depthIn(SettingOption.ToolMediaSize.group))
+        // The attached images next to the ones the agent read.
+        assertEquals(transcript.indexOf(SettingOption.ToolMediaSize) + 1, transcript.indexOf(SettingOption.AttachedImageSize))
+        assertEquals(0, SettingOption.AttachedImageSize.depthIn(SettingOption.AttachedImageSize.group))
         assertEquals(SettingsArea.LiveActivity, SettingOption.OutputLines.area)
         assertEquals(
             listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.NewChatModel),

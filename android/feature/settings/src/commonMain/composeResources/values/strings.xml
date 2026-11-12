@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">Small</string>
     <string name="settings_tool_media_size_medium">Medium</string>
     <string name="settings_tool_media_size_large">Large</string>
+    <string name="settings_attached_image_size">Attached images</string>
+    <string name="settings_attached_image_size_sub">How big the images you attach to a message show above it; Thumbnails is a row of small squares</string>
+    <string name="settings_attached_image_size_thumbnails">Thumbnails</string>
     <string name="settings_running_in_list">Show running work in the session list</string>
     <string name="settings_running_in_list_sub">Count running subagents and background commands under each session</string>
     <string name="settings_confirm_stop">Confirm before stopping commands</string>

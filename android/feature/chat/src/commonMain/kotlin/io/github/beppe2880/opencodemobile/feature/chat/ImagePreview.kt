@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcDarkColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -86,54 +87,82 @@ internal expect fun decodeImage(bytes: ByteArray, maxSide: Int): ImageBitmap?
 internal expect fun edgeToEdgeDialogProperties(): DialogProperties
 
 /**
- * Thumbnails decoded recently, by data URI: a row created again shows them at once instead of
- * blinking while they decode, as when a sent prompt is confirmed under its server id.
+ * Thumbnails decoded recently, by data URI and decoded size: a row created again shows them at
+ * once instead of blinking while they decode, as when a sent prompt is confirmed under its
+ * server id. Bounded by count and by pixels, as the larger sizes decode bigger bitmaps.
  */
 private object Thumbnails {
-    private const val MAX = 12
+    private const val MAX = 24
+
+    /** About 24 MB at four bytes a pixel. */
+    private const val MAX_PIXELS = 6_000_000L
     private val lock = SynchronizedObject()
 
+    private data class Key(val dataUri: String, val maxSide: Int)
+
     // Least recently used first.
-    private val bitmaps = LinkedHashMap<String, ImageBitmap>()
+    private val bitmaps = LinkedHashMap<Key, ImageBitmap>()
+    private var kept = 0L
 
-    fun get(dataUri: String): ImageBitmap? = synchronized(lock) { bitmaps.remove(dataUri)?.also { bitmaps[dataUri] = it } }
+    private fun pixels(bitmap: ImageBitmap): Long = bitmap.width.toLong() * bitmap.height
 
-    fun put(dataUri: String, bitmap: ImageBitmap) {
+    fun get(dataUri: String, maxSide: Int): ImageBitmap? = synchronized(lock) {
+        val key = Key(dataUri, maxSide)
+        bitmaps.remove(key)?.also { bitmaps[key] = it }
+    }
+
+    fun put(dataUri: String, maxSide: Int, bitmap: ImageBitmap) {
         synchronized(lock) {
-            bitmaps.remove(dataUri)
-            bitmaps[dataUri] = bitmap
-            if (bitmaps.size > MAX) bitmaps.remove(bitmaps.keys.first())
+            val key = Key(dataUri, maxSide)
+            bitmaps.remove(key)?.let { kept -= pixels(it) }
+            bitmaps[key] = bitmap
+            kept += pixels(bitmap)
+            // The newest one always stays.
+            while (bitmaps.size > 1 && (bitmaps.size > MAX || kept > MAX_PIXELS)) {
+                bitmaps.remove(bitmaps.keys.first())?.let { kept -= pixels(it) }
+            }
         }
     }
 }
 
 @Composable
 private fun rememberDataImage(dataUri: String?, maxSide: Int, cached: Boolean = false): ImageBitmap? {
-    val initial = remember { if (cached) dataUri?.let(Thumbnails::get) else null }
-    val image by produceState(initial, dataUri) {
-        val known = if (cached) dataUri?.let(Thumbnails::get) else null
+    val initial = remember { if (cached) dataUri?.let { Thumbnails.get(it, maxSide) } else null }
+    val image by produceState(initial, dataUri, maxSide) {
+        val known = if (cached) dataUri?.let { Thumbnails.get(it, maxSide) } else null
         value = known ?: dataUri?.let { uri ->
-            withContext(Dispatchers.Default) { decodeDataImage(uri, maxSide) }?.also { if (cached) Thumbnails.put(uri, it) }
+            withContext(Dispatchers.Default) { decodeDataImage(uri, maxSide) }?.also { if (cached) Thumbnails.put(uri, maxSide, it) }
         }
     }
     return image
 }
 
-/** A square thumbnail of a sent image; an image icon while it is not available locally. */
+/**
+ * One of the [count] images sent with a prompt, as big as [size] (the setting) says in a
+ * transcript [available] wide (see [attachedImageSize]): a square thumbnail, or a card like
+ * those of the images read by tools. An image icon while it is not available locally.
+ */
 @Composable
 internal fun ImageThumbnail(
     dataUri: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 72.dp,
+    size: AttachedImageSize = AttachedImageSize.Thumbnails,
+    count: Int = 1,
+    available: Dp = Dp.Unspecified,
     onLongClick: (() -> Unit)? = null,
 ) {
     val c = OcTheme.colors
-    val bitmap = rememberDataImage(dataUri, maxSide = 256, cached = true)
+    val bitmap = rememberDataImage(dataUri, maxSide = size.decodeSide, cached = true)
+    val square = size == AttachedImageSize.Thumbnails
+    // The header gives the shape before the image is decoded, so the row does not jump.
+    val headerAspect = remember(dataUri, square) { if (square) null else dataUriAspect(dataUri) }
+    val aspect = bitmap?.let { it.width.toFloat() / it.height } ?: headerAspect
+    val (width, height) = attachedImageSize(aspect, count, size, available.value)
     Box(
         modifier = modifier
-            .size(size)
-            .clip(RoundedCornerShape(OcRadius.md))
+            .size(width.dp, height.dp)
+            .clip(RoundedCornerShape(if (square) OcRadius.md else OcRadius.lg))
             .background(c.layer02)
             .combinedClickable(
                 role = Role.Image,
@@ -145,7 +174,9 @@ internal fun ImageThumbnail(
         contentAlignment = Alignment.Center,
     ) {
         if (bitmap != null) {
-            Image(bitmap, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            // As the cards of tool images: the only one whole (a very wide one letterboxed), a row or a square filled.
+            val scale = if (square || count > 1) ContentScale.Crop else ContentScale.Fit
+            Image(bitmap, contentDescription = null, contentScale = scale, modifier = Modifier.fillMaxSize())
         } else {
             Icon(Icons.Outlined.Image, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(24.dp))
         }
