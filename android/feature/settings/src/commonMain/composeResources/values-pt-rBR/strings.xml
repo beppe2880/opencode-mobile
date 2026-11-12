@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">Pequenas</string>
     <string name="settings_tool_media_size_medium">Médias</string>
     <string name="settings_tool_media_size_large">Grandes</string>
+    <string name="settings_attached_image_size">Imagens anexadas</string>
+    <string name="settings_attached_image_size_sub">Tamanho das imagens que você anexa a uma mensagem, exibidas acima dela; Miniaturas mostra uma fileira de quadrados pequenos</string>
+    <string name="settings_attached_image_size_thumbnails">Miniaturas</string>
     <string name="settings_running_in_list">Mostrar trabalho em andamento na lista de sessões</string>
     <string name="settings_running_in_list_sub">Contar subagentes e comandos em segundo plano em cada sessão</string>
     <string name="settings_confirm_stop">Confirmar antes de parar comandos</string>

@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">صغيرة</string>
     <string name="settings_tool_media_size_medium">متوسطة</string>
     <string name="settings_tool_media_size_large">كبيرة</string>
+    <string name="settings_attached_image_size">الصور المرفقة</string>
+    <string name="settings_attached_image_size_sub">تظهر الصور التي ترفقها بالرسالة فوقها بالحجم المختار؛ «صور مصغرة» تعرض صفاً من مربعات صغيرة</string>
+    <string name="settings_attached_image_size_thumbnails">صور مصغرة</string>
     <string name="settings_running_in_list">إظهار الأعمال قيد التشغيل في قائمة الجلسات</string>
     <string name="settings_running_in_list_sub">عرض عدد الوكلاء الفرعيين والأوامر الخلفية قيد التشغيل أسفل كل جلسة</string>
     <string name="settings_confirm_stop">تأكيد قبل إيقاف الأوامر</string>
