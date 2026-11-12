@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -93,6 +94,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.ShowFullCommandsChanged(true))
         vm.onEvent(SettingsEvent.ShowToolDetailsChanged(false))
         vm.onEvent(SettingsEvent.ToolMediaSizeChanged(ToolMediaSize.Small))
+        vm.onEvent(SettingsEvent.AttachedImageSizeChanged(AttachedImageSize.Large))
         vm.onEvent(SettingsEvent.TerminalOpenKeyboardChanged(false))
         vm.onEvent(SettingsEvent.TerminalFullscreenByDefaultChanged(true))
         vm.onEvent(SettingsEvent.OutputPreviewLinesChanged(24))
@@ -135,6 +137,7 @@ class SettingsViewModelTest {
                 showFullCommands = true,
                 showToolDetails = false,
                 toolMediaSize = ToolMediaSize.Small,
+                attachedImageSize = AttachedImageSize.Large,
                 terminalOpenKeyboard = false,
                 terminalFullscreenByDefault = true,
                 outputPreviewLines = 24,

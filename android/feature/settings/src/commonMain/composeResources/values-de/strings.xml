@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">Klein</string>
     <string name="settings_tool_media_size_medium">Mittel</string>
     <string name="settings_tool_media_size_large">Groß</string>
+    <string name="settings_attached_image_size">Angehängte Bilder</string>
+    <string name="settings_attached_image_size_sub">Wie groß die Bilder, die du an eine Nachricht anhängst, darüber angezeigt werden; „Vorschau“ zeigt eine Reihe kleiner Quadrate</string>
+    <string name="settings_attached_image_size_thumbnails">Vorschau</string>
     <string name="settings_running_in_list">Laufende Arbeit in der Sitzungsliste anzeigen</string>
     <string name="settings_running_in_list_sub">Laufende Subagenten und Hintergrundbefehle unter jeder Sitzung zählen</string>
     <string name="settings_confirm_stop">Vor dem Beenden von Befehlen bestätigen</string>

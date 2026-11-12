@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">小</string>
     <string name="settings_tool_media_size_medium">中</string>
     <string name="settings_tool_media_size_large">大</string>
+    <string name="settings_attached_image_size">添付画像</string>
+    <string name="settings_attached_image_size_sub">メッセージに添付した画像を、メッセージの上に表示するサイズです。「サムネイル」は小さな正方形を並べて表示します</string>
+    <string name="settings_attached_image_size_thumbnails">サムネイル</string>
     <string name="settings_running_in_list">セッション一覧に実行中の作業を表示</string>
     <string name="settings_running_in_list_sub">各セッションの下に、実行中のサブエージェントとバックグラウンドコマンドの数を表示</string>
     <string name="settings_confirm_stop">コマンドを停止する前に確認</string>

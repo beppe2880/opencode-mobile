@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">작게</string>
     <string name="settings_tool_media_size_medium">보통</string>
     <string name="settings_tool_media_size_large">크게</string>
+    <string name="settings_attached_image_size">첨부 이미지</string>
+    <string name="settings_attached_image_size_sub">메시지에 첨부한 이미지를 메시지 위에 표시할 크기입니다. 썸네일은 작은 정사각형 행으로 표시합니다</string>
+    <string name="settings_attached_image_size_thumbnails">썸네일</string>
     <string name="settings_running_in_list">세션 목록에 실행 중인 작업 표시</string>
     <string name="settings_running_in_list_sub">각 세션 아래에 실행 중인 하위 에이전트와 백그라운드 명령 수를 표시</string>
     <string name="settings_confirm_stop">명령 중지 전 확인</string>

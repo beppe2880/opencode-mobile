@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftReposi
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -125,6 +126,7 @@ class PreferencesRepositoriesTest {
             voiceRecordingStyle = VoiceRecordingStyle.Compact,
             voiceHoldToRecord = true,
             toolMediaSize = ToolMediaSize.Large,
+            attachedImageSize = AttachedImageSize.Thumbnails,
             chatSwipe = ChatSwipe.SessionDrawer,
             swipeSensitivity = SwipeSensitivity.High,
         )
@@ -191,6 +193,23 @@ class PreferencesRepositoriesTest {
     }
 
     @Test
+    fun `attached images start at medium like the images read by the agent and keep every choice`() = runBlocking {
+        val prefs = InMemoryPreferences()
+        fun size() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.attachedImageSize
+        assertEquals(AttachedImageSize.Medium, size())
+        assertEquals(AppSettings().toolMediaSize.name, AppSettings().attachedImageSize.name)
+
+        for (choice in AttachedImageSize.entries) {
+            PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).update { it.copy(attachedImageSize = choice) }
+            assertEquals(choice.name, prefs.values["attached_image_size"])
+            assertEquals(choice, size())
+        }
+
+        prefs.edit().putString("attached_image_size", "Huge").commit()
+        assertEquals(AttachedImageSize.Medium, size())
+    }
+
+    @Test
     fun `swipe sensitivity starts at medium and keeps every choice`() = runBlocking {
         val prefs = InMemoryPreferences()
         fun sensitivity() = PreferencesSettingsRepository(SharedPreferencesSettings(prefs)).settings.value.swipeSensitivity
@@ -230,6 +249,7 @@ class PreferencesRepositoriesTest {
             .putFloat("settings_preview_fraction", 3f)
             .putString("update_notice", "Popup")
             .putString("tool_media_size", "Huge")
+            .putString("attached_image_size", "Huge")
             .putString("unfolded_layout", "Stacked")
             .putString("unfold_open_chat", "Maybe")
             .putString("fold_open_chat", "Close")

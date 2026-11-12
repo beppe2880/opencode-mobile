@@ -16,6 +16,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.ShowFullCommandsChanged -> copy(showFullCommands = event.enabled)
     is SettingsEvent.ShowToolDetailsChanged -> copy(showToolDetails = event.enabled)
     is SettingsEvent.ToolMediaSizeChanged -> copy(toolMediaSize = event.size)
+    is SettingsEvent.AttachedImageSizeChanged -> copy(attachedImageSize = event.size)
     is SettingsEvent.TerminalOpenKeyboardChanged -> copy(terminalOpenKeyboard = event.enabled)
     is SettingsEvent.TerminalFullscreenByDefaultChanged -> copy(terminalFullscreenByDefault = event.enabled)
     is SettingsEvent.SplitViewChanged -> copy(splitView = event.enabled)

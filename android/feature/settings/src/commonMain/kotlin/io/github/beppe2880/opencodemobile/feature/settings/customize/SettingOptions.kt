@@ -27,6 +27,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ToolDetails(listOf("showToolDetails")),
     FullCommands(listOf("showFullCommands")),
     ToolMediaSize(listOf("toolMediaSize")),
+    AttachedImageSize(listOf("attachedImageSize")),
     OutputLines(listOf("outputPreviewLines")),
     ShowCost(listOf("showCost")),
     PermissionsCollapsed(listOf("permissionsCollapsed")),
@@ -99,7 +100,8 @@ val SettingsPart.options: List<SettingOption>
         // The theme also colors the markdown of answers.
         SettingsPart.TextSize -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
         SettingsPart.Header -> listOf(SettingOption.HeaderLine, SettingOption.HeaderStyle, SettingOption.HeaderOpens)
-        SettingsPart.Messages -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme)
+        // The images attached to a prompt show above its bubble, on the scale of those the agent reads.
+        SettingsPart.Messages -> listOf(SettingOption.TextSize, SettingOption.OpenCodeTheme, SettingOption.AttachedImageSize)
         SettingsPart.Thoughts -> listOf(SettingOption.ShowReasoning, SettingOption.GroupThoughts, SettingOption.GroupActivity)
         SettingsPart.Tools -> listOf(
             SettingOption.ExpandTools,
@@ -204,6 +206,7 @@ internal val SettingOption.searchKeywords: List<String>
     get() = when (this) {
         SettingOption.OpenCodeTheme -> listOf("theme", "colors", "opencode", "markdown")
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
+        SettingOption.AttachedImageSize -> listOf("attachment", "image", "picture", "photo", "screenshot", "thumbnail", "size")
         SettingOption.CloseModelPickerOnSelect -> listOf("model", "picker", "reasoning", "default", "close")
         SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
         SettingOption.SplitView, SettingOption.UnfoldedLayout -> listOf("split", "tablet", "foldable", "wide", "sidebar")

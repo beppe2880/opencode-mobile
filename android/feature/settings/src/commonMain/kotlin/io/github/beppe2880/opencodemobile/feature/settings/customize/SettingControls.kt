@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -45,6 +46,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.SettingsState
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_agent_outline_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size_thumbnails
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_back_shows_list_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_close_model_picker
@@ -245,6 +249,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ToolDetails -> Res.string.settings_tool_details
         SettingOption.FullCommands -> Res.string.settings_full_commands
         SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size
+        SettingOption.AttachedImageSize -> Res.string.settings_attached_image_size
         SettingOption.OutputLines -> Res.string.settings_output_lines
         SettingOption.ShowCost -> Res.string.settings_show_cost
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed
@@ -310,6 +315,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ToolDetails -> Res.string.settings_tool_details_sub
         SettingOption.FullCommands -> Res.string.settings_full_commands_sub
         SettingOption.ToolMediaSize -> Res.string.settings_tool_media_size_sub
+        SettingOption.AttachedImageSize -> Res.string.settings_attached_image_size_sub
         SettingOption.OutputLines -> Res.string.settings_output_lines_sub
         SettingOption.ShowCost -> Res.string.settings_show_cost_sub
         SettingOption.PermissionsCollapsed -> Res.string.settings_permissions_collapsed_sub
@@ -450,6 +456,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             ),
             selected = settings.toolMediaSize,
             onSelect = { onEvent(SettingsEvent.ToolMediaSizeChanged(it)) },
+        )
+        // The sizes, and so their names, are those of the images read by the agent.
+        SettingOption.AttachedImageSize -> ChoiceRow(
+            title = title,
+            subtitle = subtitle,
+            choices = listOf(
+                OcSegment(
+                    AttachedImageSize.Thumbnails,
+                    stringResource(Res.string.settings_attached_image_size_thumbnails),
+                    "settings_attached_image_size_thumbnails",
+                ),
+                OcSegment(AttachedImageSize.Small, stringResource(Res.string.settings_tool_media_size_small), "settings_attached_image_size_small"),
+                OcSegment(AttachedImageSize.Medium, stringResource(Res.string.settings_tool_media_size_medium), "settings_attached_image_size_medium"),
+                OcSegment(AttachedImageSize.Large, stringResource(Res.string.settings_tool_media_size_large), "settings_attached_image_size_large"),
+            ),
+            selected = settings.attachedImageSize,
+            onSelect = { onEvent(SettingsEvent.AttachedImageSizeChanged(it)) },
         )
         SettingOption.OutputLines -> ChoiceRow(
             title = title,
@@ -718,6 +741,7 @@ private val SettingOption.tag: String
         SettingOption.ToolDetails -> "tool_details"
         SettingOption.FullCommands -> "full_commands"
         SettingOption.ToolMediaSize -> "tool_media_size"
+        SettingOption.AttachedImageSize -> "attached_image_size"
         SettingOption.ShowCost -> "show_cost"
         SettingOption.PermissionsCollapsed -> "permissions_collapsed"
         SettingOption.QuestionsCollapsed -> "questions_collapsed"

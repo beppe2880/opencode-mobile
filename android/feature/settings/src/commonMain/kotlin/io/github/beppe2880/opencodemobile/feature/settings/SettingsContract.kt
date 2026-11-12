@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.compose.runtime.Immutable
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
@@ -129,6 +130,7 @@ sealed interface SettingsEvent {
     data class LiveOtherChanged(val enabled: Boolean) : SettingsEvent
     data class ShowFullCommandsChanged(val enabled: Boolean) : SettingsEvent
     data class ToolMediaSizeChanged(val size: ToolMediaSize) : SettingsEvent
+    data class AttachedImageSizeChanged(val size: AttachedImageSize) : SettingsEvent
     data class ShowToolDetailsChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalOpenKeyboardChanged(val enabled: Boolean) : SettingsEvent
     data class TerminalFullscreenByDefaultChanged(val enabled: Boolean) : SettingsEvent

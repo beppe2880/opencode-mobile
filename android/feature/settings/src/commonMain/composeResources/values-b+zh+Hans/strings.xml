@@ -70,6 +70,9 @@
     <string name="settings_tool_media_size_small">小</string>
     <string name="settings_tool_media_size_medium">中</string>
     <string name="settings_tool_media_size_large">大</string>
+    <string name="settings_attached_image_size">附加图片</string>
+    <string name="settings_attached_image_size_sub">消息中附加图片的显示大小，显示在消息上方；“缩略图”为一排小方块</string>
+    <string name="settings_attached_image_size_thumbnails">缩略图</string>
     <string name="settings_running_in_list">在会话列表中显示运行中的工作</string>
     <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
     <string name="settings_confirm_stop">停止命令前需确认</string>
