@@ -15,8 +15,9 @@ transition, change one axis, and measure the same transition again.
   Perfetto/System Trace.
 - Release shrinking, missing classes, or APK size: R8 mapping/usage/configuration
   analysis.
-- Critical startup/journey regression: Macrobenchmark and, when justified,
-  Baseline Profiles.
+- Critical startup/journey regression, or a screen that keeps drawing while idle:
+  the Macrobenchmark module (`android-benchmarks` skill) for the before and after;
+  Baseline Profiles when justified.
 - Memory/resource lifetime: profiler/heap evidence plus explicit lifecycle
   ownership review.
 

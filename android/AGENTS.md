@@ -44,6 +44,7 @@ repository boundaries.
 | `:core:network` | Ktor client (OkHttp engine on Android, Darwin on iOS), Basic auth, SSE reader, error mapping, generated-to-domain mappers |
 | `:core:api` | Generated OpenCode client. Never edit; run `bun run generate` in `../tools/api-gen` |
 | `:core:testing` | `MainDispatcherRule` and shared test support |
+| `:benchmark` | Android only, test module: Macrobenchmark performance tests run against the app's `benchmark` build type |
 
 Dependency direction: `app -> shared -> feature -> core:{ui,mvi,domain}`; `app -> core:data
 -> core:network -> core:api` (on iOS `shared` links `core:data`). Features never depend on
@@ -107,7 +108,14 @@ From `android/`:
 ./gradlew :core:network:testDebugUnitTest
 ANDROID_SERIAL=<serial> ./gradlew :app:installDebug
 ./gradlew spotlessApply   # ktlint formatting, rules in .editorconfig; core/api is excluded
+ANDROID_SERIAL=<serial> ./gradlew :benchmark:connectedBenchmarkAndroidTest   # performance, see below
 ```
+
+Performance is measured by the `:benchmark` Macrobenchmark module against the app's
+`benchmark` build type (release code, offline demo data): idle frames and CPU, cold start
+and list scrolling. It is not part of the checks before finishing; run it for the before
+and after of a performance change (see the `android-benchmarks` skill). CI compiles the
+benchmark sources (`:benchmark:compileBenchmarkKotlin`) and does not run them.
 
 Before finishing: `./gradlew spotlessCheck testDebugUnitTest :app:lintDebug :app:assembleDebug`
 and `./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileTestKotlinIosSimulatorArm64`

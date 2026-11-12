@@ -14,5 +14,6 @@ quantify.
    misses, or startup phases when visual inspection is insufficient.
 7. Record baseline and after measurements from the same scenario/build/device.
 
-Do not add Macrobenchmark or Baseline Profile modules incidentally. Neither is
-currently configured; introducing them is a dedicated performance task.
+Macrobenchmark lives in `android/benchmark` (see the `android-benchmarks` skill); its runs
+save a Perfetto trace per iteration next to the results. No Baseline Profile module is
+configured; introducing one is a dedicated performance task.

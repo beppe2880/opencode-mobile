@@ -39,6 +39,8 @@ implementation before editing.
   credential storage, clipboard, or sensitive logging.
 - Load `android-performance` only for an evidenced startup, streaming jank,
   recomposition, APK size, R8, memory, or trace problem.
+- Load `android-benchmarks` to measure performance or add a performance test: the
+  `android/benchmark` Macrobenchmark module, idle frames and CPU, cold start, scroll.
 - Load `maestro` only for `.maestro/` test flows.
 - Load `android-runtime-verification` after Android behavior/UI changes and for
   install, emulator, ADB, Logcat, crash, or runtime-debug work; shared UI or
