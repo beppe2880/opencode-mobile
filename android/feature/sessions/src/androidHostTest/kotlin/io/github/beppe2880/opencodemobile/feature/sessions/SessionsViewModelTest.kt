@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -84,7 +85,99 @@ class SessionsViewModelTest {
     private val shares = FakeShares()
     private val folders = FakeFolderPreferences()
 
-    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, folders, clock = { now }, zone = zone)
+    private val pins = InMemoryPinnedSessions()
+
+    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
+
+    @Test
+    fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val old = vm.state.value.groups.last().sessions.single()
+        vm.onEvent(SessionsEvent.ShowActions(old))
+
+        vm.onEvent(SessionsEvent.SetPinned("old", true))
+
+        val state = vm.state.value
+        assertEquals(null, state.actionsFor)
+        assertEquals(setOf("old"), state.pinned)
+        assertEquals(setOf("old"), pins.pinned())
+        assertEquals(listOf(DayBucket.Pinned, DayBucket.Today, DayBucket.Yesterday, DayBucket.ThisWeek), state.groups.map { it.bucket })
+        assertEquals(listOf("old", "today", "yesterday", "week"), state.ids())
+
+        // The pinned group survives a reload, and a pin set in a chat shows here too.
+        pins.setPinned("week", true)
+        vm.onEvent(SessionsEvent.Refresh)
+        advanceUntilIdle()
+        assertEquals(listOf("week", "old"), vm.state.value.groups.first().sessions.map { it.id })
+
+        vm.onEvent(SessionsEvent.SetPinned("old", false))
+        vm.onEvent(SessionsEvent.SetPinned("week", false))
+        assertEquals(listOf(DayBucket.Today, DayBucket.Yesterday, DayBucket.ThisWeek, DayBucket.Older), vm.state.value.groups.map { it.bucket })
+        assertEquals(emptySet<String>(), pins.pinned())
+    }
+
+    @Test
+    fun `a pinned session the server no longer lists is read on its own unless filtered out`() = runTest(main.testDispatcher) {
+        sessions.byId["ancient"] = session("ancient", now - 400 * 24 * hour)
+        pins.setPinned("ancient", true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertEquals(DayBucket.Pinned, vm.state.value.groups.first().bucket)
+        assertEquals(listOf("ancient"), vm.state.value.groups.first().sessions.map { it.id })
+
+        // The project filter and the search apply to it as to any other session.
+        vm.onEvent(SessionsEvent.FilterChanged("/p/today"))
+        advanceUntilIdle()
+        assertFalse("ancient" in vm.state.value.ids())
+        vm.onEvent(SessionsEvent.FilterChanged(null))
+        vm.onEvent(SessionsEvent.QueryChanged("nothing like it"))
+        advanceUntilIdle()
+        assertFalse("ancient" in vm.state.value.ids())
+        vm.onEvent(SessionsEvent.QueryChanged("title anc"))
+        advanceUntilIdle()
+        assertEquals(DayBucket.Pinned, vm.state.value.groups.first().bucket)
+        assertEquals(setOf("ancient"), pins.pinned())
+
+        // Unpinned, it is no longer one of the listed sessions.
+        vm.onEvent(SessionsEvent.SetPinned("ancient", false))
+        assertFalse("ancient" in vm.state.value.ids())
+    }
+
+    @Test
+    fun `pins of deleted sessions are forgotten`() = runTest(main.testDispatcher) {
+        listOf("today", "week", "gone").forEach { pins.setPinned(it, true) }
+        val vm = vm()
+        advanceUntilIdle()
+        // Deleted while the app was not looking: the server no longer knows it.
+        assertEquals(setOf("today", "week"), pins.pinned())
+
+        vm.onEvent(SessionsEvent.RequestDelete(vm.state.value.groups.first().sessions.first()))
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+        assertEquals(setOf("week"), pins.pinned())
+
+        events.flow.emit(ServerEvent.SessionChanged("week", deleted = true))
+        runCurrent()
+        assertEquals(emptySet<String>(), pins.pinned())
+        assertEquals(emptySet<String>(), vm.state.value.pinned)
+        assertFalse(DayBucket.Pinned in vm.state.value.groups.map { it.bucket })
+    }
+
+    @Test
+    fun `a failed delete keeps the pin`() = runTest(main.testDispatcher) {
+        sessions.deleteResult = Result.failure(OpenCodeError.Unreachable("down"))
+        pins.setPinned("today", true)
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.RequestDelete(vm.state.value.groups.first().sessions.single()))
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertEquals(setOf("today"), pins.pinned())
+        assertEquals(DayBucket.Pinned, vm.state.value.groups.first().bucket)
+    }
 
     private fun SessionsState.ids() = groups.flatMap { g -> g.sessions.map { it.id } }
 
@@ -1235,7 +1328,11 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     override suspend fun cachedList(serverId: String, directory: String?): List<Session>? = storedLists[serverId to directory]
     override suspend fun cachedProjects(serverId: String): List<Project>? = storedProjects[serverId]
     override suspend fun active(): Result<Set<String>> = Result.success(setOf("today"))
-    override suspend fun get(sessionId: String): Result<Session> = Result.failure(OpenCodeError.NotFound(sessionId))
+
+    /** Sessions the server still has but no longer lists. */
+    val byId = mutableMapOf<String, Session>()
+    override suspend fun get(sessionId: String): Result<Session> =
+        byId[sessionId]?.let { Result.success(it) } ?: Result.failure(OpenCodeError.NotFound(sessionId))
     override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
         created += directory
         createdModels += model

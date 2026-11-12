@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
@@ -37,6 +38,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
+import io.github.beppe2880.opencodemobile.core.domain.PinnedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.PromptAttachment
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
@@ -112,6 +114,7 @@ val fakeDataModule = module {
     single<DraftRepository> { FakeDrafts() }
     single<RecentModelRepository> { FakeRecentModels() }
     single<FolderPreferences> { FakeFolderPreferences() }
+    single<PinnedSessionRepository> { InMemoryPinnedSessions() }
     // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
     single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }

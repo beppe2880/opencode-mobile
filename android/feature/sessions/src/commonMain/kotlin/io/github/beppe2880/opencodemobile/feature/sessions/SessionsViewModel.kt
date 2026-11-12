@@ -9,6 +9,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PendingShare
+import io.github.beppe2880.opencodemobile.core.domain.PinnedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RECENT_MODELS
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
@@ -32,18 +33,15 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
-import kotlin.time.Instant
 
 class SessionsViewModel(
     private val sessions: SessionRepository,
@@ -55,6 +53,7 @@ class SessionsViewModel(
     private val recents: RecentModelRepository,
     private val shares: ShareRepository,
     private val folderPreferences: FolderPreferences,
+    private val pins: PinnedSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -65,6 +64,12 @@ class SessionsViewModel(
     private var browseJob: Job? = null
     private var newSessionDirectoryCleared = false
     private var sessionList: List<Session> = emptyList()
+
+    /** Sessions pinned on the server shown, as last read from [pins]. */
+    private var pinnedIds: Set<String> = emptySet()
+
+    /** Sessions of [sessionList] the server did not list: read one by one because they are pinned. */
+    private var listedForPin: Set<String> = emptySet()
     private var workVisible = false
     private var workPoll: Job? = null
     private var workJob: Job? = null
@@ -99,6 +104,7 @@ class SessionsViewModel(
         }
         viewModelScope.launch { events.events.collect(::onServerEvent) }
         viewModelScope.launch { shares.pending.collect(::onShare) }
+        viewModelScope.launch { pins.changes.collect { showPins() } }
         viewModelScope.launch {
             settings.settings.map { it.showRunningWorkInList }.distinctUntilChanged().collect { enabled ->
                 updateState { it.copy(showRunningWork = enabled, work = if (enabled) it.work else emptyMap()) }
@@ -138,6 +144,7 @@ class SessionsViewModel(
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
             SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
+            is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
             is SessionsEvent.RequestRename -> updateState { it.copy(actionsFor = null, renaming = event.session) }
             is SessionsEvent.RequestDelete -> updateState { it.copy(actionsFor = null, deleting = event.session) }
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
@@ -182,8 +189,11 @@ class SessionsViewModel(
         browseJob?.cancel()
         workJob?.cancel()
         sessionList = emptyList()
+        listedForPin = emptySet()
+        pinnedIds = pins.pinned()
         updateState {
             it.copy(
+                pinned = pinnedIds,
                 query = "",
                 projects = emptyList(),
                 hiddenDirectories = id?.let(folderPreferences::hiddenDirectories).orEmpty(),
@@ -279,6 +289,7 @@ class SessionsViewModel(
                 if (event.deleted) {
                     sessionList = sessionList.filterNot { it.id == event.sessionId }
                     updateState { it.copy(groups = group(sessionList)) }
+                    forgetPin(event.sessionId)
                 } else {
                     scheduleReload(EVENT_DEBOUNCE_MS)
                 }
@@ -353,7 +364,10 @@ class SessionsViewModel(
             val result = sessions.list(search = search, directory = state.directoryFilter)
             val active = sessions.active().getOrNull()
             result.fold(
-                onSuccess = { list ->
+                onSuccess = { listed ->
+                    val beyond = pinnedBeyond(listed, search, state.directoryFilter)
+                    listedForPin = beyond.mapTo(HashSet()) { it.id }
+                    val list = listed + beyond
                     sessionList = list
                     updateState {
                         it.copy(
@@ -419,25 +433,53 @@ class SessionsViewModel(
     private fun listed(projects: List<Project>): List<Project> =
         projects.sortedByDescending { it.updatedAt }.filter { it.id != GLOBAL_PROJECT_ID }.distinctBy { it.directory }
 
-    internal fun group(list: List<Session>): List<SessionGroup> {
-        val today = localDate(clock())
-        return list
-            .sortedByDescending { it.updatedAt }
-            .groupBy { session ->
-                val day = localDate(session.updatedAt)
-                when {
-                    day >= today -> DayBucket.Today
-                    day == today.minus(1, DateTimeUnit.DAY) -> DayBucket.Yesterday
-                    day > today.minus(7, DateTimeUnit.DAY) -> DayBucket.ThisWeek
-                    else -> DayBucket.Older
-                }
-            }
-            .entries
-            .sortedBy { it.key }
-            .map { (bucket, items) -> SessionGroup(bucket, items) }
+    internal fun group(list: List<Session>): List<SessionGroup> = groupSessions(list, pinnedIds, clock(), zone)
+
+    private fun setPinned(sessionId: String, pinned: Boolean) {
+        updateState { it.copy(actionsFor = null) }
+        pins.setPinned(sessionId, pinned)
+        showPins()
     }
 
-    private fun localDate(epochMillis: Long): LocalDate = Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(zone).date
+    /** A deleted session leaves no pin behind. */
+    private fun forgetPin(sessionId: String) {
+        pins.setPinned(sessionId, false)
+        showPins()
+    }
+
+    /**
+     * Reads the pins again (changed here or in a chat) and moves the rows between the groups. A
+     * session pinned while it is not listed is loaded; one only listed for its pin leaves with it.
+     */
+    private fun showPins() {
+        val added = pins.pinned() - pinnedIds
+        pinnedIds = pins.pinned()
+        sessionList = sessionList.filterNot { it.id in listedForPin && it.id !in pinnedIds }
+        updateState { it.copy(pinned = pinnedIds, groups = group(sessionList)) }
+        if (added.any { id -> sessionList.none { it.id == id } }) load(initial = false)
+    }
+
+    /**
+     * Pinned sessions missing from [listed], which holds only the most recent ones, that the
+     * project filter and the search still include. The pin of a session that no longer exists is
+     * forgotten; one that cannot be read now stays as last shown.
+     */
+    private suspend fun pinnedBeyond(listed: List<Session>, search: String?, directory: String?): List<Session> {
+        val missing = pinnedIds - listed.mapTo(HashSet()) { it.id }
+        if (missing.isEmpty()) return emptyList()
+        val shown = sessionList.associateBy { it.id }
+        val read = coroutineScope { missing.map { id -> async { id to sessions.get(id) } }.awaitAll() }
+        return read
+            .mapNotNull { (id, result) ->
+                if (result.exceptionOrNull() is OpenCodeError.NotFound) {
+                    pins.setPinned(id, false)
+                    null
+                } else {
+                    result.getOrNull() ?: shown[id]
+                }
+            }
+            .filter { it.parentId == null && it.archivedAt == null && it.matches(search, directory) }
+    }
 
     private fun rename(title: String) {
         val session = currentState.renaming ?: return
@@ -465,7 +507,7 @@ class SessionsViewModel(
         sessionList = sessionList.filterNot { it.id == session.id }
         updateState { it.copy(groups = group(sessionList)) }
         viewModelScope.launch {
-            sessions.delete(session.id).onFailure { error ->
+            sessions.delete(session.id).onSuccess { forgetPin(session.id) }.onFailure { error ->
                 sessionList = previous
                 updateState { it.copy(groups = group(sessionList)) }
                 sendEffect(SessionsEffect.ShowMessage(error.toUiText()))

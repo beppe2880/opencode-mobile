@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FormCondition
 import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpServer
 import io.github.beppe2880.opencodemobile.core.domain.McpStatus
@@ -701,8 +702,35 @@ class ChatViewModelTest {
         assertEquals(null, vm().state.value.savedScroll)
     }
 
-    private fun vm(sessions: FakeSessions = FakeSessions(model)) =
-        ChatViewModel("s1", sessions, chat, FakeCatalog(model), events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, clock = { 42 })
+    private val pins = InMemoryPinnedSessions()
+
+    private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel {
+        val catalog = FakeCatalog(model)
+        return ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = { 42 })
+    }
+
+    @Test
+    fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
+        pins.setPinned("other", true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.pinned)
+
+        vm.onEvent(ChatEvent.SetPinned(true))
+        assertTrue(vm.state.value.pinned)
+        assertEquals(setOf("other", "s1"), pins.pinned())
+        // A chat opened on a pinned session shows it at once.
+        assertTrue(vm().state.value.pinned)
+
+        vm.onEvent(ChatEvent.SetPinned(false))
+        assertFalse(vm.state.value.pinned)
+        assertEquals(setOf("other"), pins.pinned())
+
+        // Pinned from the session list beside the chat.
+        pins.setPinned("s1", true)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.pinned)
+    }
 
     @Test
     fun `content shared to this chat goes into the composer after the draft`() = runTest(main.testDispatcher) {

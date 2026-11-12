@@ -1,6 +1,8 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -121,6 +123,37 @@ interface DraftRepository {
 
     /** Blank [text] removes the draft. */
     fun save(sessionId: String, text: String)
+}
+
+/**
+ * Sessions pinned to the top of the session list. The server has no such flag: pins are kept on
+ * the device, separately for each saved server, and every call is about the active one.
+ */
+interface PinnedSessionRepository {
+    /** Emits after each [setPinned] that changed something; screens showing pins read [pinned] again. */
+    val changes: Flow<Unit>
+
+    /** IDs of the sessions pinned on the active server. */
+    fun pinned(): Set<String>
+
+    /** Unpinning is also how the pin of a deleted session is forgotten. */
+    fun setPinned(sessionId: String, pinned: Boolean)
+}
+
+/** Pins kept in memory only, for the offline demo and tests. */
+class InMemoryPinnedSessions(initial: Set<String> = emptySet()) : PinnedSessionRepository {
+    private val ids = MutableStateFlow(initial)
+    private val changed = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val changes: Flow<Unit> = changed
+
+    override fun pinned(): Set<String> = ids.value
+
+    override fun setPinned(sessionId: String, pinned: Boolean) {
+        val next = if (pinned) ids.value + sessionId else ids.value - sessionId
+        if (next == ids.value) return
+        ids.value = next
+        changed.tryEmit(Unit)
+    }
 }
 
 /** Models this device sent prompts with on the active server, kept on the device. */

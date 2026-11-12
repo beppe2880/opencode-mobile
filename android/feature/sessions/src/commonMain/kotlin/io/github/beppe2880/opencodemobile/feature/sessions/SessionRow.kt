@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
@@ -45,8 +48,11 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -68,6 +74,10 @@ internal fun SessionRow(
     work: RunningWork? = RunningWork(),
     /** Off where the same swipe closes the list (the drawer over a chat); delete stays in the actions. */
     swipeToDelete: Boolean = true,
+    /** Pinned to the top of the list: a pin marks the title. */
+    pinned: Boolean = false,
+    /** Pins or unpins the session, offered to accessibility services; the row actions have it for everyone. */
+    onTogglePin: (() -> Unit)? = null,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -78,6 +88,7 @@ internal fun SessionRow(
     val scope = rememberCoroutineScope()
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
+    val pinLabel = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin)
     val runningLabel = if (work == null) stringResource(Res.string.sessions_running_a11y) else runningSummary(work, running)
     val showsWork = work != null && (running || !work.isEmpty)
     SwipeToDismissBox(
@@ -105,7 +116,8 @@ internal fun SessionRow(
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
                 .semantics {
                     if (running || showsWork) stateDescription = runningLabel
-                    customActions = listOf(
+                    customActions = listOfNotNull(
+                        onTogglePin?.let { toggle -> CustomAccessibilityAction(pinLabel) { toggle(); true } },
                         CustomAccessibilityAction(renameLabel) { onLongClick(); true },
                         CustomAccessibilityAction(deleteLabel) { onSwipeDelete(); true },
                     )
@@ -118,13 +130,27 @@ internal fun SessionRow(
         ) {
             OcProjectAvatar(session.directoryName)
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = session.displayTitle(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (session.title.isBlank()) c.textMuted else c.textBase,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                    if (pinned) {
+                        val titleStyle = MaterialTheme.typography.bodyMedium
+                        Icon(
+                            Icons.Filled.PushPin,
+                            contentDescription = stringResource(Res.string.sessions_pinned),
+                            tint = c.textFaint,
+                            // Follows the title size, font scale included.
+                            modifier = Modifier
+                                .size(with(LocalDensity.current) { titleStyle.fontSize.toDp() })
+                                .testTag("session_row_pin_${session.id}"),
+                        )
+                    }
+                    Text(
+                        text = session.displayTitle(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (session.title.isBlank()) c.textMuted else c.textBase,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
                         text = if (compact) session.directoryName + " · " + relativeTime(session.updatedAt, now) else session.directoryName,

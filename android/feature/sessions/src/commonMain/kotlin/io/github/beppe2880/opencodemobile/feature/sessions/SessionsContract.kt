@@ -11,7 +11,8 @@ import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
-enum class DayBucket { Today, Yesterday, ThisWeek, Older }
+/** Groups of the list, in the order shown. [Pinned] holds the pinned sessions of any day, above the days. */
+enum class DayBucket { Pinned, Today, Yesterday, ThisWeek, Older }
 
 @Immutable
 data class SessionGroup(val bucket: DayBucket, val sessions: List<Session>)
@@ -72,6 +73,8 @@ data class SessionsState(
     val hiddenDirectories: Set<String> = emptySet(),
     val directoryFilter: String? = null,
     val groups: List<SessionGroup> = emptyList(),
+    /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */
+    val pinned: Set<String> = emptySet(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
     /** Rows show running subagents and commands (setting). */
@@ -106,6 +109,9 @@ sealed interface SessionsEvent {
 
     data class ShowActions(val session: Session) : SessionsEvent
     data object DismissActions : SessionsEvent
+
+    /** Pins the session to the top of the list or unpins it; closes the row actions. */
+    data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
     data class RequestRename(val session: Session) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent
     data class RequestDelete(val session: Session) : SessionsEvent
