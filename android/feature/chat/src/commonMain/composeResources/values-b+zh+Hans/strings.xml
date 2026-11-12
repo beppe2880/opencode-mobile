@@ -177,6 +177,9 @@
     <string name="chat_open_file">打开文件</string>
     <string name="chat_more">更多选项</string>
     <string name="chat_mcps">MCP 服务器</string>
+    <string name="chat_pin">置顶</string>
+    <string name="chat_unpin">取消置顶</string>
+    <string name="chat_pinned">已置顶</string>
     <string name="chat_command_mcps">管理 MCP 连接</string>
     <string name="chat_mcps_refresh">刷新 MCP 状态</string>
     <string name="chat_mcps_runtime">连接适用于当前项目，而不仅是此对话。更改持续到服务器重启，配置保持不变。</string>

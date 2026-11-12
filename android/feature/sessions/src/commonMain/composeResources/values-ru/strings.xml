@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">Доступ истёк · подключите заново</string>
     <string name="sessions_demo_server">Демо</string>
     <string name="sessions_demo_status">Примеры сессий · без сервера</string>
+    <string name="sessions_pinned">Закреплённые</string>
+    <string name="sessions_pin">Закрепить</string>
+    <string name="sessions_unpin">Открепить</string>
     <string name="sessions_rename">Переименовать</string>
     <string name="sessions_delete">Удалить</string>
     <string name="sessions_rename_title">Переименовать сессию</string>

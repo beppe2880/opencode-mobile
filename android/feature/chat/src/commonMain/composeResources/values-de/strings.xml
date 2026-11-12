@@ -188,6 +188,9 @@
     <string name="chat_open_file">Datei öffnen</string>
     <string name="chat_more">Weitere Optionen</string>
     <string name="chat_mcps">MCP-Server</string>
+    <string name="chat_pin">Anheften</string>
+    <string name="chat_unpin">Lösen</string>
+    <string name="chat_pinned">Angeheftet</string>
     <string name="chat_command_mcps">MCP-Verbindungen verwalten</string>
     <string name="chat_mcps_refresh">MCP-Status aktualisieren</string>
     <string name="chat_mcps_runtime">Verbindungen gelten für dieses Projekt, nicht nur für diesen Chat. Änderungen gelten bis zum Serverneustart; die Konfiguration bleibt unverändert.</string>

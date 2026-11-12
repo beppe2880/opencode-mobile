@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">登录已失效 · 请重新配对</string>
     <string name="sessions_demo_server">演示</string>
     <string name="sessions_demo_status">示例会话 · 无服务器</string>
+    <string name="sessions_pinned">已置顶</string>
+    <string name="sessions_pin">置顶</string>
+    <string name="sessions_unpin">取消置顶</string>
     <string name="sessions_rename">重命名</string>
     <string name="sessions_delete">删除</string>
     <string name="sessions_rename_title">重命名会话</string>

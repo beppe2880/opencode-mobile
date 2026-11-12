@@ -177,6 +177,9 @@
     <string name="chat_open_file">파일 열기</string>
     <string name="chat_more">추가 옵션</string>
     <string name="chat_mcps">MCP 서버</string>
+    <string name="chat_pin">고정</string>
+    <string name="chat_unpin">고정 해제</string>
+    <string name="chat_pinned">고정됨</string>
     <string name="chat_command_mcps">MCP 연결 관리</string>
     <string name="chat_mcps_refresh">MCP 상태 새로고침</string>
     <string name="chat_mcps_runtime">연결은 이 채팅뿐 아니라 프로젝트에 적용됩니다. 변경 사항은 서버를 다시 시작할 때까지 유지되며 설정은 바뀌지 않습니다.</string>

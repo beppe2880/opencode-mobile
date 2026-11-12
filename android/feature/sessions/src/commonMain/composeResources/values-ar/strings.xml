@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">انتهت صلاحية الدخول · أعد الإقران</string>
     <string name="sessions_demo_server">تجريبي</string>
     <string name="sessions_demo_status">جلسات تجريبية · بدون خادم</string>
+    <string name="sessions_pinned">مثبّتة</string>
+    <string name="sessions_pin">تثبيت</string>
+    <string name="sessions_unpin">إلغاء التثبيت</string>
     <string name="sessions_rename">إعادة تسمية</string>
     <string name="sessions_delete">حذف</string>
     <string name="sessions_rename_title">إعادة تسمية الجلسة</string>

@@ -188,6 +188,9 @@
     <string name="chat_open_file">Abrir archivo</string>
     <string name="chat_more">Más opciones</string>
     <string name="chat_mcps">Servidores MCP</string>
+    <string name="chat_pin">Fijar</string>
+    <string name="chat_unpin">Desfijar</string>
+    <string name="chat_pinned">Fijada</string>
     <string name="chat_command_mcps">Gestionar conexiones MCP</string>
     <string name="chat_mcps_refresh">Actualizar estado MCP</string>
     <string name="chat_mcps_runtime">Las conexiones se aplican a este proyecto, no solo a este chat. Los cambios duran hasta reiniciar el servidor; la configuración no cambia.</string>

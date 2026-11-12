@@ -24,6 +24,9 @@
     <string name="sessions_connection_unauthorized">Acesso expirado · pareie novamente</string>
     <string name="sessions_demo_server">Demo</string>
     <string name="sessions_demo_status">Sessões de exemplo · sem servidor</string>
+    <string name="sessions_pinned">Fixadas</string>
+    <string name="sessions_pin">Fixar</string>
+    <string name="sessions_unpin">Desafixar</string>
     <string name="sessions_rename">Renomear</string>
     <string name="sessions_delete">Excluir</string>
     <string name="sessions_rename_title">Renomear sessão</string>
