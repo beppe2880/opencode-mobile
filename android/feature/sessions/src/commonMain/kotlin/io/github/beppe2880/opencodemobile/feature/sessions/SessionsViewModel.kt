@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.newChatAgent
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -538,7 +539,7 @@ class SessionsViewModel(
                         agents = agents,
                         models = models,
                         configuredModel = configured,
-                        agent = new.agent ?: agents.firstOrNull { it.id == "build" }?.id ?: agents.firstOrNull()?.id,
+                        agent = new.agent ?: agents.newChatAgent()?.id,
                     ),
                 )
             }

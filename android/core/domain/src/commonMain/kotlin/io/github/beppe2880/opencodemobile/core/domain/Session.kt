@@ -26,6 +26,9 @@ fun newChatModel(agent: Agent?, configured: ModelRef?, available: List<ModelInfo
     return (listOfNotNull(agent?.model, configured) + recent).firstOrNull { it.key in keys }
 }
 
+/** The agent a new chat starts with when none was picked: `build`, else the first one. */
+fun List<Agent>.newChatAgent(): Agent? = firstOrNull { it.id == "build" } ?: firstOrNull()
+
 data class TokenUsage(
     val input: Long = 0,
     val output: Long = 0,

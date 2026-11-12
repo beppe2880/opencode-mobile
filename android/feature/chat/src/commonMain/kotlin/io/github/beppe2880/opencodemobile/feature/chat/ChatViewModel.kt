@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
@@ -36,6 +37,8 @@ import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
 import io.github.beppe2880.opencodemobile.core.domain.isComplete
+import io.github.beppe2880.opencodemobile.core.domain.newChatAgent
+import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
 import io.github.beppe2880.opencodemobile.core.domain.reply
 import io.github.beppe2880.opencodemobile.core.domain.shellOwners
@@ -1344,12 +1347,15 @@ class ChatViewModel(
         }
     }
 
-    /** A fresh session in this folder; the server resolves its agent and model, without history. */
+    /**
+     * A fresh session in this folder, without history. The server resolves its agent; its model
+     * follows the "Model for new chats" setting, as in the New session sheet.
+     */
     private fun newSession(draft: String) {
         val directory = currentState.directory
         updateState { it.copy(creatingSession = true) }
         viewModelScope.launch {
-            sessions.create(directory, agent = null, model = null).fold(
+            sessions.create(directory, agent = null, model = modelForNewChat(directory)).fold(
                 onSuccess = { session ->
                     updateState { it.copy(creatingSession = false) }
                     sendEffect(ChatEffect.OpenSession(session.id))
@@ -1359,6 +1365,22 @@ class ChatViewModel(
                     sendEffect(ChatEffect.ShowMessage(error.toUiText()))
                 },
             )
+        }
+    }
+
+    /**
+     * The model the New session sheet would start a chat in [directory] with ([newChatModel], for
+     * the agent a new chat starts with); null leaves it to the server. The catalog is read again
+     * because `/new` can run before this chat has loaded it.
+     */
+    private suspend fun modelForNewChat(directory: String): ModelRef? {
+        if (settings.settings.value.newChatModel == NewChatModel.ServerDefault) return null
+        return coroutineScope {
+            // A config that cannot be read only skips its step.
+            val configured = async { catalog.configuredModel(directory).getOrNull() }
+            val agents = async { catalog.agents(directory).getOrDefault(emptyList()).selectablePrimary() }
+            val models = catalog.models(directory).getOrDefault(emptyList())
+            newChatModel(agents.await().newChatAgent(), configured.await(), models, recents.recent() + recentFromSessions)
         }
     }
 

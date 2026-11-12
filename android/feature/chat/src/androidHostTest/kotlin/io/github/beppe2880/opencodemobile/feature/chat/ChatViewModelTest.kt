@@ -26,6 +26,7 @@ import io.github.beppe2880.opencodemobile.core.domain.McpStatus
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.PendingShare
@@ -703,11 +704,10 @@ class ChatViewModelTest {
     }
 
     private val pins = InMemoryPinnedSessions()
+    private val catalog = FakeCatalog(model)
 
-    private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel {
-        val catalog = FakeCatalog(model)
-        return ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = { 42 })
-    }
+    private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel =
+        ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = { 42 })
 
     @Test
     fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
@@ -1242,7 +1242,9 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `slash new creates in the same directory with server defaults and no copied history`() = runTest(main.testDispatcher) {
+    fun `slash new creates in the same directory with the last used model and no copied history`() = runTest(main.testDispatcher) {
+        val sonnet = ModelRef("sonnet", "anthropic")
+        recents.models += sonnet
         val sessions = FakeSessions(model)
         val vm = vm(sessions)
         advanceUntilIdle()
@@ -1252,7 +1254,8 @@ class ChatViewModelTest {
         vm.onEvent(ChatEvent.Send)
         advanceUntilIdle()
 
-        assertEquals(listOf(Triple("/repo", null, null)), sessions.creates)
+        // The agent stays the server's choice.
+        assertEquals(listOf(Triple("/repo", null, sonnet)), sessions.creates)
         assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
         assertTrue(sessions.forks.isEmpty())
         assertTrue(chat.prompts.isEmpty())
@@ -1263,6 +1266,48 @@ class ChatViewModelTest {
         assertEquals("", drafts.load("s-new"))
         assertEquals("", vm.state.value.draft)
         assertFalse(vm.state.value.creatingSession)
+    }
+
+    @Test
+    fun `slash new picks the model like the new session sheet`() = runTest(main.testDispatcher) {
+        val sonnet = ModelRef("sonnet", "anthropic")
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        fun new(): ModelRef? {
+            vm.onEvent(ChatEvent.DraftChanged("/new"))
+            vm.onEvent(ChatEvent.Send)
+            advanceUntilIdle()
+            return sessions.creates.last().third
+        }
+
+        // Nothing used on this device yet: the model of the latest session.
+        assertEquals(model, new())
+        // The model configured on the server comes before the last used one, when it is available.
+        catalog.configured = Result.success(sonnet)
+        assertEquals(sonnet, new())
+        catalog.configured = Result.success(ModelRef("gone", "openai"))
+        assertEquals(model, new())
+        // A config that cannot be read only skips its step.
+        catalog.configured = Result.failure(OpenCodeError.Unreachable("down"))
+        assertEquals(model, new())
+    }
+
+    @Test
+    fun `slash new leaves the model to the server with the server default setting`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(newChatModel = NewChatModel.ServerDefault)
+        recents.models += model
+        catalog.configured = Result.success(ModelRef("sonnet", "anthropic"))
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.DraftChanged("/new"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+
+        assertEquals(listOf(Triple("/repo", null, null)), sessions.creates)
+        assertEquals(ChatEffect.OpenSession("s-new"), vm.effect.first())
     }
 
     @Test
@@ -2878,6 +2923,8 @@ private class FakeCatalog(private val model: ModelRef) : CatalogRepository {
             ModelInfo(ModelRef("sonnet", "anthropic"), "Claude Sonnet", "anthropic", null, 200_000, true, listOf("high"), 0, true, "active", "Anthropic"),
         ),
     )
+    var configured: Result<ModelRef?> = Result.success(null)
+    override suspend fun configuredModel(directory: String?): Result<ModelRef?> = configured
     override suspend fun commands(directory: String?) = Result.success(listOf(Command("review", "Review changes")))
     override suspend fun findFiles(directory: String, query: String) =
         Result.success(listOf("src/Composer.kt", "src/Chat.kt").filter { query.lowercase() in it.lowercase() })
