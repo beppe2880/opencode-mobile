@@ -9,8 +9,28 @@
   let fit = null;
   // Until the replayed output has been parsed, the terminal's answers to old queries are dropped.
   let live = false;
+  let liveEpoch = 0;
   // Modifiers armed or locked on the key bar; they apply to the next key typed on the keyboard.
   let modifiers = 0;
+  // Writes are parsed asynchronously. Replaying a resize must wait for all text
+  // before it, and later text must wait for that resize.
+  const pending = [];
+  let parsing = false;
+
+  function enqueue(action) {
+    pending.push(action);
+    if (!parsing) drain();
+  }
+
+  function drain() {
+    const action = pending.shift();
+    parsing = !!action;
+    if (action) action(drain);
+  }
+
+  function write(data) {
+    enqueue((done) => term.write(data, done));
+  }
 
   function send(data) {
     if (live && data.length > 0) bridge.input(data);
@@ -158,11 +178,27 @@
   }
 
   window.oc = {
-    write(data) { term.write(data); },
+    write,
+    restore(data, sizes) {
+      let offset = 0;
+      for (const [at, cols, rows] of sizes) {
+        write(data.slice(offset, at));
+        enqueue((done) => { term.resize(cols, rows); done(); });
+        offset = at;
+      }
+      write(data.slice(offset));
+    },
     setLive(value) {
+      const epoch = ++liveEpoch;
       if (!value) { live = false; return; }
       // Runs once everything written so far has been parsed.
-      term.write("", () => { live = true; });
+      enqueue((done) => term.write("", () => {
+        if (epoch !== liveEpoch) { done(); return; }
+        live = true;
+        fit.fit();
+        bridge.resize(term.cols, term.rows);
+        done();
+      }));
     },
     setModifiers(mask) { modifiers = mask; },
     key(id, mask) {
@@ -174,7 +210,11 @@
       send(withModifiers(String.fromCodePoint(codePoint), mask));
     },
     paste(text) { term.paste(text); },
-    reset() { term.reset(); },
+    reset() {
+      live = false;
+      ++liveEpoch;
+      enqueue((done) => { term.reset(); term.resize(80, 24); done(); });
+    },
     focus() { term.focus(); },
     theme(theme) {
       term.options.theme = theme;
@@ -207,12 +247,13 @@
     bindTouchScroll();
     bindImeInput();
     term.onData(typed);
-    term.onResize(({ cols, rows }) => bridge.resize(cols, rows));
+    term.onResize(({ cols, rows }) => { if (live) bridge.resize(cols, rows); });
     // A tap is the user gesture that lets the focus open the soft keyboard.
     document.getElementById("terminal").addEventListener("click", () => term.focus());
-    new ResizeObserver(() => fit.fit()).observe(document.getElementById("terminal"));
-    fit.fit();
-    bridge.resize(term.cols, term.rows);
+    // The server starts PTYs at 80x24. Parse the initial replay at that geometry,
+    // then fit and notify the shell together in setLive. Fitting before replay
+    // wraps the prompt differently from readline's redraw and leaves ghost rows.
+    new ResizeObserver(() => { if (live) fit.fit(); }).observe(document.getElementById("terminal"));
     bridge.ready();
   }
 
