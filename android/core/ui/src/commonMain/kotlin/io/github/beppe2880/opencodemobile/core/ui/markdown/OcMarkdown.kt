@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import com.mikepenz.markdown.compose.LocalMarkdownTypography
 import com.mikepenz.markdown.compose.components.CurrentComponentsBridge
 import com.mikepenz.markdown.compose.components.markdownComponents
@@ -29,6 +30,7 @@ import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.MarkdownColors
 import com.mikepenz.markdown.model.MarkdownTypography
 import com.mikepenz.markdown.model.markdownAnnotator
+import com.mikepenz.markdown.model.markdownInlineContent
 import dev.snipme.highlights.Highlights
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcColors
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcMarkdownPalette
@@ -56,18 +58,31 @@ fun OcMarkdown(
     // The active OpenCode theme's markdown colors; the app's own themes have none.
     val palette = colors.markdown
     val mdColors = remember(colors) { markdownColors(colors) }
-    val mdTypography = remember(typography, colors, mono) { markdownTypography(typography, mono, colors, palette) }
+    val parsed = cache.parsedFor(id, content)
+    val formulas = parsed.formulas
+    val growLines = formulas.any { !it.display }
+    val mdTypography = remember(typography, colors, mono, growLines) { markdownTypography(typography, mono, colors, palette, growLines = growLines) }
     // The renderer lays out the paragraphs of a quote like any other, with the paragraph style of
     // the current typography: colored quotes provide one whose text is the quote style.
-    val quoteTypography = remember(typography, colors, mono) {
-        palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true) }
+    val quoteTypography = remember(typography, colors, mono, growLines) {
+        palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true, growLines = growLines) }
     }
-    val annotator = remember(palette) {
-        if (palette != null) coloredAnnotator(palette) else markdownAnnotator()
+    val annotator = remember(palette, formulas, mdTypography) {
+        mathAnnotator(if (palette != null) coloredAnnotator(palette) else markdownAnnotator(), formulas, mdTypography.inlineCode.toSpanStyle())
     }
-    val components = remember(highlights, quoteTypography) {
+    val mathContent = rememberMathInlineContent(formulas, mdTypography.paragraph, colors.isDark)
+    val components = remember(highlights, quoteTypography, formulas, mathContent) {
         val defaultBlockQuote = CurrentComponentsBridge.blockQuote
+        val defaultParagraph = CurrentComponentsBridge.paragraph
         markdownComponents(
+            paragraph = { model ->
+                val formula = soleDisplayFormula(model.content.substring(model.node.startOffset, model.node.endOffset), formulas)
+                if (formula == null) {
+                    defaultParagraph(model)
+                } else {
+                    MathBlock(formula, typesetOf(formula, formulas, mathContent), model.typography.paragraph, model.typography.inlineCode)
+                }
+            },
             blockQuote = if (quoteTypography == null) {
                 defaultBlockQuote
             } else {
@@ -115,13 +130,13 @@ fun OcMarkdown(
             },
         )
     }
-    val state = cache.stateFor(id, content)
     Markdown(
-        state = state,
+        state = parsed.state,
         colors = mdColors,
         typography = mdTypography,
         components = components,
         annotator = annotator,
+        inlineContent = markdownInlineContent(mathContent),
         modifier = modifier,
     )
 }
@@ -149,8 +164,15 @@ internal fun markdownTypography(
     c: OcColors,
     palette: OcMarkdownPalette?,
     quoteText: Boolean = false,
+    growLines: Boolean = false,
 ): MarkdownTypography {
-    val body: TextStyle = t.bodyMedium.copy(color = c.textBase)
+    // A line with a tall formula (a fraction, a root) grows instead of being drawn over its neighbors.
+    fun TextStyle.growing() = if (growLines) {
+        copy(lineHeight = TextUnit.Unspecified)
+    } else {
+        this
+    }
+    val body: TextStyle = t.bodyMedium.copy(color = c.textBase).growing()
     val inlineCode = body.merge(mono.code.copy(fontSize = body.fontSize * 0.92f))
     if (palette == null) {
         return DefaultMarkdownTypography(
@@ -171,7 +193,7 @@ internal fun markdownTypography(
             textLink = TextLinkStyles(
                 style = body.copy(color = c.textAccent, textDecoration = TextDecoration.Underline).toSpanStyle(),
             ),
-            table = t.bodySmall,
+            table = t.bodySmall.growing(),
         )
     }
     val paragraph = body.copy(color = palette.text)
@@ -198,7 +220,7 @@ internal fun markdownTypography(
         textLink = TextLinkStyles(
             style = paragraph.copy(color = palette.linkText, textDecoration = TextDecoration.Underline).toSpanStyle(),
         ),
-        table = t.bodySmall.copy(color = palette.text),
+        table = t.bodySmall.copy(color = palette.text).growing(),
     )
 }
 

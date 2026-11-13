@@ -31,12 +31,17 @@ kotlin {
             implementation(libs.markdown.renderer.m3)
             implementation(libs.markdown.renderer.code)
             implementation(libs.highlights)
+            implementation(libs.latex.renderer)
+            implementation(libs.latex.fonts.katex)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
         }
         iosMain.dependencies {
             implementation(libs.jb.navigationevent.compose)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
         getByName("androidHostTest").dependencies {
             implementation(project(":core:testing"))
