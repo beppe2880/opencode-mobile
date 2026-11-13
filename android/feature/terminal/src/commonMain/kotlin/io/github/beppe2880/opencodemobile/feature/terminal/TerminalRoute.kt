@@ -14,8 +14,12 @@ import org.koin.core.parameter.parametersOf
 
 /** A shell on the server in [directory]; leaving keeps it running for the next visit. */
 @Composable
-fun TerminalRoute(directory: String, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    val viewModel: TerminalViewModel = koinViewModel(key = "terminal-$directory") { parametersOf(directory) }
+fun TerminalRoute(
+    directory: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TerminalViewModel = koinViewModel(key = "terminal-$directory") { parametersOf(directory) },
+) {
     LifecycleResumeEffect(viewModel) {
         viewModel.setTerminalVisible(true)
         onPauseOrDispose { viewModel.setTerminalVisible(false) }

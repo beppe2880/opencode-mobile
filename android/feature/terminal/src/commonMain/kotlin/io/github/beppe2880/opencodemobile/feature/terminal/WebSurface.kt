@@ -24,6 +24,8 @@ class WebSurface(
 ) : AutoCloseable {
     private val main = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val output = StringBuilder()
+    private data class Size(val at: Int, val columns: Int, val rows: Int)
+    private val sizes = mutableListOf<Size>()
     private var page: WebTerminalPage? = null
     private var live = false
     private var modifiers = 0
@@ -33,7 +35,10 @@ class WebSurface(
     fun attach(page: WebTerminalPage) {
         this.page = page
         theme?.let { page.call("theme", it) }
-        if (output.isNotEmpty()) page.call("write", js(output.toString()))
+        if (output.isNotEmpty() || sizes.isNotEmpty()) {
+            val geometry = sizes.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" }
+            page.call("restore", js(output.toString()), geometry)
+        }
         page.call("setModifiers", modifiers.toString())
         page.call("setLive", live.toString())
         page.call("focus")
@@ -52,7 +57,13 @@ class WebSurface(
     // Bridge callbacks may arrive on a web view thread (Android).
     fun onInput(data: String) = send(data.encodeToByteArray())
 
-    fun onPageResize(columns: Int, rows: Int) = onResize(columns, rows)
+    fun onPageResize(columns: Int, rows: Int) {
+        main.launch {
+            val last = sizes.lastOrNull()
+            if (last?.columns != columns || last.rows != rows) sizes += Size(output.length, columns, rows)
+            onResize(columns, rows)
+        }
+    }
 
     fun onPageModifiersUsed() {
         main.launch { onModifiersUsed() }
@@ -64,6 +75,11 @@ class WebSurface(
             // Cut at a line start so the kept output does not begin inside an escape sequence.
             val cut = output.indexOf("\n", output.length - MAX_KEPT_CHARS).takeIf { it >= 0 } ?: (output.length - MAX_KEPT_CHARS)
             output.deleteRange(0, cut + 1)
+            val previous = sizes.lastOrNull { it.at <= cut + 1 }
+            val kept = sizes.filter { it.at > cut + 1 }.map { it.copy(at = it.at - cut - 1) }
+            sizes.clear()
+            previous?.let { sizes += it.copy(at = 0) }
+            sizes += kept
         }
         page?.call("write", js(text))
     }
@@ -92,6 +108,7 @@ class WebSurface(
     /** Clears the screen and modes for a new shell. */
     fun reset() {
         output.clear()
+        sizes.clear()
         page?.call("reset")
     }
 

@@ -38,6 +38,22 @@ class TerminalViewModelTest {
         // WebSurface writes to the page as JavaScript literals, so each chunk arrives quoted.
         assertEquals(listOf("\"hello\"", "\"again\""), page.writes)
         assertEquals(TerminalLink.Connected, viewModel.state.value.link)
+        assertEquals(1, terminals.openCalls)
+    }
+
+    @Test
+    fun `returning after explicitly closing the retained shell opens a new terminal`() = runTest(main.testDispatcher) {
+        val terminals = FakeTerminals()
+        val viewModel = TerminalViewModel("/project", terminals, FakeSettings())
+        runCurrent()
+        viewModel.onEvent(TerminalEvent.ConfirmClose)
+        runCurrent()
+        assertEquals(TerminalLink.Exited, viewModel.state.value.link)
+        viewModel.setTerminalVisible(false)
+        viewModel.setTerminalVisible(true)
+        runCurrent()
+        assertEquals(2, terminals.openCalls)
+        assertEquals(TerminalLink.Connected, viewModel.state.value.link)
     }
 
     private class FakeSettings : SettingsRepository {
@@ -48,7 +64,11 @@ class TerminalViewModelTest {
     }
 
     private class FakeTerminals : TerminalRepository {
-        override suspend fun open(directory: String) = Result.success(TerminalInfo("t1", "bash", true))
+        var openCalls = 0
+        override suspend fun open(directory: String): Result<TerminalInfo> {
+            openCalls++
+            return Result.success(TerminalInfo("t1", "bash", true))
+        }
 
         override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int) = Result.success(Unit)
 
