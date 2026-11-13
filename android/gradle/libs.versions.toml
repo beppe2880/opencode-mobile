@@ -39,6 +39,7 @@ ktor = "3.6.1"
 # ---- Markdown rendering (Compose) ----
 markdownRenderer = "0.46.0"
 highlights = "1.2.0"
+latex = "1.7.3"
 
 # ---- QR decoding ----
 zxing = "3.5.4"
@@ -138,6 +139,8 @@ markdown-renderer = { group = "com.mikepenz", name = "multiplatform-markdown-ren
 markdown-renderer-m3 = { group = "com.mikepenz", name = "multiplatform-markdown-renderer-m3", version.ref = "markdownRenderer" }
 markdown-renderer-code = { group = "com.mikepenz", name = "multiplatform-markdown-renderer-code", version.ref = "markdownRenderer" }
 highlights = { group = "dev.snipme", name = "highlights", version.ref = "highlights" }
+latex-renderer = { group = "io.github.huarangmeng", name = "latex-renderer", version.ref = "latex" }
+latex-fonts-katex = { group = "io.github.huarangmeng", name = "latex-fonts-katex", version.ref = "latex" }
 
 # ---- QR ----
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }

@@ -7,6 +7,9 @@ import com.mikepenz.markdown.model.State
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.parser.MarkdownParser
 
+/** The parse of a message whose formulas were replaced by placeholders, and those [formulas]. */
+internal class ParsedMarkdown(val state: State, val formulas: List<MathFormula>)
+
 /**
  * Parses markdown once per (id, content) pair. Held above the transcript list so
  * recycled items reuse the parsed tree; only the streaming part re-parses.
@@ -14,25 +17,27 @@ import org.intellij.markdown.parser.MarkdownParser
 class MarkdownCache {
     private val parser = MarkdownParser(GFMFlavourDescriptor())
 
-    private data class Entry(val content: String, val state: State)
+    private data class Entry(val content: String, val parsed: ParsedMarkdown)
 
     // Least recently used first: hits are moved to the end, the head is evicted.
     private val cache = LinkedHashMap<String, Entry>()
 
-    fun stateFor(id: String, content: String): State {
+    internal fun parsedFor(id: String, content: String): ParsedMarkdown {
         val cached = cache.remove(id)
         if (cached != null && cached.content == content) {
             cache[id] = cached
-            return cached.state
+            return cached.parsed
         }
+        val math = extractMath(content)
         val state = try {
-            State.Success(parser.buildMarkdownTreeFromString(content), content, linksLookedUp = false, ReferenceLinkHandlerImpl())
+            State.Success(parser.buildMarkdownTreeFromString(math.text), math.text, linksLookedUp = false, ReferenceLinkHandlerImpl())
         } catch (error: Throwable) {
             State.Error(error, ReferenceLinkHandlerImpl())
         }
-        cache[id] = Entry(content, state)
+        val parsed = ParsedMarkdown(state, math.formulas)
+        cache[id] = Entry(content, parsed)
         if (cache.size > MAX_ENTRIES) cache.remove(cache.keys.first())
-        return state
+        return parsed
     }
 
     private companion object {
