@@ -67,8 +67,8 @@ fun OcMarkdown(
     val quoteTypography = remember(typography, colors, mono, growLines) {
         palette?.let { markdownTypography(typography, mono, colors, it, quoteText = true, growLines = growLines) }
     }
-    val annotator = remember(palette, formulas) {
-        mathAnnotator(if (palette != null) coloredAnnotator(palette) else markdownAnnotator(), formulas)
+    val annotator = remember(palette, formulas, mdTypography) {
+        mathAnnotator(if (palette != null) coloredAnnotator(palette) else markdownAnnotator(), formulas, mdTypography.inlineCode.toSpanStyle())
     }
     val mathContent = rememberMathInlineContent(formulas, mdTypography.paragraph, colors.isDark)
     val components = remember(highlights, quoteTypography, formulas, colors.isDark) {
@@ -77,7 +77,7 @@ fun OcMarkdown(
         markdownComponents(
             paragraph = { model ->
                 val formula = soleDisplayFormula(model.content.substring(model.node.startOffset, model.node.endOffset), formulas)
-                if (formula != null) MathBlock(formula, model.typography.paragraph, colors.isDark) else defaultParagraph(model)
+                if (formula != null) MathBlock(formula, model.typography.paragraph, model.typography.inlineCode, colors.isDark) else defaultParagraph(model)
             },
             blockQuote = if (quoteTypography == null) {
                 defaultBlockQuote

@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.hrm.latex.renderer.Latex
@@ -25,6 +28,7 @@ import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.markdownAnnotator
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
 import org.intellij.markdown.MarkdownTokenTypes
+import kotlin.coroutines.cancellation.CancellationException
 
 private fun mathKey(index: Int) = "math$index"
 
@@ -34,7 +38,7 @@ private fun latexConfig(fontSize: TextUnit, color: Color) =
     LatexConfig(fontSize = fontSize, theme = LatexTheme.light(color = color))
 
 /** Draws the placeholders of [formulas] in text as inline content; other text is left to [base]. */
-internal fun mathAnnotator(base: MarkdownAnnotator, formulas: List<MathFormula>): MarkdownAnnotator {
+internal fun mathAnnotator(base: MarkdownAnnotator, formulas: List<MathFormula>, sourceStyle: SpanStyle): MarkdownAnnotator {
     if (formulas.isEmpty()) return base
     return markdownAnnotator(base.config) { content, child ->
         if (child.type == MarkdownTokenTypes.TEXT) {
@@ -42,7 +46,12 @@ internal fun mathAnnotator(base: MarkdownAnnotator, formulas: List<MathFormula>)
             if (text.any { placeholderIndex(it).let { index -> index in formulas.indices } }) {
                 text.forEach { c ->
                     val index = placeholderIndex(c)
-                    if (index in formulas.indices) appendInlineContent(mathKey(index), formulas[index].raw) else append(c)
+                    val formula = formulas.getOrNull(index)
+                    when {
+                        formula == null -> append(c)
+                        formula.renderable -> appendInlineContent(mathKey(index), formula.raw)
+                        else -> withStyle(sourceStyle) { append(formula.raw) }
+                    }
                 }
                 return@markdownAnnotator true
             }
@@ -51,7 +60,10 @@ internal fun mathAnnotator(base: MarkdownAnnotator, formulas: List<MathFormula>)
     }
 }
 
-/** The typeset formulas for [mathAnnotator], measured at the size and color of [style]. */
+/**
+ * The typeset formulas for [mathAnnotator], measured at the size and color of [style]. A formula
+ * that is not [MathFormula.renderable] or that the library fails on is left out: its source is shown.
+ */
 @Composable
 internal fun rememberMathInlineContent(formulas: List<MathFormula>, style: TextStyle, isDark: Boolean): Map<String, InlineTextContent> {
     if (formulas.isEmpty()) return emptyMap()
@@ -60,7 +72,17 @@ internal fun rememberMathInlineContent(formulas: List<MathFormula>, style: TextS
     return remember(measurer, formulas, config, isDark) {
         buildMap {
             formulas.forEachIndexed { index, formula ->
-                measurer.inlineContent(latexOf(formula), config, isDark)?.let { put(mathKey(index), it) }
+                if (!formula.renderable) return@forEachIndexed
+                val content = try {
+                    measurer.inlineContent(latexOf(formula), config, isDark)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    // Only a last resort: a StackOverflowError while composing is not catchable, the
+                    // nesting limit of isSafeLatex is what prevents it.
+                    null
+                }
+                if (content != null) put(mathKey(index), content)
             }
         }
     }
@@ -73,15 +95,32 @@ internal fun soleDisplayFormula(paragraph: String, formulas: List<MathFormula>):
     return formulas.getOrNull(placeholderIndex(text[0]))?.takeIf { it.display }
 }
 
-/** A display formula, centered when it fits and scrolled sideways when it is wider than the screen. */
+/**
+ * A display formula, centered when it fits and scrolled sideways when it is wider than the screen.
+ * A formula that is not renderable, or that the library cannot measure, is shown as its source.
+ */
 @Composable
-internal fun MathBlock(formula: MathFormula, style: TextStyle, isDark: Boolean, modifier: Modifier = Modifier) {
+internal fun MathBlock(formula: MathFormula, style: TextStyle, sourceStyle: TextStyle, isDark: Boolean, modifier: Modifier = Modifier) {
     val config = remember(style.fontSize, style.color) { latexConfig(style.fontSize, style.color) }
+    val measurer = rememberLatexMeasurer(config)
+    val typeset = formula.renderable && remember(measurer, formula, config, isDark) {
+        try {
+            measurer.measure(latexOf(formula), config, isDark) != null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            false
+        }
+    }
     BoxWithConstraints(modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         val minWidth = maxWidth
         Box(Modifier.horizontalScroll(rememberScrollState())) {
-            Box(Modifier.widthIn(min = minWidth), contentAlignment = Alignment.Center) {
-                Latex(latex = latexOf(formula), config = config, isDarkTheme = isDark)
+            if (typeset) {
+                Box(Modifier.widthIn(min = minWidth), contentAlignment = Alignment.Center) {
+                    Latex(latex = latexOf(formula), config = config, isDarkTheme = isDark)
+                }
+            } else {
+                Text(text = formula.raw, style = sourceStyle, softWrap = false)
             }
         }
     }

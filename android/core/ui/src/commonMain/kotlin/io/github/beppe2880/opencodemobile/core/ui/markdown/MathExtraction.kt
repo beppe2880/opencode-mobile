@@ -1,7 +1,11 @@
 package io.github.beppe2880.opencodemobile.core.ui.markdown
 
-/** A [display] formula is drawn as a block of its own; [raw] is the formula as written, delimiters included. */
-internal class MathFormula(val latex: String, val display: Boolean, val raw: String)
+/**
+ * A [display] formula is drawn as a block of its own; [raw] is the formula as written, delimiters
+ * included. A formula that is not [renderable] (see [isSafeLatex]) never reaches the LaTeX library
+ * and is shown as its source in monospace.
+ */
+internal class MathFormula(val latex: String, val display: Boolean, val raw: String, val renderable: Boolean = true)
 
 /**
  * [text] is the markdown with every formula replaced by one placeholder character (see
@@ -13,6 +17,74 @@ private const val PLACEHOLDER_BASE = 0xE000
 private const val MAX_FORMULAS = 0x1800
 private const val PRIVATE_USE_END = 0xF8FF
 private const val MAX_INLINE_LENGTH = 1000
+
+/** Longest formula handed to the LaTeX library: far above a real formula, bounds the work per formula. */
+internal const val MAX_FORMULA_LENGTH = 3000
+
+/**
+ * Deepest nesting of groups (`{}`, `\left\right`, `\begin\end`) handed to the LaTeX library. The
+ * library parses and lays out recursively without a limit, so ~500 levels overflow the stack with a
+ * `StackOverflowError`. That cannot be caught while composing: this limit is the real defense.
+ */
+internal const val MAX_FORMULA_DEPTH = 64
+
+/** Also the longest run of commands without anything between them (`\sqrt\sqrt\sqrt...`), which nest without braces. */
+private const val MAX_COMMAND_CHAIN = MAX_FORMULA_DEPTH
+
+/** Whether [latex] is short and shallow enough for the LaTeX library. */
+internal fun isSafeLatex(latex: String): Boolean = latex.length <= MAX_FORMULA_LENGTH && latexNestingDepth(latex) <= MAX_FORMULA_DEPTH
+
+/**
+ * The deepest nesting of `{}`, `\left`/`\right` and `\begin`/`\end` in [latex], or
+ * [Int.MAX_VALUE] when a chain of commands without arguments in braces is longer than
+ * [MAX_COMMAND_CHAIN]. Escaped braces (`\{`, `\}`) do not count.
+ */
+internal fun latexNestingDepth(latex: String): Int {
+    var depth = 0
+    var max = 0
+    var chain = 0
+    var i = 0
+    fun open() {
+        depth++
+        if (depth > max) max = depth
+    }
+    fun close() {
+        if (depth > 0) depth--
+    }
+    while (i < latex.length) {
+        val c = latex[i]
+        when {
+            c == '\\' -> {
+                var end = i + 1
+                while (end < latex.length && latex[end].isLetter()) end++
+                if (end == i + 1) {
+                    // A control symbol such as `\{`, `\\` or `\,`.
+                    i = minOf(end + 1, latex.length)
+                    chain = 0
+                    continue
+                }
+                when (latex.substring(i + 1, end)) {
+                    "left", "begin" -> open()
+                    "right", "end" -> close()
+                }
+                if (++chain > MAX_COMMAND_CHAIN) return Int.MAX_VALUE
+                i = end
+                continue
+            }
+            c == '{' -> {
+                open()
+                chain = 0
+            }
+            c == '}' -> {
+                close()
+                chain = 0
+            }
+            !c.isWhitespace() -> chain = 0
+        }
+        i++
+    }
+    return max
+}
 
 /** The formula index a placeholder character stands for, or -1 for any other character. */
 internal fun placeholderIndex(c: Char): Int {
@@ -158,11 +230,11 @@ private fun emit(
             val indent = source.substring(lineStart, start)
             out.setLength(out.length - indent.length)
             out.append('\n').append(indent).append(placeholder)
-            formulas += MathFormula(latex, display = true, raw)
+            formulas += MathFormula(latex, display = true, raw, isSafeLatex(latex))
             return lineEnd
         }
     }
-    formulas += MathFormula(latex, display = false, raw)
+    formulas += MathFormula(latex, display = false, raw, isSafeLatex(latex))
     out.append(placeholder)
     return end
 }

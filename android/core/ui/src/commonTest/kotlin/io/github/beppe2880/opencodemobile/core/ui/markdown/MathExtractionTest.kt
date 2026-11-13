@@ -9,6 +9,7 @@ class MathExtractionTest {
 
     private val p0 = "\uE000"
     private val p1 = "\uE001"
+    private val p2 = "\uE002"
 
     private fun latex(source: String) = extractMath(source).formulas.map { it.latex }
 
@@ -159,5 +160,69 @@ class MathExtractionTest {
         assertEquals("x", soleDisplayFormula(" $p0 \n", formulas)?.latex)
         assertEquals(null, soleDisplayFormula(p1, formulas))
         assertEquals(null, soleDisplayFormula("$p0$p1", formulas))
+    }
+
+    private fun nested(open: String, close: String, depth: Int, inner: String = "x") = open.repeat(depth) + inner + close.repeat(depth)
+
+    @Test
+    fun `deeply nested braces are not renderable`() {
+        assertFalse(isSafeLatex(nested("{", "}", 200)))
+        assertFalse(isSafeLatex(nested("\\frac{1}{", "}", 200)))
+        assertFalse(isSafeLatex(nested("\\sqrt{", "}", 200)))
+        assertFalse(isSafeLatex(nested("x^{", "}", 200)))
+        assertTrue(isSafeLatex(nested("{", "}", MAX_FORMULA_DEPTH)))
+        assertFalse(isSafeLatex(nested("{", "}", MAX_FORMULA_DEPTH + 1)))
+    }
+
+    @Test
+    fun `left right and begin end count as nesting`() {
+        assertFalse(isSafeLatex(nested("\\left(", "\\right)", 200)))
+        assertFalse(isSafeLatex(nested("\\begin{align}", "\\end{align}", 200)))
+        assertEquals(1, latexNestingDepth("\\left( x \\right)"))
+        assertEquals(2, latexNestingDepth("\\begin{pmatrix} a \\end{pmatrix}"))
+    }
+
+    @Test
+    fun `escaped braces are not counted`() {
+        assertEquals(0, latexNestingDepth("\\{".repeat(500) + "\\}".repeat(500)))
+        assertEquals(1, latexNestingDepth("\\{ {x} \\}"))
+        assertTrue(isSafeLatex("\\left\\{ \\frac{a}{b} \\right\\}"))
+    }
+
+    @Test
+    fun `a long chain of commands without braces is not renderable`() {
+        assertFalse(isSafeLatex("\\sqrt".repeat(500) + "x"))
+        assertTrue(isSafeLatex("\\alpha \\beta \\gamma = 1"))
+    }
+
+    @Test
+    fun `an over long formula is not renderable`() {
+        assertTrue(isSafeLatex("a+".repeat(MAX_FORMULA_LENGTH / 2)))
+        assertFalse(isSafeLatex("a+".repeat(MAX_FORMULA_LENGTH)))
+    }
+
+    @Test
+    fun `normal formulas are renderable`() {
+        val formulas = listOf(
+            "E = mc^2",
+            "\\int_0^{\\infty} e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}",
+            "v = \\sqrt{\\frac{2K}{m}}",
+            "\\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{pmatrix}",
+            "\\begin{aligned} \\nabla \\cdot \\vec{E} &= \\frac{\\rho}{\\varepsilon_0} \\\\ \\nabla \\times \\vec{B} &= \\mu_0 \\vec{J} + \\mu_0\\varepsilon_0 \\frac{\\partial \\vec{E}}{\\partial t} \\end{aligned}",
+            "i\\hbar \\frac{\\partial}{\\partial t} \\Psi(\\vec{r}, t) = \\hat{H} \\Psi(\\vec{r}, t)",
+            "\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}",
+        )
+        for (latex in formulas) assertTrue(isSafeLatex(latex), latex)
+    }
+
+    @Test
+    fun `an unsafe formula keeps its placeholder and is marked not renderable`() {
+        val inline = nested("{", "}", 200)
+        val display = nested("\\frac{1}{", "}", 200)
+        val math = extractMath("a \$$inline\$ b\n\n\\[ $display \\]\n\nc \$x\$")
+        assertEquals(listOf(false, false, true), math.formulas.map { it.renderable })
+        assertEquals("\$$inline\$", math.formulas[0].raw)
+        assertEquals(listOf(false, true, false), math.formulas.map { it.display })
+        assertEquals("a $p0 b\n\n\n$p1\n\nc $p2", math.text)
     }
 }
