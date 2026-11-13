@@ -2,10 +2,8 @@ package io.github.beppe2880.opencodemobile.core.ui.markdown
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -17,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.hrm.latex.renderer.Latex
+import com.hrm.latex.renderer.measure.LatexMeasurerState
 import com.hrm.latex.renderer.measure.rememberLatexMeasurer
 import com.hrm.latex.renderer.model.LatexConfig
 import com.hrm.latex.renderer.model.LatexTheme
@@ -72,19 +71,23 @@ internal fun rememberMathInlineContent(formulas: List<MathFormula>, style: TextS
     return remember(measurer, formulas, config, isDark) {
         buildMap {
             formulas.forEachIndexed { index, formula ->
-                if (!formula.renderable) return@forEachIndexed
-                val content = try {
-                    measurer.inlineContent(latexOf(formula), config, isDark)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    // Only a last resort: a StackOverflowError while composing is not catchable, the
-                    // nesting limit of isSafeLatex is what prevents it.
-                    null
-                }
-                if (content != null) put(mathKey(index), content)
+                typesetOrNull(measurer, formula, config, isDark)?.let { put(mathKey(index), it) }
             }
         }
+    }
+}
+
+/** The typeset [formula] as inline content, or null when it is not renderable or the library fails on it. */
+private fun typesetOrNull(measurer: LatexMeasurerState, formula: MathFormula, config: LatexConfig, isDark: Boolean): InlineTextContent? {
+    if (!formula.renderable) return null
+    return try {
+        measurer.inlineContent(latexOf(formula), config, isDark)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        // Only a last resort: a StackOverflowError while composing is not catchable, the
+        // nesting limit of isSafeLatex is what prevents it.
+        null
     }
 }
 
@@ -95,32 +98,36 @@ internal fun soleDisplayFormula(paragraph: String, formulas: List<MathFormula>):
     return formulas.getOrNull(placeholderIndex(text[0]))?.takeIf { it.display }
 }
 
+/** The typeset [formula] of [formulas] from [inlineContent] (see [rememberMathInlineContent]), if any. */
+internal fun typesetOf(formula: MathFormula, formulas: List<MathFormula>, inlineContent: Map<String, InlineTextContent>): InlineTextContent? =
+    inlineContent[mathKey(formulas.indexOf(formula))]
+
+private const val BLOCK_KEY = "mathBlock"
+
 /**
  * A display formula, centered when it fits and scrolled sideways when it is wider than the screen.
  * A formula that is not renderable, or that the library cannot measure, is shown as its source.
+ *
+ * The typeset formula is covered by a transparent text of the same size whose only content is a
+ * placeholder with the formula's source as alternate text: a text selection across the message
+ * then includes the formula and copies its source. The formula itself cannot be that placeholder's
+ * content: inside a display block the library's inline content is laid out but not drawn.
  */
 @Composable
-internal fun MathBlock(formula: MathFormula, style: TextStyle, sourceStyle: TextStyle, isDark: Boolean, modifier: Modifier = Modifier) {
-    val config = remember(style.fontSize, style.color) { latexConfig(style.fontSize, style.color) }
-    val measurer = rememberLatexMeasurer(config)
-    val typeset = formula.renderable && remember(measurer, formula, config, isDark) {
-        try {
-            measurer.measure(latexOf(formula), config, isDark) != null
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            false
-        }
-    }
-    BoxWithConstraints(modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        val minWidth = maxWidth
-        Box(Modifier.horizontalScroll(rememberScrollState())) {
-            if (typeset) {
-                Box(Modifier.widthIn(min = minWidth), contentAlignment = Alignment.Center) {
-                    Latex(latex = latexOf(formula), config = config, isDarkTheme = isDark)
-                }
-            } else {
+internal fun MathBlock(formula: MathFormula, typeset: InlineTextContent?, style: TextStyle, sourceStyle: TextStyle, modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxWidth().padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.horizontalScroll(rememberScrollState()), contentAlignment = Alignment.Center) {
+            if (typeset == null) {
                 Text(text = formula.raw, style = sourceStyle, softWrap = false)
+            } else {
+                typeset.children(formula.raw)
+                Text(
+                    text = buildAnnotatedString { appendInlineContent(BLOCK_KEY, formula.raw) },
+                    inlineContent = mapOf(BLOCK_KEY to InlineTextContent(typeset.placeholder) {}),
+                    modifier = Modifier.matchParentSize(),
+                    style = style.copy(lineHeight = TextUnit.Unspecified),
+                    softWrap = false,
+                )
             }
         }
     }
