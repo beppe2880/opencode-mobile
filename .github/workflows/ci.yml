@@ -32,7 +32,8 @@ jobs:
         run: ./gradlew spotlessCheck --console=plain
       - name: Unit tests, lint and debug build
         working-directory: android
-        run: ./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
+        # The benchmarks are only compiled here: running them needs a device.
+        run: ./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug :benchmark:compileBenchmarkKotlin --console=plain
       - name: Compile shared code and common tests for iOS
         # Kotlin/Native compiles iOS klibs on Linux too; only linking needs macOS. The tests catch
         # names Kotlin/Native rejects (for example commas in backticked test names).

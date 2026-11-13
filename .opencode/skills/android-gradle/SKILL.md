@@ -8,7 +8,8 @@ description: Use for opencode-mobile AGP 9, Gradle Kotlin DSL, Kotlin Multiplatf
 Gradle 9.8.1, AGP 9.4.1, Kotlin 2.4.21, Compose Multiplatform 1.12.2, compile SDK 37,
 target SDK 36, min SDK 26, JVM target 11, Gradle daemon on JDK 21. iOS targets are
 `iosArm64` and `iosSimulatorArm64`. There are no product flavors; app build types are
-`debug` (application ID suffix `.debug`) and `release`.
+`debug` (application ID suffix `.debug`), `release` and `benchmark` (release code, debug
+key, suffix `.benchmark`, offline demo data; measured by the `:benchmark` test module).
 
 ## Module Shapes
 

@@ -91,7 +91,18 @@ android {
             )
             resValue("string", "app_name", "OpenCode Mobile")
         }
+        // What `:benchmark` measures: the release code and R8, signed with the debug key,
+        // installed beside the real app and started in the offline demo so runs need no server.
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+            applicationIdSuffix = ".benchmark"
+            buildConfigField("boolean", "USE_FAKE_DATA", "true")
+        }
     }
+    // The benchmark build type has no sources of its own: it compiles the release ones.
+    sourceSets.getByName("benchmark").kotlin.directories.add("src/release/java")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

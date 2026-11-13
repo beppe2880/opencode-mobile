@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 rootProject.name = "OpenCodeMobile"
 
 include(":app")
+include(":benchmark")
 include(":core:ui")
 include(":core:mvi")
 include(":core:domain")
