@@ -96,7 +96,8 @@ internal fun ToolMediaStrip(
     }
 }
 
-private sealed interface Decoded {
+/** An image being decoded off the main thread. */
+internal sealed interface Decoded {
     data object Pending : Decoded
     data object Failed : Decoded
     class Ready(val bitmap: ImageBitmap) : Decoded

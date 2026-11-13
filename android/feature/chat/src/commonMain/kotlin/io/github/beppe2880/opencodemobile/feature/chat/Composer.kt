@@ -17,18 +17,24 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -54,6 +60,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,12 +68,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -103,6 +114,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_composer_p
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_listening
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_start
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_stop
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_open_image
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_queue
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_remove_attachment
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_send
@@ -550,21 +562,95 @@ private fun AttachmentChips(attachments: List<PromptAttachment>, onRemove: (Stri
             .horizontalScroll(rememberScrollState())
             .padding(top = OcSpacing.xs, end = OcSpacing.sm),
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         attachments.forEach { attachment ->
-            val image = attachment.mime?.startsWith("image/") == true
-            OcChip(
-                text = attachment.name,
-                // Tapping an image opens it; the X removes the attachment.
-                onClick = { if (image) onPreview(attachment.uri) },
-                leadingIcon = if (image) Icons.Outlined.Image else Icons.Outlined.AttachFile,
-                trailingIcon = Icons.Outlined.Close,
-                onTrailingClick = { onRemove(attachment.uri) },
-                trailingContentDescription = stringResource(Res.string.chat_remove_attachment, attachment.name),
+            key(attachment.uri) {
+                val image = attachment.mime?.startsWith("image/") == true
+                val decoded = if (image) rememberCachedDataImage(attachment.uri, THUMBNAIL_DECODE_SIDE) else Decoded.Failed
+                if (decoded is Decoded.Failed) {
+                    AttachmentChip(attachment, image, onRemove, onPreview)
+                } else {
+                    AttachmentThumbnail(attachment, (decoded as? Decoded.Ready)?.bitmap, onRemove, onPreview)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AttachmentChip(attachment: PromptAttachment, image: Boolean, onRemove: (String) -> Unit, onPreview: (String) -> Unit) {
+    OcChip(
+        text = attachment.name,
+        // Tapping an image opens it; the X removes the attachment.
+        onClick = { if (image) onPreview(attachment.uri) },
+        leadingIcon = if (image) Icons.Outlined.Image else Icons.Outlined.AttachFile,
+        trailingIcon = Icons.Outlined.Close,
+        onTrailingClick = { onRemove(attachment.uri) },
+        trailingContentDescription = stringResource(Res.string.chat_remove_attachment, attachment.name),
+        modifier = Modifier
+            .widthIn(max = 220.dp)
+            .testTag("chat_attachment_${attachment.name}"),
+    )
+}
+
+private val ATTACHMENT_THUMBNAIL_SIDE = 56.dp
+private val REMOVE_TARGET_SIDE = 32.dp
+
+/** An attached image as a small picture: tapping opens it, the X in the corner removes it. [bitmap] is null while decoding. */
+@Composable
+private fun AttachmentThumbnail(attachment: PromptAttachment, bitmap: ImageBitmap?, onRemove: (String) -> Unit, onPreview: (String) -> Unit) {
+    val c = OcTheme.colors
+    val shape = RoundedCornerShape(OcRadius.md)
+    // The X overhangs the top end corner, so it covers less of the picture.
+    val overhang = REMOVE_TARGET_SIDE / 4
+    Box(Modifier.size(ATTACHMENT_THUMBNAIL_SIDE + overhang)) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .size(ATTACHMENT_THUMBNAIL_SIDE)
+                .clip(shape)
+                .background(c.layer02)
+                .border(BorderStroke(1.dp, c.borderBase), shape)
+                .clickable(
+                    role = Role.Image,
+                    onClickLabel = stringResource(Res.string.chat_open_image),
+                    onClick = { onPreview(attachment.uri) },
+                )
+                .semantics { contentDescription = attachment.name }
+                .testTag("chat_attachment_${attachment.name}"),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (bitmap != null) {
+                Image(bitmap, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            } else {
+                Icon(Icons.Outlined.Image, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(20.dp))
+            }
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(REMOVE_TARGET_SIDE)
+                .clip(CircleShape)
+                .clickable(role = Role.Button, onClick = { onRemove(attachment.uri) })
+                .testTag("chat_attachment_remove_${attachment.name}"),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
                 modifier = Modifier
-                    .widthIn(max = 220.dp)
-                    .testTag("chat_attachment_${attachment.name}"),
-            )
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(c.bgInverse)
+                    .border(BorderStroke(1.dp, c.bgBase), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Outlined.Close,
+                    contentDescription = stringResource(Res.string.chat_remove_attachment, attachment.name),
+                    tint = c.textInverse,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
         }
     }
 }

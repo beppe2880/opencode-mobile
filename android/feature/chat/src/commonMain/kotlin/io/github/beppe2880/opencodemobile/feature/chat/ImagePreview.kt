@@ -137,6 +137,18 @@ private fun rememberDataImage(dataUri: String?, maxSide: Int, cached: Boolean = 
     return image
 }
 
+/** [dataUri] decoded through the shared thumbnail cache, [Decoded.Failed] when it is not a supported image. */
+@Composable
+internal fun rememberCachedDataImage(dataUri: String, maxSide: Int): Decoded {
+    val initial = remember { Thumbnails.get(dataUri, maxSide)?.let { Decoded.Ready(it) } ?: Decoded.Pending }
+    val decoded by produceState(initial, dataUri, maxSide) {
+        val bitmap = Thumbnails.get(dataUri, maxSide)
+            ?: withContext(Dispatchers.Default) { decodeDataImage(dataUri, maxSide) }?.also { Thumbnails.put(dataUri, maxSide, it) }
+        value = bitmap?.let { Decoded.Ready(it) } ?: Decoded.Failed
+    }
+    return decoded
+}
+
 /**
  * One of the [count] images sent with a prompt, as big as [size] (the setting) says in a
  * transcript [available] wide (see [attachedImageSize]): a square thumbnail, or a card like
