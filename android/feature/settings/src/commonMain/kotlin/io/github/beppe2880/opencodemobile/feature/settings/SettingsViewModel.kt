@@ -55,6 +55,7 @@ class SettingsViewModel(
             SettingsEvent.Leave -> sendEffect(SettingsEffect.NavigateBack)
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
             SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
+            SettingsEvent.OpenWhatsNew -> sendEffect(SettingsEffect.OpenWhatsNew)
             is SettingsEvent.OpenArea -> updateState {
                 val part = event.part ?: event.option?.part ?: SettingsPart.of(event.area).firstOrNull()
                 it.copy(area = event.area, selected = part, focus = event.option)

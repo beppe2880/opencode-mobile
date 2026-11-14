@@ -14,16 +14,36 @@ class ReleaseNotesTest {
         assertEquals(listOf("Features", "Bug fixes"), sections.map { it.title })
         assertEquals(
             listOf(
-                ReleaseNote("Add MCP status and connection controls", "chat"),
-                ReleaseNote("Follow the agent's work live", "chat"),
-                ReleaseNote("Add output, refresh, text size and reset options", "settings"),
-                ReleaseNote("Show the keyboard when opening the terminal", "terminal"),
+                ReleaseNote("Add MCP status and connection controls", "chat", issue(91)),
+                ReleaseNote("Follow the agent's work live", "chat", issue(72)),
+                ReleaseNote("Add output, refresh, text size and reset options", "settings", issue(75)),
+                ReleaseNote("Show the keyboard when opening the terminal", "terminal", issue(79)),
             ),
             sections[0].items,
         )
         assertEquals(7, sections[1].items.size)
-        assertEquals(ReleaseNote("Keep reading position stable while streaming", "chat"), sections[1].items.first())
+        assertEquals(ReleaseNote("Keep reading position stable while streaming", "chat", issue(93)), sections[1].items.first())
     }
+
+    @Test
+    fun onlyGithubIssuesAndPullRequestsAreKeptAsTheLinkOfAChange() {
+        val notes = """
+            ### Features
+
+            * **chat:** From a pull request ([#12](https://github.com/a/b/pull/12)) ([abc1234](https://github.com/a/b/commit/abc1234))
+            * Only a commit ([abc1234](https://github.com/a/b/commit/abc1234))
+            * Another site ([#3](https://example.com/a/b/issues/3))
+            * Not GitHub at all ([#4](https://github.com.example.com/a/b/issues/4))
+            * No link
+        """.trimIndent()
+
+        assertEquals(
+            listOf("https://github.com/a/b/pull/12", null, null, null, null),
+            ReleaseNotes.parse(notes).single().items.map { it.url },
+        )
+    }
+
+    private fun issue(number: Int) = "https://github.com/beppe2880/opencode-mobile/issues/$number"
 
     @Test
     fun itemsWithoutScopeKeepTheirWholeText() {
@@ -31,14 +51,14 @@ class ReleaseNotesTest {
 
         assertEquals(
             listOf(
-                ReleaseNote("Add a home screen widget with running and recent sessions"),
-                ReleaseNote("Add a read-only file viewer"),
-                ReleaseNote("Add a terminal through the PTY WebSocket"),
+                ReleaseNote("Add a home screen widget with running and recent sessions", url = issue(67)),
+                ReleaseNote("Add a read-only file viewer", url = issue(69)),
+                ReleaseNote("Add a terminal through the PTY WebSocket", url = issue(66)),
             ),
             sections.first { it.kind == ReleaseSectionKind.Features }.items,
         )
         assertEquals(
-            listOf(ReleaseNote("Show the compaction summary in the transcript", "chat")),
+            listOf(ReleaseNote("Show the compaction summary in the transcript", "chat", issue(64))),
             sections.first { it.kind == ReleaseSectionKind.Fixes }.items,
         )
     }

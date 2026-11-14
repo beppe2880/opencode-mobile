@@ -67,6 +67,8 @@ import io.github.beppe2880.opencodemobile.core.domain.UsageStats
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
+import io.github.beppe2880.opencodemobile.core.domain.WhatsNewHistory
+import io.github.beppe2880.opencodemobile.core.domain.WhatsNewRepository
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -123,6 +125,19 @@ val fakeDataModule = module {
             override suspend fun availableUpdate(installedVersion: String): AppUpdate? = null
             override suspend fun checkNow(installedVersion: String): Result<AppUpdate?> = Result.success(null)
             override suspend fun dismiss(release: AppRelease) = Unit
+        }
+    }
+    // The demo never asks GitHub: the What's New page has no release, the button can still be hidden.
+    single<WhatsNewRepository> {
+        object : WhatsNewRepository {
+            private val state = MutableStateFlow(WhatsNewHistory())
+            override val history: StateFlow<WhatsNewHistory> = state.asStateFlow()
+            override suspend fun refresh(): Result<List<AppRelease>> = Result.success(emptyList())
+            override suspend fun refreshIfDue() = Unit
+            override suspend fun markSeen() = Unit
+            override suspend fun hide(installedVersion: String) {
+                state.value = state.value.copy(hiddenVersion = installedVersion)
+            }
         }
     }
     single<McpRepository> {

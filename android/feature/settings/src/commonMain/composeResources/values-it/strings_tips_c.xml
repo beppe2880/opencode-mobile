@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">Parla invece di scrivere</string>
+    <string name="tips_c_voice_record_body">Tocca il microfono nella casella del messaggio e parla: una forma d'onda in tempo reale e un timer mostrano che ti sta ascoltando. Conferma per tenere il testo o annulla per scartarlo.</string>
+    <string name="tips_c_voice_record_demo">Un dito tocca il microfono, la casella del messaggio mostra una forma d'onda in movimento con un timer, poi la frase detta compare come testo.</string>
+
+    <string name="tips_c_voice_cloud_title">Dettatura migliore con il cloud</string>
+    <string name="tips_c_voice_cloud_body">Scegli un provider e un modello di trascrizione nelle impostazioni. La registrazione viene inviata quando ti fermi, e il testo arriva nella casella del messaggio per essere controllato.</string>
+    <string name="tips_c_voice_cloud_demo">Un dito sceglie Cloud come riconoscimento vocale, poi una registrazione viene trascritta e il testo compare nella casella del messaggio.</string>
+
+    <string name="tips_c_settings_categories_title">Impostazioni facili da trovare</string>
+    <string name="tips_c_settings_categories_body">Le impostazioni sono raggruppate in categorie, ognuna con la sua pagina. Non sai dove si trova qualcosa? Cercala e vai dritto all'impostazione.</string>
+    <string name="tips_c_settings_categories_demo">Un dito apre la categoria Input vocale, torna indietro, poi scrive nel campo di ricerca e compaiono le impostazioni corrispondenti.</string>
+
+    <string name="tips_c_terminal_fullscreen_title">Più spazio per il terminale</string>
+    <string name="tips_c_terminal_fullscreen_body">Entra a schermo intero per nascondere la barra del titolo e quelle di sistema e vedere più righe in una volta. Indietro o lo stesso pulsante le riporta.</string>
+    <string name="tips_c_terminal_fullscreen_demo">Un dito tocca il pulsante schermo intero del terminale: la barra del titolo e quella di stato scivolano via e compaiono più righe di output.</string>
+
+    <string name="tips_c_next_message_title">Cambia modello senza aspettare</string>
+    <string name="tips_c_next_message_body">Cambia agente o modello mentre una risposta è ancora in corso: la modifica vale dal messaggio successivo. Le nuove chat partono dall'ultimo modello usato.</string>
+    <string name="tips_c_next_message_demo">Mentre l'assistente lavora, un dito apre il menu dei modelli e ne sceglie un altro; una nota dice che la modifica vale dal prossimo messaggio.</string>
+
+    <string name="tips_c_thoughts_title">Una riga per i ragionamenti in fila</string>
+    <string name="tips_c_thoughts_body">I ragionamenti consecutivi dell'assistente sono raggruppati in un'unica riga, facile da scorrere. Tocca la riga per leggerli uno per uno.</string>
+    <string name="tips_c_thoughts_demo">Tre righe di ragionamento separate si fondono in una sola riga, che un dito tocca per mostrare i tre ragionamenti.</string>
+
+    <string name="tips_c_pending_bar_title">Leggi la chat prima di decidere</string>
+    <string name="tips_c_pending_bar_body">Le schede di domande e permessi si riducono a una barra sottile, così puoi leggere la conversazione prima di rispondere. Tocca la barra per riaprire la scheda.</string>
+    <string name="tips_c_pending_bar_demo">Una scheda di permesso si riduce a una barra toccando la sua freccia, e si riapre toccando la barra.</string>
+
+    <string name="tips_c_running_title">Vedi cosa è in esecuzione, in diretta</string>
+    <string name="tips_c_running_body">Un chip sopra la casella del messaggio conta i subagenti e i comandi in background in esecuzione. Aprilo per seguirne tempo e output, oppure per fermarli.</string>
+    <string name="tips_c_running_demo">Un dito tocca il chip degli elementi in esecuzione e un foglio elenca un subagente e un comando, con un timer che avanza e un pulsante Ferma.</string>
+</resources>

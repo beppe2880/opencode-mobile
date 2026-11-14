@@ -480,6 +480,13 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.AddServer)
         assertEquals(SettingsEffect.OpenConnect, vm.effect.first())
     }
+
+    @Test
+    fun `the whats new row in about opens the release history`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        vm.onEvent(SettingsEvent.OpenWhatsNew)
+        assertEquals(SettingsEffect.OpenWhatsNew, vm.effect.first())
+    }
 }
 
 private class FakeServers : ServerRepository {

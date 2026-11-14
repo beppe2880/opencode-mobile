@@ -18,6 +18,7 @@ fun SettingsRoute(
     onAddServer: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenUsage: () -> Unit = {},
+    onOpenWhatsNew: () -> Unit = {},
     /** Draws the previews of the groups that show other screens (chat, sessions, terminal). */
     preview: AreaPreviewContent = { _, _, _ -> },
     /** Opens the offline demo in edit mode; null where there is none. */
@@ -42,6 +43,7 @@ fun SettingsRoute(
             SettingsEffect.NavigateBack -> onBack()
             SettingsEffect.OpenConnect -> onAddServer()
             SettingsEffect.OpenUsage -> onOpenUsage()
+            SettingsEffect.OpenWhatsNew -> onOpenWhatsNew()
             SettingsEffect.RequestNotificationPermission ->
                 if (!demo) notifications.request() else viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = true))
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">Run shell commands right from chat</string>
+    <string name="tips_f_shell_body">Start your message with ! and it runs in the shell of your project instead of going to the agent. The output shows up right in the conversation.</string>
+    <string name="tips_f_shell_demo">The message box gets the text !git status -s, a hint says it runs in the shell, and after sending, the command and its output appear in the chat.</string>
+
+    <string name="tips_f_queue_title">Queue prompts and tweak them later</string>
+    <string name="tips_f_queue_body">Prompts you queue while the agent is busy wait in a list above the message box. Send one now, edit it, or remove it before it runs.</string>
+    <string name="tips_f_queue_demo">Three queued prompts are listed. One is edited, one is removed, and one is sent right away and becomes a message.</string>
+
+    <string name="tips_f_changes_title">See every file a session changed</string>
+    <string name="tips_f_changes_body">Open Changes to review the files the agent touched, for the whole session or just the last turn. Tap a file to read its diff.</string>
+    <string name="tips_f_changes_demo">The Changes sheet lists two files with added and removed line counts. Tapping the first one opens its red and green diff.</string>
+
+    <string name="tips_f_notifications_title">Get pinged when the agent needs you</string>
+    <string name="tips_f_notifications_body">A notification tells you when a session waits for a permission or an answer, and when it finishes. You can allow or reject an edit right from it.</string>
+    <string name="tips_f_notifications_demo">A notification asks for permission to edit a file and is answered with Allow once. Then a second notification says a session finished.</string>
+
+    <string name="tips_f_pair_title">Connect your phone in seconds</string>
+    <string name="tips_f_pair_body">Scan the QR code from opencode pair, paste the link, enter a password, or tap a server the app finds on your Wi-Fi.</string>
+    <string name="tips_f_pair_demo">On the Connect screen a server appears under Found on this network. Tapping Scan QR code opens the camera, reads a QR code and connects.</string>
+
+    <string name="tips_f_live_title">Watch the agent work, live</string>
+    <string name="tips_f_live_body">Text, reasoning and tool calls stream in as they happen. When the agent asks for a permission or a question, you answer right there.</string>
+    <string name="tips_f_live_demo">A reply streams in with thinking and tool calls. A permission request appears and is approved with Allow once.</string>
+
+    <string name="tips_f_steer_title">Steer, queue, and use / and @</string>
+    <string name="tips_f_steer_body">Type / for commands and @ for files. While the agent works, choose to steer it right now or queue your prompt for later.</string>
+    <string name="tips_f_steer_demo">Typing / lists commands, typing @ lists files and one is picked. With the agent busy, Steer now and Queue buttons appear and Queue is chosen.</string>
+
+    <string name="tips_f_fork_title">Fork a session from any prompt</string>
+    <string name="tips_f_fork_body">Long-press a prompt and choose Fork from here to branch a new session with the history before it. The original stays untouched. Or just type /fork.</string>
+    <string name="tips_f_fork_demo">A long press on a prompt opens a menu; Fork from here is chosen and a new session opens without the later messages.</string>
+
+    <string name="tips_f_undo_title">Undo and redo any prompt</string>
+    <string name="tips_f_undo_body">Type /undo to take back the last prompt along with its file changes. Changed your mind? Tap Restore, or use /redo.</string>
+    <string name="tips_f_undo_demo">Typing /undo hides the last prompt and shows a banner saying 1 message undone. Tapping Restore brings it back.</string>
+</resources>

@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 /**
  * Reads the recent releases of the app from the public GitHub API, without authentication. It
@@ -33,8 +34,16 @@ class GitHubReleases(
      * in one request; empty when there is none yet. Drafts and pre-releases are left out. Throws
      * [IOException] when GitHub cannot be reached or does not answer.
      */
-    suspend fun recent(): List<AppRelease> = try {
-        fetchRecent()
+    suspend fun recent(): List<AppRelease> = fetchLogged(RECENT_COUNT)
+
+    /**
+     * Like [recent] with the [HISTORY_COUNT] most recent releases (GitHub's first page), for the
+     * What's New page.
+     */
+    suspend fun history(): List<AppRelease> = fetchLogged(HISTORY_COUNT)
+
+    private suspend fun fetchLogged(count: Int): List<AppRelease> = try {
+        fetch(count)
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
@@ -43,9 +52,9 @@ class GitHubReleases(
         throw e
     }
 
-    private suspend fun fetchRecent(): List<AppRelease> {
+    private suspend fun fetch(count: Int): List<AppRelease> {
         val response = http.get(releasesUrl) {
-            parameter("per_page", RECENT_COUNT)
+            parameter("per_page", count)
             header(HttpHeaders.Accept, "application/vnd.github+json")
             header(HttpHeaders.UserAgent, USER_AGENT)
         }
@@ -64,10 +73,19 @@ class GitHubReleases(
             .filter { it.htmlUrl.startsWith(RELEASES_PAGE) }
             .mapNotNull { release ->
                 val version = release.tagName.removePrefix("v").removePrefix("V")
-                AppVersion.parse(version)?.let { it to AppRelease(version, release.htmlUrl, release.body.orEmpty()) }
+                AppVersion.parse(version)?.let {
+                    it to AppRelease(version, release.htmlUrl, release.body.orEmpty(), release.publishedAt?.let(::epochMillis))
+                }
             }
             .sortedByDescending { it.first }
             .map { it.second }
+    }
+
+    /** `2026-10-27T09:12:44Z` in epoch milliseconds; null when it is not a timestamp. */
+    private fun epochMillis(timestamp: String): Long? = try {
+        Instant.parse(timestamp).toEpochMilliseconds()
+    } catch (_: IllegalArgumentException) {
+        null
     }
 
     @Serializable
@@ -77,11 +95,15 @@ class GitHubReleases(
         val draft: Boolean = false,
         val prerelease: Boolean = false,
         val body: String? = null,
+        @SerialName("published_at") val publishedAt: String? = null,
     )
 
     companion object {
         /** Releases read by one check: enough for anyone who skipped a few. */
         const val RECENT_COUNT = 10
+
+        /** Releases read for the What's New page: one page of the GitHub API. */
+        const val HISTORY_COUNT = 30
         private const val REPOSITORY = "beppe2880/opencode-mobile"
         private const val RELEASES_URL = "https://api.github.com/repos/$REPOSITORY/releases"
         private const val RELEASES_PAGE = "https://github.com/$REPOSITORY/releases/"

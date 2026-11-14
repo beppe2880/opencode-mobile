@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">Comandi shell direttamente dalla chat</string>
+    <string name="tips_f_shell_body">Inizia il messaggio con ! e il comando viene eseguito nella shell del progetto invece di andare all'agente. L'output compare subito nella conversazione.</string>
+    <string name="tips_f_shell_demo">Nella casella del messaggio si scrive !git status -s, un suggerimento dice che verrà eseguito nella shell e, dopo l'invio, nella chat compaiono il comando e il suo output.</string>
+
+    <string name="tips_f_queue_title">Metti in coda i prompt e modificali</string>
+    <string name="tips_f_queue_body">I prompt messi in coda mentre l'agente è occupato aspettano in un elenco sopra la casella del messaggio. Puoi inviarne uno subito, modificarlo o rimuoverlo prima che parta.</string>
+    <string name="tips_f_queue_demo">Tre prompt in coda sono elencati. Uno viene modificato, uno rimosso e uno inviato subito, diventando un messaggio.</string>
+
+    <string name="tips_f_changes_title">Vedi ogni file modificato da una sessione</string>
+    <string name="tips_f_changes_body">Apri Modifiche per rivedere i file toccati dall'agente, per tutta la sessione o solo nell'ultimo turno. Tocca un file per leggerne il diff.</string>
+    <string name="tips_f_changes_demo">Il foglio Modifiche elenca due file con il numero di righe aggiunte e rimosse. Toccando il primo si apre il suo diff in rosso e verde.</string>
+
+    <string name="tips_f_notifications_title">Un avviso quando l'agente ha bisogno di te</string>
+    <string name="tips_f_notifications_body">Una notifica ti avvisa quando una sessione aspetta un permesso o una risposta, e quando finisce. Puoi consentire o rifiutare una modifica direttamente da lì.</string>
+    <string name="tips_f_notifications_demo">Una notifica chiede il permesso di modificare un file e viene risolta con Consenti una volta. Poi una seconda notifica avvisa che una sessione è terminata.</string>
+
+    <string name="tips_f_pair_title">Collega il telefono in pochi secondi</string>
+    <string name="tips_f_pair_body">Scansiona il codice QR di opencode pair, incolla il link, inserisci una password oppure tocca un server che l'app trova sulla tua rete Wi-Fi.</string>
+    <string name="tips_f_pair_demo">Nella schermata Connetti compare un server sotto Trovati in questa rete. Toccando Scansiona codice QR si apre la fotocamera, legge un codice QR e si connette.</string>
+
+    <string name="tips_f_live_title">Guarda l'agente al lavoro, in diretta</string>
+    <string name="tips_f_live_body">Testo, ragionamento e chiamate agli strumenti arrivano man mano che accadono. Quando l'agente chiede un permesso o una domanda, rispondi subito da lì.</string>
+    <string name="tips_f_live_demo">Una risposta arriva a flusso, con ragionamento e chiamate agli strumenti. Compare una richiesta di permesso che viene approvata con Consenti una volta.</string>
+
+    <string name="tips_f_steer_title">Guida, accoda e usa / e @</string>
+    <string name="tips_f_steer_body">Scrivi / per i comandi e @ per i file. Mentre l'agente lavora, scegli se guidarlo subito o accodare il prompt per dopo.</string>
+    <string name="tips_f_steer_demo">Scrivendo / compare l'elenco dei comandi, scrivendo @ quello dei file, e ne viene scelto uno. Con l'agente occupato compaiono i pulsanti Guida subito e Accoda, e si sceglie Accoda.</string>
+
+    <string name="tips_f_fork_title">Crea un fork da qualsiasi prompt</string>
+    <string name="tips_f_fork_body">Tieni premuto un prompt e scegli Fork da qui per creare una nuova sessione con la cronologia che lo precede. L'originale resta intatta. Oppure scrivi /fork.</string>
+    <string name="tips_f_fork_demo">Una pressione lunga su un prompt apre un menu; si sceglie Fork da qui e si apre una nuova sessione senza i messaggi successivi.</string>
+
+    <string name="tips_f_undo_title">Annulla e ripristina qualsiasi prompt</string>
+    <string name="tips_f_undo_body">Scrivi /undo per annullare l'ultimo prompt insieme alle sue modifiche ai file. Ci hai ripensato? Tocca Ripristina oppure usa /redo.</string>
+    <string name="tips_f_undo_demo">Scrivendo /undo l'ultimo prompt sparisce e compare un avviso con 1 messaggio annullato. Toccando Ripristina torna tutto.</string>
+</resources>

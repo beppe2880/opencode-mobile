@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">See where you are at a glance</string>
+    <string name="tips_d_header_body">The chat header shows the folder, the Git branch and how many files changed. Tap it to review the changes.</string>
+    <string name="tips_d_header_demo">The chat header shows the folder, the branch and the number of changed files; tapping it opens the list of changed files.</string>
+
+    <string name="tips_d_offline_title">Try the app without a server</string>
+    <string name="tips_d_offline_body">No server yet? Tap Try without a server on the Connect screen and look around with sample sessions. Nothing leaves your phone.</string>
+    <string name="tips_d_offline_demo">On the Connect screen a tap on Try without a server opens a list of sample sessions.</string>
+
+    <string name="tips_d_split_title">List and chat side by side</string>
+    <string name="tips_d_split_body">On unfolded foldables and tablets the sessions and the chat share the screen. Drag the divider to resize the list, or choose the split view in Settings.</string>
+    <string name="tips_d_split_demo">A wide screen shows the session list next to the chat. Tapping a session updates the chat, and dragging the divider widens the list.</string>
+
+    <string name="tips_d_share_title">Share to OpenCode from any app</string>
+    <string name="tips_d_share_body">Send text, links and images from other apps to OpenCode in the share sheet, and start a new session from them.</string>
+    <string name="tips_d_share_demo">A page is shared from another app; picking OpenCode in the share sheet starts a session with the shared link.</string>
+
+    <string name="tips_d_settings_title">Settings you can see change</string>
+    <string name="tips_d_settings_body">Change settings from a list, with live previews of the chat or in the demo. You see the result before you leave.</string>
+    <string name="tips_d_settings_demo">Dragging the chat text size slider enlarges the text of a live preview of the chat.</string>
+
+    <string name="tips_d_update_title">Know what changed before updating</string>
+    <string name="tips_d_update_body">When a new release is out, a sheet shows the changelog with the new features and fixes. Update, skip it or decide later.</string>
+    <string name="tips_d_update_demo">An update sheet opens; tapping View changelog expands the list of new features and fixes.</string>
+
+    <string name="tips_d_mcp_title">Control your MCP servers</string>
+    <string name="tips_d_mcp_body">See which MCP servers are connected and connect or disconnect them from the chat menu, without going back to your computer.</string>
+    <string name="tips_d_mcp_demo">The MCP servers sheet lists each server with its status; turning a switch on connects the server.</string>
+
+    <string name="tips_d_follow_title">Follow the agent live</string>
+    <string name="tips_d_follow_body">While the agent works, its current step stays open: you read thinking, command output and diffs as they arrive, and it folds back when the answer ends.</string>
+    <string name="tips_d_follow_demo">A chat shows the running command output, then the diff of an edit, and folds the steps when the answer arrives.</string>
+
+    <string name="tips_d_output_title">Tune tool output and text size</string>
+    <string name="tips_d_output_body">Choose how many lines of output to show, how often a running command refreshes and the chat text size. One button resets everything.</string>
+    <string name="tips_d_output_demo">The refresh interval and the number of output lines are changed, then Reset all settings restores the defaults.</string>
+</resources>

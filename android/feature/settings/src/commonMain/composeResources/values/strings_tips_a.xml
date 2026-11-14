@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">Your pictures, big and clear</string>
+    <string name="tips_a_attached_images_body">Images you attach now show as large as the ones the agent reads, whole and not cropped. Pick Thumbnails, Small, Medium or Large in Settings → Chat → Transcript.</string>
+    <string name="tips_a_attached_images_demo">In the chat settings the attached images option changes from Thumbnails to Small, Medium and Large, and the pictures of the message grow with each choice.</string>
+
+    <string name="tips_a_pin_sessions_title">Keep your best chats on top</string>
+    <string name="tips_a_pin_sessions_body">Long-press a chat in the list, or open its three-dot menu, and choose Pin. Pinned chats wait in their own group above Today.</string>
+    <string name="tips_a_pin_sessions_demo">A chat in the list is long-pressed, the Pin action is tapped and the chat moves to a Pinned group at the top.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">Swipe that fits your thumb</string>
+    <string name="tips_a_swipe_sensitivity_body">Choose how easily the swipe opens the chat list: Low, Medium or High. High opens with a short, light swipe. Find it in Settings → Chat → Gestures.</string>
+    <string name="tips_a_swipe_sensitivity_demo">With Low sensitivity a short swipe springs back and the chat list stays closed. With High sensitivity the same short swipe opens the chat list.</string>
+
+    <string name="tips_a_large_screens_title">Made for foldables and tablets</string>
+    <string name="tips_a_large_screens_body">A new Settings section gathers everything for big screens: the chat beside the list, what happens when you fold or unfold, the divider and swiping. It shows only on foldables and tablets.</string>
+    <string name="tips_a_large_screens_demo">In Settings the Foldable and large screens section is opened, then the Chat beside the list switch is turned on.</string>
+
+    <string name="tips_a_picker_stay_title">Try models without the picker closing</string>
+    <string name="tips_a_picker_stay_body">Turn off Close picker after choosing a model in Settings → Message box. The picker then stays open while you compare models, and Done closes it.</string>
+    <string name="tips_a_picker_stay_demo">The Close picker after choosing a model switch is turned off. In the model picker two models are tapped one after the other and it stays open, then Done closes it.</string>
+
+    <string name="tips_a_swipe_list_title">Swipe right for your chats</string>
+    <string name="tips_a_swipe_list_body">In a chat, swipe right and the chat list slides in as a panel that follows your finger. Swipe it back to return to the conversation. You can change the swipe in Settings → Chat → Gestures.</string>
+    <string name="tips_a_swipe_list_demo">A swipe to the right in a chat pulls the chat list in as a side panel over the conversation, then a swipe to the left closes it.</string>
+
+    <string name="tips_a_pending_prompt_title">Images show up the moment you send</string>
+    <string name="tips_a_pending_prompt_body">A prompt with images appears in the chat at once, dimmed, with Sending… and then Queued under it. No more waiting to see that your message went out.</string>
+    <string name="tips_a_pending_prompt_demo">A prompt with two pictures is sent and appears immediately, dimmed, labeled Sending… and then Queued, until the server takes it and it turns normal.</string>
+
+    <string name="tips_a_image_swipe_title">Flip through images with a swipe</string>
+    <string name="tips_a_image_swipe_body">Open an image full screen and swipe left or right to see the others from the same message or tool. A counter shows where you are.</string>
+    <string name="tips_a_image_swipe_demo">In the full-screen viewer a swipe to the left moves from the first image to the second and then to the third, and the counter follows.</string>
+
+    <string name="tips_a_hide_list_title">Give the chat the whole screen</string>
+    <string name="tips_a_hide_list_body">On a tablet or an unfolded foldable, swipe left on the chat to hide the list beside it and swipe right to bring it back. The chat widens as the list slides away.</string>
+    <string name="tips_a_hide_list_demo">On a wide window a swipe to the left on the chat slides the chat list away and the chat widens, then a swipe to the right brings the list back.</string>
+
+    <string name="tips_a_check_updates_title">Check for updates when you want</string>
+    <string name="tips_a_check_updates_body">Tap Check for updates in Settings to ask GitHub right now. If a new version is out, a clear banner appears under the search bar, above your chats.</string>
+    <string name="tips_a_check_updates_demo">Check for updates is tapped in Settings and shows Checking for updates…, then the chat list shows a banner saying a new version is available.</string>
+</resources>

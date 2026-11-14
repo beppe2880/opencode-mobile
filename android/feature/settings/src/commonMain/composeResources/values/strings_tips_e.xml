@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">Your sessions on the home screen</string>
+    <string name="tips_e_widget_body">Add the widget to see which sessions are running and which ones you used last, without opening the app. Tap a session to jump straight in, or start a new one.</string>
+    <string name="tips_e_widget_demo">A home screen with the OpenCode widget listing two running sessions and a recent one. After a refresh, one of the sessions is no longer running.</string>
+
+    <string name="tips_e_files_title">Open any file the agent touched</string>
+    <string name="tips_e_files_body">Tap the open button on a read, write or edit row, or on a changed file, to read the whole file with syntax highlighting. It is read-only, so nothing changes by accident.</string>
+    <string name="tips_e_files_demo">In the chat, a tool row for a file has an open button. Tapping it opens the file with line numbers and highlighted code.</string>
+
+    <string name="tips_e_terminal_title">A full terminal in your pocket</string>
+    <string name="tips_e_terminal_body">Open a shell on the server, in your session's folder, from the chat top bar. A key bar gives you Esc, Tab, Ctrl and the arrows that phone keyboards lack.</string>
+    <string name="tips_e_terminal_demo">A terminal where the command npm test is typed. Tapping Enter on the key bar runs it and the test results appear.</string>
+
+    <string name="tips_e_compaction_title">Read what the agent remembers</string>
+    <string name="tips_e_compaction_body">When a long conversation is compacted, tap the Context compacted divider to read the summary the agent keeps going with.</string>
+    <string name="tips_e_compaction_demo">In a transcript, the Context compacted divider is tapped and opens to show the summary of the conversation.</string>
+
+    <string name="tips_e_dictation_title">Talk to your agent</string>
+    <string name="tips_e_dictation_body">Tap the microphone next to the message box and just speak: your words appear in the prompt as you say them. Tap again to stop, then review and send.</string>
+    <string name="tips_e_dictation_demo">The microphone button is tapped and starts listening. The sentence Add a dark mode toggle to the settings screen is written into the message box word by word, then the microphone is tapped again.</string>
+
+    <string name="tips_e_usage_title">See where your tokens and money go</string>
+    <string name="tips_e_usage_body">The Usage screen in Settings shows cost, prompts, tokens and your busiest models for today, the last 7 days or the last 30 days.</string>
+    <string name="tips_e_usage_demo">The Usage screen. Switching from Today to 7 days makes the cost and token totals grow and fills the chart of steps per day, with the models used below.</string>
+
+    <string name="tips_e_notifications_title">Only the notifications you want</string>
+    <string name="tips_e_notifications_body">In Settings, under Session notifications, pick which kinds to get: permission requests, questions from the agent, or finished sessions.</string>
+    <string name="tips_e_notifications_demo">Three switches under Session notifications. Questions and Finished sessions are switched off, Permission requests stays on.</string>
+</resources>

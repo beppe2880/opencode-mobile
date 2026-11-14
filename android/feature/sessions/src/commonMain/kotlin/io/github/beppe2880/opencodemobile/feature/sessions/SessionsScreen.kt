@@ -136,6 +136,8 @@ fun SessionsScreen(
     nowProvider: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     /** Drawn under the list header (project filter and search), above the sessions, such as the app update notice; may draw nothing. */
     banner: @Composable () -> Unit = {},
+    /** Drawn at the top of the list header, above the project filter, such as the What's New button; may draw nothing. */
+    headerTop: @Composable () -> Unit = {},
     /** The offline demo: the top bar names it instead of showing a connection. */
     demo: Boolean = false,
     /**
@@ -205,7 +207,7 @@ fun SessionsScreen(
                     // of opening above the scroll position. Under the search, right above the chats.
                     Column {
                         state.sharing?.let { ShareChoice(it, onEvent) }
-                        ListHeader(state, onEvent)
+                        ListHeader(state, onEvent, headerTop)
                         banner()
                     }
                 }
@@ -291,11 +293,12 @@ private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Uni
 }
 
 @Composable
-private fun ListHeader(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+private fun ListHeader(state: SessionsState, onEvent: (SessionsEvent) -> Unit, top: @Composable () -> Unit) {
     Column(
         modifier = Modifier.padding(horizontal = OcSpacing.gutter, vertical = OcSpacing.md),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
+        top()
         ProjectFilter(state, onEvent)
         OcSearchField(
             value = state.query,

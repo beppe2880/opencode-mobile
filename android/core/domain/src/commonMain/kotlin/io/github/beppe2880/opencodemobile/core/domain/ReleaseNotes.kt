@@ -6,8 +6,11 @@ enum class ReleaseSectionKind { Breaking, Features, Fixes, Other }
 /** A group of release notes under one heading; [title] as published, empty without a heading. */
 data class ReleaseSection(val kind: ReleaseSectionKind, val title: String, val items: List<ReleaseNote>)
 
-/** One change, as plain text; [scope] is the part of the app it concerns (`chat`), when given. */
-data class ReleaseNote(val text: String, val scope: String? = null)
+/**
+ * One change, as plain text; [scope] is the part of the app it concerns (`chat`), when given.
+ * [url] is the GitHub issue or pull request the notes link it to, when they do.
+ */
+data class ReleaseNote(val text: String, val scope: String? = null, val url: String? = null)
 
 /**
  * Reads the release notes of a GitHub release, written by release-please:
@@ -19,7 +22,8 @@ data class ReleaseNote(val text: String, val scope: String? = null)
  * ```
  *
  * Each `###` heading starts a section of its bullet items, kept as plain text: the scope is taken
- * apart, commit hashes, issue references and links are dropped, Markdown emphasis is removed.
+ * apart, commit hashes, issue references and links are dropped (the first GitHub issue or pull
+ * request link is kept beside the text, as [ReleaseNote.url]), Markdown emphasis is removed.
  * Other text (the version heading, paragraphs) is skipped, and sections without items too.
  */
 object ReleaseNotes {
@@ -33,6 +37,9 @@ object ReleaseNotes {
     private val Link = Regex("""\[([^\]]*)]\([^)]*\)""")
     private val Closes = Regex(""",?\s*\bcloses\s+#\d+(?:\s*(?:,|and)?\s*#\d+)*""", RegexOption.IGNORE_CASE)
     private val Reference = Regex("""\s*\((?:#\d+|[0-9a-f]{7,40})(?:\s*,\s*(?:#\d+|[0-9a-f]{7,40}))*\)""")
+
+    // Only issues and pull requests on GitHub are opened from a change, never another site.
+    private val IssueLink = Regex("""\((https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/(?:issues|pull)/\d+)\)""")
     private val Emphasis = Regex("""\*\*|__|`""")
     private val Spaces = Regex("""\s+""")
 
@@ -82,12 +89,14 @@ object ReleaseNotes {
             text = text.substring(match.range.last + 1)
             plain(match.groupValues[1]).takeIf { it.isNotEmpty() }
         }
+        // The first one: release-please links the pull request before what it closes.
+        val url = IssueLink.find(text)?.groupValues?.get(1)
         text = text.replace(LinkInParentheses, "")
         text = text.replace(Link, "$1")
         text = text.replace(Closes, "")
         text = text.replace(Reference, "")
         text = plain(text)
-        return if (text.isEmpty()) null else ReleaseNote(text, scope)
+        return if (text.isEmpty()) null else ReleaseNote(text, scope, url)
     }
 
     private fun plain(text: String): String = text.replace(Emphasis, "").replace(Spaces, " ").trim()

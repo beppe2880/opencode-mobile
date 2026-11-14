@@ -2,9 +2,10 @@ package io.github.beppe2880.opencodemobile.core.domain
 
 /**
  * A published release of the app: its version (tag), the page to download it from and its
- * release notes as published (Markdown, read with [ReleaseNotes.parse]).
+ * release notes as published (Markdown, read with [ReleaseNotes.parse]). [publishedAt] is when
+ * it was published, in epoch milliseconds; null when unknown (releases saved by older versions).
  */
-data class AppRelease(val version: String, val url: String, val notes: String = "")
+data class AppRelease(val version: String, val url: String, val notes: String = "", val publishedAt: Long? = null)
 
 /** A newer release of the app than the installed one. */
 data class AppUpdate(
