@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">Tus imágenes, grandes y nítidas</string>
+    <string name="tips_a_attached_images_body">Las imágenes que adjuntas ahora se ven tan grandes como las que lee el agente, completas y sin recortes. Elige Miniaturas, Pequeñas, Medianas o Grandes en Ajustes → Chat → Transcripción.</string>
+    <string name="tips_a_attached_images_demo">En los ajustes del chat, la opción de imágenes adjuntas pasa de Miniaturas a Pequeñas, Medianas y Grandes, y las imágenes del mensaje crecen con cada elección.</string>
+
+    <string name="tips_a_pin_sessions_title">Mantén tus mejores chats arriba</string>
+    <string name="tips_a_pin_sessions_body">Mantén pulsado un chat de la lista, o abre su menú de tres puntos, y elige Fijar. Los chats fijados se quedan en su propio grupo, encima de Hoy.</string>
+    <string name="tips_a_pin_sessions_demo">Se mantiene pulsado un chat de la lista, se toca la acción Fijar y el chat pasa al grupo Fijados, arriba.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">Un deslizamiento que se adapta a tu pulgar</string>
+    <string name="tips_a_swipe_sensitivity_body">Elige lo fácil que debe ser deslizar para abrir la lista de chats: Baja, Media o Alta. Con Alta basta un deslizamiento corto y ligero. Lo encontrarás en Ajustes → Chat → Gestos.</string>
+    <string name="tips_a_swipe_sensitivity_demo">Con sensibilidad Baja, un deslizamiento corto vuelve atrás y la lista de chats sigue cerrada. Con sensibilidad Alta, ese mismo deslizamiento corto abre la lista de chats.</string>
+
+    <string name="tips_a_large_screens_title">Pensada para plegables y tablets</string>
+    <string name="tips_a_large_screens_body">Una nueva sección de ajustes reúne todo lo de las pantallas grandes: el chat junto a la lista, lo que pasa al plegar o desplegar, el divisor y los deslizamientos. Solo aparece en plegables y tablets.</string>
+    <string name="tips_a_large_screens_demo">En Ajustes se abre la sección Plegables y pantallas grandes y luego se activa el interruptor Chat junto a la lista.</string>
+
+    <string name="tips_a_picker_stay_title">Prueba modelos sin que el selector se cierre</string>
+    <string name="tips_a_picker_stay_body">Desactiva Cerrar el selector al elegir un modelo en Ajustes → Cuadro de mensaje. El selector se queda abierto mientras comparas modelos, y Listo lo cierra.</string>
+    <string name="tips_a_picker_stay_demo">Se desactiva el interruptor Cerrar el selector al elegir un modelo. En el selector se tocan dos modelos seguidos y sigue abierto; después, Listo lo cierra.</string>
+
+    <string name="tips_a_swipe_list_title">Desliza a la derecha para tus chats</string>
+    <string name="tips_a_swipe_list_body">En un chat, desliza hacia la derecha y la lista de chats entra como un panel que sigue a tu dedo. Desliza hacia atrás para volver a la conversación. Puedes cambiar el deslizamiento en Ajustes → Chat → Gestos.</string>
+    <string name="tips_a_swipe_list_demo">Un deslizamiento hacia la derecha en un chat hace entrar la lista de chats como panel lateral sobre la conversación; luego, un deslizamiento hacia la izquierda lo cierra.</string>
+
+    <string name="tips_a_pending_prompt_title">Las imágenes aparecen en cuanto envías</string>
+    <string name="tips_a_pending_prompt_body">Un prompt con imágenes aparece al instante en el chat, atenuado, con Enviando… y luego En cola debajo. Ya no tienes que esperar para saber que tu mensaje salió.</string>
+    <string name="tips_a_pending_prompt_demo">Se envía un prompt con dos fotos: aparece al momento, atenuado, con la etiqueta Enviando… y luego En cola, hasta que el servidor lo acepta y vuelve a la normalidad.</string>
+
+    <string name="tips_a_image_swipe_title">Pasa las imágenes con un deslizamiento</string>
+    <string name="tips_a_image_swipe_body">Abre una imagen a pantalla completa y desliza a la izquierda o a la derecha para ver las demás del mismo mensaje o herramienta. Un contador indica dónde estás.</string>
+    <string name="tips_a_image_swipe_demo">En el visor a pantalla completa, un deslizamiento hacia la izquierda pasa de la primera imagen a la segunda y luego a la tercera, y el contador se actualiza.</string>
+
+    <string name="tips_a_hide_list_title">Dale todo el espacio al chat</string>
+    <string name="tips_a_hide_list_body">En una tablet o en un plegable desplegado, desliza a la izquierda sobre el chat para ocultar la lista de al lado, y a la derecha para volver a mostrarla. El chat se ensancha mientras la lista se aleja.</string>
+    <string name="tips_a_hide_list_demo">En una ventana ancha, un deslizamiento hacia la izquierda sobre el chat aleja la lista de chats y el chat se ensancha; luego, un deslizamiento hacia la derecha devuelve la lista.</string>
+
+    <string name="tips_a_check_updates_title">Busca actualizaciones cuando quieras</string>
+    <string name="tips_a_check_updates_body">Toca Buscar actualizaciones en Ajustes para consultar a GitHub ahora mismo. Si hay una versión nueva, aparece un aviso claro bajo la barra de búsqueda, encima de tus chats.</string>
+    <string name="tips_a_check_updates_demo">Se toca Buscar actualizaciones en Ajustes y aparece Buscando actualizaciones…; después, la lista de chats muestra un aviso que indica que hay una versión nueva.</string>
+</resources>

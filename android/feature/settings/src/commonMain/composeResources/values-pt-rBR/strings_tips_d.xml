@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">Veja onde você está num relance</string>
+    <string name="tips_d_header_body">O cabeçalho do chat mostra a pasta, o branch do Git e quantos arquivos foram alterados. Toque nele para revisar as alterações.</string>
+    <string name="tips_d_header_demo">O cabeçalho do chat mostra a pasta, o branch e o número de arquivos alterados; tocar nele abre a lista de arquivos alterados.</string>
+
+    <string name="tips_d_offline_title">Experimente o app sem um servidor</string>
+    <string name="tips_d_offline_body">Ainda não tem um servidor? Toque em Testar sem servidor na tela Conectar e explore com sessões de exemplo. Nada sai do seu celular.</string>
+    <string name="tips_d_offline_demo">Na tela Conectar, um toque em Testar sem servidor abre uma lista de sessões de exemplo.</string>
+
+    <string name="tips_d_split_title">Lista e chat lado a lado</string>
+    <string name="tips_d_split_body">Em dobráveis abertos e tablets, as sessões e o chat dividem a tela. Arraste o divisor para redimensionar a lista, ou escolha a visualização dividida nas Configurações.</string>
+    <string name="tips_d_split_demo">Uma tela larga mostra a lista de sessões ao lado do chat. Ao tocar em uma sessão, o chat muda, e arrastar o divisor alarga a lista.</string>
+
+    <string name="tips_d_share_title">Compartilhe com o OpenCode a partir de qualquer app</string>
+    <string name="tips_d_share_body">Envie textos, links e imagens de outros apps para o OpenCode pela folha de compartilhamento e inicie uma nova sessão a partir deles.</string>
+    <string name="tips_d_share_demo">Uma página é compartilhada a partir de outro app; ao escolher OpenCode na folha de compartilhamento, uma sessão começa com o link compartilhado.</string>
+
+    <string name="tips_d_settings_title">Configurações que você vê mudar</string>
+    <string name="tips_d_settings_body">Altere as configurações em uma lista, com prévias ao vivo do chat ou na demo. Você vê o resultado antes de sair.</string>
+    <string name="tips_d_settings_demo">Arrastar o controle de tamanho do texto do chat aumenta o texto de uma prévia ao vivo do chat.</string>
+
+    <string name="tips_d_update_title">Saiba o que mudou antes de atualizar</string>
+    <string name="tips_d_update_body">Quando uma nova versão sai, uma folha mostra o changelog com as novidades e correções. Atualize, pule ou decida depois.</string>
+    <string name="tips_d_update_demo">Abre-se a folha de atualização; tocar em Ver novidades expande a lista de novidades e correções.</string>
+
+    <string name="tips_d_mcp_title">Controle seus servidores MCP</string>
+    <string name="tips_d_mcp_body">Veja quais servidores MCP estão conectados e conecte ou desconecte-os pelo menu do chat, sem voltar ao computador.</string>
+    <string name="tips_d_mcp_demo">A folha de servidores MCP lista cada servidor com seu status; ligar um interruptor conecta o servidor.</string>
+
+    <string name="tips_d_follow_title">Acompanhe o agente ao vivo</string>
+    <string name="tips_d_follow_body">Enquanto o agente trabalha, a etapa atual fica aberta: você lê o raciocínio, a saída dos comandos e os diffs conforme chegam, e ela se recolhe quando a resposta termina.</string>
+    <string name="tips_d_follow_demo">Um chat mostra a saída de um comando em execução, depois o diff de uma edição, e recolhe as etapas quando a resposta chega.</string>
+
+    <string name="tips_d_output_title">Ajuste a saída das ferramentas e o tamanho do texto</string>
+    <string name="tips_d_output_body">Escolha quantas linhas de saída mostrar, com que frequência um comando em execução é atualizado e o tamanho do texto do chat. Um botão redefine tudo.</string>
+    <string name="tips_d_output_demo">O intervalo de atualização e o número de linhas de saída são alterados; depois, Redefinir todas as configurações restaura os padrões.</string>
+</resources>

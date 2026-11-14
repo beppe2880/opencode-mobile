@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">入力せずに話しかける</string>
+    <string name="tips_c_voice_record_body">メッセージ欄のマイクをタップして話します。リアルタイムの波形と時間表示で、音声が認識されていることがわかります。確定すると文字が残り、キャンセルすると破棄されます。</string>
+    <string name="tips_c_voice_record_demo">指でマイクをタップすると、メッセージ欄に動く波形と時間が表示され、話した文がテキストとして現れます。</string>
+
+    <string name="tips_c_voice_cloud_title">クラウドモデルでより正確な音声入力</string>
+    <string name="tips_c_voice_cloud_body">設定でプロバイダーと文字起こしモデルを選びます。停止すると録音が送信され、テキストがメッセージ欄に入るので、確認してから送信できます。</string>
+    <string name="tips_c_voice_cloud_demo">指で音声認識をクラウドに設定すると、録音が文字起こしされ、テキストがメッセージ欄に表示されます。</string>
+
+    <string name="tips_c_settings_categories_title">設定を簡単に見つける</string>
+    <string name="tips_c_settings_categories_body">設定はカテゴリごとにまとめられ、それぞれに専用のページがあります。どこにあるか分からないときは検索すると、その設定へすぐに移動できます。</string>
+    <string name="tips_c_settings_categories_demo">指で「音声入力」カテゴリを開き、戻ってから検索欄に入力すると、一致する設定が一覧表示されます。</string>
+
+    <string name="tips_c_terminal_fullscreen_title">ターミナルの表示領域を広く</string>
+    <string name="tips_c_terminal_fullscreen_body">全画面に切り替えると、タイトルバーとシステムバーが隠れ、一度により多くの行が見えます。戻るボタンまたは同じボタンで元に戻ります。</string>
+    <string name="tips_c_terminal_fullscreen_demo">指でターミナルの全画面ボタンをタップすると、タイトルバーとステータスバーがスライドして消え、出力の行が増えて表示されます。</string>
+
+    <string name="tips_c_next_message_title">待たずにモデルを切り替え</string>
+    <string name="tips_c_next_message_body">返信がまだ実行中でも、エージェントやモデルを変更できます。変更は次のメッセージから適用されます。新しいチャットは、最後に使ったモデルから始まります。</string>
+    <string name="tips_c_next_message_demo">アシスタントの作業中に、指でモデルのメニューを開いて別のモデルを選ぶと、次のメッセージに適用されることを示す注記が表示されます。</string>
+
+    <string name="tips_c_thoughts_title">思考の連なりを1行にまとめる</string>
+    <string name="tips_c_thoughts_body">アシスタントの連続した思考は、見やすい1つの行にまとめられます。タップすると、それぞれの思考を読めます。</string>
+    <string name="tips_c_thoughts_demo">3つの別々の思考の行が1つにまとまり、指でタップすると3つの思考が表示されます。</string>
+
+    <string name="tips_c_pending_bar_title">判断する前にチャットを確認</string>
+    <string name="tips_c_pending_bar_body">質問や権限のカードは細いバーに折りたたまれるので、回答する前に会話を読めます。バーをタップするとカードが再び開きます。</string>
+    <string name="tips_c_pending_bar_demo">権限のカードは、矢印をタップすると細いバーに折りたたまれ、バーをタップするとまた開きます。</string>
+
+    <string name="tips_c_running_title">実行中の内容をリアルタイムで確認</string>
+    <string name="tips_c_running_body">メッセージ欄の上のチップには、実行中のサブエージェントとバックグラウンドコマンドの数が表示されます。開くと時間と出力を確認したり、停止したりできます。</string>
+    <string name="tips_c_running_demo">指で実行中のチップをタップすると、サブエージェント1つとコマンド1つが、経過時間の表示と「停止」ボタン付きで一覧表示されます。</string>
+</resources>

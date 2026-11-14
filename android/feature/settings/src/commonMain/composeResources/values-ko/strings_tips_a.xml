@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">사진을 크고 선명하게</string>
+    <string name="tips_a_attached_images_body">이제 첨부한 이미지가 에이전트가 읽는 것과 같은 크기로, 잘리지 않고 전체가 표시됩니다. 설정 → 채팅 → 대화 기록에서 썸네일, 작게, 보통, 크게 중에서 고를 수 있습니다.</string>
+    <string name="tips_a_attached_images_demo">채팅 설정에서 첨부 이미지 옵션이 썸네일에서 작게, 보통, 크게로 바뀌고, 선택할 때마다 메시지의 사진이 커집니다.</string>
+
+    <string name="tips_a_pin_sessions_title">자주 쓰는 채팅을 맨 위에</string>
+    <string name="tips_a_pin_sessions_body">목록에서 채팅을 길게 누르거나 점 세 개 메뉴를 열고 고정을 선택하세요. 고정된 채팅은 오늘 위의 별도 그룹에 머뭅니다.</string>
+    <string name="tips_a_pin_sessions_demo">목록에서 채팅을 길게 누르고 고정 동작을 탭하면, 해당 채팅이 맨 위의 고정됨 그룹으로 이동합니다.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">엄지에 맞는 스와이프</string>
+    <string name="tips_a_swipe_sensitivity_body">스와이프로 채팅 목록을 여는 민감도를 낮음, 보통, 높음 중에서 고르세요. 높음을 선택하면 짧고 가벼운 스와이프로도 열립니다. 설정 → 채팅 → 제스처에서 찾을 수 있습니다.</string>
+    <string name="tips_a_swipe_sensitivity_demo">민감도가 낮음일 때는 짧은 스와이프가 되돌아가고 채팅 목록은 닫힌 채로 있습니다. 민감도가 높음일 때는 같은 짧은 스와이프로 채팅 목록이 열립니다.</string>
+
+    <string name="tips_a_large_screens_title">폴더블과 태블릿을 위해</string>
+    <string name="tips_a_large_screens_body">큰 화면을 위한 설정이 모인 새 섹션이 추가되었습니다. 목록 옆의 채팅, 접거나 펼칠 때의 동작, 구분선, 스와이프 설정을 한곳에서 관리합니다. 폴더블과 태블릿에서만 표시됩니다.</string>
+    <string name="tips_a_large_screens_demo">설정에서 폴더블 및 큰 화면 섹션을 열고, 목록 옆에 채팅 스위치를 켭니다.</string>
+
+    <string name="tips_a_picker_stay_title">선택 창을 닫지 않고 모델 비교</string>
+    <string name="tips_a_picker_stay_body">설정 → 메시지 상자에서 모델을 선택한 후 선택 창 닫기를 끄세요. 모델을 비교하는 동안 선택 창이 열린 채로 있고, 완료를 누르면 닫힙니다.</string>
+    <string name="tips_a_picker_stay_demo">모델 선택 후 선택 창 닫기 스위치를 끕니다. 모델 선택 창에서 두 모델을 차례로 탭해도 창이 열려 있고, 완료를 누르면 닫힙니다.</string>
+
+    <string name="tips_a_swipe_list_title">오른쪽으로 밀어 채팅 목록 열기</string>
+    <string name="tips_a_swipe_list_body">채팅에서 오른쪽으로 스와이프하면 손가락을 따라 채팅 목록이 패널로 밀려 들어옵니다. 왼쪽으로 밀면 대화로 돌아갑니다. 스와이프 방식은 설정 → 채팅 → 제스처에서 바꿀 수 있습니다.</string>
+    <string name="tips_a_swipe_list_demo">채팅에서 오른쪽으로 스와이프하면 채팅 목록이 대화 위에 사이드 패널로 들어오고, 왼쪽으로 스와이프하면 닫힙니다.</string>
+
+    <string name="tips_a_pending_prompt_title">보내는 순간 이미지가 표시됩니다</string>
+    <string name="tips_a_pending_prompt_body">이미지가 포함된 프롬프트가 흐린 상태로 바로 채팅에 나타나며, 아래에 보내는 중… 후 대기열에 추가됨이 표시됩니다. 메시지가 전송되었는지 기다릴 필요가 없습니다.</string>
+    <string name="tips_a_pending_prompt_demo">사진 두 장이 포함된 프롬프트를 보내면 흐린 상태로 즉시 나타나고 보내는 중…으로 표시됩니다. 이후 대기열에 추가됨으로 바뀌고, 서버가 받으면 정상 표시됩니다.</string>
+
+    <string name="tips_a_image_swipe_title">스와이프로 이미지 넘기기</string>
+    <string name="tips_a_image_swipe_body">이미지를 전체 화면으로 열고 왼쪽이나 오른쪽으로 스와이프하면 같은 메시지나 도구의 다른 이미지를 볼 수 있습니다. 카운터에서 현재 위치를 확인할 수 있습니다.</string>
+    <string name="tips_a_image_swipe_demo">전체 화면 뷰어에서 왼쪽으로 스와이프하면 첫 번째 이미지에서 두 번째, 세 번째 이미지로 넘어가고 카운터도 함께 바뀝니다.</string>
+
+    <string name="tips_a_hide_list_title">채팅을 화면 전체에</string>
+    <string name="tips_a_hide_list_body">태블릿이나 펼친 폴더블에서 채팅을 왼쪽으로 밀면 옆의 목록이 숨겨지고, 오른쪽으로 밀면 다시 나타납니다. 목록이 밀려나면 채팅 영역이 넓어집니다.</string>
+    <string name="tips_a_hide_list_demo">넓은 창에서 채팅을 왼쪽으로 밀면 채팅 목록이 밀려나고 채팅 영역이 넓어집니다. 오른쪽으로 밀면 목록이 다시 나타납니다.</string>
+
+    <string name="tips_a_check_updates_title">원할 때 업데이트 확인</string>
+    <string name="tips_a_check_updates_body">설정에서 업데이트 확인을 탭하면 지금 GitHub에 확인합니다. 새 버전이 나왔으면 검색창 아래, 채팅 위에 눈에 띄는 배너가 표시됩니다.</string>
+    <string name="tips_a_check_updates_demo">설정에서 업데이트 확인을 탭하면 업데이트 확인 중…이 표시되고, 이후 채팅 목록에 새 버전이 있다는 배너가 나타납니다.</string>
+</resources>

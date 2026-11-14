@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">직접 입력 대신 폴더 선택</string>
+    <string name="tips_b_browse_body">다른 디렉터리에서 세션을 시작할 때 경로 옆의 찾아보기를 탭하면 서버의 폴더를 차례로 살펴볼 수 있습니다. 최근 폴더도 한 번의 탭으로 열립니다.</string>
+    <string name="tips_b_browse_demo">새 세션 시트에서 찾아보기를 탭하고 projects 폴더와 mobile-app 폴더를 연 다음, 이 폴더 사용을 탭하면 경로가 채워집니다.</string>
+
+    <string name="tips_b_popover_title">실행 중인 작업을 한 번의 탭으로 열고 중지</string>
+    <string name="tips_b_popover_body">메시지 상자 위의 칩을 탭하면 실행 중인 모든 에이전트와 셸을 한 목록에서 볼 수 있습니다. 열기를 누르면 하위 에이전트의 세션으로 이동하고, 중지를 누르면 종료됩니다.</string>
+    <string name="tips_b_popover_demo">손가락으로 실행 중 에이전트 칩을 탭하면 에이전트와 셸이 있는 목록이 열립니다. 열기를 누르면 에이전트 세션으로 가고, 에이전트 중지를 누르면 목록에서 사라집니다.</string>
+
+    <string name="tips_b_toolmedia_title">에이전트가 읽는 이미지 보기</string>
+    <string name="tips_b_toolmedia_body">도구가 스크린샷, 사진, PDF를 읽으면 이제 파일이 도구 행 바로 아래에 표시됩니다. 이미지를 탭하면 더 크게 볼 수 있습니다.</string>
+    <string name="tips_b_toolmedia_demo">읽기 도구 행 두 개가 완료됩니다. 첫 번째 행 아래에는 이미지 미리보기가, 두 번째 행에는 PDF 파일 칩이 표시됩니다.</string>
+
+    <string name="tips_b_new_title">/new로 새롭게 시작</string>
+    <string name="tips_b_new_body">메시지 상자에 /new를 입력하고 명령을 고르면, 같은 디렉터리에 새 세션이 바로 열립니다. 이전 대화는 복사되지 않습니다.</string>
+    <string name="tips_b_new_demo">사용자가 메시지 상자에 /new를 입력하고 제안된 명령을 탭하면, 채팅이 빈 새 세션으로 전환됩니다.</string>
+
+    <string name="tips_b_connect_title">휴대폰에서 AI 제공업체 연결</string>
+    <string name="tips_b_connect_body">채팅 메뉴에서 제공업체 목록을 열거나 /connect를 입력하세요. API 키를 붙여넣거나 코드로 로그인할 수 있습니다. 인증 정보는 휴대폰이 아니라 서버에 저장됩니다.</string>
+    <string name="tips_b_connect_demo">손가락으로 제공업체 목록에서 OpenAI를 탭하고, API 키를 입력한 뒤 연결을 탭하면 OpenAI가 연결됨 그룹으로 이동합니다.</string>
+
+    <string name="tips_b_github_title">도구 행에서 바로 GitHub로 이동</string>
+    <string name="tips_b_github_body">이슈, 풀 리퀘스트, 실행, 커밋과 관련된 도구 행에는 초록색 열기 동작이 표시됩니다. 탭하면 GitHub에서 열리고, 길게 누르면 링크가 복사됩니다.</string>
+    <string name="tips_b_github_demo">셸 도구 행 세 개에 초록색 열기 동작이 표시됩니다: #157 열기, PR #156 열기, 커밋 4f2a9c1 열기. 탭하면 링크가 열리고, 길게 누르면 복사됩니다.</string>
+
+    <string name="tips_b_chips_title">실행 중인 작업이 늘 보이도록</string>
+    <string name="tips_b_chips_body">실행 중인 셸과 하위 에이전트는 메시지 상자 위에 작은 칩으로 나타납니다. 하나를 탭하면 실행 중인 내용을 보고 출력을 열 수 있습니다. 설정에서 끌 수도 있습니다.</string>
+    <string name="tips_b_chips_demo">메시지 상자 위에 셸 칩과 에이전트 칩이 나타납니다. 손가락으로 셸 칩을 탭하면 실행 중인 명령이 있는 목록이 열립니다.</string>
+
+    <string name="tips_b_model_title">사용 중인 모델을 한눈에</string>
+    <string name="tips_b_model_body">메시지 상자의 모델 버튼에 이제 제공업체 마크, 짧은 이름, 옅은 색의 추론 강도가 표시됩니다(예: Haiku 5.5 Medium). 탭하면 전환할 수 있습니다.</string>
+    <string name="tips_b_model_demo">손가락으로 메시지 상자의 모델 버튼을 여러 번 탭하면 Haiku 5.5 Medium에서 Opus 5.5 High, GPT-5.2 High, Gemini 3 Pro로 바뀌며, 각각 제공업체 마크가 함께 표시됩니다.</string>
+
+    <string name="tips_b_stopall_title">한 번의 탭으로 모두 중지</string>
+    <string name="tips_b_stopall_body">실행 시트에서는 하위 에이전트와 명령이 각각 모두 중지 버튼과 함께 묶여 표시됩니다. 각 행에도 개별 중지 버튼이 있습니다.</string>
+    <string name="tips_b_stopall_demo">실행 시트에서 손가락이 명령 섹션의 모두 중지를 탭하고, 이어서 하위 에이전트 섹션의 모두 중지를 탭하면 두 목록이 모두 비워집니다.</string>
+
+    <string name="tips_b_search_title">프로젝트를 몇 초 만에 찾기</string>
+    <string name="tips_b_search_body">프로젝트가 많으면 새 세션 시트에 검색창이 있습니다. 몇 글자만 입력하면 접혀 있던 프로젝트까지 일치하는 모든 프로젝트가 나타납니다.</string>
+    <string name="tips_b_search_demo">손가락으로 새 세션 시트의 검색창을 탭하고 mob을 입력하면 목록이 mobile-app과 mobile-kit으로 좁혀집니다.</string>
+
+    <string name="tips_b_themes_title">TUI 테마로 앱 꾸미기</string>
+    <string name="tips_b_themes_body">설정의 모양 아래에서 OpenCode 터미널의 33가지 테마 중 원하는 것을 고르면, 코드와 diff를 포함한 앱 전체에 그 색이 적용됩니다.</string>
+    <string name="tips_b_themes_demo">작은 채팅에서 네 가지 테마가 차례로 보입니다: GitHub, Dracula, Gruvbox, Nord. 손가락으로 각 테마의 색 점을 탭하면 색이 바뀝니다.</string>
+</resources>

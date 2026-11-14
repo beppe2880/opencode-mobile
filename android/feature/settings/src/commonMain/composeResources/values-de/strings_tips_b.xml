@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">Wähle einen Ordner, statt ihn zu tippen</string>
+    <string name="tips_b_browse_body">Wenn du eine Sitzung in einem anderen Verzeichnis startest, tippe neben dem Pfad auf Durchsuchen, um die Ordner des Servers zu durchsuchen. Deine letzten Ordner sind mit einem Tipp erreichbar.</string>
+    <string name="tips_b_browse_demo">Im Blatt Neue Sitzung tippt ein Finger auf Durchsuchen, öffnet den Ordner projects und dann mobile-app, und tippt auf Diesen Ordner verwenden, um den Pfad zu füllen.</string>
+
+    <string name="tips_b_popover_title">Laufende Arbeit mit einem Tipp öffnen oder stoppen</string>
+    <string name="tips_b_popover_body">Tippe auf einen Chip über dem Nachrichtenfeld, um alle laufenden Agenten und Shells in einer Liste zu sehen. Öffnen springt zur Sitzung des Subagenten, Stoppen beendet sie.</string>
+    <string name="tips_b_popover_demo">Ein Finger tippt auf den Chip für laufende Agenten, eine Liste mit Agenten und Shells öffnet sich, Öffnen führt zur Sitzung des Agenten und Agent stoppen entfernt ihn.</string>
+
+    <string name="tips_b_toolmedia_title">Sieh die Bilder, die dein Agent liest</string>
+    <string name="tips_b_toolmedia_body">Wenn ein Werkzeug einen Screenshot, ein Bild oder ein PDF liest, wird die Datei direkt unter der Werkzeugzeile angezeigt. Tippe auf ein Bild, um es größer anzusehen.</string>
+    <string name="tips_b_toolmedia_demo">Zwei Read-Werkzeugzeilen werden abgeschlossen: die erste zeigt darunter eine Bildvorschau, die zweite einen PDF-Dateichip.</string>
+
+    <string name="tips_b_new_title">Tippe /new für einen frischen Start</string>
+    <string name="tips_b_new_body">Tippe /new ins Nachrichtenfeld und wähle den Befehl: Eine neue Sitzung öffnet sich sofort im selben Verzeichnis, ohne die alte Unterhaltung zu kopieren.</string>
+    <string name="tips_b_new_demo">Der Nutzer tippt /new ins Nachrichtenfeld, tippt auf den vorgeschlagenen Befehl und der Chat wechselt zu einer leeren Neuen Sitzung.</string>
+
+    <string name="tips_b_connect_title">KI-Anbieter direkt vom Handy verbinden</string>
+    <string name="tips_b_connect_body">Öffne die Anbieterliste über das Chat-Menü oder tippe /connect. Füge einen API-Schlüssel ein oder melde dich mit einem Code an: Die Zugangsdaten werden auf deinem Server gespeichert, nicht auf dem Handy.</string>
+    <string name="tips_b_connect_demo">Ein Finger tippt in der Anbieterliste auf OpenAI, gibt einen API-Schlüssel ein, tippt auf Verbinden und OpenAI wandert in die Gruppe Verbunden.</string>
+
+    <string name="tips_b_github_title">Von jeder Werkzeugzeile direkt zu GitHub</string>
+    <string name="tips_b_github_body">Werkzeugzeilen, die ein Issue, einen Pull Request, einen Lauf oder einen Commit betreffen, zeigen eine grüne Aktion Öffnen. Tippe, um sie auf GitHub zu öffnen, halte gedrückt, um den Link zu kopieren.</string>
+    <string name="tips_b_github_demo">Drei Shell-Zeilen zeigen grüne Aktionen Öffnen: Öffnen #157, Öffnen PR #156 und Öffnen commit 4f2a9c1. Ein Tipp öffnet den Link, langes Drücken kopiert ihn.</string>
+
+    <string name="tips_b_chips_title">Laufende Arbeit, immer im Blick</string>
+    <string name="tips_b_chips_body">Laufende Shells und Subagenten erscheinen als kleine Chips über dem Nachrichtenfeld. Tippe auf einen, um zu sehen, was läuft, und seine Ausgabe zu öffnen. Du kannst das in den Einstellungen abschalten.</string>
+    <string name="tips_b_chips_demo">Ein Shell-Chip und ein Agenten-Chip erscheinen über dem Nachrichtenfeld; ein Finger tippt auf den Shell-Chip und eine Liste mit dem laufenden Befehl öffnet sich.</string>
+
+    <string name="tips_b_model_title">Dein Modell auf einen Blick</string>
+    <string name="tips_b_model_body">Die Modelltaste im Nachrichtenfeld zeigt jetzt das Anbieterlogo, einen kurzen Namen und den Denkaufwand in hellerer Farbe, etwa Haiku 5.5 Medium. Tippe darauf, um zu wechseln.</string>
+    <string name="tips_b_model_demo">Ein Finger tippt mehrmals auf die Modelltaste im Nachrichtenfeld; sie wechselt von Haiku 5.5 Medium zu Opus 5.5 High, GPT-5.2 High und Gemini 3 Pro, jeweils mit dem Logo des Anbieters.</string>
+
+    <string name="tips_b_stopall_title">Alles mit einem Tipp stoppen</string>
+    <string name="tips_b_stopall_body">Das Blatt Laufend gruppiert Subagenten und Befehle, jeweils mit einer Schaltfläche Alle stoppen. Jede Zeile hat außerdem ihr eigenes Stoppen.</string>
+    <string name="tips_b_stopall_demo">Im Blatt Laufend tippt ein Finger in der Sektion Befehle auf Alle stoppen, dann in der Sektion Subagenten, und beide Listen leeren sich.</string>
+
+    <string name="tips_b_search_title">Ein Projekt in Sekunden finden</string>
+    <string name="tips_b_search_body">Bei vielen Projekten hat das Blatt Neue Sitzung ein Suchfeld. Tippe ein paar Buchstaben, und alle passenden Projekte erscheinen, auch die eingeklappten.</string>
+    <string name="tips_b_search_demo">Ein Finger tippt auf das Suchfeld im Blatt Neue Sitzung und tippt mob; die Liste wird auf mobile-app und mobile-kit eingegrenzt.</string>
+
+    <string name="tips_b_themes_title">Kleide die App in ein TUI-Design</string>
+    <string name="tips_b_themes_body">Wähle in den Einstellungen unter Darstellung eines der 33 OpenCode-Terminaldesigns, und die ganze App übernimmt die Farben, einschließlich Code und Diffs.</string>
+    <string name="tips_b_themes_demo">Ein kleiner Chat wird nacheinander mit vier Designs gezeigt: GitHub, Dracula, Gruvbox und Nord. Ein Finger tippt auf jeden Designpunkt und die Farben wechseln.</string>
+</resources>

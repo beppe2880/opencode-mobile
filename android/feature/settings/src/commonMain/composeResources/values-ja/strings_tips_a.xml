@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">写真を大きく、くっきりと</string>
+    <string name="tips_a_attached_images_body">添付した画像が、エージェントが読み取るものと同じ大きさで、トリミングされずに全体表示されるようになりました。設定 → チャット → トランスクリプトで、サムネイル、小、中、大から選べます。</string>
+    <string name="tips_a_attached_images_demo">チャットの設定で添付画像の項目がサムネイルから小、中、大に切り替わり、選ぶたびにメッセージの画像が大きくなります。</string>
+
+    <string name="tips_a_pin_sessions_title">よく使うチャットを上に固定</string>
+    <string name="tips_a_pin_sessions_body">一覧のチャットを長押しするか、三点メニューを開いて「固定」を選びます。固定したチャットは「今日」の上にある専用のグループに表示されます。</string>
+    <string name="tips_a_pin_sessions_demo">一覧のチャットを長押しし、「固定」をタップすると、そのチャットが上部の「固定済み」グループに移動します。</string>
+
+    <string name="tips_a_swipe_sensitivity_title">親指にちょうどいいスワイプ</string>
+    <string name="tips_a_swipe_sensitivity_body">スワイプでチャット一覧を開く感度を、低、中、高から選べます。高を選ぶと、短く軽いスワイプで開きます。設定 → チャット → ジェスチャーで変更できます。</string>
+    <string name="tips_a_swipe_sensitivity_demo">感度が低いと、短いスワイプは元に戻りチャット一覧は閉じたままです。感度が高いと、同じ短いスワイプでチャット一覧が開きます。</string>
+
+    <string name="tips_a_large_screens_title">折りたためるデバイスとタブレット向け</string>
+    <string name="tips_a_large_screens_body">大画面向けの設定がまとまった新しいセクションが追加されました。一覧の横にチャットを表示する設定、折りたたみや展開時の動作、仕切り線、スワイプが含まれます。折りたためるデバイスとタブレットでのみ表示されます。</string>
+    <string name="tips_a_large_screens_demo">設定で「折りたたみと大画面」セクションを開き、「一覧の横にチャットを表示」をオンにします。</string>
+
+    <string name="tips_a_picker_stay_title">選択画面を閉じずにモデルを比べる</string>
+    <string name="tips_a_picker_stay_body">設定 → メッセージ欄で「モデルを選んだら選択画面を閉じる」をオフにします。モデルを比較している間も選択画面が開いたままになり、完了をタップすると閉じます。</string>
+    <string name="tips_a_picker_stay_demo">「モデルを選んだら選択画面を閉じる」をオフにします。モデル選択画面で2つのモデルを続けてタップすると画面は開いたままで、完了をタップすると閉じます。</string>
+
+    <string name="tips_a_swipe_list_title">右にスワイプしてチャット一覧へ</string>
+    <string name="tips_a_swipe_list_body">チャット内で右にスワイプすると、指に合わせてチャット一覧がパネルとして現れます。左にスワイプすると会話に戻ります。スワイプの動作は設定 → チャット → ジェスチャーで変更できます。</string>
+    <string name="tips_a_swipe_list_demo">チャットで右にスワイプすると、チャット一覧が会話の上にサイドパネルとしてスライドインし、左にスワイプすると閉じます。</string>
+
+    <string name="tips_a_pending_prompt_title">送信した瞬間に画像が表示</string>
+    <string name="tips_a_pending_prompt_body">画像付きのプロンプトは、薄く表示された状態ですぐにチャットに現れ、その下に「送信中…」、続いて「キューに追加済み」と表示されます。メッセージが送信されたかを待つ必要はありません。</string>
+    <string name="tips_a_pending_prompt_demo">画像2枚付きのプロンプトを送信すると、すぐに薄く表示され「送信中…」と表示されます。その後「キューに追加済み」に変わり、サーバーが受け取ると通常の表示に戻ります。</string>
+
+    <string name="tips_a_image_swipe_title">スワイプで画像を切り替え</string>
+    <string name="tips_a_image_swipe_body">画像を全画面で開き、左右にスワイプすると、同じメッセージやツールの他の画像を見られます。カウンターで現在の位置がわかります。</string>
+    <string name="tips_a_image_swipe_demo">全画面ビューアで左にスワイプすると、1枚目から2枚目、続いて3枚目に進み、カウンターも更新されます。</string>
+
+    <string name="tips_a_hide_list_title">チャットを画面いっぱいに</string>
+    <string name="tips_a_hide_list_body">タブレットや展開した折りたためるデバイスでは、チャット上で左にスワイプすると横の一覧が隠れ、右にスワイプすると戻ります。一覧がスライドして消えると、チャットの幅が広がります。</string>
+    <string name="tips_a_hide_list_demo">横長のウィンドウでチャット上を左にスワイプすると、チャット一覧がスライドして消え、チャットが広がります。右にスワイプすると一覧が戻ります。</string>
+
+    <string name="tips_a_check_updates_title">好きなときにアップデートを確認</string>
+    <string name="tips_a_check_updates_body">設定で「アップデートを確認」をタップすると、今すぐGitHubに問い合わせます。新しいバージョンがあれば、検索バーの下、チャット一覧の上に分かりやすいバナーが表示されます。</string>
+    <string name="tips_a_check_updates_demo">設定で「アップデートを確認」をタップすると「アップデートを確認中…」と表示され、その後チャット一覧に新しいバージョンがあることを知らせるバナーが表示されます。</string>
+</resources>

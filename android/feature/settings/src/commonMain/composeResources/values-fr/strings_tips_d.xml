@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">Sachez où vous en êtes d'un coup d'œil</string>
+    <string name="tips_d_header_body">L'en-tête du chat affiche le dossier, la branche Git et le nombre de fichiers modifiés. Touchez-le pour examiner les modifications.</string>
+    <string name="tips_d_header_demo">L'en-tête du chat affiche le dossier, la branche et le nombre de fichiers modifiés ; le toucher ouvre la liste des fichiers modifiés.</string>
+
+    <string name="tips_d_offline_title">Essayez l'application sans serveur</string>
+    <string name="tips_d_offline_body">Pas encore de serveur ? Touchez Essayer sans serveur sur l'écran Connexion et explorez des sessions d'exemple. Rien ne quitte votre téléphone.</string>
+    <string name="tips_d_offline_demo">Sur l'écran Connexion, toucher Essayer sans serveur ouvre une liste de sessions d'exemple.</string>
+
+    <string name="tips_d_split_title">Liste et chat côte à côte</string>
+    <string name="tips_d_split_body">Sur les écrans pliables dépliés et les tablettes, les sessions et le chat partagent l'écran. Faites glisser le séparateur pour redimensionner la liste, ou choisissez la vue divisée dans les paramètres.</string>
+    <string name="tips_d_split_demo">Un grand écran affiche la liste des sessions à côté du chat. Toucher une session met à jour le chat, et faire glisser le séparateur élargit la liste.</string>
+
+    <string name="tips_d_share_title">Partagez vers OpenCode depuis n'importe quelle application</string>
+    <string name="tips_d_share_body">Envoyez du texte, des liens et des images depuis d'autres applications vers OpenCode via la feuille de partage, et démarrez une nouvelle session à partir d'eux.</string>
+    <string name="tips_d_share_demo">Une page est partagée depuis une autre application ; choisir OpenCode dans la feuille de partage démarre une session avec le lien partagé.</string>
+
+    <string name="tips_d_settings_title">Des paramètres dont vous voyez l'effet</string>
+    <string name="tips_d_settings_body">Modifiez les paramètres depuis une liste, avec des aperçus en direct du chat ou dans la démo. Vous voyez le résultat avant de quitter.</string>
+    <string name="tips_d_settings_demo">En faisant glisser le curseur de taille du texte du chat, le texte d'un aperçu en direct du chat s'agrandit.</string>
+
+    <string name="tips_d_update_title">Sachez ce qui change avant de mettre à jour</string>
+    <string name="tips_d_update_body">Lorsqu'une nouvelle version sort, une feuille affiche le changelog avec les nouveautés et les corrections. Mettez à jour, passez ou décidez plus tard.</string>
+    <string name="tips_d_update_demo">Une feuille de mise à jour s'ouvre ; toucher Voir les nouveautés déploie la liste des nouveautés et corrections.</string>
+
+    <string name="tips_d_mcp_title">Gérez vos serveurs MCP</string>
+    <string name="tips_d_mcp_body">Voyez quels serveurs MCP sont connectés et connectez-les ou déconnectez-les depuis le menu du chat, sans revenir à votre ordinateur.</string>
+    <string name="tips_d_mcp_demo">La feuille des serveurs MCP affiche chaque serveur avec son état ; activer un interrupteur connecte le serveur.</string>
+
+    <string name="tips_d_follow_title">Suivez l'agent en direct</string>
+    <string name="tips_d_follow_body">Pendant que l'agent travaille, l'étape en cours reste ouverte : vous lisez la réflexion, la sortie des commandes et les diffs au fur et à mesure, puis elle se replie à la fin de la réponse.</string>
+    <string name="tips_d_follow_demo">Un chat affiche la sortie d'une commande en cours, puis le diff d'une modification, et replie les étapes à l'arrivée de la réponse.</string>
+
+    <string name="tips_d_output_title">Réglez la sortie des outils et la taille du texte</string>
+    <string name="tips_d_output_body">Choisissez le nombre de lignes de sortie à afficher, la fréquence de rafraîchissement d'une commande en cours et la taille du texte du chat. Un seul bouton tout réinitialiser.</string>
+    <string name="tips_d_output_demo">L'intervalle de rafraîchissement et le nombre de lignes de sortie sont modifiés ; puis Réinitialiser tous les paramètres rétablit les valeurs par défaut.</string>
+</resources>

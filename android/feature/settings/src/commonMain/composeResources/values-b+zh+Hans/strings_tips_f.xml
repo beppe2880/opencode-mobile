@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">直接在聊天中运行 shell 命令</string>
+    <string name="tips_f_shell_body">消息以 ! 开头时，会在项目的 shell 中运行，而不是发送给智能体。输出会直接显示在对话中。</string>
+    <string name="tips_f_shell_demo">消息框中输入 !git status -s，提示说明它将在 shell 中运行；发送后，命令及其输出出现在聊天中。</string>
+
+    <string name="tips_f_queue_title">排队提示，稍后再调整</string>
+    <string name="tips_f_queue_body">智能体忙碌时排队的提示会在消息框上方的列表中等待。你可以立即发送其中一条，也可以在运行前编辑或删除它。</string>
+    <string name="tips_f_queue_demo">列出三条排队的提示。其中一条被编辑，一条被删除，另一条立即发送并成为一条消息。</string>
+
+    <string name="tips_f_changes_title">查看会话更改的每个文件</string>
+    <string name="tips_f_changes_body">打开更改，查看智能体处理过的文件，可以是整个会话的，也可以只是上一轮的。点按文件即可阅读其差异。</string>
+    <string name="tips_f_changes_demo">更改面板列出两个文件，并显示新增和删除的行数。点按第一个文件即可打开其红绿差异。</string>
+
+    <string name="tips_f_notifications_title">智能体需要你时收到提醒</string>
+    <string name="tips_f_notifications_body">会话等待权限或回答时，以及会话结束时，通知都会告诉你。你可以直接在通知中允许或拒绝编辑。</string>
+    <string name="tips_f_notifications_demo">一条通知请求编辑文件的权限，点按一次允许后作答。随后另一条通知提示会话已结束。</string>
+
+    <string name="tips_f_pair_title">几秒内连接你的手机</string>
+    <string name="tips_f_pair_body">扫描 opencode pair 显示的二维码，粘贴链接，输入密码，或点按应用在 Wi-Fi 上发现的服务器。</string>
+    <string name="tips_f_pair_demo">在连接界面的“在此网络中发现”下出现一台服务器。点按扫描二维码会打开相机，读取二维码并完成连接。</string>
+
+    <string name="tips_f_live_title">实时观看智能体工作</string>
+    <string name="tips_f_live_body">文本、推理和工具调用会在发生时实时输出。当智能体请求权限或提问时，你可以直接在此作答。</string>
+    <string name="tips_f_live_demo">回复实时输出，包含思考和工具调用。出现权限请求，点按允许一次即可批准。</string>
+
+    <string name="tips_f_steer_title">引导、排队，并使用 / 和 @</string>
+    <string name="tips_f_steer_body">输入 / 查看命令，输入 @ 查找文件。智能体工作时，可以选择立即引导它，或将提示排队稍后执行。</string>
+    <string name="tips_f_steer_demo">输入 / 时列出命令，输入 @ 时列出文件并选择一项。智能体忙碌时出现立即引导和排队按钮，选择了排队。</string>
+
+    <string name="tips_f_fork_title">从任意提示分叉会话</string>
+    <string name="tips_f_fork_body">长按一条提示并选择从此处分叉，即可基于之前的历史新建会话。原会话保持不变。也可以直接输入 /fork。</string>
+    <string name="tips_f_fork_demo">长按一条提示打开菜单，选择从此处分叉，打开的新会话不包含之后的消息。</string>
+
+    <string name="tips_f_undo_title">撤销和重做任意提示</string>
+    <string name="tips_f_undo_body">输入 /undo 可撤回最后一条提示及其文件更改。改变主意了？点按恢复，或使用 /redo。</string>
+    <string name="tips_f_undo_demo">输入 /undo 后隐藏最后一条提示，并显示“已撤销 1 条消息”的横幅。点按恢复即可找回。</string>
+</resources>

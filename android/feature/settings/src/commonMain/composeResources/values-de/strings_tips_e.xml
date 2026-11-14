@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">Deine Sitzungen auf dem Startbildschirm</string>
+    <string name="tips_e_widget_body">Füge das Widget hinzu, um zu sehen, welche Sitzungen laufen und welche du zuletzt genutzt hast, ohne die App zu öffnen. Tippe auf eine Sitzung, um direkt hineinzuspringen, oder starte eine neue.</string>
+    <string name="tips_e_widget_demo">Ein Startbildschirm mit dem OpenCode-Widget, das zwei laufende Sitzungen und eine kürzlich genutzte zeigt. Nach einer Aktualisierung läuft eine der Sitzungen nicht mehr.</string>
+
+    <string name="tips_e_files_title">Öffne jede Datei, die der Agent berührt hat</string>
+    <string name="tips_e_files_body">Tippe auf die Öffnen-Schaltfläche in einer Lese-, Schreib- oder Bearbeitungszeile oder bei einer geänderten Datei, um die ganze Datei mit Syntaxhervorhebung zu lesen. Sie ist nur lesbar, damit nichts versehentlich verändert wird.</string>
+    <string name="tips_e_files_demo">Im Chat hat eine Werkzeugzeile für eine Datei eine Öffnen-Schaltfläche. Ein Tipp öffnet die Datei mit Zeilennummern und hervorgehobenem Code.</string>
+
+    <string name="tips_e_terminal_title">Ein vollwertiges Terminal in der Tasche</string>
+    <string name="tips_e_terminal_body">Öffne eine Shell auf dem Server im Ordner deiner Sitzung über die obere Leiste des Chats. Eine Tastenleiste bietet Esc, Tab, Strg und die Pfeiltasten, die Handy-Tastaturen fehlen.</string>
+    <string name="tips_e_terminal_demo">Ein Terminal, in dem der Befehl npm test getippt wird. Ein Tipp auf Enter in der Tastenleiste führt ihn aus und die Testergebnisse erscheinen.</string>
+
+    <string name="tips_e_compaction_title">Lies, woran sich der Agent erinnert</string>
+    <string name="tips_e_compaction_body">Wenn ein langes Gespräch komprimiert wird, tippe auf die Trennlinie Kontext komprimiert, um die Zusammenfassung zu lesen, mit der der Agent weitermacht.</string>
+    <string name="tips_e_compaction_demo">Im Verlauf wird die Trennlinie Kontext komprimiert getippt und öffnet sich, um die Zusammenfassung des Gesprächs zu zeigen.</string>
+
+    <string name="tips_e_dictation_title">Sprich mit deinem Agenten</string>
+    <string name="tips_e_dictation_body">Tippe auf das Mikrofon neben dem Nachrichtenfeld und sprich einfach: Deine Worte erscheinen beim Sprechen im Prompt. Tippe erneut, um zu stoppen, dann prüfen und senden.</string>
+    <string name="tips_e_dictation_demo">Die Mikrofontaste wird getippt und beginnt zuzuhören. Der Satz Füge einen Dunkelmodus-Schalter zum Einstellungsbildschirm hinzu wird Wort für Wort ins Nachrichtenfeld geschrieben, dann wird das Mikrofon erneut getippt.</string>
+
+    <string name="tips_e_usage_title">Sieh, wohin Tokens und Geld fließen</string>
+    <string name="tips_e_usage_body">Der Bildschirm Nutzung in den Einstellungen zeigt Kosten, Prompts, Tokens und deine meistgenutzten Modelle für heute, die letzten 7 Tage oder die letzten 30 Tage.</string>
+    <string name="tips_e_usage_demo">Der Bildschirm Nutzung. Beim Wechsel von Heute zu 7 Tagen steigen die Kosten- und Token-Summen, das Diagramm der Schritte pro Tag füllt sich und darunter erscheinen die genutzten Modelle.</string>
+
+    <string name="tips_e_notifications_title">Nur die Benachrichtigungen, die du willst</string>
+    <string name="tips_e_notifications_body">Wähle in den Einstellungen unter Sitzungsbenachrichtigungen aus, welche Arten du erhältst: Berechtigungsanfragen, Fragen des Agenten oder abgeschlossene Sitzungen.</string>
+    <string name="tips_e_notifications_demo">Drei Schalter unter Sitzungsbenachrichtigungen. Fragen und Abgeschlossene Sitzungen sind ausgeschaltet, Berechtigungsanfragen bleibt eingeschaltet.</string>
+</resources>

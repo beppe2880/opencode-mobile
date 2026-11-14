@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">Sieh auf einen Blick, wo du bist</string>
+    <string name="tips_d_header_body">Die Kopfzeile des Chats zeigt den Ordner, den Git-Branch und wie viele Dateien geändert wurden. Tippe darauf, um die Änderungen zu prüfen.</string>
+    <string name="tips_d_header_demo">Die Kopfzeile des Chats zeigt Ordner, Branch und die Anzahl geänderter Dateien; ein Tipp öffnet die Liste der geänderten Dateien.</string>
+
+    <string name="tips_d_offline_title">Probiere die App ohne Server aus</string>
+    <string name="tips_d_offline_body">Noch kein Server? Tippe im Bildschirm Verbinden auf Ohne Server testen und schau dich mit Beispielsitzungen um. Nichts verlässt dein Handy.</string>
+    <string name="tips_d_offline_demo">Auf dem Bildschirm Verbinden öffnet ein Tipp auf Ohne Server testen eine Liste mit Beispielsitzungen.</string>
+
+    <string name="tips_d_split_title">Liste und Chat nebeneinander</string>
+    <string name="tips_d_split_body">Auf aufgeklappten Faltgeräten und Tablets teilen sich Sitzungen und Chat den Bildschirm. Ziehe den Trenner, um die Liste in der Größe zu ändern, oder wähle die geteilte Ansicht in den Einstellungen.</string>
+    <string name="tips_d_split_demo">Ein breiter Bildschirm zeigt die Sitzungsliste neben dem Chat. Ein Tipp auf eine Sitzung aktualisiert den Chat, und Ziehen am Trenner verbreitert die Liste.</string>
+
+    <string name="tips_d_share_title">Aus jeder App an OpenCode teilen</string>
+    <string name="tips_d_share_body">Sende Text, Links und Bilder aus anderen Apps über das Teilen-Menü an OpenCode und starte daraus eine neue Sitzung.</string>
+    <string name="tips_d_share_demo">Eine Seite wird aus einer anderen App geteilt; die Wahl von OpenCode im Teilen-Menü startet eine Sitzung mit dem geteilten Link.</string>
+
+    <string name="tips_d_settings_title">Einstellungen, deren Wirkung du siehst</string>
+    <string name="tips_d_settings_body">Ändere Einstellungen in einer Liste, mit Live-Vorschauen des Chats oder in der Demo. Du siehst das Ergebnis, bevor du gehst.</string>
+    <string name="tips_d_settings_demo">Wenn du den Regler der Chat-Textgröße ziehst, wird der Text einer Live-Vorschau des Chats größer.</string>
+
+    <string name="tips_d_update_title">Wisse vor dem Update, was sich ändert</string>
+    <string name="tips_d_update_body">Wenn eine neue Version erscheint, zeigt ein Blatt das Changelog mit neuen Funktionen und Fehlerbehebungen. Aktualisiere, überspringe es oder entscheide später.</string>
+    <string name="tips_d_update_demo">Ein Update-Blatt öffnet sich; ein Tipp auf Changelog anzeigen klappt die Liste neuer Funktionen und Fehlerbehebungen auf.</string>
+
+    <string name="tips_d_mcp_title">Steuere deine MCP-Server</string>
+    <string name="tips_d_mcp_body">Sieh, welche MCP-Server verbunden sind, und verbinde oder trenne sie über das Chat-Menü, ohne zum Computer zurückzukehren.</string>
+    <string name="tips_d_mcp_demo">Das Blatt der MCP-Server listet jeden Server mit seinem Status auf; das Einschalten eines Schalters verbindet den Server.</string>
+
+    <string name="tips_d_follow_title">Verfolge den Agenten live</string>
+    <string name="tips_d_follow_body">Während der Agent arbeitet, bleibt sein aktueller Schritt geöffnet: Du liest Denkprozess, Befehlsausgabe und Diffs, während sie eintreffen, und er klappt sich zu, wenn die Antwort endet.</string>
+    <string name="tips_d_follow_demo">Ein Chat zeigt die Ausgabe eines laufenden Befehls, dann den Diff einer Änderung, und klappt die Schritte zusammen, wenn die Antwort eintrifft.</string>
+
+    <string name="tips_d_output_title">Passe Werkzeugausgabe und Textgröße an</string>
+    <string name="tips_d_output_body">Wähle, wie viele Ausgabezeilen angezeigt werden, wie oft ein laufender Befehl aktualisiert wird, und die Textgröße des Chats. Ein Knopf setzt alles zurück.</string>
+    <string name="tips_d_output_demo">Das Aktualisierungsintervall und die Anzahl der Ausgabezeilen werden geändert, dann stellt Alle Einstellungen zurücksetzen die Standardwerte wieder her.</string>
+</resources>

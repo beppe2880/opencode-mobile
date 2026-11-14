@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">Deine Bilder, groß und scharf</string>
+    <string name="tips_a_attached_images_body">Angehängte Bilder werden jetzt so groß angezeigt wie die, die der Agent liest, vollständig und ohne Zuschnitt. Wähle Miniaturen, Klein, Mittel oder Groß unter Einstellungen → Chat → Verlauf.</string>
+    <string name="tips_a_attached_images_demo">In den Chat-Einstellungen wechselt die Option für angehängte Bilder von Miniaturen zu Klein, Mittel und Groß, und die Bilder der Nachricht werden mit jeder Auswahl größer.</string>
+
+    <string name="tips_a_pin_sessions_title">Deine besten Chats immer oben</string>
+    <string name="tips_a_pin_sessions_body">Halte einen Chat in der Liste gedrückt oder öffne sein Drei-Punkte-Menü und wähle Anheften. Angeheftete Chats bleiben in einer eigenen Gruppe oberhalb von Heute.</string>
+    <string name="tips_a_pin_sessions_demo">Ein Chat in der Liste wird gedrückt gehalten, die Aktion Anheften wird getippt und der Chat wandert in die Gruppe Angeheftet ganz oben.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">Wischen, das zu deinem Daumen passt</string>
+    <string name="tips_a_swipe_sensitivity_body">Wähle, wie leicht ein Wischen die Chatliste öffnet: Niedrig, Mittel oder Hoch. Bei Hoch reicht ein kurzer, leichter Wisch. Du findest es unter Einstellungen → Chat → Gesten.</string>
+    <string name="tips_a_swipe_sensitivity_demo">Bei niedriger Empfindlichkeit springt ein kurzer Wisch zurück und die Chatliste bleibt geschlossen. Bei hoher Empfindlichkeit öffnet derselbe kurze Wisch die Chatliste.</string>
+
+    <string name="tips_a_large_screens_title">Für Faltgeräte und Tablets gemacht</string>
+    <string name="tips_a_large_screens_body">Ein neuer Einstellungsbereich bündelt alles für große Bildschirme: den Chat neben der Liste, was beim Falten oder Entfalten passiert, den Trenner und das Wischen. Er erscheint nur auf Faltgeräten und Tablets.</string>
+    <string name="tips_a_large_screens_demo">In den Einstellungen wird der Bereich Faltgeräte und große Bildschirme geöffnet, dann wird der Schalter Chat neben der Liste eingeschaltet.</string>
+
+    <string name="tips_a_picker_stay_title">Modelle ausprobieren, ohne dass die Auswahl schließt</string>
+    <string name="tips_a_picker_stay_body">Deaktiviere unter Einstellungen → Nachrichtenfeld die Option Auswahl nach der Modellwahl schließen. Die Auswahl bleibt dann offen, während du Modelle vergleichst, und Fertig schließt sie.</string>
+    <string name="tips_a_picker_stay_demo">Der Schalter Auswahl nach der Modellwahl schließen wird deaktiviert. In der Modellauswahl werden nacheinander zwei Modelle getippt, und sie bleibt offen; dann schließt Fertig sie.</string>
+
+    <string name="tips_a_swipe_list_title">Nach rechts wischen für deine Chats</string>
+    <string name="tips_a_swipe_list_body">Wische in einem Chat nach rechts, dann gleitet die Chatliste als Panel herein und folgt deinem Finger. Wische zurück, um zur Unterhaltung zu gelangen. Das Wischen kannst du unter Einstellungen → Chat → Gesten ändern.</string>
+    <string name="tips_a_swipe_list_demo">Ein Wisch nach rechts in einem Chat zieht die Chatliste als Seitenpanel über die Unterhaltung, dann schließt ein Wisch nach links sie wieder.</string>
+
+    <string name="tips_a_pending_prompt_title">Bilder erscheinen im Moment des Sendens</string>
+    <string name="tips_a_pending_prompt_body">Ein Prompt mit Bildern erscheint sofort im Chat, abgedunkelt, mit Wird gesendet… und darunter In Warteschlange. Du musst nicht mehr warten, um zu sehen, dass deine Nachricht raus ist.</string>
+    <string name="tips_a_pending_prompt_demo">Ein Prompt mit zwei Fotos wird gesendet und erscheint sofort, abgedunkelt, mit der Beschriftung Wird gesendet… und dann In Warteschlange, bis der Server ihn annimmt und er wieder normal aussieht.</string>
+
+    <string name="tips_a_image_swipe_title">Durch Bilder blättern per Wisch</string>
+    <string name="tips_a_image_swipe_body">Öffne ein Bild im Vollbild und wische nach links oder rechts, um die anderen aus derselben Nachricht oder vom selben Werkzeug zu sehen. Ein Zähler zeigt, wo du gerade bist.</string>
+    <string name="tips_a_image_swipe_demo">Im Vollbild-Viewer wechselt ein Wisch nach links vom ersten Bild zum zweiten und dann zum dritten, und der Zähler folgt.</string>
+
+    <string name="tips_a_hide_list_title">Der Chat bekommt den ganzen Bildschirm</string>
+    <string name="tips_a_hide_list_body">Auf einem Tablet oder einem aufgeklappten Faltgerät wischst du auf dem Chat nach links, um die Liste daneben auszublenden, und nach rechts, um sie zurückzuholen. Der Chat wird breiter, während die Liste verschwindet.</string>
+    <string name="tips_a_hide_list_demo">Auf einem breiten Bildschirm schiebt ein Wisch nach links über den Chat die Chatliste weg und der Chat wird breiter; ein Wisch nach rechts holt die Liste zurück.</string>
+
+    <string name="tips_a_check_updates_title">Nach Updates suchen, wann du willst</string>
+    <string name="tips_a_check_updates_body">Tippe in den Einstellungen auf Nach Updates suchen, um GitHub sofort zu fragen. Wenn eine neue Version erschienen ist, erscheint ein deutlicher Hinweis unter der Suchleiste, oberhalb deiner Chats.</string>
+    <string name="tips_a_check_updates_demo">In den Einstellungen wird Nach Updates suchen getippt, es zeigt Suche nach Updates…, dann zeigt die Chatliste einen Hinweis, dass eine neue Version verfügbar ist.</string>
+</resources>

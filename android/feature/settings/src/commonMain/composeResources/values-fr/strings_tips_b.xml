@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">Choisissez un dossier sans le taper</string>
+    <string name="tips_b_browse_body">Lorsque vous démarrez une session dans un autre répertoire, touchez Parcourir à côté du chemin pour explorer les dossiers du serveur. Vos dossiers récents sont à portée de doigt.</string>
+    <string name="tips_b_browse_demo">Dans la feuille Nouvelle session, un doigt touche Parcourir, ouvre le dossier projects puis le dossier mobile-app, et touche Utiliser ce dossier pour remplir le chemin.</string>
+
+    <string name="tips_b_popover_title">Ouvrez ou arrêtez les tâches en cours d'un geste</string>
+    <string name="tips_b_popover_body">Touchez une pastille au-dessus de la zone de message pour voir dans une seule liste tous les agents et shells en cours. Ouvrir mène à la session du sous-agent, Arrêter la termine.</string>
+    <string name="tips_b_popover_demo">Un doigt touche la pastille des agents en cours, une liste d'agents et de shells s'ouvre, Ouvrir mène à la session de l'agent et Arrêter l'agent le retire.</string>
+
+    <string name="tips_b_toolmedia_title">Voyez les images lues par votre agent</string>
+    <string name="tips_b_toolmedia_body">Lorsqu'un outil lit une capture d'écran, une image ou un PDF, le fichier s'affiche juste sous la ligne de l'outil. Touchez une image pour la voir en plus grand.</string>
+    <string name="tips_b_toolmedia_demo">Deux lignes de l'outil Read se terminent : la première affiche un aperçu d'image dessous, la seconde une pastille de fichier PDF.</string>
+
+    <string name="tips_b_new_title">Tapez /new pour repartir de zéro</string>
+    <string name="tips_b_new_body">Tapez /new dans la zone de message et choisissez la commande : une nouvelle session s'ouvre aussitôt dans le même répertoire, sans copier l'ancienne conversation.</string>
+    <string name="tips_b_new_demo">L'utilisateur tape /new dans la zone de message, touche la commande suggérée et le chat passe à une Nouvelle session vide.</string>
+
+    <string name="tips_b_connect_title">Connectez vos fournisseurs d'IA depuis votre téléphone</string>
+    <string name="tips_b_connect_body">Ouvrez la liste des fournisseurs depuis le menu du chat ou tapez /connect. Collez une clé API ou connectez-vous avec un code : les identifiants sont enregistrés sur votre serveur, pas sur votre téléphone.</string>
+    <string name="tips_b_connect_demo">Un doigt touche OpenAI dans la liste des fournisseurs, saisit une clé API, touche Connecter et OpenAI passe dans le groupe Connectés.</string>
+
+    <string name="tips_b_github_title">Accédez à GitHub depuis n'importe quelle ligne d'outil</string>
+    <string name="tips_b_github_body">Les lignes d'outils qui concernent un ticket, une pull request, une exécution ou un commit affichent une action verte Ouvrir. Touchez pour l'ouvrir sur GitHub, appuyez longuement pour copier le lien.</string>
+    <string name="tips_b_github_demo">Trois lignes de shell affichent des actions vertes Ouvrir : Ouvrir #157, Ouvrir PR #156 et Ouvrir commit 4f2a9c1. Un toucher ouvre le lien, un appui long le copie.</string>
+
+    <string name="tips_b_chips_title">Ce qui tourne, toujours sous les yeux</string>
+    <string name="tips_b_chips_body">Les shells et les sous-agents en cours apparaissent sous forme de petites pastilles au-dessus de la zone de message. Touchez-en une pour voir ce qui tourne et ouvrir sa sortie. Vous pouvez désactiver cela dans les paramètres.</string>
+    <string name="tips_b_chips_demo">Une pastille de shell et une pastille d'agent apparaissent au-dessus de la zone de message ; un doigt touche la pastille du shell et une liste avec la commande en cours s'ouvre.</string>
+
+    <string name="tips_b_model_title">Votre modèle en un coup d'œil</string>
+    <string name="tips_b_model_body">Le bouton du modèle dans la zone de message affiche désormais le logo du fournisseur, un nom court et le niveau de raisonnement dans une couleur plus discrète, comme Haiku 5.5 Medium. Touchez-le pour changer.</string>
+    <string name="tips_b_model_demo">Un doigt touche plusieurs fois le bouton du modèle dans la zone de message ; il passe de Haiku 5.5 Medium à Opus 5.5 High, GPT-5.2 High et Gemini 3 Pro, chacun avec le logo de son fournisseur.</string>
+
+    <string name="tips_b_stopall_title">Tout arrêter d'une seule touche</string>
+    <string name="tips_b_stopall_body">La feuille En cours regroupe les sous-agents et les commandes, chacun avec un bouton Tout arrêter. Chaque ligne a aussi son propre bouton Arrêter.</string>
+    <string name="tips_b_stopall_demo">Dans la feuille En cours, un doigt touche Tout arrêter dans la section Commandes, puis dans la section Sous-agents, et les deux listes se vident.</string>
+
+    <string name="tips_b_search_title">Trouvez un projet en quelques secondes</string>
+    <string name="tips_b_search_body">Avec de nombreux projets, la feuille Nouvelle session dispose d'un champ de recherche. Tapez quelques lettres et tous les projets correspondants apparaissent, même ceux qui étaient repliés.</string>
+    <string name="tips_b_search_demo">Un doigt touche le champ de recherche de la feuille Nouvelle session et tape mob ; la liste se réduit à mobile-app et mobile-kit.</string>
+
+    <string name="tips_b_themes_title">Habillez l'application avec un thème de terminal</string>
+    <string name="tips_b_themes_body">Choisissez l'un des 33 thèmes de terminal OpenCode dans les paramètres, sous Apparence, et toute l'application en reprend les couleurs, y compris le code et les diffs.</string>
+    <string name="tips_b_themes_demo">Un petit chat est affiché avec quatre thèmes à tour de rôle : GitHub, Dracula, Gruvbox et Nord. Un doigt touche chaque pastille de thème et les couleurs changent.</string>
+</resources>

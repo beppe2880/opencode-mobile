@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">说话代替打字</string>
+    <string name="tips_c_voice_record_body">点按消息框中的麦克风然后说话：实时波形和计时器会显示正在收音。确认即可保留文字，取消则丢弃。</string>
+    <string name="tips_c_voice_record_demo">手指点按麦克风，消息框显示跳动的波形和计时器，然后说出的句子以文字形式出现。</string>
+
+    <string name="tips_c_voice_cloud_title">使用云端模型获得更好的听写效果</string>
+    <string name="tips_c_voice_cloud_body">在设置中选择服务商和转录模型。停止录音时音频会被发送，文字会进入消息框，供你检查。</string>
+    <string name="tips_c_voice_cloud_demo">手指将语音转文字选择为云端，录音被转录，文字出现在消息框中。</string>
+
+    <string name="tips_c_settings_categories_title">设置，轻松找到</string>
+    <string name="tips_c_settings_categories_body">设置按类别分组，每个类别都有自己的页面。不确定某项设置在哪里？搜索它，即可直接跳转到该设置。</string>
+    <string name="tips_c_settings_categories_demo">手指打开语音输入类别，然后返回，接着在搜索框中输入，列出匹配的设置。</string>
+
+    <string name="tips_c_terminal_fullscreen_title">为终端留出更多空间</string>
+    <string name="tips_c_terminal_fullscreen_body">进入全屏会隐藏标题栏和系统栏，一次显示更多行。点按返回或同一按钮即可恢复。</string>
+    <string name="tips_c_terminal_fullscreen_demo">手指点按终端的全屏按钮：标题栏和状态栏滑出，显示更多输出行。</string>
+
+    <string name="tips_c_next_message_title">无需等待即可切换模型</string>
+    <string name="tips_c_next_message_body">回复仍在进行时即可更改智能体或模型：更改会在你的下一条消息中生效。新聊天默认使用你上次使用的模型。</string>
+    <string name="tips_c_next_message_demo">助手工作时，手指打开模型菜单并选择另一个模型；提示说明更改将应用于下一条消息。</string>
+
+    <string name="tips_c_thoughts_title">将连续的思考合并为一行</string>
+    <string name="tips_c_thoughts_body">助手连续的思考会合并为一行，便于浏览。点按即可逐条阅读。</string>
+    <string name="tips_c_thoughts_demo">三条独立的思考行合并为一行，手指点按后显示这三条思考内容。</string>
+
+    <string name="tips_c_pending_bar_title">决定前先看看聊天内容</string>
+    <string name="tips_c_pending_bar_body">提问和权限卡片会折叠成一条细栏，让你在回答前先阅读对话。点按细栏即可重新展开卡片。</string>
+    <string name="tips_c_pending_bar_demo">点按箭头将权限卡片折叠成细栏，再点按细栏将其重新展开。</string>
+
+    <string name="tips_c_running_title">实时查看运行内容</string>
+    <string name="tips_c_running_body">消息框上方的标签会统计正在运行的子智能体和后台命令。打开它可以查看它们的耗时和输出，或将其停止。</string>
+    <string name="tips_c_running_demo">手指点按运行中标签，弹出的面板列出一个子智能体和一条命令，带有计时器和停止按钮。</string>
+</resources>
