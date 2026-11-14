@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">Parlez au lieu de taper</string>
+    <string name="tips_c_voice_record_body">Touchez le micro dans la zone de message et parlez : une forme d'onde en direct et un chronomètre montrent que vous êtes entendu. Confirmez pour garder le texte, ou annulez pour le supprimer.</string>
+    <string name="tips_c_voice_record_demo">Un doigt touche le micro, la zone de message affiche une forme d'onde animée avec un chronomètre, puis la phrase dictée apparaît sous forme de texte.</string>
+
+    <string name="tips_c_voice_cloud_title">Une meilleure dictée avec un modèle cloud</string>
+    <string name="tips_c_voice_cloud_body">Choisissez un fournisseur et un modèle de transcription dans les paramètres. L'enregistrement est envoyé lorsque vous arrêtez, et le texte arrive dans la zone de message pour que vous le vérifiiez.</string>
+    <string name="tips_c_voice_cloud_demo">Un doigt choisit Cloud comme reconnaissance vocale, puis un enregistrement est transcrit et le texte apparaît dans la zone de message.</string>
+
+    <string name="tips_c_settings_categories_title">Des paramètres faciles à trouver</string>
+    <string name="tips_c_settings_categories_body">Les paramètres sont regroupés par catégories, chacune avec sa propre page. Vous ne savez pas où se trouve quelque chose ? Recherchez-le et accédez directement au paramètre.</string>
+    <string name="tips_c_settings_categories_demo">Un doigt ouvre la catégorie Saisie vocale, revient en arrière, puis tape dans le champ de recherche et les paramètres correspondants s'affichent.</string>
+
+    <string name="tips_c_terminal_fullscreen_title">Plus de place pour le terminal</string>
+    <string name="tips_c_terminal_fullscreen_body">Passez en plein écran pour masquer la barre de titre et les barres système et voir plus de lignes à la fois. Retour ou le même bouton les rétablit.</string>
+    <string name="tips_c_terminal_fullscreen_demo">Un doigt touche le bouton plein écran du terminal : la barre de titre et la barre d'état disparaissent et davantage de lignes de sortie apparaissent.</string>
+
+    <string name="tips_c_next_message_title">Changez de modèle sans attendre</string>
+    <string name="tips_c_next_message_body">Changez d'agent ou de modèle pendant qu'une réponse est encore en cours : le changement s'applique à votre message suivant. Les nouvelles discussions démarrent avec le modèle utilisé en dernier.</string>
+    <string name="tips_c_next_message_demo">Pendant que l'assistant travaille, un doigt ouvre le menu des modèles et en choisit un autre ; une note indique qu'il s'applique au message suivant.</string>
+
+    <string name="tips_c_thoughts_title">Une seule ligne pour une suite de réflexions</string>
+    <string name="tips_c_thoughts_body">Les réflexions successives de l'assistant sont regroupées en une seule ligne facile à parcourir. Touchez-la pour lire chaque réflexion.</string>
+    <string name="tips_c_thoughts_demo">Trois lignes de réflexion séparées se fondent en une seule, qu'un doigt touche pour afficher les trois réflexions.</string>
+
+    <string name="tips_c_pending_bar_title">Consultez le chat avant de décider</string>
+    <string name="tips_c_pending_bar_body">Les cartes de questions et de permissions se replient en une fine barre, pour que vous puissiez lire la conversation avant de répondre. Touchez la barre pour rouvrir la carte.</string>
+    <string name="tips_c_pending_bar_demo">Une carte de permission se replie en barre en touchant sa flèche, et se rouvre en touchant la barre.</string>
+
+    <string name="tips_c_running_title">Voyez ce qui tourne, en direct</string>
+    <string name="tips_c_running_body">Une pastille au-dessus de la zone de message compte les sous-agents et les commandes en arrière-plan en cours. Ouvrez-la pour suivre leur durée et leur sortie, ou pour les arrêter.</string>
+    <string name="tips_c_running_demo">Un doigt touche la pastille des tâches en cours et une feuille liste un sous-agent et une commande, avec un chronomètre qui avance et un bouton Arrêter.</string>
+</resources>

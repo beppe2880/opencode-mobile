@@ -246,7 +246,7 @@
     <string name="update_download">下载</string>
     <string name="update_sheet_title">有可用更新</string>
     <string name="update_sheet_versions_description">从版本 %1$s 更新到版本 %2$s</string>
-    <string name="update_sheet_whats_new">更新内容</string>
+    <string name="update_sheet_whats_new">本次更新内容</string>
     <string name="update_sheet_version">版本 %1$s</string>
     <string name="update_sheet_later">稍后</string>
     <string name="update_sheet_skip">跳过此版本</string>
@@ -260,7 +260,7 @@
     <string name="update_check_checking">正在检查更新…</string>
     <string name="update_check_latest">当前已是最新版本（%1$s）</string>
     <string name="update_check_failed">无法连接 GitHub。请检查网络连接后重试。</string>
-    <string name="whats_new_title">更新内容</string>
+    <string name="whats_new_title">使用技巧与新功能</string>
     <string name="whats_new_settings_sub">逐个版本查看所有变更</string>
     <string name="whats_new_unseen">新版本</string>
     <string name="whats_new_hide">隐藏，直到下一个版本</string>
@@ -401,4 +401,22 @@
     <string name="settings_edit_more">%1$s 中的所有选项</string>
     <string name="settings_close_model_picker">选择模型后关闭选择器</string>
     <string name="settings_close_model_picker_sub">关闭此选项可一起选择模型和推理级别，然后点按“完成”关闭。</string>
+    <string name="feature_section_changelog">更新日志</string>
+    <string name="feature_new">新</string>
+    <string name="feature_by">作者 %1$s · #%2$d</string>
+    <string name="feature_math_title">数学公式，所见即所得</string>
+    <string name="feature_math_body">回复中的公式会在到达时排版显示：分数、根号、积分和矩阵，而不是原始 LaTeX。复制消息仍会得到 LaTeX 源码。</string>
+    <string name="feature_math_demo">一条回复逐步输出，其中的公式从 LaTeX 源码变为排版好的数学公式。</string>
+    <string name="feature_attachments_title">查看你附加的图片</string>
+    <string name="feature_attachments_body">附加的图片会以缩略图显示在消息框中，便于发送前检查。点按一张可全屏查看，点按其 X 可将其移除。</string>
+    <string name="feature_attachments_demo">消息框中出现两张图片，一张被全屏打开，然后移除一张。</string>
+    <string name="tips_version">版本 %1$s</string>
+    <string name="tips_show_list">以列表显示</string>
+    <string name="tips_show_carousel">以轮播显示</string>
+    <string name="feature_open_pr">查看拉取请求</string>
+    <string name="tips_installed">已安装</string>
+    <string name="tips_newer">新</string>
+    <plurals name="tips_feature_count">
+        <item quantity="other">%1$d 项功能</item>
+    </plurals>
 </resources>

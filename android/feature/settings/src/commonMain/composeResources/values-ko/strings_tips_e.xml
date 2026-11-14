@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">홈 화면의 세션</string>
+    <string name="tips_e_widget_body">위젯을 추가하면 앱을 열지 않고도 실행 중인 세션과 최근 세션을 볼 수 있습니다. 세션을 탭하면 바로 들어가거나 새 세션을 시작할 수 있습니다.</string>
+    <string name="tips_e_widget_demo">홈 화면의 OpenCode 위젯에 실행 중인 세션 두 개와 최근 세션 하나가 표시됩니다. 새로 고침 후 세션 중 하나는 더 이상 실행 중이 아닙니다.</string>
+
+    <string name="tips_e_files_title">에이전트가 다룬 파일 열어 보기</string>
+    <string name="tips_e_files_body">읽기, 쓰기, 편집 행이나 변경된 파일의 열기 버튼을 탭하면 구문 강조와 함께 파일 전체를 읽을 수 있습니다. 읽기 전용이라 실수로 바뀌는 일은 없습니다.</string>
+    <string name="tips_e_files_demo">채팅에서 파일에 대한 도구 행에 열기 버튼이 있습니다. 탭하면 줄 번호와 강조된 코드가 있는 파일이 열립니다.</string>
+
+    <string name="tips_e_terminal_title">주머니 속의 완전한 터미널</string>
+    <string name="tips_e_terminal_body">채팅 상단 바에서 세션 폴더 안의 서버 셸을 엽니다. 키 바에는 휴대폰 키보드에 없는 Esc, Tab, Ctrl과 방향키가 있습니다.</string>
+    <string name="tips_e_terminal_demo">터미널에 npm test 명령이 입력되어 있습니다. 키 바의 Enter를 탭하면 명령이 실행되고 테스트 결과가 나타납니다.</string>
+
+    <string name="tips_e_compaction_title">에이전트가 기억하는 내용 읽기</string>
+    <string name="tips_e_compaction_body">긴 대화가 압축되면 컨텍스트 압축됨 구분선을 탭하여, 에이전트가 이어서 사용하는 요약을 읽을 수 있습니다.</string>
+    <string name="tips_e_compaction_demo">대화 기록에서 컨텍스트 압축됨 구분선을 탭하면 대화 요약이 펼쳐져 나타납니다.</string>
+
+    <string name="tips_e_dictation_title">에이전트에게 말하기</string>
+    <string name="tips_e_dictation_body">메시지 상자 옆의 마이크를 탭하고 그냥 말하세요. 말하는 내용이 말하는 대로 프롬프트에 나타납니다. 다시 탭하면 멈추고, 검토한 뒤 보낼 수 있습니다.</string>
+    <string name="tips_e_dictation_demo">마이크 버튼을 탭하면 듣기가 시작됩니다. 설정 화면에 다크 모드 전환 추가라는 문장이 단어마다 메시지 상자에 입력되고, 이후 마이크를 다시 탭합니다.</string>
+
+    <string name="tips_e_usage_title">토큰과 비용이 어디에 쓰이는지 확인</string>
+    <string name="tips_e_usage_body">설정의 사용량 화면에는 오늘, 최근 7일, 최근 30일 동안의 비용, 프롬프트, 토큰, 가장 많이 사용한 모델이 표시됩니다.</string>
+    <string name="tips_e_usage_demo">사용량 화면입니다. 오늘에서 7일로 바꾸면 비용과 토큰 합계가 늘어나고, 날짜별 단계 차트가 채워지며, 아래에 사용한 모델이 표시됩니다.</string>
+
+    <string name="tips_e_notifications_title">필요한 알림만 받기</string>
+    <string name="tips_e_notifications_body">설정의 세션 알림에서 받을 알림 종류를 고르세요: 권한 요청, 에이전트의 질문, 완료된 세션.</string>
+    <string name="tips_e_notifications_demo">세션 알림 아래에 스위치 세 개가 있습니다. 질문과 완료된 세션은 꺼져 있고, 권한 요청은 켜진 상태입니다.</string>
+</resources>

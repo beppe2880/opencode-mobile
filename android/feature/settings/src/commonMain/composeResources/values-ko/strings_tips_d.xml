@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">현재 위치를 한눈에</string>
+    <string name="tips_d_header_body">채팅 헤더에는 폴더, Git 브랜치, 변경된 파일 수가 표시됩니다. 탭하면 변경 사항을 검토할 수 있습니다.</string>
+    <string name="tips_d_header_demo">채팅 헤더에 폴더, 브랜치, 변경된 파일 수가 표시됩니다. 탭하면 변경된 파일 목록이 열립니다.</string>
+
+    <string name="tips_d_offline_title">서버 없이 앱 둘러보기</string>
+    <string name="tips_d_offline_body">아직 서버가 없나요? 연결 화면에서 서버 없이 사용해 보기를 탭하고 샘플 세션으로 둘러보세요. 어떤 데이터도 휴대폰 밖으로 나가지 않습니다.</string>
+    <string name="tips_d_offline_demo">연결 화면에서 서버 없이 사용해 보기를 탭하면 샘플 세션 목록이 열립니다.</string>
+
+    <string name="tips_d_split_title">목록과 채팅을 나란히</string>
+    <string name="tips_d_split_body">펼친 폴더블과 태블릿에서는 세션과 채팅이 화면을 나눠 씁니다. 구분선을 끌어 목록 너비를 조절하거나, 설정에서 분할 보기를 고를 수 있습니다.</string>
+    <string name="tips_d_split_demo">넓은 화면에서 세션 목록이 채팅 옆에 표시됩니다. 세션을 탭하면 채팅이 바뀌고, 구분선을 끌면 목록이 넓어집니다.</string>
+
+    <string name="tips_d_share_title">어떤 앱에서든 OpenCode로 공유</string>
+    <string name="tips_d_share_body">다른 앱의 텍스트, 링크, 이미지를 공유 시트에서 OpenCode로 보내고, 그것으로 새 세션을 시작할 수 있습니다.</string>
+    <string name="tips_d_share_demo">다른 앱에서 페이지를 공유하고 공유 시트에서 OpenCode를 고르면, 공유된 링크로 세션이 시작됩니다.</string>
+
+    <string name="tips_d_settings_title">바뀌는 모습을 바로 보는 설정</string>
+    <string name="tips_d_settings_body">목록에서 설정을 바꿀 수 있고, 채팅의 실시간 미리 보기나 데모에서 결과를 바로 확인할 수 있습니다. 화면을 나가기 전에 결과를 볼 수 있습니다.</string>
+    <string name="tips_d_settings_demo">채팅 글자 크기 슬라이더를 끌면 실시간 미리 보기의 채팅 글자가 커집니다.</string>
+
+    <string name="tips_d_update_title">업데이트 전에 변경 사항 확인</string>
+    <string name="tips_d_update_body">새 릴리스가 나오면 새 기능과 수정 사항이 담긴 변경 로그가 시트에 표시됩니다. 업데이트하거나, 건너뛰거나, 나중에 결정할 수 있습니다.</string>
+    <string name="tips_d_update_demo">업데이트 시트가 열립니다. 변경 로그 보기를 탭하면 새 기능과 수정 사항 목록이 펼쳐집니다.</string>
+
+    <string name="tips_d_mcp_title">MCP 서버 관리</string>
+    <string name="tips_d_mcp_body">연결된 MCP 서버를 확인하고, 채팅 메뉴에서 연결하거나 연결을 끊을 수 있습니다. 컴퓨터로 돌아갈 필요가 없습니다.</string>
+    <string name="tips_d_mcp_demo">MCP 서버 시트에 각 서버와 상태가 표시됩니다. 스위치를 켜면 서버에 연결됩니다.</string>
+
+    <string name="tips_d_follow_title">에이전트 작업을 실시간으로 따라가기</string>
+    <string name="tips_d_follow_body">에이전트가 작업하는 동안 현재 단계가 열린 상태로 유지됩니다. 생각, 명령 출력, 차이점이 도착하는 대로 읽을 수 있고, 답변이 끝나면 다시 접힙니다.</string>
+    <string name="tips_d_follow_demo">채팅에 실행 중인 명령의 출력이 표시되고, 이어서 편집의 차이점이 나타납니다. 답변이 도착하면 단계가 접힙니다.</string>
+
+    <string name="tips_d_output_title">도구 출력과 글자 크기 조절</string>
+    <string name="tips_d_output_body">표시할 출력 줄 수, 실행 중인 명령의 새로 고침 빈도, 채팅 글자 크기를 고를 수 있습니다. 버튼 하나로 모두 초기화됩니다.</string>
+    <string name="tips_d_output_demo">새로 고침 간격과 출력 줄 수를 바꾼 다음 모든 설정 초기화를 누르면 기본값으로 돌아갑니다.</string>
+</resources>

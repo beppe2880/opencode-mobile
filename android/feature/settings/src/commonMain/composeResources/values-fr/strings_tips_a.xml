@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">Vos images, grandes et nettes</string>
+    <string name="tips_a_attached_images_body">Les images que vous joignez s'affichent désormais aussi grandes que celles lues par l'agent, entières et sans recadrage. Choisissez Vignettes, Petites, Moyennes ou Grandes dans Paramètres → Chat → Transcription.</string>
+    <string name="tips_a_attached_images_demo">Dans les paramètres du chat, l'option des images jointes passe de Vignettes à Petites, Moyennes et Grandes, et les images du message grandissent à chaque choix.</string>
+
+    <string name="tips_a_pin_sessions_title">Gardez vos meilleures discussions en haut</string>
+    <string name="tips_a_pin_sessions_body">Appuyez longuement sur une discussion dans la liste, ou ouvrez son menu à trois points, puis choisissez Épingler. Les discussions épinglées restent dans leur propre groupe, au-dessus d'Aujourd'hui.</string>
+    <string name="tips_a_pin_sessions_demo">Une discussion de la liste est maintenue appuyée, l'action Épingler est touchée et la discussion rejoint le groupe Épinglées, en haut.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">Un balayage adapté à votre pouce</string>
+    <string name="tips_a_swipe_sensitivity_body">Choisissez la facilité avec laquelle le balayage ouvre la liste des discussions : Faible, Moyenne ou Élevée. Avec Élevée, un balayage court et léger suffit. Vous le trouverez dans Paramètres → Chat → Gestes.</string>
+    <string name="tips_a_swipe_sensitivity_demo">Avec une sensibilité Faible, un balayage court revient en arrière et la liste reste fermée. Avec une sensibilité Élevée, ce même balayage court ouvre la liste des discussions.</string>
+
+    <string name="tips_a_large_screens_title">Conçu pour les écrans pliables et les tablettes</string>
+    <string name="tips_a_large_screens_body">Une nouvelle section des paramètres regroupe tout ce qui concerne les grands écrans : le chat à côté de la liste, ce qui se passe au pliage ou au dépliage, le séparateur et les balayages. Elle n'apparaît que sur les écrans pliables et les tablettes.</string>
+    <string name="tips_a_large_screens_demo">Dans les paramètres, la section Écrans pliables et grands écrans s'ouvre, puis l'interrupteur Chat à côté de la liste est activé.</string>
+
+    <string name="tips_a_picker_stay_title">Essayez des modèles sans fermer le sélecteur</string>
+    <string name="tips_a_picker_stay_body">Désactivez Fermer le sélecteur après le choix d'un modèle dans Paramètres → Zone de message. Le sélecteur reste ouvert pendant que vous comparez les modèles, et Terminé le ferme.</string>
+    <string name="tips_a_picker_stay_demo">L'interrupteur Fermer le sélecteur après le choix d'un modèle est désactivé. Dans le sélecteur, deux modèles sont touchés l'un après l'autre et il reste ouvert ; puis Terminé le ferme.</string>
+
+    <string name="tips_a_swipe_list_title">Balayez vers la droite pour vos discussions</string>
+    <string name="tips_a_swipe_list_body">Dans une discussion, balayez vers la droite : la liste des discussions glisse en panneau qui suit votre doigt. Balayez en sens inverse pour revenir à la conversation. Vous pouvez modifier le balayage dans Paramètres → Chat → Gestes.</string>
+    <string name="tips_a_swipe_list_demo">Un balayage vers la droite dans une discussion fait glisser la liste des discussions en panneau latéral par-dessus la conversation, puis un balayage vers la gauche la referme.</string>
+
+    <string name="tips_a_pending_prompt_title">Les images apparaissent dès l'envoi</string>
+    <string name="tips_a_pending_prompt_body">Un prompt avec des images apparaît tout de suite dans le chat, estompé, avec Envoi en cours… puis En file d'attente dessous. Plus besoin d'attendre pour savoir que votre message est parti.</string>
+    <string name="tips_a_pending_prompt_demo">Un prompt avec deux photos est envoyé et apparaît aussitôt, estompé, avec la mention Envoi en cours… puis En file d'attente, jusqu'à ce que le serveur l'accepte et qu'il redevienne normal.</string>
+
+    <string name="tips_a_image_swipe_title">Feuilletez les images d'un balayage</string>
+    <string name="tips_a_image_swipe_body">Ouvrez une image en plein écran et balayez à gauche ou à droite pour voir les autres du même message ou du même outil. Un compteur indique où vous en êtes.</string>
+    <string name="tips_a_image_swipe_demo">Dans la visionneuse plein écran, un balayage vers la gauche passe de la première image à la deuxième, puis à la troisième, et le compteur suit.</string>
+
+    <string name="tips_a_hide_list_title">Donnez tout l'écran au chat</string>
+    <string name="tips_a_hide_list_body">Sur une tablette ou un écran pliable déplié, balayez à gauche sur le chat pour masquer la liste à côté, et à droite pour la faire revenir. Le chat s'élargit à mesure que la liste s'éloigne.</string>
+    <string name="tips_a_hide_list_demo">Sur un écran large, un balayage vers la gauche sur le chat fait sortir la liste des discussions et le chat s'élargit ; puis un balayage vers la droite fait revenir la liste.</string>
+
+    <string name="tips_a_check_updates_title">Vérifiez les mises à jour quand vous voulez</string>
+    <string name="tips_a_check_updates_body">Touchez Vérifier les mises à jour dans les paramètres pour interroger GitHub tout de suite. Si une nouvelle version est disponible, une bannière claire apparaît sous la barre de recherche, au-dessus de vos discussions.</string>
+    <string name="tips_a_check_updates_demo">Vérifier les mises à jour est touché dans les paramètres et affiche Recherche de mises à jour… ; puis la liste des discussions affiche une bannière indiquant qu'une nouvelle version est disponible.</string>
+</resources>

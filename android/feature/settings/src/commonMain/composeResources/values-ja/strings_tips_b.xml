@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">入力せずにフォルダを選ぶ</string>
+    <string name="tips_b_browse_body">別のディレクトリでセッションを始めるときは、パスの横の「参照」をタップして、サーバーのフォルダをたどれます。最近使ったフォルダにもすぐアクセスできます。</string>
+    <string name="tips_b_browse_demo">新規セッションのシートで「参照」をタップし、projectsフォルダとmobile-appフォルダを開いて、「このフォルダを使う」をタップするとパスが入力されます。</string>
+
+    <string name="tips_b_popover_title">実行中の作業をワンタップで開く・停止</string>
+    <string name="tips_b_popover_body">メッセージ欄の上のチップをタップすると、実行中のエージェントとシェルが一覧で表示されます。「開く」でサブエージェントのセッションへ移動し、「停止」で終了します。</string>
+    <string name="tips_b_popover_demo">指で実行中エージェントのチップをタップすると、エージェントとシェルの一覧が開きます。「開く」でエージェントのセッションへ進み、「エージェントを停止」で一覧から消えます。</string>
+
+    <string name="tips_b_toolmedia_title">エージェントが読んだ画像を表示</string>
+    <string name="tips_b_toolmedia_body">ツールがスクリーンショット、画像、PDFを読むと、ファイルがツールの行のすぐ下に表示されるようになりました。画像をタップすると大きく表示されます。</string>
+    <string name="tips_b_toolmedia_demo">2つの読み取りツールの行が完了します。1つ目の行の下には画像のプレビューが、2つ目の行にはPDFファイルのチップが表示されます。</string>
+
+    <string name="tips_b_new_title">/new で新しいスタート</string>
+    <string name="tips_b_new_body">メッセージ欄に /new と入力してコマンドを選ぶと、同じディレクトリで新しいセッションがすぐに開きます。古い会話はコピーされません。</string>
+    <string name="tips_b_new_demo">ユーザーがメッセージ欄に /new と入力し、候補のコマンドをタップすると、チャットが空の新しいセッションに切り替わります。</string>
+
+    <string name="tips_b_connect_title">スマートフォンからAIプロバイダーを接続</string>
+    <string name="tips_b_connect_body">チャットのメニューからプロバイダーの一覧を開くか、/connect と入力します。APIキーを貼り付けるか、コードを使ってサインインできます。認証情報はスマートフォンではなく、サーバーに保存されます。</string>
+    <string name="tips_b_connect_demo">指でプロバイダーの一覧の OpenAI をタップし、APIキーを入力して「接続」をタップすると、OpenAI が「接続済み」のグループに移動します。</string>
+
+    <string name="tips_b_github_title">どのツールの行からでもGitHubへ</string>
+    <string name="tips_b_github_body">Issue、プルリクエスト、実行、コミットに関係するツールの行には、緑色の「開く」アクションが表示されます。タップするとGitHubで開き、長押しするとリンクをコピーします。</string>
+    <string name="tips_b_github_demo">3つのシェルの行に緑色の「開く」アクションが表示されています：#157を開く、PR #156を開く、コミット 4f2a9c1を開く。タップするとリンクが開き、長押しするとコピーされます。</string>
+
+    <string name="tips_b_chips_title">実行中の作業がいつでも見える</string>
+    <string name="tips_b_chips_body">実行中のシェルやサブエージェントは、メッセージ欄の上に小さなチップとして表示されます。1つタップすると実行中の内容を確認し、出力を開けます。設定でオフにすることもできます。</string>
+    <string name="tips_b_chips_demo">メッセージ欄の上にシェルのチップとエージェントのチップが表示されます。指でシェルのチップをタップすると、実行中のコマンドの一覧が開きます。</string>
+
+    <string name="tips_b_model_title">使用中のモデルがひと目で分かる</string>
+    <string name="tips_b_model_body">メッセージ欄のモデルボタンに、プロバイダーのマーク、短い名前、そして薄い色で表示される推論の強度（例：Haiku 5.5 Medium）が表示されるようになりました。タップして切り替えます。</string>
+    <string name="tips_b_model_demo">指でメッセージ欄のモデルボタンを何度かタップすると、Haiku 5.5 Medium から Opus 5.5 High、GPT-5.2 High、Gemini 3 Pro へと切り替わり、それぞれにプロバイダーのマークが表示されます。</string>
+
+    <string name="tips_b_stopall_title">ワンタップですべて停止</string>
+    <string name="tips_b_stopall_body">実行中のシートでは、サブエージェントとコマンドがそれぞれ「すべて停止」ボタン付きでまとめられます。各行にも個別の「停止」があります。</string>
+    <string name="tips_b_stopall_demo">実行中のシートで、指がコマンドのセクションの「すべて停止」、次にサブエージェントのセクションの「すべて停止」をタップすると、両方の一覧が空になります。</string>
+
+    <string name="tips_b_search_title">プロジェクトを数秒で見つける</string>
+    <string name="tips_b_search_body">プロジェクトが多い場合、新規セッションのシートに検索欄が表示されます。数文字入力すると、折りたたまれていたものも含めて一致するプロジェクトがすべて表示されます。</string>
+    <string name="tips_b_search_demo">指で新規セッションのシートの検索欄をタップし「mob」と入力すると、一覧が mobile-app と mobile-kit に絞り込まれます。</string>
+
+    <string name="tips_b_themes_title">TUIテーマでアプリを彩る</string>
+    <string name="tips_b_themes_body">設定の「外観」で、OpenCodeターミナルの33種類のテーマから好きなものを選べます。コードや差分を含め、アプリ全体の配色が切り替わります。</string>
+    <string name="tips_b_themes_demo">小さなチャットに4つのテーマが順番に表示されます：GitHub、Dracula、Gruvbox、Nord。指で各テーマの色の点をタップすると、配色が変わります。</string>
+</resources>

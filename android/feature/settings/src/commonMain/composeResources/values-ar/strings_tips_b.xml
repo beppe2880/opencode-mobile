@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">اختر مجلدًا بدل كتابته</string>
+    <string name="tips_b_browse_body">عند بدء جلسة في دليل آخر، اضغط «استعراض» بجانب المسار لتتصفح مجلدات الخادم. مجلداتك الأخيرة على بعد نقرة واحدة.</string>
+    <string name="tips_b_browse_demo">في لوحة «جلسة جديدة»، يضغط الإصبع «استعراض»، ويفتح مجلد projects ومجلد mobile-app، ثم يضغط «استخدام هذا المجلد» لملء المسار.</string>
+
+    <string name="tips_b_popover_title">أوقف العمل الجاري أو افتحه بنقرة</string>
+    <string name="tips_b_popover_body">اضغط على شريحة فوق مربع الرسالة لترى كل الوكلاء والصدفات قيد التشغيل في قائمة واحدة. «فتح» ينقلك إلى جلسة الوكيل الفرعي، و«إيقاف» ينهيها.</string>
+    <string name="tips_b_popover_demo">يضغط الإصبع على شريحة الوكلاء قيد التشغيل، فتُفتح قائمة بالوكلاء والصدفات، و«فتح» ينقل إلى جلسة الوكيل، و«إيقاف الوكيل» يزيله.</string>
+
+    <string name="tips_b_toolmedia_title">شاهد الصور التي يقرؤها الوكيل</string>
+    <string name="tips_b_toolmedia_body">عندما تقرأ أداة لقطة شاشة أو صورة أو ملف PDF، يظهر الملف الآن أسفل صف الأداة مباشرة. اضغط على الصورة لعرضها بحجم أكبر.</string>
+    <string name="tips_b_toolmedia_demo">يكتمل صفّان من أداة Read: يعرض الأول معاينة صورة أسفله، ويعرض الثاني شريحة لملف PDF.</string>
+
+    <string name="tips_b_new_title">اكتب /new لتبدأ من جديد</string>
+    <string name="tips_b_new_body">اكتب /new في مربع الرسالة واختر الأمر: تُفتح جلسة جديدة فورًا في المجلد نفسه، دون نسخ المحادثة السابقة.</string>
+    <string name="tips_b_new_demo">يكتب المستخدم /new في مربع الرسالة، ويضغط الأمر المقترح، فتنتقل المحادثة إلى «جلسة جديدة» فارغة.</string>
+
+    <string name="tips_b_connect_title">اربط مزودي الذكاء الاصطناعي من هاتفك</string>
+    <string name="tips_b_connect_body">افتح قائمة المزودين من قائمة المحادثة أو اكتب /connect. الصق مفتاح API أو سجّل الدخول برمز: تُحفظ بيانات الاعتماد على خادمك، لا على هاتفك.</string>
+    <string name="tips_b_connect_demo">يضغط الإصبع على OpenAI في قائمة المزودين، ويُدخل مفتاح API، ويضغط «اتصال»، فينتقل OpenAI إلى مجموعة «متصلة».</string>
+
+    <string name="tips_b_github_title">انتقل إلى GitHub من أي صف أداة</string>
+    <string name="tips_b_github_body">تحصل صفوف الأدوات التي تتعامل مع مشكلة أو طلب سحب أو تشغيل أو إيداع على إجراء «فتح» أخضر. اضغط لفتحه على GitHub، واضغط مطولًا لنسخ الرابط.</string>
+    <string name="tips_b_github_demo">تعرض ثلاثة صفوف صدفة إجراءات «فتح» خضراء: «فتح #157» و«فتح PR #156» و«فتح commit 4f2a9c1». النقر يفتح الرابط، والضغط المطول ينسخه.</string>
+
+    <string name="tips_b_chips_title">العمل الجاري دائمًا أمام عينيك</string>
+    <string name="tips_b_chips_body">تظهر الصدفات والوكلاء الفرعيون قيد التشغيل كشرائح صغيرة فوق مربع الرسالة. اضغط على إحداها لترى ما يعمل وتفتح مخرجاته. يمكنك إيقاف ذلك من الإعدادات.</string>
+    <string name="tips_b_chips_demo">تظهر شريحة للصدفة وأخرى للوكيل فوق مربع الرسالة؛ يضغط الإصبع على شريحة الصدفة فتُفتح قائمة بالأمر الجاري.</string>
+
+    <string name="tips_b_model_title">نموذجك في لمحة</string>
+    <string name="tips_b_model_body">يعرض زر النموذج في مربع الرسالة الآن شعار المزود واسمًا قصيرًا ومستوى الجهد بلون أخف، مثل Haiku 5.5 Medium. اضغط لتغييره.</string>
+    <string name="tips_b_model_demo">يضغط الإصبع زر النموذج في مربع الرسالة عدة مرات؛ يتغيّر من Haiku 5.5 Medium إلى Opus 5.5 High وGPT-5.2 High وGemini 3 Pro، ولكل منها شعار مزوده.</string>
+
+    <string name="tips_b_stopall_title">أوقف كل شيء بنقرة واحدة</string>
+    <string name="tips_b_stopall_body">تجمع ورقة «قيد التشغيل» الوكلاء الفرعيين والأوامر، ولكل مجموعة زر «إيقاف الكل». ولكل صف زر «إيقاف» خاص به أيضًا.</string>
+    <string name="tips_b_stopall_demo">في ورقة «قيد التشغيل»، يضغط الإصبع «إيقاف الكل» في قسم الأوامر، ثم في قسم الوكلاء الفرعيين، فتصبح القائمتان فارغتين.</string>
+
+    <string name="tips_b_search_title">ابحث عن مشروع في ثوانٍ</string>
+    <string name="tips_b_search_body">عند وجود مشاريع كثيرة، تحتوي ورقة «جلسة جديدة» على حقل بحث. اكتب بضعة حروف فتظهر كل المشاريع المطابقة، حتى المطوية منها.</string>
+    <string name="tips_b_search_demo">يضغط الإصبع حقل البحث في ورقة «جلسة جديدة» ويكتب mob؛ تضيق القائمة إلى mobile-app وmobile-kit.</string>
+
+    <string name="tips_b_themes_title">ألبس التطبيق سمة TUI</string>
+    <string name="tips_b_themes_body">اختر أيًا من سمات الطرفية الـ 33 لـ OpenCode من الإعدادات، ضمن «المظهر»، فيأخذ التطبيق كله ألوانها، بما في ذلك الشيفرة والفروقات.</string>
+    <string name="tips_b_themes_demo">تُعرض محادثة صغيرة بأربع سمات بالتتابع: GitHub وDracula وGruvbox وNord. يضغط الإصبع على كل نقطة سمة فتتغير الألوان.</string>
+</resources>

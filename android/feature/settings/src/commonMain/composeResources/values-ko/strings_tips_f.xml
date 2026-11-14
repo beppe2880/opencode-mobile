@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">채팅에서 바로 셸 명령 실행</string>
+    <string name="tips_f_shell_body">메시지를 !로 시작하면 에이전트에게 가지 않고 프로젝트의 셸에서 실행됩니다. 출력은 대화에 바로 표시됩니다.</string>
+    <string name="tips_f_shell_demo">메시지 상자에 !git status -s가 입력되고, 셸에서 실행된다는 힌트가 나타납니다. 보낸 뒤에는 명령과 출력이 채팅에 나타납니다.</string>
+
+    <string name="tips_f_queue_title">프롬프트를 대기열에 넣고 나중에 조정</string>
+    <string name="tips_f_queue_body">에이전트가 바쁠 때 대기열에 넣은 프롬프트는 메시지 상자 위 목록에서 기다립니다. 지금 보내거나, 편집하거나, 실행 전에 삭제할 수 있습니다.</string>
+    <string name="tips_f_queue_demo">대기 중인 프롬프트 세 개가 나열됩니다. 하나는 편집되고, 하나는 삭제되며, 하나는 바로 보내져 메시지가 됩니다.</string>
+
+    <string name="tips_f_changes_title">세션에서 변경된 모든 파일 보기</string>
+    <string name="tips_f_changes_body">변경을 열면 에이전트가 다룬 파일을 검토할 수 있습니다. 세션 전체 또는 마지막 턴만 볼 수 있습니다. 파일을 탭하면 차이점을 읽을 수 있습니다.</string>
+    <string name="tips_f_changes_demo">변경 시트에 추가된 줄 수와 삭제된 줄 수가 표시된 파일 두 개가 나열됩니다. 첫 번째 파일을 탭하면 빨간색과 초록색 차이점이 열립니다.</string>
+
+    <string name="tips_f_notifications_title">에이전트에게 필요할 때 알림 받기</string>
+    <string name="tips_f_notifications_body">세션이 권한이나 답변을 기다릴 때, 그리고 세션이 끝났을 때 알림으로 알려 줍니다. 알림에서 바로 편집을 허용하거나 거부할 수 있습니다.</string>
+    <string name="tips_f_notifications_demo">알림이 파일 편집 권한을 요청하고, 이번만 허용으로 응답됩니다. 이어서 다른 알림이 세션이 끝났다고 알려 줍니다.</string>
+
+    <string name="tips_f_pair_title">몇 초 만에 휴대폰 연결</string>
+    <string name="tips_f_pair_body">opencode pair의 QR 코드를 스캔하거나, 링크를 붙여넣거나, 비밀번호를 입력하거나, 앱이 Wi-Fi에서 찾은 서버를 탭하세요.</string>
+    <string name="tips_f_pair_demo">연결 화면의 이 네트워크에서 찾은 항목에 서버가 나타납니다. QR 코드 스캔을 탭하면 카메라가 열리고, QR 코드를 읽어 연결합니다.</string>
+
+    <string name="tips_f_live_title">에이전트의 작업을 실시간으로 보기</string>
+    <string name="tips_f_live_body">텍스트, 추론, 도구 호출이 일어나는 대로 실시간으로 표시됩니다. 에이전트가 권한을 요청하거나 질문하면 그 자리에서 답할 수 있습니다.</string>
+    <string name="tips_f_live_demo">답변이 생각과 도구 호출과 함께 실시간으로 나타납니다. 권한 요청이 표시되고 이번만 허용으로 승인됩니다.</string>
+
+    <string name="tips_f_steer_title">방향 조정, 대기열, / 와 @ 사용</string>
+    <string name="tips_f_steer_body">/를 입력하면 명령을, @를 입력하면 파일을 고를 수 있습니다. 에이전트가 작업하는 동안 지금 방향을 조정하거나, 프롬프트를 나중을 위해 대기열에 넣을 수 있습니다.</string>
+    <string name="tips_f_steer_demo">/를 입력하면 명령이, @를 입력하면 파일이 나열되고 하나를 고릅니다. 에이전트가 바쁘면 지금 방향 조정과 대기열 버튼이 나타나고, 대기열이 선택됩니다.</string>
+
+    <string name="tips_f_fork_title">어떤 프롬프트에서든 세션 분기</string>
+    <string name="tips_f_fork_body">프롬프트를 길게 누르고 여기서 분기를 고르면, 그 이전의 기록을 가진 새 세션이 만들어집니다. 원래 세션은 그대로 남습니다. 또는 /fork를 입력하세요.</string>
+    <string name="tips_f_fork_demo">프롬프트를 길게 누르면 메뉴가 열립니다. 여기서 분기를 고르면, 이후 메시지가 없는 새 세션이 열립니다.</string>
+
+    <string name="tips_f_undo_title">어떤 프롬프트든 실행 취소와 다시 실행</string>
+    <string name="tips_f_undo_body">/undo를 입력하면 마지막 프롬프트를 파일 변경 사항과 함께 되돌립니다. 마음이 바뀌었다면 복원을 탭하거나 /redo를 사용하세요.</string>
+    <string name="tips_f_undo_demo">/undo를 입력하면 마지막 프롬프트가 숨겨지고, 메시지 1개가 실행 취소되었다는 배너가 표시됩니다. 복원을 탭하면 다시 나타납니다.</string>
+</resources>

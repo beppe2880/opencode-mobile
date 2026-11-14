@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">チャットからシェルコマンドを実行</string>
+    <string name="tips_f_shell_body">メッセージを ! で始めると、エージェントには送られず、プロジェクトのシェルで実行されます。出力はそのまま会話に表示されます。</string>
+    <string name="tips_f_shell_demo">メッセージ欄に !git status -s と入力されると、シェルで実行されることを示すヒントが表示されます。送信後、コマンドと出力がチャットに現れます。</string>
+
+    <string name="tips_f_queue_title">プロンプトをキューに入れて後で調整</string>
+    <string name="tips_f_queue_body">エージェントの作業中に入力したプロンプトは、メッセージ欄の上の一覧で待機します。今すぐ送信する、編集する、実行前に削除する、のいずれかを選べます。</string>
+    <string name="tips_f_queue_demo">キューに入った3つのプロンプトが一覧に表示されます。1つは編集され、1つは削除され、もう1つはすぐに送信されてメッセージになります。</string>
+
+    <string name="tips_f_changes_title">セッションで変更されたファイルをすべて確認</string>
+    <string name="tips_f_changes_body">「変更」を開くと、エージェントが触れたファイルを確認できます。セッション全体でも、直前のターンだけでも表示できます。ファイルをタップすると差分が読めます。</string>
+    <string name="tips_f_changes_demo">「変更」のシートに2つのファイルが表示され、追加と削除された行数も示されます。1つ目のファイルをタップすると、赤と緑の差分が開きます。</string>
+
+    <string name="tips_f_notifications_title">エージェントが必要なときに通知</string>
+    <string name="tips_f_notifications_body">セッションが権限や回答を待っているとき、また終了したときに通知が届きます。通知から直接、編集を許可または拒否できます。</string>
+    <string name="tips_f_notifications_demo">通知がファイルの編集の権限を求め、「1回許可」で応答されます。続いて別の通知が、セッションの終了を知らせます。</string>
+
+    <string name="tips_f_pair_title">数秒でスマートフォンを接続</string>
+    <string name="tips_f_pair_body">opencode pair のQRコードを読み取るか、リンクを貼り付けるか、パスワードを入力するか、アプリがWi-Fi上で見つけたサーバーをタップします。</string>
+    <string name="tips_f_pair_demo">接続画面の「このネットワークで見つかったサーバー」にサーバーが表示されます。「QRコードをスキャン」をタップするとカメラが開き、QRコードを読み取って接続します。</string>
+
+    <string name="tips_f_live_title">エージェントの作業をリアルタイムで見守る</string>
+    <string name="tips_f_live_body">テキスト、推論、ツールの呼び出しは、発生するとすぐに届きます。エージェントが権限や質問を求めたら、その場で回答できます。</string>
+    <string name="tips_f_live_demo">回答が思考とツールの呼び出しとともに届きます。権限のリクエストが表示され、「1回許可」で承認されます。</string>
+
+    <string name="tips_f_steer_title">方向づけ、キュー、/ と @ を使う</string>
+    <string name="tips_f_steer_body">/ でコマンド、@ でファイルを選べます。エージェントの作業中は、今すぐ方向づけるか、プロンプトを後のためにキューに入れるかを選べます。</string>
+    <string name="tips_f_steer_demo">/ と入力するとコマンドの一覧が、@ と入力するとファイルの一覧が表示され、1つが選ばれます。エージェントが作業中だと「今すぐ方向づけ」と「キュー」のボタンが現れ、「キュー」が選ばれます。</string>
+
+    <string name="tips_f_fork_title">任意のプロンプトからセッションを分岐</string>
+    <string name="tips_f_fork_body">プロンプトを長押しして「ここから分岐」を選ぶと、それより前の履歴を持つ新しいセッションが作られます。元のセッションは変わりません。/fork と入力しても同じです。</string>
+    <string name="tips_f_fork_demo">プロンプトを長押しするとメニューが開きます。「ここから分岐」を選ぶと、後のメッセージを含まない新しいセッションが開きます。</string>
+
+    <string name="tips_f_undo_title">どのプロンプトも取り消しやり直し</string>
+    <string name="tips_f_undo_body">/undo と入力すると、最後のプロンプトをファイルの変更とともに取り消せます。気が変わったら「復元」をタップするか、/redo を使います。</string>
+    <string name="tips_f_undo_demo">/undo と入力すると最後のプロンプトが隠れ、「1件のメッセージを取り消しました」というバナーが表示されます。「復元」をタップすると戻ります。</string>
+</resources>

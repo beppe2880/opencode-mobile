@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">图片大而清晰</string>
+    <string name="tips_a_attached_images_body">现在附加的图片会和智能体读取时一样大，完整显示而不被裁剪。在 设置 → 聊天 → 对话记录 中选择缩略图、小、中或大。</string>
+    <string name="tips_a_attached_images_demo">在聊天设置中，附加图片选项从缩略图变为小、中、大，每次选择后消息中的图片都会随之放大。</string>
+
+    <string name="tips_a_pin_sessions_title">让常用聊天保持在顶部</string>
+    <string name="tips_a_pin_sessions_body">在列表中长按一个聊天，或打开它的三点菜单，然后选择置顶。置顶的聊天会在“今天”上方的单独分组中。</string>
+    <string name="tips_a_pin_sessions_demo">在列表中长按一个聊天，点按置顶操作，该聊天移动到顶部的“已置顶”分组。</string>
+
+    <string name="tips_a_swipe_sensitivity_title">滑动手势更顺手</string>
+    <string name="tips_a_swipe_sensitivity_body">选择滑动打开聊天列表的灵敏度：低、中或高。选择高时，短而轻的滑动即可打开。在 设置 → 聊天 → 手势 中找到它。</string>
+    <string name="tips_a_swipe_sensitivity_demo">灵敏度为低时，短滑动会弹回，聊天列表保持关闭。灵敏度为高时，同样的短滑动会打开聊天列表。</string>
+
+    <string name="tips_a_large_screens_title">专为折叠屏和平板设计</string>
+    <string name="tips_a_large_screens_body">设置中新增了一个大屏区域，集中了所有相关选项：与列表并排的聊天、折叠或展开时的行为、分隔线和滑动。仅在折叠屏和平板上显示。</string>
+    <string name="tips_a_large_screens_demo">在设置中打开“折叠屏和大屏”区域，然后打开“与列表并排显示聊天”开关。</string>
+
+    <string name="tips_a_picker_stay_title">切换模型时选择器不自动关闭</string>
+    <string name="tips_a_picker_stay_body">在 设置 → 消息框 中关闭“选择模型后关闭选择器”。这样，你在比较模型时选择器会保持打开，点按完成即可关闭。</string>
+    <string name="tips_a_picker_stay_demo">关闭“选择模型后关闭选择器”开关。在模型选择器中依次点按两个模型，选择器保持打开，然后点按完成将其关闭。</string>
+
+    <string name="tips_a_swipe_list_title">向右滑动查看聊天</string>
+    <string name="tips_a_swipe_list_body">在聊天中向右滑动，聊天列表会作为跟随手指移动的面板滑入。向左滑回即可返回对话。你可以在 设置 → 聊天 → 手势 中更改滑动方式。</string>
+    <string name="tips_a_swipe_list_demo">在聊天中向右滑动，聊天列表作为侧边面板滑入覆盖在对话上方，然后向左滑动将其关闭。</string>
+
+    <string name="tips_a_pending_prompt_title">发送时图片立即显示</string>
+    <string name="tips_a_pending_prompt_body">带图片的提示会立即出现在聊天中，颜色变淡，显示“发送中…”，下方随后显示“已排队”。无需再等待确认你的消息已发出。</string>
+    <string name="tips_a_pending_prompt_demo">发送一条带两张图片的提示后，它立即出现，颜色变淡并标注“发送中…”，然后显示“已排队”，直到服务器接收后恢复正常显示。</string>
+
+    <string name="tips_a_image_swipe_title">滑动切换查看图片</string>
+    <string name="tips_a_image_swipe_body">全屏打开一张图片，向左或向右滑动即可查看同一消息或工具中的其他图片。计数器显示当前位置。</string>
+    <string name="tips_a_image_swipe_demo">在全屏查看器中向左滑动，从第一张图片切换到第二张，再到第三张，计数器同步更新。</string>
+
+    <string name="tips_a_hide_list_title">让聊天占满整个屏幕</string>
+    <string name="tips_a_hide_list_body">在平板或展开的折叠屏上，向左滑动聊天即可隐藏旁边的列表，向右滑动即可将其调出。列表滑走时，聊天区域随之变宽。</string>
+    <string name="tips_a_hide_list_demo">在宽屏窗口中，向左滑动聊天会滑走聊天列表，聊天区域变宽；然后向右滑动，列表重新出现。</string>
+
+    <string name="tips_a_check_updates_title">随时检查更新</string>
+    <string name="tips_a_check_updates_body">在设置中点按检查更新，立即向 GitHub 查询。如果有新版本，搜索栏下方、聊天列表上方会出现醒目的提示横幅。</string>
+    <string name="tips_a_check_updates_demo">在设置中点按检查更新，显示“正在检查更新…”，然后聊天列表显示横幅，告知有新版本可用。</string>
+</resources>

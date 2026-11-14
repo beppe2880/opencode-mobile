@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">Sprich, statt zu tippen</string>
+    <string name="tips_c_voice_record_body">Tippe im Nachrichtenfeld auf das Mikrofon und sprich: Eine Live-Wellenform und ein Timer zeigen, dass du gehört wirst. Bestätige, um den Text zu behalten, oder brich ab, um ihn zu verwerfen.</string>
+    <string name="tips_c_voice_record_demo">Ein Finger tippt auf das Mikrofon, das Nachrichtenfeld zeigt eine bewegte Wellenform mit einem Timer, dann erscheint der gesprochene Satz als Text.</string>
+
+    <string name="tips_c_voice_cloud_title">Bessere Diktate mit einem Cloud-Modell</string>
+    <string name="tips_c_voice_cloud_body">Wähle in den Einstellungen einen Anbieter und ein Transkriptionsmodell. Die Aufnahme wird beim Stoppen gesendet, und der Text landet im Nachrichtenfeld, damit du ihn prüfen kannst.</string>
+    <string name="tips_c_voice_cloud_demo">Ein Finger wählt Cloud als Sprache-zu-Text, dann wird eine Aufnahme transkribiert und der Text erscheint im Nachrichtenfeld.</string>
+
+    <string name="tips_c_settings_categories_title">Einstellungen, leicht zu finden</string>
+    <string name="tips_c_settings_categories_body">Die Einstellungen sind in Kategorien gruppiert, jede mit einer eigenen Seite. Du weißt nicht, wo etwas steht? Suche danach und springe direkt zur Einstellung.</string>
+    <string name="tips_c_settings_categories_demo">Ein Finger öffnet die Kategorie Spracheingabe, geht zurück, tippt dann ins Suchfeld und die passenden Einstellungen werden aufgelistet.</string>
+
+    <string name="tips_c_terminal_fullscreen_title">Mehr Platz für das Terminal</string>
+    <string name="tips_c_terminal_fullscreen_body">Wechsle in den Vollbildmodus, um Titelleiste und Systemleisten auszublenden und mehr Zeilen auf einmal zu sehen. Zurück oder dieselbe Taste holt sie zurück.</string>
+    <string name="tips_c_terminal_fullscreen_demo">Ein Finger tippt auf die Vollbild-Taste des Terminals: Titelleiste und Statusleiste gleiten weg und mehr Ausgabezeilen erscheinen.</string>
+
+    <string name="tips_c_next_message_title">Modell wechseln, ohne zu warten</string>
+    <string name="tips_c_next_message_body">Wechsle Agent oder Modell, während eine Antwort noch läuft: Die Änderung gilt ab deiner nächsten Nachricht. Neue Chats starten mit dem Modell, das du zuletzt verwendet hast.</string>
+    <string name="tips_c_next_message_demo">Während der Assistent arbeitet, öffnet ein Finger das Modellmenü und wählt ein anderes; ein Hinweis sagt, dass es ab der nächsten Nachricht gilt.</string>
+
+    <string name="tips_c_thoughts_title">Eine Zeile für eine Kette von Gedanken</string>
+    <string name="tips_c_thoughts_body">Aufeinanderfolgende Gedanken des Assistenten werden zu einer einzigen, leicht überschaubaren Zeile zusammengefasst. Tippe darauf, um jeden Gedanken zu lesen.</string>
+    <string name="tips_c_thoughts_demo">Drei einzelne Gedankenzeilen werden zu einer zusammengeführt, auf die ein Finger tippt, um die drei Gedanken zu zeigen.</string>
+
+    <string name="tips_c_pending_bar_title">Wirf einen Blick in den Chat, bevor du entscheidest</string>
+    <string name="tips_c_pending_bar_body">Fragen- und Berechtigungskarten klappen sich zu einer schmalen Leiste zusammen, damit du den Verlauf lesen kannst, bevor du antwortest. Tippe auf die Leiste, um die Karte wieder zu öffnen.</string>
+    <string name="tips_c_pending_bar_demo">Eine Berechtigungskarte klappt sich per Tipp auf ihren Pfeil zu einer Leiste zusammen und öffnet sich wieder per Tipp auf die Leiste.</string>
+
+    <string name="tips_c_running_title">Sieh live, was läuft</string>
+    <string name="tips_c_running_body">Ein Chip über dem Nachrichtenfeld zählt die laufenden Subagenten und Hintergrundbefehle. Öffne ihn, um ihre Dauer und Ausgabe zu verfolgen oder sie zu stoppen.</string>
+    <string name="tips_c_running_demo">Ein Finger tippt auf den Chip für Laufendes, ein Blatt zeigt einen Subagenten und einen Befehl mit einem laufenden Timer und einer Stoppen-Schaltfläche.</string>
+</resources>

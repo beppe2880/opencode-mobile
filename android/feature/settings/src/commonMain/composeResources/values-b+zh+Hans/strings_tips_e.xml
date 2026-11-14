@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">主屏幕上的会话</string>
+    <string name="tips_e_widget_body">添加小组件，即可在不打开应用的情况下查看哪些会话正在运行以及你最近使用过哪些。点按会话即可直接进入，或新建一个会话。</string>
+    <string name="tips_e_widget_demo">主屏幕上的 OpenCode 小组件列出两个运行中的会话和一个最近的会话。刷新后，其中一个会话不再运行。</string>
+
+    <string name="tips_e_files_title">打开智能体处理过的任何文件</string>
+    <string name="tips_e_files_body">点按读取、写入或编辑行上的打开按钮，或点按已更改的文件，即可查看带语法高亮的完整文件。文件为只读，不会意外更改任何内容。</string>
+    <string name="tips_e_files_demo">在聊天中，文件的工具行带有打开按钮。点按后以行号和高亮代码打开该文件。</string>
+
+    <string name="tips_e_terminal_title">口袋里的完整终端</string>
+    <string name="tips_e_terminal_body">从聊天顶栏在服务器上打开一个 shell，位于会话的文件夹中。按键栏提供手机键盘缺少的 Esc、Tab、Ctrl 和方向键。</string>
+    <string name="tips_e_terminal_demo">终端中输入了命令 npm test。点按按键栏上的回车即可运行，随后显示测试结果。</string>
+
+    <string name="tips_e_compaction_title">查看智能体记住的内容</string>
+    <string name="tips_e_compaction_body">长对话被压缩后，点按“上下文已压缩”分隔线，即可阅读智能体继续工作所依据的摘要。</string>
+    <string name="tips_e_compaction_demo">在对话记录中点按“上下文已压缩”分隔线，展开后显示对话摘要。</string>
+
+    <string name="tips_e_dictation_title">用语音与智能体对话</string>
+    <string name="tips_e_dictation_body">点按消息框旁的麦克风然后直接说话：你说出的话会随即出现在提示中。再次点按即可停止，检查后发送。</string>
+    <string name="tips_e_dictation_demo">点按麦克风开始收音。句子“在设置页面添加深色模式开关”逐字写入消息框，然后再次点按麦克风。</string>
+
+    <string name="tips_e_usage_title">查看 token 和费用的去向</string>
+    <string name="tips_e_usage_body">设置中的用量页面显示今天、最近 7 天或最近 30 天的费用、提示、token 和最活跃的模型。</string>
+    <string name="tips_e_usage_demo">用量页面。从今天切换到 7 天后，费用和 token 总数随之增加，每日步骤图表被填充，下方显示所用模型。</string>
+
+    <string name="tips_e_notifications_title">只接收你需要的通知</string>
+    <string name="tips_e_notifications_body">在设置的会话通知下，选择要接收的类型：权限请求、智能体的提问，或已结束的会话。</string>
+    <string name="tips_e_notifications_demo">会话通知下有三个开关。提问和已结束的会话已关闭，权限请求保持开启。</string>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">选择文件夹，无需手动输入</string>
+    <string name="tips_b_browse_body">在其他目录中开始会话时，点按路径旁的浏览，即可逐级查看服务器上的文件夹。最近使用的文件夹只需一点即可找到。</string>
+    <string name="tips_b_browse_demo">在新建会话面板中，手指点按浏览，依次打开 projects 文件夹和 mobile-app 文件夹，然后点按使用此文件夹以填入路径。</string>
+
+    <string name="tips_b_popover_title">一点即可打开或停止运行中的任务</string>
+    <string name="tips_b_popover_body">点按消息框上方的标签，即可在一个列表中查看所有运行中的智能体和命令行。打开会跳转到子智能体的会话，停止则结束它。</string>
+    <string name="tips_b_popover_demo">手指点按运行中的智能体标签，打开包含智能体和命令行的列表；点按打开进入智能体的会话，点按停止智能体将其移除。</string>
+
+    <string name="tips_b_toolmedia_title">查看智能体读取的图片</string>
+    <string name="tips_b_toolmedia_body">工具读取截图、图片或 PDF 时，文件现在会直接显示在工具行下方。点按图片可放大查看。</string>
+    <string name="tips_b_toolmedia_demo">两个读取工具行完成：第一行下方显示图片预览，第二行显示 PDF 文件标签。</string>
+
+    <string name="tips_b_new_title">输入 /new 开始全新对话</string>
+    <string name="tips_b_new_body">在消息框中输入 /new 并选择该命令：新会话会立即在同一目录中打开，无需复制旧的对话内容。</string>
+    <string name="tips_b_new_demo">用户在消息框中输入 /new，点按推荐的命令，聊天切换到空白的新会话。</string>
+
+    <string name="tips_b_connect_title">在手机上连接 AI 服务商</string>
+    <string name="tips_b_connect_body">从聊天菜单打开服务商列表，或输入 /connect。粘贴 API 密钥或使用验证码登录：凭据保存在你的服务器上，而不是手机上。</string>
+    <string name="tips_b_connect_demo">手指点按服务商列表中的 OpenAI，输入 API 密钥，点按连接，OpenAI 移入“已连接”分组。</string>
+
+    <string name="tips_b_github_title">从任意工具行直接跳转 GitHub</string>
+    <string name="tips_b_github_body">涉及议题、拉取请求、运行或提交的工具行会显示绿色的打开操作。点按即可在 GitHub 上打开，长按则复制链接。</string>
+    <string name="tips_b_github_demo">三个 shell 工具行显示绿色的打开操作：打开 #157、打开 PR #156 和打开提交 4f2a9c1。点按会打开链接，长按则复制。</string>
+
+    <string name="tips_b_chips_title">运行中的任务始终可见</string>
+    <string name="tips_b_chips_body">正在运行的 shell 和子智能体会以小标签的形式显示在消息框上方。点按一个即可查看正在运行的内容并打开其输出。你可以在设置中关闭此功能。</string>
+    <string name="tips_b_chips_demo">消息框上方出现一个 shell 标签和一个智能体标签；手指点按 shell 标签，打开显示正在运行命令的列表。</string>
+
+    <string name="tips_b_model_title">一眼看清当前模型</string>
+    <string name="tips_b_model_body">消息框中的模型按钮现在会以较浅的颜色显示服务商标识、简称和推理强度，例如 Haiku 5.5 Medium。点按即可切换。</string>
+    <string name="tips_b_model_demo">手指多次点按消息框中的模型按钮，它依次变为 Haiku 5.5 Medium、Opus 5.5 High、GPT-5.2 High 和 Gemini 3 Pro，每个都带有服务商标识。</string>
+
+    <string name="tips_b_stopall_title">一键停止全部任务</string>
+    <string name="tips_b_stopall_body">运行面板将子智能体和命令分组显示，每组都有全部停止按钮。每一行也都有各自的停止按钮。</string>
+    <string name="tips_b_stopall_demo">在运行面板中，手指先点按命令分组的全部停止，再点按子智能体分组的全部停止，两个列表都清空了。</string>
+
+    <string name="tips_b_search_title">几秒内找到项目</string>
+    <string name="tips_b_search_body">项目较多时，新建会话面板提供搜索框。输入几个字母，所有匹配的项目都会显示出来，包括已折叠的项目。</string>
+    <string name="tips_b_search_demo">手指点按新建会话面板中的搜索框并输入 mob，列表缩小为 mobile-app 和 mobile-kit。</string>
+
+    <string name="tips_b_themes_title">用 TUI 主题装扮应用</string>
+    <string name="tips_b_themes_body">在设置的外观下，可以选择 OpenCode 终端的 33 种主题中的任意一种，整个应用都会采用其配色，包括代码和差异内容。</string>
+    <string name="tips_b_themes_demo">一个小型聊天依次展示四种主题：GitHub、Dracula、Gruvbox 和 Nord。手指点按每个主题色点，颜色随之变化。</string>
+</resources>

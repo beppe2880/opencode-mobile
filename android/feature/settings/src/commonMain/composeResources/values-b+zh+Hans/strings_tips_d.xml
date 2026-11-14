@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">一眼看清当前位置</string>
+    <string name="tips_d_header_body">聊天标题栏显示文件夹、Git 分支以及已更改的文件数量。点按即可查看这些更改。</string>
+    <string name="tips_d_header_demo">聊天标题栏显示文件夹、分支和已更改的文件数量；点按后打开已更改文件的列表。</string>
+
+    <string name="tips_d_offline_title">无需服务器即可试用应用</string>
+    <string name="tips_d_offline_body">还没有服务器？在连接界面点按不使用服务器试用，即可浏览示例会话。没有任何内容会离开你的手机。</string>
+    <string name="tips_d_offline_demo">在连接界面点按不使用服务器试用，打开示例会话列表。</string>
+
+    <string name="tips_d_split_title">列表与聊天并排显示</string>
+    <string name="tips_d_split_body">在展开的折叠屏和平板上，会话列表与聊天共享屏幕。拖动分隔线可调整列表宽度，也可以在设置中选择分屏视图。</string>
+    <string name="tips_d_split_demo">宽屏上会话列表显示在聊天旁边。点按一个会话会更新聊天内容，拖动分隔线可加宽列表。</string>
+
+    <string name="tips_d_share_title">从任何应用分享到 OpenCode</string>
+    <string name="tips_d_share_body">在分享菜单中，将其他应用的文本、链接和图片发送到 OpenCode，并以此开始新会话。</string>
+    <string name="tips_d_share_demo">在其他应用中分享一个页面；在分享菜单中选择 OpenCode，即可用分享的链接开始会话。</string>
+
+    <string name="tips_d_settings_title">看得见变化的设置</string>
+    <string name="tips_d_settings_body">从列表中更改设置，并可通过聊天的实时预览或演示即时查看效果。离开前就能看到结果。</string>
+    <string name="tips_d_settings_demo">拖动聊天文字大小滑块，实时预览中的聊天文字随之放大。</string>
+
+    <string name="tips_d_update_title">更新前先了解有哪些变化</string>
+    <string name="tips_d_update_body">有新版本发布时，面板会显示包含新功能和修复的更新日志。你可以更新、跳过，或稍后再决定。</string>
+    <string name="tips_d_update_demo">更新面板打开；点按查看更新日志，展开新功能和修复的列表。</string>
+
+    <string name="tips_d_mcp_title">管理你的 MCP 服务器</string>
+    <string name="tips_d_mcp_body">查看已连接的 MCP 服务器，并在聊天菜单中连接或断开它们，无需回到电脑前。</string>
+    <string name="tips_d_mcp_demo">MCP 服务器面板列出每台服务器及其状态；打开开关即可连接该服务器。</string>
+
+    <string name="tips_d_follow_title">实时跟随智能体</string>
+    <string name="tips_d_follow_body">智能体工作时，其当前步骤保持展开：思考、命令输出和差异内容随到达实时显示，回答结束后自动收起。</string>
+    <string name="tips_d_follow_demo">聊天中显示正在运行命令的输出，然后显示编辑的差异，回答到达时各步骤折叠起来。</string>
+
+    <string name="tips_d_output_title">调整工具输出和文字大小</string>
+    <string name="tips_d_output_body">选择显示的输出行数、运行中命令的刷新频率以及聊天文字大小。一个按钮即可全部重置。</string>
+    <string name="tips_d_output_demo">更改刷新间隔和输出行数，然后点按重置所有设置，恢复默认值。</string>
+</resources>

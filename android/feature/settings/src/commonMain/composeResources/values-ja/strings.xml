@@ -246,7 +246,7 @@
     <string name="update_download">ダウンロード</string>
     <string name="update_sheet_title">アップデートがあります</string>
     <string name="update_sheet_versions_description">バージョン %1$s から %2$s へ</string>
-    <string name="update_sheet_whats_new">新機能</string>
+    <string name="update_sheet_whats_new">今回のアップデート</string>
     <string name="update_sheet_version">バージョン %1$s</string>
     <string name="update_sheet_later">あとで</string>
     <string name="update_sheet_skip">このバージョンをスキップ</string>
@@ -260,7 +260,7 @@
     <string name="update_check_checking">アップデートを確認中…</string>
     <string name="update_check_latest">最新バージョンを使用中です（%1$s）</string>
     <string name="update_check_failed">GitHub に接続できませんでした。接続を確認して、もう一度お試しください。</string>
-    <string name="whats_new_title">新着情報</string>
+    <string name="whats_new_title">ヒントと新機能</string>
     <string name="whats_new_settings_sub">リリースごとの変更をすべて表示</string>
     <string name="whats_new_unseen">新しいリリース</string>
     <string name="whats_new_hide">次のリリースまで非表示</string>
@@ -401,4 +401,22 @@
     <string name="settings_edit_more">%1$s のすべてのオプション</string>
     <string name="settings_close_model_picker">モデル選択後に選択画面を閉じる</string>
     <string name="settings_close_model_picker_sub">オフにするとモデルと推論レベルをまとめて選べます。「完了」をタップして閉じます。</string>
+    <string name="feature_section_changelog">変更履歴</string>
+    <string name="feature_new">新着</string>
+    <string name="feature_by">%1$s 作成 · #%2$d</string>
+    <string name="feature_math_title">数式がきれいに読める</string>
+    <string name="feature_math_body">回答の数式は届くそばから整形されて表示されます。分数、根号、積分、行列が、生のLaTeXではなく組版された形で見えます。メッセージをコピーすると、LaTeXのソースも得られます。</string>
+    <string name="feature_math_demo">回答が届き、その数式がLaTeXのソースから整形された数式に変わります。</string>
+    <string name="feature_attachments_title">添付した写真を確認</string>
+    <string name="feature_attachments_body">添付した画像はメッセージ欄にサムネイルで表示されるので、送信前に確認できます。1つをタップすると全画面で表示され、×で削除できます。</string>
+    <string name="feature_attachments_demo">メッセージ欄に写真が2枚表示され、1枚が全画面で開いたあと、1枚が削除されます。</string>
+    <string name="tips_version">バージョン %1$s</string>
+    <string name="tips_show_list">リストで表示</string>
+    <string name="tips_show_carousel">カルーセルで表示</string>
+    <string name="feature_open_pr">プルリクエストを表示</string>
+    <string name="tips_installed">インストール済み</string>
+    <string name="tips_newer">新着</string>
+    <plurals name="tips_feature_count">
+        <item quantity="other">%1$d 件の機能</item>
+    </plurals>
 </resources>
