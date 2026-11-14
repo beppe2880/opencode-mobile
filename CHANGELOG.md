@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.16.0](https://github.com/beppe2880/opencode-mobile/compare/v0.15.0...v0.16.0) (2026-11-14)
+
+
+### Features
+
+* **chat:** Adjustable sensitivity of the swipe that opens and closes the chat list ([#191](https://github.com/beppe2880/opencode-mobile/issues/191)) ([7915004](https://github.com/beppe2880/opencode-mobile/commit/79150040773d71ba86c8c9c4b5bef8edf971e45f))
+* **chat:** Render math formulas in replies ([#216](https://github.com/beppe2880/opencode-mobile/issues/216)) ([593ed38](https://github.com/beppe2880/opencode-mobile/commit/593ed3849056a8c8b5905ada627d4ed56f701f35))
+* **chat:** Show attached images as large as images read by the agent ([#207](https://github.com/beppe2880/opencode-mobile/issues/207)) ([4cfb15b](https://github.com/beppe2880/opencode-mobile/commit/4cfb15bfe38fd95e4c28b13d76d1afa772a3aa30))
+* **chat:** Show attached images as thumbnails in the composer ([#218](https://github.com/beppe2880/opencode-mobile/issues/218)) ([e20f0b2](https://github.com/beppe2880/opencode-mobile/commit/e20f0b24966b5b630e855dfa8ee6978702c985a0))
+* **sessions:** Pin sessions to the top of the list ([#206](https://github.com/beppe2880/opencode-mobile/issues/206)) ([9897b54](https://github.com/beppe2880/opencode-mobile/commit/9897b54b89db8af7c20cbc3cb4b3bf5c53848d2c))
+* **settings:** Settings section for foldables and large screens ([#192](https://github.com/beppe2880/opencode-mobile/issues/192)) ([0157a47](https://github.com/beppe2880/opencode-mobile/commit/0157a47786da386b7a56f4bafdfad8dc1d24cc77))
+* **settings:** Tips & new features page with live demos of every release ([#221](https://github.com/beppe2880/opencode-mobile/issues/221)) ([9b4c912](https://github.com/beppe2880/opencode-mobile/commit/9b4c9129eca33d08f6ad3e96998af3b5557e5216))
+
+
+### Bug fixes
+
+* **chat:** Start /new chats with the model for new chats ([#210](https://github.com/beppe2880/opencode-mobile/issues/210)) ([8e00412](https://github.com/beppe2880/opencode-mobile/commit/8e0041211aecb64b46ec98619a2ceb2de0c150f3))
+* **sessions:** Restore the split view when unfolding with a chat open ([#190](https://github.com/beppe2880/opencode-mobile/issues/190)) ([347dc2f](https://github.com/beppe2880/opencode-mobile/commit/347dc2fe300b6d90bdd97aa2b4508c744ee968cc))
+
 ## [0.15.0](https://github.com/beppe2880/opencode-mobile/compare/v0.14.0...v0.15.0) (2026-11-10)
 
 
