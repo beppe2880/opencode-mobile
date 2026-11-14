@@ -4,7 +4,7 @@ import { runInNewContext } from "node:vm"
 
 const script = readFileSync(new URL("../android/feature/terminal/src/commonMain/composeResources/files/terminal/terminal.js", import.meta.url), "utf8")
 
-function terminal() {
+function terminal(deferWrites = false) {
   type Listener = (event: any) => void
   class Element {
     listeners = new Map<string, Listener[]>()
@@ -37,6 +37,11 @@ function terminal() {
   let nativeSelection = ""
   let keyHandler: (event: any) => boolean = () => true
   const sent: string[] = []
+  const sizes: number[][] = []
+  const applied: (string | number[])[] = []
+  const writes: (() => void)[] = []
+  let fits = 0
+  let resized = () => {}
   const term = {
     element: root, rows: 20, cols: 80,
     buffer: { active: { type: "normal", baseY: 200 } },
@@ -46,22 +51,38 @@ function terminal() {
     focus: () => { focused++ },
     loadAddon() {}, open() {}, onData() {}, onResize() {},
     attachCustomKeyEventHandler(handler: (event: any) => boolean) { keyHandler = handler },
-    write(_data: string, done?: () => void) { done?.() },
+    write(_data: string, done?: () => void) {
+      if (_data) applied.push(_data)
+      if (done) {
+        if (deferWrites) writes.push(done)
+        else done()
+      }
+    },
+    resize(cols: number, rows: number) { applied.push([cols, rows]); term.cols = cols; term.rows = rows },
+    reset() {},
   }
   const window: any = {
-    OcTerminal: { font() { throw new Error("Use fallback font") }, resize() {}, ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
+    OcTerminal: { font() { throw new Error("Use fallback font") }, resize: (cols: number, rows: number) => sizes.push([cols, rows]), ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
     getSelection: () => nativeSelection,
   }
   runInNewContext(script, {
     window,
     document: { getElementById: () => root },
     Terminal: function () { return term },
-    FitAddon: { FitAddon: class { fit() {} } },
-    ResizeObserver: class { observe() {} },
+    FitAddon: { FitAddon: class { fit() { fits++; term.cols = 52; term.rows = 30 } } },
+    ResizeObserver: class { constructor(callback: () => void) { resized = callback } observe() {} },
   })
   const touch = (x: number, y: number, id = 1) => ({ identifier: id, clientX: x, clientY: y })
   return {
-    term, screen, scrolls, touch, sent,
+    term, screen, scrolls, touch, sent, sizes,
+    fits: () => fits,
+    resize: () => resized(),
+    parsed: () => { for (const done of writes.splice(0)) done() },
+    offline: () => window.oc.setLive(false),
+    restore: (data: string, sizes: number[][]) => window.oc.restore(data, sizes),
+    write: (data: string) => window.oc.write(data),
+    reset: () => window.oc.reset(),
+    applied,
     live: () => window.oc.setLive(true),
     setModifiers: (mask: number) => window.oc.setModifiers(mask),
     key: (event: object) => keyHandler({ type: "keydown", isComposing: false, ...event }),
@@ -77,6 +98,77 @@ function terminal() {
     },
   }
 }
+
+test("initial replay keeps the server's 80 columns until it has been parsed", () => {
+  const t = terminal(true)
+  t.resize()
+  expect(t.term.cols).toBe(80)
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+  t.live()
+  t.resize()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
+  t.resize()
+  expect(t.fits()).toBe(2)
+})
+
+test("reconnection defers fitting until the replay finishes", () => {
+  const t = terminal(true)
+  t.live()
+  t.parsed()
+  t.offline()
+  t.resize()
+  expect(t.fits()).toBe(1)
+  t.live()
+  expect(t.fits()).toBe(1)
+  t.parsed()
+  expect(t.fits()).toBe(2)
+})
+
+test("disconnecting during replay cannot enable input or resize the shell", () => {
+  const t = terminal(true)
+  t.live()
+  t.offline()
+  t.parsed()
+  t.key({ keyCode: 229 })
+  t.input({ inputType: "insertText", data: "x" })
+  expect(t.sent).toEqual([])
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+})
+
+test("a restarted shell replays at the server's initial dimensions again", () => {
+  const t = terminal()
+  t.live()
+  expect(t.term.cols).toBe(52)
+  t.reset()
+  expect(t.term.cols).toBe(80)
+  expect(t.term.rows).toBe(24)
+  t.resize()
+  expect(t.term.cols).toBe(80)
+  t.live()
+  expect(t.term.cols).toBe(52)
+})
+
+test("restores historical dimensions between parsed output chunks before fitting", () => {
+  const t = terminal(true)
+  t.restore("oldpromptnewprompt", [[9, 50, 24]])
+  t.write("live output")
+  t.live()
+  expect(t.applied).toEqual(["oldprompt"])
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.applied).toEqual(["oldprompt", [50, 24], "newprompt"])
+  t.parsed()
+  expect(t.applied.at(-1)).toBe("live output")
+  t.parsed()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.fits()).toBe(1)
+})
 
 test("vertical swipes scroll history in both directions", () => {
   const t = terminal()
