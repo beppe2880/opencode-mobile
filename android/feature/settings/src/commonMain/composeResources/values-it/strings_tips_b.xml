@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">Scegli una cartella, senza scriverla</string>
+    <string name="tips_b_browse_body">Quando avvii una sessione in un'altra directory, tocca Sfoglia accanto al percorso per esplorare le cartelle del server. Le cartelle recenti sono a un tocco.</string>
+    <string name="tips_b_browse_demo">Nel foglio Nuova sessione, un dito tocca Sfoglia, apre la cartella projects e poi la cartella mobile-app, quindi tocca Usa questa cartella per compilare il percorso.</string>
+
+    <string name="tips_b_popover_title">Apri o ferma ciò che gira con un tocco</string>
+    <string name="tips_b_popover_body">Tocca un chip sopra la casella del messaggio per vedere in un'unica lista tutti gli agenti e le shell in esecuzione. Apri porta alla sessione del subagente, Ferma lo termina.</string>
+    <string name="tips_b_popover_demo">Un dito tocca il chip degli agenti in esecuzione, si apre una lista con agenti e shell, Apri porta alla sessione dell'agente e Ferma agente lo rimuove.</string>
+
+    <string name="tips_b_toolmedia_title">Vedi le immagini lette dall'agente</string>
+    <string name="tips_b_toolmedia_body">Quando uno strumento legge uno screenshot, un'immagine o un PDF, il file compare subito sotto la riga dello strumento. Tocca un'immagine per vederla più grande.</string>
+    <string name="tips_b_toolmedia_demo">Si completano due righe dello strumento Read: la prima mostra l'anteprima di un'immagine sotto di sé, la seconda un chip con un file PDF.</string>
+
+    <string name="tips_b_new_title">Scrivi /new per ripartire da zero</string>
+    <string name="tips_b_new_body">Scrivi /new nella casella del messaggio e scegli il comando: si apre subito una nuova sessione nella stessa directory, senza copiare la conversazione precedente.</string>
+    <string name="tips_b_new_demo">L'utente scrive /new nella casella del messaggio, tocca il comando suggerito e la chat passa a una Nuova sessione vuota.</string>
+
+    <string name="tips_b_connect_title">Collega i provider AI dal telefono</string>
+    <string name="tips_b_connect_body">Apri l'elenco dei provider dal menu della chat oppure scrivi /connect. Incolla una API key o accedi con un codice: le credenziali restano salvate sul tuo server, non sul telefono.</string>
+    <string name="tips_b_connect_demo">Un dito tocca OpenAI nell'elenco dei provider, inserisce una API key, tocca Connetti e OpenAI passa al gruppo Connessi.</string>
+
+    <string name="tips_b_github_title">Vai su GitHub da ogni riga dello strumento</string>
+    <string name="tips_b_github_body">Le righe degli strumenti che toccano una issue, una pull request, una run o un commit mostrano un'azione Apri verde. Tocca per aprirla su GitHub, tieni premuto per copiare il link.</string>
+    <string name="tips_b_github_demo">Tre righe della shell mostrano azioni Apri verdi: Apri #157, Apri PR #156 e Apri commit 4f2a9c1. Un tocco apre il link, una pressione lunga lo copia.</string>
+
+    <string name="tips_b_chips_title">Ciò che gira, sempre sotto gli occhi</string>
+    <string name="tips_b_chips_body">Le shell e i subagenti in esecuzione compaiono come piccoli chip sopra la casella del messaggio. Tocca un chip per vedere cosa gira e aprirne l'output. Puoi disattivarli nelle Impostazioni.</string>
+    <string name="tips_b_chips_demo">Un chip della shell e uno dell'agente compaiono sopra la casella del messaggio; un dito tocca il chip della shell e si apre una lista con il comando in esecuzione.</string>
+
+    <string name="tips_b_model_title">Il tuo modello a colpo d'occhio</string>
+    <string name="tips_b_model_body">Il pulsante del modello nella casella del messaggio ora mostra il logo del provider, un nome breve e il livello di ragionamento in un colore più tenue, come Haiku 5.5 Medium. Tocca per cambiarlo.</string>
+    <string name="tips_b_model_demo">Un dito tocca più volte il pulsante del modello nella casella del messaggio: cambia da Haiku 5.5 Medium a Opus 5.5 High, GPT-5.2 High e Gemini 3 Pro, ognuno con il logo del suo provider.</string>
+
+    <string name="tips_b_stopall_title">Ferma tutto con un tocco</string>
+    <string name="tips_b_stopall_body">Il foglio In esecuzione raggruppa subagenti e comandi, ciascuno con un pulsante Ferma tutto. Ogni riga ha anche il proprio Ferma.</string>
+    <string name="tips_b_stopall_demo">Nel foglio In esecuzione, un dito tocca Ferma tutto nella sezione Comandi, poi in quella dei Subagenti, e le due liste si svuotano.</string>
+
+    <string name="tips_b_search_title">Trova un progetto in pochi secondi</string>
+    <string name="tips_b_search_body">Con tanti progetti, il foglio Nuova sessione ha un campo di ricerca. Scrivi qualche lettera e compaiono tutti i progetti che corrispondono, anche quelli ripiegati.</string>
+    <string name="tips_b_search_demo">Un dito tocca il campo di ricerca nel foglio Nuova sessione e scrive mob: la lista si riduce a mobile-app e mobile-kit.</string>
+
+    <string name="tips_b_themes_title">Veste l'app con un tema del terminale</string>
+    <string name="tips_b_themes_body">Scegli uno dei 33 temi del terminale OpenCode in Impostazioni, sotto Aspetto, e tutta l'app ne prende i colori, compresi codice e diff.</string>
+    <string name="tips_b_themes_demo">Una piccola chat viene mostrata con quattro temi in sequenza: GitHub, Dracula, Gruvbox e Nord. Un dito tocca ogni pallino e i colori cambiano.</string>
+</resources>

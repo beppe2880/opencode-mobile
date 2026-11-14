@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">Sai sempre dove ti trovi</string>
+    <string name="tips_d_header_body">L'intestazione della chat mostra la cartella, il branch Git e quanti file sono cambiati. Toccala per rivedere le modifiche.</string>
+    <string name="tips_d_header_demo">L'intestazione della chat mostra la cartella, il branch e il numero di file modificati; toccandola si apre l'elenco dei file modificati.</string>
+
+    <string name="tips_d_offline_title">Prova l'app senza un server</string>
+    <string name="tips_d_offline_body">Non hai ancora un server? Tocca Prova senza server nella schermata Connetti ed esplora alcune sessioni di esempio. Nulla lascia il tuo telefono.</string>
+    <string name="tips_d_offline_demo">Nella schermata Connetti, un tocco su Prova senza server apre un elenco di sessioni di esempio.</string>
+
+    <string name="tips_d_split_title">Elenco e chat affiancati</string>
+    <string name="tips_d_split_body">Su pieghevoli aperti e tablet le sessioni e la chat condividono lo schermo. Trascina il divisore per ridimensionare l'elenco, oppure scegli Chat accanto all'elenco nelle Impostazioni.</string>
+    <string name="tips_d_split_demo">Uno schermo largo mostra l'elenco delle sessioni accanto alla chat. Toccando una sessione la chat cambia, e trascinando il divisore l'elenco si allarga.</string>
+
+    <string name="tips_d_share_title">Condividi con OpenCode da ogni app</string>
+    <string name="tips_d_share_body">Invia testo, link e immagini da altre app a OpenCode dal menu Condividi e avvia da lì una nuova sessione.</string>
+    <string name="tips_d_share_demo">Una pagina viene condivisa da un'altra app; scegliendo OpenCode nel menu Condividi parte una sessione con il link condiviso.</string>
+
+    <string name="tips_d_settings_title">Impostazioni che vedi cambiare</string>
+    <string name="tips_d_settings_body">Cambia le impostazioni da un elenco, con anteprime dal vivo della chat o nella demo. Vedi il risultato prima di uscire.</string>
+    <string name="tips_d_settings_demo">Trascinando il cursore della dimensione del testo, il testo dell'anteprima dal vivo della chat si ingrandisce.</string>
+
+    <string name="tips_d_update_title">Scopri le novità prima di aggiornare</string>
+    <string name="tips_d_update_body">Quando esce una nuova versione, una finestra mostra il changelog con le novità e le correzioni. Aggiorna, salta o decidi più tardi.</string>
+    <string name="tips_d_update_demo">Si apre la finestra di aggiornamento; toccando Vedi le novità si espande l'elenco di novità e correzioni.</string>
+
+    <string name="tips_d_mcp_title">Controlla i tuoi server MCP</string>
+    <string name="tips_d_mcp_body">Vedi quali server MCP sono connessi e collegali o scollegali dal menu della chat, senza tornare al computer.</string>
+    <string name="tips_d_mcp_demo">La finestra dei server MCP elenca ogni server con il suo stato; attivando un interruttore il server si connette.</string>
+
+    <string name="tips_d_follow_title">Segui l'agente in diretta</string>
+    <string name="tips_d_follow_body">Mentre l'agente lavora, il passaggio in corso resta aperto: leggi ragionamento, output dei comandi e diff mentre arrivano, poi si richiude quando la risposta finisce.</string>
+    <string name="tips_d_follow_demo">Una chat mostra l'output di un comando in corso, poi il diff di una modifica, e ripiega i passaggi quando arriva la risposta.</string>
+
+    <string name="tips_d_output_title">Regola output e dimensione del testo</string>
+    <string name="tips_d_output_body">Scegli quante righe di output mostrare, ogni quanto si aggiorna un comando in corso e la dimensione del testo della chat. Un solo pulsante ripristina tutto.</string>
+    <string name="tips_d_output_demo">Si cambiano l'intervallo di aggiornamento e il numero di righe di output, poi Ripristina tutte le impostazioni riporta i valori predefiniti.</string>
+</resources>

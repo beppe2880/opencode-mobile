@@ -87,7 +87,7 @@ internal class GitHubUpdateRepository(
         if (releases.isEmpty()) {
             prefs.remove(KEY_RELEASES)
         } else {
-            val stored = releases.map { StoredRelease(it.version, it.url, it.notes) }
+            val stored = releases.map { StoredRelease(it.version, it.url, it.notes, it.publishedAt) }
             prefs.putString(KEY_RELEASES, StoreJson.encodeToString(StoredReleases, stored))
         }
     }
@@ -101,7 +101,7 @@ internal class GitHubUpdateRepository(
             return listOf(AppRelease(version, url))
         }
         return try {
-            StoreJson.decodeFromString(StoredReleases, json).map { AppRelease(it.version, it.url, it.notes) }
+            StoreJson.decodeFromString(StoredReleases, json).map { AppRelease(it.version, it.url, it.notes, it.publishedAt) }
         } catch (_: SerializationException) {
             emptyList()
         } catch (_: IllegalArgumentException) {
@@ -116,7 +116,7 @@ internal class GitHubUpdateRepository(
     }
 
     @Serializable
-    private class StoredRelease(val version: String, val url: String, val notes: String = "")
+    private class StoredRelease(val version: String, val url: String, val notes: String = "", val publishedAt: Long? = null)
 
     internal companion object {
         const val CHECK_INTERVAL_MS = 24L * 60 * 60 * 1000

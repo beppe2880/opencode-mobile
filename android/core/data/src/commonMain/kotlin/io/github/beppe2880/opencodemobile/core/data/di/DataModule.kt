@@ -27,6 +27,7 @@ import io.github.beppe2880.opencodemobile.core.data.stt.CloudSpeechToTextReposit
 import io.github.beppe2880.opencodemobile.core.data.stt.appLanguage
 import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepository
 import io.github.beppe2880.opencodemobile.core.data.update.GitHubUpdateRepository
+import io.github.beppe2880.opencodemobile.core.data.update.GitHubWhatsNewRepository
 import io.github.beppe2880.opencodemobile.core.data.vcs.RemoteVcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
@@ -47,6 +48,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
+import io.github.beppe2880.opencodemobile.core.domain.WhatsNewRepository
 import io.github.beppe2880.opencodemobile.core.network.GitHubReleases
 import io.github.beppe2880.opencodemobile.core.network.SpeechToTextClient
 import kotlinx.coroutines.CoroutineScope
@@ -125,5 +127,9 @@ val dataModule = module {
     single<UpdateRepository> {
         val releases = GitHubReleases()
         GitHubUpdateRepository(releases::recent, get(SettingsStore))
+    }
+    single<WhatsNewRepository> {
+        val releases = GitHubReleases()
+        GitHubWhatsNewRepository(releases::history, get(SettingsStore))
     }
 }

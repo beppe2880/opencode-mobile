@@ -65,6 +65,25 @@ class GitHubReleasesTest {
     }
 
     @Test
+    fun `the history is one page of releases with when each was published`() = runBlocking {
+        respond(
+            """[{"tag_name":"v1.0.0","html_url":"${PAGE}v1.0.0","body":"notes","published_at":"2026-10-27T09:12:44Z"},""" +
+                """{"tag_name":"v0.9.0","html_url":"${PAGE}v0.9.0","body":"notes","published_at":"not a date"},""" +
+                """{"tag_name":"v0.8.0","html_url":"${PAGE}v0.8.0","body":"notes","published_at":null}]""",
+        )
+
+        assertEquals(
+            listOf(
+                AppRelease("1.0.0", PAGE + "v1.0.0", "notes", publishedAt = 1_793_092_364_000),
+                AppRelease("0.9.0", PAGE + "v0.9.0", "notes"),
+                AppRelease("0.8.0", PAGE + "v0.8.0", "notes"),
+            ),
+            releases.history(),
+        )
+        assertEquals("/repos/beppe2880/opencode-mobile/releases?per_page=${GitHubReleases.HISTORY_COUNT}", server.takeRequest().path)
+    }
+
+    @Test
     fun `no release yet is not an error`() = runBlocking {
         respond("[]")
         assertEquals(emptyList<AppRelease>(), releases.recent())

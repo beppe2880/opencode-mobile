@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_b_browse_title">Pick a folder instead of typing it</string>
+    <string name="tips_b_browse_body">When you start a session in another directory, tap Browse next to the path to walk through the server's folders. Your recent folders are one tap away.</string>
+    <string name="tips_b_browse_demo">In the New session sheet, a finger taps Browse, opens the projects folder and the mobile-app folder, then taps Use this folder to fill the path.</string>
+
+    <string name="tips_b_popover_title">Open or stop running work in a tap</string>
+    <string name="tips_b_popover_body">Tap a chip above the message box to see every running agent and shell in one list. Open jumps to the subagent's session, Stop ends it.</string>
+    <string name="tips_b_popover_demo">A finger taps the running agents chip, a list with agents and shells opens, Open goes to the agent's session and Stop agent removes it.</string>
+
+    <string name="tips_b_toolmedia_title">See the images your agent reads</string>
+    <string name="tips_b_toolmedia_body">When a tool reads a screenshot, a picture or a PDF, the file now shows right under the tool row. Tap an image to view it larger.</string>
+    <string name="tips_b_toolmedia_demo">Two Read tool rows complete: the first shows an image preview under it, the second shows a PDF file chip.</string>
+
+    <string name="tips_b_new_title">Type /new for a fresh start</string>
+    <string name="tips_b_new_body">Type /new in the message box and pick the command: a new session opens at once in the same directory, without copying the old conversation.</string>
+    <string name="tips_b_new_demo">The user types /new in the message box, taps the suggested command and the chat switches to an empty New session.</string>
+
+    <string name="tips_b_connect_title">Connect AI providers from your phone</string>
+    <string name="tips_b_connect_body">Open the provider list from the chat menu or type /connect. Paste an API key or sign in with a code: the credentials are saved on your server, not on your phone.</string>
+    <string name="tips_b_connect_demo">A finger taps OpenAI in the provider list, types an API key, taps Connect and OpenAI moves to the Connected group.</string>
+
+    <string name="tips_b_github_title">Jump to GitHub from any tool row</string>
+    <string name="tips_b_github_body">Tool rows that touch an issue, pull request, run or commit get a green Open action. Tap to open it on GitHub, long press to copy the link.</string>
+    <string name="tips_b_github_demo">Three shell rows show green Open actions: Open #157, Open PR #156 and Open commit 4f2a9c1. Tapping opens the link, a long press copies it.</string>
+
+    <string name="tips_b_chips_title">Running work, always in sight</string>
+    <string name="tips_b_chips_body">Shells and subagents that are running appear as small chips above the message box. Tap one to see what is running and open its output. You can turn this off in Settings.</string>
+    <string name="tips_b_chips_demo">A shell chip and an agent chip appear above the message box; a finger taps the shell chip and a list with the running command opens.</string>
+
+    <string name="tips_b_model_title">Your model at a glance</string>
+    <string name="tips_b_model_body">The model button in the message box now shows the provider mark, a short name and the effort in a lighter color, like Haiku 5.5 Medium. Tap it to switch.</string>
+    <string name="tips_b_model_demo">A finger taps the model button in the message box several times; it changes from Haiku 5.5 Medium to Opus 5.5 High, GPT-5.2 High and Gemini 3 Pro, each with its provider mark.</string>
+
+    <string name="tips_b_stopall_title">Stop everything with one tap</string>
+    <string name="tips_b_stopall_body">The Running sheet groups subagents and commands, each with a Stop all button. Every row also has its own Stop.</string>
+    <string name="tips_b_stopall_demo">In the Running sheet, a finger taps Stop all on the Commands section, then on the Subagents section, and both lists empty.</string>
+
+    <string name="tips_b_search_title">Find a project in seconds</string>
+    <string name="tips_b_search_body">With many projects, the New session sheet has a search field. Type a few letters and every project that matches shows up, even the ones that were folded away.</string>
+    <string name="tips_b_search_demo">A finger taps the search field in the New session sheet and types mob; the list narrows to mobile-app and mobile-kit.</string>
+
+    <string name="tips_b_themes_title">Dress the app in a TUI theme</string>
+    <string name="tips_b_themes_body">Choose any of the 33 OpenCode terminal themes in Settings, under Appearance, and the whole app takes its colors, including code and diffs.</string>
+    <string name="tips_b_themes_demo">A small chat is shown with four themes in turn: GitHub, Dracula, Gruvbox and Nord. A finger taps each theme dot and the colors change.</string>
+</resources>

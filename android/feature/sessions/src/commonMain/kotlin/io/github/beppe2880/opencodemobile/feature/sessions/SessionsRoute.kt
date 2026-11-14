@@ -22,6 +22,8 @@ fun SessionsRoute(
     openNewSession: Boolean = false,
     onNewSessionOpened: () -> Unit = {},
     banner: @Composable () -> Unit = {},
+    /** Drawn at the top of the list header (see [SessionsScreen]). */
+    headerTop: @Composable () -> Unit = {},
     /** The offline demo: sample sessions, no server behind them. */
     demo: Boolean = false,
     /** Shown in the drawer over a chat (see [SessionsScreen]). */
@@ -57,6 +59,7 @@ fun SessionsRoute(
         selectedSessionId = selectedSessionId,
         snackbarHostState = snackbar,
         banner = banner,
+        headerTop = headerTop,
         demo = demo,
         inDrawer = inDrawer,
     )

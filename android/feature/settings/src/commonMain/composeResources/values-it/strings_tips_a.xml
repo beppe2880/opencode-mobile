@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_a_attached_images_title">Le tue immagini, grandi e nitide</string>
+    <string name="tips_a_attached_images_body">Le immagini che alleghi ora si vedono grandi quanto quelle lette dall'agente, intere e senza tagli. Scegli Miniature, Piccole, Medie o Grandi in Impostazioni → Chat → Trascrizione.</string>
+    <string name="tips_a_attached_images_demo">Nelle impostazioni della chat, l'opzione delle immagini allegate passa da Miniature a Piccole, Medie e Grandi, e le immagini del messaggio crescono a ogni scelta.</string>
+
+    <string name="tips_a_pin_sessions_title">Le chat migliori sempre in cima</string>
+    <string name="tips_a_pin_sessions_body">Tieni premuta una chat nell'elenco, oppure apri il suo menu a tre puntini, e scegli Fissa. Le chat fissate restano in un gruppo a parte, sopra Oggi.</string>
+    <string name="tips_a_pin_sessions_demo">Si tiene premuta una chat dell'elenco, si tocca l'azione Fissa e la chat passa al gruppo Fissate in alto.</string>
+
+    <string name="tips_a_swipe_sensitivity_title">Scorrimento su misura per te</string>
+    <string name="tips_a_swipe_sensitivity_body">Scegli quanto deve essere facile lo scorrimento per aprire l'elenco delle chat: Bassa, Media o Alta. Con Alta basta uno scorrimento breve e leggero. Lo trovi in Impostazioni → Chat → Gesti.</string>
+    <string name="tips_a_swipe_sensitivity_demo">Con sensibilità Bassa uno scorrimento breve torna indietro e l'elenco delle chat resta chiuso. Con sensibilità Alta lo stesso scorrimento breve apre l'elenco delle chat.</string>
+
+    <string name="tips_a_large_screens_title">Pensata per pieghevoli e tablet</string>
+    <string name="tips_a_large_screens_body">Una nuova sezione delle impostazioni raccoglie tutto ciò che riguarda gli schermi grandi: la chat accanto all'elenco, cosa succede quando pieghi o apri, il divisore e lo scorrimento. Compare solo su pieghevoli e tablet.</string>
+    <string name="tips_a_large_screens_demo">Nelle impostazioni si apre la sezione Pieghevoli e schermi grandi, poi si attiva l'interruttore Chat accanto all'elenco.</string>
+
+    <string name="tips_a_picker_stay_title">Prova i modelli senza che il selettore si chiuda</string>
+    <string name="tips_a_picker_stay_body">Disattiva Chiudi il selettore dopo la scelta di un modello in Impostazioni → Casella del messaggio. Il selettore resta aperto mentre confronti i modelli, e Fine lo chiude.</string>
+    <string name="tips_a_picker_stay_demo">Si disattiva l'interruttore Chiudi il selettore dopo la scelta di un modello. Nel selettore si toccano due modelli di seguito e resta aperto, poi Fine lo chiude.</string>
+
+    <string name="tips_a_swipe_list_title">Scorri a destra per le tue chat</string>
+    <string name="tips_a_swipe_list_body">In una chat, scorri verso destra: l'elenco delle chat entra come pannello e segue il dito. Scorri indietro per tornare alla conversazione. Puoi cambiare il gesto in Impostazioni → Chat → Gesti.</string>
+    <string name="tips_a_swipe_list_demo">Uno scorrimento verso destra in una chat fa entrare l'elenco delle chat come pannello laterale sopra la conversazione, poi uno scorrimento verso sinistra lo chiude.</string>
+
+    <string name="tips_a_pending_prompt_title">Le immagini appaiono appena invii</string>
+    <string name="tips_a_pending_prompt_body">Un messaggio con immagini compare subito nella chat, attenuato, con Invio… e poi In coda sotto. Non devi più aspettare per sapere che è partito.</string>
+    <string name="tips_a_pending_prompt_demo">Si invia un messaggio con due immagini: compare subito, attenuato, con l'etichetta Invio… e poi In coda, finché il server lo accetta e torna normale.</string>
+
+    <string name="tips_a_image_swipe_title">Sfoglia le immagini con uno scorrimento</string>
+    <string name="tips_a_image_swipe_body">Apri un'immagine a schermo intero e scorri a sinistra o a destra per vedere le altre dello stesso messaggio o strumento. Un contatore indica a che punto sei.</string>
+    <string name="tips_a_image_swipe_demo">Nel visualizzatore a schermo intero uno scorrimento verso sinistra passa dalla prima immagine alla seconda e poi alla terza, e il contatore si aggiorna.</string>
+
+    <string name="tips_a_hide_list_title">Tutto lo schermo alla chat</string>
+    <string name="tips_a_hide_list_body">Su tablet o pieghevole aperto, scorri a sinistra sulla chat per nascondere l'elenco accanto e a destra per riportarlo. La chat si allarga mentre l'elenco scivola via.</string>
+    <string name="tips_a_hide_list_demo">Su una finestra larga uno scorrimento verso sinistra sulla chat fa scivolare via l'elenco e la chat si allarga; poi uno scorrimento verso destra riporta l'elenco.</string>
+
+    <string name="tips_a_check_updates_title">Controlla gli aggiornamenti quando vuoi</string>
+    <string name="tips_a_check_updates_body">Tocca Verifica aggiornamenti nelle impostazioni per chiedere subito a GitHub. Se è uscita una nuova versione, un banner chiaro compare sotto la barra di ricerca, sopra le chat.</string>
+    <string name="tips_a_check_updates_demo">Si tocca Verifica aggiornamenti nelle impostazioni, compare Verifica degli aggiornamenti…, poi l'elenco delle chat mostra un banner che annuncia una nuova versione.</string>
+</resources>

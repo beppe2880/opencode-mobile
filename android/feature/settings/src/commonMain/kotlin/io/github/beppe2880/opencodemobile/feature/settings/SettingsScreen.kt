@@ -148,6 +148,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_un
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_usage_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.usage_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.whats_new_settings_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.whats_new_title
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
@@ -650,6 +652,14 @@ internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit
             )
             OcDivider()
             AboutRow(stringResource(Res.string.settings_api_version), state.apiVersion)
+            OcDivider()
+            OcListRow(
+                title = stringResource(Res.string.whats_new_title),
+                subtitle = stringResource(Res.string.whats_new_settings_sub),
+                onClick = { onEvent(SettingsEvent.OpenWhatsNew) },
+                trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted) },
+                modifier = Modifier.testTag("settings_whats_new_row"),
+            )
             if (showUpdateNotice) {
                 OcDivider()
                 SettingOptionControl(SettingOption.UpdateNotice, state, onEvent)

@@ -89,6 +89,11 @@ import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRo
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeSample
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateSheetRoute
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageRoute
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureRoute
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.TipsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.VersionRoute
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewButtonRoute
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
 import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
@@ -118,6 +123,22 @@ data class SettingsDestination(val area: String? = null)
 
 @Serializable
 data object UsageDestination
+
+/** The release history of the app, from the button above the session list or from Settings. */
+@Serializable
+data object WhatsNewDestination
+
+/** Every change of every release, opened from the tips page. */
+@Serializable
+data object ChangelogDestination
+
+/** The new features of one version. */
+@Serializable
+data class VersionDestination(val version: String)
+
+/** The page of one new feature, by its id. */
+@Serializable
+data class FeatureDestination(val id: String)
 
 @Serializable
 data class TerminalDestination(val directory: String)
@@ -265,6 +286,7 @@ fun AppNavHost(
                 demo = isDemo,
                 onOpenChatFullScreen = navController::openChat,
                 onOpenSettings = { navController.navigate(SettingsDestination()) },
+                onOpenWhatsNew = navController::openWhatsNew,
                 openNewSession = pendingNewSession,
                 onNewSessionOpened = { pendingNewSession = false },
                 selectSession = pendingSelection,
@@ -316,12 +338,34 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() },
                 onAddServer = onConnectServer ?: { navController.navigate(ConnectDestination(addServer = true)) },
                 onOpenUsage = { navController.navigate(UsageDestination) },
+                onOpenWhatsNew = navController::openWhatsNew,
                 preview = settingsPreviews,
                 onOpenLiveDemo = onCustomizeInDemo,
             )
         }
         composable<UsageDestination> {
             UsageRoute(onBack = { navController.popBackStack() })
+        }
+        composable<WhatsNewDestination> {
+            TipsRoute(
+                onBack = { navController.popBackStack() },
+                onOpenChangelog = { navController.navigate(ChangelogDestination) },
+                onOpenVersion = { navController.navigate(VersionDestination(it)) },
+                onOpenFeature = { navController.navigate(FeatureDestination(it)) },
+            )
+        }
+        composable<ChangelogDestination> {
+            WhatsNewRoute(onBack = { navController.popBackStack() })
+        }
+        composable<VersionDestination> { entry ->
+            VersionRoute(
+                version = entry.toRoute<VersionDestination>().version,
+                onBack = { navController.popBackStack() },
+                onOpenFeature = { navController.navigate(FeatureDestination(it)) },
+            )
+        }
+        composable<FeatureDestination> { entry ->
+            FeatureRoute(id = entry.toRoute<FeatureDestination>().id, onBack = { navController.popBackStack() })
         }
         composable<TerminalDestination> { entry ->
             TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })
@@ -341,6 +385,12 @@ private fun NavController.openChat(sessionId: String) {
     val top = currentBackStackEntry
     if (top?.destination?.hasRoute<ChatDestination>() == true && top.toRoute<ChatDestination>().sessionId == sessionId) return
     navigate(ChatDestination(sessionId))
+}
+
+/** Pushes the What's New page unless it is already on top (a repeated tap during the transition). */
+private fun NavController.openWhatsNew() {
+    if (currentBackStackEntry?.destination?.hasRoute<WhatsNewDestination>() == true) return
+    navigate(WhatsNewDestination)
 }
 
 /** The route of this entry for [splitStep]: the list, a chat, Connect, or another screen. */
@@ -365,6 +415,7 @@ private fun SessionsListDetail(
     demo: Boolean,
     onOpenChatFullScreen: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenWhatsNew: () -> Unit,
     onOpenTerminal: (String) -> Unit,
     onOpenFile: (String, String) -> Unit,
     openNewSession: Boolean,
@@ -414,6 +465,7 @@ private fun SessionsListDetail(
                 openNewSession = openNewSession,
                 onNewSessionOpened = onNewSessionOpened,
                 banner = { UpdateBanner() },
+                headerTop = { WhatsNewButtonRoute(onOpen = onOpenWhatsNew) },
                 demo = demo,
             )
         } else {
@@ -497,6 +549,7 @@ private fun SessionsListDetail(
                     },
                     modifier = Modifier.width(listWidth).fillMaxHeight().clipToBounds(),
                     banner = { UpdateBanner() },
+                    headerTop = { WhatsNewButtonRoute(onOpen = onOpenWhatsNew) },
                     demo = demo,
                 )
                 VerticalDivider(color = OcTheme.colors.borderBase)

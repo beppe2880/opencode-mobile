@@ -249,7 +249,7 @@
     <string name="update_download">Download</string>
     <string name="update_sheet_title">Update available</string>
     <string name="update_sheet_versions_description">From version %1$s to version %2$s</string>
-    <string name="update_sheet_whats_new">What's new</string>
+    <string name="update_sheet_whats_new">In this update</string>
     <string name="update_sheet_version">Version %1$s</string>
     <string name="update_sheet_later">Later</string>
     <string name="update_sheet_skip">Skip this version</string>
@@ -263,6 +263,23 @@
     <string name="update_check_checking">Checking for updates…</string>
     <string name="update_check_latest">You're on the latest version (%1$s)</string>
     <string name="update_check_failed">Couldn't reach GitHub. Check your connection and try again.</string>
+    <string name="whats_new_title">Tips &amp; new features</string>
+    <string name="whats_new_settings_sub">Everything that changed, release by release</string>
+    <string name="whats_new_unseen">New releases</string>
+    <string name="whats_new_hide">Hide until the next release</string>
+    <string name="whats_new_refresh">Refresh</string>
+    <string name="whats_new_type_new">New</string>
+    <string name="whats_new_type_fixed">Fixed</string>
+    <string name="whats_new_type_other">Other</string>
+    <string name="whats_new_also_includes">Also includes %1$s</string>
+    <string name="whats_new_installed">Installed</string>
+    <string name="whats_new_installed_version">%1$s installed</string>
+    <string name="whats_new_open_change">Open on GitHub</string>
+    <string name="whats_new_no_notes">No release notes</string>
+    <string name="whats_new_empty">No releases yet</string>
+    <string name="whats_new_empty_message">New versions of the app will be listed here.</string>
+    <string name="whats_new_error">Could not load the releases</string>
+    <string name="whats_new_offline">Couldn't refresh. Showing the releases saved on this device.</string>
     <string name="settings_split_view">Chat beside the list</string>
     <string name="settings_split_view_sub">On wide screens, show the open chat next to the session list. Drag the handle on the divider to resize the list.</string>
     <string name="settings_list_width">Session list width</string>
@@ -387,4 +404,23 @@
     <string name="settings_edit_more">All options in %1$s</string>
     <string name="settings_close_model_picker">Close picker after choosing a model</string>
     <string name="settings_close_model_picker_sub">Turn off to choose the model and reasoning together, then tap Done to close.</string>
+    <string name="feature_section_changelog">Changelog</string>
+    <string name="feature_new">New</string>
+    <string name="feature_by">By %1$s · #%2$d</string>
+    <string name="feature_math_title">Math that reads like math</string>
+    <string name="feature_math_body">Formulas in replies are typeset as they arrive: fractions, roots, integrals and matrices instead of raw LaTeX. Copying a message still gives you the LaTeX source.</string>
+    <string name="feature_math_demo">A reply streams in and its formulas turn from LaTeX source into typeset math.</string>
+    <string name="feature_attachments_title">See the pictures you attach</string>
+    <string name="feature_attachments_body">Attached images show as thumbnails in the message box, so you can check them before sending. Tap one to see it full screen, or its X to remove it.</string>
+    <string name="feature_attachments_demo">Two pictures appear in the message box, one opens full screen, then one is removed.</string>
+    <string name="tips_version">Version %1$s</string>
+    <string name="tips_show_list">Show as a list</string>
+    <string name="tips_show_carousel">Show as a carousel</string>
+    <string name="feature_open_pr">View the pull request</string>
+    <string name="tips_installed">Installed</string>
+    <string name="tips_newer">New</string>
+    <plurals name="tips_feature_count">
+        <item quantity="one">%1$d feature</item>
+        <item quantity="other">%1$d features</item>
+    </plurals>
 </resources>

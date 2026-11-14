@@ -249,7 +249,7 @@
     <string name="update_download">Scarica</string>
     <string name="update_sheet_title">Aggiornamento disponibile</string>
     <string name="update_sheet_versions_description">Dalla versione %1$s alla versione %2$s</string>
-    <string name="update_sheet_whats_new">Novità</string>
+    <string name="update_sheet_whats_new">In questo aggiornamento</string>
     <string name="update_sheet_version">Versione %1$s</string>
     <string name="update_sheet_later">Più tardi</string>
     <string name="update_sheet_skip">Salta questa versione</string>
@@ -263,6 +263,23 @@
     <string name="update_check_checking">Verifica degli aggiornamenti…</string>
     <string name="update_check_latest">Hai l'ultima versione (%1$s)</string>
     <string name="update_check_failed">Impossibile raggiungere GitHub. Controlla la connessione e riprova.</string>
+    <string name="whats_new_title">Novità e consigli</string>
+    <string name="whats_new_settings_sub">Tutte le modifiche, versione per versione</string>
+    <string name="whats_new_unseen">Nuove versioni</string>
+    <string name="whats_new_hide">Nascondi fino alla prossima versione</string>
+    <string name="whats_new_refresh">Aggiorna</string>
+    <string name="whats_new_type_new">Nuovo</string>
+    <string name="whats_new_type_fixed">Corretto</string>
+    <string name="whats_new_type_other">Altro</string>
+    <string name="whats_new_also_includes">Include anche %1$s</string>
+    <string name="whats_new_installed">Installata</string>
+    <string name="whats_new_installed_version">%1$s installata</string>
+    <string name="whats_new_open_change">Apri su GitHub</string>
+    <string name="whats_new_no_notes">Nessuna nota di rilascio</string>
+    <string name="whats_new_empty">Nessuna versione ancora</string>
+    <string name="whats_new_empty_message">Qui compariranno le nuove versioni dell'app.</string>
+    <string name="whats_new_error">Impossibile caricare le versioni</string>
+    <string name="whats_new_offline">Impossibile aggiornare. Vengono mostrate le versioni salvate su questo dispositivo.</string>
     <string name="settings_split_view">Chat accanto all'elenco</string>
     <string name="settings_split_view_sub">Sugli schermi larghi mostra la chat aperta accanto all'elenco delle sessioni. Trascina la maniglia sul divisore per cambiarne la larghezza.</string>
     <string name="settings_list_width">Larghezza dell'elenco</string>
@@ -387,4 +404,23 @@
     <string name="settings_edit_more">Tutte le opzioni in %1$s</string>
     <string name="settings_close_model_picker">Chiudi il selettore dopo la scelta del modello</string>
     <string name="settings_close_model_picker_sub">Disattiva per scegliere insieme modello e ragionamento, poi tocca Fine per chiudere.</string>
+    <string name="feature_section_changelog">Changelog</string>
+    <string name="feature_new">Nuovo</string>
+    <string name="feature_by">Di %1$s · #%2$d</string>
+    <string name="feature_math_title">Formule che si leggono come formule</string>
+    <string name="feature_math_body">Le formule nelle risposte vengono composte mentre arrivano: frazioni, radici, integrali e matrici al posto del LaTeX grezzo. Copiando un messaggio ottieni comunque il sorgente LaTeX.</string>
+    <string name="feature_math_demo">Arriva una risposta e le sue formule passano dal sorgente LaTeX alla matematica composta.</string>
+    <string name="feature_attachments_title">Vedi le foto che alleghi</string>
+    <string name="feature_attachments_body">Le immagini allegate compaiono come miniature nel campo di scrittura, così le controlli prima di inviare. Toccane una per vederla a schermo intero, o la sua X per toglierla.</string>
+    <string name="feature_attachments_demo">Due foto compaiono nel campo di scrittura, una si apre a schermo intero, poi una viene rimossa.</string>
+    <string name="tips_version">Versione %1$s</string>
+    <string name="tips_show_list">Mostra come elenco</string>
+    <string name="tips_show_carousel">Mostra come carosello</string>
+    <string name="feature_open_pr">Vedi la pull request</string>
+    <string name="tips_installed">Installata</string>
+    <string name="tips_newer">Nuova</string>
+    <plurals name="tips_feature_count">
+        <item quantity="one">%1$d funzionalità</item>
+        <item quantity="other">%1$d funzionalità</item>
+    </plurals>
 </resources>

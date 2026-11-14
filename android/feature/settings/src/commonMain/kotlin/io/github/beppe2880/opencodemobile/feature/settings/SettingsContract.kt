@@ -97,6 +97,9 @@ sealed interface SettingsEvent {
     data object AddServer : SettingsEvent
     data object OpenUsage : SettingsEvent
 
+    /** The release history of the app, from About. */
+    data object OpenWhatsNew : SettingsEvent
+
     /** Opens a category, at [part] of its preview or at [option] (the part of [option] in the Preview style). */
     data class OpenArea(val area: SettingsArea, val part: SettingsPart? = null, val option: SettingOption? = null) : SettingsEvent
     data object CloseArea : SettingsEvent
@@ -202,6 +205,7 @@ sealed interface SettingsEffect {
     data object NavigateBack : SettingsEffect
     data object OpenConnect : SettingsEffect
     data object OpenUsage : SettingsEffect
+    data object OpenWhatsNew : SettingsEffect
     data object RequestNotificationPermission : SettingsEffect
     data object OpenNotificationSettings : SettingsEffect
 }
