@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">اعرف مكانك في لمحة</string>
+    <string name="tips_d_header_body">يعرض رأس المحادثة المجلد وفرع Git وعدد الملفات المعدّلة. اضغط عليه لمراجعة التغييرات.</string>
+    <string name="tips_d_header_demo">يعرض رأس المحادثة المجلد والفرع وعدد الملفات المعدّلة؛ والنقر عليه يفتح قائمة الملفات المعدّلة.</string>
+
+    <string name="tips_d_offline_title">جرّب التطبيق دون خادم</string>
+    <string name="tips_d_offline_body">لا يوجد خادم بعد؟ اضغط «تجربة بدون خادم» في شاشة الاتصال وتصفّح جلسات تجريبية. لا شيء يغادر هاتفك.</string>
+    <string name="tips_d_offline_demo">في شاشة الاتصال، يفتح النقر على «تجربة بدون خادم» قائمة بجلسات تجريبية.</string>
+
+    <string name="tips_d_split_title">القائمة والمحادثة جنبًا إلى جنب</string>
+    <string name="tips_d_split_body">على الأجهزة القابلة للطي المفرودة والألواح، تتشارك الجلسات والمحادثة الشاشة. اسحب الفاصل لتغيير حجم القائمة، أو اختر العرض المقسوم من الإعدادات.</string>
+    <string name="tips_d_split_demo">تعرض شاشة عريضة قائمة الجلسات بجانب المحادثة. النقر على جلسة يحدّث المحادثة، وسحب الفاصل يوسّع القائمة.</string>
+
+    <string name="tips_d_share_title">شارك إلى OpenCode من أي تطبيق</string>
+    <string name="tips_d_share_body">أرسل النصوص والروابط والصور من التطبيقات الأخرى إلى OpenCode عبر ورقة المشاركة، وابدأ منها جلسة جديدة.</string>
+    <string name="tips_d_share_demo">تُشارك صفحة من تطبيق آخر؛ اختيار OpenCode في ورقة المشاركة يبدأ جلسة بالرابط المشارَك.</string>
+
+    <string name="tips_d_settings_title">إعدادات ترى تغيّرها</string>
+    <string name="tips_d_settings_body">غيّر الإعدادات من قائمة، مع معاينات مباشرة للمحادثة أو في النسخة التجريبية. ترى النتيجة قبل أن تغادر.</string>
+    <string name="tips_d_settings_demo">سحب شريط حجم نص المحادثة يكبّر النص في المعاينة المباشرة للمحادثة.</string>
+
+    <string name="tips_d_update_title">اعرف ما تغيّر قبل التحديث</string>
+    <string name="tips_d_update_body">عند صدور إصدار جديد، تعرض ورقة سجل التغييرات بالميزات الجديدة والإصلاحات. حدّث، أو تخطَّ، أو قرر لاحقًا.</string>
+    <string name="tips_d_update_demo">تُفتح ورقة التحديث؛ النقر على «عرض ما الجديد» يوسّع قائمة الميزات والإصلاحات الجديدة.</string>
+
+    <string name="tips_d_mcp_title">تحكّم في خوادم MCP</string>
+    <string name="tips_d_mcp_body">اطّلع على خوادم MCP المتصلة، ووصّل أو افصل أيًا منها من قائمة المحادثة، دون العودة إلى الحاسوب.</string>
+    <string name="tips_d_mcp_demo">تعرض ورقة خوادم MCP كل خادم مع حالته؛ تفعيل المفتاح يصل الخادم.</string>
+
+    <string name="tips_d_follow_title">تابع الوكيل مباشرةً</string>
+    <string name="tips_d_follow_body">أثناء عمل الوكيل تبقى خطوته الحالية مفتوحة: تقرأ التفكير ومخرجات الأوامر والفروقات فور وصولها، وتُطوى عند انتهاء الرد.</string>
+    <string name="tips_d_follow_demo">تعرض محادثة مخرجات أمر قيد التشغيل، ثم فرق تعديل، وتطوي الخطوات عند وصول الرد.</string>
+
+    <string name="tips_d_output_title">اضبط مخرجات الأدوات وحجم النص</string>
+    <string name="tips_d_output_body">اختر عدد أسطر المخرجات المعروضة، وعدد مرات تحديث الأمر الجاري، وحجم نص المحادثة. زر واحد يعيد كل شيء إلى ما كان عليه.</string>
+    <string name="tips_d_output_demo">يتغيّر فاصل التحديث وعدد أسطر المخرجات، ثم يعيد «إعادة ضبط جميع الإعدادات» القيم الافتراضية.</string>
+</resources>

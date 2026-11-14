@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">ホーム画面でセッションを確認</string>
+    <string name="tips_e_widget_body">ウィジェットを追加すると、アプリを開かなくても、実行中のセッションと最近使ったセッションを確認できます。セッションをタップするとすぐに開け、新しいセッションも始められます。</string>
+    <string name="tips_e_widget_demo">OpenCodeウィジェットがホーム画面にあり、実行中のセッションが2つと最近のセッションが1つ表示されています。更新すると、そのうち1つは実行中ではなくなります。</string>
+
+    <string name="tips_e_files_title">エージェントが触れたファイルをすべて開く</string>
+    <string name="tips_e_files_body">読み取り、書き込み、編集の行や変更されたファイルの「開く」ボタンをタップすると、シンタックスハイライト付きでファイル全体を読めます。読み取り専用なので、誤って変更されることはありません。</string>
+    <string name="tips_e_files_demo">チャットでファイルのツールの行に「開く」ボタンがあります。タップすると、行番号とハイライトされたコードでファイルが開きます。</string>
+
+    <string name="tips_e_terminal_title">ポケットの中の本格的なターミナル</string>
+    <string name="tips_e_terminal_body">チャットの上部バーから、セッションのフォルダにあるサーバーのシェルを開きます。キーバーには、スマートフォンのキーボードにないEsc、Tab、Ctrl、矢印キーがあります。</string>
+    <string name="tips_e_terminal_demo">ターミナルに npm test と入力されています。キーバーの Enter をタップするとコマンドが実行され、テストの結果が表示されます。</string>
+
+    <string name="tips_e_compaction_title">エージェントが覚えている内容を読む</string>
+    <string name="tips_e_compaction_body">長い会話が圧縮されたら、「コンテキストを圧縮しました」の区切り線をタップすると、エージェントが引き継いで使っている要約を読めます。</string>
+    <string name="tips_e_compaction_demo">トランスクリプトで「コンテキストを圧縮しました」の区切り線をタップすると、会話の要約が開いて表示されます。</string>
+
+    <string name="tips_e_dictation_title">エージェントに話しかける</string>
+    <string name="tips_e_dictation_body">メッセージ欄の横のマイクをタップして話すだけです。話した言葉がそのままプロンプトに表示されます。もう一度タップして停止し、確認してから送信します。</string>
+    <string name="tips_e_dictation_demo">マイクボタンがタップされ、音声の受け付けが始まります。「設定画面にダークモードの切り替えを追加」という文が、単語ごとにメッセージ欄に入力され、その後マイクが再びタップされます。</string>
+
+    <string name="tips_e_usage_title">トークンと費用の内訳を確認</string>
+    <string name="tips_e_usage_body">設定の「利用状況」画面には、今日、直近7日間、直近30日間の費用、プロンプト、トークン、よく使われるモデルが表示されます。</string>
+    <string name="tips_e_usage_demo">利用状況の画面です。「今日」から「7日間」に切り替えると、費用とトークンの合計が増え、日ごとのステップのグラフが埋まり、その下に使用したモデルが表示されます。</string>
+
+    <string name="tips_e_notifications_title">必要な通知だけを受け取る</string>
+    <string name="tips_e_notifications_body">設定の「セッションの通知」で、受け取る種類を選べます：権限のリクエスト、エージェントからの質問、終了したセッション。</string>
+    <string name="tips_e_notifications_demo">「セッションの通知」の下に3つのスイッチがあります。「質問」と「終了したセッション」はオフ、「権限のリクエスト」はオンのままです。</string>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">Shell-Befehle direkt aus dem Chat ausführen</string>
+    <string name="tips_f_shell_body">Beginne deine Nachricht mit ! und sie wird in der Shell deines Projekts ausgeführt, statt an den Agenten zu gehen. Die Ausgabe erscheint direkt im Verlauf.</string>
+    <string name="tips_f_shell_demo">Das Nachrichtenfeld enthält den Text !git status -s, ein Hinweis sagt, dass er in der Shell ausgeführt wird, und nach dem Senden erscheinen Befehl und Ausgabe im Chat.</string>
+
+    <string name="tips_f_queue_title">Prompts in die Warteschlange stellen und später anpassen</string>
+    <string name="tips_f_queue_body">Prompts, die du einreihst, während der Agent beschäftigt ist, warten in einer Liste über dem Nachrichtenfeld. Sende einen sofort, bearbeite ihn oder entferne ihn, bevor er läuft.</string>
+    <string name="tips_f_queue_demo">Drei Prompts in der Warteschlange werden aufgelistet. Einer wird bearbeitet, einer entfernt und einer sofort gesendet und wird zu einer Nachricht.</string>
+
+    <string name="tips_f_changes_title">Sieh jede Datei, die eine Sitzung geändert hat</string>
+    <string name="tips_f_changes_body">Öffne Änderungen, um die Dateien zu prüfen, die der Agent berührt hat, für die ganze Sitzung oder nur den letzten Durchlauf. Tippe auf eine Datei, um ihren Diff zu lesen.</string>
+    <string name="tips_f_changes_demo">Das Blatt Änderungen listet zwei Dateien mit der Anzahl hinzugefügter und entfernter Zeilen. Ein Tipp auf die erste öffnet ihren Diff in Rot und Grün.</string>
+
+    <string name="tips_f_notifications_title">Werde benachrichtigt, wenn der Agent dich braucht</string>
+    <string name="tips_f_notifications_body">Eine Benachrichtigung sagt dir, wenn eine Sitzung auf eine Berechtigung oder eine Antwort wartet und wenn sie fertig ist. Du kannst eine Änderung direkt daraus erlauben oder ablehnen.</string>
+    <string name="tips_f_notifications_demo">Eine Benachrichtigung bittet um Erlaubnis, eine Datei zu bearbeiten, und wird mit Einmal erlauben beantwortet. Dann meldet eine zweite Benachrichtigung, dass eine Sitzung abgeschlossen ist.</string>
+
+    <string name="tips_f_pair_title">Verbinde dein Handy in Sekunden</string>
+    <string name="tips_f_pair_body">Scanne den QR-Code von opencode pair, füge den Link ein, gib ein Passwort ein oder tippe auf einen Server, den die App in deinem WLAN findet.</string>
+    <string name="tips_f_pair_demo">Auf dem Bildschirm Verbinden erscheint ein Server unter Im Netzwerk gefunden. Ein Tipp auf QR-Code scannen öffnet die Kamera, liest einen QR-Code und verbindet.</string>
+
+    <string name="tips_f_live_title">Sieh dem Agenten live bei der Arbeit zu</string>
+    <string name="tips_f_live_body">Text, Überlegungen und Werkzeugaufrufe kommen laufend herein, während sie passieren. Wenn der Agent eine Berechtigung oder eine Frage braucht, antwortest du direkt dort.</string>
+    <string name="tips_f_live_demo">Eine Antwort wird gestreamt, mit Denkprozess und Werkzeugaufrufen. Eine Berechtigungsanfrage erscheint und wird mit Einmal erlauben genehmigt.</string>
+
+    <string name="tips_f_steer_title">Steuern, einreihen und / und @ nutzen</string>
+    <string name="tips_f_steer_body">Tippe / für Befehle und @ für Dateien. Während der Agent arbeitet, wähle, ob du ihn sofort steuern oder deinen Prompt für später einreihen willst.</string>
+    <string name="tips_f_steer_demo">Ein / listet Befehle auf, ein @ listet Dateien und eine wird gewählt. Während der Agent beschäftigt ist, erscheinen die Schaltflächen Jetzt steuern und Einreihen, und Einreihen wird gewählt.</string>
+
+    <string name="tips_f_fork_title">Eine Sitzung ab jedem Prompt verzweigen</string>
+    <string name="tips_f_fork_body">Halte einen Prompt gedrückt und wähle Ab hier verzweigen, um eine neue Sitzung mit dem Verlauf davor zu starten. Das Original bleibt unverändert. Oder tippe einfach /fork.</string>
+    <string name="tips_f_fork_demo">Ein langes Drücken auf einen Prompt öffnet ein Menü; Ab hier verzweigen wird gewählt und eine neue Sitzung öffnet sich ohne die späteren Nachrichten.</string>
+
+    <string name="tips_f_undo_title">Jeden Prompt rückgängig machen und wiederherstellen</string>
+    <string name="tips_f_undo_body">Tippe /undo, um den letzten Prompt samt seinen Dateiänderungen zurückzunehmen. Anders überlegt? Tippe auf Wiederherstellen oder nutze /redo.</string>
+    <string name="tips_f_undo_demo">Ein /undo blendet den letzten Prompt aus und zeigt einen Hinweis mit 1 Nachricht rückgängig gemacht. Ein Tipp auf Wiederherstellen holt ihn zurück.</string>
+</resources>

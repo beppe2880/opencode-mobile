@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">Vos sessions sur l'écran d'accueil</string>
+    <string name="tips_e_widget_body">Ajoutez le widget pour voir quelles sessions sont en cours et lesquelles vous avez utilisées en dernier, sans ouvrir l'application. Touchez une session pour y accéder directement, ou démarrez-en une nouvelle.</string>
+    <string name="tips_e_widget_demo">Un écran d'accueil avec le widget OpenCode affichant deux sessions en cours et une récente. Après une actualisation, l'une des sessions n'est plus en cours.</string>
+
+    <string name="tips_e_files_title">Ouvrez n'importe quel fichier touché par l'agent</string>
+    <string name="tips_e_files_body">Touchez le bouton d'ouverture d'une ligne de lecture, d'écriture ou de modification, ou d'un fichier modifié, pour lire le fichier entier avec coloration syntaxique. Il est en lecture seule, rien ne change par accident.</string>
+    <string name="tips_e_files_demo">Dans le chat, une ligne d'outil pour un fichier a un bouton d'ouverture. Le toucher ouvre le fichier avec les numéros de ligne et le code coloré.</string>
+
+    <string name="tips_e_terminal_title">Un terminal complet dans votre poche</string>
+    <string name="tips_e_terminal_body">Ouvrez un shell sur le serveur, dans le dossier de votre session, depuis la barre supérieure du chat. Une barre de touches vous donne Échap, Tab, Ctrl et les flèches qui manquent aux claviers de téléphone.</string>
+    <string name="tips_e_terminal_demo">Un terminal où la commande npm test est tapée. Toucher Entrée sur la barre de touches l'exécute et les résultats des tests apparaissent.</string>
+
+    <string name="tips_e_compaction_title">Lisez ce que l'agent retient</string>
+    <string name="tips_e_compaction_body">Lorsqu'une longue conversation est compactée, touchez le séparateur Contexte compacté pour lire le résumé avec lequel l'agent poursuit.</string>
+    <string name="tips_e_compaction_demo">Dans une transcription, le séparateur Contexte compacté est touché et s'ouvre en affichant le résumé de la conversation.</string>
+
+    <string name="tips_e_dictation_title">Parlez à votre agent</string>
+    <string name="tips_e_dictation_body">Touchez le micro à côté de la zone de message et parlez simplement : vos mots apparaissent dans le prompt au fur et à mesure. Touchez à nouveau pour arrêter, puis relisez et envoyez.</string>
+    <string name="tips_e_dictation_demo">Le bouton micro est touché et commence à écouter. La phrase Ajoute un interrupteur de mode sombre à l'écran des paramètres s'écrit mot à mot dans la zone de message, puis le micro est touché à nouveau.</string>
+
+    <string name="tips_e_usage_title">Voyez où partent vos jetons et votre argent</string>
+    <string name="tips_e_usage_body">L'écran Utilisation dans les paramètres affiche le coût, les prompts, les jetons et vos modèles les plus actifs pour aujourd'hui, les 7 derniers jours ou les 30 derniers jours.</string>
+    <string name="tips_e_usage_demo">L'écran Utilisation. Passer d'Aujourd'hui à 7 jours fait grimper les totaux de coût et de jetons, remplit le graphique des étapes par jour, et les modèles utilisés s'affichent dessous.</string>
+
+    <string name="tips_e_notifications_title">Seulement les notifications qui vous intéressent</string>
+    <string name="tips_e_notifications_body">Dans les paramètres, sous Notifications des sessions, choisissez les types à recevoir : demandes d'autorisation, questions de l'agent ou sessions terminées.</string>
+    <string name="tips_e_notifications_demo">Trois interrupteurs sous Notifications des sessions. Questions et Sessions terminées sont désactivés, Demandes d'autorisation reste activé.</string>
+</resources>

@@ -249,7 +249,7 @@
     <string name="update_download">Télécharger</string>
     <string name="update_sheet_title">Mise à jour disponible</string>
     <string name="update_sheet_versions_description">De la version %1$s à la version %2$s</string>
-    <string name="update_sheet_whats_new">Nouveautés</string>
+    <string name="update_sheet_whats_new">Dans cette mise à jour</string>
     <string name="update_sheet_version">Version %1$s</string>
     <string name="update_sheet_later">Plus tard</string>
     <string name="update_sheet_skip">Ignorer cette version</string>
@@ -263,7 +263,7 @@
     <string name="update_check_checking">Recherche de mises à jour…</string>
     <string name="update_check_latest">Vous utilisez la dernière version (%1$s)</string>
     <string name="update_check_failed">Impossible de joindre GitHub. Vérifiez votre connexion et réessayez.</string>
-    <string name="whats_new_title">Nouveautés</string>
+    <string name="whats_new_title">Astuces et nouveautés</string>
     <string name="whats_new_settings_sub">Tout ce qui a changé, version après version</string>
     <string name="whats_new_unseen">Nouvelles versions</string>
     <string name="whats_new_hide">Masquer jusqu’à la prochaine version</string>
@@ -404,4 +404,23 @@
     <string name="settings_edit_more">Toutes les options dans %1$s</string>
     <string name="settings_close_model_picker">Fermer le sélecteur après le choix du modèle</string>
     <string name="settings_close_model_picker_sub">Désactivez pour choisir le modèle et le raisonnement ensemble, puis touchez Terminé pour fermer.</string>
+    <string name="feature_section_changelog">Changelog</string>
+    <string name="feature_new">Nouveau</string>
+    <string name="feature_by">Par %1$s · #%2$d</string>
+    <string name="feature_math_title">Des maths qui se lisent comme des maths</string>
+    <string name="feature_math_body">Les formules des réponses sont mises en forme au fur et à mesure de leur arrivée : fractions, racines, intégrales et matrices au lieu du LaTeX brut. Copier un message donne toujours le code source LaTeX.</string>
+    <string name="feature_math_demo">Une réponse arrive et ses formules passent du code LaTeX à des maths mises en forme.</string>
+    <string name="feature_attachments_title">Voyez les photos que vous joignez</string>
+    <string name="feature_attachments_body">Les images jointes apparaissent sous forme de miniatures dans la zone de message, pour que vous puissiez les vérifier avant l'envoi. Touchez-en une pour la voir en plein écran, ou sa croix pour la retirer.</string>
+    <string name="feature_attachments_demo">Deux photos apparaissent dans la zone de message, l'une s'ouvre en plein écran, puis l'une est retirée.</string>
+    <string name="tips_version">Version %1$s</string>
+    <string name="tips_show_list">Afficher en liste</string>
+    <string name="tips_show_carousel">Afficher en carrousel</string>
+    <string name="feature_open_pr">Voir la pull request</string>
+    <string name="tips_installed">Installée</string>
+    <string name="tips_newer">Nouvelle</string>
+    <plurals name="tips_feature_count">
+        <item quantity="one">%1$d fonctionnalité</item>
+        <item quantity="other">%1$d fonctionnalités</item>
+    </plurals>
 </resources>

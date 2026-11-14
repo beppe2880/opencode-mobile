@@ -255,7 +255,7 @@
     <string name="update_download">Скачать</string>
     <string name="update_sheet_title">Доступно обновление</string>
     <string name="update_sheet_versions_description">С версии %1$s до версии %2$s</string>
-    <string name="update_sheet_whats_new">Что нового</string>
+    <string name="update_sheet_whats_new">В этом обновлении</string>
     <string name="update_sheet_version">Версия %1$s</string>
     <string name="update_sheet_later">Позже</string>
     <string name="update_sheet_skip">Пропустить эту версию</string>
@@ -269,7 +269,7 @@
     <string name="update_check_checking">Проверка обновлений…</string>
     <string name="update_check_latest">У вас последняя версия (%1$s)</string>
     <string name="update_check_failed">Не удалось связаться с GitHub. Проверьте подключение и попробуйте снова.</string>
-    <string name="whats_new_title">Что нового</string>
+    <string name="whats_new_title">Советы &amp; новинки</string>
     <string name="whats_new_settings_sub">Все изменения по версиям</string>
     <string name="whats_new_unseen">Новые версии</string>
     <string name="whats_new_hide">Скрыть до следующей версии</string>
@@ -410,4 +410,25 @@
     <string name="settings_edit_more">Все параметры в разделе %1$s</string>
     <string name="settings_close_model_picker">Закрывать список после выбора модели</string>
     <string name="settings_close_model_picker_sub">Отключите, чтобы выбрать модель и уровень рассуждений вместе, затем нажмите «Готово» для закрытия.</string>
+    <string name="feature_section_changelog">Changelog</string>
+    <string name="feature_new">Новое</string>
+    <string name="feature_by">Автор: %1$s · #%2$d</string>
+    <string name="feature_math_title">Математика, которая читается как математика</string>
+    <string name="feature_math_body">Формулы в ответах оформляются по мере поступления: дроби, корни, интегралы и матрицы вместо исходного LaTeX. При копировании сообщения по-прежнему получается исходный код LaTeX.</string>
+    <string name="feature_math_demo">Ответ поступает потоком, и его формулы превращаются из исходного кода LaTeX в оформленную математику.</string>
+    <string name="feature_attachments_title">Смотрите прикреплённые изображения</string>
+    <string name="feature_attachments_body">Прикреплённые изображения показываются миниатюрами в поле сообщения, чтобы вы могли проверить их перед отправкой. Нажмите на одно, чтобы открыть его на весь экран, или на крестик, чтобы удалить.</string>
+    <string name="feature_attachments_demo">В поле сообщения появляются два изображения, одно открывается на весь экран, затем другое удаляется.</string>
+    <string name="tips_version">Версия %1$s</string>
+    <string name="tips_show_list">Показать списком</string>
+    <string name="tips_show_carousel">Показать каруселью</string>
+    <string name="feature_open_pr">Открыть pull request</string>
+    <string name="tips_installed">Установлена</string>
+    <string name="tips_newer">Новое</string>
+    <plurals name="tips_feature_count">
+        <item quantity="one">%1$d функция</item>
+        <item quantity="few">%1$d функции</item>
+        <item quantity="many">%1$d функций</item>
+        <item quantity="other">%1$d функции</item>
+    </plurals>
 </resources>

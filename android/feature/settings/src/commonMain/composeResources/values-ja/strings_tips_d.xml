@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">今いる場所をひと目で</string>
+    <string name="tips_d_header_body">チャットのヘッダーには、フォルダ、Gitのブランチ、変更されたファイル数が表示されます。タップすると変更内容を確認できます。</string>
+    <string name="tips_d_header_demo">チャットのヘッダーにフォルダ、ブランチ、変更ファイル数が表示されます。タップすると変更されたファイルの一覧が開きます。</string>
+
+    <string name="tips_d_offline_title">サーバーなしでアプリを試す</string>
+    <string name="tips_d_offline_body">まだサーバーがありませんか？接続画面の「サーバーなしで試す」をタップすると、サンプルのセッションで操作を確認できます。データがスマートフォンの外に出ることはありません。</string>
+    <string name="tips_d_offline_demo">接続画面で「サーバーなしで試す」をタップすると、サンプルのセッション一覧が開きます。</string>
+
+    <string name="tips_d_split_title">一覧とチャットを並べて表示</string>
+    <string name="tips_d_split_body">展開した折りたためるデバイスやタブレットでは、セッションとチャットが画面を共有します。仕切り線をドラッグして一覧の幅を変えられ、設定で分割表示を選ぶこともできます。</string>
+    <string name="tips_d_split_demo">横長の画面ではセッション一覧がチャットの横に表示されます。セッションをタップするとチャットが切り替わり、仕切り線をドラッグすると一覧が広がります。</string>
+
+    <string name="tips_d_share_title">どのアプリからでもOpenCodeへ共有</string>
+    <string name="tips_d_share_body">他のアプリのテキスト、リンク、画像を共有シートからOpenCodeに送り、そこから新しいセッションを始められます。</string>
+    <string name="tips_d_share_demo">別のアプリでページを共有し、共有シートでOpenCodeを選ぶと、共有されたリンクを使ってセッションが始まります。</string>
+
+    <string name="tips_d_settings_title">変更がその場で見える設定</string>
+    <string name="tips_d_settings_body">設定は一覧から変更でき、チャットのライブプレビューやデモで結果がすぐに分かります。画面を離れる前に結果を確認できます。</string>
+    <string name="tips_d_settings_demo">チャットの文字サイズのスライダーをドラッグすると、ライブプレビューのチャットの文字が大きくなります。</string>
+
+    <string name="tips_d_update_title">アップデート前に変更点を確認</string>
+    <string name="tips_d_update_body">新しいリリースがあると、新機能と修正を含む変更履歴がシートに表示されます。アップデート、スキップ、後で判断から選べます。</string>
+    <string name="tips_d_update_demo">アップデートのシートが開きます。「変更履歴を表示」をタップすると、新機能と修正の一覧が展開されます。</string>
+
+    <string name="tips_d_mcp_title">MCPサーバーを管理</string>
+    <string name="tips_d_mcp_body">接続されているMCPサーバーを確認し、チャットのメニューから接続や切断ができます。パソコンに戻る必要はありません。</string>
+    <string name="tips_d_mcp_demo">MCPサーバーのシートには、各サーバーとその状態が一覧表示されます。スイッチをオンにするとサーバーに接続されます。</string>
+
+    <string name="tips_d_follow_title">エージェントの作業をリアルタイムで追う</string>
+    <string name="tips_d_follow_body">エージェントの作業中は、現在のステップが開いたままになります。思考、コマンドの出力、差分が届くそばから読め、回答が終わると自動で折りたたまれます。</string>
+    <string name="tips_d_follow_demo">チャットにはまず実行中のコマンドの出力が表示され、次に編集の差分が表示されます。回答が届くとステップは折りたたまれます。</string>
+
+    <string name="tips_d_output_title">ツールの出力と文字サイズを調整</string>
+    <string name="tips_d_output_body">表示する出力の行数、実行中コマンドの更新頻度、チャットの文字サイズを選べます。ボタン1つですべてリセットできます。</string>
+    <string name="tips_d_output_demo">更新間隔と出力行数を変更してから「すべての設定をリセット」をタップすると、既定値に戻ります。</string>
+</resources>

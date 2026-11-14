@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">Execute comandos de shell direto do chat</string>
+    <string name="tips_f_shell_body">Comece sua mensagem com ! e ela roda no shell do seu projeto, em vez de ir para o agente. A saída aparece logo na conversa.</string>
+    <string name="tips_f_shell_demo">A caixa de mensagem recebe o texto !git status -s, uma dica diz que será executado no shell e, após o envio, o comando e a saída aparecem no chat.</string>
+
+    <string name="tips_f_queue_title">Coloque prompts na fila e ajuste depois</string>
+    <string name="tips_f_queue_body">Os prompts enfileirados enquanto o agente está ocupado aguardam em uma lista acima da caixa de mensagem. Envie um agora, edite-o ou remova-o antes de executar.</string>
+    <string name="tips_f_queue_demo">Três prompts na fila são listados. Um é editado, um é removido e um é enviado na hora e vira uma mensagem.</string>
+
+    <string name="tips_f_changes_title">Veja todos os arquivos alterados por uma sessão</string>
+    <string name="tips_f_changes_body">Abra Alterações para revisar os arquivos que o agente tocou, em toda a sessão ou só na última rodada. Toque em um arquivo para ler o seu diff.</string>
+    <string name="tips_f_changes_demo">A folha Alterações lista dois arquivos com a contagem de linhas adicionadas e removidas. Tocar no primeiro abre seu diff em vermelho e verde.</string>
+
+    <string name="tips_f_notifications_title">Seja avisado quando o agente precisar de você</string>
+    <string name="tips_f_notifications_body">Uma notificação avisa quando uma sessão aguarda uma permissão ou uma resposta, e quando termina. Você pode permitir ou rejeitar uma edição direto por ela.</string>
+    <string name="tips_f_notifications_demo">Uma notificação pede permissão para editar um arquivo e é respondida com Permitir uma vez. Depois, uma segunda notificação avisa que uma sessão terminou.</string>
+
+    <string name="tips_f_pair_title">Conecte seu celular em segundos</string>
+    <string name="tips_f_pair_body">Escaneie o QR code de opencode pair, cole o link, digite uma senha ou toque em um servidor que o app encontra no seu Wi-Fi.</string>
+    <string name="tips_f_pair_demo">Na tela Conectar, um servidor aparece em Encontrado nesta rede. Tocar em Escanear QR code abre a câmera, lê um QR code e conecta.</string>
+
+    <string name="tips_f_live_title">Acompanhe o agente trabalhar, ao vivo</string>
+    <string name="tips_f_live_body">Texto, raciocínio e chamadas de ferramentas chegam em fluxo conforme acontecem. Quando o agente pede uma permissão ou faz uma pergunta, você responde ali mesmo.</string>
+    <string name="tips_f_live_demo">Uma resposta chega em fluxo com raciocínio e chamadas de ferramentas. Um pedido de permissão aparece e é aprovado com Permitir uma vez.</string>
+
+    <string name="tips_f_steer_title">Direcione, enfileire e use / e @</string>
+    <string name="tips_f_steer_body">Digite / para comandos e @ para arquivos. Enquanto o agente trabalha, escolha direcioná-lo agora ou enfileirar seu prompt para depois.</string>
+    <string name="tips_f_steer_demo">Digitar / lista os comandos, digitar @ lista os arquivos e um é escolhido. Com o agente ocupado, aparecem os botões Direcionar agora e Enfileirar, e Enfileirar é escolhido.</string>
+
+    <string name="tips_f_fork_title">Crie um fork de sessão a partir de qualquer prompt</string>
+    <string name="tips_f_fork_body">Toque e segure um prompt e escolha Bifurcar daqui para criar uma nova sessão com o histórico anterior a ele. A original permanece intacta. Ou simplesmente digite /fork.</string>
+    <string name="tips_f_fork_demo">Um toque longo em um prompt abre um menu; Bifurcar daqui é escolhido e uma nova sessão abre sem as mensagens posteriores.</string>
+
+    <string name="tips_f_undo_title">Desfaça e refaça qualquer prompt</string>
+    <string name="tips_f_undo_body">Digite /undo para desfazer o último prompt junto com suas alterações em arquivos. Mudou de ideia? Toque em Restaurar, ou use /redo.</string>
+    <string name="tips_f_undo_demo">Digitar /undo oculta o último prompt e mostra um aviso dizendo 1 mensagem desfeita. Tocar em Restaurar o traz de volta.</string>
+</resources>

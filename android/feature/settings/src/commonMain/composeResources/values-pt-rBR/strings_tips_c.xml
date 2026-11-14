@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">Fale em vez de digitar</string>
+    <string name="tips_c_voice_record_body">Toque no microfone na caixa de mensagem e fale: uma forma de onda ao vivo e um cronômetro mostram que você está sendo ouvido. Confirme para manter o texto ou cancele para descartá-lo.</string>
+    <string name="tips_c_voice_record_demo">Um dedo toca no microfone, a caixa de mensagem mostra uma onda em movimento com um cronômetro e depois a frase falada aparece como texto.</string>
+
+    <string name="tips_c_voice_cloud_title">Ditado melhor com um modelo na nuvem</string>
+    <string name="tips_c_voice_cloud_body">Escolha um provedor e um modelo de transcrição nas configurações. A gravação é enviada quando você para, e o texto vai para a caixa de mensagem para você revisar.</string>
+    <string name="tips_c_voice_cloud_demo">Um dedo escolhe Nuvem como fala para texto; depois, uma gravação é transcrita e o texto aparece na caixa de mensagem.</string>
+
+    <string name="tips_c_settings_categories_title">Configurações fáceis de encontrar</string>
+    <string name="tips_c_settings_categories_body">As configurações são agrupadas em categorias, cada uma com sua própria página. Não sabe onde algo fica? Pesquise e vá direto para a configuração.</string>
+    <string name="tips_c_settings_categories_demo">Um dedo abre a categoria Entrada de voz, volta, depois digita no campo de busca e as configurações correspondentes são listadas.</string>
+
+    <string name="tips_c_terminal_fullscreen_title">Mais espaço para o terminal</string>
+    <string name="tips_c_terminal_fullscreen_body">Entre em tela cheia para ocultar a barra de título e as barras do sistema e ver mais linhas de uma vez. Voltar ou o mesmo botão as traz de volta.</string>
+    <string name="tips_c_terminal_fullscreen_demo">Um dedo toca no botão de tela cheia do terminal: a barra de título e a barra de status deslizam para fora e mais linhas de saída aparecem.</string>
+
+    <string name="tips_c_next_message_title">Troque de modelo sem esperar</string>
+    <string name="tips_c_next_message_body">Troque o agente ou o modelo enquanto uma resposta ainda está em andamento: a mudança vale a partir da sua próxima mensagem. Novos chats começam com o modelo usado por último.</string>
+    <string name="tips_c_next_message_demo">Enquanto o assistente trabalha, um dedo abre o menu de modelos e escolhe outro; uma nota diz que a mudança vale para a próxima mensagem.</string>
+
+    <string name="tips_c_thoughts_title">Uma linha para uma cadeia de raciocínios</string>
+    <string name="tips_c_thoughts_body">Raciocínios consecutivos do assistente são agrupados em uma única linha fácil de percorrer. Toque nela para ler cada raciocínio.</string>
+    <string name="tips_c_thoughts_demo">Três linhas de raciocínio separadas se fundem em uma só, que um dedo toca para mostrar os três raciocínios.</string>
+
+    <string name="tips_c_pending_bar_title">Veja o chat antes de decidir</string>
+    <string name="tips_c_pending_bar_body">Os cartões de perguntas e permissões se recolhem em uma barra fina, para você ler a conversa antes de responder. Toque na barra para abrir o cartão novamente.</string>
+    <string name="tips_c_pending_bar_demo">Um cartão de permissão é recolhido em uma barra ao tocar na sua seta, e reaberto ao tocar na barra.</string>
+
+    <string name="tips_c_running_title">Veja o que está rodando, ao vivo</string>
+    <string name="tips_c_running_body">Um chip acima da caixa de mensagem conta os subagentes e comandos em segundo plano em execução. Abra-o para acompanhar o tempo e a saída, ou para pará-los.</string>
+    <string name="tips_c_running_demo">Um dedo toca no chip de execução e uma folha lista um subagente e um comando, com um cronômetro correndo e um botão Parar.</string>
+</resources>

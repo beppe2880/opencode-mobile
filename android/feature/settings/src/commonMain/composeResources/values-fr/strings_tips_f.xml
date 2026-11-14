@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_f_shell_title">Lancez des commandes shell depuis le chat</string>
+    <string name="tips_f_shell_body">Commencez votre message par ! et il s'exécute dans le shell de votre projet au lieu d'être envoyé à l'agent. La sortie s'affiche directement dans la conversation.</string>
+    <string name="tips_f_shell_demo">La zone de message reçoit le texte !git status -s, un indice indique qu'il s'exécute dans le shell et, après l'envoi, la commande et sa sortie apparaissent dans le chat.</string>
+
+    <string name="tips_f_queue_title">Mettez les prompts en file d'attente et ajustez-les plus tard</string>
+    <string name="tips_f_queue_body">Les prompts mis en file pendant que l'agent est occupé attendent dans une liste au-dessus de la zone de message. Envoyez-en un maintenant, modifiez-le ou supprimez-le avant son exécution.</string>
+    <string name="tips_f_queue_demo">Trois prompts en file d'attente sont listés. Un est modifié, un est supprimé et un est envoyé aussitôt et devient un message.</string>
+
+    <string name="tips_f_changes_title">Voyez chaque fichier modifié par une session</string>
+    <string name="tips_f_changes_body">Ouvrez Modifications pour examiner les fichiers touchés par l'agent, pour toute la session ou seulement le dernier tour. Touchez un fichier pour lire son diff.</string>
+    <string name="tips_f_changes_demo">La feuille Modifications liste deux fichiers avec le nombre de lignes ajoutées et supprimées. Toucher le premier ouvre son diff en rouge et vert.</string>
+
+    <string name="tips_f_notifications_title">Soyez alerté quand l'agent a besoin de vous</string>
+    <string name="tips_f_notifications_body">Une notification vous prévient lorsqu'une session attend une autorisation ou une réponse, et lorsqu'elle se termine. Vous pouvez autoriser ou refuser une modification directement depuis elle.</string>
+    <string name="tips_f_notifications_demo">Une notification demande l'autorisation de modifier un fichier et reçoit une réponse Autoriser une fois. Puis une seconde notification indique qu'une session est terminée.</string>
+
+    <string name="tips_f_pair_title">Connectez votre téléphone en quelques secondes</string>
+    <string name="tips_f_pair_body">Scannez le code QR de opencode pair, collez le lien, saisissez un mot de passe ou touchez un serveur que l'application trouve sur votre Wi-Fi.</string>
+    <string name="tips_f_pair_demo">Sur l'écran Connexion, un serveur apparaît sous Trouvé sur ce réseau. Toucher Scanner le code QR ouvre la caméra, lit un code QR et se connecte.</string>
+
+    <string name="tips_f_live_title">Regardez l'agent travailler, en direct</string>
+    <string name="tips_f_live_body">Le texte, le raisonnement et les appels d'outils arrivent au fil de l'eau. Lorsque l'agent demande une autorisation ou pose une question, vous répondez sur place.</string>
+    <string name="tips_f_live_demo">Une réponse arrive en flux, avec la réflexion et les appels d'outils. Une demande d'autorisation apparaît et est approuvée avec Autoriser une fois.</string>
+
+    <string name="tips_f_steer_title">Orientez, mettez en file et utilisez / et @</string>
+    <string name="tips_f_steer_body">Tapez / pour les commandes et @ pour les fichiers. Pendant que l'agent travaille, choisissez de l'orienter tout de suite ou de mettre votre prompt en file pour plus tard.</string>
+    <string name="tips_f_steer_demo">Taper / liste les commandes, taper @ liste les fichiers et l'un est choisi. L'agent étant occupé, les boutons Orienter maintenant et File d'attente apparaissent et File d'attente est choisi.</string>
+
+    <string name="tips_f_fork_title">Créez une branche de session depuis n'importe quel prompt</string>
+    <string name="tips_f_fork_body">Appuyez longuement sur un prompt et choisissez Bifurquer à partir d'ici pour créer une nouvelle session avec l'historique qui le précède. L'originale reste intacte. Ou tapez simplement /fork.</string>
+    <string name="tips_f_fork_demo">Un appui long sur un prompt ouvre un menu ; Bifurquer à partir d'ici est choisi et une nouvelle session s'ouvre sans les messages suivants.</string>
+
+    <string name="tips_f_undo_title">Annulez et rétablissez n'importe quel prompt</string>
+    <string name="tips_f_undo_body">Tapez /undo pour reprendre le dernier prompt avec ses modifications de fichiers. Vous avez changé d'avis ? Touchez Restaurer, ou utilisez /redo.</string>
+    <string name="tips_f_undo_demo">Taper /undo masque le dernier prompt et affiche un bandeau indiquant 1 message annulé. Toucher Restaurer le rétablit.</string>
+</resources>

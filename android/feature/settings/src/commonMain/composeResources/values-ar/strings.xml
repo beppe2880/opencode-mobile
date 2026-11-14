@@ -261,7 +261,7 @@
     <string name="update_download">تنزيل</string>
     <string name="update_sheet_title">التحديث متاح</string>
     <string name="update_sheet_versions_description">من الإصدار %1$s إلى الإصدار %2$s</string>
-    <string name="update_sheet_whats_new">ما الجديد</string>
+    <string name="update_sheet_whats_new">في هذا التحديث</string>
     <string name="update_sheet_version">الإصدار %1$s</string>
     <string name="update_sheet_later">لاحقًا</string>
     <string name="update_sheet_skip">تخطي هذا الإصدار</string>
@@ -275,7 +275,7 @@
     <string name="update_check_checking">جارٍ التحقق من التحديثات…</string>
     <string name="update_check_latest">أنت على أحدث إصدار (%1$s)</string>
     <string name="update_check_failed">تعذّر الوصول إلى GitHub. تحقّق من اتصالك وحاول مرة أخرى.</string>
-    <string name="whats_new_title">ما الجديد</string>
+    <string name="whats_new_title">نصائح &amp; ميزات جديدة</string>
     <string name="whats_new_settings_sub">كل ما تغيّر، إصدارًا تلو الآخر</string>
     <string name="whats_new_unseen">إصدارات جديدة</string>
     <string name="whats_new_hide">إخفاء حتى الإصدار التالي</string>
@@ -416,4 +416,27 @@
     <string name="settings_edit_more">كل الخيارات في %1$s</string>
     <string name="settings_close_model_picker">إغلاق القائمة بعد اختيار النموذج</string>
     <string name="settings_close_model_picker_sub">عطّل هذا الخيار لاختيار النموذج ومستوى الاستدلال معًا، ثم اضغط على تم للإغلاق.</string>
+    <string name="feature_section_changelog">سجل التغييرات</string>
+    <string name="feature_new">جديد</string>
+    <string name="feature_by">بواسطة %1$s · #%2$d</string>
+    <string name="feature_math_title">رياضيات تُقرأ كما هي</string>
+    <string name="feature_math_body">تُنسَّق الصيغ الرياضية في الردود أثناء وصولها: كسور وجذور وتكاملات ومصفوفات بدلًا من LaTeX الخام. ولا يزال نسخ الرسالة يعطيك مصدر LaTeX.</string>
+    <string name="feature_math_demo">يصل رد بشكل متدفق فتتحول صيغه من مصدر LaTeX إلى رياضيات منسّقة.</string>
+    <string name="feature_attachments_title">شاهد الصور التي ترفقها</string>
+    <string name="feature_attachments_body">تظهر الصور المرفقة كمصغّرات في مربع الرسالة، لتتحقق منها قبل الإرسال. اضغط على واحدة لعرضها بملء الشاشة، أو على زر X لإزالتها.</string>
+    <string name="feature_attachments_demo">تظهر صورتان في مربع الرسالة، تُفتح إحداهما بملء الشاشة، ثم تُزال واحدة.</string>
+    <string name="tips_version">الإصدار %1$s</string>
+    <string name="tips_show_list">عرض كقائمة</string>
+    <string name="tips_show_carousel">عرض كشريط متحرك</string>
+    <string name="feature_open_pr">عرض طلب السحب</string>
+    <string name="tips_installed">مثبّت</string>
+    <string name="tips_newer">جديد</string>
+    <plurals name="tips_feature_count">
+        <item quantity="zero">%1$d ميزة</item>
+        <item quantity="one">%1$d ميزة</item>
+        <item quantity="two">%1$d ميزتان</item>
+        <item quantity="few">%1$d ميزات</item>
+        <item quantity="many">%1$d ميزة</item>
+        <item quantity="other">%1$d ميزة</item>
+    </plurals>
 </resources>

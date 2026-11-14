@@ -249,7 +249,7 @@
     <string name="update_download">Herunterladen</string>
     <string name="update_sheet_title">Update verfügbar</string>
     <string name="update_sheet_versions_description">Von Version %1$s auf Version %2$s</string>
-    <string name="update_sheet_whats_new">Neuerungen</string>
+    <string name="update_sheet_whats_new">In diesem Update</string>
     <string name="update_sheet_version">Version %1$s</string>
     <string name="update_sheet_later">Später</string>
     <string name="update_sheet_skip">Diese Version überspringen</string>
@@ -263,7 +263,7 @@
     <string name="update_check_checking">Suche nach Updates…</string>
     <string name="update_check_latest">Du verwendest die neueste Version (%1$s)</string>
     <string name="update_check_failed">GitHub ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.</string>
-    <string name="whats_new_title">Neuigkeiten</string>
+    <string name="whats_new_title">Tipps &amp; Neuerungen</string>
     <string name="whats_new_settings_sub">Alle Änderungen, Version für Version</string>
     <string name="whats_new_unseen">Neue Versionen</string>
     <string name="whats_new_hide">Bis zur nächsten Version ausblenden</string>
@@ -404,4 +404,23 @@
     <string name="settings_edit_more">Alle Optionen in %1$s</string>
     <string name="settings_close_model_picker">Auswahl nach der Modellwahl schließen</string>
     <string name="settings_close_model_picker_sub">Deaktivieren, um Modell und Denkaufwand gemeinsam zu wählen. Danach mit Fertig schließen.</string>
+    <string name="feature_section_changelog">Changelog</string>
+    <string name="feature_new">Neu</string>
+    <string name="feature_by">Von %1$s · #%2$d</string>
+    <string name="feature_math_title">Mathe, die wie Mathe aussieht</string>
+    <string name="feature_math_body">Formeln in Antworten werden beim Eintreffen gesetzt: Brüche, Wurzeln, Integrale und Matrizen statt rohem LaTeX. Beim Kopieren einer Nachricht erhältst du weiterhin den LaTeX-Quelltext.</string>
+    <string name="feature_math_demo">Eine Antwort trifft ein, und ihre Formeln wechseln vom LaTeX-Quelltext zu gesetzter Mathematik.</string>
+    <string name="feature_attachments_title">Sieh dir die Bilder an, die du anhängst</string>
+    <string name="feature_attachments_body">Angehängte Bilder erscheinen als Miniaturen im Nachrichtenfeld, sodass du sie vor dem Senden prüfen kannst. Tippe auf ein Bild, um es im Vollbild zu sehen, oder auf das X, um es zu entfernen.</string>
+    <string name="feature_attachments_demo">Zwei Fotos erscheinen im Nachrichtenfeld, eines öffnet sich im Vollbild, dann wird eines entfernt.</string>
+    <string name="tips_version">Version %1$s</string>
+    <string name="tips_show_list">Als Liste anzeigen</string>
+    <string name="tips_show_carousel">Als Karussell anzeigen</string>
+    <string name="feature_open_pr">Pull Request ansehen</string>
+    <string name="tips_installed">Installiert</string>
+    <string name="tips_newer">Neu</string>
+    <plurals name="tips_feature_count">
+        <item quantity="one">%1$d Funktion</item>
+        <item quantity="other">%1$d Funktionen</item>
+    </plurals>
 </resources>

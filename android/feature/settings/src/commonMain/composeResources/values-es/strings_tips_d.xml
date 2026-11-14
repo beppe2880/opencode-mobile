@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_d_header_title">Ve de un vistazo dónde estás</string>
+    <string name="tips_d_header_body">El encabezado del chat muestra la carpeta, la rama de Git y cuántos archivos han cambiado. Tócalo para revisar los cambios.</string>
+    <string name="tips_d_header_demo">El encabezado del chat muestra la carpeta, la rama y el número de archivos modificados; al tocarlo se abre la lista de archivos modificados.</string>
+
+    <string name="tips_d_offline_title">Prueba la app sin servidor</string>
+    <string name="tips_d_offline_body">¿Aún no tienes servidor? Toca Probar sin servidor en la pantalla Conectar y explora algunas sesiones de muestra. Nada sale de tu teléfono.</string>
+    <string name="tips_d_offline_demo">En la pantalla Conectar, al tocar Probar sin servidor se abre una lista de sesiones de muestra.</string>
+
+    <string name="tips_d_split_title">Lista y chat lado a lado</string>
+    <string name="tips_d_split_body">En plegables desplegados y tablets, las sesiones y el chat comparten la pantalla. Arrastra el divisor para cambiar el tamaño de la lista, o elige la vista dividida en Ajustes.</string>
+    <string name="tips_d_split_demo">Una pantalla ancha muestra la lista de sesiones junto al chat. Al tocar una sesión se actualiza el chat, y al arrastrar el divisor la lista se ensancha.</string>
+
+    <string name="tips_d_share_title">Comparte con OpenCode desde cualquier app</string>
+    <string name="tips_d_share_body">Envía texto, enlaces e imágenes de otras apps a OpenCode desde la hoja de compartir, y empieza una sesión nueva a partir de ellos.</string>
+    <string name="tips_d_share_demo">Se comparte una página desde otra app; al elegir OpenCode en la hoja de compartir se inicia una sesión con el enlace compartido.</string>
+
+    <string name="tips_d_settings_title">Ajustes cuyo cambio puedes ver</string>
+    <string name="tips_d_settings_body">Cambia los ajustes desde una lista, con vistas previas en vivo del chat o en la demo. Ves el resultado antes de salir.</string>
+    <string name="tips_d_settings_demo">Al arrastrar el control deslizante del tamaño del texto del chat, se agranda el texto de una vista previa en vivo del chat.</string>
+
+    <string name="tips_d_update_title">Entérate de lo que cambia antes de actualizar</string>
+    <string name="tips_d_update_body">Cuando sale una versión nueva, una hoja muestra el changelog con las novedades y las correcciones. Actualiza, sáltala o decide más tarde.</string>
+    <string name="tips_d_update_demo">Se abre una hoja de actualización; al tocar Ver novedades se despliega la lista de novedades y correcciones.</string>
+
+    <string name="tips_d_mcp_title">Controla tus servidores MCP</string>
+    <string name="tips_d_mcp_body">Mira qué servidores MCP están conectados y conéctalos o desconéctalos desde el menú del chat, sin volver al ordenador.</string>
+    <string name="tips_d_mcp_demo">La hoja de servidores MCP muestra cada servidor con su estado; activar un interruptor conecta el servidor.</string>
+
+    <string name="tips_d_follow_title">Sigue al agente en directo</string>
+    <string name="tips_d_follow_body">Mientras el agente trabaja, su paso actual permanece abierto: lees el razonamiento, la salida de los comandos y los diffs según llegan, y se pliega cuando termina la respuesta.</string>
+    <string name="tips_d_follow_demo">Un chat muestra la salida de un comando en ejecución, luego el diff de una edición, y pliega los pasos cuando llega la respuesta.</string>
+
+    <string name="tips_d_output_title">Ajusta la salida de herramientas y el tamaño del texto</string>
+    <string name="tips_d_output_body">Elige cuántas líneas de salida mostrar, cada cuánto se actualiza un comando en ejecución y el tamaño del texto del chat. Un solo botón lo restablece todo.</string>
+    <string name="tips_d_output_demo">Se cambian el intervalo de actualización y el número de líneas de salida; luego, Restablecer todos los ajustes devuelve los valores predeterminados.</string>
+</resources>

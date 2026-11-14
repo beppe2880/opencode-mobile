@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_e_widget_title">Tus sesiones en la pantalla de inicio</string>
+    <string name="tips_e_widget_body">Añade el widget para ver qué sesiones están en ejecución y cuáles usaste por última vez, sin abrir la app. Toca una sesión para entrar directamente o inicia una nueva.</string>
+    <string name="tips_e_widget_demo">Una pantalla de inicio con el widget de OpenCode que muestra dos sesiones en ejecución y una reciente. Tras actualizar, una de las sesiones ya no está en ejecución.</string>
+
+    <string name="tips_e_files_title">Abre cualquier archivo que tocó el agente</string>
+    <string name="tips_e_files_body">Toca el botón de abrir en una fila de lectura, escritura o edición, o en un archivo modificado, para leer el archivo completo con resaltado de sintaxis. Es de solo lectura, así que nada cambia por accidente.</string>
+    <string name="tips_e_files_demo">En el chat, una fila de herramienta de un archivo tiene un botón de abrir. Al tocarlo se abre el archivo con números de línea y código resaltado.</string>
+
+    <string name="tips_e_terminal_title">Un terminal completo en el bolsillo</string>
+    <string name="tips_e_terminal_body">Abre una shell en el servidor, en la carpeta de tu sesión, desde la barra superior del chat. Una barra de teclas te ofrece Esc, Tab, Ctrl y las flechas que faltan en los teclados de los teléfonos.</string>
+    <string name="tips_e_terminal_demo">Un terminal donde se escribe el comando npm test. Al tocar Intro en la barra de teclas se ejecuta y aparecen los resultados de las pruebas.</string>
+
+    <string name="tips_e_compaction_title">Lee lo que recuerda el agente</string>
+    <string name="tips_e_compaction_body">Cuando una conversación larga se compacta, toca el separador Contexto compactado para leer el resumen con el que sigue trabajando el agente.</string>
+    <string name="tips_e_compaction_demo">En una transcripción se toca el separador Contexto compactado y se abre mostrando el resumen de la conversación.</string>
+
+    <string name="tips_e_dictation_title">Habla con tu agente</string>
+    <string name="tips_e_dictation_body">Toca el micrófono junto al cuadro de mensaje y simplemente habla: tus palabras aparecen en el prompt conforme las dices. Toca de nuevo para parar, luego revisa y envía.</string>
+    <string name="tips_e_dictation_demo">Se toca el botón del micrófono y empieza a escuchar. La frase Añade un interruptor de modo oscuro a la pantalla de ajustes se escribe en el cuadro de mensaje palabra por palabra, y luego se toca otra vez el micrófono.</string>
+
+    <string name="tips_e_usage_title">Mira adónde van tus tokens y tu dinero</string>
+    <string name="tips_e_usage_body">La pantalla Uso en Ajustes muestra el coste, los prompts, los tokens y tus modelos más usados de hoy, de los últimos 7 días o de los últimos 30.</string>
+    <string name="tips_e_usage_demo">La pantalla Uso. Al pasar de Hoy a 7 días, los totales de coste y tokens crecen, el gráfico de pasos por día se llena y debajo aparecen los modelos usados.</string>
+
+    <string name="tips_e_notifications_title">Solo las notificaciones que quieres</string>
+    <string name="tips_e_notifications_body">En Ajustes, bajo Notificaciones de sesiones, elige qué tipos recibir: solicitudes de permiso, preguntas del agente o sesiones terminadas.</string>
+    <string name="tips_e_notifications_demo">Tres interruptores bajo Notificaciones de sesiones. Preguntas y Sesiones terminadas están desactivados, y Solicitudes de permiso sigue activado.</string>
+</resources>

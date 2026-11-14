@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_c_voice_record_title">타이핑 대신 말하기</string>
+    <string name="tips_c_voice_record_body">메시지 상자의 마이크를 탭하고 말하세요. 실시간 파형과 타이머로 음성이 인식되고 있음을 확인할 수 있습니다. 확인을 누르면 텍스트가 남고, 취소를 누르면 버려집니다.</string>
+    <string name="tips_c_voice_record_demo">손가락으로 마이크를 탭하면 메시지 상자에 움직이는 파형과 타이머가 나타나고, 말한 문장이 텍스트로 표시됩니다.</string>
+
+    <string name="tips_c_voice_cloud_title">클라우드 모델로 더 정확한 받아쓰기</string>
+    <string name="tips_c_voice_cloud_body">설정에서 제공업체와 음성 변환 모델을 고르세요. 멈추면 녹음이 전송되고, 텍스트가 메시지 상자에 들어가 확인한 뒤 보낼 수 있습니다.</string>
+    <string name="tips_c_voice_cloud_demo">손가락으로 음성-텍스트 변환을 클라우드로 선택하면 녹음이 변환되고, 텍스트가 메시지 상자에 나타납니다.</string>
+
+    <string name="tips_c_settings_categories_title">설정을 쉽게 찾기</string>
+    <string name="tips_c_settings_categories_body">설정은 카테고리로 묶여 있고, 각 카테고리마다 별도의 페이지가 있습니다. 어디에 있는지 모르겠다면 검색해서 해당 설정으로 바로 이동하세요.</string>
+    <string name="tips_c_settings_categories_demo">손가락으로 음성 입력 카테고리를 열고 뒤로 간 다음 검색창에 입력하면, 일치하는 설정이 목록으로 표시됩니다.</string>
+
+    <string name="tips_c_terminal_fullscreen_title">터미널을 더 넓게</string>
+    <string name="tips_c_terminal_fullscreen_body">전체 화면으로 들어가면 제목 표시줄과 시스템 막대가 숨겨져 한 번에 더 많은 줄을 볼 수 있습니다. 뒤로 가기나 같은 버튼을 누르면 다시 나타납니다.</string>
+    <string name="tips_c_terminal_fullscreen_demo">손가락으로 터미널의 전체 화면 버튼을 탭하면 제목 표시줄과 상태 표시줄이 밀려나고, 더 많은 출력 줄이 나타납니다.</string>
+
+    <string name="tips_c_next_message_title">기다리지 않고 모델 전환</string>
+    <string name="tips_c_next_message_body">응답이 아직 진행 중이어도 에이전트나 모델을 바꿀 수 있습니다. 변경 사항은 다음 메시지부터 적용됩니다. 새 채팅은 마지막으로 사용한 모델로 시작합니다.</string>
+    <string name="tips_c_next_message_demo">어시스턴트가 작업하는 동안 손가락으로 모델 메뉴를 열고 다른 모델을 고르면, 다음 메시지에 적용된다는 안내가 표시됩니다.</string>
+
+    <string name="tips_c_thoughts_title">연속된 생각을 한 줄로</string>
+    <string name="tips_c_thoughts_body">어시스턴트의 연속된 생각은 훑어보기 쉬운 한 줄로 묶입니다. 탭하면 각 생각을 읽을 수 있습니다.</string>
+    <string name="tips_c_thoughts_demo">서로 떨어진 세 개의 생각 행이 하나로 합쳐지고, 손가락으로 탭하면 세 가지 생각이 표시됩니다.</string>
+
+    <string name="tips_c_pending_bar_title">결정하기 전에 채팅 미리 보기</string>
+    <string name="tips_c_pending_bar_body">질문과 권한 카드는 얇은 막대로 접혀서, 답하기 전에 대화를 읽을 수 있습니다. 막대를 탭하면 카드가 다시 펼쳐집니다.</string>
+    <string name="tips_c_pending_bar_demo">권한 카드는 화살표를 탭하면 얇은 막대로 접히고, 막대를 탭하면 다시 펼쳐집니다.</string>
+
+    <string name="tips_c_running_title">실행 중인 작업을 실시간으로 확인</string>
+    <string name="tips_c_running_body">메시지 상자 위의 칩에 실행 중인 하위 에이전트와 백그라운드 명령의 수가 표시됩니다. 열면 경과 시간과 출력을 확인하거나 중지할 수 있습니다.</string>
+    <string name="tips_c_running_demo">손가락으로 실행 중 칩을 탭하면, 경과 타이머와 중지 버튼이 있는 하위 에이전트 하나와 명령 하나가 시트에 표시됩니다.</string>
+</resources>
