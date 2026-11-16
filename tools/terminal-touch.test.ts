@@ -8,7 +8,7 @@ function terminal(deferWrites = false) {
   type Listener = (event: any) => void
   class Element {
     listeners = new Map<string, Listener[]>()
-    height = 400
+    height = 480
     addEventListener(type: string, listener: Listener) {
       const listeners = this.listeners.get(type) ?? []
       listeners.push(listener)
@@ -68,7 +68,11 @@ function terminal(deferWrites = false) {
   runInNewContext(script, {
     window,
     document: { getElementById: () => root },
-    Terminal: function () { return term },
+    Terminal: function (options: { cols: number, rows: number }) {
+      term.cols = options.cols
+      term.rows = options.rows
+      return term
+    },
     FitAddon: { FitAddon: class { fit() { fits++; term.cols = 52; term.rows = 30 } } },
     ResizeObserver: class { constructor(callback: () => void) { resized = callback } observe() {} },
   })
@@ -103,10 +107,14 @@ test("initial replay keeps the server's 80 columns until it has been parsed", ()
   const t = terminal(true)
   t.resize()
   expect(t.term.cols).toBe(80)
+  expect(t.term.rows).toBe(24)
   expect(t.fits()).toBe(0)
   expect(t.sizes).toEqual([])
+  t.write("initial prompt")
   t.live()
   t.resize()
+  expect(t.fits()).toBe(0)
+  t.parsed()
   expect(t.fits()).toBe(0)
   t.parsed()
   expect(t.fits()).toBe(1)
@@ -117,6 +125,8 @@ test("initial replay keeps the server's 80 columns until it has been parsed", ()
 
 test("reconnection defers fitting until the replay finishes", () => {
   const t = terminal(true)
+  t.write("initial prompt")
+  t.parsed()
   t.live()
   t.parsed()
   t.offline()
@@ -142,6 +152,7 @@ test("disconnecting during replay cannot enable input or resize the shell", () =
 
 test("a restarted shell replays at the server's initial dimensions again", () => {
   const t = terminal()
+  t.write("old prompt")
   t.live()
   expect(t.term.cols).toBe(52)
   t.reset()
@@ -150,7 +161,26 @@ test("a restarted shell replays at the server's initial dimensions again", () =>
   t.resize()
   expect(t.term.cols).toBe(80)
   t.live()
+  t.resize()
+  expect(t.term.cols).toBe(80)
+  expect(t.fits()).toBe(1)
+  t.write("new prompt")
   expect(t.term.cols).toBe(52)
+})
+
+test("an empty initial replay waits for the shell's first output before fitting", () => {
+  const t = terminal(true)
+  t.live()
+  t.parsed()
+  t.resize()
+  expect([t.term.cols, t.term.rows]).toEqual([80, 24])
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+  t.write("late initial prompt")
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
 })
 
 test("restores historical dimensions between parsed output chunks before fitting", () => {
@@ -168,6 +198,36 @@ test("restores historical dimensions between parsed output chunks before fitting
   expect(t.fits()).toBe(0)
   t.parsed()
   expect(t.fits()).toBe(1)
+})
+
+test("viewport resize waits for pending output to be parsed", () => {
+  const t = terminal(true)
+  t.write("initial prompt")
+  t.parsed()
+  t.live()
+  t.parsed()
+  t.write("pending output")
+  t.resize()
+  expect(t.fits()).toBe(1)
+  t.parsed()
+  expect(t.fits()).toBe(2)
+})
+
+test("queued viewport resize cannot fit a disconnected or restarted shell", () => {
+  for (const restart of [false, true]) {
+    const t = terminal(true)
+    t.write("initial prompt")
+    t.parsed()
+    t.live()
+    t.parsed()
+    t.write("old output")
+    t.resize()
+    if (restart) t.reset()
+    else t.offline()
+    t.parsed()
+    expect(t.fits()).toBe(1)
+    if (restart) expect([t.term.cols, t.term.rows]).toEqual([80, 24])
+  }
 })
 
 test("vertical swipes scroll history in both directions", () => {
@@ -204,7 +264,7 @@ test("slow movements accumulate fractional rows without losing distance", () => 
 
 test("row size follows the current viewport instead of a fixed pixel distance", () => {
   const t = terminal()
-  t.screen.height = 200
+  t.screen.height = t.term.rows * 10
   t.start()
   t.move(100, 140)
   expect(t.scrolls).toEqual([-4])

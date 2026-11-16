@@ -95,7 +95,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.VersionRoute
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewButtonRoute
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewRoute
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalRoute
-import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.shared.resources.Res
 import io.github.beppe2880.opencodemobile.shared.resources.app_hide_sessions
 import io.github.beppe2880.opencodemobile.shared.resources.app_select_session
@@ -108,8 +107,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Serializable
 data class ConnectDestination(val addServer: Boolean = false)
@@ -371,18 +368,7 @@ fun AppNavHost(
             FeatureRoute(id = entry.toRoute<FeatureDestination>().id, onBack = { navController.popBackStack() })
         }
         composable<TerminalDestination> { entry ->
-            val directory = entry.toRoute<TerminalDestination>().directory
-            val servers = koinInject<ServerRepository>()
-            val server by servers.activeServer.collectAsStateWithLifecycle()
-            // Keep the parsed output, resize timeline and stream cursor across visits.
-            // Replaying the server's raw bytes in a new ViewModel loses historical sizes.
-            // The session-list entry owns these shells; the route still pauses them when hidden.
-            val owner = remember(entry) { navController.getBackStackEntry(SessionsDestination) }
-            val terminal: TerminalViewModel = koinViewModel(
-                viewModelStoreOwner = owner,
-                key = "terminal-${server?.id}-$directory",
-            ) { parametersOf(directory) }
-            TerminalRoute(directory = directory, onBack = { navController.popBackStack() }, viewModel = terminal)
+            TerminalRoute(directory = entry.toRoute<TerminalDestination>().directory, onBack = { navController.popBackStack() })
         }
         composable<FileDestination> { entry ->
             val args = entry.toRoute<FileDestination>()

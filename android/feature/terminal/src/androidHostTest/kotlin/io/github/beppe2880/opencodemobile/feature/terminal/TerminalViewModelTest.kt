@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.TerminalLink
 import io.github.beppe2880.opencodemobile.core.domain.TerminalRepository
 import io.github.beppe2880.opencodemobile.core.domain.TerminalUpdate
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -18,6 +19,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TerminalViewModelTest {
 
     @get:Rule val main = MainDispatcherRule()
@@ -42,18 +44,37 @@ class TerminalViewModelTest {
     }
 
     @Test
-    fun `returning after explicitly closing the retained shell opens a new terminal`() = runTest(main.testDispatcher) {
-        val terminals = FakeTerminals()
+    fun `server exit followed by pause and resume does not open a new shell`() = runTest(main.testDispatcher) {
+        val terminals = FakeTerminals(exits = true)
         val viewModel = TerminalViewModel("/project", terminals, FakeSettings())
-        runCurrent()
-        viewModel.onEvent(TerminalEvent.ConfirmClose)
         runCurrent()
         assertEquals(TerminalLink.Exited, viewModel.state.value.link)
         viewModel.setTerminalVisible(false)
+        runCurrent()
         viewModel.setTerminalVisible(true)
         runCurrent()
+        assertEquals(1, terminals.openCalls)
+        assertEquals(TerminalLink.Exited, viewModel.state.value.link)
+    }
+
+    @Test
+    fun `new terminal does not resize to the old shell dimensions before replay`() = runTest(main.testDispatcher) {
+        val terminals = FakeTerminals()
+        val viewModel = TerminalViewModel("/project", terminals, FakeSettings())
+        runCurrent()
+        viewModel.surface.onPageResize(50, 12)
+        advanceUntilIdle()
+        assertEquals(listOf(Triple("t1", 50, 12)), terminals.resizes)
+
+        viewModel.onEvent(TerminalEvent.Restart)
+        advanceUntilIdle()
         assertEquals(2, terminals.openCalls)
-        assertEquals(TerminalLink.Connected, viewModel.state.value.link)
+        assertEquals(listOf(Triple("t1", 50, 12)), terminals.resizes)
+
+        // The new page signals its fitted size only after parsing the replay.
+        viewModel.surface.onPageResize(50, 12)
+        advanceUntilIdle()
+        assertEquals(listOf(Triple("t1", 50, 12), Triple("t2", 50, 12)), terminals.resizes)
     }
 
     private class FakeSettings : SettingsRepository {
@@ -63,14 +84,18 @@ class TerminalViewModelTest {
         }
     }
 
-    private class FakeTerminals : TerminalRepository {
+    private class FakeTerminals(private val exits: Boolean = false) : TerminalRepository {
         var openCalls = 0
+        val resizes = mutableListOf<Triple<String, Int, Int>>()
         override suspend fun open(directory: String): Result<TerminalInfo> {
             openCalls++
-            return Result.success(TerminalInfo("t1", "bash", true))
+            return Result.success(TerminalInfo("t$openCalls", "bash", true))
         }
 
-        override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int) = Result.success(Unit)
+        override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int): Result<Unit> {
+            resizes += Triple(terminalId, columns, rows)
+            return Result.success(Unit)
+        }
 
         override suspend fun close(directory: String, terminalId: String) = Result.success(Unit)
 
@@ -83,6 +108,10 @@ class TerminalViewModelTest {
             visible.first { it }
             emit(TerminalUpdate.Link(TerminalLink.Connected))
             emit(TerminalUpdate.Output("hello"))
+            if (exits) {
+                emit(TerminalUpdate.Link(TerminalLink.Exited))
+                return@flow
+            }
             visible.first { !it }
             visible.first { it }
             emit(TerminalUpdate.Output("again"))

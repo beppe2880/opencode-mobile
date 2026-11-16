@@ -60,6 +60,8 @@ class WebSurface(
     fun onPageResize(columns: Int, rows: Int) {
         main.launch {
             val last = sizes.lastOrNull()
+            // Approximate replay position: output can arrive while the bridge callback
+            // hops to Main, before this offset is read. It is not a server resize timeline.
             if (last?.columns != columns || last.rows != rows) sizes += Size(output.length, columns, rows)
             onResize(columns, rows)
         }

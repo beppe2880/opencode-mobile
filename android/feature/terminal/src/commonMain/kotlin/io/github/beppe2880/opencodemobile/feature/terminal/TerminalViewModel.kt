@@ -32,10 +32,6 @@ class TerminalViewModel(
 
     /** The attach reader waits on it before every connection, so a hidden terminal talks to the server only to resume. */
     fun setTerminalVisible(visible: Boolean) {
-        if (visible && !terminalVisible.value && currentState.link == TerminalLink.Exited) {
-            surface.reset()
-            open()
-        }
         terminalVisible.value = visible
     }
 
@@ -75,6 +71,8 @@ class TerminalViewModel(
             TerminalEvent.Retry -> open()
             is TerminalEvent.Fullscreen -> updateState { it.copy(fullscreen = event.enabled) }
             TerminalEvent.Restart -> {
+                // A new PTY starts at the server default, not the previous shell's fitted size.
+                size.value = null
                 surface.reset()
                 open()
             }
@@ -137,8 +135,6 @@ class TerminalViewModel(
                 }
             }
             session?.cancel()
-            updateState { it.copy(link = TerminalLink.Exited) }
-            surface.setLive(false)
             sendEffect(TerminalEffect.NavigateBack)
         }
     }
