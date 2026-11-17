@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">Mais espaço para o terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Entre em tela cheia para ocultar a barra de título e as barras do sistema e ver mais linhas de uma vez. Voltar ou o mesmo botão as traz de volta.</string>
     <string name="tips_c_terminal_fullscreen_demo">Um dedo toca no botão de tela cheia do terminal: a barra de título e a barra de status deslizam para fora e mais linhas de saída aparecem.</string>
+    <string name="tips_c_terminal_select_title">Copiar texto do terminal</string>
+    <string name="tips_c_terminal_select_body">Pressione e segure uma palavra na saída para selecioná-la, arraste as alças para selecionar mais e toque em Copiar. Selecionar tudo seleciona tudo, e o botão Selecionar texto na barra superior também inicia uma seleção.</string>
+    <string name="tips_c_terminal_select_demo">Uma palavra de uma linha de teste com falha é pressionada e destacada, sua alça é arrastada até o fim da linha e Copiar é tocado: aparece um aviso de Copiado.</string>
 
     <string name="tips_c_next_message_title">Troque de modelo sem esperar</string>
     <string name="tips_c_next_message_body">Troque o agente ou o modelo enquanto uma resposta ainda está em andamento: a mudança vale a partir da sua próxima mensagem. Novos chats começam com o modelo usado por último.</string>

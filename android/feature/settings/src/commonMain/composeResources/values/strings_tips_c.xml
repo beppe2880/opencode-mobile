@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">More room for the terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Enter full screen to hide the title bar and the system bars and see more lines at once. Back or the same button brings them back.</string>
     <string name="tips_c_terminal_fullscreen_demo">A finger taps the full screen button of the terminal: the title bar and the status bar slide away and more output lines appear.</string>
+    <string name="tips_c_terminal_select_title">Copy text from the terminal</string>
+    <string name="tips_c_terminal_select_body">Long-press a word in the output to select it, drag the handles to select more, then tap Copy. Select all selects everything, and the Select text button in the top bar starts a selection too.</string>
+    <string name="tips_c_terminal_select_demo">A word of a failing test line is long-pressed and highlighted, its handle is dragged to the end of the line and Copy is tapped: a Copied notice appears.</string>
 
     <string name="tips_c_next_message_title">Switch model without waiting</string>
     <string name="tips_c_next_message_body">Change the agent or the model while a reply is still running: the change applies with your next message. New chats start from the model you used last.</string>

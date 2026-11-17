@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">Mehr Platz für das Terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Wechsle in den Vollbildmodus, um Titelleiste und Systemleisten auszublenden und mehr Zeilen auf einmal zu sehen. Zurück oder dieselbe Taste holt sie zurück.</string>
     <string name="tips_c_terminal_fullscreen_demo">Ein Finger tippt auf die Vollbild-Taste des Terminals: Titelleiste und Statusleiste gleiten weg und mehr Ausgabezeilen erscheinen.</string>
+    <string name="tips_c_terminal_select_title">Text aus dem Terminal kopieren</string>
+    <string name="tips_c_terminal_select_body">Halte ein Wort in der Ausgabe gedrückt, um es auszuwählen, ziehe die Griffe, um mehr auszuwählen, und tippe dann auf Kopieren. Alles auswählen wählt alles aus, und die Schaltfläche Text auswählen in der oberen Leiste startet ebenfalls eine Auswahl.</string>
+    <string name="tips_c_terminal_select_demo">Ein Wort einer fehlschlagenden Testzeile wird gedrückt gehalten und markiert, sein Griff wird bis zum Zeilenende gezogen und auf Kopieren getippt: ein Hinweis Kopiert erscheint.</string>
 
     <string name="tips_c_next_message_title">Modell wechseln, ohne zu warten</string>
     <string name="tips_c_next_message_body">Wechsle Agent oder Modell, während eine Antwort noch läuft: Die Änderung gilt ab deiner nächsten Nachricht. Neue Chats starten mit dem Modell, das du zuletzt verwendet hast.</string>
