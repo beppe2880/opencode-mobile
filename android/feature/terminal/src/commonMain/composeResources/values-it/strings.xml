@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">Schermo intero: niente barra del titolo e niente barre di sistema</string>
     <string name="terminal_preview_keyboard_on">La tastiera si apre con il terminale</string>
     <string name="terminal_preview_keyboard_off">La tastiera si apre quando tocchi il terminale</string>
+    <string name="terminal_select_text">Seleziona testo</string>
+    <string name="terminal_select_all">Seleziona tutto</string>
+    <string name="terminal_selection_start">Inizio selezione</string>
+    <string name="terminal_selection_end">Fine selezione</string>
+    <string name="terminal_copy_failed">Impossibile copiare. Riprova.</string>
+    <string name="terminal_selection_unavailable">La selezione del testo non è disponibile nelle app terminale a schermo intero o in modalità mouse.</string>
+    <string name="terminal_selection_position">Riga %1$d, colonna %2$d</string>
+    <string name="terminal_selection_tap_word">Tocca una parola per selezionarla</string>
 </resources>

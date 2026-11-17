@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">전체 화면: 제목 표시줄과 시스템 막대가 없습니다</string>
     <string name="terminal_preview_keyboard_on">터미널과 함께 키보드가 열립니다</string>
     <string name="terminal_preview_keyboard_off">터미널을 탭하면 키보드가 열립니다</string>
+    <string name="terminal_select_text">텍스트 선택</string>
+    <string name="terminal_select_all">모두 선택</string>
+    <string name="terminal_selection_start">선택 시작</string>
+    <string name="terminal_selection_end">선택 끝</string>
+    <string name="terminal_copy_failed">복사하지 못했습니다. 다시 시도하세요.</string>
+    <string name="terminal_selection_unavailable">전체 화면 터미널 앱이나 마우스 모드에서는 텍스트를 선택할 수 없습니다.</string>
+    <string name="terminal_selection_position">%1$d행, %2$d열</string>
+    <string name="terminal_selection_tap_word">선택할 단어를 탭하세요</string>
 </resources>

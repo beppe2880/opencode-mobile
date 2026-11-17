@@ -14,6 +14,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -23,7 +25,16 @@ import androidx.core.view.SoftwareKeyboardControllerCompat
 /** A WebView that only loads the bundled page and has no network access. */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage, openKeyboard: Boolean, modifier: Modifier) {
+internal actual fun PlatformTerminalView(
+    surface: WebSurface,
+    page: TerminalPage,
+    openKeyboard: Boolean,
+    onSelectionChanged: (active: Boolean, toolbarAtTop: Boolean) -> Unit,
+    onCopy: (String) -> Unit,
+    modifier: Modifier,
+) {
+    val selectionChanged by rememberUpdatedState(onSelectionChanged)
+    val copy by rememberUpdatedState(onCopy)
     val keyboardRequest = rememberSaveable(
         saver = Saver<TerminalKeyboardRequest, Boolean>(
             save = { it.handled },
@@ -43,13 +54,18 @@ internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage
                 settings.allowContentAccess = false
                 settings.domStorageEnabled = false
                 isVerticalScrollBarEnabled = false
+                // xterm's hidden textarea must not open Android's native Paste popup.
+                setOnLongClickListener { true }
                 val bridgePage = object : WebTerminalPage {
                     override fun call(function: String, vararg arguments: String) {
                         val callback = if (function == "focus") ValueCallback<String> { onPageFocused() } else null
                         evaluateJavascript("window.oc.$function(${arguments.joinToString(",")})", callback)
                     }
                 }
-                addJavascriptInterface(Bridge(surface, bridgePage, this, page.fontBase64), "OcTerminal")
+                addJavascriptInterface(
+                    Bridge(surface, bridgePage, this, page.fontBase64, { active, top -> selectionChanged(active, top) }, { copy(it) }),
+                    "OcTerminal",
+                )
                 webViewClient = object : WebViewClient() {
                     // Nothing but the bundled page is ever shown.
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = true
@@ -115,6 +131,8 @@ private class Bridge(
     private val page: WebTerminalPage,
     private val view: WebView,
     private val fontBase64: String,
+    private val onSelectionChanged: (Boolean, Boolean) -> Unit,
+    private val onCopy: (String) -> Unit,
 ) {
     @JavascriptInterface
     fun ready() {
@@ -134,6 +152,22 @@ private class Bridge(
 
     @JavascriptInterface
     fun modifiersUsed() = surface.onPageModifiersUsed()
+
+    @JavascriptInterface
+    fun selectionAvailable(available: Boolean) = surface.onPageSelectionAvailable(available)
+
+    @JavascriptInterface
+    fun selectionPicking(picking: Boolean) = surface.onPageSelectionPicking(picking)
+
+    @JavascriptInterface
+    fun selectionChanged(active: Boolean, toolbarAtTop: Boolean) {
+        view.post { onSelectionChanged(active, toolbarAtTop) }
+    }
+
+    @JavascriptInterface
+    fun copy(text: String) {
+        view.post { onCopy(text) }
+    }
 
     /** IBM Plex Mono, the app's monospace font, for the page to load. */
     @JavascriptInterface

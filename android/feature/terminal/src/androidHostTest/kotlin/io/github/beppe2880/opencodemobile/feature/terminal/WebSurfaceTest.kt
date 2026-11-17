@@ -29,7 +29,7 @@ class WebSurfaceTest {
                 calls += function to arguments.toList()
             }
         })
-        assertEquals("restore" to listOf("\"old promptredrawn prompt\"", "[[10,50,24], [24,100,12]]"), calls.first())
+        assertEquals("restore" to listOf("\"old promptredrawn prompt\"", "[[10,50,24], [24,100,12]]"), calls.first { it.first != "keyboardVisible" })
         surface.close()
     }
 
@@ -66,7 +66,7 @@ class WebSurfaceTest {
                 first += function to arguments.toList()
             }
         })
-        assertEquals("fitBeforeReplay" to emptyList<String>(), first.first())
+        assertEquals("fitBeforeReplay" to emptyList<String>(), first.first { it.first != "keyboardVisible" })
         surface.write("prompt drawn for the phone")
         surface.onPageResize(50, 24)
         runCurrent()
@@ -77,7 +77,7 @@ class WebSurfaceTest {
                 calls += function to arguments.toList()
             }
         })
-        assertEquals("restore" to listOf("\"prompt drawn for the phone\"", "[[0,50,24]]"), calls.first())
+        assertEquals("restore" to listOf("\"prompt drawn for the phone\"", "[[0,50,24]]"), calls.first { it.first != "keyboardVisible" })
         surface.close()
     }
 
@@ -94,7 +94,7 @@ class WebSurfaceTest {
                 calls += function
             }
         })
-        assertEquals(listOf("setModifiers", "setLive", "focus"), calls)
+        assertEquals(listOf("keyboardVisible", "setModifiers", "setLive", "focus"), calls)
         surface.close()
     }
 }

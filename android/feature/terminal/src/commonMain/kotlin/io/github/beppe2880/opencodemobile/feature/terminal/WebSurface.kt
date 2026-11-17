@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** The page of a web view running xterm.js; implemented by [WebTerminalView]. */
@@ -31,11 +33,19 @@ class WebSurface(
     private var modifiers = 0
     private var theme: String? = null
     private var fitBeforeReplay = false
+    private var selectionLabels: List<String>? = null
+    private val mutableSelectionAvailable = MutableStateFlow(false)
+    val selectionAvailable = mutableSelectionAvailable.asStateFlow()
+    private val mutableSelectionPicking = MutableStateFlow(false)
+    val selectionPicking = mutableSelectionPicking.asStateFlow()
+    private var imeVisible = false
 
     /** Called by the page once xterm.js is ready. */
     fun attach(page: WebTerminalPage) {
         this.page = page
         theme?.let { page.call("theme", it) }
+        selectionLabels?.let { labels -> page.call("selectionLabels", *labels.map(::js).toTypedArray()) }
+        page.call("keyboardVisible", imeVisible.toString())
         if (fitBeforeReplay && sizes.isEmpty()) page.call("fitBeforeReplay")
         if (output.isNotEmpty() || sizes.isNotEmpty()) {
             val geometry = sizes.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" }
@@ -47,7 +57,11 @@ class WebSurface(
     }
 
     fun detach(page: WebTerminalPage) {
-        if (this.page === page) this.page = null
+        if (this.page === page) {
+            this.page = null
+            mutableSelectionAvailable.value = false
+            mutableSelectionPicking.value = false
+        }
     }
 
     /** [theme] is an xterm.js `ITheme` as a JavaScript object literal. */
@@ -119,6 +133,33 @@ class WebSurface(
     fun paste(text: String) {
         page?.call("paste", js(text))
     }
+
+    fun setSelectionLabels(start: String, end: String, position: String) {
+        selectionLabels = listOf(start, end, position)
+        page?.call("selectionLabels", js(start), js(end), js(position))
+    }
+
+    fun onPageSelectionAvailable(available: Boolean) {
+        main.launch { mutableSelectionAvailable.value = available }
+    }
+
+    fun onPageSelectionPicking(picking: Boolean) {
+        main.launch { mutableSelectionPicking.value = picking }
+    }
+
+    fun setKeyboardVisible(visible: Boolean) {
+        imeVisible = visible
+        page?.call("keyboardVisible", visible.toString())
+    }
+
+    /** Toggle tap-to-select without guessing a word or moving shell input focus. */
+    fun toggleSelectionMode() { page?.call("toggleSelectionMode") }
+
+    fun selectAll() { page?.call("selectAll") }
+
+    fun copySelection() { page?.call("copySelection") }
+
+    fun clearSelection() { page?.call("clearSelection") }
 
     /** Clears the screen and modes for a new shell. */
     fun reset() {

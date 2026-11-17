@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">Full screen: no title bar and no system bars</string>
     <string name="terminal_preview_keyboard_on">The keyboard opens with the terminal</string>
     <string name="terminal_preview_keyboard_off">The keyboard opens when you tap the terminal</string>
+    <string name="terminal_select_text">Select text</string>
+    <string name="terminal_select_all">Select all</string>
+    <string name="terminal_selection_start">Selection start</string>
+    <string name="terminal_selection_end">Selection end</string>
+    <string name="terminal_copy_failed">Couldn’t copy. Try again.</string>
+    <string name="terminal_selection_unavailable">Text selection is unavailable in full-screen terminal apps or mouse mode.</string>
+    <string name="terminal_selection_position">Row %1$d, column %2$d</string>
+    <string name="terminal_selection_tap_word">Tap a word to select it</string>
 </resources>

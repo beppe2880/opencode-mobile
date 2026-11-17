@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">Plein écran : ni barre de titre ni barres système</string>
     <string name="terminal_preview_keyboard_on">Le clavier s’ouvre avec le terminal</string>
     <string name="terminal_preview_keyboard_off">Le clavier s’ouvre lorsque vous touchez le terminal</string>
+    <string name="terminal_select_text">Sélectionner du texte</string>
+    <string name="terminal_select_all">Tout sélectionner</string>
+    <string name="terminal_selection_start">Début de sélection</string>
+    <string name="terminal_selection_end">Fin de sélection</string>
+    <string name="terminal_copy_failed">Impossible de copier. Réessayez.</string>
+    <string name="terminal_selection_unavailable">La sélection de texte est indisponible dans les applications de terminal en plein écran ou en mode souris.</string>
+    <string name="terminal_selection_position">Ligne %1$d, colonne %2$d</string>
+    <string name="terminal_selection_tap_word">Touchez un mot pour le sélectionner</string>
 </resources>

@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">Vollbild: keine Titelleiste und keine Systemleisten</string>
     <string name="terminal_preview_keyboard_on">Die Tastatur öffnet sich mit dem Terminal</string>
     <string name="terminal_preview_keyboard_off">Die Tastatur öffnet sich, wenn du das Terminal antippst</string>
+    <string name="terminal_select_text">Text auswählen</string>
+    <string name="terminal_select_all">Alles auswählen</string>
+    <string name="terminal_selection_start">Auswahlbeginn</string>
+    <string name="terminal_selection_end">Auswahlende</string>
+    <string name="terminal_copy_failed">Kopieren fehlgeschlagen. Erneut versuchen.</string>
+    <string name="terminal_selection_unavailable">Die Textauswahl ist in Vollbild-Terminalanwendungen oder im Mausmodus nicht verfügbar.</string>
+    <string name="terminal_selection_position">Zeile %1$d, Spalte %2$d</string>
+    <string name="terminal_selection_tap_word">Tippe auf ein Wort, um es auszuwählen</string>
 </resources>

@@ -9,6 +9,7 @@
   const INITIAL_SIZE = { cols: 80, rows: 24 };
   let term = null;
   let fit = null;
+  let selection = null;
   // Until the replayed output has been parsed, the terminal's answers to old queries are dropped.
   let live = false;
   let liveEpoch = 0;
@@ -257,6 +258,7 @@
     },
     paste(text) { term.paste(text); },
     reset() {
+      selection.clear();
       live = false;
       ++liveEpoch;
       cancelFit();
@@ -269,6 +271,12 @@
       });
     },
     focus() { term.focus(); },
+    selectionLabels(start, end, position) { selection.labels(start, end, position); },
+    keyboardVisible(value) { selection.keyboardVisible(value); },
+    toggleSelectionMode() { selection.arm(); },
+    selectAll() { selection.all(); },
+    copySelection() { selection.copy(); },
+    clearSelection() { selection.clear(); },
     theme(theme) {
       term.options.theme = theme;
       document.body.style.background = theme.background;
@@ -298,6 +306,9 @@
     fit = new FitAddon.FitAddon();
     term.loadAddon(fit);
     term.open(document.getElementById("terminal"));
+    // Selection must register first: its capture listeners own handle drags and
+    // selection-dismiss gestures before the ordinary touch-scroll handler runs.
+    selection = window.OcTouchSelection(term, bridge);
     bindTouchScroll();
     bindImeInput();
     term.onData(typed);

@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">ملء الشاشة: بدون شريط العنوان ولا أشرطة النظام</string>
     <string name="terminal_preview_keyboard_on">تفتح لوحة المفاتيح مع الطرفية</string>
     <string name="terminal_preview_keyboard_off">تفتح لوحة المفاتيح عند النقر على الطرفية</string>
+    <string name="terminal_select_text">تحديد النص</string>
+    <string name="terminal_select_all">تحديد الكل</string>
+    <string name="terminal_selection_start">بداية التحديد</string>
+    <string name="terminal_selection_end">نهاية التحديد</string>
+    <string name="terminal_copy_failed">تعذّر النسخ. حاول مرة أخرى.</string>
+    <string name="terminal_selection_unavailable">تحديد النص غير متاح في تطبيقات الطرفية بملء الشاشة أو في وضع الفأرة.</string>
+    <string name="terminal_selection_position">الصف %1$d، العمود %2$d</string>
+    <string name="terminal_selection_tap_word">اضغط على كلمة لتحديدها</string>
 </resources>

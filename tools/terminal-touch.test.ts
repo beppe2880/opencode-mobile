@@ -65,6 +65,7 @@ function terminal(deferWrites = false) {
     reset() {},
   }
   const window: any = {
+    OcTouchSelection: () => ({ clear() {} }), // Selection gestures have their own controller tests.
     OcTerminal: { font() { throw new Error("Use fallback font") }, resize: (cols: number, rows: number) => sizes.push([cols, rows]), ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
     getSelection: () => nativeSelection,
   }
