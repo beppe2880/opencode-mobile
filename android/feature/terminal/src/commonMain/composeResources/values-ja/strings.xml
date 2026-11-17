@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">全画面表示：タイトルバーもシステムバーも表示しません</string>
     <string name="terminal_preview_keyboard_on">キーボードはターミナルと一緒に開きます</string>
     <string name="terminal_preview_keyboard_off">キーボードはターミナルをタップすると開きます</string>
+    <string name="terminal_select_text">テキストを選択</string>
+    <string name="terminal_select_all">すべて選択</string>
+    <string name="terminal_selection_start">選択範囲の開始</string>
+    <string name="terminal_selection_end">選択範囲の終了</string>
+    <string name="terminal_copy_failed">コピーできませんでした。もう一度お試しください。</string>
+    <string name="terminal_selection_unavailable">全画面のターミナルアプリやマウスモードではテキストを選択できません。</string>
+    <string name="terminal_selection_position">%1$d 行、%2$d 列</string>
+    <string name="terminal_selection_tap_word">単語をタップして選択</string>
 </resources>

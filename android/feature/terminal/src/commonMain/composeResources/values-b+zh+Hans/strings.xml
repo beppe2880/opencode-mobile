@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">全屏：无标题栏，也没有系统栏</string>
     <string name="terminal_preview_keyboard_on">键盘随终端一起打开</string>
     <string name="terminal_preview_keyboard_off">点击终端时才会打开键盘</string>
+    <string name="terminal_select_text">选择文本</string>
+    <string name="terminal_select_all">全选</string>
+    <string name="terminal_selection_start">选择起点</string>
+    <string name="terminal_selection_end">选择终点</string>
+    <string name="terminal_copy_failed">无法复制，请重试。</string>
+    <string name="terminal_selection_unavailable">全屏终端应用或鼠标模式下无法选择文本。</string>
+    <string name="terminal_selection_position">第 %1$d 行，第 %2$d 列</string>
+    <string name="terminal_selection_tap_word">点按一个词以选中它</string>
 </resources>

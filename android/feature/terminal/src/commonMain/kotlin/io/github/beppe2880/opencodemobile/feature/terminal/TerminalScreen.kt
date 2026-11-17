@@ -20,12 +20,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Fullscreen
+import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -59,6 +62,8 @@ import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_ex
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_fullscreen
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_new
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_reconnecting
+import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_select_text
+import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_selection_unavailable
 import io.github.beppe2880.opencodemobile.feature.terminal.resources.terminal_title
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -75,6 +80,8 @@ fun TerminalScreen(
     val c = OcTheme.colors
     val clipboard = rememberTextClipboard()
     val scope = rememberCoroutineScope()
+    val selectionAvailable by surface.selectionAvailable.collectAsState()
+    val selectionUnavailable = stringResource(Res.string.terminal_selection_unavailable)
 
     SystemBarsHidden(state.fullscreen)
     OcBackHandler(enabled = state.fullscreen) { onEvent(TerminalEvent.Fullscreen(false)) }
@@ -85,10 +92,21 @@ fun TerminalScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             if (!state.fullscreen) {
-                TopBar(state, onEvent)
+                TopBar(
+                    state,
+                    onEvent,
+                    selectionAvailable = selectionAvailable,
+                    onSelect = {
+                        // Explained on demand: a permanent note would resize full-screen apps.
+                        if (selectionAvailable) {
+                            surface.toggleSelectionMode()
+                        } else {
+                            scope.launch { snackbarHostState.showSnackbar(selectionUnavailable) }
+                        }
+                    },
+                )
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -109,10 +127,13 @@ fun TerminalScreen(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 } else {
-                    WebTerminalView(surface, state.openKeyboard, Modifier.fillMaxSize().testTag("terminal_view"))
-                    LinkBanner(state.link, onRestart = { onEvent(TerminalEvent.Restart) }, Modifier.align(Alignment.BottomCenter))
+                    WebTerminalView(surface, state.openKeyboard, snackbarHostState, Modifier.fillMaxSize().testTag("terminal_view"))
                 }
+                // Above the key bar and the keyboard: the Scaffold's slot would sit behind them.
+                SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
             }
+            // Keep connection feedback outside the selection overlay's bounds.
+            LinkBanner(state.link, onRestart = { onEvent(TerminalEvent.Restart) })
             KeyBar(
                 rows = state.keyRows,
                 modifierState = state::modifier,
@@ -157,7 +178,7 @@ fun TerminalScreen(
 }
 
 @Composable
-private fun TopBar(state: TerminalState, onEvent: (TerminalEvent) -> Unit) {
+private fun TopBar(state: TerminalState, onEvent: (TerminalEvent) -> Unit, selectionAvailable: Boolean, onSelect: () -> Unit) {
     OcTopBar(
         title = state.title.ifEmpty { stringResource(Res.string.terminal_title) },
         subtitle = state.directory,
@@ -173,6 +194,13 @@ private fun TopBar(state: TerminalState, onEvent: (TerminalEvent) -> Unit) {
             if (state.error == null && state.link in Waiting) OcSpinner(Modifier.testTag("terminal_connecting"))
         },
         actions = {
+            OcIconButton(
+                icon = Icons.Outlined.TextFields,
+                contentDescription = stringResource(Res.string.terminal_select_text),
+                onClick = onSelect,
+                tint = if (selectionAvailable) OcTheme.colors.iconBase else OcTheme.colors.textFaint,
+                modifier = Modifier.testTag("terminal_select_text_button"),
+            )
             OcIconButton(
                 icon = Icons.Outlined.Fullscreen,
                 contentDescription = stringResource(Res.string.terminal_fullscreen),
