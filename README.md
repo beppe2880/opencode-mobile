@@ -38,6 +38,7 @@
 <p align="center">
   <a href="#see-it-in-action">Demo</a> ·
   <a href="#what-you-can-do">Features</a> ·
+  <a href="#make-it-yours">Settings</a> ·
   <a href="#get-the-app">Install</a> ·
   <a href="#build-from-source">Build</a> ·
   <a href="https://github.com/beppe2880/opencode-mobile/issues">Feedback</a>
@@ -121,10 +122,46 @@ Russian, Simplified Chinese, Japanese, Korean and Arabic.
 | Background session notifications and permission replies from notifications | Yes | — |
 | Start a session from another app's share menu | Yes | — |
 | Offline demo with sample sessions | Yes | — |
-| Installation | Release APK | Build from source |
+| Installation | Release APK | TestFlight beta |
 
 On Android, choose which notifications you receive: permission requests, questions and finished
 sessions. On iOS, live updates resume when you return to the app.
+
+## Make it yours
+
+<p align="center">
+  <img src="docs/media/settings.png" width="1000" alt="Android settings: every category in one list, a Preview style with a card per category, a chat page with a live preview of the setting being changed, and the picker of 33 OpenCode themes">
+</p>
+
+More than 60 settings decide how much the app shows and how it behaves. Browse them as a
+**list** or as **previews** of the screens they change, search them by name, and watch a
+**live preview** update as you change each one. On Android, **Customize in the demo** lets
+you tap any part of the real screens, filled with sample data, to change it.
+
+<p align="center">
+  <img src="docs/media/themes.png" width="820" alt="The same chat in three OpenCode themes: catppuccin-macchiato in dark mode, tokyonight in light mode and gruvbox in dark mode">
+</p>
+
+<details>
+<summary><strong>Every setting, by category</strong></summary>
+
+| Category | What you can change |
+| --- | --- |
+| **Appearance** | System, light or dark theme · 33 OpenCode terminal themes for the whole app and the markdown in answers · chat text size |
+| **Chat** | Reasoning on or off · grouped thoughts · grouped thinking and tools · expanded tool calls · tool details · full commands · size of images read by the agent and of attached images · cost per reply · header line under the chat title, its style and what tapping it opens · permission requests and questions shown collapsed · running work above the message box · swipe between chats or to the chat list, and its sensitivity |
+| **Live activity** | Follow running work · which steps stay open while the agent works: thinking, shell commands, file changes, reads and searches, other tools · keep steps open · shell output refresh rate · output lines |
+| **Message box** | Agent color outline · apply agent and model changes now or with the next message · close the model picker after choosing · model for new chats: last used or the server default |
+| **Voice input** | On or off · the phone's speech recognition or a cloud provider · provider, model and API key · send the app language · recording style · hold to record |
+| **Sessions** | Running work in the session list · confirm before stopping commands |
+| **Terminal** | Custom key bar · open the keyboard · full screen by default |
+| **Updates** | New version notice as a window, a banner or off |
+| **Notifications** *(Android)* | Permission requests · questions · finished sessions |
+| **Sharing** *(Android)* | OpenCode in the share menu · sharing opens a new session or lets you choose |
+| **Large screens** *(foldables and tablets)* | Chat beside the list · unfolded layout and list width · what happens when folding or unfolding with a chat open · divider handle · Back shows the hidden list · swipe to hide and show the list |
+
+Servers, usage statistics and **About and reset** live in the same screen.
+
+</details>
 
 ## Get the app
 
