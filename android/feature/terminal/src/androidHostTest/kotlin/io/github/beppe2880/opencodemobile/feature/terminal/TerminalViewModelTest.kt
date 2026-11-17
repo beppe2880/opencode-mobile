@@ -107,6 +107,35 @@ class TerminalViewModelTest {
         assertEquals(0, fresh.calls.count { it == "fitBeforeReplay" })
     }
 
+    @Test
+    fun `reopening a running shell replays it at the sizes of the earlier visit`() = runTest(main.testDispatcher) {
+        val timelines = TerminalTimelines()
+        val first = TerminalViewModel("/project", FakeTerminals(), FakeSettings(), timelines)
+        runCurrent()
+        first.surface.onPageResize(49, 19)
+        advanceUntilIdle()
+        assertEquals(listOf(TerminalSize(5, 49, 19)), timelines["t1"])
+
+        val page = RecordingPage()
+        val reopened = TerminalViewModel("/project", FakeTerminals(running = true), FakeSettings(), timelines)
+        reopened.surface.attach(page)
+        runCurrent()
+        assertEquals(0, page.calls.count { it == "fitBeforeReplay" })
+        assertEquals(listOf("restore"), page.calls.filter { it == "restore" || it == "write" }.take(1))
+    }
+
+    @Test
+    fun `a new shell forgets the sizes of the old one`() = runTest(main.testDispatcher) {
+        val timelines = TerminalTimelines()
+        val viewModel = TerminalViewModel("/project", FakeTerminals(), FakeSettings(), timelines)
+        runCurrent()
+        viewModel.surface.onPageResize(49, 19)
+        advanceUntilIdle()
+        viewModel.onEvent(TerminalEvent.Restart)
+        advanceUntilIdle()
+        assertEquals(null, timelines["t1"])
+    }
+
     private class FakeSettings : SettingsRepository {
         override val settings = MutableStateFlow(AppSettings())
         override suspend fun update(transform: (AppSettings) -> AppSettings) {
