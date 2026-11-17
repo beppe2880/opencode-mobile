@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/media/android-and-ios.png" width="1000" alt="OpenCode Mobile running on Android and iPhone, with dark-theme chat and syntax-highlighted Kotlin code on both platforms">
+  <img src="docs/media/android-and-ios.png" width="1000" alt="OpenCode Mobile running on Android and iPhone, with dark-theme chat and syntax-highlighted Kotlin code on both platforms; Android is available as an APK on GitHub and iOS as a TestFlight beta, with the Play Store and App Store coming soon">
 </p>
 
 <p align="center">
