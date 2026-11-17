@@ -77,6 +77,36 @@ class TerminalViewModelTest {
         assertEquals(listOf(Triple("t1", 50, 12), Triple("t2", 50, 12)), terminals.resizes)
     }
 
+    @Test
+    fun `the first size reaches a new shell at once and later ones are debounced`() = runTest(main.testDispatcher) {
+        val terminals = FakeTerminals()
+        val viewModel = TerminalViewModel("/project", terminals, FakeSettings())
+        runCurrent()
+        viewModel.surface.onPageResize(50, 12)
+        runCurrent()
+        assertEquals(listOf(Triple("t1", 50, 12)), terminals.resizes)
+        viewModel.surface.onPageResize(50, 20)
+        runCurrent()
+        assertEquals(1, terminals.resizes.size)
+        advanceUntilIdle()
+        assertEquals(Triple("t1", 50, 20), terminals.resizes.last())
+    }
+
+    @Test
+    fun `an already running shell is replayed at the page size`() = runTest(main.testDispatcher) {
+        val page = RecordingPage()
+        val viewModel = TerminalViewModel("/project", FakeTerminals(running = true), FakeSettings())
+        viewModel.surface.attach(page)
+        runCurrent()
+        assertEquals(1, page.calls.count { it == "fitBeforeReplay" })
+
+        val fresh = RecordingPage()
+        val created = TerminalViewModel("/project", FakeTerminals(), FakeSettings())
+        created.surface.attach(fresh)
+        runCurrent()
+        assertEquals(0, fresh.calls.count { it == "fitBeforeReplay" })
+    }
+
     private class FakeSettings : SettingsRepository {
         override val settings = MutableStateFlow(AppSettings())
         override suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -84,12 +114,12 @@ class TerminalViewModelTest {
         }
     }
 
-    private class FakeTerminals(private val exits: Boolean = false) : TerminalRepository {
+    private class FakeTerminals(private val exits: Boolean = false, private val running: Boolean = false) : TerminalRepository {
         var openCalls = 0
         val resizes = mutableListOf<Triple<String, Int, Int>>()
         override suspend fun open(directory: String): Result<TerminalInfo> {
             openCalls++
-            return Result.success(TerminalInfo("t$openCalls", "bash", true))
+            return Result.success(TerminalInfo("t$openCalls", "bash", running = true, created = !running))
         }
 
         override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int): Result<Unit> {
@@ -120,8 +150,10 @@ class TerminalViewModelTest {
 
     private class RecordingPage : WebTerminalPage {
         val writes = mutableListOf<String>()
+        val calls = mutableListOf<String>()
 
         override fun call(function: String, vararg arguments: String) {
+            calls += function
             if (function == "write") writes += arguments.first()
         }
     }

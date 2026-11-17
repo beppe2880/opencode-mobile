@@ -42,6 +42,9 @@ function terminal(deferWrites = false) {
   const writes: (() => void)[] = []
   let fits = 0
   let resized = () => {}
+  // Fake timers: the page fits once output has paused, which tests trigger with settle().
+  let nextTimer = 0
+  const timers = new Map<number, { callback: () => void, delay: number }>()
   const term = {
     element: root, rows: 20, cols: 80,
     buffer: { active: { type: "normal", baseY: 200 } },
@@ -75,12 +78,24 @@ function terminal(deferWrites = false) {
     },
     FitAddon: { FitAddon: class { fit() { fits++; term.cols = 52; term.rows = 30 } } },
     ResizeObserver: class { constructor(callback: () => void) { resized = callback } observe() {} },
+    setTimeout: (callback: () => void, delay: number) => { timers.set(++nextTimer, { callback, delay }); return nextTimer },
+    clearTimeout: (id: number) => { timers.delete(id) },
   })
+  // Runs the pending timers that fire within [ms], as if output stayed quiet that long.
+  const settle = (ms = Infinity) => {
+    for (const [id, timer] of [...timers].sort((a, b) => a[1].delay - b[1].delay)) {
+      if (timer.delay > ms || !timers.has(id)) continue
+      timers.delete(id)
+      timer.callback()
+    }
+  }
   const touch = (x: number, y: number, id = 1) => ({ identifier: id, clientX: x, clientY: y })
   return {
     term, screen, scrolls, touch, sent, sizes,
     fits: () => fits,
+    settle,
     resize: () => resized(),
+    fitBeforeReplay: () => window.oc.fitBeforeReplay(),
     parsed: () => { for (const done of writes.splice(0)) done() },
     offline: () => window.oc.setLive(false),
     restore: (data: string, sizes: number[][]) => window.oc.restore(data, sizes),
@@ -115,12 +130,66 @@ test("initial replay keeps the server's 80 columns until it has been parsed", ()
   t.resize()
   expect(t.fits()).toBe(0)
   t.parsed()
+  t.settle()
   expect(t.fits()).toBe(0)
   t.parsed()
+  expect(t.fits()).toBe(0)
+  t.settle()
   expect(t.fits()).toBe(1)
   expect(t.sizes).toEqual([[52, 30]])
   t.resize()
   expect(t.fits()).toBe(2)
+})
+
+test("fitting waits until the shell has finished drawing its first prompt", () => {
+  const t = terminal()
+  t.live()
+  // zsh writes PROMPT_SP and the prompt as separate chunks.
+  t.write("%" + " ".repeat(79) + "\r \r")
+  t.settle(50)
+  t.write("user@host:/a/long/directory/name > ")
+  t.settle(50)
+  expect(t.fits()).toBe(0)
+  expect(t.applied).toEqual(["%" + " ".repeat(79) + "\r \r", "user@host:/a/long/directory/name > "])
+  t.settle(120)
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
+})
+
+test("output that never pauses is fitted after the longest wait", () => {
+  const t = terminal()
+  t.live()
+  for (let i = 0; i < 5; i++) {
+    t.write("line " + i + "\n")
+    t.settle(50)
+  }
+  expect(t.fits()).toBe(0)
+  t.settle(1000)
+  expect(t.fits()).toBe(1)
+})
+
+test("a pending fit is dropped when the shell disconnects or restarts", () => {
+  for (const restart of [false, true]) {
+    const t = terminal()
+    t.live()
+    t.write("prompt")
+    if (restart) t.reset()
+    else t.offline()
+    t.settle()
+    expect(t.fits()).toBe(0)
+    expect(t.sizes).toEqual([])
+  }
+})
+
+test("a shell that was already running is parsed at the current size", () => {
+  const t = terminal(true)
+  t.fitBeforeReplay()
+  t.restore("prompt drawn for the phone", [])
+  expect(t.fits()).toBe(1)
+  expect([t.term.cols, t.term.rows]).toEqual([52, 30])
+  t.parsed()
+  expect(t.applied).toEqual(["prompt drawn for the phone"])
+  expect(t.sizes).toEqual([])
 })
 
 test("reconnection defers fitting until the replay finishes", () => {
@@ -129,12 +198,14 @@ test("reconnection defers fitting until the replay finishes", () => {
   t.parsed()
   t.live()
   t.parsed()
+  t.settle()
   t.offline()
   t.resize()
   expect(t.fits()).toBe(1)
   t.live()
   expect(t.fits()).toBe(1)
   t.parsed()
+  t.settle()
   expect(t.fits()).toBe(2)
 })
 
@@ -143,6 +214,7 @@ test("disconnecting during replay cannot enable input or resize the shell", () =
   t.live()
   t.offline()
   t.parsed()
+  t.settle()
   t.key({ keyCode: 229 })
   t.input({ inputType: "insertText", data: "x" })
   expect(t.sent).toEqual([])
@@ -154,6 +226,7 @@ test("a restarted shell replays at the server's initial dimensions again", () =>
   const t = terminal()
   t.write("old prompt")
   t.live()
+  t.settle()
   expect(t.term.cols).toBe(52)
   t.reset()
   expect(t.term.cols).toBe(80)
@@ -162,9 +235,11 @@ test("a restarted shell replays at the server's initial dimensions again", () =>
   expect(t.term.cols).toBe(80)
   t.live()
   t.resize()
+  t.settle()
   expect(t.term.cols).toBe(80)
   expect(t.fits()).toBe(1)
   t.write("new prompt")
+  t.settle()
   expect(t.term.cols).toBe(52)
 })
 
@@ -172,13 +247,16 @@ test("an empty initial replay waits for the shell's first output before fitting"
   const t = terminal(true)
   t.live()
   t.parsed()
+  t.settle()
   t.resize()
   expect([t.term.cols, t.term.rows]).toEqual([80, 24])
   expect(t.fits()).toBe(0)
   expect(t.sizes).toEqual([])
   t.write("late initial prompt")
+  t.settle()
   expect(t.fits()).toBe(0)
   t.parsed()
+  t.settle()
   expect(t.fits()).toBe(1)
   expect(t.sizes).toEqual([[52, 30]])
 })
@@ -195,8 +273,10 @@ test("restores historical dimensions between parsed output chunks before fitting
   t.parsed()
   expect(t.applied.at(-1)).toBe("live output")
   t.parsed()
+  t.settle()
   expect(t.fits()).toBe(0)
   t.parsed()
+  t.settle()
   expect(t.fits()).toBe(1)
 })
 
@@ -206,6 +286,7 @@ test("viewport resize waits for pending output to be parsed", () => {
   t.parsed()
   t.live()
   t.parsed()
+  t.settle()
   t.write("pending output")
   t.resize()
   expect(t.fits()).toBe(1)
@@ -220,6 +301,7 @@ test("queued viewport resize cannot fit a disconnected or restarted shell", () =
     t.parsed()
     t.live()
     t.parsed()
+    t.settle()
     t.write("old output")
     t.resize()
     if (restart) t.reset()

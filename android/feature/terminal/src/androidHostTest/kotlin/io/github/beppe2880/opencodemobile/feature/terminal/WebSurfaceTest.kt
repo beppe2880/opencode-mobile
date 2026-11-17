@@ -57,6 +57,31 @@ class WebSurfaceTest {
     }
 
     @Test
+    fun `output of an already running shell is replayed at the fitted size`() = runTest(main.testDispatcher) {
+        val surface = WebSurface({}, { _, _ -> }, {})
+        surface.fitBeforeReplay()
+        val first = mutableListOf<Pair<String, List<String>>>()
+        surface.attach(object : WebTerminalPage {
+            override fun call(function: String, vararg arguments: String) {
+                first += function to arguments.toList()
+            }
+        })
+        assertEquals("fitBeforeReplay" to emptyList<String>(), first.first())
+        surface.write("prompt drawn for the phone")
+        surface.onPageResize(50, 24)
+        runCurrent()
+        // A recreated page restores that size before the whole replay, not after it.
+        val calls = mutableListOf<Pair<String, List<String>>>()
+        surface.attach(object : WebTerminalPage {
+            override fun call(function: String, vararg arguments: String) {
+                calls += function to arguments.toList()
+            }
+        })
+        assertEquals("restore" to listOf("\"prompt drawn for the phone\"", "[[0,50,24]]"), calls.first())
+        surface.close()
+    }
+
+    @Test
     fun `reset discards dimensions belonging to the old shell`() = runTest(main.testDispatcher) {
         val surface = WebSurface({}, { _, _ -> }, {})
         surface.write("old")

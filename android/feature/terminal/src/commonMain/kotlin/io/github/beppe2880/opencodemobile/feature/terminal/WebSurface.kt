@@ -30,11 +30,13 @@ class WebSurface(
     private var live = false
     private var modifiers = 0
     private var theme: String? = null
+    private var fitBeforeReplay = false
 
     /** Called by the page once xterm.js is ready. */
     fun attach(page: WebTerminalPage) {
         this.page = page
         theme?.let { page.call("theme", it) }
+        if (fitBeforeReplay && sizes.isEmpty()) page.call("fitBeforeReplay")
         if (output.isNotEmpty() || sizes.isNotEmpty()) {
             val geometry = sizes.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" }
             page.call("restore", js(output.toString()), geometry)
@@ -62,9 +64,20 @@ class WebSurface(
             val last = sizes.lastOrNull()
             // Approximate replay position: output can arrive while the bridge callback
             // hops to Main, before this offset is read. It is not a server resize timeline.
-            if (last?.columns != columns || last.rows != rows) sizes += Size(output.length, columns, rows)
+            // A replay parsed at the fitted size starts at that size.
+            val at = if (last == null && fitBeforeReplay) 0 else output.length
+            if (last?.columns != columns || last.rows != rows) sizes += Size(at, columns, rows)
             onResize(columns, rows)
         }
+    }
+
+    /**
+     * The shell was already running before this screen, so its output so far was drawn at the
+     * size the app gave it, not at the server's initial one: the page parses it at its own size.
+     */
+    fun fitBeforeReplay() {
+        fitBeforeReplay = true
+        if (sizes.isEmpty()) page?.call("fitBeforeReplay")
     }
 
     fun onPageModifiersUsed() {
@@ -111,6 +124,7 @@ class WebSurface(
     fun reset() {
         output.clear()
         sizes.clear()
+        fitBeforeReplay = false
         page?.call("reset")
     }
 

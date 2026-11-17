@@ -40,13 +40,36 @@
     }));
   }
 
+  // A shell draws its first prompt in several chunks (zsh: PROMPT_SP, then the prompt).
+  // Fitting between them parses the rest at the new width while the shell still lays
+  // it out for the old one, which leaves a ghost row. Fit once output pauses instead.
+  const SETTLE_MS = 120, MAX_SETTLE_MS = 1000;
+  let settleTimer = null, deadlineTimer = null;
+
+  function cancelFit() {
+    clearTimeout(settleTimer);
+    clearTimeout(deadlineTimer);
+    settleTimer = deadlineTimer = null;
+  }
+
   function fitIfReady() {
     // A newly spawned shell can connect with an empty replay before drawing its
     // first prompt. Keep parsing at the server size until that output arrives too.
     if (!live || !fitPending || !hasOutput) return;
-    fitPending = false;
-    fit.fit();
-    bridge.resize(term.cols, term.rows);
+    const epoch = liveEpoch;
+    const fitNow = () => enqueue((done) => {
+      if (live && fitPending && epoch === liveEpoch) {
+        cancelFit();
+        fitPending = false;
+        fit.fit();
+        bridge.resize(term.cols, term.rows);
+      }
+      done();
+    });
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(fitNow, SETTLE_MS);
+    // Output that never pauses must not keep the phone at the server size.
+    deadlineTimer ??= setTimeout(fitNow, MAX_SETTLE_MS);
   }
 
   function send(data) {
@@ -205,8 +228,14 @@
       }
       write(data.slice(offset));
     },
+    // A shell that was already running drew its output for the phone: parse its
+    // replay at the current size, not at the server's initial one.
+    fitBeforeReplay() {
+      enqueue((done) => { fit.fit(); done(); });
+    },
     setLive(value) {
       const epoch = ++liveEpoch;
+      cancelFit();
       if (!value) { live = false; return; }
       // Runs once everything written so far has been parsed.
       enqueue((done) => term.write("", () => {
@@ -230,6 +259,7 @@
     reset() {
       live = false;
       ++liveEpoch;
+      cancelFit();
       enqueue((done) => {
         hasOutput = false;
         fitPending = false;
