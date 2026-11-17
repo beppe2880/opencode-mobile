@@ -287,4 +287,13 @@
     <string name="chat_preview_selection_now">Escolhido no compositor: o chat muda para eles imediatamente</string>
     <string name="chat_preview_stop_asks">Parar um comando pela folha Em execução pede confirmação primeiro</string>
     <string name="chat_preview_stop_direct">Parar um comando pela folha Em execução o encerra imediatamente</string>
+    <string name="chat_btw_title">Pergunta à parte</string>
+    <string name="chat_btw_ask">Perguntar à parte</string>
+    <string name="chat_btw_text_only">Perguntas à parte aceitam apenas texto. Remova os anexos antes de enviar.</string>
+    <string name="chat_btw_unavailable">Perguntas à parte indisponíveis. Verifique se o servidor aceita /btw.</string>
+    <string name="chat_btw_empty">Nenhum texto foi retornado.</string>
+    <string name="chat_btw_failed">Falha na pergunta</string>
+    <string name="chat_btw_loading">Preparando resposta…</string>
+    <string name="chat_btw_question">Sua pergunta</string>
+    <string name="chat_btw_ready">Resposta pronta</string>
 </resources>

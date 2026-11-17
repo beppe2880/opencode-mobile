@@ -325,4 +325,13 @@
     <string name="chat_preview_selection_now">Выбрано в поле ввода: чат сразу переключится на них</string>
     <string name="chat_preview_stop_asks">Остановка команды из листа «Выполняется» сначала запрашивает подтверждение</string>
     <string name="chat_preview_stop_direct">Остановка команды из листа «Выполняется» сразу её завершает</string>
+    <string name="chat_btw_title">Отдельный вопрос</string>
+    <string name="chat_btw_ask">Спросить отдельно</string>
+    <string name="chat_btw_text_only">Отдельные вопросы поддерживают только текст. Удалите вложения перед отправкой.</string>
+    <string name="chat_btw_unavailable">Отдельные вопросы недоступны. Проверьте поддержку /btw на сервере.</string>
+    <string name="chat_btw_empty">Текст не получен.</string>
+    <string name="chat_btw_failed">Ошибка вопроса</string>
+    <string name="chat_btw_loading">Подготовка ответа…</string>
+    <string name="chat_btw_question">Ваш вопрос</string>
+    <string name="chat_btw_ready">Ответ готов</string>
 </resources>

@@ -133,9 +133,11 @@ fun ChatScreen(
     markdownCache: MarkdownCache = rememberMarkdownCache(),
     /** Shares text through the system; null hides sharing. */
     onShare: ((String) -> Unit)? = null,
+    externalOverlayOpen: Boolean = false,
 ) {
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
+    BtwAutoOpen(state, allowed = !contextOpen && !externalOverlayOpen, onEvent)
     Scaffold(
         modifier = modifier,
         containerColor = c.bgBase,
@@ -225,6 +227,7 @@ fun ChatScreen(
     }
     state.changes?.let { ChangesSheet(state, it, onEvent) }
     state.mcps?.let { McpSheet(state.directory, it, onEvent) }
+    if (state.btwOpen) state.btw?.let { BtwPanel(it, onEvent, onCopy) }
     if (state.workOpen) RunningSheet(state, onEvent)
     state.runningPanel?.let { panel ->
         panel.item?.let { item -> RunningItemSheet(state, panel, item, onEvent, onCopy, onShare) }

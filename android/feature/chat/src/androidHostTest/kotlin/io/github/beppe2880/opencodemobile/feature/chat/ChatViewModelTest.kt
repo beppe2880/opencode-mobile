@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
+import androidx.lifecycle.ViewModelStore
 import io.github.beppe2880.opencodemobile.core.domain.Agent
 import io.github.beppe2880.opencodemobile.core.domain.AgentMode
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
@@ -61,6 +62,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_commands_failed
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +72,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -92,6 +95,198 @@ class ChatViewModelTest {
     private val mcps = FakeMcps()
     private val recents = FakeRecents()
     private val vcs = FakeVcs()
+    private val btwMemory = BtwMemory(CoroutineScope(main.testDispatcher))
+
+    @After
+    fun closeBtwRequests() {
+        btwMemory.close()
+    }
+
+    @Test
+    fun `side question survives destroying and recreating the chat viewmodel`() = runTest(main.testDispatcher) {
+        chat.generateGate = CompletableDeferred()
+        val original = vm()
+        advanceUntilIdle()
+        val owner = ViewModelStore().apply { put("chat", original) }
+        original.onEvent(ChatEvent.DraftChanged("/btw What next?"))
+        original.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertTrue(original.state.value.btw!!.loading)
+        owner.clear() // Navigation can dispose the entire chat, not just hide its UI.
+        runCurrent()
+
+        val reopened = vm()
+        runCurrent()
+        assertTrue(reopened.state.value.btw!!.loading)
+        assertFalse(reopened.state.value.btwOpen)
+        reopened.onEvent(ChatEvent.DraftChanged("/btw Duplicate?"))
+        reopened.onEvent(ChatEvent.Send)
+        assertEquals(1, chat.generations.size)
+        chat.generateGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals("A short answer", reopened.state.value.btw!!.answer)
+        assertFalse(reopened.state.value.btwOpen)
+
+        ViewModelStore().apply { put("chat", reopened); clear() }
+        val returnedAfterCompletion = vm()
+        advanceUntilIdle()
+        assertEquals("A short answer", returnedAfterCompletion.state.value.btw!!.answer)
+        assertFalse(returnedAfterCompletion.state.value.btwOpen)
+        assertEquals(1, chat.generations.size)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `side question failure while away is visible and retryable on return`() = runTest(main.testDispatcher) {
+        chat.generateGate = CompletableDeferred()
+        chat.generateResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        val original = vm()
+        advanceUntilIdle()
+        original.onEvent(ChatEvent.DraftChanged("/btw Why?"))
+        original.onEvent(ChatEvent.Send)
+        runCurrent()
+        ViewModelStore().apply { put("chat", original); clear() }
+        chat.generateGate!!.complete(Unit)
+        advanceUntilIdle()
+
+        val returned = vm()
+        advanceUntilIdle()
+        assertEquals("Why?", returned.state.value.btw!!.question)
+        assertNotNull(returned.state.value.btw!!.error)
+        assertFalse(returned.state.value.btw!!.loading)
+        chat.generateResult = Result.success("Retried")
+        returned.onEvent(ChatEvent.AskBtw)
+        advanceUntilIdle()
+        assertEquals("Retried", returned.state.value.btw!!.answer)
+    }
+
+    @Test
+    fun `stalled side question times out and becomes retryable instead of staying busy`() = runTest(main.testDispatcher) {
+        chat.generateGate = CompletableDeferred()
+        val original = vm()
+        advanceUntilIdle()
+        original.onEvent(ChatEvent.DraftChanged("/btw Why?"))
+        original.onEvent(ChatEvent.Send)
+        runCurrent()
+        advanceTimeBy(300_001)
+        runCurrent()
+        assertFalse(original.state.value.btw!!.loading)
+        assertNotNull(original.state.value.btw!!.error)
+        chat.generateGate!!.complete(Unit)
+        original.onEvent(ChatEvent.AskBtw)
+        advanceUntilIdle()
+        assertEquals("A short answer", original.state.value.btw!!.answer)
+    }
+
+    @Test
+    fun `side question during execution does not prompt steer or mutate the transcript`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { activeIds = setOf("s1") }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val before = vm.state.value.items
+        chat.generateGate = CompletableDeferred()
+        vm.onEvent(ChatEvent.DraftChanged("What are we doing?"))
+        vm.onEvent(ChatEvent.BtwMode(true))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertTrue(vm.state.value.running)
+        assertTrue(vm.state.value.btw!!.loading)
+        assertFalse(vm.state.value.btwMode)
+        assertEquals("", vm.state.value.draft)
+        assertEquals(before, vm.state.value.items)
+        assertTrue(chat.generations.single().endsWith("\n\nWhat are we doing?"))
+        assertTrue(chat.generations.single().contains("Do not call any tools"))
+        assertEquals(ChatEffect.BtwSent, vm.effect.first()) // Do not scroll the main transcript.
+        assertTrue(chat.prompts.isEmpty())
+        assertTrue(chat.commands.isEmpty())
+        assertTrue(chat.calls.isEmpty())
+
+        vm.onEvent(ChatEvent.DraftChanged("/btw another question"))
+        vm.onEvent(ChatEvent.Send)
+        assertEquals(1, chat.generations.size)
+        vm.onEvent(ChatEvent.DraftChanged("next task"))
+        assertTrue(vm.state.value.canSend) // Main conversation stays usable.
+        chat.generateGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals("next task", vm.state.value.draft)
+        assertEquals("A short answer", vm.state.value.btw!!.answer)
+        assertEquals(before, vm.state.value.items)
+        assertTrue(vm.state.value.running)
+        vm.onEvent(ChatEvent.BtwOpen(true))
+        vm.onEvent(ChatEvent.BtwOpen(false))
+        assertEquals("A short answer", vm.state.value.btw!!.answer)
+        assertEquals("A short answer", vm().state.value.btw!!.answer)
+    }
+
+    @Test
+    fun `btw command works when idle and a bare command opens a question field`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("/bt"))
+        vm.onEvent(ChatEvent.PickSuggestion(vm.state.value.suggestions.single()))
+        assertTrue(vm.state.value.btwOpen)
+        assertTrue(chat.generations.isEmpty())
+        vm.onEvent(ChatEvent.BtwQuestion("Explain the context"))
+        vm.onEvent(ChatEvent.AskBtw)
+        advanceUntilIdle()
+        assertTrue(chat.generations.single().endsWith("\n\nExplain the context"))
+        assertFalse(vm.state.value.running)
+        vm.onEvent(ChatEvent.DraftChanged("/btw What next?"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertTrue(chat.generations.last().endsWith("\n\nWhat next?"))
+        assertEquals(2, chat.generations.size)
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `side question failure preserves the question for retry without replacing new composer text`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        chat.generateResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        vm.onEvent(ChatEvent.DraftChanged("/btw Why?"))
+        vm.onEvent(ChatEvent.Send)
+        vm.onEvent(ChatEvent.DraftChanged("new draft"))
+        advanceUntilIdle()
+        assertEquals("Why?", vm.state.value.btw!!.question)
+        assertNotNull(vm.state.value.btw!!.error)
+        assertFalse(vm.state.value.btw!!.loading)
+        assertEquals("new draft", vm.state.value.draft)
+        chat.generateResult = Result.success("Retried")
+        vm.onEvent(ChatEvent.AskBtw)
+        advanceUntilIdle()
+        assertEquals("Retried", vm.state.value.btw!!.answer)
+        assertNull(vm.state.value.btw!!.error)
+        assertEquals("new draft", vm.state.value.draft)
+    }
+
+    @Test
+    fun `btw refuses uploads and mentions without silently dropping attachments`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val attachment = PromptAttachment("data:text/plain;base64,WA==", "note.txt", "text/plain")
+        vm.onEvent(ChatEvent.AddAttachments(listOf(attachment)))
+        vm.onEvent(ChatEvent.DraftChanged("/btw Read this"))
+        assertFalse(vm.state.value.canSend)
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf(attachment), vm.state.value.attachments)
+        assertEquals("/btw Read this", vm.state.value.draft)
+        assertTrue(chat.generations.isEmpty())
+        assertTrue(chat.prompts.isEmpty())
+    }
+
+    @Test
+    fun `side answers are isolated by server and session and bounded in memory`() {
+        val answer = BtwState(question = "Why?", answer = "Because")
+        btwMemory.put("server", "s1", answer)
+        assertNull(btwMemory.get("other", "s1"))
+        assertNull(btwMemory.get("server", "s2"))
+        btwMemory.put("server", "s1", answer.copy(loading = true))
+        assertEquals(answer, btwMemory.get("server", "s1"))
+        repeat(20) { btwMemory.put("server", "session-$it", answer) }
+        assertNull(btwMemory.get("server", "s1"))
+    }
 
     @Test
     fun `running commands are attributed by shell id never by shared directory`() = runTest(main.testDispatcher) {
@@ -707,7 +902,9 @@ class ChatViewModelTest {
     private val catalog = FakeCatalog(model)
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel =
-        ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = { 42 })
+        ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = {
+            42
+        }, btwMemory = btwMemory)
 
     @Test
     fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
@@ -1118,7 +1315,7 @@ class ChatViewModelTest {
 
         vm.onEvent(ChatEvent.DraftChanged("/"))
         assertEquals(
-            listOf("new", "undo", "redo", "compact", "fork", "mcps", "connect", "review"),
+            listOf("new", "btw", "undo", "redo", "compact", "fork", "mcps", "connect", "review"),
             vm.state.value.suggestions.map {
                 (it as Suggestion.Slash).name
             },
@@ -2713,6 +2910,14 @@ private class FakeSessions(
 }
 
 private class FakeChat(var transcript: List<Message>) : ChatRepository {
+    val generations = mutableListOf<String>()
+    var generateGate: CompletableDeferred<Unit>? = null
+    var generateResult: Result<String> = Result.success("A short answer")
+    override suspend fun generate(sessionId: String, prompt: String, serverId: String?): Result<String> {
+        generations += prompt
+        generateGate?.await()
+        return generateResult
+    }
     var runningCommands: List<RunningCommand> = emptyList()
     var runningFailure: Throwable? = null
     var failedDirectory: String? = null

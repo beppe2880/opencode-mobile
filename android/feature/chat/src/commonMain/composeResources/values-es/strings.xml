@@ -287,4 +287,13 @@
     <string name="chat_preview_selection_now">Elegido en el redactor: el chat cambia a ellos al instante</string>
     <string name="chat_preview_stop_asks">Detener un comando desde la hoja En ejecución pide confirmación primero</string>
     <string name="chat_preview_stop_direct">Detener un comando desde la hoja En ejecución lo termina al instante</string>
+    <string name="chat_btw_title">Pregunta aparte</string>
+    <string name="chat_btw_ask">Preguntar aparte</string>
+    <string name="chat_btw_text_only">Las preguntas aparte solo admiten texto. Quita los archivos adjuntos antes de enviar.</string>
+    <string name="chat_btw_unavailable">Preguntas aparte no disponibles. Comprueba que el servidor admite /btw.</string>
+    <string name="chat_btw_empty">No se ha devuelto texto.</string>
+    <string name="chat_btw_failed">La pregunta ha fallado</string>
+    <string name="chat_btw_loading">Preparando respuesta…</string>
+    <string name="chat_btw_question">Tu pregunta</string>
+    <string name="chat_btw_ready">Respuesta lista</string>
 </resources>

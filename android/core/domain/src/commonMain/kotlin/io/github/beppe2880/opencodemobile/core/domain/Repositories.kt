@@ -201,6 +201,10 @@ interface McpRepository {
 }
 
 interface ChatRepository {
+    /** One-shot text without editing history. [serverId] pins requests that outlive screen/server navigation. */
+    suspend fun generate(sessionId: String, prompt: String, serverId: String? = null): Result<String> =
+        Result.failure(OpenCodeError.NotFound("Side questions are not available"))
+
     /**
      * Transcript, oldest first. System instructions are omitted; [Message.Idle] and
      * [Message.Synthetic] are kept as turn boundaries and are not rendered.

@@ -287,4 +287,13 @@
     <string name="chat_preview_selection_now">Picked in the composer: the chat switches to them right away</string>
     <string name="chat_preview_stop_asks">Stopping a command from the Running sheet asks first</string>
     <string name="chat_preview_stop_direct">Stopping a command from the Running sheet ends it at once</string>
+    <string name="chat_btw_title">Side question</string>
+    <string name="chat_btw_ask">Ask aside</string>
+    <string name="chat_btw_text_only">Side questions support text only. Remove attachments before sending.</string>
+    <string name="chat_btw_unavailable">Side questions are unavailable. Check that your server supports /btw.</string>
+    <string name="chat_btw_empty">No text was returned.</string>
+    <string name="chat_btw_failed">Question failed</string>
+    <string name="chat_btw_loading">Preparing answer…</string>
+    <string name="chat_btw_question">Your question</string>
+    <string name="chat_btw_ready">Answer ready</string>
 </resources>
