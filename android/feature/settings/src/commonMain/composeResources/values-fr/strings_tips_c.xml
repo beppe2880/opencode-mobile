@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">Plus de place pour le terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Passez en plein écran pour masquer la barre de titre et les barres système et voir plus de lignes à la fois. Retour ou le même bouton les rétablit.</string>
     <string name="tips_c_terminal_fullscreen_demo">Un doigt touche le bouton plein écran du terminal : la barre de titre et la barre d'état disparaissent et davantage de lignes de sortie apparaissent.</string>
+    <string name="tips_c_terminal_select_title">Copier du texte depuis le terminal</string>
+    <string name="tips_c_terminal_select_body">Appuyez longuement sur un mot de la sortie pour le sélectionner, faites glisser les poignées pour en sélectionner davantage, puis appuyez sur Copier. Tout sélectionner sélectionne tout, et le bouton Sélectionner du texte dans la barre supérieure lance aussi une sélection.</string>
+    <string name="tips_c_terminal_select_demo">Un mot d'une ligne de test en échec est appuyé longuement et mis en surbrillance, sa poignée est glissée jusqu'à la fin de la ligne et Copier est appuyé : un avis Copié apparaît.</string>
 
     <string name="tips_c_next_message_title">Changez de modèle sans attendre</string>
     <string name="tips_c_next_message_body">Changez d'agent ou de modèle pendant qu'une réponse est encore en cours : le changement s'applique à votre message suivant. Les nouvelles discussions démarrent avec le modèle utilisé en dernier.</string>

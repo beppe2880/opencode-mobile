@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">为终端留出更多空间</string>
     <string name="tips_c_terminal_fullscreen_body">进入全屏会隐藏标题栏和系统栏，一次显示更多行。点按返回或同一按钮即可恢复。</string>
     <string name="tips_c_terminal_fullscreen_demo">手指点按终端的全屏按钮：标题栏和状态栏滑出，显示更多输出行。</string>
+    <string name="tips_c_terminal_select_title">从终端复制文本</string>
+    <string name="tips_c_terminal_select_body">长按输出中的一个词即可选中它，拖动手柄可选中更多内容，然后点按“复制”。“全选”会选中全部内容，顶部栏中的“选择文本”按钮也可以开始选择。</string>
+    <string name="tips_c_terminal_select_demo">长按失败测试行中的一个词使其高亮，将其手柄拖到行尾，然后点按“复制”：出现“已复制”提示。</string>
 
     <string name="tips_c_next_message_title">无需等待即可切换模型</string>
     <string name="tips_c_next_message_body">回复仍在进行时即可更改智能体或模型：更改会在你的下一条消息中生效。新聊天默认使用你上次使用的模型。</string>

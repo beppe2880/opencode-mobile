@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.CloudQueue
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
@@ -25,6 +26,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_sett
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_title
@@ -38,6 +42,17 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
 internal val tipsCardsC: List<FeatureCard> = listOf(
+    FeatureCard(
+        id = "terminal-select-text",
+        version = "0.17.0",
+        icon = Icons.Outlined.ContentCopy,
+        title = Res.string.tips_c_terminal_select_title,
+        body = Res.string.tips_c_terminal_select_body,
+        demoDescription = Res.string.tips_c_terminal_select_demo,
+        author = "Andrease11",
+        pullRequest = 227,
+        demo = { TerminalSelectionDemo(it) },
+    ),
     FeatureCard(
         id = "voice-recording-waveform",
         version = "0.11.0",

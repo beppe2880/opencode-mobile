@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">مساحة أكبر للطرفية</string>
     <string name="tips_c_terminal_fullscreen_body">ادخل ملء الشاشة لإخفاء شريط العنوان وأشرطة النظام ورؤية سطور أكثر دفعة واحدة. يعيدها الرجوع أو الزر نفسه.</string>
     <string name="tips_c_terminal_fullscreen_demo">يضغط الإصبع زر ملء الشاشة في الطرفية: ينزلق شريط العنوان وشريط الحالة بعيدًا وتظهر سطور مخرجات أكثر.</string>
+    <string name="tips_c_terminal_select_title">نسخ النص من الطرفية</string>
+    <string name="tips_c_terminal_select_body">اضغط مطولًا على كلمة في المخرجات لتحديدها، واسحب المقابض لتحديد المزيد، ثم اضغط نسخ. تحديد الكل يحدد كل شيء، وزر تحديد النص في الشريط العلوي يبدأ التحديد أيضًا.</string>
+    <string name="tips_c_terminal_select_demo">يُضغط مطولًا على كلمة من سطر اختبار فاشل فتُبرز، ويُسحب مقبضها إلى نهاية السطر ويُضغط نسخ: يظهر إشعار تم النسخ.</string>
 
     <string name="tips_c_next_message_title">بدّل النموذج دون انتظار</string>
     <string name="tips_c_next_message_body">غيّر الوكيل أو النموذج أثناء تشغيل الرد: يسري التغيير مع رسالتك التالية. تبدأ المحادثات الجديدة بالنموذج الذي استخدمته آخرًا.</string>

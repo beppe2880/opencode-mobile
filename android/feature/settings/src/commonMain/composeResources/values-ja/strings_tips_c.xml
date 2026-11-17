@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">ターミナルの表示領域を広く</string>
     <string name="tips_c_terminal_fullscreen_body">全画面に切り替えると、タイトルバーとシステムバーが隠れ、一度により多くの行が見えます。戻るボタンまたは同じボタンで元に戻ります。</string>
     <string name="tips_c_terminal_fullscreen_demo">指でターミナルの全画面ボタンをタップすると、タイトルバーとステータスバーがスライドして消え、出力の行が増えて表示されます。</string>
+    <string name="tips_c_terminal_select_title">ターミナルからテキストをコピー</string>
+    <string name="tips_c_terminal_select_body">出力内の単語を長押しして選択し、ハンドルをドラッグしてさらに選択してから、「コピー」をタップします。「すべて選択」はすべてを選択し、上部バーの「テキストを選択」ボタンでも選択を開始できます。</string>
+    <string name="tips_c_terminal_select_demo">失敗したテスト行の単語を長押しして強調表示し、そのハンドルを行末までドラッグして「コピー」をタップすると、「コピーしました」の通知が表示されます。</string>
 
     <string name="tips_c_next_message_title">待たずにモデルを切り替え</string>
     <string name="tips_c_next_message_body">返信がまだ実行中でも、エージェントやモデルを変更できます。変更は次のメッセージから適用されます。新しいチャットは、最後に使ったモデルから始まります。</string>
