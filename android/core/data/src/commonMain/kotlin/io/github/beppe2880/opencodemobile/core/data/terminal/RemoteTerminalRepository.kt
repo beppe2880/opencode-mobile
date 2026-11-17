@@ -36,7 +36,7 @@ internal class RemoteTerminalRepository(
         val api = clients.active().pty
         val running = awaitBody { api.ptyList(locationDirectory = directory) }.data
             .firstOrNull { it.status == Pty.Status.RUNNING }
-        (running ?: awaitBody { api.ptyCreate(PtyCreateRequest(), locationDirectory = directory) }.data).toDomain()
+        running?.toDomain() ?: awaitBody { api.ptyCreate(PtyCreateRequest(), locationDirectory = directory) }.data.toDomain().copy(created = true)
     }
 
     override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int): Result<Unit> = resultOf {

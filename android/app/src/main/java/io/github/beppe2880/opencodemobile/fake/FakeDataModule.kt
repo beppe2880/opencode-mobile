@@ -588,7 +588,7 @@ internal class FakeSettings : SettingsRepository {
 
 /** A terminal that echoes what is typed, like a shell without commands. */
 internal class FakeTerminals : TerminalRepository {
-    override suspend fun open(directory: String) = Result.success(TerminalInfo(id = "pty_fake", title = "Terminal 1", running = true))
+    override suspend fun open(directory: String) = Result.success(TerminalInfo(id = "pty_fake", title = "Terminal 1", running = true, created = true))
 
     override suspend fun resize(directory: String, terminalId: String, columns: Int, rows: Int) = Result.success(Unit)
 

@@ -15,9 +15,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class TerminalViewModel(
@@ -71,6 +74,8 @@ class TerminalViewModel(
             TerminalEvent.Retry -> open()
             is TerminalEvent.Fullscreen -> updateState { it.copy(fullscreen = event.enabled) }
             TerminalEvent.Restart -> {
+                // A new PTY starts at the server default, not the previous shell's fitted size.
+                size.value = null
                 surface.reset()
                 open()
             }
@@ -94,8 +99,12 @@ class TerminalViewModel(
             }
             terminalId = terminal.id
             updateState { it.copy(title = terminal.title) }
+            if (!terminal.created) surface.fitBeforeReplay()
             val resizing = launch {
-                size.filterNotNull().debounce(RESIZE_DEBOUNCE_MILLIS).collectLatest { (columns, rows) ->
+                val sizes = size.filterNotNull()
+                // The first size goes out at once: until the shell gets it, it keeps
+                // drawing for the server's initial size while the page shows another.
+                merge(sizes.take(1), sizes.drop(1).debounce(RESIZE_DEBOUNCE_MILLIS)).collectLatest { (columns, rows) ->
                     terminals.resize(directory, terminal.id, columns, rows)
                 }
             }

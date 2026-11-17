@@ -5,12 +5,72 @@
 
   const bridge = window.OcTerminal;
   const SHIFT = 1, ALT = 2, CTRL = 4;
+  // OpenCode's PTY creation defaults (packages/opencode/src/pty/index.ts).
+  const INITIAL_SIZE = { cols: 80, rows: 24 };
   let term = null;
   let fit = null;
   // Until the replayed output has been parsed, the terminal's answers to old queries are dropped.
   let live = false;
+  let liveEpoch = 0;
+  let hasOutput = false;
+  let fitPending = false;
   // Modifiers armed or locked on the key bar; they apply to the next key typed on the keyboard.
   let modifiers = 0;
+  // Writes are parsed asynchronously. Replaying a resize must wait for all text
+  // before it, and later text must wait for that resize.
+  const pending = [];
+  let parsing = false;
+
+  function enqueue(action) {
+    pending.push(action);
+    if (!parsing) drain();
+  }
+
+  function drain() {
+    const action = pending.shift();
+    parsing = !!action;
+    if (action) action(drain);
+  }
+
+  function write(data) {
+    enqueue((done) => term.write(data, () => {
+      hasOutput ||= data.length > 0;
+      fitIfReady();
+      done();
+    }));
+  }
+
+  // A shell draws its first prompt in several chunks (zsh: PROMPT_SP, then the prompt).
+  // Fitting between them parses the rest at the new width while the shell still lays
+  // it out for the old one, which leaves a ghost row. Fit once output pauses instead.
+  const SETTLE_MS = 120, MAX_SETTLE_MS = 1000;
+  let settleTimer = null, deadlineTimer = null;
+
+  function cancelFit() {
+    clearTimeout(settleTimer);
+    clearTimeout(deadlineTimer);
+    settleTimer = deadlineTimer = null;
+  }
+
+  function fitIfReady() {
+    // A newly spawned shell can connect with an empty replay before drawing its
+    // first prompt. Keep parsing at the server size until that output arrives too.
+    if (!live || !fitPending || !hasOutput) return;
+    const epoch = liveEpoch;
+    const fitNow = () => enqueue((done) => {
+      if (live && fitPending && epoch === liveEpoch) {
+        cancelFit();
+        fitPending = false;
+        fit.fit();
+        bridge.resize(term.cols, term.rows);
+      }
+      done();
+    });
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(fitNow, SETTLE_MS);
+    // Output that never pauses must not keep the phone at the server size.
+    deadlineTimer ??= setTimeout(fitNow, MAX_SETTLE_MS);
+  }
 
   function send(data) {
     if (live && data.length > 0) bridge.input(data);
@@ -158,11 +218,33 @@
   }
 
   window.oc = {
-    write(data) { term.write(data); },
+    write,
+    restore(data, sizes) {
+      let offset = 0;
+      for (const [at, cols, rows] of sizes) {
+        write(data.slice(offset, at));
+        enqueue((done) => { term.resize(cols, rows); done(); });
+        offset = at;
+      }
+      write(data.slice(offset));
+    },
+    // A shell that was already running drew its output for the phone: parse its
+    // replay at the current size, not at the server's initial one.
+    fitBeforeReplay() {
+      enqueue((done) => { fit.fit(); done(); });
+    },
     setLive(value) {
+      const epoch = ++liveEpoch;
+      cancelFit();
       if (!value) { live = false; return; }
       // Runs once everything written so far has been parsed.
-      term.write("", () => { live = true; });
+      enqueue((done) => term.write("", () => {
+        if (epoch !== liveEpoch) { done(); return; }
+        live = true;
+        fitPending = true;
+        fitIfReady();
+        done();
+      }));
     },
     setModifiers(mask) { modifiers = mask; },
     key(id, mask) {
@@ -174,7 +256,18 @@
       send(withModifiers(String.fromCodePoint(codePoint), mask));
     },
     paste(text) { term.paste(text); },
-    reset() { term.reset(); },
+    reset() {
+      live = false;
+      ++liveEpoch;
+      cancelFit();
+      enqueue((done) => {
+        hasOutput = false;
+        fitPending = false;
+        term.reset();
+        term.resize(INITIAL_SIZE.cols, INITIAL_SIZE.rows);
+        done();
+      });
+    },
     focus() { term.focus(); },
     theme(theme) {
       term.options.theme = theme;
@@ -194,6 +287,7 @@
       // The system monospace font is a fine fallback.
     }
     term = new Terminal({
+      ...INITIAL_SIZE,
       fontFamily,
       fontSize: 13,
       scrollback: 5000,
@@ -207,12 +301,20 @@
     bindTouchScroll();
     bindImeInput();
     term.onData(typed);
-    term.onResize(({ cols, rows }) => bridge.resize(cols, rows));
+    term.onResize(({ cols, rows }) => { if (live) bridge.resize(cols, rows); });
     // A tap is the user gesture that lets the focus open the soft keyboard.
     document.getElementById("terminal").addEventListener("click", () => term.focus());
-    new ResizeObserver(() => fit.fit()).observe(document.getElementById("terminal"));
-    fit.fit();
-    bridge.resize(term.cols, term.rows);
+    // Parse the initial replay at INITIAL_SIZE,
+    // then fit and notify the shell together in setLive. Fitting before replay
+    // wraps the prompt differently from readline's redraw and leaves ghost rows.
+    new ResizeObserver(() => {
+      if (!live || fitPending) return;
+      const epoch = liveEpoch;
+      enqueue((done) => {
+        if (live && epoch === liveEpoch) fit.fit();
+        done();
+      });
+    }).observe(document.getElementById("terminal"));
     bridge.ready();
   }
 
