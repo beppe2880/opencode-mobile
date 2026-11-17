@@ -28,6 +28,12 @@ class WebSurface(
     private val output = StringBuilder()
     private data class Size(val at: Int, val columns: Int, val rows: Int)
     private val sizes = mutableListOf<Size>()
+
+    // Output trimmed from the start of [output], so positions in the shell's output are `dropped + index`.
+    private var dropped = 0L
+
+    // Sizes from an earlier visit, applied as the replay reaches their positions.
+    private val replaySizes = ArrayDeque<TerminalSize>()
     private var page: WebTerminalPage? = null
     private var live = false
     private var modifiers = 0
@@ -94,23 +100,48 @@ class WebSurface(
         if (sizes.isEmpty()) page?.call("fitBeforeReplay")
     }
 
+    /** The sizes the shell's output was drawn at, by position in that output. */
+    fun timeline(): List<TerminalSize> = sizes.map { TerminalSize(dropped + it.at, it.columns, it.rows) }
+
+    /**
+     * Replays the shell's output at the sizes of an earlier [timeline], from the beginning of the
+     * output, instead of guessing one size for all of it.
+     */
+    fun replayAt(timeline: List<TerminalSize>) {
+        replaySizes.clear()
+        replaySizes += timeline.sortedBy { it.at }
+    }
+
     fun onPageModifiersUsed() {
         main.launch { onModifiersUsed() }
     }
 
     fun write(text: String) {
+        val start = dropped + output.length
+        val due = buildList {
+            while (replaySizes.isNotEmpty() && replaySizes.first().at <= start + text.length) {
+                val size = replaySizes.removeFirst()
+                add(Size((size.at - start).coerceAtLeast(0).toInt(), size.columns, size.rows))
+            }
+        }
+        due.forEach { sizes += it.copy(at = output.length + it.at) }
         output.append(text)
         if (output.length > MAX_KEPT_CHARS) {
             // Cut at a line start so the kept output does not begin inside an escape sequence.
             val cut = output.indexOf("\n", output.length - MAX_KEPT_CHARS).takeIf { it >= 0 } ?: (output.length - MAX_KEPT_CHARS)
             output.deleteRange(0, cut + 1)
+            dropped += cut + 1
             val previous = sizes.lastOrNull { it.at <= cut + 1 }
             val kept = sizes.filter { it.at > cut + 1 }.map { it.copy(at = it.at - cut - 1) }
             sizes.clear()
             previous?.let { sizes += it.copy(at = 0) }
             sizes += kept
         }
-        page?.call("write", js(text))
+        if (due.isEmpty()) {
+            page?.call("write", js(text))
+        } else {
+            page?.call("restore", js(text), due.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" })
+        }
     }
 
     /**
@@ -165,6 +196,8 @@ class WebSurface(
     fun reset() {
         output.clear()
         sizes.clear()
+        dropped = 0
+        replaySizes.clear()
         fitBeforeReplay = false
         page?.call("reset")
     }
@@ -184,6 +217,9 @@ class WebSurface(
         const val MAX_KEPT_CHARS = 1_000_000
     }
 }
+
+/** The terminal was [columns]×[rows] from position [at] of the shell's output on. */
+data class TerminalSize(val at: Long, val columns: Int, val rows: Int)
 
 /** A JavaScript string literal of [text]. */
 internal fun js(text: String): String = buildString(text.length + 2) {
