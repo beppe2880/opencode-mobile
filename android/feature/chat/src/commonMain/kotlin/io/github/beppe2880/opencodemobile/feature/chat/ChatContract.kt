@@ -42,6 +42,8 @@ data class ChatState(
     val running: Boolean = false,
     val connection: ConnectionState = ConnectionState.Connected,
     val draft: String = "",
+    /** Grows when the composer should take the focus and open the keyboard (a quote was added). */
+    val composerFocus: Int = 0,
     val delivery: PromptDelivery = PromptDelivery.Steer,
     val sending: Boolean = false,
     val stopping: Boolean = false,
@@ -360,6 +362,9 @@ sealed interface ChatEvent {
     data object CloseRunningItem : ChatEvent
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
+
+    /** "Ask" on selected transcript text: a quote line in the composer, ready for the question. */
+    data class Quote(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent
     data object Send : ChatEvent
     data object Stop : ChatEvent

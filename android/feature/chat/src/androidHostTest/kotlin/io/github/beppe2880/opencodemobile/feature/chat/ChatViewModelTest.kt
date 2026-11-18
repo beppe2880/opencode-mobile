@@ -695,6 +695,20 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `quoting puts the selection in the composer and asks for the keyboard`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("Why"))
+        vm.onEvent(ChatEvent.Quote("  the selected\npart "))
+        assertEquals("Why\n↳ \"the selected part\" ", vm.state.value.draft)
+        assertEquals(1, vm.state.value.composerFocus)
+        assertTrue(chat.prompts.isEmpty())
+
+        vm.onEvent(ChatEvent.Quote("   "))
+        assertEquals(1, vm.state.value.composerFocus)
+    }
+
+    @Test
     fun `the reading position is kept for the next opening of the chat`() = runTest(main.testDispatcher) {
         vm().onEvent(ChatEvent.ScrollMoved(ScrollMemory.Anchor("u1", 12)))
         assertEquals(ScrollMemory.Anchor("u1", 12), vm().state.value.savedScroll)
