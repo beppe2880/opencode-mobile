@@ -196,89 +196,91 @@ internal fun Transcript(
     LaunchedEffect(liveGroupKey) { liveGroupKey?.let(followed::add) }
     val keptOpen: (String) -> Boolean = { key -> state.keepLiveStepsOpen && key != liveGroupKey && key in followed }
     TranscriptLocals(state) {
-        Box(Modifier.fillMaxSize()) {
-            LazyColumn(
-                state = listState,
-                // Top anchoring keeps the paragraph being read still when this same row grows.
-                modifier = Modifier.fillMaxSize().nestedScroll(readingScroll).testTag("chat_transcript"),
-                contentPadding = PaddingValues(vertical = OcSpacing.lg),
-                verticalArrangement = Arrangement.spacedBy(OcSpacing.md, Alignment.Bottom),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                olderHistory(state, onEvent)
-                items(state.items, key = { it.key }, contentType = { it::class }) { item ->
-                    TranscriptItem(
-                        item = item,
-                        state = state,
-                        onEvent = onEvent,
-                        onCopy = onCopy,
-                        cache = cache,
-                        modifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter),
-                        liveGroupKey = liveGroupKey,
-                        keptOpen = keptOpen,
-                        onUserActions = { actionsFor = it },
-                    )
-                }
-            }
-            AnimatedVisibility(
-                visible = !stickToBottom,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut(),
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
-            ) {
-                val jump = {
-                    stickToBottom = false
-                    hasNew = false
-                    scope.launch {
-                        val last = listState.layoutInfo.totalItemsCount - 1
-                        if (last >= 0) listState.animateScrollToItem(last, Int.MAX_VALUE)
-                        stickToBottom = true
-                        hasNew = false
+        QuoteSelection(onQuote = { onEvent(ChatEvent.Quote(it)) }) {
+            Box(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    state = listState,
+                    // Top anchoring keeps the paragraph being read still when this same row grows.
+                    modifier = Modifier.fillMaxSize().nestedScroll(readingScroll).testTag("chat_transcript"),
+                    contentPadding = PaddingValues(vertical = OcSpacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.md, Alignment.Bottom),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    olderHistory(state, onEvent)
+                    items(state.items, key = { it.key }, contentType = { it::class }) { item ->
+                        TranscriptItem(
+                            item = item,
+                            state = state,
+                            onEvent = onEvent,
+                            onCopy = onCopy,
+                            cache = cache,
+                            modifier = Modifier.widthIn(max = OcSpacing.contentMaxWidth).fillMaxWidth().padding(horizontal = OcSpacing.gutter),
+                            liveGroupKey = liveGroupKey,
+                            keptOpen = keptOpen,
+                            onUserActions = { actionsFor = it },
+                        )
                     }
-                    Unit
                 }
-                if (hasNew) {
-                    OcChip(
-                        text = stringResource(Res.string.chat_new_messages),
-                        onClick = jump,
-                        selected = true,
-                        leadingIcon = Icons.Outlined.ArrowDownward,
-                        modifier = Modifier
-                            .shadow(2.dp, RoundedCornerShape(OcRadius.md))
-                            .testTag("chat_new_messages_button"),
-                    )
-                } else {
-                    OcRoundIconButton(
-                        icon = Icons.Outlined.ArrowDownward,
-                        contentDescription = stringResource(Res.string.chat_jump_latest),
-                        onClick = jump,
-                        container = OcTheme.colors.bgBase,
-                        content = OcTheme.colors.iconBase,
-                        modifier = Modifier
-                            .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
-                            .testTag("chat_jump_latest_button"),
-                    )
+                AnimatedVisibility(
+                    visible = !stickToBottom,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut(),
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = OcSpacing.sm),
+                ) {
+                    val jump = {
+                        stickToBottom = false
+                        hasNew = false
+                        scope.launch {
+                            val last = listState.layoutInfo.totalItemsCount - 1
+                            if (last >= 0) listState.animateScrollToItem(last, Int.MAX_VALUE)
+                            stickToBottom = true
+                            hasNew = false
+                        }
+                        Unit
+                    }
+                    if (hasNew) {
+                        OcChip(
+                            text = stringResource(Res.string.chat_new_messages),
+                            onClick = jump,
+                            selected = true,
+                            leadingIcon = Icons.Outlined.ArrowDownward,
+                            modifier = Modifier
+                                .shadow(2.dp, RoundedCornerShape(OcRadius.md))
+                                .testTag("chat_new_messages_button"),
+                        )
+                    } else {
+                        OcRoundIconButton(
+                            icon = Icons.Outlined.ArrowDownward,
+                            contentDescription = stringResource(Res.string.chat_jump_latest),
+                            onClick = jump,
+                            container = OcTheme.colors.bgBase,
+                            content = OcTheme.colors.iconBase,
+                            modifier = Modifier
+                                .background(OcTheme.colors.bgBase, RoundedCornerShape(50))
+                                .testTag("chat_jump_latest_button"),
+                        )
+                    }
                 }
             }
         }
-    }
-    val selected = actionsFor?.let { key -> state.items.firstOrNull { it.key == key } as? ChatItem.User }
-    if (selected != null) {
-        MessageActionsSheet(
-            onRevert = {
-                actionsFor = null
-                onEvent(ChatEvent.Revert(selected.key))
-            },
-            onFork = {
-                actionsFor = null
-                onEvent(ChatEvent.Fork(selected.key))
-            },
-            onCopy = {
-                actionsFor = null
-                onCopy(selected.text)
-            },
-            onDismiss = { actionsFor = null },
-        )
+        val selected = actionsFor?.let { key -> state.items.firstOrNull { it.key == key } as? ChatItem.User }
+        if (selected != null) {
+            MessageActionsSheet(
+                onRevert = {
+                    actionsFor = null
+                    onEvent(ChatEvent.Revert(selected.key))
+                },
+                onFork = {
+                    actionsFor = null
+                    onEvent(ChatEvent.Fork(selected.key))
+                },
+                onCopy = {
+                    actionsFor = null
+                    onCopy(selected.text)
+                },
+                onDismiss = { actionsFor = null },
+            )
+        }
     }
 }
 

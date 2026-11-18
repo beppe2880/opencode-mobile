@@ -81,6 +81,7 @@
     <string name="chat_expanded">Expanded</string>
     <string name="chat_collapsed">Collapsed</string>
     <string name="chat_copy_response">Copy response</string>
+    <string name="chat_quote">Quote</string>
     <string name="chat_interrupted">Interrupted</string>
     <string name="chat_empty_title">Start the conversation</string>
     <string name="chat_empty_message">Describe a task for the agent. It works in %1$s.</string>

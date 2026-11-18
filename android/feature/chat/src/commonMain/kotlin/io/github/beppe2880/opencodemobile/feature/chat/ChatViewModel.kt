@@ -292,6 +292,13 @@ class ChatViewModel(
                 updateState { it.copy(draft = event.text) }
                 updateSuggestions(event.text)
             }
+            is ChatEvent.Quote -> {
+                val draft = withQuote(currentState.draft, event.text)
+                if (draft != currentState.draft) {
+                    updateState { it.copy(draft = draft, composerFocus = it.composerFocus + 1) }
+                    updateSuggestions(draft)
+                }
+            }
             is ChatEvent.DeliveryChanged -> updateState { it.copy(delivery = event.delivery) }
             ChatEvent.Send -> send()
             ChatEvent.Stop -> stop()

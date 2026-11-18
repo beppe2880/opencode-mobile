@@ -72,6 +72,7 @@
     <string name="chat_expanded">펼쳐짐</string>
     <string name="chat_collapsed">접힘</string>
     <string name="chat_copy_response">응답 복사</string>
+    <string name="chat_quote">인용</string>
     <string name="chat_interrupted">중단됨</string>
     <string name="chat_empty_title">대화 시작</string>
     <string name="chat_empty_message">에이전트에게 작업을 설명하세요. 작업 위치: %1$s.</string>
