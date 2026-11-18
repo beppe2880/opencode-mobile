@@ -245,6 +245,7 @@ fun SessionsScreen(
                                 swipeToDelete = !inDrawer,
                                 pinned = pinned,
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
+                                waiting = state.waiting[session.id],
                             )
                         }
                     }

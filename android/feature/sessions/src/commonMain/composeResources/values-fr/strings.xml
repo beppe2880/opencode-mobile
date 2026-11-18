@@ -12,6 +12,8 @@
     <string name="sessions_running">En cours</string>
     <string name="sessions_failed">Échec</string>
     <string name="sessions_interrupted">Interrompue</string>
+    <string name="sessions_waiting_permission">Autorisation requise</string>
+    <string name="sessions_waiting_answer">Question pour vous</string>
     <string name="sessions_empty_title">Aucune session pour le moment</string>
     <string name="sessions_empty_message">Démarrez une session pour confier une tâche à l’agent dans l’un de vos projets.</string>
     <string name="sessions_empty_search_title">Aucune session correspondante</string>

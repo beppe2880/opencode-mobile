@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">Più spazio per il terminale</string>
     <string name="tips_c_terminal_fullscreen_body">Entra a schermo intero per nascondere la barra del titolo e quelle di sistema e vedere più righe in una volta. Indietro o lo stesso pulsante le riporta.</string>
     <string name="tips_c_terminal_fullscreen_demo">Un dito tocca il pulsante schermo intero del terminale: la barra del titolo e quella di stato scivolano via e compaiono più righe di output.</string>
+    <string name="tips_c_waiting_title">Vedi quali chat aspettano una tua risposta</string>
+    <string name="tips_c_waiting_body">Quando un agente si ferma per farti una domanda o chiedere un permesso, la sua chat nell'elenco mostra Domanda per te o Richiede permesso al posto di In lavorazione, nel colore di avviso. Anche le richieste dei suoi subagenti contano.</string>
+    <string name="tips_c_waiting_demo">Una chat in lavorazione nell'elenco passa a Domanda per te nel colore di avviso, torna a In lavorazione dopo la risposta, poi mostra Richiede permesso.</string>
     <string name="tips_c_terminal_select_title">Copia testo dal terminale</string>
     <string name="tips_c_terminal_select_body">Tieni premuta una parola nell'output per selezionarla, trascina le maniglie per selezionarne altre, poi tocca Copia. Seleziona tutto seleziona l'intero contenuto, e il pulsante Seleziona testo nella barra in alto avvia anch'esso una selezione.</string>
     <string name="tips_c_terminal_select_demo">Una parola di una riga di test fallito viene tenuta premuta ed evidenziata, la sua maniglia viene trascinata fino alla fine della riga e si tocca Copia: compare un avviso Copiato.</string>

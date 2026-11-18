@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">More room for the terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Enter full screen to hide the title bar and the system bars and see more lines at once. Back or the same button brings them back.</string>
     <string name="tips_c_terminal_fullscreen_demo">A finger taps the full screen button of the terminal: the title bar and the status bar slide away and more output lines appear.</string>
+    <string name="tips_c_waiting_title">See which chats are waiting for you</string>
+    <string name="tips_c_waiting_body">When an agent stops to ask you a question or for permission, its chat in the list shows Question for you or Needs permission instead of Working, in the warning color. Requests from its subagents count too.</string>
+    <string name="tips_c_waiting_demo">A working chat in the list changes to Question for you in the warning color, goes back to Working once answered, then shows Needs permission.</string>
     <string name="tips_c_terminal_select_title">Copy text from the terminal</string>
     <string name="tips_c_terminal_select_body">Long-press a word in the output to select it, drag the handles to select more, then tap Copy. Select all selects everything, and the Select text button in the top bar starts a selection too.</string>
     <string name="tips_c_terminal_select_demo">A word of a failing test line is long-pressed and highlighted, its handle is dragged to the end of the line and Copy is tapped: a Copied notice appears.</string>

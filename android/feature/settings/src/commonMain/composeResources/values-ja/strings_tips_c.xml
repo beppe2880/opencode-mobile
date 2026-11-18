@@ -15,6 +15,9 @@
     <string name="tips_c_terminal_fullscreen_title">ターミナルの表示領域を広く</string>
     <string name="tips_c_terminal_fullscreen_body">全画面に切り替えると、タイトルバーとシステムバーが隠れ、一度により多くの行が見えます。戻るボタンまたは同じボタンで元に戻ります。</string>
     <string name="tips_c_terminal_fullscreen_demo">指でターミナルの全画面ボタンをタップすると、タイトルバーとステータスバーがスライドして消え、出力の行が増えて表示されます。</string>
+    <string name="tips_c_waiting_title">回答を待っているチャットを確認</string>
+    <string name="tips_c_waiting_body">エージェントが質問や許可のために停止すると、一覧のそのチャットには、作業中の代わりに「質問あり」または「要許可」が警告色で表示されます。そのサブエージェントからのリクエストも対象です。</string>
+    <string name="tips_c_waiting_demo">一覧の作業中のチャットが警告色の「質問あり」に変わり、回答すると再び「作業中」に戻り、その後「要許可」が表示されます。</string>
     <string name="tips_c_terminal_select_title">ターミナルからテキストをコピー</string>
     <string name="tips_c_terminal_select_body">出力内の単語を長押しして選択し、ハンドルをドラッグしてさらに選択してから、「コピー」をタップします。「すべて選択」はすべてを選択し、上部バーの「テキストを選択」ボタンでも選択を開始できます。</string>
     <string name="tips_c_terminal_select_demo">失敗したテスト行の単語を長押しして強調表示し、そのハンドルを行末までドラッグして「コピー」をタップすると、「コピーしました」の通知が表示されます。</string>

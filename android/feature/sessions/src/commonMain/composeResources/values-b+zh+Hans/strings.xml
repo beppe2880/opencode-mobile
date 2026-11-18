@@ -12,6 +12,8 @@
     <string name="sessions_running">运行中</string>
     <string name="sessions_failed">失败</string>
     <string name="sessions_interrupted">已中断</string>
+    <string name="sessions_waiting_permission">需要授权</string>
+    <string name="sessions_waiting_answer">待你回答</string>
     <string name="sessions_empty_title">暂无会话</string>
     <string name="sessions_empty_message">新建会话，让智能体在你的项目中执行任务。</string>
     <string name="sessions_empty_search_title">没有匹配的会话</string>

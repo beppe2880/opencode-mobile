@@ -75,6 +75,7 @@ class SessionsViewModel(
     private var workPoll: Job? = null
     private var workJob: Job? = null
     private var workEventJob: Job? = null
+    private var waitingJob: Job? = null
     private val runningWork = RunningWorkLoader(sessions, chat)
     private val showRunningWork: Boolean get() = settings.settings.value.showRunningWorkInList
 
@@ -125,6 +126,7 @@ class SessionsViewModel(
             is SessionsEvent.Visible -> {
                 workVisible = event.visible
                 restartRunningPoll()
+                requestWaitingRefresh()
             }
             SessionsEvent.Refresh -> {
                 load(initial = currentState.groups.isEmpty(), pull = currentState.groups.isNotEmpty())
@@ -189,6 +191,7 @@ class SessionsViewModel(
         debounceJob?.cancel()
         browseJob?.cancel()
         workJob?.cancel()
+        waitingJob?.cancel()
         sessionList = emptyList()
         listedForPin = emptySet()
         pinnedIds = pins.pinned()
@@ -202,6 +205,7 @@ class SessionsViewModel(
                 groups = emptyList(),
                 running = emptySet(),
                 work = emptyMap(),
+                waiting = emptyMap(),
                 loading = id != null,
                 refreshing = false,
                 error = null,
@@ -281,11 +285,16 @@ class SessionsViewModel(
         }
         when (event) {
             ServerEvent.Connected -> load(initial = false)
-            is ServerEvent.ExecutionStarted -> updateState { it.copy(running = it.running + event.sessionId) }
-            is ServerEvent.ExecutionEnded -> {
-                updateState { it.copy(running = it.running - event.sessionId) }
-                scheduleReload(EVENT_DEBOUNCE_MS)
+            is ServerEvent.ExecutionStarted -> {
+                updateState { it.copy(running = it.running + event.sessionId) }
+                requestWaitingRefresh()
             }
+            is ServerEvent.ExecutionEnded -> {
+                updateState { it.copy(running = it.running - event.sessionId, waiting = it.waiting - event.sessionId) }
+                scheduleReload(EVENT_DEBOUNCE_MS)
+                requestWaitingRefresh()
+            }
+            is ServerEvent.PermissionChanged, is ServerEvent.FormsChanged -> requestWaitingRefresh()
             is ServerEvent.SessionChanged -> {
                 if (event.deleted) {
                     sessionList = sessionList.filterNot { it.id == event.sessionId }
@@ -341,8 +350,52 @@ class SessionsViewModel(
                     val work = snapshot.sessions.mapValues { (id, work) -> if (id in snapshot.errors) state.work[id] ?: work else work }
                     state.copy(work = work.filterValues { !it.isEmpty })
                 }
+                // Subagents found since may be the ones asking.
+                requestWaitingRefresh()
             }
         }
+    }
+
+    /** Bursts of events (a request asked and answered) cause one refresh; a newer one replaces it. */
+    private fun requestWaitingRefresh() {
+        if (!workVisible || serverId == null) return
+        waitingJob?.cancel()
+        waitingJob = viewModelScope.launch {
+            delay(WAITING_DEBOUNCE_MS)
+            refreshWaiting()
+        }
+    }
+
+    /**
+     * Reads the pending permissions and questions of the running listed sessions and of their
+     * known subagents. A session whose requests could not be read keeps what it showed.
+     */
+    private suspend fun refreshWaiting() {
+        val server = serverId
+        val state = currentState
+        val listed = sessionList.mapTo(HashSet()) { it.id }
+        val roots = state.running.filter { it in listed }
+        val waiting = coroutineScope {
+            roots.map { root ->
+                async {
+                    val ids = listOf(root) + state.work[root]?.agents.orEmpty().map { it.session.id }
+                    root to waitingFor(ids).getOrElse { state.waiting[root] }
+                }
+            }.awaitAll()
+        }
+        if (serverId != server) return
+        updateState { it.copy(waiting = waiting.mapNotNull { (id, w) -> w?.let { id to it } }.toMap()) }
+    }
+
+    /** What [ids] wait for, null when nothing; a failure when a request list could not be read. */
+    private suspend fun waitingFor(ids: List<String>): Result<SessionWaiting?> {
+        var answer = false
+        for (id in ids) {
+            val permissions = chat.permissions(id).getOrElse { return Result.failure(it) }
+            if (permissions.isNotEmpty()) return Result.success(SessionWaiting.Permission)
+            if (!answer) answer = chat.forms(id).getOrElse { return Result.failure(it) }.isNotEmpty()
+        }
+        return Result.success(if (answer) SessionWaiting.Answer else null)
     }
 
     private fun scheduleReload(delayMs: Long) {
@@ -382,6 +435,7 @@ class SessionsViewModel(
                     fillNewSessionDirectory()
                     prefetch(list)
                     refreshRunning()
+                    requestWaitingRefresh()
                 },
                 onFailure = { error ->
                     updateState { it.copy(loading = false, refreshing = false, error = if (it.groups.isEmpty()) error.toUiText() else null) }
@@ -689,6 +743,7 @@ class SessionsViewModel(
         const val PREFETCH_MESSAGES = 2
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
+        const val WAITING_DEBOUNCE_MS = 300L
         const val GLOBAL_PROJECT_ID = "global"
     }
 }

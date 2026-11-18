@@ -12,6 +12,8 @@
     <string name="sessions_running">Выполняется</string>
     <string name="sessions_failed">Ошибка</string>
     <string name="sessions_interrupted">Прервано</string>
+    <string name="sessions_waiting_permission">Нужно разрешение</string>
+    <string name="sessions_waiting_answer">Вопрос к вам</string>
     <string name="sessions_empty_title">Пока нет сессий</string>
     <string name="sessions_empty_message">Начните сессию, чтобы поручить агенту задачу в одном из проектов.</string>
     <string name="sessions_empty_search_title">Нет подходящих сессий</string>

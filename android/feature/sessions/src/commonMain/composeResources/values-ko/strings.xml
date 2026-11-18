@@ -12,6 +12,8 @@
     <string name="sessions_running">실행 중</string>
     <string name="sessions_failed">실패</string>
     <string name="sessions_interrupted">중단됨</string>
+    <string name="sessions_waiting_permission">권한 필요</string>
+    <string name="sessions_waiting_answer">질문 있음</string>
     <string name="sessions_empty_title">아직 세션이 없습니다</string>
     <string name="sessions_empty_message">새 세션을 시작하여 프로젝트에서 에이전트에게 작업을 맡기세요.</string>
     <string name="sessions_empty_search_title">일치하는 세션이 없습니다</string>

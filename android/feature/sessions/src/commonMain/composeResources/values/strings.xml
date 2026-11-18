@@ -12,6 +12,8 @@
     <string name="sessions_running">Running</string>
     <string name="sessions_failed">Failed</string>
     <string name="sessions_interrupted">Interrupted</string>
+    <string name="sessions_waiting_permission">Needs permission</string>
+    <string name="sessions_waiting_answer">Question for you</string>
     <string name="sessions_empty_title">No sessions yet</string>
     <string name="sessions_empty_message">Start a new session to give the agent a task in one of your projects.</string>
     <string name="sessions_empty_search_title">No matching sessions</string>
