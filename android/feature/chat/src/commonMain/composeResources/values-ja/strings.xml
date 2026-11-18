@@ -72,7 +72,7 @@
     <string name="chat_expanded">展開済み</string>
     <string name="chat_collapsed">折りたたみ済み</string>
     <string name="chat_copy_response">返信をコピー</string>
-    <string name="chat_quote">引用</string>
+    <string name="chat_selection_ask">質問</string>
     <string name="chat_interrupted">中断</string>
     <string name="chat_empty_title">会話を始める</string>
     <string name="chat_empty_message">エージェントへのタスクを説明してください。作業場所は %1$s です。</string>

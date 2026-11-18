@@ -363,7 +363,7 @@ sealed interface ChatEvent {
     data object Retry : ChatEvent
     data class DraftChanged(val text: String) : ChatEvent
 
-    /** "Quote" on selected transcript text: a quote line in the composer, ready for the question. */
+    /** "Ask" on selected transcript text: a quote line in the composer, ready for the question. */
     data class Quote(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent
     data object Send : ChatEvent

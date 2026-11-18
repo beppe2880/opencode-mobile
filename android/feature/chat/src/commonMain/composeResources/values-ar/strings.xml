@@ -117,7 +117,7 @@
     <string name="chat_expanded">مُوسَّع</string>
     <string name="chat_collapsed">مطوي</string>
     <string name="chat_copy_response">نسخ الرد</string>
-    <string name="chat_quote">اقتباس</string>
+    <string name="chat_selection_ask">اسأل</string>
     <string name="chat_interrupted">متوقف</string>
     <string name="chat_empty_title">ابدأ المحادثة</string>
     <string name="chat_empty_message">صف مهمة للوكيل. يعمل في %1$s.</string>

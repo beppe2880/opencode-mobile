@@ -72,7 +72,7 @@
     <string name="chat_expanded">已展开</string>
     <string name="chat_collapsed">已折叠</string>
     <string name="chat_copy_response">复制回复</string>
-    <string name="chat_quote">引用</string>
+    <string name="chat_selection_ask">提问</string>
     <string name="chat_interrupted">已中断</string>
     <string name="chat_empty_title">开始对话</string>
     <string name="chat_empty_message">为智能体描述任务。工作目录为 %1$s。</string>

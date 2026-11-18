@@ -16,7 +16,7 @@ internal const val QUOTE_MARK = "↳"
 internal const val MAX_QUOTE_LENGTH = 1000
 
 /**
- * Wraps the transcript so its text selection menu offers "Quote", which hands the selected text
+ * Wraps the transcript so its text selection menu offers "Ask", which hands the selected text
  * to [onQuote] without touching the clipboard. Where the platform menu cannot be extended, the
  * content is shown as it is.
  */

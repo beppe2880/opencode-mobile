@@ -81,7 +81,7 @@
     <string name="chat_expanded">Erweitert</string>
     <string name="chat_collapsed">Eingeklappt</string>
     <string name="chat_copy_response">Antwort kopieren</string>
-    <string name="chat_quote">Zitieren</string>
+    <string name="chat_selection_ask">Fragen</string>
     <string name="chat_interrupted">Unterbrochen</string>
     <string name="chat_empty_title">Unterhaltung beginnen</string>
     <string name="chat_empty_message">Beschreibe eine Aufgabe für den Agenten. Er arbeitet in %1$s.</string>

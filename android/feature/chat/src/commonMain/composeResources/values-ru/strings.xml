@@ -99,7 +99,7 @@
     <string name="chat_expanded">Развёрнуто</string>
     <string name="chat_collapsed">Свёрнуто</string>
     <string name="chat_copy_response">Копировать ответ</string>
-    <string name="chat_quote">Цитировать</string>
+    <string name="chat_selection_ask">Спросить</string>
     <string name="chat_interrupted">Прервано</string>
     <string name="chat_empty_title">Начните разговор</string>
     <string name="chat_empty_message">Опишите задачу агенту. Он работает в %1$s.</string>
