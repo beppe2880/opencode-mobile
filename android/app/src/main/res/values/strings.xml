@@ -26,6 +26,10 @@
     <string name="notif_intro_text">While a session runs, the app stays connected to your server in the background to tell you when the agent needs a permission or an answer, and when it finishes. You can allow or reject an edit right from the notification.\n\nNotifications come straight from your server, with no other service in between. You can turn them off anytime in Settings.</string>
     <string name="notif_intro_allow">Allow</string>
     <string name="notif_intro_later">Not now</string>
+    <string name="voice_channel">Voice recording</string>
+    <string name="voice_recording_title">Recording a voice message</string>
+    <string name="voice_recording_text">Tap Stop to turn it into text in the message box.</string>
+    <string name="voice_recording_stop">Stop</string>
     <string name="widget_title" translatable="false">OpenCode</string>
     <string name="widget_label">OpenCode sessions</string>
     <string name="widget_description">Running and recent sessions, and a button to start a new one.</string>

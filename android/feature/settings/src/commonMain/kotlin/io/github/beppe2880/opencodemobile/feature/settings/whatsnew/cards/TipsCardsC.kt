@@ -33,6 +33,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_term
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_title
@@ -56,6 +59,17 @@ internal val tipsCardsC: List<FeatureCard> = listOf(
         author = "beppe2880",
         pullRequest = 241,
         demo = { WaitingForYouDemo(it) },
+    ),
+    FeatureCard(
+        id = "voice-background-recording",
+        version = "0.18.0",
+        icon = Icons.Outlined.Mic,
+        title = Res.string.tips_c_voice_background_title,
+        body = Res.string.tips_c_voice_background_body,
+        demoDescription = Res.string.tips_c_voice_background_demo,
+        author = "beppe2880",
+        pullRequest = 245,
+        demo = { VoiceBackgroundDemo(it) },
     ),
     FeatureCard(
         id = "terminal-select-text",

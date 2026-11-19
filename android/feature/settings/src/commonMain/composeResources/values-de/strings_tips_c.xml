@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Im Hintergrund weiter aufnehmen</string>
+    <string name="tips_c_voice_background_body">Eine Sprachnachricht, die mit einem Cloud-Modell aufgenommen wird, läuft weiter, wenn du zu einer anderen App wechselst oder das Telefon sperrst. Unter Android beendet Stoppen in der Benachrichtigung die Aufnahme; der Text wartet im Nachrichtenfeld, wenn du zurückkommst.</string>
+    <string name="tips_c_voice_background_demo">Eine Aufnahme läuft im Nachrichtenfeld, dann zeigt der Startbildschirm eine Benachrichtigung mit der Zeit. Ein Finger tippt auf Stoppen, und zurück in der App steht der gesprochene Satz im Nachrichtenfeld.</string>
+
     <string name="tips_c_voice_record_title">Sprich, statt zu tippen</string>
     <string name="tips_c_voice_record_body">Tippe im Nachrichtenfeld auf das Mikrofon und sprich: Eine Live-Wellenform und ein Timer zeigen, dass du gehört wirst. Bestätige, um den Text zu behalten, oder brich ab, um ihn zu verwerfen.</string>
     <string name="tips_c_voice_record_demo">Ein Finger tippt auf das Mikrofon, das Nachrichtenfeld zeigt eine bewegte Wellenform mit einem Timer, dann erscheint der gesprochene Satz als Text.</string>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Sigue grabando en segundo plano</string>
+    <string name="tips_c_voice_background_body">Un mensaje de voz grabado con un modelo en la nube sigue grabándose cuando cambias a otra app o bloqueas el teléfono. En Android, Detener en la notificación lo termina; el texto te espera en el cuadro de mensaje al volver.</string>
+    <string name="tips_c_voice_background_demo">Una grabación se ejecuta en el cuadro de mensaje, luego la pantalla de inicio muestra una notificación que cuenta el tiempo. Un dedo toca Detener y, de vuelta en la app, la frase dictada está en el cuadro de mensaje.</string>
+
     <string name="tips_c_voice_record_title">Habla en lugar de escribir</string>
     <string name="tips_c_voice_record_body">Toca el micrófono en el cuadro de mensaje y habla: una forma de onda en vivo y un temporizador muestran que te están escuchando. Confirma para conservar el texto o cancela para descartarlo.</string>
     <string name="tips_c_voice_record_demo">Un dedo toca el micrófono, el cuadro de mensaje muestra una forma de onda en movimiento con un temporizador y luego la frase dictada aparece como texto.</string>
