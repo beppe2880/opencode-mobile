@@ -54,7 +54,7 @@ internal val tipsCardsC: List<FeatureCard> = listOf(
         body = Res.string.tips_c_chat_menu_body,
         demoDescription = Res.string.tips_c_chat_menu_demo,
         author = "Andrease11",
-        pullRequest = null, // Fill with the actual PR number on submission.
+        pullRequest = 243,
         demo = { ChatMenuDemo(it) },
     ),
     FeatureCard(
