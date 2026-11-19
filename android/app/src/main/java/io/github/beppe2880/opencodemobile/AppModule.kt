@@ -46,6 +46,7 @@ val appModule = module {
             notifier = get<AndroidMonitorNotifier>(),
             visible = get(AppVisible),
             startService = { SessionMonitorService.start(androidContext()) },
+            mutes = get(),
         )
     }
 }

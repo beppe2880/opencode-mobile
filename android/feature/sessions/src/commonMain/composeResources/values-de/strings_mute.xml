@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">Benachrichtigungen stummschalten</string>
+    <string name="sessions_unmute">Benachrichtigungen aktivieren</string>
+    <string name="sessions_muted">Benachrichtigungen auf diesem Gerät stummgeschaltet</string>
+</resources>

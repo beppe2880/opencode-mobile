@@ -11,9 +11,11 @@ import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
@@ -84,6 +86,7 @@ class ChatViewModel(
     private val vcs: VcsRepository,
     private val shares: ShareRepository,
     private val pins: PinnedSessionRepository,
+    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
 
@@ -178,6 +181,9 @@ class ChatViewModel(
     private var localIds = 0
 
     init {
+        viewModelScope.launch {
+            mutes.muted.collect { ids -> updateState { it.copy(muted = sessionId in ids) } }
+        }
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
             revertMessageId = s.revertMessageId
@@ -229,6 +235,7 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
+            is ChatEvent.SetMuted -> mutes.setMuted(sessionId, event.muted)
             ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
             ChatEvent.Undo -> if (currentState.historyReady) undo()
             is ChatEvent.Visible -> {

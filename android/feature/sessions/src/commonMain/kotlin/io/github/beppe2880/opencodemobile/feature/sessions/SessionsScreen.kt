@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
@@ -83,6 +84,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
@@ -104,6 +106,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
@@ -118,6 +121,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_se
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_this_week
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unmute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
@@ -244,6 +248,7 @@ fun SessionsScreen(
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
                                 swipeToDelete = !inDrawer,
                                 pinned = pinned,
+                                muted = session.id in state.muted,
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
                             )
                         }
@@ -432,6 +437,12 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm),
             )
             val pinned = session.id in state.pinned
+            if (sessionNotificationsSupported) OcListRow(
+                title = stringResource(if (session.id in state.muted) Res.string.sessions_unmute else Res.string.sessions_mute),
+                onClick = { onEvent(SessionsEvent.SetMuted(session.id, session.id !in state.muted)) },
+                leading = { Icon(Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
+                modifier = Modifier.testTag("sessions_action_mute"),
+            )
             OcListRow(
                 title = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin),
                 onClick = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },

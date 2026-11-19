@@ -39,10 +39,12 @@ class SessionMonitorTest {
     private val servers = FakeServers()
     private val notifier = RecordingNotifier()
     private val visible = MutableStateFlow(false)
+    private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
     private var serviceStarts = 0
 
     private fun TestScope.monitor() = SessionMonitor(
         events, sessions, chat, settings, servers, notifier, visible, startService = { serviceStarts++ },
+        mutes = mutes,
     ).also {
         it.start(backgroundScope)
         runCurrent()
@@ -51,6 +53,36 @@ class SessionMonitorTest {
     private suspend fun TestScope.emit(event: ServerEvent) {
         events.flow.emit(event)
         runCurrent()
+    }
+
+    @Test
+    fun `muted sessions send no attention or finished notifications and unmuting restores pending ones`() = runTest {
+        sessions.add(session("ses_a", "Muted"))
+        monitor()
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        chat.forms["ses_a"] = listOf(Form("frm_1", "ses_a", "Question", emptyList()))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded))
+        assertTrue(notifier.attention().isEmpty())
+        assertTrue(notifier.log.none { it.startsWith("finished") })
+        mutes.setMuted("ses_a", false)
+        runCurrent()
+        assertTrue(notifier.attention().any { it.startsWith("permission") })
+        assertTrue(notifier.attention().any { it.startsWith("question") })
+    }
+
+    @Test
+    fun `muting cancels attention notifications already posted`() = runTest {
+        sessions.add(session("ses_a", "Title"))
+        monitor()
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        assertTrue(notifier.attention().contains("cancel per_1"))
     }
 
     @Test

@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">通知をミュート</string>
+    <string name="sessions_unmute">通知を再開</string>
+    <string name="sessions_muted">このデバイスでは通知がミュートされています</string>
+</resources>

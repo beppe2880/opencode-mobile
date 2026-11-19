@@ -5,4 +5,7 @@
     <string name="chat_fork">대화 분기 만들기</string>
     <string name="chat_undo">마지막 프롬프트 실행 취소</string>
     <string name="chat_redo">취소한 프롬프트 복원</string>
+    <string name="chat_muted">이 기기에서 알림이 음소거됨</string>
+    <string name="chat_mute">알림 음소거</string>
+    <string name="chat_unmute">알림 다시 켜기</string>
 </resources>

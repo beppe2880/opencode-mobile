@@ -75,6 +75,7 @@ data class SessionsState(
     val groups: List<SessionGroup> = emptyList(),
     /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */
     val pinned: Set<String> = emptySet(),
+    val muted: Set<String> = emptySet(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
     /** Rows show running subagents and commands (setting). */
@@ -112,6 +113,7 @@ sealed interface SessionsEvent {
 
     /** Pins the session to the top of the list or unpins it; closes the row actions. */
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
+    data class SetMuted(val sessionId: String, val muted: Boolean) : SessionsEvent
     data class RequestRename(val session: Session) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent
     data class RequestDelete(val session: Session) : SessionsEvent

@@ -6,6 +6,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PendingShare
@@ -55,6 +57,7 @@ class SessionsViewModel(
     private val shares: ShareRepository,
     private val folderPreferences: FolderPreferences,
     private val pins: PinnedSessionRepository,
+    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -94,6 +97,7 @@ class SessionsViewModel(
     private var assignedShare: Long? = null
 
     init {
+        viewModelScope.launch { mutes.muted.collect { ids -> updateState { it.copy(muted = ids) } } }
         viewModelScope.launch {
             servers.activeServer.collect { server -> updateState { it.copy(serverName = server?.name.orEmpty()) } }
         }
@@ -146,6 +150,10 @@ class SessionsViewModel(
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
             SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
             is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
+            is SessionsEvent.SetMuted -> {
+                mutes.setMuted(event.sessionId, event.muted)
+                updateState { it.copy(actionsFor = null) }
+            }
             is SessionsEvent.RequestRename -> updateState { it.copy(actionsFor = null, renaming = event.session) }
             is SessionsEvent.RequestDelete -> updateState { it.copy(actionsFor = null, deleting = event.session) }
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
@@ -508,7 +516,10 @@ class SessionsViewModel(
         sessionList = sessionList.filterNot { it.id == session.id }
         updateState { it.copy(groups = group(sessionList)) }
         viewModelScope.launch {
-            sessions.delete(session.id).onSuccess { forgetPin(session.id) }.onFailure { error ->
+            sessions.delete(session.id).onSuccess {
+                forgetPin(session.id)
+                mutes.setMuted(session.id, false)
+            }.onFailure { error ->
                 sessionList = previous
                 updateState { it.copy(groups = group(sessionList)) }
                 sendEffect(SessionsEffect.ShowMessage(error.toUiText()))

@@ -33,6 +33,7 @@ data class ChatState(
     val title: String = "",
     /** Pinned to the top of the session list on this device. */
     val pinned: Boolean = false,
+    val muted: Boolean = false,
     val directory: String = "",
     val agent: String? = null,
     val model: ModelRef? = null,
@@ -338,6 +339,8 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
         ?: ModelLabel(ref.id, ref.providerId)
 
 sealed interface ChatEvent {
+    data class SetMuted(val muted: Boolean) : ChatEvent
+
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent
 

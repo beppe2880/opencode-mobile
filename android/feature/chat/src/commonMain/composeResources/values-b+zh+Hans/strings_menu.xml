@@ -5,4 +5,7 @@
     <string name="chat_fork">创建分支对话</string>
     <string name="chat_undo">撤销上一条提示</string>
     <string name="chat_redo">恢复已撤销的提示</string>
+    <string name="chat_muted">此设备上的通知已静音</string>
+    <string name="chat_mute">静音通知</string>
+    <string name="chat_unmute">恢复通知</string>
 </resources>

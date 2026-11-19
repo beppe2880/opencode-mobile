@@ -8,6 +8,7 @@ data class WidgetSession(
     val project: String,
     val updatedAt: Long,
     val running: Boolean,
+    val muted: Boolean = false,
 )
 
 /** What the home screen widget shows. */
@@ -21,7 +22,7 @@ sealed interface WidgetModel {
         val sessions: List<WidgetSession>,
         val stale: Boolean,
     ) : WidgetModel {
-        val runningCount: Int get() = sessions.count { it.running }
+        val runningCount: Int get() = sessions.count { it.running && !it.muted }
     }
 }
 

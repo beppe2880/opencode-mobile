@@ -5,6 +5,8 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
@@ -69,6 +71,7 @@ class SessionMonitor(
     private val notifier: MonitorNotifier,
     private val visible: StateFlow<Boolean>,
     private val startService: () -> Unit,
+    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
 ) {
     private val _running = MutableStateFlow<Map<String, RunningSession>>(emptyMap())
 
@@ -100,7 +103,18 @@ class SessionMonitor(
 
     private suspend fun follow(scope: CoroutineScope) {
         scope.launch {
-            combine(_running.map { it.isNotEmpty() }, visible) { running, shown -> running && shown }
+            mutes.muted.collect { muted ->
+                lock.withLock {
+                    for (id in muted) {
+                        notifier.cancelFinished(id)
+                        pending[id].orEmpty().filter { notified.remove(it) }.forEach(notifier::cancelAttention)
+                    }
+                }
+                pendingSessions().filterNot { it in muted }.forEach { refresh(scope, it) }
+            }
+        }
+        scope.launch {
+            combine(_running, visible, mutes.muted) { running, shown, muted -> running.keys.any { it !in muted } && shown }
                 .distinctUntilChanged()
                 .filter { it }
                 .collect { startService() }
@@ -154,7 +168,7 @@ class SessionMonitor(
     private suspend fun ended(sessionId: String, outcome: SessionOutcome) {
         val session = _running.value[sessionId]
         _running.update { it - sessionId }
-        if (session != null && !visible.value && settings.settings.value.notifyFinished) {
+        if (session != null && sessionId !in mutes.muted.value && !visible.value && settings.settings.value.notifyFinished) {
             notifier.finished(sessionId, session.title, outcome)
         }
     }
@@ -207,7 +221,7 @@ class SessionMonitor(
                 if (notified.remove(gone)) notifier.cancelAttention(gone)
             }
             if (now.isEmpty()) pending.remove(sessionId) else pending[sessionId] = now
-            if (visible.value) return
+            if (visible.value || sessionId in mutes.muted.value) return
             val enabled = settings.settings.value
             val newPermissions = if (enabled.notifyPermissions) permissions.filter { it.id !in notified } else emptyList()
             val newForms = if (enabled.notifyQuestions) forms.filter { it.id !in notified } else emptyList()

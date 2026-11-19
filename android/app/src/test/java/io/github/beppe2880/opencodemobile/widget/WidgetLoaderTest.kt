@@ -20,7 +20,19 @@ class WidgetLoaderTest {
 
     private val servers = FakeServers()
     private val sessions = FakeSessions()
-    private val loader = WidgetLoader(servers, sessions, timeoutMillis = 1_000)
+    private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
+    private val loader = WidgetLoader(servers, sessions, timeoutMillis = 1_000, mutes = mutes)
+
+    @Test
+    fun `muted sessions stay listed but do not contribute to the running count`() = runTest {
+        sessions.remote = listOf(session("ses_a", updatedAt = 1))
+        sessions.running = setOf("ses_a")
+        mutes.setMuted("ses_a", true)
+        val model = loader.load() as WidgetModel.Sessions
+        assertEquals(0, model.runningCount)
+        assertEquals(true, model.sessions.single().muted)
+        assertEquals(true, model.sessions.single().running)
+    }
 
     @Test
     fun `running sessions come first, then the most recently updated, without subagents or archived ones`() {

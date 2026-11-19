@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.Difference
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.Icon
@@ -89,6 +90,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_mess
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_muted
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pinned
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
@@ -285,6 +287,12 @@ internal fun ChatTopBar(
             null
         },
         titleAccessory = {
+            if (state.muted) Icon(
+                Icons.Outlined.NotificationsOff,
+                contentDescription = stringResource(Res.string.chat_muted),
+                tint = c.textFaint,
+                modifier = Modifier.size(14.dp).testTag("chat_muted_mark"),
+            )
             if (state.pinned) {
                 Icon(
                     Icons.Filled.PushPin,

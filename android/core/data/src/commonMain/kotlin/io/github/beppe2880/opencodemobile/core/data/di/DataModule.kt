@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
 import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
+import io.github.beppe2880.opencodemobile.core.data.session.PreferencesMutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.session.PreferencesPinnedSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
@@ -37,6 +38,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.PinnedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.RecentModelRepository
@@ -102,6 +104,7 @@ val dataModule = module {
                     PreferencesRecentModelRepository.clearServer(settings, serverId)
                     PreferencesFolderPreferences.clearServer(settings, serverId)
                     PreferencesPinnedSessionRepository.clearServer(settings, serverId)
+                    PreferencesMutedSessionRepository.clearServer(settings, serverId)
                 }
             },
         )
@@ -122,6 +125,7 @@ val dataModule = module {
     single<RecentModelRepository> { PreferencesRecentModelRepository(get(SettingsStore), get()) }
     single<FolderPreferences> { PreferencesFolderPreferences(get(SettingsStore)) }
     single<PinnedSessionRepository> { PreferencesPinnedSessionRepository(get(SettingsStore), get()) }
+    single<MutedSessionRepository> { PreferencesMutedSessionRepository(get(SettingsStore), get(), get(AppScope)) }
     single<ShareRepository> { StoredShareRepository(get(), get(AppScope)) }
     single<SpeechToTextRepository> { CloudSpeechToTextRepository(get(SttKeysStore), get(), SpeechToTextClient(), ::appLanguage) }
     single<UpdateRepository> {

@@ -30,11 +30,13 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     // Stored ids of themes no longer shipped read as none (PreferencesSettingsRepository).
     single<OpenCodeThemeIds> { OpenCodeThemeIds { OpenCodeThemes.byId(it) != null } }
     viewModel { ConnectViewModel(get(), get()) }
-    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { SessionsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), mutes = get()) }
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
-    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { params ->
+        ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), mutes = get())
+    }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
     viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }
@@ -50,5 +52,5 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params -> TerminalViewModel(params.get(), get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
     // Home screen widget: Glance on Android, WidgetKit on iOS.
-    single { WidgetLoader(get(), get()) }
+    single { WidgetLoader(get(), get(), mutes = get()) }
 }

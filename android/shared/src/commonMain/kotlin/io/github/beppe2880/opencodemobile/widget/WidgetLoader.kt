@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.widget
 
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import kotlinx.coroutines.async
@@ -12,6 +14,7 @@ class WidgetLoader(
     private val servers: ServerRepository,
     private val sessions: SessionRepository,
     private val timeoutMillis: Long = LOAD_TIMEOUT_MILLIS,
+    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
 ) {
     suspend fun load(): WidgetModel {
         // The widget can update in a fresh process, before the saved servers are read.
@@ -26,12 +29,14 @@ class WidgetLoader(
         }
         if (fresh != null) {
             val (recent, running) = fresh
-            return WidgetModel.Sessions(server.name, widgetSessions(recent, running), stale = false)
+            return WidgetModel.Sessions(server.name, withMutes(widgetSessions(recent, running)), stale = false)
         }
         val cached = sessions.cachedList(server.id).orEmpty()
         // Without the server nothing is known to be running.
-        return WidgetModel.Sessions(server.name, widgetSessions(cached, emptySet()), stale = true)
+        return WidgetModel.Sessions(server.name, withMutes(widgetSessions(cached, emptySet())), stale = true)
     }
+
+    private fun withMutes(sessions: List<WidgetSession>) = sessions.map { it.copy(muted = it.id in mutes.muted.value) }
 
     private companion object {
         const val LIST_LIMIT = 30
