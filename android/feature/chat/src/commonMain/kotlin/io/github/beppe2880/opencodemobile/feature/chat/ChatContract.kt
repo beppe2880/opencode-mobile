@@ -356,6 +356,7 @@ sealed interface ChatEvent {
     data class ExportSheet(val open: Boolean) : ChatEvent
     data class Export(val save: Boolean) : ChatEvent
     data object ExportFailed : ChatEvent
+
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent
 

@@ -227,6 +227,7 @@ fun ChatScreen(
     }
     // After the sheets, so a confirmation shows over the one that asked for it.
     RunningStopDialogs(state, onEvent)
+    ChatExportSheet(state, onEvent)
     if (contextOpen) {
         ContextSheet(
             context = state.context,
@@ -320,7 +321,6 @@ internal fun ChatTopBar(
                     onClick = { menuOpen = true },
                     modifier = Modifier.testTag("chat_more_button"),
                 )
-                ChatExportSheet(state, onEvent)
                 ChatActionsMenu(state, menuOpen, onDismiss = { menuOpen = false }) { event ->
                     when (event) {
                         is ChatEvent.SetPinned -> onPin(event.pinned)

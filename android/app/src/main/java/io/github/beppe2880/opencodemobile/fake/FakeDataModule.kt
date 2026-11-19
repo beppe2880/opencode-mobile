@@ -372,6 +372,9 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
         return Result.success(fork)
     }
 
+    override suspend fun export(sessionId: String): Result<List<Message>> =
+        store.transcripts[sessionId]?.let { Result.success(it) } ?: Result.failure(OpenCodeError.NotFound("session"))
+
     override suspend fun projects(): Result<List<Project>> = Result.success(SampleData.projects)
 
     override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> {
