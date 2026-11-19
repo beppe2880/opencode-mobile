@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">Chat-Aktionen, geordnet</string>
+    <string name="tips_c_chat_menu_body">Das Drei-Punkte-Menü gruppiert Unterhaltung, Kontext und Verlauf sowie Werkzeuge. Erstelle einen Chat im selben Ordner, zweige ab, komprimiere oder mache Änderungen rückgängig, ohne einen Befehl einzugeben. Slash-Kürzel bleiben verfügbar.</string>
+    <string name="tips_c_chat_menu_demo">Das Menü zeigt gruppierte Aktionen. Ein Finger hebt das Erstellen einer Abzweigung hervor.</string>
+    <string name="tips_c_chat_menu_groups">Unterhaltung\nKontext und Verlauf\nWerkzeuge</string>
+    <string name="tips_c_chat_menu_actions">Neuer Chat\nAbzweigung erstellen\nKontext komprimieren\nLetzten Prompt rückgängig\nLaufende Aufgaben\nMCP-Server</string>
+</resources>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">Контекст и история</string>
+    <string name="chat_menu_tools">Инструменты</string>
+    <string name="chat_new">Новый чат</string>
+    <string name="chat_fork">Создать ответвление</string>
+    <string name="chat_undo">Отменить последний запрос</string>
+    <string name="chat_redo">Восстановить отменённые запросы</string>
+</resources>

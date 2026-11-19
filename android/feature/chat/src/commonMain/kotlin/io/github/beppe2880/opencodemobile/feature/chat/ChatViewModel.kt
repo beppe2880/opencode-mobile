@@ -229,6 +229,8 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
+            ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
+            ChatEvent.Undo -> if (currentState.historyReady) undo()
             is ChatEvent.Visible -> {
                 workVisible = event.visible
                 restartRunningPoll()
@@ -1180,6 +1182,9 @@ class ChatViewModel(
             it.copy(
                 items = items,
                 revertedCount = reverted,
+                canUndo = visible.any { it is Message.User && !it.pending && !it.id.startsWith(LOCAL_PREFIX) } ||
+                    (visible.isNotEmpty() && currentState.hasOlder),
+                canRedo = revertMessageId != null,
                 backgroundable = backgroundable,
                 context = SessionInsights.context(visible, state.models),
                 compacting = compacting,

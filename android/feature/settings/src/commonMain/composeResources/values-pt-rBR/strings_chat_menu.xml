@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">Ações do chat, organizadas</string>
+    <string name="tips_c_chat_menu_body">O menu de três pontos agrupa conversa, contexto e histórico, e ferramentas. Crie uma conversa na mesma pasta, bifurque, compacte, desfaça ou restaure sem digitar um comando. Os atalhos slash continuam disponíveis.</string>
+    <string name="tips_c_chat_menu_demo">O menu mostra ações agrupadas. Um dedo destaca criar uma bifurcação.</string>
+    <string name="tips_c_chat_menu_groups">Conversa\nContexto e histórico\nFerramentas</string>
+    <string name="tips_c_chat_menu_actions">Nova conversa\nCriar bifurcação\nCompactar contexto\nDesfazer último prompt\nEm andamento\nServidores MCP</string>
+</resources>

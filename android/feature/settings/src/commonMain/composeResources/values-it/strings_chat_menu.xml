@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">Azioni della chat, in ordine</string>
+    <string name="tips_c_chat_menu_body">Il menu a tre puntini raggruppa conversazione, contesto e cronologia, e strumenti. Crea una chat nella stessa cartella, fai un fork, compatta, annulla o ripristina senza digitare un comando. Le scorciatoie slash restano disponibili.</string>
+    <string name="tips_c_chat_menu_demo">Il menu a tre puntini mostra le azioni raggruppate. Un dito evidenzia la creazione di un fork.</string>
+    <string name="tips_c_chat_menu_groups">Conversazione\nContesto e cronologia\nStrumenti</string>
+    <string name="tips_c_chat_menu_actions">Nuova chat\nCrea un fork\nCompatta contesto\nAnnulla ultimo prompt\nAttività in corso\nServer MCP</string>
+</resources>

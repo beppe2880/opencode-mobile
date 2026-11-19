@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">上下文与历史</string>
+    <string name="chat_menu_tools">工具</string>
+    <string name="chat_new">新建聊天</string>
+    <string name="chat_fork">创建分支对话</string>
+    <string name="chat_undo">撤销上一条提示</string>
+    <string name="chat_redo">恢复已撤销的提示</string>
+</resources>

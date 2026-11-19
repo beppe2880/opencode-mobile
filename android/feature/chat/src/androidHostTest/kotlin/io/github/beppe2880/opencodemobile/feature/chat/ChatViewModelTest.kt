@@ -724,6 +724,67 @@ class ChatViewModelTest {
         ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = { 42 })
 
     @Test
+    fun `menu new and fork reuse the existing behavior without consuming the draft`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("keep my draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        vm.onEvent(ChatEvent.NewSession)
+        advanceUntilIdle()
+        assertEquals(1, sessions.creates.size)
+        assertEquals("/repo", sessions.creates.single().first)
+        assertNull(sessions.creates.single().second)
+        assertEquals("keep my draft", vm.state.value.draft)
+        vm.onEvent(ChatEvent.Fork())
+        advanceUntilIdle()
+        assertEquals(listOf("s1" to null), sessions.forks)
+        assertEquals("keep my draft", vm.state.value.draft)
+    }
+
+    @Test
+    fun `failed menu new preserves text typed while creating and can retry`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply {
+            createGate = gate
+            createResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("original draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        runCurrent()
+        assertTrue(vm.state.value.creatingSession)
+        vm.onEvent(ChatEvent.DraftChanged("edited draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.creatingSession)
+        assertEquals("edited draft", vm.state.value.draft)
+        assertEquals(1, sessions.creates.size)
+        vm.onEvent(ChatEvent.NewSession)
+        advanceUntilIdle()
+        assertEquals(2, sessions.creates.size)
+    }
+
+    @Test
+    fun `menu undo and redo use the existing revert and restore paths`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.canUndo)
+        assertFalse(vm.state.value.canRedo)
+        vm.onEvent(ChatEvent.Undo)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.canRedo)
+        assertEquals(1, vm.state.value.revertedCount)
+        assertEquals("hello", vm.state.value.draft)
+        vm.onEvent(ChatEvent.RestoreRevert)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.canRedo)
+        assertEquals(0, vm.state.value.revertedCount)
+    }
+
+    @Test
     fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
         pins.setPinned("other", true)
         val vm = vm()

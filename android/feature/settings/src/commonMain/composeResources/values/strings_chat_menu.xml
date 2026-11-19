@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">Chat actions, organized</string>
+    <string name="tips_c_chat_menu_body">The three-dot menu groups conversation, context and history, and tools. Start a new chat in the same folder, fork, compact, undo or restore without typing a command. Slash shortcuts still work.</string>
+    <string name="tips_c_chat_menu_demo">The three-dot menu opens with grouped actions. A finger highlights creating a fork.</string>
+    <string name="tips_c_chat_menu_groups">Conversation\nContext and history\nTools</string>
+    <string name="tips_c_chat_menu_actions">New chat\nCreate a fork\nCompact context\nUndo last prompt\nRunning\nMCP servers</string>
+</resources>
