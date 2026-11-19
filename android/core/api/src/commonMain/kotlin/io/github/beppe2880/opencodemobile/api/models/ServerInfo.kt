@@ -37,6 +37,7 @@ import kotlinx.serialization.Contextual
  * @param pid 
  * @param urls 
  * @param paths 
+ * @param hostname 
  * @param capabilities 
  */
 @Serializable
@@ -45,7 +46,7 @@ data class ServerInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "version")
-    val version: kotlin.String?,
+    val version: kotlin.String,
 
     @SerialName(value = "pid")
     val pid: kotlin.Long,
@@ -55,6 +56,9 @@ data class ServerInfo (
 
     @SerialName(value = "paths")
     val paths: ServerInfoPaths,
+
+    @SerialName(value = "hostname")
+    val hostname: kotlin.String? = null,
 
     @SerialName(value = "capabilities")
     val capabilities: ServerInfoCapabilities? = null

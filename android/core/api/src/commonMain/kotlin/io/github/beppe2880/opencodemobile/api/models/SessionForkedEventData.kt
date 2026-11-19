@@ -33,8 +33,8 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param sessionID 
- * @param parentID 
+ * @param sessionID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
+ * @param parentID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
  * @param boundary 
  * @param instructions 
  * @param instructionEntries 
@@ -43,9 +43,11 @@ import kotlinx.serialization.Contextual
 
 data class SessionForkedEventData (
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "sessionID")
     val sessionID: kotlin.String?,
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "parentID")
     val parentID: kotlin.String?,
 

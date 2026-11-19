@@ -8,7 +8,7 @@
     "check": "bun src/generate.ts check"
   },
   "dependencies": {
-    "@opencode/schema": "2.0.27",
+    "@opencode/schema": "2.3.2",
     "effect": "4.0.1"
   }
 }

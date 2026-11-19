@@ -35,6 +35,7 @@ import kotlinx.serialization.Contextual
  * @param title 
  * @param metadata 
  * @param permissions 
+ * @param archived Archive the session with true or restore it with false. Repeating the current state is a no-op.
  */
 @Serializable
 
@@ -47,7 +48,11 @@ data class SessionUpdateRequest (
     val metadata: kotlinx.serialization.json.JsonObject? = null,
 
     @SerialName(value = "permissions")
-    val permissions: kotlin.collections.List<PermissionRule>? = null
+    val permissions: kotlin.collections.List<PermissionRule>? = null,
+
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
+    @SerialName(value = "archived")
+    val archived: kotlin.Boolean? = null
 
 ) {
 

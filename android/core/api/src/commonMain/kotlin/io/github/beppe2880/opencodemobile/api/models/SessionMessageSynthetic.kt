@@ -52,7 +52,7 @@ data class SessionMessageSynthetic (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "text")
-    val text: kotlin.String?,
+    val text: kotlin.String,
 
     @SerialName(value = "type")
     val type: SessionMessageSynthetic.Type,

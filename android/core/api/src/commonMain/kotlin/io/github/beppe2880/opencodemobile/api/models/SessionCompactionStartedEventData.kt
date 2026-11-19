@@ -33,7 +33,6 @@ import kotlinx.serialization.Contextual
  *
  * @param sessionID 
  * @param reason 
- * @param recent 
  * @param inputID 
  */
 @Serializable
@@ -45,9 +44,6 @@ data class SessionCompactionStartedEventData (
 
     @SerialName(value = "reason")
     val reason: SessionCompactionStartedEventData.Reason,
-
-    @SerialName(value = "recent")
-    val recent: kotlin.String,
 
     @SerialName(value = "inputID")
     val inputID: kotlin.String? = null

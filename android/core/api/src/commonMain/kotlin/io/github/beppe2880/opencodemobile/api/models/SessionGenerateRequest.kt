@@ -39,7 +39,7 @@ data class SessionGenerateRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "prompt")
-    val prompt: kotlin.String?
+    val prompt: kotlin.String
 
 ) {
 

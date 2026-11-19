@@ -104,7 +104,7 @@ fun ApiModelInfo.toDomain(providerNames: Map<String, String> = emptyMap()): Doma
         supportsImages = "image" in capabilities.input,
         variants = variants.map { it.id },
         releasedAt = time.released.toLong(),
-        enabled = enabled,
+        enabled = enabled ?: true,
         status = status.value,
     )
 }

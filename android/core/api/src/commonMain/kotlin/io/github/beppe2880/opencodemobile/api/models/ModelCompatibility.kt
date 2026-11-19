@@ -23,7 +23,9 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.ModelCacheFormat
 import io.github.beppe2880.opencodemobile.api.models.ModelMaxTokensField
+import io.github.beppe2880.opencodemobile.api.models.ModelMediaInput
 import io.github.beppe2880.opencodemobile.api.models.ModelReasoningField
 
 import kotlinx.serialization.Serializable
@@ -39,8 +41,11 @@ import kotlinx.serialization.Contextual
  * @param requireFinishReason 
  * @param requireAssistantAfterTool 
  * @param supportsPromptCacheKey 
+ * @param streamUsage 
+ * @param cacheFormat 
  * @param supportsThinkingBlockBinding 
  * @param supportsEffortUpdates 
+ * @param mediaInput 
  */
 @Serializable
 
@@ -64,11 +69,20 @@ data class ModelCompatibility (
     @SerialName(value = "supportsPromptCacheKey")
     val supportsPromptCacheKey: kotlin.Boolean? = null,
 
+    @SerialName(value = "streamUsage")
+    val streamUsage: kotlin.Boolean? = null,
+
+    @Contextual @SerialName(value = "cacheFormat")
+    val cacheFormat: ModelCacheFormat? = null,
+
     @SerialName(value = "supportsThinkingBlockBinding")
     val supportsThinkingBlockBinding: kotlin.Boolean? = null,
 
     @SerialName(value = "supportsEffortUpdates")
-    val supportsEffortUpdates: kotlin.Boolean? = null
+    val supportsEffortUpdates: kotlin.Boolean? = null,
+
+    @Contextual @SerialName(value = "mediaInput")
+    val mediaInput: ModelMediaInput? = null
 
 ) {
 

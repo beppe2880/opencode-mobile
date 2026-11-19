@@ -222,8 +222,7 @@ class RemoteRepositoriesTest {
                     {"path":"../../../home/u/.Cache/","type":"directory"},
                     {"path":"../../../home/u/Beta/","type":"directory"},
                     {"path":"/","type":"directory"},
-                    {"path":"  ","type":"directory"},
-                    {"path":null,"type":"directory"}
+                    {"path":"  ","type":"directory"}
                 ]}
                 """.trimIndent(),
             ),

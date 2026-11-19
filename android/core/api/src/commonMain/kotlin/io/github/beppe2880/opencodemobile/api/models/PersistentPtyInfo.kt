@@ -40,7 +40,8 @@ import kotlinx.serialization.Contextual
  * @param cwd Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param status 
  * @param pid 
- * @param sessionID 
+ * @param sessionID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
+ * @param userTitle 
  * @param foregroundProcess 
  * @param propertySize 
  * @param output 
@@ -55,18 +56,18 @@ data class PersistentPtyInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "title")
-    val title: kotlin.String?,
+    val title: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "command")
-    val command: kotlin.String?,
+    val command: kotlin.String,
 
     @SerialName(value = "args")
     val args: kotlin.collections.List<kotlin.String>,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "cwd")
-    val cwd: kotlin.String?,
+    val cwd: kotlin.String,
 
     @SerialName(value = "status")
     val status: PersistentPtyInfo.Status,
@@ -74,8 +75,12 @@ data class PersistentPtyInfo (
     @SerialName(value = "pid")
     val pid: kotlin.Long,
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "sessionID")
     val sessionID: kotlin.String?,
+
+    @SerialName(value = "userTitle")
+    val userTitle: kotlin.String?,
 
     @SerialName(value = "foregroundProcess")
     val foregroundProcess: kotlin.String?,

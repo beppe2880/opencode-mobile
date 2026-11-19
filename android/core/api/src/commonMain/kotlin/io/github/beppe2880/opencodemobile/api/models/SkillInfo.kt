@@ -44,15 +44,15 @@ data class SkillInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "name")
-    val name: kotlin.String?,
+    val name: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "path")
-    val path: kotlin.String?,
+    val path: kotlin.String,
 
     @SerialName(value = "content")
     val content: kotlin.String,

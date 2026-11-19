@@ -37,10 +37,11 @@ import kotlinx.serialization.Contextual
  * @param command 
  * @param cwd Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param environment 
- * @param disabled 
- * @param codemode 
+ * @param disabled Archive the session with true or restore it with false. Repeating the current state is a no-op.
+ * @param codemode Archive the session with true or restore it with false. Repeating the current state is a no-op.
  * @param timeout 
  * @param protocol 
+ * @param pool Archive the session with true or restore it with false. Repeating the current state is a no-op.
  */
 @Serializable
 
@@ -59,9 +60,11 @@ data class McpLocalConfigEncoded (
     @SerialName(value = "environment")
     val environment: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "disabled")
     val disabled: kotlin.Boolean? = null,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "codemode")
     val codemode: kotlin.Boolean? = null,
 
@@ -69,7 +72,11 @@ data class McpLocalConfigEncoded (
     val timeout: McpRemoteConfigEncodedTimeout? = null,
 
     @Contextual @SerialName(value = "protocol")
-    val protocol: McpProtocol? = null
+    val protocol: McpProtocol? = null,
+
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
+    @SerialName(value = "pool")
+    val pool: kotlin.Boolean? = null
 
 ) {
 

@@ -33,7 +33,7 @@ import kotlinx.serialization.Contextual
  *
  * @param key Instruction entry key (lowercase alphanumerics plus . _ -)
  * @param `value` 
- * @param removed 
+ * @param removed Archive the session with true or restore it with false. Repeating the current state is a no-op.
  */
 @Serializable
 
@@ -46,8 +46,9 @@ data class InstructionEntrySnapshotInner (
     @Contextual @SerialName(value = "value")
     val `value`: kotlinx.serialization.json.JsonElement?,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "removed")
-    val removed: kotlin.Boolean
+    val removed: kotlin.Boolean?
 
 ) {
 

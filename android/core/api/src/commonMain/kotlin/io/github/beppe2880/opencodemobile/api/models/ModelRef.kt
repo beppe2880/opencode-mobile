@@ -44,7 +44,7 @@ data class ModelRef (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "providerID")
-    val providerID: kotlin.String?,
+    val providerID: kotlin.String,
 
     @SerialName(value = "variant")
     val variant: kotlin.String? = null

@@ -38,10 +38,11 @@ import kotlinx.serialization.Contextual
  * @param url Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param headers 
  * @param oauth 
- * @param disabled 
- * @param codemode 
+ * @param disabled Archive the session with true or restore it with false. Repeating the current state is a no-op.
+ * @param codemode Archive the session with true or restore it with false. Repeating the current state is a no-op.
  * @param timeout 
  * @param protocol 
+ * @param pool Archive the session with true or restore it with false. Repeating the current state is a no-op.
  */
 @Serializable
 
@@ -52,7 +53,7 @@ data class McpRemoteConfigEncoded (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "url")
-    val url: kotlin.String?,
+    val url: kotlin.String,
 
     @SerialName(value = "headers")
     val headers: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
@@ -60,9 +61,11 @@ data class McpRemoteConfigEncoded (
     @SerialName(value = "oauth")
     val oauth: McpRemoteConfigEncodedOauth? = null,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "disabled")
     val disabled: kotlin.Boolean? = null,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "codemode")
     val codemode: kotlin.Boolean? = null,
 
@@ -70,7 +73,11 @@ data class McpRemoteConfigEncoded (
     val timeout: McpRemoteConfigEncodedTimeout? = null,
 
     @Contextual @SerialName(value = "protocol")
-    val protocol: McpProtocol? = null
+    val protocol: McpProtocol? = null,
+
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
+    @SerialName(value = "pool")
+    val pool: kotlin.Boolean? = null
 
 ) {
 

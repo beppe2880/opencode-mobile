@@ -40,7 +40,7 @@ data class SessionShellRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "command")
-    val command: kotlin.String?,
+    val command: kotlin.String,
 
     @SerialName(value = "id")
     val id: kotlin.String? = null

@@ -9,11 +9,15 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import io.github.beppe2880.opencodemobile.api.models.ModelRef as ApiModelRef
+import io.github.beppe2880.opencodemobile.api.models.ModelRef1 as ApiModelRef1
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef as DomainModelRef
 
 /** The server reports "no variant chosen" as `default`; the domain uses null, which omits it on send. */
 fun ApiModelRef.toDomain(): DomainModelRef =
     DomainModelRef(id = id, providerId = providerID.orEmpty(), variant = variant?.takeUnless { it == DEFAULT_VARIANT })
+
+fun ApiModelRef1.toDomain(): DomainModelRef =
+    DomainModelRef(id = id, providerId = providerID, variant = variant?.takeUnless { it == DEFAULT_VARIANT })
 
 private const val DEFAULT_VARIANT = "default"
 

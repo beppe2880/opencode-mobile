@@ -42,15 +42,15 @@ data class WorktreeResolvedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "directory")
-    val directory: kotlin.String?,
+    val directory: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "previous")
-    val previous: kotlin.String?,
+    val previous: kotlin.String,
 
     @SerialName(value = "adopted")
     val adopted: kotlin.collections.List<kotlin.String>? = null

@@ -31,7 +31,7 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     }
 
     is OpenCodeEvent.SessionstepstartedWrapper -> with(value.data) {
-        ServerEvent.StepStarted(sessionID, assistantMessageID, agent.orEmpty(), model.toDomain(), started)
+        model?.toDomain()?.let { ServerEvent.StepStarted(sessionID, assistantMessageID, agent.orEmpty(), it, started) }
     }
     is OpenCodeEvent.SessionstependedWrapper -> with(value.data) {
         ServerEvent.StepEnded(sessionID, assistantMessageID, finish.value, cost, tokens.toDomain(), value.created.toLong())
