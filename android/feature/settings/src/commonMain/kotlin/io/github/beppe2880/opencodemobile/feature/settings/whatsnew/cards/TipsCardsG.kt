@@ -18,7 +18,7 @@ internal val tipsCardsG: List<FeatureCard> = listOf(
         body = Res.string.tips_g_filters_body,
         demoDescription = Res.string.tips_g_filters_demo,
         author = "Azykle",
-        pullRequest = null,
+        pullRequest = 247,
         demo = { SessionFiltersDemo(it) },
     ),
 )
