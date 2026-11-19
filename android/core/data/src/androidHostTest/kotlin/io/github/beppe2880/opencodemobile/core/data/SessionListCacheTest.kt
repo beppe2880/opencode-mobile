@@ -111,4 +111,32 @@ class SessionListCacheTest {
         PreferencesDraftRepository.clearServer(prefs, "unknown")
         assertEquals(setOf("s2/ses_1"), values.values.keys)
     }
+
+    @Test
+    fun `archived lists are not cached and request the archived filter`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        server.enqueue(MockResponse().setBody(fixture("session_list.json")))
+
+        repository.list(archived = true).getOrThrow()
+
+        assertTrue(server.takeRequest().path!!.contains("archived=true"))
+        assertNull(repository.cachedList("s1"))
+    }
+
+    @Test
+    fun `archiving patches the session and drops it from the stored list`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        server.enqueue(MockResponse().setBody(fixture("session_list.json")))
+        val loaded = repository.list().getOrThrow()
+        server.takeRequest()
+        server.enqueue(MockResponse().setResponseCode(204))
+
+        repository.setArchived(loaded.single().id, true).getOrThrow()
+
+        val request = server.takeRequest()
+        assertEquals("PATCH", request.method)
+        assertTrue(request.path!!.endsWith("/api/session/${loaded.single().id}"))
+        assertTrue(request.body.readUtf8().contains("\"archived\":true"))
+        assertTrue(repository.cachedList("s1")?.none { it.id == loaded.single().id } != false)
+    }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">세션 필터링</string>
+    <string name="tips_g_filters_body">날짜, 결과 또는 보관 상태로 목록을 좁히세요. 보관 후 실행 취소도 가능합니다.</string>
+    <string name="tips_g_filters_demo">세션 목록이 필터를 열고 보관된 세션을 표시합니다.</string>
+</resources>

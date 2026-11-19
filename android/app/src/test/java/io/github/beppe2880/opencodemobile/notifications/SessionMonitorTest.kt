@@ -236,7 +236,7 @@ private class FakeSessions : SessionRepository {
     private val byId = mutableMapOf<String, Session>()
     var activeIds: Set<String> = emptySet()
     fun add(session: Session) { byId[session.id] = session }
-    override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(byId.values.toList())
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(byId.values.toList())
     override suspend fun active() = Result.success(activeIds)
     override suspend fun get(sessionId: String) =
         byId[sessionId]?.let { Result.success(it) } ?: Result.failure(IllegalStateException(sessionId))

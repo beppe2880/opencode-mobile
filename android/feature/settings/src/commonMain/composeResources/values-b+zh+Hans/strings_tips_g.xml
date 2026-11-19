@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">筛选会话</string>
+    <string name="tips_g_filters_body">按日期、结果或归档状态缩小列表。归档后还可以撤销。</string>
+    <string name="tips_g_filters_demo">会话列表打开筛选条件并显示已归档的会话。</string>
+</resources>

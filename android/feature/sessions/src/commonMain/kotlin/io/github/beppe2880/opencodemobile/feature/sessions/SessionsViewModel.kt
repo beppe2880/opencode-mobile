@@ -42,7 +42,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 class SessionsViewModel(
     private val sessions: SessionRepository,
@@ -141,6 +143,20 @@ class SessionsViewModel(
                 showCachedFirst = true
                 load(initial = false)
             }
+            SessionsEvent.OpenFilters -> updateState { it.copy(filterSheetOpen = true) }
+            SessionsEvent.DismissFilters -> updateState { it.copy(filterSheetOpen = false) }
+            is SessionsEvent.ToggleStatus -> toggleStatus(event.status)
+            is SessionsEvent.SetDateFilter -> updateFilters { it.copy(date = event.filter) }
+            is SessionsEvent.ToggleOutcome -> updateFilters { current ->
+                current.copy(
+                    outcomes = if (event.outcome in current.outcomes) {
+                        current.outcomes - event.outcome
+                    } else {
+                        current.outcomes + event.outcome
+                    },
+                )
+            }
+            SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
             is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
@@ -148,6 +164,7 @@ class SessionsViewModel(
             is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
             SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
             is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
+            is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)
             is SessionsEvent.RequestRename -> updateState { it.copy(actionsFor = null, renaming = event.session) }
             is SessionsEvent.RequestDelete -> updateState { it.copy(actionsFor = null, deleting = event.session) }
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
@@ -202,6 +219,8 @@ class SessionsViewModel(
                 projects = emptyList(),
                 hiddenDirectories = id?.let(folderPreferences::hiddenDirectories).orEmpty(),
                 directoryFilter = id?.let(filters::get),
+                filters = SessionFilters(),
+                filterSheetOpen = false,
                 groups = emptyList(),
                 running = emptySet(),
                 work = emptyMap(),
@@ -411,21 +430,22 @@ class SessionsViewModel(
         updateState { it.copy(loading = initial && it.groups.isEmpty(), refreshing = pull, error = null) }
         loadJob = viewModelScope.launch {
             val state = currentState
+            val filters = state.filters
             val search = state.query.trim().ifEmpty { null }
             if (showCachedFirst) {
                 if (search == null) showCached(state.directoryFilter) else showCachedFirst = false
             }
-            val result = sessions.list(search = search, directory = state.directoryFilter)
+            val result = listSessions(filters, search, state.directoryFilter)
             val active = sessions.active().getOrNull()
             result.fold(
                 onSuccess = { listed ->
-                    val beyond = pinnedBeyond(listed, search, state.directoryFilter)
+                    val beyond = pinnedBeyond(listed, search, state.directoryFilter, filters)
                     listedForPin = beyond.mapTo(HashSet()) { it.id }
                     val list = listed + beyond
                     sessionList = list
                     updateState {
                         it.copy(
-                            groups = group(list),
+                            groups = group(list, filters),
                             running = active ?: it.running,
                             loading = false,
                             refreshing = false,
@@ -460,7 +480,7 @@ class SessionsViewModel(
         showCachedFirst = false
         if (cached == null) return
         sessionList = cached
-        updateState { it.copy(groups = group(cached), loading = false, error = null) }
+        updateState { it.copy(groups = group(cached, currentState.filters), loading = false, error = null) }
         fillNewSessionDirectory()
     }
 
@@ -488,12 +508,73 @@ class SessionsViewModel(
     private fun listed(projects: List<Project>): List<Project> =
         projects.sortedByDescending { it.updatedAt }.filter { it.id != GLOBAL_PROJECT_ID }.distinctBy { it.directory }
 
-    internal fun group(list: List<Session>): List<SessionGroup> = groupSessions(list, pinnedIds, clock(), zone)
+    internal fun group(list: List<Session>): List<SessionGroup> = group(list, currentState.filters)
+
+    private fun group(list: List<Session>, filters: SessionFilters): List<SessionGroup> =
+        groupSessions(list, pinnedIds, clock(), zone, filters)
 
     private fun setPinned(sessionId: String, pinned: Boolean) {
         updateState { it.copy(actionsFor = null) }
         pins.setPinned(sessionId, pinned)
         showPins()
+    }
+
+    /** Adds or removes a status; when both are selected the two server lists are merged. */
+    private fun toggleStatus(status: SessionStatus) {
+        val filters = currentState.filters.toggleStatus(status)
+        if (filters.statuses == currentState.filters.statuses) return
+        sessionList = emptyList()
+        showCachedFirst = SessionStatus.Active in filters.effectiveStatuses
+        updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+        load(initial = true)
+    }
+
+    /** Narrows the loaded list without asking the server; grouping applies the filters. */
+    private fun updateFilters(transform: (SessionFilters) -> SessionFilters) {
+        val filters = transform(currentState.filters)
+        if (filters == currentState.filters) return
+        updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+    }
+
+    private fun resetFilters() {
+        val wasFiltered = currentState.filters.effectiveStatuses != SessionFilters().effectiveStatuses
+        val filters = SessionFilters()
+        if (wasFiltered) {
+            sessionList = emptyList()
+            showCachedFirst = true
+            updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+            load(initial = true)
+        } else {
+            updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+        }
+    }
+
+    /** Archives or restores [session], removing it from the list shown until the server confirms. */
+    private fun setArchived(session: Session, archived: Boolean) {
+        updateState { it.copy(actionsFor = null) }
+        val previous = sessionList
+        val status = if (archived) SessionStatus.Archived else SessionStatus.Active
+        if (status !in currentState.filters.effectiveStatuses) {
+            sessionList = sessionList.filterNot { it.id == session.id }
+        } else {
+            sessionList = sessionList.map {
+                if (it.id == session.id) {
+                    it.copy(archivedAt = if (archived) clock() else null)
+                } else {
+                    it
+                }
+            }
+        }
+        updateState { it.copy(groups = group(sessionList)) }
+        viewModelScope.launch {
+            sessions.setArchived(session.id, archived).onSuccess {
+                sendEffect(SessionsEffect.ShowArchiveUndo(session, archived))
+            }.onFailure { error ->
+                sessionList = previous
+                updateState { it.copy(groups = group(sessionList)) }
+                sendEffect(SessionsEffect.ShowMessage(error.toUiText()))
+            }
+        }
     }
 
     /** A deleted session leaves no pin behind. */
@@ -519,11 +600,17 @@ class SessionsViewModel(
      * project filter and the search still include. The pin of a session that no longer exists is
      * forgotten; one that cannot be read now stays as last shown.
      */
-    private suspend fun pinnedBeyond(listed: List<Session>, search: String?, directory: String?): List<Session> {
+    private suspend fun pinnedBeyond(
+        listed: List<Session>,
+        search: String?,
+        directory: String?,
+        filters: SessionFilters,
+    ): List<Session> {
         val missing = pinnedIds - listed.mapTo(HashSet()) { it.id }
         if (missing.isEmpty()) return emptyList()
         val shown = sessionList.associateBy { it.id }
         val read = coroutineScope { missing.map { id -> async { id to sessions.get(id) } }.awaitAll() }
+        val today = Instant.fromEpochMilliseconds(clock()).toLocalDateTime(zone).date
         return read
             .mapNotNull { (id, result) ->
                 if (result.exceptionOrNull() is OpenCodeError.NotFound) {
@@ -533,7 +620,29 @@ class SessionsViewModel(
                     result.getOrNull() ?: shown[id]
                 }
             }
-            .filter { it.parentId == null && it.archivedAt == null && it.matches(search, directory) }
+            .filter { it.parentId == null && filters.matches(it, today, zone) && it.matches(search, directory) }
+    }
+
+    /** Loads one or both status lists; a single failed half of a two-list load keeps the other. */
+    private suspend fun listSessions(
+        filters: SessionFilters,
+        search: String?,
+        directory: String?,
+    ): Result<List<Session>> {
+        val statuses = filters.effectiveStatuses
+        val limit = if (filters.date == SessionDateFilter.AnyTime) DEFAULT_LIST_LIMIT else FILTERED_LIST_LIMIT
+        val results = if (statuses.size > 1) {
+            coroutineScope {
+                val active = async { sessions.list(search, directory, limit, archived = false) }
+                val archived = async { sessions.list(search, directory, limit, archived = true) }
+                listOf(active.await(), archived.await())
+            }
+        } else {
+            listOf(sessions.list(search, directory, limit, archived = statuses.single() == SessionStatus.Archived))
+        }
+        val successful = results.mapNotNull { it.getOrNull() }
+        if (successful.isEmpty()) return results.first()
+        return Result.success(successful.flatten().distinctBy { it.id }.sortedByDescending { it.updatedAt })
     }
 
     private fun rename(title: String) {
@@ -741,6 +850,10 @@ class SessionsViewModel(
         const val EVENT_DEBOUNCE_MS = 600L
         const val PREFETCH_SESSIONS = 5
         const val PREFETCH_MESSAGES = 2
+
+        /** The default page; a date filter may need sessions older than it. */
+        const val DEFAULT_LIST_LIMIT = 100
+        const val FILTERED_LIST_LIMIT = 500
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
         const val WAITING_DEBOUNCE_MS = 300L

@@ -22,6 +22,7 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
+import kotlin.time.Clock
 
 /** Sessions from the active server; the unsearched lists and projects are also kept per server in [lists]. */
 internal class RemoteSessionRepository(
@@ -52,7 +53,7 @@ internal class RemoteSessionRepository(
         sessions.forEach { seen[serverId to it.id] = it }
     }
 
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> = resultOf {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> = resultOf {
         // Resolved once, so a server switch during the request never files the list under the new server.
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
@@ -63,11 +64,14 @@ internal class RemoteSessionRepository(
                 order = SessionApi.OrderSessionList.DESC,
                 search = query,
                 parentID = ROOT_SESSIONS,
+                archived = archived?.let { if (it) SessionApi.ArchivedSessionList.TRUE else SessionApi.ArchivedSessionList.FALSE },
                 directory = directory,
             )
         }.data.map { it.toDomain() }
         remember(profile.id, sessions)
-        if (query == null) lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(sessions))
+        if (query == null && archived != true) {
+            lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(sessions))
+        }
         sessions
     }
 
@@ -110,6 +114,18 @@ internal class RemoteSessionRepository(
         awaitSuccess { api.sessionRemove(sessionId) }
         lists.removeSession(profile.id, sessionId)
         seen.remove(profile.id to sessionId)
+    }
+
+    override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        awaitSuccess { api.sessionUpdate(sessionId, SessionUpdateRequest(archived = archived)) }
+        seen[profile.id to sessionId]?.let { session ->
+            seen[profile.id to sessionId] = session.copy(
+                archivedAt = if (archived) Clock.System.now().toEpochMilliseconds() else null,
+            )
+        }
+        if (archived) lists.removeSession(profile.id, sessionId)
     }
 
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = resultOf {

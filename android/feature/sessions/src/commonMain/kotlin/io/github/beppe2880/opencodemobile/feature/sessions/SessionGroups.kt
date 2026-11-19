@@ -14,10 +14,17 @@ import kotlin.time.Instant
  * each group. A pinned session is only in the pinned group, and only when it is in [sessions]:
  * the project filter and the search have already been applied to them.
  */
-internal fun groupSessions(sessions: List<Session>, pinned: Set<String>, now: Long, zone: TimeZone): List<SessionGroup> {
+internal fun groupSessions(
+    sessions: List<Session>,
+    pinned: Set<String>,
+    now: Long,
+    zone: TimeZone,
+    filters: SessionFilters = SessionFilters(),
+): List<SessionGroup> {
     fun localDate(epochMillis: Long): LocalDate = Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(zone).date
     val today = localDate(now)
     return sessions
+        .filter { filters.matches(it, today, zone) }
         .distinctBy { it.id }
         .sortedByDescending { it.updatedAt }
         .groupBy { session ->

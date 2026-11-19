@@ -99,6 +99,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCa
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsD
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsE
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsF
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsG
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -128,7 +129,7 @@ internal class FeatureCard(
 private const val REPOSITORY = "https://github.com/beppe2880/opencode-mobile"
 
 /** Every card, newest version first within the page (the page groups and sorts them by version). */
-internal val featureCards: List<FeatureCard> by lazy { baseCards + tipsCardsA + tipsCardsB + tipsCardsC + tipsCardsD + tipsCardsE + tipsCardsF }
+internal val featureCards: List<FeatureCard> by lazy { baseCards + tipsCardsA + tipsCardsB + tipsCardsC + tipsCardsD + tipsCardsE + tipsCardsF + tipsCardsG }
 
 private val baseCards = listOf(
     FeatureCard(

@@ -76,8 +76,11 @@ interface EventRepository {
 }
 
 interface SessionRepository {
-    /** Root sessions (no parent), newest first. [search] filters by title on the server. */
-    suspend fun list(search: String? = null, directory: String? = null, limit: Int = 100): Result<List<Session>>
+    /**
+     * Root sessions (no parent), newest first. [search] filters by title on the server.
+     * [archived] true lists only archived sessions, false only active ones, null lets the server decide.
+     */
+    suspend fun list(search: String? = null, directory: String? = null, limit: Int = 100, archived: Boolean? = null): Result<List<Session>>
 
     /** IDs of sessions currently executing. */
     suspend fun active(): Result<Set<String>>
@@ -86,6 +89,10 @@ interface SessionRepository {
     suspend fun create(directory: String, agent: String? = null, model: ModelRef? = null): Result<Session>
     suspend fun rename(sessionId: String, title: String): Result<Unit>
     suspend fun delete(sessionId: String): Result<Unit>
+
+    /** Archives the session (hidden from the default list) or restores it. */
+    suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Archiving is not available"))
 
     /**
      * Copies the session into a new root session ("… (fork #n)"): the history before

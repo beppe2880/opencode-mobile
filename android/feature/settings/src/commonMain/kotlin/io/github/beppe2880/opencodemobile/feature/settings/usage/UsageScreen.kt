@@ -52,6 +52,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.text.formatCost
 import io.github.beppe2880.opencodemobile.core.ui.text.formatInteger
+import io.github.beppe2880.opencodemobile.core.ui.text.formatMediumDate
 import io.github.beppe2880.opencodemobile.core.ui.text.formatTokens
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing

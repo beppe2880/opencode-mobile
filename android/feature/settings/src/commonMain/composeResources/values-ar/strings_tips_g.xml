@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">صفِّ جلساتك</string>
+    <string name="tips_g_filters_body">ضيّق القائمة حسب التاريخ أو النتيجة أو المؤرشفة. توفر الأرشفة أيضًا التراجع.</string>
+    <string name="tips_g_filters_demo">تفتح قائمة الجلسات عوامل التصفية وتعرض جلسة مؤرشفة.</string>
+</resources>

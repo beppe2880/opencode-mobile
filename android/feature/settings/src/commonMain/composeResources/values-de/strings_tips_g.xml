@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Sitzungen filtern</string>
+    <string name="tips_g_filters_body">Grenze die Liste nach Datum, Ergebnis oder archiviert ein. Beim Archivieren gibt es auch Rückgängig.</string>
+    <string name="tips_g_filters_demo">Eine Sitzungsliste öffnet ihre Filter und zeigt eine archivierte Sitzung.</string>
+</resources>

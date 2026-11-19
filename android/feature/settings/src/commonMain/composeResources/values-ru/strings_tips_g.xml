@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Фильтруйте сессии</string>
+    <string name="tips_g_filters_body">Сузьте список по дате, результату или архиву. При архивировании также можно отменить действие.</string>
+    <string name="tips_g_filters_demo">Список сессий открывает фильтры и показывает архивную сессию.</string>
+</resources>

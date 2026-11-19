@@ -74,6 +74,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_retry
+import io.github.beppe2880.opencodemobile.core.ui.text.formatMediumDate
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcStateColors
@@ -102,7 +103,6 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.whats_new_t
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateAction
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateActionKind
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
-import io.github.beppe2880.opencodemobile.feature.settings.usage.formatMediumDate
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes

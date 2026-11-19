@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,7 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.mvi.CollectEffect
+import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.asString
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archived_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_restored_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_undo
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -49,6 +55,17 @@ fun SessionsRoute(
             is SessionsEffect.OpenChat -> onOpenChat(effect.sessionId)
             SessionsEffect.OpenSettings -> onOpenSettings()
             is SessionsEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
+            is SessionsEffect.ShowArchiveUndo -> {
+                val result = snackbar.showSnackbar(
+                    message = UiText.Resource(
+                        if (effect.archived) Res.string.sessions_archived_message else Res.string.sessions_restored_message,
+                    ).asString(),
+                    actionLabel = UiText.Resource(Res.string.sessions_undo).asString(),
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.onEvent(SessionsEvent.SetArchived(effect.session, !effect.archived))
+                }
+            }
         }
     }
 

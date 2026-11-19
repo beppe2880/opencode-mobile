@@ -2692,7 +2692,7 @@ private class FakeSessions(
     private val titles: Map<String, String> = emptyMap(),
 ) : SessionRepository {
     private val session = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null)
-    override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(listOf(session) + others)
     var activeIds: Set<String> = emptySet()
     override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
     var uncached = false

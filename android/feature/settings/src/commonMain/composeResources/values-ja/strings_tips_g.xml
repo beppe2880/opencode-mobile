@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">セッションを絞り込む</string>
+    <string name="tips_g_filters_body">日付、結果、アーカイブ状態でリストを絞り込めます。アーカイブ後は元に戻せます。</string>
+    <string name="tips_g_filters_demo">セッションリストがフィルターを開き、アーカイブされたセッションを表示します。</string>
+</resources>

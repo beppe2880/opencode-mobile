@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filtrez vos sessions</string>
+    <string name="tips_g_filters_body">Limitez la liste par date, résultat ou sessions archivées. L'archivage propose aussi Annuler.</string>
+    <string name="tips_g_filters_demo">Une liste de sessions ouvre ses filtres et affiche une session archivée.</string>
+</resources>
