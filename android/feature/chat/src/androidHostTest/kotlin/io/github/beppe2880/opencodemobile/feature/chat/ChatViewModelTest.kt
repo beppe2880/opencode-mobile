@@ -912,6 +912,33 @@ class ChatViewModelTest {
         assertEquals(null, vm().state.value.savedScroll)
     }
 
+    @Test
+    fun `export reads the complete server transcript and can retry after failure`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        backgroundScope.launch { vm.effect.collect { effects += it } }
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("keep draft"))
+        vm.onEvent(ChatEvent.ExportSheet(true))
+        vm.onEvent(ChatEvent.Export(save = true))
+        vm.onEvent(ChatEvent.Export(save = true))
+        advanceUntilIdle()
+        assertEquals(1, sessions.exports)
+        assertTrue(vm.state.value.exportOpen)
+        assertFalse(vm.state.value.exporting)
+        sessions.exportResult = Result.success(listOf(Message.User("older", 0, "not loaded in chat")))
+        vm.onEvent(ChatEvent.Export(save = false))
+        advanceUntilIdle()
+        runCurrent()
+        val exported = effects.filterIsInstance<ChatEffect.ExportMarkdown>().single()
+        assertTrue(exported.markdown.contains("not loaded in chat"))
+        assertFalse(exported.save)
+        assertFalse(vm.state.value.exportOpen)
+        assertEquals("keep draft", vm.state.value.draft)
+    }
+
     private val pins = InMemoryPinnedSessions()
     private val catalog = FakeCatalog(model)
 
@@ -3012,6 +3039,12 @@ private class FakeSessions(
         creates += Triple(directory, agent, model)
         createGate?.await()
         return createResult
+    }
+    var exports = 0
+    var exportResult: Result<List<Message>> = Result.failure(OpenCodeError.NotFound("unsupported"))
+    override suspend fun export(sessionId: String): Result<List<Message>> {
+        exports++
+        return exportResult
     }
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
     override suspend fun delete(sessionId: String) = Result.success(Unit)

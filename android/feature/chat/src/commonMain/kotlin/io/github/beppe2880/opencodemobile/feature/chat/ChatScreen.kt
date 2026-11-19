@@ -320,6 +320,7 @@ internal fun ChatTopBar(
                     onClick = { menuOpen = true },
                     modifier = Modifier.testTag("chat_more_button"),
                 )
+                ChatExportSheet(state, onEvent)
                 ChatActionsMenu(state, menuOpen, onDismiss = { menuOpen = false }) { event ->
                     when (event) {
                         is ChatEvent.SetPinned -> onPin(event.pinned)

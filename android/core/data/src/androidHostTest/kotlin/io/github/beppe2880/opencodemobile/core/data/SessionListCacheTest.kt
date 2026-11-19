@@ -6,7 +6,12 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.draft.PreferencesDraftRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
+import io.github.beppe2880.opencodemobile.core.domain.Message
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -32,6 +37,22 @@ class SessionListCacheTest {
     fun tearDown() = server.shutdown()
 
     private fun fixture(name: String) = requireNotNull(javaClass.classLoader?.getResource(name)).readText()
+
+    @Test
+    fun `export requests full original text from the generated API and maps all messages`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        val info = Json.parseToJsonElement(fixture("session_get.json")).jsonObject.getValue("data")
+        val messages = Json.parseToJsonElement(fixture("session_messages.json")).jsonObject.getValue("data")
+        val body = JsonObject(mapOf("data" to JsonObject(mapOf("info" to info, "messages" to messages))))
+        server.enqueue(MockResponse().setHeader("Content-Type", "application/json").setBody(body.toString()))
+        val exported = repository.export("ses_test").getOrThrow()
+        val request = server.takeRequest()
+        assertEquals("/api/experimental/session/ses_test/export?sanitize=false", request.path)
+        assertTrue(exported.any { it is Message.User })
+        assertTrue(exported.any { it is Message.Assistant })
+        server.enqueue(MockResponse().setResponseCode(404))
+        assertTrue(repository.export("ses_test").exceptionOrNull() is OpenCodeError.NotFound)
+    }
 
     @Test
     fun `unsearched lists and projects are stored per server and directory`() = runBlocking {

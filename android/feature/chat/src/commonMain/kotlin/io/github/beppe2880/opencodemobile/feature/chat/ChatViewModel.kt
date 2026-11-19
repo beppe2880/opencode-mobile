@@ -49,6 +49,7 @@ import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attachment_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_btw_text_only
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_undo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
@@ -242,6 +243,9 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
+            is ChatEvent.ExportSheet -> updateState { it.copy(exportOpen = event.open) }
+            is ChatEvent.Export -> exportSession(event.save)
+            ChatEvent.ExportFailed -> sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_export_failed)))
             ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
             ChatEvent.Undo -> if (currentState.historyReady) undo()
             is ChatEvent.Visible -> {
@@ -1447,6 +1451,24 @@ class ChatViewModel(
      * A fresh session in this folder, without history. The server resolves its agent; its model
      * follows the "Model for new chats" setting, as in the New session sheet.
      */
+    private fun exportSession(save: Boolean) {
+        if (!currentState.menuReady || currentState.exporting) return
+        val title = currentState.title
+        updateState { it.copy(exporting = true) }
+        viewModelScope.launch {
+            sessions.export(sessionId).fold(
+                onSuccess = { transcript ->
+                    updateState { it.copy(exporting = false, exportOpen = false) }
+                    sendEffect(ChatEffect.ExportMarkdown(title, transcriptMarkdown(title, transcript), save))
+                },
+                onFailure = { error ->
+                    updateState { it.copy(exporting = false) }
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                },
+            )
+        }
+    }
+
     private fun newSession(draft: String) {
         val directory = currentState.directory
         updateState { it.copy(creatingSession = true) }

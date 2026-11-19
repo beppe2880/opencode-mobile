@@ -68,6 +68,7 @@ fun ChatRoute(
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
+    val export = rememberMarkdownExport { viewModel.onEvent(ChatEvent.ExportFailed) }
     val scope = rememberCoroutineScope()
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
@@ -156,6 +157,7 @@ fun ChatRoute(
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
+            is ChatEffect.ExportMarkdown -> export(effect.title, effect.markdown, effect.save)
             ChatEffect.OpenProviders -> {
                 providerModel.onEvent(ProviderConnectionEvent.Open(state.directory))
                 providersOpen = true

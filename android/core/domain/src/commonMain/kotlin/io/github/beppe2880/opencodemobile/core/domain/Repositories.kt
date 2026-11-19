@@ -126,6 +126,10 @@ interface SessionRepository {
      */
     suspend fun fork(sessionId: String, beforeMessageId: String? = null): Result<Session>
 
+    /** Complete projected transcript, not just the locally loaded page; no inline images. */
+    suspend fun export(sessionId: String): Result<List<Message>> =
+        Result.failure(OpenCodeError.NotFound("Session export is not available"))
+
     suspend fun projects(): Result<List<Project>>
 
     /** Usage between [from] and [to] (epoch millis), with days counted in [timeZone] (IANA id). */

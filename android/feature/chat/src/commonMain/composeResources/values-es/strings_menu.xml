@@ -5,4 +5,9 @@
     <string name="chat_fork">Crear una bifurcación</string>
     <string name="chat_undo">Deshacer último prompt</string>
     <string name="chat_redo">Restaurar prompts deshechos</string>
+    <string name="chat_export">Exportar / Compartir…</string>
+    <string name="chat_export_hint">Exporta toda la conversación en Markdown, con la salida de herramientas plegada y sin imágenes. Puede contener texto privado, código y rutas de archivos. Revísala antes de compartirla.</string>
+    <string name="chat_export_share">Compartir Markdown</string>
+    <string name="chat_export_save">Guardar archivo Markdown</string>
+    <string name="chat_export_failed">No se pudo exportar la conversación. Inténtalo de nuevo.</string>
 </resources>

@@ -5,4 +5,9 @@
     <string name="chat_fork">创建分支对话</string>
     <string name="chat_undo">撤销上一条提示</string>
     <string name="chat_redo">恢复已撤销的提示</string>
+    <string name="chat_export">导出 / 分享…</string>
+    <string name="chat_export_hint">将完整对话导出为 Markdown，折叠工具输出并省略图片。可能包含私人文本、代码和文件路径。分享前请检查。</string>
+    <string name="chat_export_share">分享 Markdown</string>
+    <string name="chat_export_save">保存 Markdown 文件</string>
+    <string name="chat_export_failed">无法导出对话，请重试。</string>
 </resources>

@@ -14,4 +14,13 @@
             <action android:name="android.speech.RecognitionService" />
         </intent>
     </queries>
+    <application>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.transcript-exports"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/transcript_export_paths" />
+        </provider>
+    </application>
 </manifest>

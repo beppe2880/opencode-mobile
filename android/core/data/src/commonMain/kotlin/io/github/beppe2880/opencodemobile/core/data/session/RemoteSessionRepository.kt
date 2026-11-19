@@ -12,6 +12,7 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.AppVersion
+import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
@@ -203,6 +204,14 @@ internal class RemoteSessionRepository(
         val api = clients.forProfile(profile).projects
         awaitBody { api.projectList() }.map { it.toDomain() }.sortedByDescending { it.updatedAt }
             .also { lists.write(profile.id, ListCache.PROJECTS_KEY, SessionListCodec.encodeProjects(it)) }
+    }
+
+    override suspend fun export(sessionId: String): Result<List<Message>> = resultOf {
+        val api = clients.active().sessions
+        // Server sanitization replaces conversation text too. Export the real text, warn before
+        // sharing, and render only user/assistant content (never system context or wire metadata).
+        awaitBody { api.experimentalSessionExport(sessionId, SessionApi.SanitizeExperimentalSessionExport.FALSE) }
+            .data.messages.mapNotNull { it.toDomain() }
     }
 
     override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> = resultOf {
