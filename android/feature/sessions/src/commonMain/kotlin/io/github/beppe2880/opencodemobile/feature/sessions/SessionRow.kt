@@ -149,19 +149,7 @@ internal fun SessionRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
         ) {
-            Box {
-                OcProjectAvatar(session.directoryName)
-                if (unread) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(7.dp)
-                            .clip(CircleShape)
-                            .background(c.info.fg)
-                            .testTag("session_unread_${session.id}"),
-                    )
-                }
-            }
+            OcProjectAvatar(session.directoryName)
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                     if (pinned) {
@@ -211,12 +199,20 @@ internal fun SessionRow(
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (!compact) {
-                    Text(
-                        text = relativeTime(session.updatedAt, now),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = c.textFaint,
-                        maxLines = 1,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    ) {
+                        Text(
+                            text = relativeTime(session.updatedAt, now),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = c.textFaint,
+                            maxLines = 1,
+                        )
+                        if (unread) UnreadDot(session.id)
+                    }
+                } else if (unread) {
+                    UnreadDot(session.id)
                 }
                 if (running) {
                     OcPulsingDot(if (waiting != null) c.warning.fg else c.info.fg, Modifier.testTag("session_running_${session.id}"))
@@ -224,6 +220,18 @@ internal fun SessionRow(
             }
         }
     }
+}
+
+/** The unread marker at the row's trailing edge, next to the time. */
+@Composable
+private fun UnreadDot(sessionId: String) {
+    Box(
+        modifier = Modifier
+            .size(8.dp)
+            .clip(CircleShape)
+            .background(OcTheme.colors.info.fg)
+            .testTag("session_unread_$sessionId"),
+    )
 }
 
 @Composable

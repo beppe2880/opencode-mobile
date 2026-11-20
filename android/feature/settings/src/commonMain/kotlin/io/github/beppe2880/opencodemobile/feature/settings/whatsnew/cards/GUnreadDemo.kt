@@ -67,12 +67,12 @@ internal fun UnreadSessionsDemo(active: Boolean) {
             DemoSessionRow(
                 project = "blog",
                 title = "Fix flaky RSS test",
-                subtitle = "blog · 2m",
+                age = "2m",
                 unread = unread,
                 modifier = Modifier.then(targets.target("row")),
             )
-            DemoSessionRow("dotfiles", "Tidy shell aliases", "dotfiles · 1h", unread = false)
-            DemoSessionRow("shop", "Plan the checkout", "shop · 3h", unread = false)
+            DemoSessionRow("dotfiles", "Tidy shell aliases", "1h", unread = false)
+            DemoSessionRow("shop", "Plan the checkout", "3h", unread = false)
         }
         finger.Draw()
     }
@@ -82,7 +82,7 @@ internal fun UnreadSessionsDemo(active: Boolean) {
 private fun DemoSessionRow(
     project: String,
     title: String,
-    subtitle: String,
+    age: String,
     unread: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -92,21 +92,24 @@ private fun DemoSessionRow(
         shape = RoundedCornerShape(OcRadius.lg),
     ) {
         Row(Modifier.padding(OcSpacing.md), verticalAlignment = Alignment.CenterVertically) {
-            Box {
-                OcProjectAvatar(project)
+            OcProjectAvatar(project)
+            Column(Modifier.weight(1f).padding(start = OcSpacing.sm)) {
+                Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+                Text(project, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(age, style = MaterialTheme.typography.labelSmall, color = c.textFaint)
                 if (unread) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(7.dp)
+                            .size(8.dp)
                             .clip(CircleShape)
                             .background(c.info.fg),
                     )
                 }
-            }
-            Column(Modifier.weight(1f).padding(start = OcSpacing.sm)) {
-                Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
             }
         }
     }
