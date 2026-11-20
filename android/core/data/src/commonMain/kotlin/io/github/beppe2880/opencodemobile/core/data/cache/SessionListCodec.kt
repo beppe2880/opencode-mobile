@@ -42,6 +42,8 @@ internal object SessionListCodec {
         val createdAt: Long,
         val updatedAt: Long,
         val archivedAt: Long? = null,
+        val idleAt: Long? = null,
+        val viewedAt: Long? = null,
         val revertMessageId: String? = null,
     )
 
@@ -91,6 +93,8 @@ internal object SessionListCodec {
         createdAt = createdAt,
         updatedAt = updatedAt,
         archivedAt = archivedAt,
+        idleAt = idleAt,
+        viewedAt = viewedAt,
         revertMessageId = revertMessageId,
     )
 
@@ -108,6 +112,8 @@ internal object SessionListCodec {
         createdAt = createdAt,
         updatedAt = updatedAt,
         archivedAt = archivedAt,
+        idleAt = idleAt,
+        viewedAt = viewedAt,
         revertMessageId = revertMessageId,
     )
 }

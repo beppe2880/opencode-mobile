@@ -57,6 +57,7 @@ import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -1517,15 +1518,68 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.Visible(false))
     }
 
+    @Test
+    fun `the read filter narrows the loaded list without asking the server`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("unread", now - hour, idleAt = 10, viewedAt = 5),
+                session("never-viewed", now - hour, idleAt = 10),
+                session("read", now - hour, idleAt = 10, viewedAt = 10),
+                session("running", now - hour),
+            ),
+        )
+        val vm = vm(repository)
+        advanceUntilIdle()
+        val loads = repository.listCalls
+
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+
+        assertEquals(SessionRead.Unread, vm.state.value.filters.readState)
+        assertEquals(listOf("unread", "never-viewed"), vm.state.value.ids())
+        assertEquals(loads, repository.listCalls)
+
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Read))
+
+        assertEquals(SessionRead.Read, vm.state.value.filters.readState)
+        assertEquals(listOf("read", "running"), vm.state.value.ids())
+        assertEquals(loads, repository.listCalls)
+
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Read))
+
+        assertNull(vm.state.value.filters.readState)
+        assertEquals(listOf("unread", "never-viewed", "read", "running"), vm.state.value.ids())
+        assertEquals(loads, repository.listCalls)
+    }
+
+    @Test
+    fun `a viewed event clears the row without reloading the list`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(listOf(session("today", now - hour, idleAt = 10)))
+        val vm = vm(repository)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.groups.single().sessions.single().isUnread)
+        val loads = repository.listCalls
+
+        events.flow.emit(ServerEvent.Viewed("today", idleAt = 10))
+        runCurrent()
+
+        val session = vm.state.value.groups.single().sessions.single()
+        assertFalse(session.isUnread)
+        assertEquals(10L, session.viewedAt)
+        assertEquals(loads, repository.listCalls)
+    }
+
     private fun session(
         id: String,
         updated: Long,
         archivedAt: Long? = null,
         outcome: SessionOutcome? = null,
+        idleAt: Long? = null,
+        viewedAt: Long? = null,
     ) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
         agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = outcome,
         createdAt = updated, updatedAt = updated, archivedAt = archivedAt,
+        idleAt = idleAt, viewedAt = viewedAt,
     )
 }
 

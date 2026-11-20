@@ -16,6 +16,9 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -89,6 +92,20 @@ class RemoteRepositoriesTest {
         assertNull(first.requestUrl!!.queryParameter("cursor"))
         assertEquals("c2", second.requestUrl!!.queryParameter("cursor"))
         assertEquals(2, server.requestCount)
+    }
+
+    @Test
+    fun `marking a session viewed posts the idle watermark`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(MockResponse().setResponseCode(204))
+
+        sessions.markViewed("ses_1", 1_791_910_789_786L).getOrThrow()
+
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/session/ses_1/view", request.path)
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals(1_791_910_789_786.0, body.getValue("idle").jsonPrimitive.content.toDouble(), 0.0)
     }
 
     @Test

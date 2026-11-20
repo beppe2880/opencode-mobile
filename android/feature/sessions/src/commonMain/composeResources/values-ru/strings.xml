@@ -23,7 +23,7 @@
     <string name="sessions_filters">Фильтры</string>
     <string name="sessions_filters_active">Фильтры (%1$d)</string>
     <string name="sessions_filter_active">Активные</string>
-    <string name="sessions_filter_status">Показать</string>
+    <string name="sessions_filter_status">Статус</string>
     <string name="sessions_filter_last_updated">Последнее обновление</string>
     <string name="sessions_filter_any_time">Любая дата</string>
     <string name="sessions_filter_last_7_days">Последние 7 дней</string>
@@ -31,6 +31,9 @@
     <string name="sessions_filter_custom_range">Свой диапазон…</string>
     <string name="sessions_filter_range_hint">Выберите начальную и конечную даты</string>
     <string name="sessions_filter_outcome">Результат</string>
+    <string name="sessions_unread">Непрочитанные</string>
+    <string name="sessions_read">Прочитанные</string>
+    <string name="sessions_filter_read">Статус прочтения</string>
     <string name="sessions_outcome_succeeded">Успешно</string>
     <string name="sessions_filter_reset">Сбросить</string>
     <string name="sessions_filter_show">Показать сессии</string>
@@ -38,6 +41,8 @@
     <string name="sessions_filter_remove">Удалить фильтр «%1$s»</string>
     <string name="sessions_empty_filter_title">Нет сессий, соответствующих фильтрам</string>
     <string name="sessions_empty_filter_message">Попробуйте другой диапазон дат или результат либо сбросьте фильтры.</string>
+    <string name="sessions_empty_unread_title">Нет непрочитанных сессий</string>
+    <string name="sessions_empty_unread_message">Сессии остаются непрочитанными, пока вы их не откроете.</string>
     <string name="sessions_clear_filters">Сбросить фильтры</string>
     <string name="sessions_empty_archived_title">Нет архивных сессий</string>
     <string name="sessions_empty_archived_message">Архивированные сессии скрываются из основного списка и показываются здесь.</string>

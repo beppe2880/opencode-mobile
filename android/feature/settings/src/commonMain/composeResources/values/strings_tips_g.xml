@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">Filter your sessions</string>
     <string name="tips_g_filters_body">Narrow the list by date, outcome, or archived. Archiving also offers Undo.</string>
     <string name="tips_g_filters_demo">A session list opens its filter sheet and shows an archived session.</string>
+    <string name="tips_g_unread_title">Unread sessions</string>
+    <string name="tips_g_unread_body">A dot marks a session whose latest turn ended after you last viewed it. Open the session to clear it, or filter the list to unread sessions from the sheet.</string>
+    <string name="tips_g_unread_demo">A dot appears on a finished session; tapping the row clears it.</string>
 </resources>

@@ -306,6 +306,14 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
 
     override suspend fun active(): Result<Set<String>> = Result.success(store.running.toSet())
 
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> {
+        store.sessions.value = store.sessions.value.map {
+            if (it.id == sessionId) it.copy(viewedAt = idleAt) else it
+        }
+        events.emit(ServerEvent.Viewed(sessionId, idleAt))
+        return Result.success(Unit)
+    }
+
     override suspend fun get(sessionId: String): Result<Session> =
         store.sessions.value.firstOrNull { it.id == sessionId }?.let { Result.success(it) }
             ?: Result.failure(OpenCodeError.NotFound("session"))

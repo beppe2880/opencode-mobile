@@ -23,7 +23,7 @@
     <string name="sessions_filters">Filter</string>
     <string name="sessions_filters_active">Filter (%1$d)</string>
     <string name="sessions_filter_active">Aktiv</string>
-    <string name="sessions_filter_status">Anzeigen</string>
+    <string name="sessions_filter_status">Status</string>
     <string name="sessions_filter_last_updated">Zuletzt aktualisiert</string>
     <string name="sessions_filter_any_time">Beliebiger Zeitraum</string>
     <string name="sessions_filter_last_7_days">Letzte 7 Tage</string>
@@ -31,6 +31,9 @@
     <string name="sessions_filter_custom_range">Benutzerdefinierter Zeitraum…</string>
     <string name="sessions_filter_range_hint">Wähle ein Start- und Enddatum</string>
     <string name="sessions_filter_outcome">Ergebnis</string>
+    <string name="sessions_unread">Ungelesen</string>
+    <string name="sessions_read">Gelesen</string>
+    <string name="sessions_filter_read">Lesestatus</string>
     <string name="sessions_outcome_succeeded">Erfolgreich</string>
     <string name="sessions_filter_reset">Zurücksetzen</string>
     <string name="sessions_filter_show">Sitzungen anzeigen</string>
@@ -38,6 +41,8 @@
     <string name="sessions_filter_remove">Filter „%1$s“ entfernen</string>
     <string name="sessions_empty_filter_title">Keine Sitzungen entsprechen diesen Filtern</string>
     <string name="sessions_empty_filter_message">Versuche einen anderen Zeitraum oder ein anderes Ergebnis oder lösche die Filter.</string>
+    <string name="sessions_empty_unread_title">Keine ungelesenen Sitzungen</string>
+    <string name="sessions_empty_unread_message">Sitzungen bleiben ungelesen, bis du sie öffnest.</string>
     <string name="sessions_clear_filters">Filter löschen</string>
     <string name="sessions_empty_archived_title">Keine archivierten Sitzungen</string>
     <string name="sessions_empty_archived_message">Archivierte Sitzungen werden aus der Hauptliste ausgeblendet und hier angezeigt.</string>

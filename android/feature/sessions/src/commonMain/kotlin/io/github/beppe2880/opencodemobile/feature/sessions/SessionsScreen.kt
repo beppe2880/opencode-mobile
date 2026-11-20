@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.MarkEmailRead
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
@@ -131,6 +132,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_active
@@ -142,6 +145,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_last_updated
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_outcome
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_range_hint
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_remove
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_reset
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_show
@@ -155,6 +159,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ou
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_label
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_title
@@ -166,6 +171,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ti
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unarchive
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
@@ -427,6 +433,14 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 testTag = "sessions_filter_archived_chip",
             )
         }
+        state.filters.readState?.let { read ->
+            FilterSummaryChip(
+                label = readStateLabel(read),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.ToggleRead(read)) },
+                testTag = "sessions_filter_read_chip",
+            )
+        }
         if (state.filters.date != SessionDateFilter.AnyTime) {
             FilterSummaryChip(
                 label = dateFilterLabel(state.filters.date),
@@ -479,6 +493,12 @@ private fun outcomeLabel(outcome: SessionOutcome): String = when (outcome) {
     SessionOutcome.Succeeded -> stringResource(Res.string.sessions_outcome_succeeded)
     SessionOutcome.Failed -> stringResource(Res.string.sessions_failed)
     SessionOutcome.Interrupted -> stringResource(Res.string.sessions_interrupted)
+}
+
+@Composable
+private fun readStateLabel(state: SessionRead): String = when (state) {
+    SessionRead.Read -> stringResource(Res.string.sessions_read)
+    SessionRead.Unread -> stringResource(Res.string.sessions_unread)
 }
 
 @Composable
@@ -550,12 +570,14 @@ private fun FilterProjectItem(project: Project, onClick: () -> Unit, onHide: () 
 @Composable
 private fun EmptyContent(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
     val filtered = state.query.isNotBlank() || state.directoryFilter != null
+    val unreadOnly = state.filters.readState == SessionRead.Unread && state.filters.activeCount == 1 && !filtered
     val archivedOnly = state.filters.effectiveStatuses == setOf(SessionStatus.Archived) &&
         state.filters.date == SessionDateFilter.AnyTime &&
         state.filters.outcomes.isEmpty() &&
         !filtered
     OcEmptyState(
         icon = when {
+            unreadOnly -> Icons.Outlined.MarkEmailRead
             archivedOnly -> Icons.Outlined.Archive
             state.filters.isActive -> Icons.Outlined.FilterAlt
             filtered -> Icons.Outlined.SearchOff
@@ -563,6 +585,7 @@ private fun EmptyContent(state: SessionsState, onEvent: (SessionsEvent) -> Unit)
         },
         title = stringResource(
             when {
+                unreadOnly -> Res.string.sessions_empty_unread_title
                 archivedOnly -> Res.string.sessions_empty_archived_title
                 state.filters.isActive -> Res.string.sessions_empty_filter_title
                 filtered -> Res.string.sessions_empty_search_title
@@ -571,6 +594,7 @@ private fun EmptyContent(state: SessionsState, onEvent: (SessionsEvent) -> Unit)
         ),
         message = stringResource(
             when {
+                unreadOnly -> Res.string.sessions_empty_unread_message
                 archivedOnly -> Res.string.sessions_empty_archived_message
                 state.filters.isActive -> Res.string.sessions_empty_filter_message
                 filtered -> Res.string.sessions_empty_search_message
@@ -745,6 +769,25 @@ private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -
                         onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
                         selected = SessionStatus.Archived in state.filters.effectiveStatuses,
                         modifier = Modifier.testTag("sessions_filter_archived"),
+                    )
+                }
+            }
+            Text(
+                text = stringResource(Res.string.sessions_filter_read),
+                style = MaterialTheme.typography.labelLarge,
+                color = OcTheme.colors.textMuted,
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                SessionRead.entries.forEach { read ->
+                    OcChip(
+                        text = readStateLabel(read),
+                        onClick = { onEvent(SessionsEvent.ToggleRead(read)) },
+                        selected = state.filters.readState == read,
+                        modifier = Modifier.testTag("sessions_filter_read_${read.name.lowercase()}"),
                     )
                 }
             }

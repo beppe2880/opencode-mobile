@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.Delete
@@ -26,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -53,6 +55,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_answer
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_permission
@@ -101,7 +104,10 @@ internal fun SessionRow(
         waitingLabel,
         workLabel.ifEmpty { agentRunning.takeIf { waiting == null } },
     ).joinToString(" · ")
+    val unreadLabel = stringResource(Res.string.sessions_unread)
     val showsWork = workLabel.isNotEmpty()
+    // A running session shows its activity dot instead, like the desktop app.
+    val unread = session.isUnread && !running
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
@@ -126,7 +132,11 @@ internal fun SessionRow(
                 .background(if (selected) c.layer02 else c.bgBase)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
                 .semantics {
-                    if (running || showsWork) stateDescription = runningLabel
+                    val states = buildList {
+                        if (running || showsWork) add(runningLabel)
+                        if (unread) add(unreadLabel)
+                    }
+                    if (states.isNotEmpty()) stateDescription = states.joinToString(", ")
                     customActions = listOfNotNull(
                         onTogglePin?.let { toggle -> CustomAccessibilityAction(pinLabel) { toggle(); true } },
                         CustomAccessibilityAction(renameLabel) { onLongClick(); true },
@@ -139,7 +149,19 @@ internal fun SessionRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
         ) {
-            OcProjectAvatar(session.directoryName)
+            Box {
+                OcProjectAvatar(session.directoryName)
+                if (unread) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(7.dp)
+                            .clip(CircleShape)
+                            .background(c.info.fg)
+                            .testTag("session_unread_${session.id}"),
+                    )
+                }
+            }
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                     if (pinned) {

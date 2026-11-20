@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">Filtre suas sessões</string>
     <string name="tips_g_filters_body">Restrinja a lista por data, resultado ou arquivadas. Arquivar também oferece Desfazer.</string>
     <string name="tips_g_filters_demo">Uma lista de sessões abre os filtros e mostra uma sessão arquivada.</string>
+    <string name="tips_g_unread_title">Sessões não lidas</string>
+    <string name="tips_g_unread_body">Um ponto marca as sessões cujo último turno terminou depois da última vez que você as abriu. Abra a sessão para removê-lo ou filtre a lista por sessões não lidas no painel.</string>
+    <string name="tips_g_unread_demo">Um ponto aparece em uma sessão concluída; tocar na linha o remove.</string>
 </resources>

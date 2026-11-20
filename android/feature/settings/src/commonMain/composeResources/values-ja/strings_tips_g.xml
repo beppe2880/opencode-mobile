@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">セッションを絞り込む</string>
     <string name="tips_g_filters_body">日付、結果、アーカイブ状態でリストを絞り込めます。アーカイブ後は元に戻せます。</string>
     <string name="tips_g_filters_demo">セッションリストがフィルターを開き、アーカイブされたセッションを表示します。</string>
+    <string name="tips_g_unread_title">未読のセッション</string>
+    <string name="tips_g_unread_body">最後に開いた後に最新のターンが終了したセッションに点が付きます。セッションを開くと消え、フィルターシートで未読だけに絞り込めます。</string>
+    <string name="tips_g_unread_demo">終了したセッションに点が付き、行をタップすると消えます。</string>
 </resources>

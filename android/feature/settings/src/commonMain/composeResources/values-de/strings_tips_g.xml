@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">Sitzungen filtern</string>
     <string name="tips_g_filters_body">Grenze die Liste nach Datum, Ergebnis oder archiviert ein. Beim Archivieren gibt es auch Rückgängig.</string>
     <string name="tips_g_filters_demo">Eine Sitzungsliste öffnet ihre Filter und zeigt eine archivierte Sitzung.</string>
+    <string name="tips_g_unread_title">Ungelesene Sitzungen</string>
+    <string name="tips_g_unread_body">Ein Punkt markiert Sitzungen, deren letzter Durchlauf nach deinem letzten Blick geendet hat. Öffne die Sitzung, um ihn zu entfernen, oder filtere die Liste im Filterblatt auf ungelesene Sitzungen.</string>
+    <string name="tips_g_unread_demo">Ein Punkt erscheint an einer beendeten Sitzung; Tippen auf die Zeile entfernt ihn.</string>
 </resources>

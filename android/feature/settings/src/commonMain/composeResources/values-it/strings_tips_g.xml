@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">Filtra le tue sessioni</string>
     <string name="tips_g_filters_body">Restringi l'elenco per data, esito o sessioni archiviate. L'archiviazione offre anche Annulla.</string>
     <string name="tips_g_filters_demo">Un elenco di sessioni apre i filtri e mostra una sessione archiviata.</string>
+    <string name="tips_g_unread_title">Sessioni non lette</string>
+    <string name="tips_g_unread_body">Un punto segna le sessioni il cui ultimo turno è terminato dopo l'ultima volta che le hai aperte. Apri la sessione per toglierlo, oppure filtra l'elenco per le sessioni non lette dal pannello.</string>
+    <string name="tips_g_unread_demo">Un punto compare su una sessione terminata; toccando la riga scompare.</string>
 </resources>
