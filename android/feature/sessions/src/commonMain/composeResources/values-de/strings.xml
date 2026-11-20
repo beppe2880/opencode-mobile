@@ -12,6 +12,8 @@
     <string name="sessions_running">Wird ausgeführt</string>
     <string name="sessions_failed">Fehlgeschlagen</string>
     <string name="sessions_interrupted">Unterbrochen</string>
+    <string name="sessions_waiting_permission">Berechtigung nötig</string>
+    <string name="sessions_waiting_answer">Frage an dich</string>
     <string name="sessions_empty_title">Noch keine Sitzungen</string>
     <string name="sessions_empty_message">Starte eine Sitzung, um dem Agenten eine Aufgabe in einem deiner Projekte zu geben.</string>
     <string name="sessions_empty_search_title">Keine passenden Sitzungen</string>

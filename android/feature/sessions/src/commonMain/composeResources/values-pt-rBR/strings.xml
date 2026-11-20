@@ -12,6 +12,8 @@
     <string name="sessions_running">Em execução</string>
     <string name="sessions_failed">Falhou</string>
     <string name="sessions_interrupted">Interrompida</string>
+    <string name="sessions_waiting_permission">Precisa de permissão</string>
+    <string name="sessions_waiting_answer">Pergunta para você</string>
     <string name="sessions_empty_title">Nenhuma sessão ainda</string>
     <string name="sessions_empty_message">Inicie uma sessão para dar ao agente uma tarefa em um dos seus projetos.</string>
     <string name="sessions_empty_search_title">Nenhuma sessão encontrada</string>

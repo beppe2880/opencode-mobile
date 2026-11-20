@@ -64,6 +64,9 @@ data class NewSessionState(
     val effectiveModel: ModelRef? get() = model ?: defaultModel
 }
 
+/** What a running session waits for; a permission request wins over a question. */
+enum class SessionWaiting { Permission, Answer }
+
 @Immutable
 data class SessionsState(
     val serverName: String = "",
@@ -77,6 +80,8 @@ data class SessionsState(
     val pinned: Set<String> = emptySet(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
+    /** Running sessions blocked on the user (their own requests or their subagents'). */
+    val waiting: Map<String, SessionWaiting> = emptyMap(),
     /** Rows show running subagents and commands (setting). */
     val showRunningWork: Boolean = true,
     val loading: Boolean = true,

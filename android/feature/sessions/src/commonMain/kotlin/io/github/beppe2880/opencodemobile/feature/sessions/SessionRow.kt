@@ -54,7 +54,10 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_re
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_answer
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_permission
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,6 +81,8 @@ internal fun SessionRow(
     pinned: Boolean = false,
     /** Pins or unpins the session, offered to accessibility services; the row actions have it for everyone. */
     onTogglePin: (() -> Unit)? = null,
+    /** Running but blocked on the user: a badge replaces "Working" and the dot turns to a warning. */
+    waiting: SessionWaiting? = null,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -89,8 +94,14 @@ internal fun SessionRow(
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
     val pinLabel = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin)
-    val runningLabel = if (work == null) stringResource(Res.string.sessions_running_a11y) else runningSummary(work, running)
-    val showsWork = work != null && (running || !work.isEmpty)
+    val waitingLabel = waiting?.let { stringResource(it.label()) }
+    val workLabel = if (work == null) "" else runningSummary(work, running && waiting == null)
+    val agentRunning = stringResource(Res.string.sessions_running_a11y)
+    val runningLabel = listOfNotNull(
+        waitingLabel,
+        workLabel.ifEmpty { agentRunning.takeIf { waiting == null } },
+    ).joinToString(" · ")
+    val showsWork = workLabel.isNotEmpty()
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
@@ -161,10 +172,13 @@ internal fun SessionRow(
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     OutcomeBadge(session.outcome, running)
+                    if (running && waitingLabel != null) {
+                        OcBadge(waitingLabel, c.warning, Modifier.testTag("session_waiting_${session.id}"))
+                    }
                 }
                 if (showsWork) {
                     Text(
-                        runningLabel,
+                        workLabel,
                         style = MaterialTheme.typography.bodySmall,
                         color = c.info.fg,
                         maxLines = 2,
@@ -182,7 +196,9 @@ internal fun SessionRow(
                         maxLines = 1,
                     )
                 }
-                if (running) OcPulsingDot(c.info.fg, Modifier.testTag("session_running_${session.id}"))
+                if (running) {
+                    OcPulsingDot(if (waiting != null) c.warning.fg else c.info.fg, Modifier.testTag("session_running_${session.id}"))
+                }
             }
         }
     }
@@ -197,6 +213,11 @@ private fun OutcomeBadge(outcome: SessionOutcome?, running: Boolean) {
         SessionOutcome.Interrupted -> OcBadge(stringResource(Res.string.sessions_interrupted), c.warning)
         else -> Unit
     }
+}
+
+private fun SessionWaiting.label(): StringResource = when (this) {
+    SessionWaiting.Permission -> Res.string.sessions_waiting_permission
+    SessionWaiting.Answer -> Res.string.sessions_waiting_answer
 }
 
 /** The session's title, or a placeholder while the server has not named it yet. */

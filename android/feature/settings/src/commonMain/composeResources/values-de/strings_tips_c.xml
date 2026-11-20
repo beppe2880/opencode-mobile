@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Im Hintergrund weiter aufnehmen</string>
+    <string name="tips_c_voice_background_body">Eine Sprachnachricht, die mit einem Cloud-Modell aufgenommen wird, läuft weiter, wenn du zu einer anderen App wechselst oder das Telefon sperrst. Unter Android beendet Stoppen in der Benachrichtigung die Aufnahme; der Text wartet im Nachrichtenfeld, wenn du zurückkommst.</string>
+    <string name="tips_c_voice_background_demo">Eine Aufnahme läuft im Nachrichtenfeld, dann zeigt der Startbildschirm eine Benachrichtigung mit der Zeit. Ein Finger tippt auf Stoppen, und zurück in der App steht der gesprochene Satz im Nachrichtenfeld.</string>
+
     <string name="tips_c_voice_record_title">Sprich, statt zu tippen</string>
     <string name="tips_c_voice_record_body">Tippe im Nachrichtenfeld auf das Mikrofon und sprich: Eine Live-Wellenform und ein Timer zeigen, dass du gehört wirst. Bestätige, um den Text zu behalten, oder brich ab, um ihn zu verwerfen.</string>
     <string name="tips_c_voice_record_demo">Ein Finger tippt auf das Mikrofon, das Nachrichtenfeld zeigt eine bewegte Wellenform mit einem Timer, dann erscheint der gesprochene Satz als Text.</string>
@@ -15,6 +19,9 @@
     <string name="tips_c_terminal_fullscreen_title">Mehr Platz für das Terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Wechsle in den Vollbildmodus, um Titelleiste und Systemleisten auszublenden und mehr Zeilen auf einmal zu sehen. Zurück oder dieselbe Taste holt sie zurück.</string>
     <string name="tips_c_terminal_fullscreen_demo">Ein Finger tippt auf die Vollbild-Taste des Terminals: Titelleiste und Statusleiste gleiten weg und mehr Ausgabezeilen erscheinen.</string>
+    <string name="tips_c_waiting_title">Sieh, welche Chats auf dich warten</string>
+    <string name="tips_c_waiting_body">Wenn ein Agent anhält, um dir eine Frage zu stellen oder um Berechtigung zu bitten, zeigt sein Chat in der Liste Frage an dich oder Berechtigung nötig statt Arbeitet, in der Warnfarbe. Anfragen seiner Subagenten zählen auch.</string>
+    <string name="tips_c_waiting_demo">Ein arbeitender Chat in der Liste wechselt zu Frage an dich in der Warnfarbe, springt nach der Antwort zurück zu Arbeitet und zeigt dann Berechtigung nötig.</string>
     <string name="tips_c_terminal_select_title">Text aus dem Terminal kopieren</string>
     <string name="tips_c_terminal_select_body">Halte ein Wort in der Ausgabe gedrückt, um es auszuwählen, ziehe die Griffe, um mehr auszuwählen, und tippe dann auf Kopieren. Alles auswählen wählt alles aus, und die Schaltfläche Text auswählen in der oberen Leiste startet ebenfalls eine Auswahl.</string>
     <string name="tips_c_terminal_select_demo">Ein Wort einer fehlschlagenden Testzeile wird gedrückt gehalten und markiert, sein Griff wird bis zum Zeilenende gezogen und auf Kopieren getippt: ein Hinweis Kopiert erscheint.</string>

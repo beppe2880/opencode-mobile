@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">استمرار التسجيل في الخلفية</string>
+    <string name="tips_c_voice_background_body">تستمر الرسالة الصوتية المسجّلة بنموذج سحابي عند التبديل إلى تطبيق آخر أو قفل الهاتف. على Android، يُنهيها «إيقاف» في الإشعار؛ والنص في مربع الرسالة بانتظارك عند عودتك.</string>
+    <string name="tips_c_voice_background_demo">يجري التسجيل في مربع الرسالة، ثم تعرض الشاشة الرئيسية إشعارًا يعدّ الوقت. يضغط الإصبع «إيقاف»، وعند العودة إلى التطبيق تكون الجملة المنطوقة في مربع الرسالة.</string>
+
     <string name="tips_c_voice_record_title">تحدّث بدل الكتابة</string>
     <string name="tips_c_voice_record_body">اضغط على الميكروفون في مربع الرسالة وتحدّث: موجة صوتية حية ومؤقت يبيّنان أنك مسموع. أكّد للاحتفاظ بالنص، أو ألغِ لتجاهله.</string>
     <string name="tips_c_voice_record_demo">يضغط الإصبع الميكروفون، فيعرض مربع الرسالة موجة متحركة مع مؤقت، ثم تظهر الجملة المنطوقة نصًا.</string>
@@ -15,6 +19,9 @@
     <string name="tips_c_terminal_fullscreen_title">مساحة أكبر للطرفية</string>
     <string name="tips_c_terminal_fullscreen_body">ادخل ملء الشاشة لإخفاء شريط العنوان وأشرطة النظام ورؤية سطور أكثر دفعة واحدة. يعيدها الرجوع أو الزر نفسه.</string>
     <string name="tips_c_terminal_fullscreen_demo">يضغط الإصبع زر ملء الشاشة في الطرفية: ينزلق شريط العنوان وشريط الحالة بعيدًا وتظهر سطور مخرجات أكثر.</string>
+    <string name="tips_c_waiting_title">اعرف أي المحادثات تنتظرك</string>
+    <string name="tips_c_waiting_body">عندما يتوقف الوكيل ليسألك سؤالًا أو يطلب إذنًا، تُظهر محادثته في القائمة "سؤال لك" أو "يحتاج إذنًا" بدلًا من "قيد العمل"، باللون التحذيري. وتُحتسب أيضًا طلبات الوكلاء الفرعيين التابعين له.</string>
+    <string name="tips_c_waiting_demo">تتحول محادثة "قيد العمل" في القائمة إلى "سؤال لك" باللون التحذيري، وتعود إلى "قيد العمل" بعد الرد، ثم تُظهر "يحتاج إذنًا".</string>
     <string name="tips_c_terminal_select_title">نسخ النص من الطرفية</string>
     <string name="tips_c_terminal_select_body">اضغط مطولًا على كلمة في المخرجات لتحديدها، واسحب المقابض لتحديد المزيد، ثم اضغط نسخ. تحديد الكل يحدد كل شيء، وزر تحديد النص في الشريط العلوي يبدأ التحديد أيضًا.</string>
     <string name="tips_c_terminal_select_demo">يُضغط مطولًا على كلمة من سطر اختبار فاشل فتُبرز، ويُسحب مقبضها إلى نهاية السطر ويُضغط نسخ: يظهر إشعار تم النسخ.</string>

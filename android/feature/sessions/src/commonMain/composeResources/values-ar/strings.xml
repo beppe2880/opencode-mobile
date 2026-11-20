@@ -12,6 +12,8 @@
     <string name="sessions_running">قيد التشغيل</string>
     <string name="sessions_failed">فشلت</string>
     <string name="sessions_interrupted">متوقفة</string>
+    <string name="sessions_waiting_permission">يحتاج إذنًا</string>
+    <string name="sessions_waiting_answer">سؤال لك</string>
     <string name="sessions_empty_title">لا توجد جلسات بعد</string>
     <string name="sessions_empty_message">ابدأ جلسة جديدة لتكليف الوكيل بمهمة في أحد مشاريعك.</string>
     <string name="sessions_empty_search_title">لا توجد جلسات مطابقة</string>

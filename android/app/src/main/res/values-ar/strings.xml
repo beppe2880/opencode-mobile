@@ -30,6 +30,10 @@
     <string name="notif_intro_text">أثناء تشغيل جلسة، يبقى التطبيق متصلًا بخادمك في الخلفية ليُعلمك عندما يحتاج الوكيل إلى إذن أو إجابة، وعندما ينتهي. يمكنك السماح بتعديل أو رفضه مباشرةً من الإشعار.\n\nتأتي الإشعارات مباشرةً من خادمك دون أي خدمة أخرى بينهما. يمكنك إيقافها في أي وقت من الإعدادات.</string>
     <string name="notif_intro_allow">السماح</string>
     <string name="notif_intro_later">ليس الآن</string>
+    <string name="voice_channel">تسجيل صوتي</string>
+    <string name="voice_recording_title">جارٍ تسجيل رسالة صوتية</string>
+    <string name="voice_recording_text">اضغط «إيقاف» لتحويلها إلى نص في مربع الرسالة.</string>
+    <string name="voice_recording_stop">إيقاف</string>
     <string name="widget_label">جلسات OpenCode</string>
     <string name="widget_description">الجلسات الجارية والأخيرة، وزر لبدء جلسة جديدة.</string>
     <string name="widget_new_session">جديدة</string>

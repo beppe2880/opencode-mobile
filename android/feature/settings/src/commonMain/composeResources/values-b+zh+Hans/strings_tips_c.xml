@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">在后台继续录音</string>
+    <string name="tips_c_voice_background_body">使用云端模型录制的语音消息，在你切换到其他应用或锁屏时仍会继续录制。在 Android 上，通知中的“停止”可结束录音；你回来时文字已在消息框中等待。</string>
+    <string name="tips_c_voice_background_demo">录音在消息框中进行，然后主屏幕显示一条通知并计时。手指点按“停止”，回到应用后，说出的句子已在消息框中。</string>
+
     <string name="tips_c_voice_record_title">说话代替打字</string>
     <string name="tips_c_voice_record_body">点按消息框中的麦克风然后说话：实时波形和计时器会显示正在收音。确认即可保留文字，取消则丢弃。</string>
     <string name="tips_c_voice_record_demo">手指点按麦克风，消息框显示跳动的波形和计时器，然后说出的句子以文字形式出现。</string>
@@ -15,6 +19,9 @@
     <string name="tips_c_terminal_fullscreen_title">为终端留出更多空间</string>
     <string name="tips_c_terminal_fullscreen_body">进入全屏会隐藏标题栏和系统栏，一次显示更多行。点按返回或同一按钮即可恢复。</string>
     <string name="tips_c_terminal_fullscreen_demo">手指点按终端的全屏按钮：标题栏和状态栏滑出，显示更多输出行。</string>
+    <string name="tips_c_waiting_title">查看哪些聊天正在等待你</string>
+    <string name="tips_c_waiting_body">当代理停下来向你提问或请求权限时，列表中它的聊天会显示“待你回答”或“需要授权”，而不是“工作中”，并使用警告颜色。其子智能体的请求也会计入。</string>
+    <string name="tips_c_waiting_demo">列表中“工作中”的聊天会变为警告颜色的“待你回答”，回答后恢复为“工作中”，然后显示“需要授权”。</string>
     <string name="tips_c_terminal_select_title">从终端复制文本</string>
     <string name="tips_c_terminal_select_body">长按输出中的一个词即可选中它，拖动手柄可选中更多内容，然后点按“复制”。“全选”会选中全部内容，顶部栏中的“选择文本”按钮也可以开始选择。</string>
     <string name="tips_c_terminal_select_demo">长按失败测试行中的一个词使其高亮，将其手柄拖到行尾，然后点按“复制”：出现“已复制”提示。</string>

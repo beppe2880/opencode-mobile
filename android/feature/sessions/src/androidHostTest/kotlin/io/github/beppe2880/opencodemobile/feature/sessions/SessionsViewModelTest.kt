@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
+import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
@@ -1299,6 +1300,46 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.Visible(false))
     }
 
+    @Test
+    fun `a running session waiting for a question or a permission says so while visible`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.Visible(true))
+        advanceTimeBy(1_000)
+        assertTrue(vm.state.value.waiting.isEmpty())
+
+        chat.pendingForms = mapOf("today" to listOf(Form("f1", "today", "Which one?", emptyList())))
+        events.flow.emit(ServerEvent.FormsChanged("today"))
+        advanceTimeBy(1_000)
+        assertEquals(SessionWaiting.Answer, vm.state.value.waiting["today"])
+
+        chat.pendingPermissions = mapOf("today" to listOf(PermissionRequest("p1", "today", "bash", listOf("rm"), null, false)))
+        events.flow.emit(ServerEvent.PermissionChanged("today"))
+        advanceTimeBy(1_000)
+        assertEquals(SessionWaiting.Permission, vm.state.value.waiting["today"])
+
+        // Unreadable requests keep what was shown.
+        chat.requestsFail = true
+        events.flow.emit(ServerEvent.PermissionChanged("today"))
+        advanceTimeBy(1_000)
+        assertEquals(SessionWaiting.Permission, vm.state.value.waiting["today"])
+
+        chat.requestsFail = false
+        chat.pendingPermissions = emptyMap()
+        chat.pendingForms = emptyMap()
+        events.flow.emit(ServerEvent.PermissionChanged("today"))
+        advanceTimeBy(1_000)
+        assertTrue(vm.state.value.waiting.isEmpty())
+
+        chat.pendingForms = mapOf("today" to listOf(Form("f2", "today", "Again?", emptyList())))
+        events.flow.emit(ServerEvent.FormsChanged("today"))
+        advanceTimeBy(1_000)
+        events.flow.emit(ServerEvent.ExecutionEnded("today", SessionOutcome.Succeeded))
+        runCurrent()
+        assertTrue(vm.state.value.waiting.isEmpty())
+        vm.onEvent(SessionsEvent.Visible(false))
+    }
+
     private fun session(id: String, updated: Long) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
         agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = null,
@@ -1372,7 +1413,12 @@ private class FakeChat : ChatRepository {
     override suspend fun interrupt(sessionId: String) = Result.success(Unit)
     override suspend fun switchAgent(sessionId: String, agent: String) = Result.success(Unit)
     override suspend fun switchModel(sessionId: String, model: ModelRef) = Result.success(Unit)
-    override suspend fun permissions(sessionId: String): Result<List<PermissionRequest>> = Result.success(emptyList())
+    var pendingPermissions: Map<String, List<PermissionRequest>> = emptyMap()
+    var pendingForms: Map<String, List<Form>> = emptyMap()
+    var requestsFail = false
+    override suspend fun permissions(sessionId: String): Result<List<PermissionRequest>> =
+        if (requestsFail) Result.failure(OpenCodeError.Unreachable("offline")) else Result.success(pendingPermissions[sessionId].orEmpty())
+    override suspend fun forms(sessionId: String): Result<List<Form>> = Result.success(pendingForms[sessionId].orEmpty())
     override suspend fun replyPermission(sessionId: String, requestId: String, decision: PermissionDecision, message: String?) =
         Result.success(Unit)
 }

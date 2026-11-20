@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Continue gravando em segundo plano</string>
+    <string name="tips_c_voice_background_body">Uma mensagem de voz gravada com um modelo na nuvem continua quando você troca de app ou bloqueia o celular. No Android, Parar na notificação encerra a gravação; o texto espera na caixa de mensagem quando você voltar.</string>
+    <string name="tips_c_voice_background_demo">Uma gravação acontece na caixa de mensagem, depois a tela inicial mostra uma notificação contando o tempo. Um dedo toca em Parar e, de volta ao app, a frase falada está na caixa de mensagem.</string>
+
     <string name="tips_c_voice_record_title">Fale em vez de digitar</string>
     <string name="tips_c_voice_record_body">Toque no microfone na caixa de mensagem e fale: uma forma de onda ao vivo e um cronômetro mostram que você está sendo ouvido. Confirme para manter o texto ou cancele para descartá-lo.</string>
     <string name="tips_c_voice_record_demo">Um dedo toca no microfone, a caixa de mensagem mostra uma onda em movimento com um cronômetro e depois a frase falada aparece como texto.</string>
@@ -15,6 +19,9 @@
     <string name="tips_c_terminal_fullscreen_title">Mais espaço para o terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Entre em tela cheia para ocultar a barra de título e as barras do sistema e ver mais linhas de uma vez. Voltar ou o mesmo botão as traz de volta.</string>
     <string name="tips_c_terminal_fullscreen_demo">Um dedo toca no botão de tela cheia do terminal: a barra de título e a barra de status deslizam para fora e mais linhas de saída aparecem.</string>
+    <string name="tips_c_waiting_title">Veja quais conversas estão esperando por você</string>
+    <string name="tips_c_waiting_body">Quando um agente para para fazer uma pergunta ou pedir permissão, a conversa dele na lista mostra Pergunta para você ou Precisa de permissão em vez de Trabalhando, na cor de aviso. Os pedidos dos subagentes também contam.</string>
+    <string name="tips_c_waiting_demo">Uma conversa trabalhando na lista muda para Pergunta para você na cor de aviso, volta para Trabalhando depois de respondida e, em seguida, mostra Precisa de permissão.</string>
     <string name="tips_c_terminal_select_title">Copiar texto do terminal</string>
     <string name="tips_c_terminal_select_body">Pressione e segure uma palavra na saída para selecioná-la, arraste as alças para selecionar mais e toque em Copiar. Selecionar tudo seleciona tudo, e o botão Selecionar texto na barra superior também inicia uma seleção.</string>
     <string name="tips_c_terminal_select_demo">Uma palavra de uma linha de teste com falha é pressionada e destacada, sua alça é arrastada até o fim da linha e Copiar é tocado: aparece um aviso de Copiado.</string>

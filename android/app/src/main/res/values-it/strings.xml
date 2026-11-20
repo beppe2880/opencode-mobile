@@ -27,6 +27,10 @@
     <string name="notif_intro_text">Mentre una sessione è in corso, l\'app resta connessa al tuo server in background per avvisarti quando l\'agente chiede un permesso o una risposta, e quando ha finito. Puoi consentire o rifiutare una modifica direttamente dalla notifica.\n\nLe notifiche arrivano direttamente dal tuo server, senza altri servizi in mezzo. Puoi disattivarle quando vuoi nelle Impostazioni.</string>
     <string name="notif_intro_allow">Consenti</string>
     <string name="notif_intro_later">Non ora</string>
+    <string name="voice_channel">Registrazione vocale</string>
+    <string name="voice_recording_title">Registrazione di un messaggio vocale</string>
+    <string name="voice_recording_text">Tocca Stop per trasformarlo in testo nella casella del messaggio.</string>
+    <string name="voice_recording_stop">Stop</string>
     <string name="widget_label">Sessioni OpenCode</string>
     <string name="widget_description">Sessioni in esecuzione e recenti, e un pulsante per avviarne una nuova.</string>
     <string name="widget_new_session">Nuova</string>

@@ -12,6 +12,8 @@
     <string name="sessions_running">実行中</string>
     <string name="sessions_failed">失敗</string>
     <string name="sessions_interrupted">中断</string>
+    <string name="sessions_waiting_permission">要許可</string>
+    <string name="sessions_waiting_answer">質問あり</string>
     <string name="sessions_empty_title">まだセッションがありません</string>
     <string name="sessions_empty_message">新しいセッションを開始して、プロジェクト内のタスクをエージェントに依頼してください。</string>
     <string name="sessions_empty_search_title">一致するセッションがありません</string>
