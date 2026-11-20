@@ -120,6 +120,9 @@ sealed interface SessionsEvent {
     data class ToggleStatus(val status: SessionStatus) : SessionsEvent
     data class SetDateFilter(val filter: SessionDateFilter) : SessionsEvent
     data class ToggleOutcome(val outcome: SessionOutcome) : SessionsEvent
+
+    /** Narrows the list to [state], or clears the filter when it is already picked. */
+    data class ToggleRead(val state: SessionRead) : SessionsEvent
     data object ResetFilters : SessionsEvent
 
     data class HideProject(val directory: String) : SessionsEvent

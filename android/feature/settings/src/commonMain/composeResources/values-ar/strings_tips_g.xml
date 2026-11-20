@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">صفِّ جلساتك</string>
     <string name="tips_g_filters_body">ضيّق القائمة حسب التاريخ أو النتيجة أو المؤرشفة. توفر الأرشفة أيضًا التراجع.</string>
     <string name="tips_g_filters_demo">تفتح قائمة الجلسات عوامل التصفية وتعرض جلسة مؤرشفة.</string>
+    <string name="tips_g_unread_title">الجلسات غير المقروءة</string>
+    <string name="tips_g_unread_body">تشير نقطة إلى الجلسات التي انتهت آخر جولة لها بعد آخر مرة فتحتها. افتح الجلسة لإزالتها، أو صفِّ القائمة إلى الجلسات غير المقروءة من لوحة عوامل التصفية.</string>
+    <string name="tips_g_unread_demo">تظهر نقطة على الجلسة المنتهية، ويلغيها النقر على الصف.</string>
 </resources>

@@ -20,6 +20,7 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     is OpenCodeEvent.SessiondeletedWrapper -> ServerEvent.SessionChanged(value.data.sessionID, deleted = true)
     is OpenCodeEvent.SessionarchivedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessionunarchivedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
+    is OpenCodeEvent.SessionviewedWrapper -> ServerEvent.Viewed(value.data.sessionID, value.data.idle.toLong())
 
     is OpenCodeEvent.SessionexecutionstartedWrapper -> ServerEvent.ExecutionStarted(value.data.sessionID)
     is OpenCodeEvent.SessionexecutionsucceededWrapper -> with(value) {

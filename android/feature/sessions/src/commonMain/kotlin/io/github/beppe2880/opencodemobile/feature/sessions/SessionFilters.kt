@@ -23,11 +23,14 @@ sealed interface SessionDateFilter {
 
 enum class SessionStatus { Active, Archived }
 
+/** Whether the latest turn of a session has been viewed. */
+enum class SessionRead { Read, Unread }
+
 private val DefaultStatuses = setOf(SessionStatus.Active)
 
 /**
- * The filters chosen in the sessions sheet. The archived status selects the server list; the date
- * and outcome filters narrow the loaded page. [activeCount] counts categories, not values.
+ * The filters chosen in the sessions sheet. The archived status selects the server list; the date,
+ * outcome and read filters narrow the loaded page. [activeCount] counts categories, not values.
  */
 @Immutable
 data class SessionFilters(
@@ -35,6 +38,8 @@ data class SessionFilters(
     val statuses: Set<SessionStatus> = DefaultStatuses,
     val date: SessionDateFilter = SessionDateFilter.AnyTime,
     val outcomes: Set<SessionOutcome> = emptySet(),
+    /** Null shows read and unread sessions; [SessionRead.Read] or [SessionRead.Unread] narrows it. */
+    val readState: SessionRead? = null,
 ) {
     /** Empty reads as the default active-only selection. */
     val effectiveStatuses: Set<SessionStatus> get() = statuses.ifEmpty { DefaultStatuses }
@@ -42,7 +47,8 @@ data class SessionFilters(
     val activeCount: Int
         get() = (if (effectiveStatuses != DefaultStatuses) 1 else 0) +
             (if (date != SessionDateFilter.AnyTime) 1 else 0) +
-            (if (outcomes.isNotEmpty()) 1 else 0)
+            (if (outcomes.isNotEmpty()) 1 else 0) +
+            (if (readState != null) 1 else 0)
 
     val isActive: Boolean get() = activeCount > 0
 
@@ -53,10 +59,14 @@ data class SessionFilters(
         return copy(statuses = next.ifEmpty { DefaultStatuses })
     }
 
+    /** Picks [state], or clears the filter when it is already picked. */
+    fun toggleRead(state: SessionRead): SessionFilters = copy(readState = if (readState == state) null else state)
+
     /** Whether [session] passes every filter; [today] is the device's local date. */
     fun matches(session: Session, today: LocalDate, zone: TimeZone): Boolean {
         val status = if (session.archivedAt != null) SessionStatus.Archived else SessionStatus.Active
         if (status !in effectiveStatuses) return false
+        if (readState != null && (session.isUnread != (readState == SessionRead.Unread))) return false
         if (outcomes.isNotEmpty() && session.outcome !in outcomes) return false
         return date.matches(session.updatedAt, today, zone)
     }

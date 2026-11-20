@@ -23,7 +23,7 @@
     <string name="sessions_filters">Filters</string>
     <string name="sessions_filters_active">Filters (%1$d)</string>
     <string name="sessions_filter_active">Active</string>
-    <string name="sessions_filter_status">Show</string>
+    <string name="sessions_filter_status">Status</string>
     <string name="sessions_filter_last_updated">Last updated</string>
     <string name="sessions_filter_any_time">Any time</string>
     <string name="sessions_filter_last_7_days">Last 7 days</string>
@@ -31,6 +31,9 @@
     <string name="sessions_filter_custom_range">Custom range…</string>
     <string name="sessions_filter_range_hint">Pick a start and end date</string>
     <string name="sessions_filter_outcome">Outcome</string>
+    <string name="sessions_unread">Unread</string>
+    <string name="sessions_read">Read</string>
+    <string name="sessions_filter_read">Read status</string>
     <string name="sessions_outcome_succeeded">Succeeded</string>
     <string name="sessions_filter_reset">Reset</string>
     <string name="sessions_filter_show">Show sessions</string>
@@ -38,6 +41,8 @@
     <string name="sessions_filter_remove">Remove %1$s filter</string>
     <string name="sessions_empty_filter_title">No sessions match these filters</string>
     <string name="sessions_empty_filter_message">Try a different date range or outcome, or clear the filters.</string>
+    <string name="sessions_empty_unread_title">No unread sessions</string>
+    <string name="sessions_empty_unread_message">Sessions stay unread until you open them.</string>
     <string name="sessions_clear_filters">Clear filters</string>
     <string name="sessions_empty_archived_title">No archived sessions</string>
     <string name="sessions_empty_archived_message">Sessions you archive are hidden from the main list and shown here.</string>

@@ -114,6 +114,13 @@ interface SessionRepository {
     suspend fun archiveSupported(): Boolean = true
 
     /**
+     * Reports [idleAt] (the session's `idle` watermark) as seen. The server moves `viewed` forward
+     * only, and accepts an idle it already knows; an older value is ignored.
+     */
+    suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Viewing is not available"))
+
+    /**
      * Copies the session into a new root session ("… (fork #n)"): the history before
      * [beforeMessageId], or all of it when null. The original is left untouched.
      */

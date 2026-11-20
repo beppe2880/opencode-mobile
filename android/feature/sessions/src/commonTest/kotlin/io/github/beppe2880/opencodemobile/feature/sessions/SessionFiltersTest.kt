@@ -32,12 +32,16 @@ class SessionFiltersTest {
         updatedAt: Long,
         outcome: SessionOutcome? = null,
         archived: Boolean = false,
+        idleAt: Long? = null,
+        viewedAt: Long? = null,
     ): Session = SampleData.sessions.first().copy(
         id = id,
         updatedAt = updatedAt,
         createdAt = updatedAt,
         outcome = outcome,
         archivedAt = if (archived) now else null,
+        idleAt = idleAt,
+        viewedAt = viewedAt,
     )
 
     private fun matches(date: SessionDateFilter = SessionDateFilter.AnyTime, session: Session): Boolean =
@@ -187,6 +191,8 @@ class SessionFiltersTest {
         assertEquals(1, SessionFilters(statuses = SessionStatus.entries.toSet()).activeCount)
         assertEquals(1, SessionFilters(date = SessionDateFilter.Today).activeCount)
         assertEquals(1, SessionFilters(outcomes = setOf(SessionOutcome.Failed, SessionOutcome.Interrupted)).activeCount)
+        assertEquals(1, SessionFilters(readState = SessionRead.Unread).activeCount)
+        assertEquals(1, SessionFilters(readState = SessionRead.Read).activeCount)
         assertEquals(
             3,
             SessionFilters(
@@ -195,5 +201,45 @@ class SessionFiltersTest {
                 outcomes = setOf(SessionOutcome.Failed),
             ).activeCount,
         )
+    }
+
+    @Test
+    fun readStateNarrowsTheListToUnreadOrReadSessions() {
+        val unread = session("unread", now, idleAt = 10, viewedAt = 5)
+        val neverViewed = session("never-viewed", now, idleAt = 10)
+        val read = session("read", now, idleAt = 10, viewedAt = 10)
+        val running = session("running", now)
+
+        val onlyUnread = SessionFilters(readState = SessionRead.Unread)
+        assertTrue(onlyUnread.matches(unread, today, zone))
+        assertTrue(onlyUnread.matches(neverViewed, today, zone))
+        assertFalse(onlyUnread.matches(read, today, zone))
+        assertFalse(onlyUnread.matches(running, today, zone))
+
+        val onlyRead = SessionFilters(readState = SessionRead.Read)
+        assertTrue(onlyRead.matches(read, today, zone))
+        assertTrue(onlyRead.matches(running, today, zone))
+        assertFalse(onlyRead.matches(unread, today, zone))
+
+        assertTrue(SessionFilters().matches(read, today, zone))
+        assertTrue(SessionFilters().matches(unread, today, zone))
+    }
+
+    @Test
+    fun togglingAReadStateSelectsItThenTheOtherThenAll() {
+        val unread = SessionFilters().toggleRead(SessionRead.Unread)
+        assertEquals(SessionRead.Unread, unread.readState)
+        assertEquals(SessionRead.Read, unread.toggleRead(SessionRead.Read).readState)
+        assertNull(unread.toggleRead(SessionRead.Unread).readState)
+    }
+
+    @Test
+    fun readStateCombinesWithTheOtherFilters() {
+        val filters = SessionFilters(readState = SessionRead.Unread, outcomes = setOf(SessionOutcome.Failed))
+
+        assertTrue(filters.matches(session("failed", now, outcome = SessionOutcome.Failed, idleAt = 10), today, zone))
+        assertFalse(filters.matches(session("succeeded", now, outcome = SessionOutcome.Succeeded, idleAt = 10), today, zone))
+        assertFalse(filters.matches(session("archived", now, archived = true, idleAt = 10), today, zone))
+        assertFalse(filters.matches(session("read-failed", now, outcome = SessionOutcome.Failed, idleAt = 10, viewedAt = 10), today, zone))
     }
 }

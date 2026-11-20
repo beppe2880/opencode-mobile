@@ -23,7 +23,7 @@
     <string name="sessions_filters">Filtres</string>
     <string name="sessions_filters_active">Filtres (%1$d)</string>
     <string name="sessions_filter_active">Actives</string>
-    <string name="sessions_filter_status">Afficher</string>
+    <string name="sessions_filter_status">Statut</string>
     <string name="sessions_filter_last_updated">Dernière modification</string>
     <string name="sessions_filter_any_time">Toutes les dates</string>
     <string name="sessions_filter_last_7_days">7 derniers jours</string>
@@ -31,6 +31,9 @@
     <string name="sessions_filter_custom_range">Plage personnalisée…</string>
     <string name="sessions_filter_range_hint">Choisissez une date de début et de fin</string>
     <string name="sessions_filter_outcome">Résultat</string>
+    <string name="sessions_unread">Non lues</string>
+    <string name="sessions_read">Lues</string>
+    <string name="sessions_filter_read">Statut de lecture</string>
     <string name="sessions_outcome_succeeded">Réussie</string>
     <string name="sessions_filter_reset">Réinitialiser</string>
     <string name="sessions_filter_show">Afficher les sessions</string>
@@ -38,6 +41,8 @@
     <string name="sessions_filter_remove">Supprimer le filtre %1$s</string>
     <string name="sessions_empty_filter_title">Aucune session ne correspond à ces filtres</string>
     <string name="sessions_empty_filter_message">Essayez une autre plage de dates ou un autre résultat, ou effacez les filtres.</string>
+    <string name="sessions_empty_unread_title">Aucune session non lue</string>
+    <string name="sessions_empty_unread_message">Les sessions restent non lues jusqu'à ce que vous les ouvriez.</string>
     <string name="sessions_clear_filters">Effacer les filtres</string>
     <string name="sessions_empty_archived_title">Aucune session archivée</string>
     <string name="sessions_empty_archived_message">Les sessions que vous archivez sont masquées de la liste principale et affichées ici.</string>

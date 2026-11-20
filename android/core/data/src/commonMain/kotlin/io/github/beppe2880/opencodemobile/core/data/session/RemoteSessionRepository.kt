@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.api.models.LocationPublicRef
 import io.github.beppe2880.opencodemobile.api.models.SessionCreateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionForkRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionUpdateRequest
+import io.github.beppe2880.opencodemobile.api.models.SessionViewRequest
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
@@ -182,6 +183,14 @@ internal class RemoteSessionRepository(
         awaitBody { clients.forProfile(profile).server.serverInfo() }.version
     }.map { version -> AppVersion.parse(version)?.let { it >= archiveSince } ?: true }
         .getOrDefault(true)
+
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        // The server ignores an idle it no longer has and never moves `viewed` backwards.
+        awaitSuccess { api.sessionView(sessionId, SessionViewRequest(idle = idleAt.toDouble())) }
+        seen[profile.id to sessionId]?.let { seen[profile.id to sessionId] = it.copy(viewedAt = idleAt) }
+    }
 
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = resultOf {
         val api = clients.active().sessions

@@ -41,6 +41,8 @@ fun SessionInfo.toDomain(): Session = Session(
     createdAt = time.created.toLong(),
     updatedAt = time.updated.toLong(),
     archivedAt = time.archived?.toLong(),
+    idleAt = time.idle?.toLong(),
+    viewedAt = time.viewed?.toLong(),
     revertMessageId = revert?.messageID,
 )
 

@@ -161,6 +161,7 @@ class SessionsViewModel(
                     },
                 )
             }
+            is SessionsEvent.ToggleRead -> updateFilters { it.toggleRead(event.state) }
             SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
@@ -359,6 +360,13 @@ class SessionsViewModel(
                 } else {
                     scheduleReload(EVENT_DEBOUNCE_MS)
                 }
+            }
+            // Another client (or this one, from the chat) reported the idle transition as viewed.
+            is ServerEvent.Viewed -> {
+                sessionList = sessionList.map { session ->
+                    if (session.id == event.sessionId) session.copy(viewedAt = event.idleAt) else session
+                }
+                updateState { it.copy(groups = group(sessionList)) }
             }
             else -> Unit
         }

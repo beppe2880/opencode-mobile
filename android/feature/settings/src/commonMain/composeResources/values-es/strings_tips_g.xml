@@ -3,4 +3,7 @@
     <string name="tips_g_filters_title">Filtra tus sesiones</string>
     <string name="tips_g_filters_body">Limita la lista por fecha, resultado o archivadas. Archivar también ofrece Deshacer.</string>
     <string name="tips_g_filters_demo">Una lista de sesiones abre sus filtros y muestra una sesión archivada.</string>
+    <string name="tips_g_unread_title">Sesiones sin leer</string>
+    <string name="tips_g_unread_body">Un punto marca las sesiones cuyo último turno terminó después de la última vez que las viste. Abre la sesión para quitarlo o filtra la lista por sesiones sin leer desde el panel.</string>
+    <string name="tips_g_unread_demo">Aparece un punto en una sesión terminada; al tocar la fila desaparece.</string>
 </resources>

@@ -23,7 +23,7 @@
     <string name="sessions_filters">عوامل التصفية</string>
     <string name="sessions_filters_active">عوامل التصفية (%1$d)</string>
     <string name="sessions_filter_active">نشطة</string>
-    <string name="sessions_filter_status">عرض</string>
+    <string name="sessions_filter_status">الحالة</string>
     <string name="sessions_filter_last_updated">آخر تحديث</string>
     <string name="sessions_filter_any_time">أي وقت</string>
     <string name="sessions_filter_last_7_days">آخر 7 أيام</string>
@@ -31,6 +31,9 @@
     <string name="sessions_filter_custom_range">نطاق مخصص…</string>
     <string name="sessions_filter_range_hint">اختر تاريخ البداية والنهاية</string>
     <string name="sessions_filter_outcome">النتيجة</string>
+    <string name="sessions_unread">غير مقروءة</string>
+    <string name="sessions_read">مقروءة</string>
+    <string name="sessions_filter_read">حالة القراءة</string>
     <string name="sessions_outcome_succeeded">ناجحة</string>
     <string name="sessions_filter_reset">إعادة تعيين</string>
     <string name="sessions_filter_show">عرض الجلسات</string>
@@ -38,6 +41,8 @@
     <string name="sessions_filter_remove">إزالة عامل التصفية %1$s</string>
     <string name="sessions_empty_filter_title">لا توجد جلسات تطابق عوامل التصفية هذه</string>
     <string name="sessions_empty_filter_message">جرّب نطاق تاريخ أو نتيجة مختلفة، أو امسح عوامل التصفية.</string>
+    <string name="sessions_empty_unread_title">لا توجد جلسات غير مقروءة</string>
+    <string name="sessions_empty_unread_message">تبقى الجلسات غير مقروءة حتى تفتحها.</string>
     <string name="sessions_clear_filters">مسح عوامل التصفية</string>
     <string name="sessions_empty_archived_title">لا توجد جلسات مؤرشفة</string>
     <string name="sessions_empty_archived_message">تُخفى الجلسات التي تؤرشفها من القائمة الرئيسية وتظهر هنا.</string>
