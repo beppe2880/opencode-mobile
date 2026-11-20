@@ -3,9 +3,9 @@
 agp = "9.5.1"
 kotlin = "2.4.21"
 composeBom = "2026.09.00"
-kotlinxSerialization = "1.12.0"
+kotlinxSerialization = "1.13.0"
 kotlinxCoroutines = "1.11.0"
-ksp = "2.3.13"
+ksp = "2.3.14"
 spotless = "8.11.0"
 ktlint = "1.8.0"
 composeMultiplatform = "1.12.2"
@@ -40,14 +40,14 @@ ktor = "3.6.1"
 markdownRenderer = "0.46.0"
 highlights = "1.2.0"
 # Pinned: a bump needs a changelog review (minor versions changed the API before) and a check of the nesting limits in MathExtraction.
-latex = "1.7.3"
+latex = "1.7.5"
 
 # ---- QR decoding ----
 zxing = "3.5.4"
 
 # ---- Test ----
 junit = "4.13.2"
-robolectric = "4.17"
+robolectric = "4.18"
 testRunner = "1.7.0"
 androidxTestExtJunit = "1.3.0"
 uiautomator = "2.4.1"
