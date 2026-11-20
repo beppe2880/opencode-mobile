@@ -403,7 +403,7 @@
     <string name="settings_close_model_picker_sub">끄면 모델과 추론 수준을 함께 선택한 후 완료를 눌러 닫을 수 있습니다.</string>
     <string name="feature_section_changelog">변경 로그</string>
     <string name="feature_new">신규</string>
-    <string name="feature_by">%1$s 작성 · #%2$d</string>
+    <string name="feature_by">%1$s 작성 · %2$s</string>
     <string name="feature_math_title">수식이 수식처럼 보입니다</string>
     <string name="feature_math_body">답변의 수식은 도착하는 즉시 조판되어, 원시 LaTeX 대신 분수, 근호, 적분, 행렬로 표시됩니다. 메시지를 복사하면 여전히 LaTeX 원문을 얻을 수 있습니다.</string>
     <string name="feature_math_demo">답변이 도착하면서 수식이 LaTeX 원문에서 조판된 수학 기호로 바뀝니다.</string>

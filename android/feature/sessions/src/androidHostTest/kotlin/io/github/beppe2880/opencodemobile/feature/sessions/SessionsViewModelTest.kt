@@ -1531,11 +1531,14 @@ class SessionsViewModelTest {
         val vm = vm(repository)
         advanceUntilIdle()
         val loads = repository.listCalls
+        assertEquals(listOf(DayBucket.Unread, DayBucket.Today), vm.state.value.groups.map { it.bucket })
 
         vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
 
         assertEquals(SessionRead.Unread, vm.state.value.filters.readState)
         assertEquals(listOf("unread", "never-viewed"), vm.state.value.ids())
+        // The section would swallow the whole filtered list, so it keeps its day grouping.
+        assertEquals(listOf(DayBucket.Today), vm.state.value.groups.map { it.bucket })
         assertEquals(loads, repository.listCalls)
 
         vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Read))

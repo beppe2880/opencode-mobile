@@ -244,7 +244,7 @@ fun FeatureRoute(id: String, onBack: () -> Unit, modifier: Modifier = Modifier) 
                 Text(stringResource(card.title), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold), color = c.textBase)
                 Text(stringResource(card.body), style = MaterialTheme.typography.bodyLarge, color = c.textMuted)
                 Author(card, openUrl)
-                card.pullRequest?.let { pr ->
+                card.latestPullRequest?.let { pr ->
                     OcButton(
                         text = stringResource(Res.string.feature_open_pr),
                         onClick = { openUrl("https://github.com/beppe2880/opencode-mobile/pull/$pr") },

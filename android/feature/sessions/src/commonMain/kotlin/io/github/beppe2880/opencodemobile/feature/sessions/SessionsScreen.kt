@@ -645,6 +645,7 @@ private fun LazyListScope.skeletonItems() {
 
 private fun DayBucket.label(): StringResource = when (this) {
     DayBucket.Pinned -> Res.string.sessions_pinned
+    DayBucket.Unread -> Res.string.sessions_unread
     DayBucket.Today -> Res.string.sessions_today
     DayBucket.Yesterday -> Res.string.sessions_yesterday
     DayBucket.ThisWeek -> Res.string.sessions_this_week

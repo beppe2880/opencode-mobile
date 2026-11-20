@@ -406,7 +406,7 @@
     <string name="settings_close_model_picker_sub">Turn off to choose the model and reasoning together, then tap Done to close.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">New</string>
-    <string name="feature_by">By %1$s · #%2$d</string>
+    <string name="feature_by">By %1$s · %2$s</string>
     <string name="feature_math_title">Math that reads like math</string>
     <string name="feature_math_body">Formulas in replies are typeset as they arrive: fractions, roots, integrals and matrices instead of raw LaTeX. Copying a message still gives you the LaTeX source.</string>
     <string name="feature_math_demo">A reply streams in and its formulas turn from LaTeX source into typeset math.</string>

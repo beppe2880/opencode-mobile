@@ -406,7 +406,7 @@
     <string name="settings_close_model_picker_sub">Désactivez pour choisir le modèle et le raisonnement ensemble, puis touchez Terminé pour fermer.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">Nouveau</string>
-    <string name="feature_by">Par %1$s · #%2$d</string>
+    <string name="feature_by">Par %1$s · %2$s</string>
     <string name="feature_math_title">Des maths qui se lisent comme des maths</string>
     <string name="feature_math_body">Les formules des réponses sont mises en forme au fur et à mesure de leur arrivée : fractions, racines, intégrales et matrices au lieu du LaTeX brut. Copier un message donne toujours le code source LaTeX.</string>
     <string name="feature_math_demo">Une réponse arrive et ses formules passent du code LaTeX à des maths mises en forme.</string>

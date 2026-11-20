@@ -34,6 +34,7 @@ internal val tipsCardsG: List<FeatureCard> = listOf(
         demoDescription = Res.string.tips_g_unread_demo,
         author = "Azykle",
         pullRequest = 248,
+        morePullRequests = listOf(251),
         demo = { UnreadSessionsDemo(it) },
     ),
 )
