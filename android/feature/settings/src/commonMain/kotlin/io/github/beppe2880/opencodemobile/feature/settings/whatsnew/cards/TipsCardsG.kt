@@ -33,7 +33,7 @@ internal val tipsCardsG: List<FeatureCard> = listOf(
         body = Res.string.tips_g_unread_body,
         demoDescription = Res.string.tips_g_unread_demo,
         author = "Azykle",
-        pullRequest = null,
+        pullRequest = 248,
         demo = { UnreadSessionsDemo(it) },
     ),
 )
