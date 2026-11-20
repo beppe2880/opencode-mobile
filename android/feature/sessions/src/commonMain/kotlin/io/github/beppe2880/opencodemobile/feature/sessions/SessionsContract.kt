@@ -12,8 +12,11 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
-/** Groups of the list, in the order shown. [Pinned] holds the pinned sessions of any day, above the days. */
-enum class DayBucket { Pinned, Today, Yesterday, ThisWeek, Older }
+/**
+ * Groups of the list, in the order shown. [Pinned] holds the pinned sessions of any day, [Unread] the
+ * unread sessions that are not pinned, both above the days.
+ */
+enum class DayBucket { Pinned, Unread, Today, Yesterday, ThisWeek, Older }
 
 @Immutable
 data class SessionGroup(val bucket: DayBucket, val sessions: List<Session>)

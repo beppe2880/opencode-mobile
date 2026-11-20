@@ -448,7 +448,11 @@ class SessionsViewModel(
             }.awaitAll()
         }
         if (serverId != server) return
-        updateState { it.copy(waiting = waiting.mapNotNull { (id, w) -> w?.let { id to it } }.toMap()) }
+        val next = waiting.mapNotNull { (id, w) -> w?.let { id to it } }.toMap()
+        updateState {
+            // A session that starts or stops waiting enters or leaves the unread group.
+            it.copy(waiting = next, groups = group(sessionList, it.filters, next.keys))
+        }
     }
 
     /** What [ids] wait for, null when nothing; a failure when a request list could not be read. */
@@ -556,7 +560,10 @@ class SessionsViewModel(
     internal fun group(list: List<Session>): List<SessionGroup> = group(list, currentState.filters)
 
     private fun group(list: List<Session>, filters: SessionFilters): List<SessionGroup> =
-        groupSessions(list, pinnedIds, clock(), zone, filters)
+        group(list, filters, currentState.waiting.keys)
+
+    private fun group(list: List<Session>, filters: SessionFilters, waiting: Set<String>): List<SessionGroup> =
+        groupSessions(list, pinnedIds, clock(), zone, filters, waiting)
 
     private fun setPinned(sessionId: String, pinned: Boolean) {
         updateState { it.copy(actionsFor = null) }

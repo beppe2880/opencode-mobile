@@ -4,6 +4,6 @@
     <string name="tips_g_filters_body">按日期、结果或归档状态缩小列表。归档后还可以撤销。</string>
     <string name="tips_g_filters_demo">会话列表打开筛选条件并显示已归档的会话。</string>
     <string name="tips_g_unread_title">未读会话</string>
-    <string name="tips_g_unread_body">圆点标记的是在你上次查看之后才结束最新一轮的会话。打开会话即可清除，或在筛选面板中只看未读会话。</string>
-    <string name="tips_g_unread_demo">已结束的会话会出现圆点，点击该行即可清除。</string>
+    <string name="tips_g_unread_body">圆点标记的是在你上次查看之后才结束最新一轮的会话。未读会话位于固定会话下方的独立分组，始终排在最前面；打开会话即可清除圆点并回到所属日期。</string>
+    <string name="tips_g_unread_demo">已结束的会话会出现圆点并移到未读分组；点击后圆点消失并回到今天。</string>
 </resources>

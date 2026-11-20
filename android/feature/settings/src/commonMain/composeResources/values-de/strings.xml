@@ -406,7 +406,7 @@
     <string name="settings_close_model_picker_sub">Deaktivieren, um Modell und Denkaufwand gemeinsam zu wählen. Danach mit Fertig schließen.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">Neu</string>
-    <string name="feature_by">Von %1$s · #%2$d</string>
+    <string name="feature_by">Von %1$s · %2$s</string>
     <string name="feature_math_title">Mathe, die wie Mathe aussieht</string>
     <string name="feature_math_body">Formeln in Antworten werden beim Eintreffen gesetzt: Brüche, Wurzeln, Integrale und Matrizen statt rohem LaTeX. Beim Kopieren einer Nachricht erhältst du weiterhin den LaTeX-Quelltext.</string>
     <string name="feature_math_demo">Eine Antwort trifft ein, und ihre Formeln wechseln vom LaTeX-Quelltext zu gesetzter Mathematik.</string>

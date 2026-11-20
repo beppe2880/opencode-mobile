@@ -116,7 +116,8 @@ val fakeDataModule = module {
     single<DraftRepository> { FakeDrafts() }
     single<RecentModelRepository> { FakeRecentModels() }
     single<FolderPreferences> { FakeFolderPreferences() }
-    single<PinnedSessionRepository> { InMemoryPinnedSessions() }
+    // Pins the newest and an old session, so the list shows Pinned above the days, with an unread and a read pin.
+    single<PinnedSessionRepository> { InMemoryPinnedSessions(setOf("ses_1", "ses_8")) }
     // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
     single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }

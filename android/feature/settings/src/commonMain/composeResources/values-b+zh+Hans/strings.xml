@@ -403,7 +403,7 @@
     <string name="settings_close_model_picker_sub">关闭此选项可一起选择模型和推理级别，然后点按“完成”关闭。</string>
     <string name="feature_section_changelog">更新日志</string>
     <string name="feature_new">新</string>
-    <string name="feature_by">作者 %1$s · #%2$d</string>
+    <string name="feature_by">作者 %1$s · %2$s</string>
     <string name="feature_math_title">数学公式，所见即所得</string>
     <string name="feature_math_body">回复中的公式会在到达时排版显示：分数、根号、积分和矩阵，而不是原始 LaTeX。复制消息仍会得到 LaTeX 源码。</string>
     <string name="feature_math_demo">一条回复逐步输出，其中的公式从 LaTeX 源码变为排版好的数学公式。</string>
