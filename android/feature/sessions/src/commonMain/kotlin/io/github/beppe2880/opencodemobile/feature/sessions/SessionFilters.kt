@@ -6,6 +6,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
@@ -73,3 +74,18 @@ private fun SessionDateFilter.matches(updatedAt: Long, today: LocalDate, zone: T
         is SessionDateFilter.Custom -> from <= to && updated in from..to
     }
 }
+
+/**
+ * The oldest instant [this] can match (epoch millis), used to stop reading older pages once the
+ * range is covered; null when the filter has no lower bound.
+ */
+internal fun SessionDateFilter.lowerBound(today: LocalDate, zone: TimeZone): Long? = when (this) {
+    SessionDateFilter.AnyTime -> null
+    SessionDateFilter.Today -> today.startOfDay(zone)
+    SessionDateFilter.Yesterday -> today.minus(1, DateTimeUnit.DAY).startOfDay(zone)
+    SessionDateFilter.Last7Days -> today.minus(6, DateTimeUnit.DAY).startOfDay(zone)
+    SessionDateFilter.Last30Days -> today.minus(29, DateTimeUnit.DAY).startOfDay(zone)
+    is SessionDateFilter.Custom -> from.startOfDay(zone)
+}
+
+private fun LocalDate.startOfDay(zone: TimeZone): Long = atStartOfDayIn(zone).toEpochMilliseconds()

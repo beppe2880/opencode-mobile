@@ -108,6 +108,17 @@ class SessionFiltersTest {
     }
 
     @Test
+    fun dateFiltersStartAtTheLocalMidnightOfTheirFirstDay() {
+        assertEquals(at(today, hour = 0), SessionDateFilter.Today.lowerBound(today, zone))
+        assertEquals(at(today.minus(1, kotlinx.datetime.DateTimeUnit.DAY), hour = 0), SessionDateFilter.Yesterday.lowerBound(today, zone))
+        assertEquals(at(today.minus(6, kotlinx.datetime.DateTimeUnit.DAY), hour = 0), SessionDateFilter.Last7Days.lowerBound(today, zone))
+        assertEquals(at(today.minus(29, kotlinx.datetime.DateTimeUnit.DAY), hour = 0), SessionDateFilter.Last30Days.lowerBound(today, zone))
+        val from = today.minus(10, kotlinx.datetime.DateTimeUnit.DAY)
+        assertEquals(at(from, hour = 0), SessionDateFilter.Custom(from, today).lowerBound(today, zone))
+        assertNull(SessionDateFilter.AnyTime.lowerBound(today, zone))
+    }
+
+    @Test
     fun outcomeFilterMatchesOnlySelectedOutcomes() {
         val filters = SessionFilters(outcomes = setOf(SessionOutcome.Failed, SessionOutcome.Interrupted))
 

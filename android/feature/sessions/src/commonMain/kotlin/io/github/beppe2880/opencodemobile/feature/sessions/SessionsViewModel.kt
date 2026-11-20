@@ -147,7 +147,11 @@ class SessionsViewModel(
             SessionsEvent.OpenFilters -> updateState { it.copy(filterSheetOpen = true) }
             SessionsEvent.DismissFilters -> updateState { it.copy(filterSheetOpen = false) }
             is SessionsEvent.ToggleStatus -> toggleStatus(event.status)
-            is SessionsEvent.SetDateFilter -> updateFilters { it.copy(date = event.filter) }
+            is SessionsEvent.SetDateFilter -> if (event.filter != currentState.filters.date) {
+                updateFilters { it.copy(date = event.filter) }
+                // A range is read from the server page by page; the loaded page may be too narrow.
+                load(initial = false)
+            }
             is SessionsEvent.ToggleOutcome -> updateFilters { current ->
                 current.copy(
                     outcomes = if (event.outcome in current.outcomes) {
@@ -571,7 +575,9 @@ class SessionsViewModel(
     }
 
     private fun resetFilters() {
-        val wasFiltered = currentState.filters.effectiveStatuses != SessionFilters().effectiveStatuses
+        val current = currentState.filters
+        val wasFiltered = current.effectiveStatuses != SessionFilters().effectiveStatuses ||
+            current.date != SessionDateFilter.AnyTime
         val filters = SessionFilters()
         if (wasFiltered) {
             sessionList = emptyList()
@@ -665,14 +671,24 @@ class SessionsViewModel(
     ): Result<List<Session>> {
         val statuses = filters.effectiveStatuses
         val limit = if (filters.date == SessionDateFilter.AnyTime) DEFAULT_LIST_LIMIT else FILTERED_LIST_LIMIT
+        val today = Instant.fromEpochMilliseconds(clock()).toLocalDateTime(zone).date
+        val notBefore = filters.date.lowerBound(today, zone)
+
+        // A date range keeps reading older pages until its first day; other filters take one page.
+        suspend fun listStatus(archived: Boolean): Result<List<Session>> =
+            if (notBefore == null) {
+                sessions.list(search, directory, limit, archived = archived)
+            } else {
+                sessions.listUntil(search, directory, limit, archived = archived, notBefore = notBefore)
+            }
         val results = if (statuses.size > 1) {
             coroutineScope {
-                val active = async { sessions.list(search, directory, limit, archived = false) }
-                val archived = async { sessions.list(search, directory, limit, archived = true) }
+                val active = async { listStatus(false) }
+                val archived = async { listStatus(true) }
                 listOf(active.await(), archived.await())
             }
         } else {
-            listOf(sessions.list(search, directory, limit, archived = statuses.single() == SessionStatus.Archived))
+            listOf(listStatus(statuses.single() == SessionStatus.Archived))
         }
         val successful = results.mapNotNull { it.getOrNull() }
         if (successful.isEmpty()) return results.first()

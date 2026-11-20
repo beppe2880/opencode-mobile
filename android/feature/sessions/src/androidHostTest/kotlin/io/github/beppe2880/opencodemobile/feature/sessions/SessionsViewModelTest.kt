@@ -170,7 +170,7 @@ class SessionsViewModelTest {
     }
 
     @Test
-    fun `date and outcome filters narrow the loaded list without loading again`() = runTest(main.testDispatcher) {
+    fun `a date filter reloads the list and the outcome narrows it without loading again`() = runTest(main.testDispatcher) {
         sessions.listResult = Result.success(
             listOf(
                 session("failed-today", now - hour, outcome = SessionOutcome.Failed),
@@ -180,14 +180,36 @@ class SessionsViewModelTest {
         )
         val vm = vm()
         advanceUntilIdle()
-        val loads = sessions.listCalls
+        assertTrue(sessions.untilCalls.isEmpty())
 
         vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.Today))
+        advanceUntilIdle()
         assertEquals(listOf("failed-today", "succeeded-today"), vm.state.value.ids())
+        assertEquals(1, sessions.untilCalls.size)
+        val loads = sessions.listCalls
 
         vm.onEvent(SessionsEvent.ToggleOutcome(SessionOutcome.Failed))
         assertEquals(listOf("failed-today"), vm.state.value.ids())
         assertEquals(loads, sessions.listCalls)
+    }
+
+    @Test
+    fun `a date range is read down to the start of its first day`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(listOf(session("today", now - hour)))
+        val vm = vm(repository)
+        advanceUntilIdle()
+        assertTrue(repository.untilCalls.isEmpty())
+
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.Last7Days))
+        advanceUntilIdle()
+
+        val start = LocalDateTime.of(2026, 10, 7, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli()
+        assertEquals(listOf(start), repository.untilCalls)
+
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.AnyTime))
+        advanceUntilIdle()
+
+        assertEquals(1, repository.untilCalls.size)
     }
 
     @Test
@@ -1518,6 +1540,7 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var archiveSupported = true
     var listCalls = 0
     val archivedCalls = mutableListOf<Pair<String, Boolean>>()
+    val untilCalls = mutableListOf<Long>()
     val created = mutableListOf<String>()
     val createdModels = mutableListOf<ModelRef?>()
     val storedLists = mutableMapOf<Pair<String, String?>, List<Session>>()
@@ -1533,6 +1556,16 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
         lastDirectory = directory
         lastArchived = archived
         return if (archived == true) archivedResult ?: listResult else listResult
+    }
+    override suspend fun listUntil(
+        search: String?,
+        directory: String?,
+        limit: Int,
+        archived: Boolean?,
+        notBefore: Long,
+    ): Result<List<Session>> {
+        untilCalls += notBefore
+        return listResult
     }
     override suspend fun cachedList(serverId: String, directory: String?): List<Session>? = storedLists[serverId to directory]
     override suspend fun cachedProjects(serverId: String): List<Project>? = storedProjects[serverId]

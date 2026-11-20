@@ -47,6 +47,11 @@ class RemoteRepositoriesTest {
     private fun userMessage(index: Int) =
         """{"id":"msg_$index","time":{"created":$index},"type":"user","text":"prompt $index"}"""
 
+    private fun sessionJson(id: String, updated: Long) =
+        """{"id":"$id","projectID":"p","cost":0,""" +
+            """"tokens":{"input":0,"output":0,"reasoning":0,"cache":{"read":0,"write":0}},""" +
+            """"time":{"created":1,"updated":$updated},"location":{"directory":"/repo"}}"""
+
     @Test
     fun `archiving support comes from the server version`() = runBlocking {
         val sessions = RemoteSessionRepository(graph.clients)
@@ -57,6 +62,33 @@ class RemoteRepositoriesTest {
         assertFalse(sessions.archiveSupported())
         assertEquals("/api/info", server.takeRequest().path)
         assertEquals("/api/info", server.takeRequest().path)
+    }
+
+    @Test
+    fun `a date range keeps reading older pages until the cutoff`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(
+            json(
+                """{"data":[${sessionJson("ses_1", 100)},${sessionJson("ses_2", 90)}],""" +
+                    """"cursor":{"previous":null,"next":"c2"}}""",
+            ),
+        )
+        server.enqueue(
+            json(
+                """{"data":[${sessionJson("ses_3", 80)},${sessionJson("ses_4", 50)}],""" +
+                    """"cursor":{"previous":"c1","next":"c3"}}""",
+            ),
+        )
+
+        val list = sessions.listUntil(limit = 500, archived = false, notBefore = 60).getOrThrow()
+
+        assertEquals(listOf("ses_1", "ses_2", "ses_3", "ses_4"), list.map { it.id })
+        val first = server.takeRequest()
+        val second = server.takeRequest()
+        assertEquals("200", first.requestUrl!!.queryParameter("limit"))
+        assertNull(first.requestUrl!!.queryParameter("cursor"))
+        assertEquals("c2", second.requestUrl!!.queryParameter("cursor"))
+        assertEquals(2, server.requestCount)
     }
 
     @Test

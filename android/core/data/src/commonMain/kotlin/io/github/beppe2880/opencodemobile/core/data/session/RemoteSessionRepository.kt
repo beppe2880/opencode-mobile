@@ -79,6 +79,51 @@ internal class RemoteSessionRepository(
         sessions
     }
 
+    override suspend fun listUntil(
+        search: String?,
+        directory: String?,
+        limit: Int,
+        archived: Boolean?,
+        notBefore: Long,
+    ): Result<List<Session>> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        val query = search?.trim()?.takeIf { it.isNotEmpty() }
+        val pageSize = minOf(limit, PAGE_SIZE)
+        val seen = HashSet<String>()
+        val sessions = mutableListOf<Session>()
+        var cursor: String? = null
+        var pages = 0
+        do {
+            val page = awaitBody {
+                api.sessionList(
+                    limit = pageSize.toString(),
+                    order = SessionApi.OrderSessionList.DESC,
+                    search = query,
+                    parentID = ROOT_SESSIONS,
+                    archived = archived?.let { if (it) SessionApi.ArchivedSessionList.TRUE else SessionApi.ArchivedSessionList.FALSE },
+                    directory = directory,
+                    cursor = cursor,
+                )
+            }
+            val batch = page.data.map { it.toDomain() }
+            // A server without cursor support repeats the first page; the ids show when to stop.
+            val added = batch.filter { seen.add(it.id) }
+            sessions += added
+            cursor = page.cursor.next
+            pages++
+        } while (
+            added.isNotEmpty() && cursor != null && sessions.size < limit && pages < MAX_PAGES &&
+            batch.lastOrNull()?.updatedAt?.let { it >= notBefore } == true
+        )
+        val result = sessions.take(limit)
+        remember(profile.id, result)
+        if (query == null && archived != true) {
+            lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(result))
+        }
+        result
+    }
+
     override suspend fun cachedList(serverId: String, directory: String?): List<Session>? {
         val raw = lists.read(serverId, ListCache.sessionsKey(directory)) ?: return null
         return withContext(Dispatchers.Default) { SessionListCodec.decodeSessions(raw) }?.also { remember(serverId, it) }
@@ -166,5 +211,11 @@ internal class RemoteSessionRepository(
     private companion object {
         /** `parentID=null` asks the server for root sessions only. */
         const val ROOT_SESSIONS = "null"
+
+        /** Sessions read per page while filling a date range. */
+        const val PAGE_SIZE = 200
+
+        /** A server that ignores the cursor would repeat a page; the id check stops first. */
+        const val MAX_PAGES = 10
     }
 }

@@ -82,6 +82,19 @@ interface SessionRepository {
      */
     suspend fun list(search: String? = null, directory: String? = null, limit: Int = 100, archived: Boolean? = null): Result<List<Session>>
 
+    /**
+     * Like [list], but follows the server's cursor until [notBefore] (epoch millis) is passed or
+     * [limit] sessions are read, so a date range is filled on a large history too. Servers that do
+     * not paginate return a single page, like [list].
+     */
+    suspend fun listUntil(
+        search: String? = null,
+        directory: String? = null,
+        limit: Int = 100,
+        archived: Boolean? = null,
+        notBefore: Long,
+    ): Result<List<Session>> = list(search, directory, limit, archived)
+
     /** IDs of sessions currently executing. */
     suspend fun active(): Result<Set<String>>
 
