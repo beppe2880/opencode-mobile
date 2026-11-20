@@ -23,12 +23,15 @@
 
 package io.github.beppe2880.opencodemobile.api.apis
 
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalFsUnwatchRequest
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalFsWatchRequest
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalFsWrite200Response
 import io.github.beppe2880.opencodemobile.api.models.FsFind200Response
 import io.github.beppe2880.opencodemobile.api.models.FsList200Response
 import io.github.beppe2880.opencodemobile.api.models.FsRead404Response
 import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
+import io.github.beppe2880.opencodemobile.api.models.ServiceUnavailableErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.UnauthorizedErrorEncoded
 
 import io.github.beppe2880.opencodemobile.api.infrastructure.*
@@ -59,6 +62,74 @@ open class FilesystemApi : ApiClient {
         baseUrl: String,
         httpClient: HttpClient
     ): super(baseUrl = baseUrl, httpClient = httpClient)
+
+    /**
+     * Unwatch file
+     * Stop watching one file relative to the requested location. Experimental: may change without compatibility guarantees.
+     * @param experimentalFsUnwatchRequest 
+     * @param locationDirectory  (optional)
+     * @return void
+     */
+    open suspend fun experimentalFsUnwatch(experimentalFsUnwatchRequest: ExperimentalFsUnwatchRequest, locationDirectory: kotlin.String? = null): HttpResponse<Unit> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = experimentalFsUnwatchRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        locationDirectory?.apply { localVariableQuery["location[directory]"] = listOf("$locationDirectory") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/api/experimental/fs/watch",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * Watch file
+     * Watch one file relative to the requested location for 24 hours, publishing filesystem.changed on that location when it changes. Watching an already watched file resets its expiry. Paths follow read confinement. Experimental: may change without compatibility guarantees.
+     * @param experimentalFsWatchRequest 
+     * @param locationDirectory  (optional)
+     * @return void
+     */
+    open suspend fun experimentalFsWatch(experimentalFsWatchRequest: ExperimentalFsWatchRequest, locationDirectory: kotlin.String? = null): HttpResponse<Unit> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = experimentalFsWatchRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        locationDirectory?.apply { localVariableQuery["location[directory]"] = listOf("$locationDirectory") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/api/experimental/fs/watch",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
 
     /**
      * Write file

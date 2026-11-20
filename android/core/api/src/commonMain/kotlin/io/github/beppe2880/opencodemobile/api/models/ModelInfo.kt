@@ -29,6 +29,7 @@ import io.github.beppe2880.opencodemobile.api.models.ModelCost
 import io.github.beppe2880.opencodemobile.api.models.ModelInfoLimit
 import io.github.beppe2880.opencodemobile.api.models.ModelInfoTime
 import io.github.beppe2880.opencodemobile.api.models.ModelSettings
+import io.github.beppe2880.opencodemobile.api.models.ModelType
 import io.github.beppe2880.opencodemobile.api.models.ModelVariant
 
 import kotlinx.serialization.Serializable
@@ -47,9 +48,10 @@ import kotlinx.serialization.Contextual
  * @param time 
  * @param cost 
  * @param status 
- * @param enabled 
+ * @param enabled Archive the session with true or restore it with false. Repeating the current state is a no-op.
  * @param limit 
  * @param canonical Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param type 
  * @param family Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param compatibility 
  * @param `package` Maximum number of sessions to return. Defaults to the newest 50 sessions.
@@ -63,19 +65,19 @@ data class ModelInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "modelID")
-    val modelID: kotlin.String?,
+    val modelID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "providerID")
-    val providerID: kotlin.String?,
+    val providerID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "name")
-    val name: kotlin.String?,
+    val name: kotlin.String,
 
     @SerialName(value = "capabilities")
     val capabilities: ModelCapabilities,
@@ -92,8 +94,9 @@ data class ModelInfo (
     @SerialName(value = "status")
     val status: ModelInfo.Status,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "enabled")
-    val enabled: kotlin.Boolean,
+    val enabled: kotlin.Boolean?,
 
     @SerialName(value = "limit")
     val limit: ModelInfoLimit,
@@ -101,6 +104,9 @@ data class ModelInfo (
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "canonical")
     val canonical: kotlin.String? = null,
+
+    @SerialName(value = "type")
+    val type: ModelType? = null,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "family")

@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -32,6 +33,8 @@ import kotlinx.serialization.Contextual
  * 
  *
  * @param text Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param tokens 
+ * @param cost 
  */
 @Serializable
 
@@ -39,7 +42,13 @@ data class SessionGenerateResponseData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "text")
-    val text: kotlin.String?
+    val text: kotlin.String,
+
+    @SerialName(value = "tokens")
+    val tokens: TokenUsageInfo,
+
+    @SerialName(value = "cost")
+    val cost: kotlin.Double
 
 ) {
 

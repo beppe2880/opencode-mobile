@@ -24,7 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.LocationPublicRef
-import io.github.beppe2880.opencodemobile.api.models.ShellInfo
+import io.github.beppe2880.opencodemobile.api.models.ShellInfo1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -44,7 +44,7 @@ data class ShellCreate200Response (
     val location: LocationPublicRef?,
 
     @SerialName(value = "data")
-    val `data`: ShellInfo
+    val `data`: ShellInfo1
 
 ) {
 

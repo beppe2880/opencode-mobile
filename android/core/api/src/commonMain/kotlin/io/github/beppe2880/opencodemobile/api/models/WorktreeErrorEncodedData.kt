@@ -40,7 +40,7 @@ data class WorktreeErrorEncodedData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "message")
-    val message: kotlin.String?,
+    val message: kotlin.String,
 
     @SerialName(value = "forceRequired")
     val forceRequired: kotlin.Boolean? = null

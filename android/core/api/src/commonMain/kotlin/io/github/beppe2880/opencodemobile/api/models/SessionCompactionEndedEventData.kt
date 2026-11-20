@@ -24,8 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.ModelRef
-import io.github.beppe2880.opencodemobile.api.models.SessionProviderContext
-import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
+import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -37,10 +36,8 @@ import kotlinx.serialization.Contextual
  * @param sessionID 
  * @param reason 
  * @param text 
- * @param recent 
  * @param model 
- * @param providerState 
- * @param providerContext 
+ * @param native 
  * @param cost 
  * @param tokens 
  */
@@ -57,23 +54,17 @@ data class SessionCompactionEndedEventData (
     @SerialName(value = "text")
     val text: kotlin.String,
 
-    @SerialName(value = "recent")
-    val recent: kotlin.String,
-
     @SerialName(value = "model")
     val model: ModelRef? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
-
-    @SerialName(value = "providerContext")
-    val providerContext: SessionProviderContext? = null,
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null,
 
     @SerialName(value = "cost")
     val cost: kotlin.Double? = null,
 
     @SerialName(value = "tokens")
-    val tokens: TokenUsageInfo? = null
+    val tokens: TokenUsageInfo1? = null
 
 ) {
 

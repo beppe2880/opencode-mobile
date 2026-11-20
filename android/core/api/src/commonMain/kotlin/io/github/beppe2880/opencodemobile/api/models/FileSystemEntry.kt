@@ -40,7 +40,7 @@ data class FileSystemEntry (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "path")
-    val path: kotlin.String?,
+    val path: kotlin.String,
 
     @SerialName(value = "type")
     val type: FileSystemEntry.Type

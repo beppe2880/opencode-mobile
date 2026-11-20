@@ -24,7 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxDelivery
-import io.github.beppe2880.opencodemobile.api.models.SessionInboxMovePayload
+import io.github.beppe2880.opencodemobile.api.models.SessionInboxMovePayload1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -45,7 +45,7 @@ data class SessionInboxItemAnyOf3 (
     val type: SessionInboxItemAnyOf3.Type,
 
     @SerialName(value = "payload")
-    val payload: SessionInboxMovePayload,
+    val payload: SessionInboxMovePayload1,
 
     @Contextual @SerialName(value = "delivery")
     val delivery: SessionInboxDelivery

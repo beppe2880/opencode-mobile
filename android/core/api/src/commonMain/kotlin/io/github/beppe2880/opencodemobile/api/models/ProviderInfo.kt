@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.ProviderCompatibility
 import io.github.beppe2880.opencodemobile.api.models.ProviderSettings
 
 import kotlinx.serialization.Serializable
@@ -38,6 +39,7 @@ import kotlinx.serialization.Contextual
  * @param `package` 
  * @param canonical Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param integrationID Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param compatibility 
  * @param settings 
  * @param headers 
  * @param body 
@@ -48,7 +50,7 @@ data class ProviderInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     @SerialName(value = "name")
     val name: kotlin.String,
@@ -66,6 +68,9 @@ data class ProviderInfo (
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "integrationID")
     val integrationID: kotlin.String? = null,
+
+    @SerialName(value = "compatibility")
+    val compatibility: ProviderCompatibility? = null,
 
     @SerialName(value = "settings")
     val settings: ProviderSettings? = null,

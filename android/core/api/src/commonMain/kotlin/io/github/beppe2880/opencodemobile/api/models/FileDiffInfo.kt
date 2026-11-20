@@ -36,6 +36,7 @@ import kotlinx.serialization.Contextual
  * @param additions 
  * @param deletions 
  * @param status 
+ * @param more 
  */
 @Serializable
 
@@ -54,7 +55,10 @@ data class FileDiffInfo (
     val deletions: kotlin.Long,
 
     @SerialName(value = "status")
-    val status: FileDiffInfo.Status
+    val status: FileDiffInfo.Status,
+
+    @SerialName(value = "more")
+    val more: kotlin.Boolean? = null
 
 ) {
 

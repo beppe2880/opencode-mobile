@@ -25,7 +25,7 @@ package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.LocationRef
 import io.github.beppe2880.opencodemobile.api.models.SessionCreatedEventDurable
-import io.github.beppe2880.opencodemobile.api.models.SessionStepStreamedEventData
+import io.github.beppe2880.opencodemobile.api.models.SessionStepFirstTokenEventData
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -59,7 +59,7 @@ data class SessionStepStreamedEvent (
     val durable: SessionCreatedEventDurable,
 
     @SerialName(value = "data")
-    val `data`: SessionStepStreamedEventData,
+    val `data`: SessionStepFirstTokenEventData,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,

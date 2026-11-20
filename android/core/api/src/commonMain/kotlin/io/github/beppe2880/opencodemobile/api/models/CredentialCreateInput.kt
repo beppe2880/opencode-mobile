@@ -44,7 +44,7 @@ data class CredentialCreateInput (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "integrationID")
-    val integrationID: kotlin.String?,
+    val integrationID: kotlin.String,
 
     @SerialName(value = "value")
     val `value`: CredentialValue,

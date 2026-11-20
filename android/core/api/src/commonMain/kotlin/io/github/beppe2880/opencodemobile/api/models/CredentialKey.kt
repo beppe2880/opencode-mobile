@@ -34,7 +34,6 @@ import kotlinx.serialization.Contextual
  * @param type 
  * @param key 
  * @param metadata 
- * @param configuration 
  */
 @Serializable
 
@@ -47,10 +46,7 @@ data class CredentialKey (
     val key: kotlin.String,
 
     @Contextual @SerialName(value = "metadata")
-    val metadata: kotlinx.serialization.json.JsonObject? = null,
-
-    @Contextual @SerialName(value = "configuration")
-    val configuration: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null
+    val metadata: kotlinx.serialization.json.JsonObject? = null
 
 ) {
 

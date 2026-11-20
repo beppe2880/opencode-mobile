@@ -44,19 +44,19 @@ data class PermissionSavedInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "action")
-    val action: kotlin.String?,
+    val action: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "resource")
-    val resource: kotlin.String?,
+    val resource: kotlin.String,
 
     @SerialName(value = "time")
     val time: PermissionSavedInfoTime

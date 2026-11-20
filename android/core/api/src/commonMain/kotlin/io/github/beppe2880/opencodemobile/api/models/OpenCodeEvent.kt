@@ -26,10 +26,12 @@ package io.github.beppe2880.opencodemobile.api.models
 import kotlin.jvm.JvmInline
 
 import io.github.beppe2880.opencodemobile.api.models.AgentUpdatedEvent
+import io.github.beppe2880.opencodemobile.api.models.ArtifactUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.CommandUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.ConfigUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.CredentialSwitchedEvent
 import io.github.beppe2880.opencodemobile.api.models.CredentialUpdatedEvent
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalMcpEventEvent
 import io.github.beppe2880.opencodemobile.api.models.FilesystemChangedEvent
 import io.github.beppe2880.opencodemobile.api.models.FormCancelledEvent
 import io.github.beppe2880.opencodemobile.api.models.FormCreatedEvent
@@ -47,6 +49,7 @@ import io.github.beppe2880.opencodemobile.api.models.PermissionAskedEvent
 import io.github.beppe2880.opencodemobile.api.models.PermissionRepliedEvent
 import io.github.beppe2880.opencodemobile.api.models.PersistentPtyAddedEvent
 import io.github.beppe2880.opencodemobile.api.models.PersistentPtyRemovedEvent
+import io.github.beppe2880.opencodemobile.api.models.PersistentPtyUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.PluginUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.ProjectUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.ProviderUpdatedEvent
@@ -57,6 +60,7 @@ import io.github.beppe2880.opencodemobile.api.models.PtyUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.ReferenceUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.ServerConnectedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionAgentSelectedEvent
+import io.github.beppe2880.opencodemobile.api.models.SessionArchivedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionCompactionDeltaEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionCompactionEndedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionCompactionFailedEvent
@@ -93,6 +97,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionSkillActivatedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionStatusUpdated
 import io.github.beppe2880.opencodemobile.api.models.SessionStepEndedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionStepFailedEvent
+import io.github.beppe2880.opencodemobile.api.models.SessionStepFirstTokenEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionStepStartedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionStepStreamedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionSyntheticEvent
@@ -106,6 +111,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionToolInputEndedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionToolInputStartedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionToolProgressEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionToolSuccessEvent
+import io.github.beppe2880.opencodemobile.api.models.SessionUnarchivedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionUsageUpdatedEvent
 import io.github.beppe2880.opencodemobile.api.models.SessionViewedEvent
 import io.github.beppe2880.opencodemobile.api.models.ShellCreatedEvent
@@ -147,6 +153,9 @@ sealed interface OpenCodeEvent {
      value class AgentupdatedWrapper(val value: AgentUpdatedEvent) : OpenCodeEvent
 
     @JvmInline
+     value class ArtifactupdatedWrapper(val value: ArtifactUpdatedEvent) : OpenCodeEvent
+
+    @JvmInline
      value class CommandupdatedWrapper(val value: CommandUpdatedEvent) : OpenCodeEvent
 
     @JvmInline
@@ -157,6 +166,9 @@ sealed interface OpenCodeEvent {
 
     @JvmInline
      value class CredentialupdatedWrapper(val value: CredentialUpdatedEvent) : OpenCodeEvent
+
+    @JvmInline
+     value class ExperimentalmcpeventWrapper(val value: ExperimentalMcpEventEvent) : OpenCodeEvent
 
     @JvmInline
      value class FilesystemchangedWrapper(val value: FilesystemChangedEvent) : OpenCodeEvent
@@ -207,6 +219,9 @@ sealed interface OpenCodeEvent {
      value class PersistentPtyremovedWrapper(val value: PersistentPtyRemovedEvent) : OpenCodeEvent
 
     @JvmInline
+     value class PersistentPtyupdatedWrapper(val value: PersistentPtyUpdatedEvent) : OpenCodeEvent
+
+    @JvmInline
      value class PluginupdatedWrapper(val value: PluginUpdatedEvent) : OpenCodeEvent
 
     @JvmInline
@@ -235,6 +250,9 @@ sealed interface OpenCodeEvent {
 
     @JvmInline
      value class SessionagentselectedWrapper(val value: SessionAgentSelectedEvent) : OpenCodeEvent
+
+    @JvmInline
+     value class SessionarchivedWrapper(val value: SessionArchivedEvent) : OpenCodeEvent
 
     @JvmInline
      value class SessioncompactiondeltaWrapper(val value: SessionCompactionDeltaEvent) : OpenCodeEvent
@@ -342,6 +360,9 @@ sealed interface OpenCodeEvent {
      value class SessionstepfailedWrapper(val value: SessionStepFailedEvent) : OpenCodeEvent
 
     @JvmInline
+     value class SessionstepfirstTokenWrapper(val value: SessionStepFirstTokenEvent) : OpenCodeEvent
+
+    @JvmInline
      value class SessionstepstartedWrapper(val value: SessionStepStartedEvent) : OpenCodeEvent
 
     @JvmInline
@@ -379,6 +400,9 @@ sealed interface OpenCodeEvent {
 
     @JvmInline
      value class SessiontoolsuccessWrapper(val value: SessionToolSuccessEvent) : OpenCodeEvent
+
+    @JvmInline
+     value class SessionunarchivedWrapper(val value: SessionUnarchivedEvent) : OpenCodeEvent
 
     @JvmInline
      value class SessionusageupdatedWrapper(val value: SessionUsageUpdatedEvent) : OpenCodeEvent
@@ -435,6 +459,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 jsonMap["type"] = JsonPrimitive("agent.updated")
                 JsonObject(jsonMap)
             }
+            is OpenCodeEvent.ArtifactupdatedWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(ArtifactUpdatedEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("artifact.updated")
+                JsonObject(jsonMap)
+            }
             is OpenCodeEvent.CommandupdatedWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(CommandUpdatedEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("command.updated")
@@ -453,6 +482,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             is OpenCodeEvent.CredentialupdatedWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(CredentialUpdatedEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("credential.updated")
+                JsonObject(jsonMap)
+            }
+            is OpenCodeEvent.ExperimentalmcpeventWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(ExperimentalMcpEventEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("experimental.mcp.event")
                 JsonObject(jsonMap)
             }
             is OpenCodeEvent.FilesystemchangedWrapper -> {
@@ -535,6 +569,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 jsonMap["type"] = JsonPrimitive("persistent-pty.removed")
                 JsonObject(jsonMap)
             }
+            is OpenCodeEvent.PersistentPtyupdatedWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(PersistentPtyUpdatedEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("persistent-pty.updated")
+                JsonObject(jsonMap)
+            }
             is OpenCodeEvent.PluginupdatedWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(PluginUpdatedEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("plugin.updated")
@@ -583,6 +622,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             is OpenCodeEvent.SessionagentselectedWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(SessionAgentSelectedEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("session.agent.selected")
+                JsonObject(jsonMap)
+            }
+            is OpenCodeEvent.SessionarchivedWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(SessionArchivedEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("session.archived")
                 JsonObject(jsonMap)
             }
             is OpenCodeEvent.SessioncompactiondeltaWrapper -> {
@@ -760,6 +804,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 jsonMap["type"] = JsonPrimitive("session.step.failed")
                 JsonObject(jsonMap)
             }
+            is OpenCodeEvent.SessionstepfirstTokenWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(SessionStepFirstTokenEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("session.step.first-token")
+                JsonObject(jsonMap)
+            }
             is OpenCodeEvent.SessionstepstartedWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(SessionStepStartedEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("session.step.started")
@@ -823,6 +872,11 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             is OpenCodeEvent.SessiontoolsuccessWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(SessionToolSuccessEvent.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["type"] = JsonPrimitive("session.tool.success")
+                JsonObject(jsonMap)
+            }
+            is OpenCodeEvent.SessionunarchivedWrapper -> {
+                val jsonMap = encoder.json.encodeToJsonElement(SessionUnarchivedEvent.serializer(), value.value).jsonObject.toMutableMap()
+                jsonMap["type"] = JsonPrimitive("session.unarchived")
                 JsonObject(jsonMap)
             }
             is OpenCodeEvent.SessionusageupdatedWrapper -> {
@@ -911,6 +965,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 val decoded = decoder.json.decodeFromJsonElement(AgentUpdatedEvent.serializer(), element)
                 OpenCodeEvent.AgentupdatedWrapper(decoded)
             }
+            "artifact.updated" -> {
+                val decoded = decoder.json.decodeFromJsonElement(ArtifactUpdatedEvent.serializer(), element)
+                OpenCodeEvent.ArtifactupdatedWrapper(decoded)
+            }
             "command.updated" -> {
                 val decoded = decoder.json.decodeFromJsonElement(CommandUpdatedEvent.serializer(), element)
                 OpenCodeEvent.CommandupdatedWrapper(decoded)
@@ -926,6 +984,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             "credential.updated" -> {
                 val decoded = decoder.json.decodeFromJsonElement(CredentialUpdatedEvent.serializer(), element)
                 OpenCodeEvent.CredentialupdatedWrapper(decoded)
+            }
+            "experimental.mcp.event" -> {
+                val decoded = decoder.json.decodeFromJsonElement(ExperimentalMcpEventEvent.serializer(), element)
+                OpenCodeEvent.ExperimentalmcpeventWrapper(decoded)
             }
             "filesystem.changed" -> {
                 val decoded = decoder.json.decodeFromJsonElement(FilesystemChangedEvent.serializer(), element)
@@ -991,6 +1053,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 val decoded = decoder.json.decodeFromJsonElement(PersistentPtyRemovedEvent.serializer(), element)
                 OpenCodeEvent.PersistentPtyremovedWrapper(decoded)
             }
+            "persistent-pty.updated" -> {
+                val decoded = decoder.json.decodeFromJsonElement(PersistentPtyUpdatedEvent.serializer(), element)
+                OpenCodeEvent.PersistentPtyupdatedWrapper(decoded)
+            }
             "plugin.updated" -> {
                 val decoded = decoder.json.decodeFromJsonElement(PluginUpdatedEvent.serializer(), element)
                 OpenCodeEvent.PluginupdatedWrapper(decoded)
@@ -1030,6 +1096,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             "session.agent.selected" -> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionAgentSelectedEvent.serializer(), element)
                 OpenCodeEvent.SessionagentselectedWrapper(decoded)
+            }
+            "session.archived" -> {
+                val decoded = decoder.json.decodeFromJsonElement(SessionArchivedEvent.serializer(), element)
+                OpenCodeEvent.SessionarchivedWrapper(decoded)
             }
             "session.compaction.delta" -> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionCompactionDeltaEvent.serializer(), element)
@@ -1171,6 +1241,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionStepFailedEvent.serializer(), element)
                 OpenCodeEvent.SessionstepfailedWrapper(decoded)
             }
+            "session.step.first-token" -> {
+                val decoded = decoder.json.decodeFromJsonElement(SessionStepFirstTokenEvent.serializer(), element)
+                OpenCodeEvent.SessionstepfirstTokenWrapper(decoded)
+            }
             "session.step.started" -> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionStepStartedEvent.serializer(), element)
                 OpenCodeEvent.SessionstepstartedWrapper(decoded)
@@ -1222,6 +1296,10 @@ object OpenCodeEventSerializer : KSerializer<OpenCodeEvent> {
             "session.tool.success" -> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionToolSuccessEvent.serializer(), element)
                 OpenCodeEvent.SessiontoolsuccessWrapper(decoded)
+            }
+            "session.unarchived" -> {
+                val decoded = decoder.json.decodeFromJsonElement(SessionUnarchivedEvent.serializer(), element)
+                OpenCodeEvent.SessionunarchivedWrapper(decoded)
             }
             "session.usage.updated" -> {
                 val decoded = decoder.json.decodeFromJsonElement(SessionUsageUpdatedEvent.serializer(), element)

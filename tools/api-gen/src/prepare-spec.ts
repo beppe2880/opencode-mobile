@@ -165,5 +165,12 @@ export function prepareSpec(spec: any): string {
   mark({ $ref: "#/components/schemas/OpenCodeEvent" })
   for (const name of Object.keys(components)) if (!reachable.has(name)) delete components[name]
 
+  // 6. Boolean literal enums (`type: boolean`, `enum: [true]`) make the generator emit
+  //    `enum class X(val value: Boolean)` whose members are initialized with the wire strings
+  //    ("true"), which does not compile. These are flags, not enums: keep a plain boolean.
+  walk(spec, (node) => {
+    if (node.type === "boolean" && Array.isArray(node.enum)) delete node.enum
+  })
+
   return `${discriminated} unions, ${Object.keys(spec.paths).length} paths, ${Object.keys(components).length} schemas`
 }

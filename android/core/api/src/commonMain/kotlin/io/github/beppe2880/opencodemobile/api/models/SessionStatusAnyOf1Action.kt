@@ -31,32 +31,38 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param reason 
- * @param provider 
- * @param title 
- * @param message 
- * @param label 
- * @param link 
+ * @param reason Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param provider Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param title Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param message Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param label Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param link Maximum number of sessions to return. Defaults to the newest 50 sessions.
  */
 @Serializable
 
 data class SessionStatusAnyOf1Action (
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "reason")
     val reason: kotlin.String,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "provider")
     val provider: kotlin.String,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "title")
     val title: kotlin.String,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "message")
     val message: kotlin.String,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "label")
     val label: kotlin.String,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "link")
     val link: kotlin.String? = null
 

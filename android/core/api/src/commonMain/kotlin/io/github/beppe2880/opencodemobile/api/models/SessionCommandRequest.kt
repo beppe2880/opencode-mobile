@@ -48,11 +48,11 @@ data class SessionCommandRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "name")
-    val name: kotlin.String?,
+    val name: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "text")
-    val text: kotlin.String?,
+    val text: kotlin.String,
 
     @SerialName(value = "files")
     val files: kotlin.collections.List<PromptInputFileAttachment>? = null,

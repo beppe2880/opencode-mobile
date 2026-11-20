@@ -27,6 +27,7 @@ import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.ModelDefault200Response
 import io.github.beppe2880.opencodemobile.api.models.ModelList200Response
+import io.github.beppe2880.opencodemobile.api.models.ModelListTypesParameter
 import io.github.beppe2880.opencodemobile.api.models.ServiceUnavailableErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.UnauthorizedErrorEncoded
 
@@ -95,12 +96,13 @@ open class ModelApi : ApiClient {
 
     /**
      * List models
-     * Retrieve the current snapshot of available models ordered by release date. The snapshot may precede initial plugin settlement.
+     * Retrieve the current snapshot of available models of the requested types, chat by default, ordered by release date within each type. The snapshot may precede initial plugin settlement.
      * @param locationDirectory  (optional)
+     * @param types  (optional)
      * @return ModelList200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun modelList(locationDirectory: kotlin.String? = null): HttpResponse<ModelList200Response> {
+    open suspend fun modelList(locationDirectory: kotlin.String? = null, types: ModelListTypesParameter? = null): HttpResponse<ModelList200Response> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -109,6 +111,7 @@ open class ModelApi : ApiClient {
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         locationDirectory?.apply { localVariableQuery["location[directory]"] = listOf("$locationDirectory") }
+        types?.apply { localVariableQuery["types"] = listOf("$types") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(

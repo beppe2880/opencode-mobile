@@ -39,7 +39,7 @@ data class ExperimentalIntegrationWellknownAddRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "url")
-    val url: kotlin.String?
+    val url: kotlin.String
 
 ) {
 

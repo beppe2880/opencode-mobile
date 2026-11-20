@@ -25,7 +25,6 @@ package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.ModelRef
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageIdleTime
-import io.github.beppe2880.opencodemobile.api.models.SessionProviderContext
 import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
 
 import kotlinx.serialization.Serializable
@@ -41,11 +40,9 @@ import kotlinx.serialization.Contextual
  * @param status 
  * @param reason 
  * @param summary Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param recent Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param metadata 
  * @param model 
- * @param providerState 
- * @param providerContext 
+ * @param native 
  * @param cost 
  * @param tokens 
  */
@@ -71,11 +68,7 @@ data class SessionMessageCompactionCompleted (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "summary")
-    val summary: kotlin.String?,
-
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
-    @SerialName(value = "recent")
-    val recent: kotlin.String?,
+    val summary: kotlin.String,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,
@@ -83,11 +76,8 @@ data class SessionMessageCompactionCompleted (
     @SerialName(value = "model")
     val model: ModelRef? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
-
-    @SerialName(value = "providerContext")
-    val providerContext: SessionProviderContext? = null,
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null,
 
     @SerialName(value = "cost")
     val cost: kotlin.Double? = null,

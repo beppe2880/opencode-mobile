@@ -23,7 +23,9 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.ProviderCache
 import io.github.beppe2880.opencodemobile.api.models.ProviderCompaction
+import io.github.beppe2880.opencodemobile.api.models.ProviderEncoding
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -33,13 +35,21 @@ import kotlinx.serialization.Contextual
  * 
  *
  * @param compaction 
+ * @param cache 
+ * @param encoding 
  */
 @Serializable
 
 data class ModelSettings (
 
     @SerialName(value = "compaction")
-    val compaction: ProviderCompaction? = null
+    val compaction: ProviderCompaction? = null,
+
+    @SerialName(value = "cache")
+    val cache: ProviderCache? = null,
+
+    @Contextual @SerialName(value = "encoding")
+    val encoding: ProviderEncoding? = null
 
 ) {
 

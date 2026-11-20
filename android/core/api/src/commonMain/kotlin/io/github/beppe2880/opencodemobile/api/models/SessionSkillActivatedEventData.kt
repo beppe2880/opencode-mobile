@@ -45,11 +45,11 @@ data class SessionSkillActivatedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "name")
-    val name: kotlin.String?,
+    val name: kotlin.String,
 
     @SerialName(value = "text")
     val text: kotlin.String
