@@ -1,11 +1,13 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -16,6 +18,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archived_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_restored_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_undo
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -42,6 +45,7 @@ fun SessionsRoute(
         onStopOrDispose { viewModel.onEvent(SessionsEvent.Visible(false)) }
     }
     val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(openNewSession) {
         if (openNewSession) {
@@ -56,14 +60,19 @@ fun SessionsRoute(
             SessionsEffect.OpenSettings -> onOpenSettings()
             is SessionsEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
             is SessionsEffect.ShowArchiveUndo -> {
-                val result = snackbar.showSnackbar(
-                    message = UiText.Resource(
-                        if (effect.archived) Res.string.sessions_archived_message else Res.string.sessions_restored_message,
-                    ).asString(),
-                    actionLabel = UiText.Resource(Res.string.sessions_undo).asString(),
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.onEvent(SessionsEvent.SetArchived(effect.session, !effect.archived))
+                // Its own coroutine: the snackbar must not make CollectEffect await it, or every
+                // later effect (opening a session, for one) waits until it disappears.
+                scope.launch {
+                    val result = snackbar.showSnackbar(
+                        message = UiText.Resource(
+                            if (effect.archived) Res.string.sessions_archived_message else Res.string.sessions_restored_message,
+                        ).asString(),
+                        actionLabel = UiText.Resource(Res.string.sessions_undo).asString(),
+                        duration = SnackbarDuration.Long,
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.onEvent(SessionsEvent.SetArchived(effect.session, !effect.archived))
+                    }
                 }
             }
         }
