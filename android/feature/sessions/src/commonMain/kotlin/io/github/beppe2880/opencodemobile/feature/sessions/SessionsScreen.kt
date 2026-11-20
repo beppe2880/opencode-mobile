@@ -722,23 +722,24 @@ private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -
                 style = MaterialTheme.typography.titleSmall,
                 color = OcTheme.colors.textBase,
             )
-            Text(
-                text = stringResource(Res.string.sessions_filter_status),
-                style = MaterialTheme.typography.labelLarge,
-                color = OcTheme.colors.textMuted,
-            )
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-            ) {
-                OcChip(
-                    text = stringResource(Res.string.sessions_filter_active),
-                    onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active)) },
-                    selected = SessionStatus.Active in state.filters.effectiveStatuses,
-                    modifier = Modifier.testTag("sessions_filter_active"),
+            // Without archiving, active is the only status: the whole section would be a no-op.
+            if (state.archiveSupported) {
+                Text(
+                    text = stringResource(Res.string.sessions_filter_status),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = OcTheme.colors.textMuted,
                 )
-                if (state.archiveSupported) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                ) {
+                    OcChip(
+                        text = stringResource(Res.string.sessions_filter_active),
+                        onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active)) },
+                        selected = SessionStatus.Active in state.filters.effectiveStatuses,
+                        modifier = Modifier.testTag("sessions_filter_active"),
+                    )
                     OcChip(
                         text = stringResource(Res.string.sessions_archived),
                         onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
