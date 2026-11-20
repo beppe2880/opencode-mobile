@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_ar
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_restored_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_undo
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -63,13 +64,15 @@ fun SessionsRoute(
                 // Its own coroutine: the snackbar must not make CollectEffect await it, or every
                 // later effect (opening a session, for one) waits until it disappears.
                 scope.launch {
-                    val result = snackbar.showSnackbar(
-                        message = UiText.Resource(
-                            if (effect.archived) Res.string.sessions_archived_message else Res.string.sessions_restored_message,
-                        ).asString(),
-                        actionLabel = UiText.Resource(Res.string.sessions_undo).asString(),
-                        duration = SnackbarDuration.Long,
-                    )
+                    val result = withTimeoutOrNull(ARCHIVE_UNDO_MS) {
+                        snackbar.showSnackbar(
+                            message = UiText.Resource(
+                                if (effect.archived) Res.string.sessions_archived_message else Res.string.sessions_restored_message,
+                            ).asString(),
+                            actionLabel = UiText.Resource(Res.string.sessions_undo).asString(),
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                    }
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.onEvent(SessionsEvent.SetArchived(effect.session, !effect.archived))
                     }
@@ -90,3 +93,6 @@ fun SessionsRoute(
         inDrawer = inDrawer,
     )
 }
+
+/** How long the archive confirmation offers Undo; matches the voice discard window. */
+private const val ARCHIVE_UNDO_MS = 5_000L
