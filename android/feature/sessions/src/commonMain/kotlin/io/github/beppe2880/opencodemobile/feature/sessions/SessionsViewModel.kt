@@ -65,6 +65,7 @@ class SessionsViewModel(
     private var projectsJob: Job? = null
     private var debounceJob: Job? = null
     private var browseJob: Job? = null
+    private var archiveJob: Job? = null
     private var newSessionDirectoryCleared = false
     private var sessionList: List<Session> = emptyList()
 
@@ -207,6 +208,7 @@ class SessionsViewModel(
         projectsJob?.cancel()
         debounceJob?.cancel()
         browseJob?.cancel()
+        archiveJob?.cancel()
         workJob?.cancel()
         waitingJob?.cancel()
         sessionList = emptyList()
@@ -239,9 +241,40 @@ class SessionsViewModel(
         showCachedFirst = true
         load(initial = true)
         loadProjects(cachedFirst = true)
+        checkArchiveSupport(id)
         // A share still to place opens again on the new server.
         shownShare = null
         onShare(shares.pending.value)
+    }
+
+    /**
+     * Archive arrived in OpenCode 2.1.0. Older servers accept the update and ignore `archived`, so
+     * the action and the archived filter are hidden instead of silently doing nothing; a filter
+     * already narrowed to archived sessions falls back to active ones.
+     */
+    private fun checkArchiveSupport(id: String) {
+        archiveJob?.cancel()
+        archiveJob = viewModelScope.launch {
+            val supported = sessions.archiveSupported()
+            if (serverId != id) return@launch
+            if (supported) {
+                updateState { it.copy(archiveSupported = true) }
+                return@launch
+            }
+            val dropped = SessionStatus.Archived in currentState.filters.effectiveStatuses
+            updateState {
+                it.copy(
+                    archiveSupported = false,
+                    filters = if (dropped) it.filters.copy(statuses = setOf(SessionStatus.Active)) else it.filters,
+                )
+            }
+            if (dropped) {
+                sessionList = emptyList()
+                showCachedFirst = true
+                updateState { it.copy(groups = emptyList(), loading = true) }
+                load(initial = true)
+            }
+        }
     }
 
     /**
@@ -521,6 +554,7 @@ class SessionsViewModel(
 
     /** Adds or removes a status; when both are selected the two server lists are merged. */
     private fun toggleStatus(status: SessionStatus) {
+        if (status == SessionStatus.Archived && !currentState.archiveSupported) return
         val filters = currentState.filters.toggleStatus(status)
         if (filters.statuses == currentState.filters.statuses) return
         sessionList = emptyList()

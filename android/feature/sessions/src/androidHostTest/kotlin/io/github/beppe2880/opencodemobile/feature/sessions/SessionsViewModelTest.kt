@@ -89,7 +89,8 @@ class SessionsViewModelTest {
 
     private val pins = InMemoryPinnedSessions()
 
-    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
+    private fun vm(repository: FakeSessionRepository = sessions) =
+        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
 
     @Test
     fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {
@@ -255,6 +256,21 @@ class SessionsViewModelTest {
 
         assertTrue(target.id in vm.state.value.ids())
         assertTrue(effect.await() is SessionsEffect.ShowMessage)
+    }
+
+    @Test
+    fun `archiving stays hidden on a server that ignores it`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(listOf(session("today", now - hour)))
+        repository.archiveSupported = false
+        val vm = vm(repository)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.archiveSupported)
+
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+
+        assertEquals(setOf(SessionStatus.Active), vm.state.value.filters.effectiveStatuses)
+        assertEquals(listOf("today"), vm.state.value.ids())
     }
 
     @Test
@@ -1499,6 +1515,7 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var lastArchived: Boolean? = null
     var archivedResult: Result<List<Session>>? = null
     var setArchivedResult: Result<Unit> = Result.success(Unit)
+    var archiveSupported = true
     var listCalls = 0
     val archivedCalls = mutableListOf<Pair<String, Boolean>>()
     val created = mutableListOf<String>()
@@ -1536,6 +1553,7 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
         archivedCalls += sessionId to archived
         return setArchivedResult
     }
+    override suspend fun archiveSupported(): Boolean = archiveSupported
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())
     var serverProjects = listOf(Project("p", "/p/today", null, null, 0))
     override suspend fun projects(): Result<List<Project>> {

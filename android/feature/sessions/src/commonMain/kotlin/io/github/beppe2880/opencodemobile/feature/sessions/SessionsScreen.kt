@@ -419,7 +419,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 testTag = "sessions_filter_active_chip",
             )
         }
-        if (SessionStatus.Archived in statuses) {
+        if (state.archiveSupported && SessionStatus.Archived in statuses) {
             FilterSummaryChip(
                 label = stringResource(Res.string.sessions_archived),
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
@@ -652,18 +652,20 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 leading = { Icon(Icons.Outlined.DriveFileRenameOutline, null, tint = OcTheme.colors.iconBase) },
                 modifier = Modifier.testTag("sessions_action_rename"),
             )
-            OcListRow(
-                title = stringResource(if (archived) Res.string.sessions_unarchive else Res.string.sessions_archive),
-                onClick = { onEvent(SessionsEvent.SetArchived(session, !archived)) },
-                leading = {
-                    Icon(
-                        if (archived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
-                        contentDescription = null,
-                        tint = OcTheme.colors.iconBase,
-                    )
-                },
-                modifier = Modifier.testTag("sessions_action_archive"),
-            )
+            if (state.archiveSupported) {
+                OcListRow(
+                    title = stringResource(if (archived) Res.string.sessions_unarchive else Res.string.sessions_archive),
+                    onClick = { onEvent(SessionsEvent.SetArchived(session, !archived)) },
+                    leading = {
+                        Icon(
+                            if (archived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
+                            contentDescription = null,
+                            tint = OcTheme.colors.iconBase,
+                        )
+                    },
+                    modifier = Modifier.testTag("sessions_action_archive"),
+                )
+            }
             OcListRow(
                 title = stringResource(Res.string.sessions_delete),
                 titleColor = OcTheme.colors.danger.fg,
@@ -736,12 +738,14 @@ private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -
                     selected = SessionStatus.Active in state.filters.effectiveStatuses,
                     modifier = Modifier.testTag("sessions_filter_active"),
                 )
-                OcChip(
-                    text = stringResource(Res.string.sessions_archived),
-                    onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
-                    selected = SessionStatus.Archived in state.filters.effectiveStatuses,
-                    modifier = Modifier.testTag("sessions_filter_archived"),
-                )
+                if (state.archiveSupported) {
+                    OcChip(
+                        text = stringResource(Res.string.sessions_archived),
+                        onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
+                        selected = SessionStatus.Archived in state.filters.effectiveStatuses,
+                        modifier = Modifier.testTag("sessions_filter_archived"),
+                    )
+                }
             }
             Text(
                 text = stringResource(Res.string.sessions_filter_last_updated),

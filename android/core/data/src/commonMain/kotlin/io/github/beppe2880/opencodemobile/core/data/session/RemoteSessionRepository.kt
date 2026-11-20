@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.data.resultOf
+import io.github.beppe2880.opencodemobile.core.domain.AppVersion
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
@@ -29,6 +30,9 @@ internal class RemoteSessionRepository(
     private val clients: OpenCodeClients,
     private val lists: ListCache = ListCache.None,
 ) : SessionRepository {
+
+    /** Archiving, with the archived list, exists since OpenCode 2.1.0. */
+    private val archiveSince = requireNotNull(AppVersion.parse("2.1.0"))
 
     /** Sessions last seen, by server and session id, so a chat can show its header at once. */
     private val seen = ConcurrentMap<Pair<String, String>, Session>()
@@ -127,6 +131,12 @@ internal class RemoteSessionRepository(
         }
         if (archived) lists.removeSession(profile.id, sessionId)
     }
+
+    override suspend fun archiveSupported(): Boolean = resultOf {
+        val profile = clients.activeProfile()
+        awaitBody { clients.forProfile(profile).server.serverInfo() }.version
+    }.map { version -> AppVersion.parse(version)?.let { it >= archiveSince } ?: true }
+        .getOrDefault(true)
 
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = resultOf {
         val api = clients.active().sessions

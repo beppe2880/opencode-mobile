@@ -78,6 +78,8 @@ data class SessionsState(
     val directoryFilter: String? = null,
     /** The filters chosen in the filter sheet. */
     val filters: SessionFilters = SessionFilters(),
+    /** False on servers before OpenCode 2.1.0: archive and the archived filter are hidden. */
+    val archiveSupported: Boolean = true,
     val filterSheetOpen: Boolean = false,
     val groups: List<SessionGroup> = emptyList(),
     /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */

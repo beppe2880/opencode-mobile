@@ -95,6 +95,12 @@ interface SessionRepository {
         Result.failure(OpenCodeError.NotFound("Archiving is not available"))
 
     /**
+     * Whether the server supports archiving. Servers before OpenCode 2.1.0 accept the update but
+     * ignore `archived`, so the app offers neither the action nor the archived filter there.
+     */
+    suspend fun archiveSupported(): Boolean = true
+
+    /**
      * Copies the session into a new root session ("… (fork #n)"): the history before
      * [beforeMessageId], or all of it when null. The original is left untouched.
      */

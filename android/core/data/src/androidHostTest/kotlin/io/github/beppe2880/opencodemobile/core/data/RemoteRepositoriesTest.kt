@@ -22,6 +22,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -45,6 +46,18 @@ class RemoteRepositoriesTest {
 
     private fun userMessage(index: Int) =
         """{"id":"msg_$index","time":{"created":$index},"type":"user","text":"prompt $index"}"""
+
+    @Test
+    fun `archiving support comes from the server version`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(json("""{"version":"2.1.0","pid":1,"urls":[],"paths":{"tmp":"/tmp"}}"""))
+        server.enqueue(json("""{"version":"2.0.27","pid":1,"urls":[],"paths":{"tmp":"/tmp"}}"""))
+
+        assertTrue(sessions.archiveSupported())
+        assertFalse(sessions.archiveSupported())
+        assertEquals("/api/info", server.takeRequest().path)
+        assertEquals("/api/info", server.takeRequest().path)
+    }
 
     @Test
     fun `running shell mapping keeps owner and location and stop targets that shell`() = runBlocking {
