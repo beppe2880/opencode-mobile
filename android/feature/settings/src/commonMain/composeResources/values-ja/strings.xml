@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">サムネイル</string>
     <string name="settings_running_in_list">セッション一覧に実行中の作業を表示</string>
     <string name="settings_running_in_list_sub">各セッションの下に、実行中のサブエージェントとバックグラウンドコマンドの数を表示</string>
+    <string name="settings_unread_sessions">未読のセッション</string>
+    <string name="settings_unread_sessions_off">オフ</string>
+    <string name="settings_unread_sessions_dot">ドット</string>
+    <string name="settings_unread_sessions_group">ドットとグループ</string>
+    <string name="settings_unread_sessions_off_sub">ドットと未読グループを表示せず、リストは既読状態を記録しません</string>
+    <string name="settings_unread_sessions_dot_sub">時刻の横の点は、まだ開いていない返信を示します。セッションは元の日付に残ります</string>
+    <string name="settings_unread_sessions_group_sub">点は、まだ開いていない返信を示します。これらのセッションは日付の上にまとめて表示されます</string>
     <string name="settings_confirm_stop">コマンドを停止する前に確認</string>
     <string name="settings_confirm_stop_sub">実行中シートからバックグラウンドコマンドを停止する前に確認します</string>
     <string name="settings_running_chips">メッセージ欄の上に実行中の作業を表示</string>

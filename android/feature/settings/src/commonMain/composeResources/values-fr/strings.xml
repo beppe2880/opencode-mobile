@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Miniatures</string>
     <string name="settings_running_in_list">Afficher le travail en cours dans la liste des sessions</string>
     <string name="settings_running_in_list_sub">Compter les sous-agents et les commandes en arrière-plan sous chaque session</string>
+    <string name="settings_unread_sessions">Sessions non lues</string>
+    <string name="settings_unread_sessions_off">Désactivé</string>
+    <string name="settings_unread_sessions_dot">Point</string>
+    <string name="settings_unread_sessions_group">Point et groupe</string>
+    <string name="settings_unread_sessions_off_sub">Aucun point ni groupe « Non lues » : la liste ne suit pas ce que vous avez lu</string>
+    <string name="settings_unread_sessions_dot_sub">Un point à côté de l'heure marque une réponse que vous n'avez pas ouverte ; la session reste dans son jour</string>
+    <string name="settings_unread_sessions_group_sub">Un point marque une réponse que vous n'avez pas ouverte, et ces sessions sont regroupées au-dessus des jours</string>
     <string name="settings_confirm_stop">Confirmer avant d’arrêter les commandes</string>
     <string name="settings_confirm_stop_sub">Demander confirmation avant d’arrêter une commande en arrière-plan depuis la feuille En cours</string>
     <string name="settings_running_chips">Tâches en cours au-dessus de la zone de message</string>

@@ -409,6 +409,18 @@ enum class SelectionApply {
     Immediately,
 }
 
+/** How the session list shows sessions whose latest turn the user has not viewed. */
+enum class UnreadSessions {
+    /** No unread dots, no Unread group and no read filter. */
+    Off,
+
+    /** A dot next to the time; the sessions stay in their day. */
+    Dot,
+
+    /** The dot, and the unread sessions grouped above the days. */
+    DotAndGroup,
+}
+
 /** The model a new chat starts with when none is picked. */
 enum class NewChatModel {
     /** The agent's configured model, else the last one used that is still available. */
@@ -544,6 +556,8 @@ data class AppSettings(
     val showRunningWorkInList: Boolean = true,
     /** Stopping a background command from the Running sheet asks first. */
     val confirmStopCommand: Boolean = true,
+    /** How the session list marks and groups unread sessions. */
+    val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */

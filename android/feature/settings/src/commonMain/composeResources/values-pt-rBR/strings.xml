@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Miniaturas</string>
     <string name="settings_running_in_list">Mostrar trabalho em andamento na lista de sessões</string>
     <string name="settings_running_in_list_sub">Contar subagentes e comandos em segundo plano em cada sessão</string>
+    <string name="settings_unread_sessions">Sessões não lidas</string>
+    <string name="settings_unread_sessions_off">Desligado</string>
+    <string name="settings_unread_sessions_dot">Ponto</string>
+    <string name="settings_unread_sessions_group">Ponto e grupo</string>
+    <string name="settings_unread_sessions_off_sub">Sem pontos e sem grupo «Não lidas»: a lista não registra o que você leu</string>
+    <string name="settings_unread_sessions_dot_sub">Um ponto ao lado da hora marca uma resposta que você não abriu; a sessão continua no seu dia</string>
+    <string name="settings_unread_sessions_group_sub">Um ponto marca uma resposta que você não abriu, e essas sessões ficam agrupadas acima dos dias</string>
     <string name="settings_confirm_stop">Confirmar antes de parar comandos</string>
     <string name="settings_confirm_stop_sub">Perguntar antes de parar um comando em segundo plano na folha Em execução</string>
     <string name="settings_running_chips">Trabalho em execução acima da caixa de mensagem</string>

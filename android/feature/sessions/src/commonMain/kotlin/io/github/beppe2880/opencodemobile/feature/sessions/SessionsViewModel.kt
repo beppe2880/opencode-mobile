@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.newChatAgent
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
@@ -31,6 +32,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -41,6 +43,8 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -117,6 +121,16 @@ class SessionsViewModel(
             }
         }
         viewModelScope.launch {
+            settings.settings.map { it.unreadSessions }.distinctUntilChanged().collect { unread ->
+                updateState { s ->
+                    // Without unread state the read filter has nothing to narrow.
+                    val filters = if (unread == UnreadSessions.Off) s.filters.copy(readState = null) else s.filters
+                    val next = s.copy(unreadSessions = unread, filters = filters)
+                    next.copy(groups = groupSessions(sessionList, pinnedIds, clock(), zone, filters, s.waiting.keys, unread))
+                }
+            }
+        }
+        viewModelScope.launch {
             // The order shown (filters included) is the one a chat swipes through.
             state.map { s -> s.groups.flatMap { group -> group.sessions.map { it.id } } }
                 .distinctUntilChanged()
@@ -161,7 +175,8 @@ class SessionsViewModel(
                     },
                 )
             }
-            is SessionsEvent.ToggleRead -> updateFilters { it.toggleRead(event.state) }
+            is SessionsEvent.ToggleRead -> if (currentState.unreadSessions != UnreadSessions.Off) updateFilters { it.toggleRead(event.state) }
+            SessionsEvent.MarkAllRead -> markAllRead()
             SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
@@ -563,7 +578,35 @@ class SessionsViewModel(
         group(list, filters, currentState.waiting.keys)
 
     private fun group(list: List<Session>, filters: SessionFilters, waiting: Set<String>): List<SessionGroup> =
-        groupSessions(list, pinnedIds, clock(), zone, filters, waiting)
+        groupSessions(list, pinnedIds, clock(), zone, filters, waiting, currentState.unreadSessions)
+
+    /**
+     * Marks the unread sessions the list shows as viewed at their idle watermark, a few requests
+     * at a time. The rows clear at once; those the server refuses become unread again, with one
+     * message for all of them.
+     */
+    private fun markAllRead() {
+        if (currentState.markingAllRead) return
+        val marks = currentState.unreadShown.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
+        if (marks.isEmpty()) return
+        val previous = sessionList.filter { it.id in marks }.associate { it.id to it.viewedAt }
+        sessionList = sessionList.map { session -> marks[session.id]?.let { session.copy(viewedAt = it) } ?: session }
+        updateState { it.copy(markingAllRead = true, filterSheetOpen = false, groups = group(sessionList)) }
+        viewModelScope.launch {
+            val permits = Semaphore(MARK_READ_PARALLEL)
+            val failed = marks.map { (id, idle) ->
+                async { permits.withPermit { id.takeIf { sessions.markViewed(id, idle).isFailure } } }
+            }.awaitAll().filterNotNull().toSet()
+            if (failed.isNotEmpty()) {
+                // A newer watermark from another client stays; only the failed marks are undone.
+                sessionList = sessionList.map { session ->
+                    if (session.id in failed && session.viewedAt == marks[session.id]) session.copy(viewedAt = previous[session.id]) else session
+                }
+                sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_mark_all_read_failed)))
+            }
+            updateState { it.copy(markingAllRead = false, groups = group(sessionList)) }
+        }
+    }
 
     private fun setPinned(sessionId: String, pinned: Boolean) {
         updateState { it.copy(actionsFor = null) }
@@ -921,6 +964,7 @@ class SessionsViewModel(
         const val FILTERED_LIST_LIMIT = 500
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
+        const val MARK_READ_PARALLEL = 4
         const val WAITING_DEBOUNCE_MS = 300L
         const val GLOBAL_PROJECT_ID = "global"
     }

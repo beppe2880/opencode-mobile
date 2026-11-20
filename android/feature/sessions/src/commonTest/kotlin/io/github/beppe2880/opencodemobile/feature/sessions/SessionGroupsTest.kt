@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.sessions
 
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
@@ -43,6 +44,33 @@ class SessionGroupsTest {
     private val all = listOf(old, today, week, yesterday)
 
     private fun List<SessionGroup>.ids() = map { group -> group.bucket to group.sessions.map { it.id } }
+
+    @Test
+    fun theUnreadSettingDropsTheGroupOrTheUnreadOrderOfPins() {
+        val pinnedRead = session("pinned-read", now - hour, idleAt = now - hour, viewedAt = now - hour)
+        val pinnedUnread = session("pinned-unread", now - 5 * hour, idleAt = now - 5 * hour)
+        val list = listOf(today, unreadToday, pinnedRead, pinnedUnread)
+        val pins = setOf("pinned-read", "pinned-unread")
+
+        assertEquals(
+            listOf(
+                DayBucket.Pinned to listOf("pinned-unread", "pinned-read"),
+                DayBucket.Unread to listOf("unread-today"),
+                DayBucket.Today to listOf("today"),
+            ),
+            groupSessions(list, pins, now, zone).ids(),
+        )
+        // Dot only: no group, pinned unread sessions still first.
+        assertEquals(
+            listOf(DayBucket.Pinned to listOf("pinned-unread", "pinned-read"), DayBucket.Today to listOf("today", "unread-today")),
+            groupSessions(list, pins, now, zone, unread = UnreadSessions.Dot).ids(),
+        )
+        // Off: pins by their last update only.
+        assertEquals(
+            listOf(DayBucket.Pinned to listOf("pinned-read", "pinned-unread"), DayBucket.Today to listOf("today", "unread-today")),
+            groupSessions(list, pins, now, zone, unread = UnreadSessions.Off).ids(),
+        )
+    }
 
     @Test
     fun withoutPinsSessionsAreGroupedByDay() {

@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">缩略图</string>
     <string name="settings_running_in_list">在会话列表中显示运行中的工作</string>
     <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
+    <string name="settings_unread_sessions">未读会话</string>
+    <string name="settings_unread_sessions_off">关闭</string>
+    <string name="settings_unread_sessions_dot">圆点</string>
+    <string name="settings_unread_sessions_group">圆点和分组</string>
+    <string name="settings_unread_sessions_off_sub">不显示圆点和未读分组，列表不记录你是否已读</string>
+    <string name="settings_unread_sessions_dot_sub">时间旁的圆点标记你尚未打开的回复；会话仍保留在所属日期中</string>
+    <string name="settings_unread_sessions_group_sub">圆点标记你尚未打开的回复，这些会话会归入日期上方的分组</string>
     <string name="settings_confirm_stop">停止命令前需确认</string>
     <string name="settings_confirm_stop_sub">从“运行中”面板停止后台命令前进行询问</string>
     <string name="settings_running_chips">在消息框上方显示运行中的任务</string>

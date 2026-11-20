@@ -85,6 +85,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -153,6 +154,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filters
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filters_active
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_count
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_outcome_succeeded
@@ -172,6 +175,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_to
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unarchive
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread_count
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
@@ -283,10 +287,14 @@ fun SessionsScreen(
                     state.isEmpty -> item(key = "empty") { EmptyContent(state, onEvent) }
                     else -> state.groups.forEach { group ->
                         item(key = "group-${group.bucket}", contentType = "group") {
-                            OcSectionHeader(
-                                stringResource(group.bucket.label()),
-                                Modifier.padding(top = OcSpacing.sm).testTag("sessions_group_${group.bucket.name.lowercase()}"),
-                            )
+                            if (group.bucket == DayBucket.Unread) {
+                                UnreadGroupHeader(group.sessions.size, state.markingAllRead, onEvent)
+                            } else {
+                                OcSectionHeader(
+                                    stringResource(group.bucket.label()),
+                                    Modifier.padding(top = OcSpacing.sm).testTag("sessions_group_${group.bucket.name.lowercase()}"),
+                                )
+                            }
                         }
                         items(group.sessions, key = { it.id }, contentType = { "session" }) { session ->
                             val pinned = session.id in state.pinned
@@ -305,6 +313,7 @@ fun SessionsScreen(
                                 pinned = pinned,
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
                                 waiting = state.waiting[session.id],
+                                showUnread = state.unreadSessions != UnreadSessions.Off,
                             )
                         }
                     }
@@ -643,6 +652,36 @@ private fun LazyListScope.skeletonItems() {
     }
 }
 
+/** The Unread group's header, with its count and the action that marks them all as read. */
+@Composable
+private fun UnreadGroupHeader(count: Int, marking: Boolean, onEvent: (SessionsEvent) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = OcSpacing.sm, end = OcSpacing.gutter - OcSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OcSectionHeader(
+            stringResource(Res.string.sessions_unread_count, count),
+            Modifier.weight(1f).testTag("sessions_group_unread"),
+        )
+        if (count >= MARK_ALL_READ_MIN) {
+            TextButton(
+                onClick = { onEvent(SessionsEvent.MarkAllRead) },
+                enabled = !marking,
+                modifier = Modifier.testTag("sessions_mark_all_read"),
+            ) {
+                Text(
+                    stringResource(Res.string.sessions_mark_all_read),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = OcTheme.colors.textAccent,
+                )
+            }
+        }
+    }
+}
+
+/** With a single unread session, opening it is as quick as the action. */
+private const val MARK_ALL_READ_MIN = 2
+
 private fun DayBucket.label(): StringResource = when (this) {
     DayBucket.Pinned -> Res.string.sessions_pinned
     DayBucket.Unread -> Res.string.sessions_unread
@@ -773,22 +812,37 @@ private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -
                     )
                 }
             }
-            Text(
-                text = stringResource(Res.string.sessions_filter_read),
-                style = MaterialTheme.typography.labelLarge,
-                color = OcTheme.colors.textMuted,
-            )
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-            ) {
-                SessionRead.entries.forEach { read ->
-                    OcChip(
-                        text = readStateLabel(read),
-                        onClick = { onEvent(SessionsEvent.ToggleRead(read)) },
-                        selected = state.filters.readState == read,
-                        modifier = Modifier.testTag("sessions_filter_read_${read.name.lowercase()}"),
+            // Hidden when the setting turns unread state off.
+            if (state.unreadSessions != UnreadSessions.Off) {
+                Text(
+                    text = stringResource(Res.string.sessions_filter_read),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = OcTheme.colors.textMuted,
+                )
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                ) {
+                    SessionRead.entries.forEach { read ->
+                        OcChip(
+                            text = readStateLabel(read),
+                            onClick = { onEvent(SessionsEvent.ToggleRead(read)) },
+                            selected = state.filters.readState == read,
+                            modifier = Modifier.testTag("sessions_filter_read_${read.name.lowercase()}"),
+                        )
+                    }
+                }
+                // Also where there is no Unread group (dot only) or it is out of sight.
+                if (state.unreadShown.isNotEmpty()) {
+                    OcButton(
+                        text = stringResource(Res.string.sessions_mark_all_read_count, state.unreadShown.size),
+                        onClick = { onEvent(SessionsEvent.MarkAllRead) },
+                        variant = OcButtonVariant.Secondary,
+                        compact = true,
+                        loading = state.markingAllRead,
+                        leadingIcon = Icons.Outlined.MarkEmailRead,
+                        modifier = Modifier.testTag("sessions_filter_mark_all_read"),
                     )
                 }
             }

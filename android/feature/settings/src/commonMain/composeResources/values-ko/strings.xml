@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">썸네일</string>
     <string name="settings_running_in_list">세션 목록에 실행 중인 작업 표시</string>
     <string name="settings_running_in_list_sub">각 세션 아래에 실행 중인 하위 에이전트와 백그라운드 명령 수를 표시</string>
+    <string name="settings_unread_sessions">읽지 않은 세션</string>
+    <string name="settings_unread_sessions_off">끄기</string>
+    <string name="settings_unread_sessions_dot">점</string>
+    <string name="settings_unread_sessions_group">점과 그룹</string>
+    <string name="settings_unread_sessions_off_sub">점과 읽지 않음 그룹을 표시하지 않으며, 목록은 읽은 내용을 추적하지 않습니다</string>
+    <string name="settings_unread_sessions_dot_sub">시간 옆의 점은 아직 열지 않은 응답을 표시합니다. 세션은 원래 날짜에 그대로 있습니다</string>
+    <string name="settings_unread_sessions_group_sub">점은 아직 열지 않은 응답을 표시하며, 이런 세션은 날짜 위에 별도로 묶입니다</string>
     <string name="settings_confirm_stop">명령 중지 전 확인</string>
     <string name="settings_confirm_stop_sub">실행 중 시트에서 백그라운드 명령을 중지하기 전에 확인합니다</string>
     <string name="settings_running_chips">메시지 상자 위에 실행 중인 작업 표시</string>

@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">صور مصغرة</string>
     <string name="settings_running_in_list">إظهار الأعمال قيد التشغيل في قائمة الجلسات</string>
     <string name="settings_running_in_list_sub">عرض عدد الوكلاء الفرعيين والأوامر الخلفية قيد التشغيل أسفل كل جلسة</string>
+    <string name="settings_unread_sessions">الجلسات غير المقروءة</string>
+    <string name="settings_unread_sessions_off">إيقاف</string>
+    <string name="settings_unread_sessions_dot">نقطة</string>
+    <string name="settings_unread_sessions_group">نقطة ومجموعة</string>
+    <string name="settings_unread_sessions_off_sub">لا نقاط ولا مجموعة غير المقروءة: القائمة لا تتتبع ما قرأته</string>
+    <string name="settings_unread_sessions_dot_sub">تظهر نقطة بجوار الوقت للرد الذي لم تفتحه؛ وتبقى الجلسة في يومها</string>
+    <string name="settings_unread_sessions_group_sub">تشير النقطة إلى رد لم تفتحه، وتُجمع هذه الجلسات فوق الأيام</string>
     <string name="settings_confirm_stop">تأكيد قبل إيقاف الأوامر</string>
     <string name="settings_confirm_stop_sub">اطلب التأكيد قبل إيقاف أمر خلفي من ورقة قيد التشغيل</string>
     <string name="settings_running_chips">العمل الجاري فوق مربع الرسالة</string>

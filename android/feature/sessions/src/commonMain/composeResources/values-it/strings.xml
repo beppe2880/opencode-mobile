@@ -32,6 +32,10 @@
     <string name="sessions_filter_range_hint">Scegli una data di inizio e fine</string>
     <string name="sessions_filter_outcome">Esito</string>
     <string name="sessions_unread">Non lette</string>
+    <string name="sessions_unread_count">Non lette · %1$d</string>
+    <string name="sessions_mark_all_read">Segna tutte come lette</string>
+    <string name="sessions_mark_all_read_count">Segna %1$d come lette</string>
+    <string name="sessions_mark_all_read_failed">Alcune sessioni non sono state segnate come lette</string>
     <string name="sessions_read">Lette</string>
     <string name="sessions_filter_read">Stato di lettura</string>
     <string name="sessions_outcome_succeeded">Completata</string>

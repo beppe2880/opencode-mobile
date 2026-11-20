@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -83,6 +84,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_SWIPE_SENSITIVITY, next.swipeSensitivity.name)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
+        prefs.putString(KEY_UNREAD_SESSIONS, next.unreadSessions.name)
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
@@ -170,6 +172,8 @@ internal class PreferencesSettingsRepository(
                 ?: defaults.swipeSensitivity,
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
+            unreadSessions = UnreadSessions.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNREAD_SESSIONS) }
+                ?: defaults.unreadSessions,
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
@@ -261,6 +265,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_SWIPE_SENSITIVITY = "swipe_sensitivity"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
+        const val KEY_UNREAD_SESSIONS = "unread_sessions"
         const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"

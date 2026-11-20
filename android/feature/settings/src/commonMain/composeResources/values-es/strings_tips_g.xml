@@ -4,6 +4,6 @@
     <string name="tips_g_filters_body">Limita la lista por fecha, resultado o archivadas. Archivar también ofrece Deshacer.</string>
     <string name="tips_g_filters_demo">Una lista de sesiones abre sus filtros y muestra una sesión archivada.</string>
     <string name="tips_g_unread_title">Sesiones sin leer</string>
-    <string name="tips_g_unread_body">Un punto marca las sesiones cuyo último turno terminó después de la última vez que las viste. Las sesiones sin leer tienen su propio grupo bajo las fijadas, así que siempre están arriba; abre una para quitar el punto y devolverla a su día.</string>
+    <string name="tips_g_unread_body">Un punto marca las sesiones cuyo último turno terminó después de la última vez que las viste. Las sesiones sin leer tienen su propio grupo bajo las fijadas, así que siempre están arriba; abre una para quitar el punto y devolverla a su día, o marca todas como leídas desde el grupo. En Ajustes → Sesiones puedes dejar solo el punto o desactivar las sesiones sin leer.</string>
     <string name="tips_g_unread_demo">Una sesión terminada recibe un punto y pasa a Sin leer; al tocarla desaparece el punto y vuelve a Hoy.</string>
 </resources>

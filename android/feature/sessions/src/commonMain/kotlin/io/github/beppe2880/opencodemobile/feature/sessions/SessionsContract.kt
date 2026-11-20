@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
 /**
@@ -93,6 +94,10 @@ data class SessionsState(
     val waiting: Map<String, SessionWaiting> = emptyMap(),
     /** Rows show running subagents and commands (setting). */
     val showRunningWork: Boolean = true,
+    /** How unread sessions are marked and grouped (setting). */
+    val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
+    /** Marking every listed unread session as read is under way. */
+    val markingAllRead: Boolean = false,
     val loading: Boolean = true,
     val refreshing: Boolean = false,
     val error: UiText? = null,
@@ -107,6 +112,10 @@ data class SessionsState(
     val deleting: Session? = null,
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
+
+    /** The unread sessions the list shows, those [SessionsEvent.MarkAllRead] marks; none while unread state is off. */
+    val unreadShown: List<Session>
+        get() = if (unreadSessions == UnreadSessions.Off) emptyList() else groups.flatMap { it.sessions }.filter { it.isUnread }
     val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
@@ -126,6 +135,9 @@ sealed interface SessionsEvent {
 
     /** Narrows the list to [state], or clears the filter when it is already picked. */
     data class ToggleRead(val state: SessionRead) : SessionsEvent
+
+    /** Marks every unread session the list shows (filters and search applied) as viewed. */
+    data object MarkAllRead : SessionsEvent
     data object ResetFilters : SessionsEvent
 
     data class HideProject(val directory: String) : SessionsEvent

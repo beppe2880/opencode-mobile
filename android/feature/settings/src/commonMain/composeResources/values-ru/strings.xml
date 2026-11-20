@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Миниатюры</string>
     <string name="settings_running_in_list">Показывать текущую работу в списке сессий</string>
     <string name="settings_running_in_list_sub">Считать выполняемых субагентов и фоновые команды под каждой сессией</string>
+    <string name="settings_unread_sessions">Непрочитанные сессии</string>
+    <string name="settings_unread_sessions_off">Выкл.</string>
+    <string name="settings_unread_sessions_dot">Точка</string>
+    <string name="settings_unread_sessions_group">Точка и группа</string>
+    <string name="settings_unread_sessions_off_sub">Без точек и без группы «Непрочитанные»: список не отслеживает, что вы прочитали</string>
+    <string name="settings_unread_sessions_dot_sub">Точка рядом со временем отмечает ответ, который вы не открывали; сессия остаётся в своём дне</string>
+    <string name="settings_unread_sessions_group_sub">Точка отмечает ответ, который вы не открывали; такие сессии собраны над днями</string>
     <string name="settings_confirm_stop">Подтверждать остановку команд</string>
     <string name="settings_confirm_stop_sub">Спрашивать перед остановкой фоновой команды из панели «Выполняется»</string>
     <string name="settings_running_chips">Выполняемая работа над полем сообщения</string>

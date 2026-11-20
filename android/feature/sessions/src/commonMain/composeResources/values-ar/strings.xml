@@ -32,6 +32,10 @@
     <string name="sessions_filter_range_hint">اختر تاريخ البداية والنهاية</string>
     <string name="sessions_filter_outcome">النتيجة</string>
     <string name="sessions_unread">غير مقروءة</string>
+    <string name="sessions_unread_count">غير مقروءة · %1$d</string>
+    <string name="sessions_mark_all_read">تحديد الكل كمقروء</string>
+    <string name="sessions_mark_all_read_count">تحديد %1$d كمقروءة</string>
+    <string name="sessions_mark_all_read_failed">تعذّر تحديد بعض الجلسات كمقروءة</string>
     <string name="sessions_read">مقروءة</string>
     <string name="sessions_filter_read">حالة القراءة</string>
     <string name="sessions_outcome_succeeded">ناجحة</string>

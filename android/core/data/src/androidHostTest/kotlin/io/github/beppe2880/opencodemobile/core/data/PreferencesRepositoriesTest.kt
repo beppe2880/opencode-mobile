@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -90,6 +91,7 @@ class PreferencesRepositoriesTest {
             groupThoughts = false,
             showRunningWorkInList = false,
             confirmStopCommand = false,
+            unreadSessions = UnreadSessions.Off,
             runningChips = false,
             questionsCollapsed = true,
             permissionsCollapsed = true,
