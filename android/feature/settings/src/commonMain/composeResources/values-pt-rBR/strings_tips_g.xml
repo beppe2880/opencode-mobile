@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filtre suas sessões</string>
+    <string name="tips_g_filters_body">Restrinja a lista por data, resultado ou arquivadas. Arquivar também oferece Desfazer.</string>
+    <string name="tips_g_filters_demo">Uma lista de sessões abre os filtros e mostra uma sessão arquivada.</string>
+</resources>

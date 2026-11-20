@@ -293,7 +293,7 @@ internal class FakeEvents : EventRepository {
 }
 
 internal class FakeSessions(private val store: FakeStore, private val events: FakeEvents) : SessionRepository {
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> {
         delay(LATENCY)
         return Result.success(
             store.sessions.value

@@ -5,17 +5,6 @@ import platform.Foundation.NSCalendar
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
 import platform.Foundation.NSDateFormatter
-import platform.Foundation.NSDateFormatterMediumStyle
-import platform.Foundation.NSDateFormatterNoStyle
-
-internal actual fun formatMediumDate(date: LocalDate): String {
-    val formatter = NSDateFormatter().apply {
-        dateStyle = NSDateFormatterMediumStyle
-        timeStyle = NSDateFormatterNoStyle
-    }
-    return formatter.stringFromDate(date.toNSDate())
-}
-
 internal actual fun formatShortDayName(date: LocalDate): String {
     val formatter = NSDateFormatter().apply { setLocalizedDateFormatFromTemplate("EEE") }
     return formatter.stringFromDate(date.toNSDate())

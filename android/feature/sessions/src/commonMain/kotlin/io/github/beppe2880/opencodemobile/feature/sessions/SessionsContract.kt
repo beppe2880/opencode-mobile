@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
@@ -75,6 +76,11 @@ data class SessionsState(
     val projects: List<Project> = emptyList(),
     val hiddenDirectories: Set<String> = emptySet(),
     val directoryFilter: String? = null,
+    /** The filters chosen in the filter sheet. */
+    val filters: SessionFilters = SessionFilters(),
+    /** False on servers before OpenCode 2.1.0: archive and the archived filter are hidden. */
+    val archiveSupported: Boolean = true,
+    val filterSheetOpen: Boolean = false,
     val groups: List<SessionGroup> = emptyList(),
     /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */
     val pinned: Set<String> = emptySet(),
@@ -107,6 +113,15 @@ sealed interface SessionsEvent {
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent
+    data object OpenFilters : SessionsEvent
+    data object DismissFilters : SessionsEvent
+
+    /** Adds or removes a status from the list; reloads it. */
+    data class ToggleStatus(val status: SessionStatus) : SessionsEvent
+    data class SetDateFilter(val filter: SessionDateFilter) : SessionsEvent
+    data class ToggleOutcome(val outcome: SessionOutcome) : SessionsEvent
+    data object ResetFilters : SessionsEvent
+
     data class HideProject(val directory: String) : SessionsEvent
     data class UnhideProject(val directory: String) : SessionsEvent
     data class Open(val sessionId: String) : SessionsEvent
@@ -117,6 +132,9 @@ sealed interface SessionsEvent {
 
     /** Pins the session to the top of the list or unpins it; closes the row actions. */
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
+
+    /** Archives the session or restores it; closes the row actions. */
+    data class SetArchived(val session: Session, val archived: Boolean) : SessionsEvent
     data class RequestRename(val session: Session) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent
     data class RequestDelete(val session: Session) : SessionsEvent
@@ -149,4 +167,7 @@ sealed interface SessionsEffect {
     data class OpenChat(val sessionId: String) : SessionsEffect
     data object OpenSettings : SessionsEffect
     data class ShowMessage(val message: UiText) : SessionsEffect
+
+    /** Shows the archive/restore confirmation with an Undo action. */
+    data class ShowArchiveUndo(val session: Session, val archived: Boolean) : SessionsEffect
 }

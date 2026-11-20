@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filtra tus sesiones</string>
+    <string name="tips_g_filters_body">Limita la lista por fecha, resultado o archivadas. Archivar también ofrece Deshacer.</string>
+    <string name="tips_g_filters_demo">Una lista de sesiones abre sus filtros y muestra una sesión archivada.</string>
+</resources>

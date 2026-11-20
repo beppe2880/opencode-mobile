@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filtra le tue sessioni</string>
+    <string name="tips_g_filters_body">Restringi l'elenco per data, esito o sessioni archiviate. L'archiviazione offre anche Annulla.</string>
+    <string name="tips_g_filters_demo">Un elenco di sessioni apre i filtri e mostra una sessione archiviata.</string>
+</resources>

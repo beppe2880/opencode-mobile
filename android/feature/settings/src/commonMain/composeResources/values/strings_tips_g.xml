@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filter your sessions</string>
+    <string name="tips_g_filters_body">Narrow the list by date, outcome, or archived. Archiving also offers Undo.</string>
+    <string name="tips_g_filters_demo">A session list opens its filter sheet and shows an archived session.</string>
+</resources>

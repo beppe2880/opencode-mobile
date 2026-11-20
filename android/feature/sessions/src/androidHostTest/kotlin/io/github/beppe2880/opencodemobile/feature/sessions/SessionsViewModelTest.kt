@@ -42,6 +42,7 @@ import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -88,7 +89,8 @@ class SessionsViewModelTest {
 
     private val pins = InMemoryPinnedSessions()
 
-    private fun vm() = SessionsViewModel(sessions, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
+    private fun vm(repository: FakeSessionRepository = sessions) =
+        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
 
     @Test
     fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {
@@ -116,6 +118,181 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.SetPinned("week", false))
         assertEquals(listOf(DayBucket.Today, DayBucket.Yesterday, DayBucket.ThisWeek, DayBucket.Older), vm.state.value.groups.map { it.bucket })
         assertEquals(emptySet<String>(), pins.pinned())
+    }
+
+    @Test
+    fun `the filter sheet opens and closes`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.filterSheetOpen)
+
+        vm.onEvent(SessionsEvent.OpenFilters)
+        assertTrue(vm.state.value.filterSheetOpen)
+
+        vm.onEvent(SessionsEvent.DismissFilters)
+        assertFalse(vm.state.value.filterSheetOpen)
+    }
+
+    @Test
+    fun `the archived status loads the archived list and returns to active sessions`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.archivedResult = Result.success(listOf(session("archived", now - hour, archivedAt = now)))
+
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active))
+        advanceUntilIdle()
+
+        assertEquals(setOf(SessionStatus.Archived), vm.state.value.filters.statuses)
+        assertEquals(true, sessions.lastArchived)
+        assertEquals(listOf("archived"), vm.state.value.ids())
+
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        advanceUntilIdle()
+
+        assertEquals(setOf(SessionStatus.Active), vm.state.value.filters.statuses)
+        assertEquals(false, sessions.lastArchived)
+        assertEquals(listOf("today", "yesterday", "week", "old"), vm.state.value.ids())
+    }
+
+    @Test
+    fun `selecting both statuses merges active and archived sessions`() = runTest(main.testDispatcher) {
+        sessions.archivedResult = Result.success(listOf(session("archived", now - 2 * hour, archivedAt = now)))
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        advanceUntilIdle()
+
+        assertEquals(setOf(SessionStatus.Active, SessionStatus.Archived), vm.state.value.filters.statuses)
+        assertTrue("archived" in vm.state.value.ids())
+        assertTrue("today" in vm.state.value.ids())
+    }
+
+    @Test
+    fun `a date filter reloads the list and the outcome narrows it without loading again`() = runTest(main.testDispatcher) {
+        sessions.listResult = Result.success(
+            listOf(
+                session("failed-today", now - hour, outcome = SessionOutcome.Failed),
+                session("succeeded-today", now - 2 * hour, outcome = SessionOutcome.Succeeded),
+                session("failed-yesterday", now - 20 * hour, outcome = SessionOutcome.Failed),
+            ),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(sessions.untilCalls.isEmpty())
+
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.Today))
+        advanceUntilIdle()
+        assertEquals(listOf("failed-today", "succeeded-today"), vm.state.value.ids())
+        assertEquals(1, sessions.untilCalls.size)
+        val loads = sessions.listCalls
+
+        vm.onEvent(SessionsEvent.ToggleOutcome(SessionOutcome.Failed))
+        assertEquals(listOf("failed-today"), vm.state.value.ids())
+        assertEquals(loads, sessions.listCalls)
+    }
+
+    @Test
+    fun `a date range is read down to the start of its first day`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(listOf(session("today", now - hour)))
+        val vm = vm(repository)
+        advanceUntilIdle()
+        assertTrue(repository.untilCalls.isEmpty())
+
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.Last7Days))
+        advanceUntilIdle()
+
+        val start = LocalDateTime.of(2026, 10, 7, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli()
+        assertEquals(listOf(start), repository.untilCalls)
+
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.AnyTime))
+        advanceUntilIdle()
+
+        assertEquals(1, repository.untilCalls.size)
+    }
+
+    @Test
+    fun `resetting filters clears them and reloads active sessions`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.archivedResult = Result.success(emptyList())
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active))
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.Today))
+        vm.onEvent(SessionsEvent.ToggleOutcome(SessionOutcome.Failed))
+
+        vm.onEvent(SessionsEvent.ResetFilters)
+        advanceUntilIdle()
+
+        assertEquals(SessionFilters(), vm.state.value.filters)
+        assertEquals(false, sessions.lastArchived)
+        assertEquals(listOf("today", "yesterday", "week", "old"), vm.state.value.ids())
+    }
+
+    @Test
+    fun `archiving removes the row and offers an undo`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val target = vm.state.value.groups.first().sessions.first()
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(SessionsEvent.SetArchived(target, true))
+        advanceUntilIdle()
+
+        assertEquals(SessionsEffect.ShowArchiveUndo(target, true), effect.await())
+        assertFalse(target.id in vm.state.value.ids())
+        assertEquals(listOf(target.id to true), sessions.archivedCalls)
+    }
+
+    @Test
+    fun `unarchiving removes the row from the archived list and offers an undo`() = runTest(main.testDispatcher) {
+        sessions.archivedResult = Result.success(listOf(session("archived", now - hour, archivedAt = now)))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active))
+        advanceUntilIdle()
+        val target = vm.state.value.groups.first().sessions.single()
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(SessionsEvent.SetArchived(target, false))
+        advanceUntilIdle()
+
+        assertEquals(SessionsEffect.ShowArchiveUndo(target, false), effect.await())
+        assertTrue(vm.state.value.groups.isEmpty())
+        assertEquals(listOf(target.id to false), sessions.archivedCalls)
+    }
+
+    @Test
+    fun `a failed archive restores the row and shows the error`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val target = vm.state.value.groups.first().sessions.first()
+        sessions.setArchivedResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(SessionsEvent.SetArchived(target, true))
+        advanceUntilIdle()
+
+        assertTrue(target.id in vm.state.value.ids())
+        assertTrue(effect.await() is SessionsEffect.ShowMessage)
+    }
+
+    @Test
+    fun `archiving stays hidden on a server that ignores it`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(listOf(session("today", now - hour)))
+        repository.archiveSupported = false
+        val vm = vm(repository)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.archiveSupported)
+
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+
+        assertEquals(setOf(SessionStatus.Active), vm.state.value.filters.effectiveStatuses)
+        assertEquals(listOf("today"), vm.state.value.ids())
     }
 
     @Test
@@ -1340,10 +1517,15 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.Visible(false))
     }
 
-    private fun session(id: String, updated: Long) = Session(
+    private fun session(
+        id: String,
+        updated: Long,
+        archivedAt: Long? = null,
+        outcome: SessionOutcome? = null,
+    ) = Session(
         id = id, parentId = null, projectId = "p", title = "Title $id", directory = "/p/$id",
-        agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = null,
-        createdAt = updated, updatedAt = updated, archivedAt = null,
+        agent = "build", model = null, cost = 0.0, tokens = TokenUsage(), outcome = outcome,
+        createdAt = updated, updatedAt = updated, archivedAt = archivedAt,
     )
 }
 
@@ -1352,6 +1534,13 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var deleteResult: Result<Unit> = Result.success(Unit)
     var lastSearch: String? = null
     var lastDirectory: String? = null
+    var lastArchived: Boolean? = null
+    var archivedResult: Result<List<Session>>? = null
+    var setArchivedResult: Result<Unit> = Result.success(Unit)
+    var archiveSupported = true
+    var listCalls = 0
+    val archivedCalls = mutableListOf<Pair<String, Boolean>>()
+    val untilCalls = mutableListOf<Long>()
     val created = mutableListOf<String>()
     val createdModels = mutableListOf<ModelRef?>()
     val storedLists = mutableMapOf<Pair<String, String?>, List<Session>>()
@@ -1360,10 +1549,22 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     /** When set, network loads wait for it. */
     var gate: CompletableDeferred<Unit>? = null
 
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> {
         gate?.await()
+        listCalls++
         lastSearch = search
         lastDirectory = directory
+        lastArchived = archived
+        return if (archived == true) archivedResult ?: listResult else listResult
+    }
+    override suspend fun listUntil(
+        search: String?,
+        directory: String?,
+        limit: Int,
+        archived: Boolean?,
+        notBefore: Long,
+    ): Result<List<Session>> {
+        untilCalls += notBefore
         return listResult
     }
     override suspend fun cachedList(serverId: String, directory: String?): List<Session>? = storedLists[serverId to directory]
@@ -1381,6 +1582,11 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     }
     override suspend fun rename(sessionId: String, title: String): Result<Unit> = Result.success(Unit)
     override suspend fun delete(sessionId: String): Result<Unit> = deleteResult
+    override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
+        archivedCalls += sessionId to archived
+        return setArchivedResult
+    }
+    override suspend fun archiveSupported(): Boolean = archiveSupported
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())
     var serverProjects = listOf(Project("p", "/p/today", null, null, 0))
     override suspend fun projects(): Result<List<Project>> {
