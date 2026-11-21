@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">별도 질문하기</string>
+    <string name="tips_c_btw_body">에이전트가 작업하는 동안 메시지 입력창 위의 별도로 질문을 고르거나 /btw와 질문을 입력하세요. 대화 내용을 바탕으로 도구 없이 간단히 답하며, 작업을 방해하거나 방향을 바꾸지 않습니다. 답변은 복사 기능이 있는 별도 패널에서 열리며 채팅에는 들어가지 않습니다. 채팅이 유휴 상태일 때도 작동합니다.</string>
+    <string name="tips_c_btw_demo">에이전트가 작업하는 동안 메시지 입력창에 질문을 입력하고 별도로 질문으로 보냅니다. 입력창 위의 칩에 답변 준비 중, 이어서 답변 준비 완료가 표시되며, 탭하면 답변이 별도 패널에서 열립니다.</string>
+    <string name="tips_c_btw_working">재시도 로직을 리팩터링하는 중…</string>
+    <string name="tips_c_btw_question">재시도 로직은 어느 파일에 있나요?</string>
+    <string name="tips_c_btw_answer">재시도 로직은 **src/api/client.ts**의 `withRetry()`에 있습니다.</string>
+    <string name="tips_c_btw_labels">지금 방향 수정\n대기열에 추가\n별도로 질문\n답변 준비 중…\n답변 준비 완료\n별도 질문\n복사\n닫기</string>
+</resources>

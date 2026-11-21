@@ -33,6 +33,11 @@ internal class OpenCodeClients(
     /** Client for the active server; fails with [OpenCodeError.Unauthorized] when none is selected. */
     fun active(): OpenCodeClient = forProfile(activeProfile())
 
+    /** Resolves an explicitly saved server rather than whichever one navigation made active. */
+    fun forServer(serverId: String): OpenCodeClient = forProfile(
+        servers.servers.value.firstOrNull { it.id == serverId } ?: throw OpenCodeError.NotFound("Server is no longer saved"),
+    )
+
     /** The active server profile; fails like [active] when none is selected. */
     fun activeProfile(): ServerProfile =
         servers.activeServer.value ?: throw OpenCodeError.Unauthorized("No server selected")

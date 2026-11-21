@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Fai una domanda a parte</string>
+    <string name="tips_c_btw_body">Mentre l'agente lavora, scegli Chiedi a parte sopra la casella del messaggio, oppure scrivi /btw e la tua domanda. Risponde brevemente partendo dalla conversazione, senza strumenti e senza interrompere o guidare il compito. La risposta si apre nel suo pannello con Copia e non entra mai nella chat. Funziona anche quando la chat è inattiva.</string>
+    <string name="tips_c_btw_demo">Mentre l'agente lavora, una domanda viene scritta nella casella del messaggio e inviata con Chiedi a parte. Un chip sopra la casella mostra che la risposta è in preparazione, poi pronta; toccandolo, la risposta si apre in un pannello separato.</string>
+    <string name="tips_c_btw_working">Riscrittura della logica dei tentativi…</string>
+    <string name="tips_c_btw_question">Quale file contiene la logica dei tentativi?</string>
+    <string name="tips_c_btw_answer">La logica dei tentativi si trova in **src/api/client.ts**, in `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Guida ora\nIn coda\nChiedi a parte\nPreparazione della risposta…\nRisposta pronta\nDomanda a parte\nCopia\nChiudi</string>
+</resources>

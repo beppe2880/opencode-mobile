@@ -269,4 +269,13 @@
     <string name="chat_preview_selection_now">在输入框中选择：聊天立即切换到这些内容</string>
     <string name="chat_preview_stop_asks">从“运行中”面板停止命令前会先询问</string>
     <string name="chat_preview_stop_direct">从“运行中”面板停止命令会立即结束它</string>
+    <string name="chat_btw_title">旁支问题</string>
+    <string name="chat_btw_ask">单独提问</string>
+    <string name="chat_btw_text_only">旁支问题仅支持文本。请先移除附件再发送。</string>
+    <string name="chat_btw_unavailable">旁支问题不可用。请检查服务器是否支持 /btw。</string>
+    <string name="chat_btw_empty">未返回文本。</string>
+    <string name="chat_btw_failed">提问失败</string>
+    <string name="chat_btw_loading">正在准备回答…</string>
+    <string name="chat_btw_question">你的问题</string>
+    <string name="chat_btw_ready">回答已就绪</string>
 </resources>

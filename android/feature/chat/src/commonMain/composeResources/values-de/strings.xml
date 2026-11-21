@@ -288,4 +288,13 @@
     <string name="chat_preview_selection_now">Im Eingabefeld gewählt: Der Chat wechselt sofort zu ihnen</string>
     <string name="chat_preview_stop_asks">Einen Befehl im Blatt Laufend zu stoppen, fragt zuerst nach</string>
     <string name="chat_preview_stop_direct">Einen Befehl im Blatt Laufend zu stoppen, beendet ihn sofort</string>
+    <string name="chat_btw_title">Nebenfrage</string>
+    <string name="chat_btw_ask">Nebenfrage stellen</string>
+    <string name="chat_btw_text_only">Nebenfragen unterstützen nur Text. Entferne Anhänge vor dem Senden.</string>
+    <string name="chat_btw_unavailable">Nebenfragen nicht verfügbar. Prüfe, ob der Server /btw unterstützt.</string>
+    <string name="chat_btw_empty">Kein Text zurückgegeben.</string>
+    <string name="chat_btw_failed">Frage fehlgeschlagen</string>
+    <string name="chat_btw_loading">Antwort wird vorbereitet…</string>
+    <string name="chat_btw_question">Deine Frage</string>
+    <string name="chat_btw_ready">Antwort bereit</string>
 </resources>

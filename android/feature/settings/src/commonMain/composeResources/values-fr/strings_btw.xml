@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Poser une question à part</string>
+    <string name="tips_c_btw_body">Pendant que l'agent travaille, choisis Demander à part au-dessus de la zone de message, ou tape /btw suivi de ta question. Il répond brièvement à partir de la conversation, sans outils et sans interrompre ni réorienter la tâche. La réponse s'ouvre dans son propre panneau avec Copier et n'entre jamais dans le chat. Cela fonctionne aussi lorsque le chat est inactif.</string>
+    <string name="tips_c_btw_demo">Pendant que l'agent travaille, une question est saisie dans la zone de message et envoyée avec Demander à part. Une pastille au-dessus de la zone indique que la réponse est en préparation, puis prête ; un appui l'ouvre dans un panneau séparé.</string>
+    <string name="tips_c_btw_working">Refactorisation de la logique de nouvelle tentative…</string>
+    <string name="tips_c_btw_question">Quel fichier contient la logique de nouvelle tentative ?</string>
+    <string name="tips_c_btw_answer">La logique de nouvelle tentative se trouve dans **src/api/client.ts**, dans `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Réorienter maintenant\nMettre en attente\nDemander à part\nPréparation de la réponse…\nRéponse prête\nQuestion à part\nCopier\nFermer</string>
+</resources>

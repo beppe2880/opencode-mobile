@@ -364,4 +364,13 @@
     <string name="chat_preview_selection_now">محدد في حقل الكتابة: تنتقل الدردشة إليها فوراً</string>
     <string name="chat_preview_stop_asks">إيقاف أمر من لائحة «قيد التشغيل» يطلب تأكيداً أولاً</string>
     <string name="chat_preview_stop_direct">إيقاف أمر من لائحة «قيد التشغيل» ينهيه فوراً</string>
+    <string name="chat_btw_title">سؤال جانبي</string>
+    <string name="chat_btw_ask">اسأل جانبياً</string>
+    <string name="chat_btw_text_only">الأسئلة الجانبية تدعم النص فقط. أزل المرفقات قبل الإرسال.</string>
+    <string name="chat_btw_unavailable">الأسئلة الجانبية غير متاحة. تحقق من دعم الخادم للأمر /btw.</string>
+    <string name="chat_btw_empty">لم يتم إرجاع نص.</string>
+    <string name="chat_btw_failed">تعذر إرسال السؤال</string>
+    <string name="chat_btw_loading">جارٍ تحضير الإجابة…</string>
+    <string name="chat_btw_question">سؤالك</string>
+    <string name="chat_btw_ready">الإجابة جاهزة</string>
 </resources>

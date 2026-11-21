@@ -1,7 +1,9 @@
 package io.github.beppe2880.opencodemobile
 
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
+import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
+import io.github.beppe2880.opencodemobile.feature.chat.BtwMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ProviderConnectionViewModel
@@ -22,7 +24,9 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
 fun sharedModule(appInfo: AppInfo): Module = module {
@@ -34,7 +38,14 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
-    viewModel { params -> ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    // The process-wide scope supplied by the real and demo data modules.
+    single { BtwMemory(get(named("AppScope"))) } onClose { it?.close() }
+    viewModel { params ->
+        ChatViewModel(
+            params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+            btwMemory = get(), serverId = get<ServerRepository>().activeServer.value?.id.orEmpty(),
+        )
+    }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
     viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }

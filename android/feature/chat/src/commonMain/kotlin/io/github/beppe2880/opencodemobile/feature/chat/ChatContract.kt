@@ -45,6 +45,9 @@ data class ChatState(
     /** Grows when the composer should take the focus and open the keyboard (a quote was added). */
     val composerFocus: Int = 0,
     val delivery: PromptDelivery = PromptDelivery.Steer,
+    val btwMode: Boolean = false,
+    val btw: BtwState? = null,
+    val btwOpen: Boolean = false,
     val sending: Boolean = false,
     val stopping: Boolean = false,
     val permissions: List<PermissionRequest> = emptyList(),
@@ -168,8 +171,10 @@ data class ChatState(
 
     /** The draft is a `!command` for the session's shell. */
     val isShell: Boolean get() = Completions.shell(draft) != null
+    val isBtw: Boolean get() = btwMode || Completions.slash(draft.trim())?.name == "btw"
     val canSend: Boolean get() = when {
         sending || reverting || creatingSession -> false
+        isBtw -> btw?.loading != true && attachments.isEmpty() && draft.isNotBlank()
         isShell -> !Completions.shell(draft).isNullOrEmpty()
         else -> draft.isNotBlank() || uploads.isNotEmpty()
     }
@@ -181,6 +186,14 @@ data class ChatState(
 
     fun isFormCollapsed(formId: String): Boolean = (formId in toggledForms) != questionsCollapsedByDefault
 }
+
+/** Transient side conversation, never included in the transcript or saved on disk. */
+data class BtwState(
+    val question: String = "",
+    val answer: String? = null,
+    val loading: Boolean = false,
+    val error: UiText? = null,
+)
 
 /** The display settings of the chat; shared by the chat and its preview in Settings. */
 internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
@@ -375,6 +388,10 @@ sealed interface ChatEvent {
     data class Quote(val text: String) : ChatEvent
     data class DeliveryChanged(val delivery: PromptDelivery) : ChatEvent
     data object Send : ChatEvent
+    data class BtwMode(val selected: Boolean) : ChatEvent
+    data class BtwOpen(val open: Boolean) : ChatEvent
+    data class BtwQuestion(val text: String) : ChatEvent
+    data object AskBtw : ChatEvent
     data object Stop : ChatEvent
 
     /** Moves the running shell command or subagent to the background (TUI ctrl+b). */
@@ -480,6 +497,7 @@ sealed interface ChatEffect {
     data class ShowMessage(val message: UiText) : ChatEffect
     data object NavigateBack : ChatEffect
     data object PromptSent : ChatEffect
+    data object BtwSent : ChatEffect
     data class OpenSession(val sessionId: String) : ChatEffect
     data class SwitchSession(val sessionId: String) : ChatEffect
     data class OpenTerminal(val directory: String) : ChatEffect

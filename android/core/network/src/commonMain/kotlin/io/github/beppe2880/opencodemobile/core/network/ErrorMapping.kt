@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.network
 
 import io.github.beppe2880.opencodemobile.api.infrastructure.HttpResponse
+import io.github.beppe2880.opencodemobile.api.models.SessionGenerateResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionMessagesResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionsResponse
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -55,6 +56,7 @@ internal suspend fun <T> decodeBody(response: io.ktor.client.statement.HttpRespo
     when (type.classifier) {
         SessionMessagesResponse::class -> TolerantPages.messages(OpenCodeJson, text) as T
         SessionsResponse::class -> TolerantPages.sessions(OpenCodeJson, text) as T
+        SessionGenerateResponse::class -> decodeGenerateResponse(OpenCodeJson, text) as T
         else -> OpenCodeJson.decodeFromString(OpenCodeJson.serializersModule.serializer(type), text) as T
     }
 } catch (e: CancellationException) {

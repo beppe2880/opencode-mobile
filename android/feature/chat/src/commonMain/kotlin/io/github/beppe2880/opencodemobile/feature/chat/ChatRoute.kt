@@ -166,6 +166,7 @@ fun ChatRoute(
                 dictation.cancel()
                 listState.scrollToLatest()
             }
+            ChatEffect.BtwSent -> dictation.cancel()
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)
             is ChatEffect.SwitchSession -> onSwitchSession(effect.sessionId)
             is ChatEffect.OpenTerminal -> onOpenTerminal(effect.directory)
@@ -174,6 +175,7 @@ fun ChatRoute(
     }
 
     ChatScreen(
+        externalOverlayOpen = providersOpen,
         state = state,
         onEvent = viewModel::onEvent,
         onCopy = { text ->

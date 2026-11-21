@@ -42,6 +42,7 @@ class OpenCodeClientFactory(private val debugLogging: Boolean = false) {
         // to answer with JSON. Responses are decoded by [awaitBody].
         install(ContentNegotiation) { json(OpenCodeJson) }
         install(NoContentTypeWithoutBody)
+        install(SessionGenerationTimeouts)
         // Pings detect a dead terminal connection; OkHttp sends its own (see platformHttpClient).
         install(WebSockets) { pingIntervalMillis = PING_INTERVAL_MILLIS }
     }
