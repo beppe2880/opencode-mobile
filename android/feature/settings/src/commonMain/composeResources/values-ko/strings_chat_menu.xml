@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">정리된 채팅 작업</string>
+    <string name="tips_c_chat_menu_body">점 세 개 메뉴에서 대화, 컨텍스트 및 기록, 도구별로 작업을 모았습니다. 명령을 입력하지 않고 같은 폴더에 새 채팅을 만들거나 분기, 압축, 실행 취소 및 복원할 수 있습니다. 슬래시 명령도 그대로 사용할 수 있습니다.</string>
+    <string name="tips_c_chat_menu_demo">메뉴에 그룹화된 작업이 표시됩니다. 손가락이 대화 분기 만들기를 가리킵니다.</string>
+    <string name="tips_c_chat_menu_groups">대화\n컨텍스트 및 기록\n도구</string>
+    <string name="tips_c_chat_menu_actions">새 채팅\n대화 분기 만들기\n컨텍스트 압축\n마지막 프롬프트 실행 취소\n실행 중\nMCP 서버</string>
+</resources>

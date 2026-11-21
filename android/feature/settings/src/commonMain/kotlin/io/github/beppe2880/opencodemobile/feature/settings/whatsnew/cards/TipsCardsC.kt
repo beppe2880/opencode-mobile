@@ -8,10 +8,14 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_title
@@ -49,6 +53,17 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
 internal val tipsCardsC: List<FeatureCard> = listOf(
+    FeatureCard(
+        id = "chat-actions-menu",
+        version = "0.18.0",
+        icon = Icons.Outlined.MoreVert,
+        title = Res.string.tips_c_chat_menu_title,
+        body = Res.string.tips_c_chat_menu_body,
+        demoDescription = Res.string.tips_c_chat_menu_demo,
+        author = "Andrease11",
+        pullRequest = 243,
+        demo = { ChatMenuDemo(it) },
+    ),
     FeatureCard(
         id = "session-waiting-for-you",
         version = "0.18.0",

@@ -28,11 +28,8 @@ import androidx.compose.material.icons.outlined.Difference
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material.icons.outlined.Terminal
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -76,7 +73,6 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
-import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_back
@@ -92,13 +88,9 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_op
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pin
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pinned
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unpin
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_branch_description
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_detached
@@ -154,6 +146,7 @@ fun ChatScreen(
                     onProviders = { onEvent(ChatEvent.OpenProviders) },
                     onPin = { onEvent(ChatEvent.SetPinned(it)) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
+                    onMenuEvent = onEvent,
                 )
                 if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
@@ -255,6 +248,7 @@ internal fun ChatTopBar(
     onProviders: () -> Unit = {},
     /** Pins the session to the top of the session list (true) or unpins it. */
     onPin: (Boolean) -> Unit = {},
+    onMenuEvent: (ChatEvent) -> Unit = {},
     applyStatusBarInset: Boolean = true,
 ) {
     val c = OcTheme.colors
@@ -323,44 +317,14 @@ internal fun ChatTopBar(
                     onClick = { menuOpen = true },
                     modifier = Modifier.testTag("chat_more_button"),
                 )
-                DropdownMenu(
-                    expanded = menuOpen,
-                    onDismissRequest = { menuOpen = false },
-                    containerColor = c.bgBase,
-                    modifier = Modifier.exposeTestTags(),
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(if (state.pinned) Res.string.chat_unpin else Res.string.chat_pin)) },
-                        onClick = {
-                            menuOpen = false
-                            onPin(!state.pinned)
-                        },
-                        leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
-                        modifier = Modifier.testTag("chat_menu_pin"),
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(UiRes.string.oc_running)) },
-                        onClick = {
-                            menuOpen = false
-                            onRunning()
-                        },
-                        modifier = Modifier.testTag("chat_running_menu_item"),
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.chat_providers)) },
-                        onClick = { menuOpen = false; onProviders() },
-                        enabled = state.directory.isNotEmpty(),
-                        modifier = Modifier.testTag("chat_providers_menu_item"),
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.chat_mcps)) },
-                        onClick = {
-                            menuOpen = false
-                            onMcps()
-                        },
-                        enabled = state.directory.isNotEmpty(),
-                        modifier = Modifier.testTag("chat_mcps_menu_item"),
-                    )
+                ChatActionsMenu(state, menuOpen, onDismiss = { menuOpen = false }) { event ->
+                    when (event) {
+                        is ChatEvent.SetPinned -> onPin(event.pinned)
+                        is ChatEvent.RunningSheet -> onRunning()
+                        ChatEvent.OpenProviders -> onProviders()
+                        ChatEvent.OpenMcps -> onMcps()
+                        else -> onMenuEvent(event)
+                    }
                 }
             }
         },

@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">チャット操作を整理</string>
+    <string name="tips_c_chat_menu_body">三点メニューは会話、コンテキストと履歴、ツールに分かれています。コマンドを入力せずに、同じフォルダーで新規チャット、分岐、圧縮、取り消し、復元ができます。スラッシュコマンドも引き続き使えます。</string>
+    <string name="tips_c_chat_menu_demo">メニューがグループ化された操作を表示します。指が会話の分岐を示します。</string>
+    <string name="tips_c_chat_menu_groups">会話\nコンテキストと履歴\nツール</string>
+    <string name="tips_c_chat_menu_actions">新しいチャット\n会話を分岐\nコンテキストを圧縮\n最後のプロンプトを取り消す\n実行中\nMCP サーバー</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">Les actions du chat, organisées</string>
+    <string name="tips_c_chat_menu_body">Le menu à trois points regroupe conversation, contexte et historique, et outils. Créez une discussion dans le même dossier, bifurquez, compactez, annulez ou restaurez sans saisir de commande. Les raccourcis slash restent disponibles.</string>
+    <string name="tips_c_chat_menu_demo">Le menu affiche des actions regroupées. Un doigt souligne la création d'une bifurcation.</string>
+    <string name="tips_c_chat_menu_groups">Conversation\nContexte et historique\nOutils</string>
+    <string name="tips_c_chat_menu_actions">Nouvelle discussion\nCréer une bifurcation\nCompacter le contexte\nAnnuler le dernier prompt\nEn cours\nServeurs MCP</string>
+</resources>

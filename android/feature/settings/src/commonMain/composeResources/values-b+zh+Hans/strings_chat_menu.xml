@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">聊天操作，井然有序</string>
+    <string name="tips_c_chat_menu_body">三点菜单按对话、上下文与历史、工具分组。无需输入命令即可在同一文件夹中新建聊天、分支、压缩、撤销或恢复。斜杠快捷命令仍可使用。</string>
+    <string name="tips_c_chat_menu_demo">菜单显示分组操作。手指突出显示创建分支。</string>
+    <string name="tips_c_chat_menu_groups">对话\n上下文与历史\n工具</string>
+    <string name="tips_c_chat_menu_actions">新建聊天\n创建分支对话\n压缩上下文\n撤销上一条提示\n运行中\nMCP 服务器</string>
+</resources>

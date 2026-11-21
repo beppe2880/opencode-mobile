@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">Contexte et historique</string>
+    <string name="chat_menu_tools">Outils</string>
+    <string name="chat_new">Nouvelle discussion</string>
+    <string name="chat_fork">Créer une bifurcation</string>
+    <string name="chat_undo">Annuler le dernier prompt</string>
+    <string name="chat_redo">Restaurer les prompts annulés</string>
+</resources>

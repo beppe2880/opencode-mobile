@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">Kontext und Verlauf</string>
+    <string name="chat_menu_tools">Werkzeuge</string>
+    <string name="chat_new">Neuer Chat</string>
+    <string name="chat_fork">Abzweigung erstellen</string>
+    <string name="chat_undo">Letzten Prompt rückgängig machen</string>
+    <string name="chat_redo">Prompts wiederherstellen</string>
+</resources>

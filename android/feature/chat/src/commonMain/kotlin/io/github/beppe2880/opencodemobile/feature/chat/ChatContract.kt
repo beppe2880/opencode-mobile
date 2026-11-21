@@ -99,6 +99,9 @@ data class ChatState(
     val reverting: Boolean = false,
     val forking: Boolean = false,
     val creatingSession: Boolean = false,
+    /** Availability of the existing undo/redo commands, also offered by the header menu. */
+    val canUndo: Boolean = false,
+    val canRedo: Boolean = false,
     /** Blocking work the user can move to the background; the hint shows once it runs long. */
     val backgroundable: BackgroundableWork? = null,
     /** Context the next step will use; null before the first reply or right after a compaction. */
@@ -335,6 +338,11 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
         ?: ModelLabel(ref.id, ref.providerId)
 
 sealed interface ChatEvent {
+    /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
+    data object NewSession : ChatEvent
+
+    /** Runs the existing /undo behavior. */
+    data object Undo : ChatEvent
     data class Visible(val visible: Boolean) : ChatEvent
     data class RunningSheet(val open: Boolean) : ChatEvent
     data object RefreshRunning : ChatEvent
@@ -437,8 +445,8 @@ sealed interface ChatEvent {
     data class Revert(val messageId: String) : ChatEvent
     data object RestoreRevert : ChatEvent
 
-    /** Copies the history before [messageId] to a new session and opens it with that prompt as draft. */
-    data class Fork(val messageId: String) : ChatEvent
+    /** Copies history before [messageId] with that prompt as draft; null copies the whole chat, like /fork. */
+    data class Fork(val messageId: String? = null) : ChatEvent
 
     data object OpenChanges : ChatEvent
 
