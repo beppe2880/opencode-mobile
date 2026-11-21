@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.ToolFreeformFormat
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -34,6 +35,8 @@ import kotlinx.serialization.Contextual
  * @param tools 
  * @param input 
  * @param output 
+ * @param freeform 
+ * @param temperature 
  */
 @Serializable
 
@@ -46,7 +49,13 @@ data class ModelCapabilities (
     val input: kotlin.collections.List<kotlin.String>,
 
     @SerialName(value = "output")
-    val output: kotlin.collections.List<kotlin.String>
+    val output: kotlin.collections.List<kotlin.String>,
+
+    @SerialName(value = "freeform")
+    val freeform: kotlin.collections.List<@Contextual ToolFreeformFormat>? = null,
+
+    @SerialName(value = "temperature")
+    val temperature: kotlin.Boolean? = null
 
 ) {
 

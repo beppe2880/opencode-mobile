@@ -177,6 +177,11 @@ class ChatViewModel(
     private var revertMessageId: String? = null
     private var localIds = 0
 
+    /** The session's idle and viewed watermarks as last loaded; the viewed one is reported once. */
+    private var sessionIdleAt: Long? = null
+    private var sessionViewedAt: Long? = null
+    private var reportedViewedAt: Long? = null
+
     init {
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
@@ -576,6 +581,8 @@ class ChatViewModel(
             }
             val s = sessionResult.getOrThrow()
             revertMessageId = s.revertMessageId
+            sessionIdleAt = s.idleAt
+            sessionViewedAt = s.viewedAt
             pendingForms.await().onSuccess(::showForms)
             val server = transcriptResult.getOrThrow()
             keepSentImages(server)
@@ -602,6 +609,7 @@ class ChatViewModel(
                 )
             }
             rebuild()
+            reportViewed()
             // `/mcps` can open the panel before the project directory is known.
             if (currentState.mcps?.servers == null && mcpJob?.isActive != true) refreshMcps()
             loadCatalog(s.directory)
@@ -877,6 +885,15 @@ class ChatViewModel(
                 applyEvent(event)
                 scheduleReload()
                 refreshChangedFiles()
+                // The new idle watermark is read from the session: the reload only reads messages.
+                viewModelScope.launch {
+                    if (!chatVisible.value) return@launch
+                    sessions.get(sessionId).onSuccess { s ->
+                        sessionIdleAt = s.idleAt
+                        sessionViewedAt = s.viewedAt
+                        reportViewed()
+                    }
+                }
             }
             is ServerEvent.SessionChanged -> if (event.deleted) {
                 sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_session_deleted)))
@@ -1103,6 +1120,26 @@ class ChatViewModel(
 
     fun setChatVisible(visible: Boolean) {
         chatVisible.value = visible
+        if (visible) reportViewed()
+    }
+
+    /**
+     * Reports the session's latest idle transition as viewed while this chat is on screen, once per
+     * idle, like the desktop app. A session already viewed at that idle makes no request; a failed
+     * one (an older server, a dropped connection) is retried by the next load or visit.
+     */
+    private fun reportViewed() {
+        if (!chatVisible.value) return
+        val idle = sessionIdleAt ?: return
+        val viewed = sessionViewedAt
+        if (viewed != null && viewed >= idle) return
+        if (reportedViewedAt == idle) return
+        reportedViewedAt = idle
+        viewModelScope.launch {
+            sessions.markViewed(sessionId, idle)
+                .onSuccess { sessionViewedAt = idle }
+                .onFailure { if (reportedViewedAt == idle) reportedViewedAt = null }
+        }
     }
 
     /**

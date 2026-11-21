@@ -39,7 +39,7 @@ data class CredentialUpdateRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "label")
-    val label: kotlin.String?
+    val label: kotlin.String
 
 ) {
 

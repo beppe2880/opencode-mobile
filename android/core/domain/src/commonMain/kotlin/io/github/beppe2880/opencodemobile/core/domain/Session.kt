@@ -83,9 +83,21 @@ data class Session(
     val createdAt: Long,
     val updatedAt: Long,
     val archivedAt: Long?,
+    /** When the latest turn ended (the server's idle watermark); null before the first turn ends. */
+    val idleAt: Long? = null,
+    /** The idle watermark a client last reported as viewed; null when no client ever viewed it. */
+    val viewedAt: Long? = null,
     /** First message of a staged revert: it and everything after are hidden until committed or cleared. */
     val revertMessageId: String? = null,
 ) {
+    /**
+     * The latest turn ended after the idle transition any client last viewed, or no client viewed
+     * one: the row shows an unread dot. A session without an idle (never finished, or running its
+     * first turn) is read. Like the desktop app, it is the root session that carries this state.
+     */
+    val isUnread: Boolean
+        get() = idleAt != null && (viewedAt == null || idleAt > viewedAt)
+
     /** Last path segment of the working directory, used as a compact project label. */
     val directoryName: String
         get() = directory.trimEnd('/').substringAfterLast('/').ifEmpty { "/" }

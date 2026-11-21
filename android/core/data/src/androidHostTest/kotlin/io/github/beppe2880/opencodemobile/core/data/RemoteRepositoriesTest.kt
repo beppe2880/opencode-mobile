@@ -16,12 +16,16 @@ import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PromptDelivery
 import io.github.beppe2880.opencodemobile.core.domain.ShellOutput
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -45,6 +49,64 @@ class RemoteRepositoriesTest {
 
     private fun userMessage(index: Int) =
         """{"id":"msg_$index","time":{"created":$index},"type":"user","text":"prompt $index"}"""
+
+    private fun sessionJson(id: String, updated: Long) =
+        """{"id":"$id","projectID":"p","cost":0,""" +
+            """"tokens":{"input":0,"output":0,"reasoning":0,"cache":{"read":0,"write":0}},""" +
+            """"time":{"created":1,"updated":$updated},"location":{"directory":"/repo"}}"""
+
+    @Test
+    fun `archiving support comes from the server version`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(json("""{"version":"2.1.0","pid":1,"urls":[],"paths":{"tmp":"/tmp"}}"""))
+        server.enqueue(json("""{"version":"2.0.27","pid":1,"urls":[],"paths":{"tmp":"/tmp"}}"""))
+
+        assertTrue(sessions.archiveSupported())
+        assertFalse(sessions.archiveSupported())
+        assertEquals("/api/info", server.takeRequest().path)
+        assertEquals("/api/info", server.takeRequest().path)
+    }
+
+    @Test
+    fun `a date range keeps reading older pages until the cutoff`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(
+            json(
+                """{"data":[${sessionJson("ses_1", 100)},${sessionJson("ses_2", 90)}],""" +
+                    """"cursor":{"previous":null,"next":"c2"}}""",
+            ),
+        )
+        server.enqueue(
+            json(
+                """{"data":[${sessionJson("ses_3", 80)},${sessionJson("ses_4", 50)}],""" +
+                    """"cursor":{"previous":"c1","next":"c3"}}""",
+            ),
+        )
+
+        val list = sessions.listUntil(limit = 500, archived = false, notBefore = 60).getOrThrow()
+
+        assertEquals(listOf("ses_1", "ses_2", "ses_3", "ses_4"), list.map { it.id })
+        val first = server.takeRequest()
+        val second = server.takeRequest()
+        assertEquals("200", first.requestUrl!!.queryParameter("limit"))
+        assertNull(first.requestUrl!!.queryParameter("cursor"))
+        assertEquals("c2", second.requestUrl!!.queryParameter("cursor"))
+        assertEquals(2, server.requestCount)
+    }
+
+    @Test
+    fun `marking a session viewed posts the idle watermark`() = runBlocking {
+        val sessions = RemoteSessionRepository(graph.clients)
+        server.enqueue(MockResponse().setResponseCode(204))
+
+        sessions.markViewed("ses_1", 1_791_910_789_786L).getOrThrow()
+
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/session/ses_1/view", request.path)
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals(1_791_910_789_786.0, body.getValue("idle").jsonPrimitive.content.toDouble(), 0.0)
+    }
 
     @Test
     fun `running shell mapping keeps owner and location and stop targets that shell`() = runBlocking {
@@ -222,8 +284,7 @@ class RemoteRepositoriesTest {
                     {"path":"../../../home/u/.Cache/","type":"directory"},
                     {"path":"../../../home/u/Beta/","type":"directory"},
                     {"path":"/","type":"directory"},
-                    {"path":"  ","type":"directory"},
-                    {"path":null,"type":"directory"}
+                    {"path":"  ","type":"directory"}
                 ]}
                 """.trimIndent(),
             ),

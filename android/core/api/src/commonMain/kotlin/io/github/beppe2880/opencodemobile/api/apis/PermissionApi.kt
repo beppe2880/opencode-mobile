@@ -23,10 +23,14 @@
 
 package io.github.beppe2880.opencodemobile.api.apis
 
+import io.github.beppe2880.opencodemobile.api.models.ConflictErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.PermissionRequestList200Response
 import io.github.beppe2880.opencodemobile.api.models.PermissionSavedList200Response
+import io.github.beppe2880.opencodemobile.api.models.PermissionSavedNotFoundErrorEncoded
+import io.github.beppe2880.opencodemobile.api.models.PermissionSavedUpdate200Response
+import io.github.beppe2880.opencodemobile.api.models.PermissionSavedUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionPermissionCreate200Response
 import io.github.beppe2880.opencodemobile.api.models.SessionPermissionCreateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionPermissionGet200Response
@@ -163,6 +167,40 @@ open class PermissionApi : ApiClient {
             localVariableAuthNames
         ).wrap()
     }
+
+
+    /**
+     * Update saved permission
+     * Change the action or resource of a saved permission. Fails with a conflict when the project already has a saved permission with the same action and resource.
+     * @param id 
+     * @param permissionSavedUpdateRequest 
+     * @return PermissionSavedUpdate200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun permissionSavedUpdate(id: kotlin.String, permissionSavedUpdateRequest: PermissionSavedUpdateRequest): HttpResponse<PermissionSavedUpdate200Response> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = permissionSavedUpdateRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/api/permission/saved/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
 
 
     /**

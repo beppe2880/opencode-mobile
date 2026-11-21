@@ -39,7 +39,7 @@ data class WorktreeInfo (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "directory")
-    val directory: kotlin.String?
+    val directory: kotlin.String
 
 ) {
 

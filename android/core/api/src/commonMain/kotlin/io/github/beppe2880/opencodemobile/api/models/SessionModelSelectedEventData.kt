@@ -24,6 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.ModelRef
+import io.github.beppe2880.opencodemobile.api.models.ModelRef1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -44,7 +45,7 @@ data class SessionModelSelectedEventData (
     val sessionID: kotlin.String,
 
     @SerialName(value = "model")
-    val model: ModelRef,
+    val model: ModelRef1,
 
     @SerialName(value = "previous")
     val previous: ModelRef? = null

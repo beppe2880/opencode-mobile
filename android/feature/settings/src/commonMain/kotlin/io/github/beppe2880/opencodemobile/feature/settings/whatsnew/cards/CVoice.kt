@@ -175,6 +175,113 @@ internal fun VoiceRecordDemo(active: Boolean) {
     }
 }
 
+/**
+ * A recording goes on at the home screen: the notification counts the time, its Stop ends it,
+ * and back in the app the sentence is in the message box.
+ */
+@Composable
+internal fun VoiceBackgroundDemo(active: Boolean) {
+    val c = OcTheme.colors
+    var home by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf(SPOKEN) }
+    var elapsed by remember { mutableLongStateOf(0L) }
+    val levels = remember { mutableStateListOf<Float>().apply { repeat(BARS) { add(0f) } } }
+    val finger = remember { DemoFinger() }
+    val targets = remember { DemoTargets() }
+    DemoLoop(active, finalFrame = {
+        home = false
+        text = SPOKEN
+        finger.hide()
+    }) {
+        home = false
+        text = ""
+        elapsed = 0
+        for (i in levels.indices) levels[i] = 0f
+        finger.hide()
+        for (i in 0 until 20) {
+            levels.removeAt(0)
+            levels.add(waveLevel(i))
+            elapsed = i * 100L
+            delay(100)
+        }
+        home = true
+        for (i in 20 until 50) {
+            elapsed = i * 100L
+            delay(100)
+        }
+        finger.show(targets.center("stop") + Offset(-120f, 160f))
+        finger.moveTo(targets.center("stop"))
+        finger.tap()
+        home = false
+        text = SPOKEN
+        finger.hide()
+        delay(2400)
+    }
+    Box(Modifier.fillMaxSize().then(targets.root())) {
+        if (home) {
+            Column(Modifier.fillMaxSize().background(c.layer02).padding(OcSpacing.md)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(OcRadius.lg))
+                        .background(c.bgBase)
+                        .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.lg))
+                        .padding(OcSpacing.md),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Outlined.Mic, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(20.dp))
+                    Column(Modifier.weight(1f).padding(horizontal = OcSpacing.sm)) {
+                        Text("Recording a voice message", style = MaterialTheme.typography.labelLarge, color = c.textBase)
+                        Text(clock(elapsed), style = OcTheme.mono.codeSmall, color = c.textMuted)
+                    }
+                    Text(
+                        "Stop",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = c.textBase,
+                        modifier = Modifier.padding(OcSpacing.sm).then(targets.target("stop")),
+                    )
+                }
+                Spacer(Modifier.height(OcSpacing.xl))
+                repeat(2) {
+                    Row(Modifier.fillMaxWidth().padding(vertical = OcSpacing.md), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        repeat(4) { Box(Modifier.size(40.dp).clip(RoundedCornerShape(OcRadius.md)).background(c.borderBase)) }
+                    }
+                }
+            }
+        } else {
+            DemoUserBubble("Fix the flaky upload test", Modifier.padding(OcSpacing.md))
+            Column(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(OcSpacing.md)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(OcRadius.lg))
+                    .background(c.bgBase)
+                    .border(1.dp, c.borderFocus, RoundedCornerShape(OcRadius.lg))
+                    .padding(OcSpacing.md),
+            ) {
+                if (text.isEmpty()) {
+                    Row(Modifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Close, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(20.dp))
+                        Waveform(levels, Modifier.weight(1f).padding(horizontal = OcSpacing.sm))
+                        Text(clock(elapsed), style = OcTheme.mono.codeSmall, color = c.textMuted)
+                    }
+                } else {
+                    Text(text, style = MaterialTheme.typography.bodyMedium, color = c.textBase, modifier = Modifier.padding(vertical = OcSpacing.sm))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Add, contentDescription = null, tint = c.iconBase)
+                        Spacer(Modifier.weight(1f))
+                        Icon(Icons.Outlined.Mic, contentDescription = null, tint = c.iconBase)
+                        Spacer(Modifier.size(OcSpacing.md))
+                        SendButton()
+                    }
+                }
+            }
+        }
+        finger.Draw()
+    }
+}
+
 @Composable
 private fun CloudRow(title: String, value: String, modifier: Modifier = Modifier) {
     val c = OcTheme.colors

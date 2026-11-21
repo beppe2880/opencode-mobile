@@ -71,6 +71,11 @@
 	<string>Turns your dictated prompts into text.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Attaches images to your prompts.</string>
+	<!-- A voice recording goes on with the app in the background. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

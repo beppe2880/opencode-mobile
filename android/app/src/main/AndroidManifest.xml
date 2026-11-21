@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- A voice recording goes on with the app in the background. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".OpenCodeApplication"
@@ -57,6 +60,13 @@
             android:foregroundServiceType="dataSync" />
         <receiver
             android:name=".notifications.PermissionActionReceiver"
+            android:exported="false" />
+        <service
+            android:name=".voice.VoiceRecordingService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+        <receiver
+            android:name=".voice.VoiceRecordingService$StopReceiver"
             android:exported="false" />
         <receiver
             android:name=".widget.SessionsWidgetReceiver"

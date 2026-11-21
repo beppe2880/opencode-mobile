@@ -49,11 +49,11 @@ data class Project (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "canonical")
-    val canonical: kotlin.String?,
+    val canonical: kotlin.String,
 
     @SerialName(value = "time")
     val time: ProjectTime,

@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.EventVersionEncoded8
+import io.github.beppe2880.opencodemobile.api.models.EventVersionEncoded10
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -47,7 +47,7 @@ data class SessionDeletedEventDurable (
     val seq: kotlin.Long,
 
     @Contextual @SerialName(value = "version")
-    val version: EventVersionEncoded8
+    val version: EventVersionEncoded10
 
 ) {
 

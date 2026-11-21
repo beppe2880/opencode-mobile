@@ -25,6 +25,10 @@
     <string name="notif_intro_text">会话运行期间，应用会在后台与你的服务器保持连接，在智能体需要权限或回复时以及完成时通知你。你可以直接在通知中允许或拒绝修改。\n\n通知直接来自你的服务器，中间没有其他服务。你可以随时在设置中关闭通知。</string>
     <string name="notif_intro_allow">允许</string>
     <string name="notif_intro_later">以后再说</string>
+    <string name="voice_channel">语音录制</string>
+    <string name="voice_recording_title">正在录制语音消息</string>
+    <string name="voice_recording_text">点按“停止”即可将其转换为消息框中的文字。</string>
+    <string name="voice_recording_stop">停止</string>
     <string name="widget_label">OpenCode 会话</string>
     <string name="widget_description">正在运行和最近的会话，以及一个用于新建会话的按钮。</string>
     <string name="widget_new_session">新建</string>

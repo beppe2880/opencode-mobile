@@ -116,7 +116,8 @@ val fakeDataModule = module {
     single<DraftRepository> { FakeDrafts() }
     single<RecentModelRepository> { FakeRecentModels() }
     single<FolderPreferences> { FakeFolderPreferences() }
-    single<PinnedSessionRepository> { InMemoryPinnedSessions() }
+    // Pins the newest and an old session, so the list shows Pinned above the days, with an unread and a read pin.
+    single<PinnedSessionRepository> { InMemoryPinnedSessions(setOf("ses_1", "ses_8")) }
     // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
     single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }
@@ -293,7 +294,7 @@ internal class FakeEvents : EventRepository {
 }
 
 internal class FakeSessions(private val store: FakeStore, private val events: FakeEvents) : SessionRepository {
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> {
         delay(LATENCY)
         return Result.success(
             store.sessions.value
@@ -305,6 +306,14 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
     }
 
     override suspend fun active(): Result<Set<String>> = Result.success(store.running.toSet())
+
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> {
+        store.sessions.value = store.sessions.value.map {
+            if (it.id == sessionId) it.copy(viewedAt = idleAt) else it
+        }
+        events.emit(ServerEvent.Viewed(sessionId, idleAt))
+        return Result.success(Unit)
+    }
 
     override suspend fun get(sessionId: String): Result<Session> =
         store.sessions.value.firstOrNull { it.id == sessionId }?.let { Result.success(it) }

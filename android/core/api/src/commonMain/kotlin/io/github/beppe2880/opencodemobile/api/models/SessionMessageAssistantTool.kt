@@ -38,9 +38,8 @@ import kotlinx.serialization.Contextual
  * @param name Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param state 
  * @param time 
- * @param executed 
- * @param providerState 
- * @param providerResultState 
+ * @param executed Archive the session with true or restore it with false. Repeating the current state is a no-op.
+ * @param native 
  */
 @Serializable
 
@@ -51,11 +50,11 @@ data class SessionMessageAssistantTool (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "name")
-    val name: kotlin.String?,
+    val name: kotlin.String,
 
     @SerialName(value = "state")
     val state: SessionMessageAssistantToolState,
@@ -63,14 +62,12 @@ data class SessionMessageAssistantTool (
     @SerialName(value = "time")
     val time: SessionMessageAssistantToolTime,
 
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
     @SerialName(value = "executed")
     val executed: kotlin.Boolean? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
-
-    @Contextual @SerialName(value = "providerResultState")
-    val providerResultState: kotlinx.serialization.json.JsonObject? = null
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null
 
 ) {
 

@@ -25,7 +25,6 @@ package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.LocationPublicRef
 import io.github.beppe2880.opencodemobile.api.models.SessionInfo
-import io.github.beppe2880.opencodemobile.api.models.SessionMessageInfo
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -46,7 +45,7 @@ data class ExperimentalSessionImportRequest (
     val info: SessionInfo,
 
     @SerialName(value = "messages")
-    val messages: kotlin.collections.List<SessionMessageInfo>,
+    val messages: kotlin.collections.List<@Contextual kotlinx.serialization.json.JsonElement>,
 
     @SerialName(value = "location")
     val location: LocationPublicRef? = null

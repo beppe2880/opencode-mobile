@@ -35,6 +35,7 @@ import io.github.beppe2880.opencodemobile.api.models.VcsGet200Response
 import io.github.beppe2880.opencodemobile.api.models.VcsInitNotSupportedErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.VcsMode
 import io.github.beppe2880.opencodemobile.api.models.VcsStatus200Response
+import io.github.beppe2880.opencodemobile.api.models.VcsUntracked
 
 import io.github.beppe2880.opencodemobile.api.infrastructure.*
 import io.ktor.client.HttpClient
@@ -144,10 +145,11 @@ open class VcsApi : ApiClient {
      * @param locationDirectory  (optional)
      * @param base  (optional)
      * @param context  (optional)
+     * @param untracked  (optional)
      * @return VcsDiff200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun vcsDiff(mode: VcsMode, locationDirectory: kotlin.String? = null, base: kotlin.String? = null, context: kotlin.String? = null): HttpResponse<VcsDiff200Response> {
+    open suspend fun vcsDiff(mode: VcsMode, locationDirectory: kotlin.String? = null, base: kotlin.String? = null, context: kotlin.String? = null, untracked: VcsUntracked? = null): HttpResponse<VcsDiff200Response> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -159,6 +161,7 @@ open class VcsApi : ApiClient {
         mode?.apply { localVariableQuery["mode"] = listOf("${ mode.value }") }
         base?.apply { localVariableQuery["base"] = listOf("$base") }
         context?.apply { localVariableQuery["context"] = listOf("$context") }
+        untracked?.apply { localVariableQuery["untracked"] = listOf("${ untracked.value }") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(

@@ -86,7 +86,7 @@ private class FakeSessions : SessionRepository {
         requests += Triple(from, to, timeZone)
         return result
     }
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> = Result.success(emptyList())
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> = Result.success(emptyList())
     override suspend fun active(): Result<Set<String>> = Result.success(emptySet())
     override suspend fun get(sessionId: String): Result<Session> = Result.failure(OpenCodeError.NotFound(sessionId))
     override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> = Result.failure(OpenCodeError.NotFound(directory))

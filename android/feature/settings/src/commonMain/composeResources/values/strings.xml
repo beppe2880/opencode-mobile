@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Thumbnails</string>
     <string name="settings_running_in_list">Show running work in the session list</string>
     <string name="settings_running_in_list_sub">Count running subagents and background commands under each session</string>
+    <string name="settings_unread_sessions">Unread sessions</string>
+    <string name="settings_unread_sessions_off">Off</string>
+    <string name="settings_unread_sessions_dot">Dot</string>
+    <string name="settings_unread_sessions_group">Dot and group</string>
+    <string name="settings_unread_sessions_off_sub">No dots and no Unread group: the list does not track what you have read</string>
+    <string name="settings_unread_sessions_dot_sub">A dot next to the time marks a reply you have not opened; the session stays in its day</string>
+    <string name="settings_unread_sessions_group_sub">A dot marks a reply you have not opened, and those sessions are grouped above the days</string>
     <string name="settings_confirm_stop">Confirm before stopping commands</string>
     <string name="settings_confirm_stop_sub">Ask before stopping a background command from the Running sheet</string>
     <string name="settings_running_chips">Running work above the message box</string>
@@ -406,7 +413,7 @@
     <string name="settings_close_model_picker_sub">Turn off to choose the model and reasoning together, then tap Done to close.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">New</string>
-    <string name="feature_by">By %1$s · #%2$d</string>
+    <string name="feature_by">By %1$s · %2$s</string>
     <string name="feature_math_title">Math that reads like math</string>
     <string name="feature_math_body">Formulas in replies are typeset as they arrive: fractions, roots, integrals and matrices instead of raw LaTeX. Copying a message still gives you the LaTeX source.</string>
     <string name="feature_math_demo">A reply streams in and its formulas turn from LaTeX source into typeset math.</string>

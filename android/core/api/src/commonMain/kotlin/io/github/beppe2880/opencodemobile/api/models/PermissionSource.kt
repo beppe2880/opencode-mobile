@@ -44,11 +44,11 @@ data class PermissionSource (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "messageID")
-    val messageID: kotlin.String?,
+    val messageID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?
+    val id: kotlin.String
 
 ) {
 

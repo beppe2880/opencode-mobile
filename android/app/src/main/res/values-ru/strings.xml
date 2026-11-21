@@ -28,6 +28,10 @@
     <string name="notif_intro_text">Пока выполняется сессия, приложение остаётся подключённым к вашему серверу в фоне, чтобы сообщить, когда агенту нужно разрешение или ответ и когда он закончит. Разрешить или отклонить изменение можно прямо в уведомлении.\n\nУведомления приходят напрямую с вашего сервера, без посторонних сервисов. Их можно отключить в любой момент в настройках.</string>
     <string name="notif_intro_allow">Разрешить</string>
     <string name="notif_intro_later">Не сейчас</string>
+    <string name="voice_channel">Запись голоса</string>
+    <string name="voice_recording_title">Идёт запись голосового сообщения</string>
+    <string name="voice_recording_text">Нажмите «Стоп», чтобы превратить её в текст в поле сообщения.</string>
+    <string name="voice_recording_stop">Стоп</string>
     <string name="widget_label">Сеансы OpenCode</string>
     <string name="widget_description">Запущенные и недавние сеансы, а также кнопка для запуска нового.</string>
     <string name="widget_new_session">Новый</string>

@@ -41,7 +41,7 @@ data class SessionMoveRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "directory")
-    val directory: kotlin.String?,
+    val directory: kotlin.String,
 
     @Contextual @SerialName(value = "delivery")
     val delivery: SessionInboxDelivery? = null

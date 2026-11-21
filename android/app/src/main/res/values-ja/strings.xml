@@ -25,6 +25,10 @@
     <string name="notif_intro_text">セッションの実行中、アプリはバックグラウンドでサーバーとの接続を保ち、エージェントが許可や応答を求めたときと作業が終わったときに通知します。変更の許可や拒否は通知から直接行えます。\n\n通知はサーバーから直接届き、ほかのサービスを経由しません。設定でいつでもオフにできます。</string>
     <string name="notif_intro_allow">許可</string>
     <string name="notif_intro_later">後で</string>
+    <string name="voice_channel">音声録音</string>
+    <string name="voice_recording_title">音声メッセージを録音中</string>
+    <string name="voice_recording_text">「停止」をタップすると、メッセージ欄にテキストとして入力されます。</string>
+    <string name="voice_recording_stop">停止</string>
     <string name="widget_label">OpenCode セッション</string>
     <string name="widget_description">実行中および最近のセッションと、新しいセッションを開始するボタン。</string>
     <string name="widget_new_session">新規</string>

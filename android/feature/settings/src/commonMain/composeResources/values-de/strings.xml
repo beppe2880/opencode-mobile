@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Vorschau</string>
     <string name="settings_running_in_list">Laufende Arbeit in der Sitzungsliste anzeigen</string>
     <string name="settings_running_in_list_sub">Laufende Subagenten und Hintergrundbefehle unter jeder Sitzung zählen</string>
+    <string name="settings_unread_sessions">Ungelesene Sitzungen</string>
+    <string name="settings_unread_sessions_off">Aus</string>
+    <string name="settings_unread_sessions_dot">Punkt</string>
+    <string name="settings_unread_sessions_group">Punkt und Gruppe</string>
+    <string name="settings_unread_sessions_off_sub">Keine Punkte und keine Gruppe „Ungelesen“: die Liste verfolgt nicht, was du gelesen hast</string>
+    <string name="settings_unread_sessions_dot_sub">Ein Punkt neben der Uhrzeit markiert eine Antwort, die du nicht geöffnet hast; die Sitzung bleibt an ihrem Tag</string>
+    <string name="settings_unread_sessions_group_sub">Ein Punkt markiert eine Antwort, die du nicht geöffnet hast; diese Sitzungen sind über den Tagen gruppiert</string>
     <string name="settings_confirm_stop">Vor dem Beenden von Befehlen bestätigen</string>
     <string name="settings_confirm_stop_sub">Vor dem Beenden eines Hintergrundbefehls aus dem Blatt „Laufend“ nachfragen</string>
     <string name="settings_running_chips">Laufende Arbeit über dem Nachrichtenfeld</string>
@@ -406,7 +413,7 @@
     <string name="settings_close_model_picker_sub">Deaktivieren, um Modell und Denkaufwand gemeinsam zu wählen. Danach mit Fertig schließen.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">Neu</string>
-    <string name="feature_by">Von %1$s · #%2$d</string>
+    <string name="feature_by">Von %1$s · %2$s</string>
     <string name="feature_math_title">Mathe, die wie Mathe aussieht</string>
     <string name="feature_math_body">Formeln in Antworten werden beim Eintreffen gesetzt: Brüche, Wurzeln, Integrale und Matrizen statt rohem LaTeX. Beim Kopieren einer Nachricht erhältst du weiterhin den LaTeX-Quelltext.</string>
     <string name="feature_math_demo">Eine Antwort trifft ein, und ihre Formeln wechseln vom LaTeX-Quelltext zu gesetzter Mathematik.</string>

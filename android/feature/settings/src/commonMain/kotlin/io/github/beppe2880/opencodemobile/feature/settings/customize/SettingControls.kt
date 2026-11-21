@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -204,6 +205,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_un
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_side
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_side_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unfolded_layout_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_dot
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_dot_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_group
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_group_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_unread_sessions_off_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_update_notice_banner_sub
@@ -279,6 +287,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ShareMenu -> Res.string.settings_share_menu
         SettingOption.ShareOpens -> Res.string.settings_share_opens
         SettingOption.RunningInList -> Res.string.settings_running_in_list
+        SettingOption.UnreadSessions -> Res.string.settings_unread_sessions
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats
         SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity
         SettingOption.SplitView -> Res.string.settings_split_view
@@ -345,6 +354,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ShareMenu -> Res.string.settings_share_menu_sub
         SettingOption.ShareOpens -> Res.string.settings_share_opens_sub
         SettingOption.RunningInList -> Res.string.settings_running_in_list_sub
+        SettingOption.UnreadSessions -> Res.string.settings_unread_sessions_group_sub
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats_sub
         SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity_medium_sub
         SettingOption.SplitView -> Res.string.settings_split_view_sub
@@ -573,6 +583,23 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             onSelect = { onEvent(SettingsEvent.ShareOpensChanged(it)) },
         )
         SettingOption.RunningInList -> switch(settings.showRunningWorkInList, SettingsEvent::RunningInListChanged)()
+        SettingOption.UnreadSessions -> ChoiceRow(
+            title = title,
+            subtitle = stringResource(
+                when (settings.unreadSessions) {
+                    UnreadSessions.Off -> Res.string.settings_unread_sessions_off_sub
+                    UnreadSessions.Dot -> Res.string.settings_unread_sessions_dot_sub
+                    UnreadSessions.DotAndGroup -> Res.string.settings_unread_sessions_group_sub
+                },
+            ),
+            choices = listOf(
+                OcSegment(UnreadSessions.Off, stringResource(Res.string.settings_unread_sessions_off), "settings_unread_sessions_off"),
+                OcSegment(UnreadSessions.Dot, stringResource(Res.string.settings_unread_sessions_dot), "settings_unread_sessions_dot"),
+                OcSegment(UnreadSessions.DotAndGroup, stringResource(Res.string.settings_unread_sessions_group), "settings_unread_sessions_group"),
+            ),
+            selected = settings.unreadSessions,
+            onSelect = { onEvent(SettingsEvent.UnreadSessionsChanged(it)) },
+        )
         SettingOption.SwipeChats -> ChoiceRow(
             title = title,
             subtitle = stringResource(
@@ -764,6 +791,7 @@ private val SettingOption.tag: String
         SettingOption.VoiceStyle -> "voice_style"
         SettingOption.VoiceHold -> "voice_hold"
         SettingOption.RunningInList -> "running_in_list"
+        SettingOption.UnreadSessions -> "unread_sessions"
         SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"
         SettingOption.SwipeSensitivity -> "swipe_sensitivity"

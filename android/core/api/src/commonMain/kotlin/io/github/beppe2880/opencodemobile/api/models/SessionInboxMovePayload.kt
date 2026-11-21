@@ -42,7 +42,7 @@ data class SessionInboxMovePayload (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     @SerialName(value = "location")
     val location: LocationPublicRef,

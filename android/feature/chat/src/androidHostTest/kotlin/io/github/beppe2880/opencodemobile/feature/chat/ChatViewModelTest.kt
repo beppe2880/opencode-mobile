@@ -785,6 +785,45 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a visible chat reports the session idle as viewed once it loaded`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+    }
+
+    @Test
+    fun `a hidden chat does not report the idle as viewed`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(false)
+        advanceUntilIdle()
+        assertTrue(sessions.viewed.isEmpty())
+
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+    }
+
+    @Test
+    fun `a turn ending while the chat is visible reports the new idle`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+
+        sessions.sessionInfo = sessions.sessionInfo.copy(idleAt = 84)
+        events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded, at = 84))
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L, "s1" to 84L), sessions.viewed)
+    }
+
+    @Test
     fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
         pins.setPinned("other", true)
         val vm = vm()
@@ -2751,9 +2790,10 @@ private class FakeSessions(
     private val others: List<Session> = emptyList(),
     private val order: List<String> = emptyList(),
     private val titles: Map<String, String> = emptyMap(),
+    idleAt: Long? = null,
 ) : SessionRepository {
-    private val session = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null)
-    override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
+    var sessionInfo = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null, idleAt)
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(listOf(sessionInfo) + others)
     var activeIds: Set<String> = emptySet()
     override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
     var uncached = false
@@ -2764,13 +2804,13 @@ private class FakeSessions(
         loaded?.await()
         if (sessionId != "s1") gets += sessionId
         if (sessionId in failing) return Result.failure(OpenCodeError.Unreachable("offline"))
-        return Result.success(others.firstOrNull { it.id == sessionId } ?: session)
+        return Result.success(others.firstOrNull { it.id == sessionId } ?: sessionInfo)
     }
-    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
+    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { sessionInfo.copy(id = sessionId, title = it) } ?: sessionInfo
     override fun browseOrder() = order
     val creates = mutableListOf<Triple<String, String?, ModelRef?>>()
     var createGate: CompletableDeferred<Unit>? = null
-    var createResult: Result<Session> = Result.success(session.copy(id = "s-new", agent = "build", model = null))
+    var createResult: Result<Session> = Result.success(sessionInfo.copy(id = "s-new", agent = "build", model = null))
     override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
         creates += Triple(directory, agent, model)
         createGate?.await()
@@ -2779,10 +2819,17 @@ private class FakeSessions(
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     val forks = mutableListOf<Pair<String, String?>>()
-    var forkResult: Result<Session> = Result.success(session.copy(id = "s2", title = "Title (fork #1)"))
+    var forkResult: Result<Session> = Result.success(sessionInfo.copy(id = "s2", title = "Title (fork #1)"))
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> {
         forks += sessionId to beforeMessageId
         return forkResult
+    }
+    val viewed = mutableListOf<Pair<String, Long>>()
+    var viewResult: Result<Unit> = Result.success(Unit)
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> {
+        viewed += sessionId to idleAt
+        if (viewResult.isSuccess) sessionInfo = sessionInfo.copy(viewedAt = idleAt)
+        return viewResult
     }
     override suspend fun projects(): Result<List<Project>> = Result.success(emptyList())
 }

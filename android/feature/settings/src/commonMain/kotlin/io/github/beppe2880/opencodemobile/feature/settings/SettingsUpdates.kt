@@ -40,6 +40,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.SwipeSensitivityChanged -> copy(swipeSensitivity = event.sensitivity)
     is SettingsEvent.RunningInListChanged -> copy(showRunningWorkInList = event.enabled)
     is SettingsEvent.ConfirmStopChanged -> copy(confirmStopCommand = event.enabled)
+    is SettingsEvent.UnreadSessionsChanged -> copy(unreadSessions = event.unread)
     is SettingsEvent.RunningChipsChanged -> copy(runningChips = event.enabled)
     is SettingsEvent.AgentColorOutlineChanged -> copy(agentColorOutline = event.enabled)
     is SettingsEvent.DictationChanged -> copy(dictation = event.enabled)

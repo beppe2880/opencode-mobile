@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Continuer l'enregistrement en arrière-plan</string>
+    <string name="tips_c_voice_background_body">Un message vocal enregistré avec un modèle cloud continue lorsque vous passez à une autre application ou verrouillez le téléphone. Sur Android, Arrêter dans la notification le termine ; le texte attend dans la zone de message à votre retour.</string>
+    <string name="tips_c_voice_background_demo">Un enregistrement se déroule dans la zone de message, puis l'écran d'accueil affiche une notification qui compte le temps. Un doigt touche Arrêter, et de retour dans l'app, la phrase dictée se trouve dans la zone de message.</string>
+
     <string name="tips_c_voice_record_title">Parlez au lieu de taper</string>
     <string name="tips_c_voice_record_body">Touchez le micro dans la zone de message et parlez : une forme d'onde en direct et un chronomètre montrent que vous êtes entendu. Confirmez pour garder le texte, ou annulez pour le supprimer.</string>
     <string name="tips_c_voice_record_demo">Un doigt touche le micro, la zone de message affiche une forme d'onde animée avec un chronomètre, puis la phrase dictée apparaît sous forme de texte.</string>
@@ -15,6 +19,9 @@
     <string name="tips_c_terminal_fullscreen_title">Plus de place pour le terminal</string>
     <string name="tips_c_terminal_fullscreen_body">Passez en plein écran pour masquer la barre de titre et les barres système et voir plus de lignes à la fois. Retour ou le même bouton les rétablit.</string>
     <string name="tips_c_terminal_fullscreen_demo">Un doigt touche le bouton plein écran du terminal : la barre de titre et la barre d'état disparaissent et davantage de lignes de sortie apparaissent.</string>
+    <string name="tips_c_waiting_title">Voyez quels chats attendent votre réponse</string>
+    <string name="tips_c_waiting_body">Lorsqu'un agent s'arrête pour vous poser une question ou demander une autorisation, son chat dans la liste affiche Question pour vous ou Autorisation requise au lieu de En cours de traitement, dans la couleur d'avertissement. Les demandes de ses sous-agents comptent aussi.</string>
+    <string name="tips_c_waiting_demo">Un chat en cours de traitement dans la liste passe à Question pour vous dans la couleur d'avertissement, revient à En cours de traitement une fois la question répondue, puis affiche Autorisation requise.</string>
     <string name="tips_c_terminal_select_title">Copier du texte depuis le terminal</string>
     <string name="tips_c_terminal_select_body">Appuyez longuement sur un mot de la sortie pour le sélectionner, faites glisser les poignées pour en sélectionner davantage, puis appuyez sur Copier. Tout sélectionner sélectionne tout, et le bouton Sélectionner du texte dans la barre supérieure lance aussi une sélection.</string>
     <string name="tips_c_terminal_select_demo">Un mot d'une ligne de test en échec est appuyé longuement et mis en surbrillance, sa poignée est glissée jusqu'à la fin de la ligne et Copier est appuyé : un avis Copié apparaît.</string>

@@ -40,7 +40,7 @@ data class IntegrationCommandConnectRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "methodID")
-    val methodID: kotlin.String?,
+    val methodID: kotlin.String,
 
     @SerialName(value = "label")
     val label: kotlin.String? = null

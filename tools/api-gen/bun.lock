@@ -5,16 +5,18 @@
     "": {
       "name": "opencode-mobile-api-gen",
       "dependencies": {
-        "@opencode/schema": "2.0.27",
+        "@opencode/schema": "2.3.2",
         "effect": "4.0.1",
       },
     },
   },
   "packages": {
-    "@opencode/schema": ["@opencode/schema@2.0.27", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "effect": "4.0.1" } }, "sha512-BxGuiIFo503tW6UYxoBrrgjyczEvPiU3fDn45FxUHtmZgBC8kFE+ldI56ab8kV0Lu5C94ZKOniRb2bWqDu4tAg=="],
+    "@opencode/schema": ["@opencode/schema@2.3.2", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "effect": "4.1.0" } }, "sha512-9PqnLzPNV0QTG3HrRHTVjVEQ2Hv+zcprM6QvwxNVdQ3RUTmtdpmUD6/0y0NQnHFzHwI3hpnkNCIstjw9TVsJcg=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
 
     "effect": ["effect@4.0.1", "", {}, "sha512-b1VlQG9g8fwxE5QnIZuPoOP/0MsqHJSRKxUijjoM80E5q95FXrX5yWtY5XI8G+GJsBQAVSDbLS458z9a++uVvw=="],
+
+    "@opencode/schema/effect": ["effect@4.1.0", "", {}, "sha512-lGx2MJJyrXA8RZb2UpQ/0Nkb5Utaimby7oD92+18noBxLPE85IFOvptdzau8dvcxAOwfwHo9iqapbKeFzqQM/Q=="],
   }
 }
