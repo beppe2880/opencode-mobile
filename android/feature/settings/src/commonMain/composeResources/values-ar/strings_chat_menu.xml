@@ -1,0 +1,7 @@
+<resources>
+    <string name="tips_c_chat_menu_title">إجراءات المحادثة، منظمة</string>
+    <string name="tips_c_chat_menu_body">تجمع قائمة النقاط الثلاث إجراءات المحادثة والسياق والسجل والأدوات. أنشئ محادثة في المجلد نفسه أو تفرعاً أو اضغط السياق أو تراجع واستعد دون كتابة أمر. تبقى أوامر الشرطة المائلة متاحة.</string>
+    <string name="tips_c_chat_menu_demo">تعرض القائمة إجراءات مجمعة. يشير إصبع إلى إنشاء تفرع.</string>
+    <string name="tips_c_chat_menu_groups">المحادثة\nالسياق والسجل\nالأدوات</string>
+    <string name="tips_c_chat_menu_actions">محادثة جديدة\nإنشاء تفرع\nضغط السياق\nالتراجع عن آخر طلب\nقيد التشغيل\nخوادم MCP</string>
+</resources>

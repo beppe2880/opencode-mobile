@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** The page of a web view running xterm.js; implemented by [WebTerminalView]. */
@@ -24,23 +26,48 @@ class WebSurface(
 ) : AutoCloseable {
     private val main = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val output = StringBuilder()
+    private data class Size(val at: Int, val columns: Int, val rows: Int)
+    private val sizes = mutableListOf<Size>()
+
+    // Output trimmed from the start of [output], so positions in the shell's output are `dropped + index`.
+    private var dropped = 0L
+
+    // Sizes from an earlier visit, applied as the replay reaches their positions.
+    private val replaySizes = ArrayDeque<TerminalSize>()
     private var page: WebTerminalPage? = null
     private var live = false
     private var modifiers = 0
     private var theme: String? = null
+    private var fitBeforeReplay = false
+    private var selectionLabels: List<String>? = null
+    private val mutableSelectionAvailable = MutableStateFlow(false)
+    val selectionAvailable = mutableSelectionAvailable.asStateFlow()
+    private val mutableSelectionPicking = MutableStateFlow(false)
+    val selectionPicking = mutableSelectionPicking.asStateFlow()
+    private var imeVisible = false
 
     /** Called by the page once xterm.js is ready. */
     fun attach(page: WebTerminalPage) {
         this.page = page
         theme?.let { page.call("theme", it) }
-        if (output.isNotEmpty()) page.call("write", js(output.toString()))
+        selectionLabels?.let { labels -> page.call("selectionLabels", *labels.map(::js).toTypedArray()) }
+        page.call("keyboardVisible", imeVisible.toString())
+        if (fitBeforeReplay && sizes.isEmpty()) page.call("fitBeforeReplay")
+        if (output.isNotEmpty() || sizes.isNotEmpty()) {
+            val geometry = sizes.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" }
+            page.call("restore", js(output.toString()), geometry)
+        }
         page.call("setModifiers", modifiers.toString())
         page.call("setLive", live.toString())
         page.call("focus")
     }
 
     fun detach(page: WebTerminalPage) {
-        if (this.page === page) this.page = null
+        if (this.page === page) {
+            this.page = null
+            mutableSelectionAvailable.value = false
+            mutableSelectionPicking.value = false
+        }
     }
 
     /** [theme] is an xterm.js `ITheme` as a JavaScript object literal. */
@@ -52,20 +79,69 @@ class WebSurface(
     // Bridge callbacks may arrive on a web view thread (Android).
     fun onInput(data: String) = send(data.encodeToByteArray())
 
-    fun onPageResize(columns: Int, rows: Int) = onResize(columns, rows)
+    fun onPageResize(columns: Int, rows: Int) {
+        main.launch {
+            val last = sizes.lastOrNull()
+            // Approximate replay position: output can arrive while the bridge callback
+            // hops to Main, before this offset is read. It is not a server resize timeline.
+            // A replay parsed at the fitted size starts at that size.
+            val at = if (last == null && fitBeforeReplay) 0 else output.length
+            if (last?.columns != columns || last.rows != rows) sizes += Size(at, columns, rows)
+            onResize(columns, rows)
+        }
+    }
+
+    /**
+     * The shell was already running before this screen, so its output so far was drawn at the
+     * size the app gave it, not at the server's initial one: the page parses it at its own size.
+     */
+    fun fitBeforeReplay() {
+        fitBeforeReplay = true
+        if (sizes.isEmpty()) page?.call("fitBeforeReplay")
+    }
+
+    /** The sizes the shell's output was drawn at, by position in that output. */
+    fun timeline(): List<TerminalSize> = sizes.map { TerminalSize(dropped + it.at, it.columns, it.rows) }
+
+    /**
+     * Replays the shell's output at the sizes of an earlier [timeline], from the beginning of the
+     * output, instead of guessing one size for all of it.
+     */
+    fun replayAt(timeline: List<TerminalSize>) {
+        replaySizes.clear()
+        replaySizes += timeline.sortedBy { it.at }
+    }
 
     fun onPageModifiersUsed() {
         main.launch { onModifiersUsed() }
     }
 
     fun write(text: String) {
+        val start = dropped + output.length
+        val due = buildList {
+            while (replaySizes.isNotEmpty() && replaySizes.first().at <= start + text.length) {
+                val size = replaySizes.removeFirst()
+                add(Size((size.at - start).coerceAtLeast(0).toInt(), size.columns, size.rows))
+            }
+        }
+        due.forEach { sizes += it.copy(at = output.length + it.at) }
         output.append(text)
         if (output.length > MAX_KEPT_CHARS) {
             // Cut at a line start so the kept output does not begin inside an escape sequence.
             val cut = output.indexOf("\n", output.length - MAX_KEPT_CHARS).takeIf { it >= 0 } ?: (output.length - MAX_KEPT_CHARS)
             output.deleteRange(0, cut + 1)
+            dropped += cut + 1
+            val previous = sizes.lastOrNull { it.at <= cut + 1 }
+            val kept = sizes.filter { it.at > cut + 1 }.map { it.copy(at = it.at - cut - 1) }
+            sizes.clear()
+            previous?.let { sizes += it.copy(at = 0) }
+            sizes += kept
         }
-        page?.call("write", js(text))
+        if (due.isEmpty()) {
+            page?.call("write", js(text))
+        } else {
+            page?.call("restore", js(text), due.joinToString(prefix = "[", postfix = "]") { "[${it.at},${it.columns},${it.rows}]" })
+        }
     }
 
     /**
@@ -89,9 +165,40 @@ class WebSurface(
         page?.call("paste", js(text))
     }
 
+    fun setSelectionLabels(start: String, end: String, position: String) {
+        selectionLabels = listOf(start, end, position)
+        page?.call("selectionLabels", js(start), js(end), js(position))
+    }
+
+    fun onPageSelectionAvailable(available: Boolean) {
+        main.launch { mutableSelectionAvailable.value = available }
+    }
+
+    fun onPageSelectionPicking(picking: Boolean) {
+        main.launch { mutableSelectionPicking.value = picking }
+    }
+
+    fun setKeyboardVisible(visible: Boolean) {
+        imeVisible = visible
+        page?.call("keyboardVisible", visible.toString())
+    }
+
+    /** Toggle tap-to-select without guessing a word or moving shell input focus. */
+    fun toggleSelectionMode() { page?.call("toggleSelectionMode") }
+
+    fun selectAll() { page?.call("selectAll") }
+
+    fun copySelection() { page?.call("copySelection") }
+
+    fun clearSelection() { page?.call("clearSelection") }
+
     /** Clears the screen and modes for a new shell. */
     fun reset() {
         output.clear()
+        sizes.clear()
+        dropped = 0
+        replaySizes.clear()
+        fitBeforeReplay = false
         page?.call("reset")
     }
 
@@ -110,6 +217,9 @@ class WebSurface(
         const val MAX_KEPT_CHARS = 1_000_000
     }
 }
+
+/** The terminal was [columns]×[rows] from position [at] of the shell's output on. */
+data class TerminalSize(val at: Long, val columns: Int, val rows: Int)
 
 /** A JavaScript string literal of [text]. */
 internal fun js(text: String): String = buildString(text.length + 2) {

@@ -39,7 +39,7 @@ data class SessionStructuredErrorResponse (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "body")
-    val body: kotlin.String?
+    val body: kotlin.String
 
 ) {
 

@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateSheetSes
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewButtonViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.WhatsNewViewModel
+import io.github.beppe2880.opencodemobile.feature.terminal.TerminalTimelines
 import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
@@ -45,7 +46,8 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params -> UpdateNoticeViewModel(get(), get(), get(), get(), automatic = params.getOrNull<Boolean>() ?: true) }
     viewModel { WhatsNewViewModel(get(), get()) }
     viewModel { WhatsNewButtonViewModel(get(), get(), get()) }
-    viewModel { params -> TerminalViewModel(params.get(), get(), get()) }
+    single { TerminalTimelines() }
+    viewModel { params -> TerminalViewModel(params.get(), get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
     // Home screen widget: Glance on Android, WidgetKit on iOS.
     single { WidgetLoader(get(), get()) }

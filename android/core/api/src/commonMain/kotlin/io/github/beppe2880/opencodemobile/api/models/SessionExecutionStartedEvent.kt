@@ -24,8 +24,8 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.LocationRef
+import io.github.beppe2880.opencodemobile.api.models.SessionArchivedEventData
 import io.github.beppe2880.opencodemobile.api.models.SessionCreatedEventDurable
-import io.github.beppe2880.opencodemobile.api.models.SessionDeletedEventData
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -59,7 +59,7 @@ data class SessionExecutionStartedEvent (
     val durable: SessionCreatedEventDurable,
 
     @SerialName(value = "data")
-    val `data`: SessionDeletedEventData,
+    val `data`: SessionArchivedEventData,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,

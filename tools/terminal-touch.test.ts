@@ -4,11 +4,13 @@ import { runInNewContext } from "node:vm"
 
 const script = readFileSync(new URL("../android/feature/terminal/src/commonMain/composeResources/files/terminal/terminal.js", import.meta.url), "utf8")
 
-function terminal() {
+function terminal(deferWrites = false) {
   type Listener = (event: any) => void
   class Element {
     listeners = new Map<string, Listener[]>()
-    height = 400
+    // Capture-phase ancestor: its listeners run first, like the document's.
+    parent?: Element
+    height = 480
     addEventListener(type: string, listener: Listener) {
       const listeners = this.listeners.get(type) ?? []
       listeners.push(listener)
@@ -22,7 +24,7 @@ function terminal() {
         stopImmediatePropagation() { this.stopped = true },
         ...extra,
       }
-      for (const listener of this.listeners.get(type) ?? []) {
+      for (const listener of [...this.parent?.listeners.get(type) ?? [], ...this.listeners.get(type) ?? []]) {
         listener(event)
         if (event.stopped) break
       }
@@ -35,7 +37,10 @@ function terminal() {
   let focused = 0
   let selected = false
   let nativeSelection = ""
-  const document: any = { getElementById: () => root }
+  const document: any = Object.assign(new Element(), { getElementById: () => root })
+  root.parent = document
+  // Stands in for the selection controller, which can stop a touch before the scroll handler.
+  let swallowing = false
   const textarea = {
     value: "", selectionStart: 0, selectionEnd: 0,
     setSelectionRange(start: number, end: number) {
@@ -46,6 +51,14 @@ function terminal() {
   }
   let keyHandler: (event: any) => boolean = () => true
   const sent: string[] = []
+  const sizes: number[][] = []
+  const applied: (string | number[])[] = []
+  const writes: (() => void)[] = []
+  let fits = 0
+  let resized = () => {}
+  // Fake timers: the page fits once output has paused, which tests trigger with settle().
+  let nextTimer = 0
+  const timers = new Map<number, { callback: () => void, delay: number }>()
   const term = {
     element: root, rows: 20, cols: 80, textarea,
     buffer: { active: { type: "normal", baseY: 200 } },
@@ -56,22 +69,61 @@ function terminal() {
     focus: () => { focused++ },
     loadAddon() {}, open() {}, onData() {}, onResize() {},
     attachCustomKeyEventHandler(handler: (event: any) => boolean) { keyHandler = handler },
-    write(_data: string, done?: () => void) { done?.() },
+    write(_data: string, done?: () => void) {
+      if (_data) applied.push(_data)
+      if (done) {
+        if (deferWrites) writes.push(done)
+        else done()
+      }
+    },
+    resize(cols: number, rows: number) { applied.push([cols, rows]); term.cols = cols; term.rows = rows },
+    reset() {},
   }
   const window: any = {
-    OcTerminal: { font() { throw new Error("Use fallback font") }, resize() {}, ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
+    // Selection gestures have their own controller tests.
+    OcTouchSelection: () => {
+      for (const type of ["touchstart", "touchend"]) {
+        root.addEventListener(type, (event: any) => { if (swallowing) event.stopImmediatePropagation() })
+      }
+      return { clear() {} }
+    },
+    OcTerminal: { font() { throw new Error("Use fallback font") }, resize: (cols: number, rows: number) => sizes.push([cols, rows]), ready() {}, input: (data: string) => sent.push(data), modifiersUsed() {} },
     getSelection: () => nativeSelection,
   }
   runInNewContext(script, {
     window,
     document,
-    Terminal: function () { return term },
-    FitAddon: { FitAddon: class { fit() {} } },
-    ResizeObserver: class { observe() {} },
+    Terminal: function (options: { cols: number, rows: number }) {
+      term.cols = options.cols
+      term.rows = options.rows
+      return term
+    },
+    FitAddon: { FitAddon: class { fit() { fits++; term.cols = 52; term.rows = 30 } } },
+    ResizeObserver: class { constructor(callback: () => void) { resized = callback } observe() {} },
+    setTimeout: (callback: () => void, delay: number) => { timers.set(++nextTimer, { callback, delay }); return nextTimer },
+    clearTimeout: (id: number) => { timers.delete(id) },
   })
+  // Runs the pending timers that fire within [ms], as if output stayed quiet that long.
+  const settle = (ms = Infinity) => {
+    for (const [id, timer] of [...timers].sort((a, b) => a[1].delay - b[1].delay)) {
+      if (timer.delay > ms || !timers.has(id)) continue
+      timers.delete(id)
+      timer.callback()
+    }
+  }
   const touch = (x: number, y: number, id = 1) => ({ identifier: id, clientX: x, clientY: y })
   return {
-    term, screen, root, scrolls, touch, sent,
+    term, screen, root, scrolls, touch, sent, sizes,
+    fits: () => fits,
+    settle,
+    resize: () => resized(),
+    fitBeforeReplay: () => window.oc.fitBeforeReplay(),
+    parsed: () => { for (const done of writes.splice(0)) done() },
+    offline: () => window.oc.setLive(false),
+    restore: (data: string, sizes: number[][]) => window.oc.restore(data, sizes),
+    write: (data: string) => window.oc.write(data),
+    reset: () => window.oc.reset(),
+    applied,
     live: () => window.oc.setLive(true),
     setModifiers: (mask: number) => window.oc.setModifiers(mask),
     key: (event: object) => keyHandler({ type: "keydown", isComposing: false, ...event }),
@@ -85,6 +137,7 @@ function terminal() {
       textarea.selectionEnd = textarea.value.length
       document.activeElement = textarea
     },
+    swallow: (value: boolean) => { swallowing = value },
     start: (x = 100, y = 100) => root.dispatch("touchstart", [touch(x, y)]),
     move: (x: number, y: number) => root.dispatch("touchmove", [touch(x, y)]),
     click: () => {
@@ -93,6 +146,200 @@ function terminal() {
     },
   }
 }
+
+test("initial replay keeps the server's 80 columns until it has been parsed", () => {
+  const t = terminal(true)
+  t.resize()
+  expect(t.term.cols).toBe(80)
+  expect(t.term.rows).toBe(24)
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+  t.write("initial prompt")
+  t.live()
+  t.resize()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  t.settle()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.fits()).toBe(0)
+  t.settle()
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
+  t.resize()
+  expect(t.fits()).toBe(2)
+})
+
+test("fitting waits until the shell has finished drawing its first prompt", () => {
+  const t = terminal()
+  t.live()
+  // zsh writes PROMPT_SP and the prompt as separate chunks.
+  t.write("%" + " ".repeat(79) + "\r \r")
+  t.settle(50)
+  t.write("user@host:/a/long/directory/name > ")
+  t.settle(50)
+  expect(t.fits()).toBe(0)
+  expect(t.applied).toEqual(["%" + " ".repeat(79) + "\r \r", "user@host:/a/long/directory/name > "])
+  t.settle(120)
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
+})
+
+test("output that never pauses is fitted after the longest wait", () => {
+  const t = terminal()
+  t.live()
+  for (let i = 0; i < 5; i++) {
+    t.write("line " + i + "\n")
+    t.settle(50)
+  }
+  expect(t.fits()).toBe(0)
+  t.settle(1000)
+  expect(t.fits()).toBe(1)
+})
+
+test("a pending fit is dropped when the shell disconnects or restarts", () => {
+  for (const restart of [false, true]) {
+    const t = terminal()
+    t.live()
+    t.write("prompt")
+    if (restart) t.reset()
+    else t.offline()
+    t.settle()
+    expect(t.fits()).toBe(0)
+    expect(t.sizes).toEqual([])
+  }
+})
+
+test("a shell that was already running is parsed at the current size", () => {
+  const t = terminal(true)
+  t.fitBeforeReplay()
+  t.restore("prompt drawn for the phone", [])
+  expect(t.fits()).toBe(1)
+  expect([t.term.cols, t.term.rows]).toEqual([52, 30])
+  t.parsed()
+  expect(t.applied).toEqual(["prompt drawn for the phone"])
+  expect(t.sizes).toEqual([])
+})
+
+test("reconnection defers fitting until the replay finishes", () => {
+  const t = terminal(true)
+  t.write("initial prompt")
+  t.parsed()
+  t.live()
+  t.parsed()
+  t.settle()
+  t.offline()
+  t.resize()
+  expect(t.fits()).toBe(1)
+  t.live()
+  expect(t.fits()).toBe(1)
+  t.parsed()
+  t.settle()
+  expect(t.fits()).toBe(2)
+})
+
+test("disconnecting during replay cannot enable input or resize the shell", () => {
+  const t = terminal(true)
+  t.live()
+  t.offline()
+  t.parsed()
+  t.settle()
+  t.key({ keyCode: 229 })
+  t.input({ inputType: "insertText", data: "x" })
+  expect(t.sent).toEqual([])
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+})
+
+test("a restarted shell replays at the server's initial dimensions again", () => {
+  const t = terminal()
+  t.write("old prompt")
+  t.live()
+  t.settle()
+  expect(t.term.cols).toBe(52)
+  t.reset()
+  expect(t.term.cols).toBe(80)
+  expect(t.term.rows).toBe(24)
+  t.resize()
+  expect(t.term.cols).toBe(80)
+  t.live()
+  t.resize()
+  t.settle()
+  expect(t.term.cols).toBe(80)
+  expect(t.fits()).toBe(1)
+  t.write("new prompt")
+  t.settle()
+  expect(t.term.cols).toBe(52)
+})
+
+test("an empty initial replay waits for the shell's first output before fitting", () => {
+  const t = terminal(true)
+  t.live()
+  t.parsed()
+  t.settle()
+  t.resize()
+  expect([t.term.cols, t.term.rows]).toEqual([80, 24])
+  expect(t.fits()).toBe(0)
+  expect(t.sizes).toEqual([])
+  t.write("late initial prompt")
+  t.settle()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  t.settle()
+  expect(t.fits()).toBe(1)
+  expect(t.sizes).toEqual([[52, 30]])
+})
+
+test("restores historical dimensions between parsed output chunks before fitting", () => {
+  const t = terminal(true)
+  t.restore("oldpromptnewprompt", [[9, 50, 24]])
+  t.write("live output")
+  t.live()
+  expect(t.applied).toEqual(["oldprompt"])
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  expect(t.applied).toEqual(["oldprompt", [50, 24], "newprompt"])
+  t.parsed()
+  expect(t.applied.at(-1)).toBe("live output")
+  t.parsed()
+  t.settle()
+  expect(t.fits()).toBe(0)
+  t.parsed()
+  t.settle()
+  expect(t.fits()).toBe(1)
+})
+
+test("viewport resize waits for pending output to be parsed", () => {
+  const t = terminal(true)
+  t.write("initial prompt")
+  t.parsed()
+  t.live()
+  t.parsed()
+  t.settle()
+  t.write("pending output")
+  t.resize()
+  expect(t.fits()).toBe(1)
+  t.parsed()
+  expect(t.fits()).toBe(2)
+})
+
+test("queued viewport resize cannot fit a disconnected or restarted shell", () => {
+  for (const restart of [false, true]) {
+    const t = terminal(true)
+    t.write("initial prompt")
+    t.parsed()
+    t.live()
+    t.parsed()
+    t.settle()
+    t.write("old output")
+    t.resize()
+    if (restart) t.reset()
+    else t.offline()
+    t.parsed()
+    expect(t.fits()).toBe(1)
+    if (restart) expect([t.term.cols, t.term.rows]).toEqual([80, 24])
+  }
+})
 
 test("vertical swipes scroll history in both directions", () => {
   const t = terminal()
@@ -128,7 +375,7 @@ test("slow movements accumulate fractional rows without losing distance", () => 
 
 test("row size follows the current viewport instead of a fixed pixel distance", () => {
   const t = terminal()
-  t.screen.height = 200
+  t.screen.height = t.term.rows * 10
   t.start()
   t.move(100, 140)
   expect(t.scrolls).toEqual([-4])
@@ -245,6 +492,16 @@ test("a partial input selection left after keyboard resize does not lock scrolli
   expect(t.move(100, 160).defaultPrevented).toBe(true)
   expect(t.scrolls).toEqual([-3])
   expect(t.term.textarea.selectionStart).toBe(t.term.textarea.selectionEnd)
+})
+
+test("a touch swallowed by the selection controller cannot reuse the previous gesture", () => {
+  const t = terminal()
+  t.start()
+  t.swallow(true)
+  t.root.dispatch("touchend")
+  t.start(100, 300)
+  expect(t.move(100, 140).defaultPrevented).toBe(false)
+  expect(t.scrolls).toEqual([])
 })
 
 // Android routes keys through the input method: keydown 229, then an input event with the text.

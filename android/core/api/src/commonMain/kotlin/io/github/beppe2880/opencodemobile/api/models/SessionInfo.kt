@@ -38,13 +38,13 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param id 
+ * @param id Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
  * @param projectID Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param cost 
  * @param tokens 
  * @param time 
  * @param location 
- * @param parentID 
+ * @param parentID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
  * @param fork 
  * @param agent Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param model 
@@ -59,12 +59,13 @@ import kotlinx.serialization.Contextual
 
 data class SessionInfo (
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "id")
     val id: kotlin.String?,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     @SerialName(value = "cost")
     val cost: kotlin.Double,
@@ -78,6 +79,7 @@ data class SessionInfo (
     @SerialName(value = "location")
     val location: LocationPublicRef?,
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "parentID")
     val parentID: kotlin.String? = null,
 

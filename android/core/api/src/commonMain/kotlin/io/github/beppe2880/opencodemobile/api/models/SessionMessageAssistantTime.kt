@@ -32,6 +32,7 @@ import kotlinx.serialization.Contextual
  * 
  *
  * @param created 
+ * @param firstToken 
  * @param streamed 
  * @param completed 
  */
@@ -41,6 +42,9 @@ data class SessionMessageAssistantTime (
 
     @SerialName(value = "created")
     val created: kotlin.Double,
+
+    @SerialName(value = "firstToken")
+    val firstToken: kotlin.Double? = null,
 
     @SerialName(value = "streamed")
     val streamed: kotlin.Double? = null,

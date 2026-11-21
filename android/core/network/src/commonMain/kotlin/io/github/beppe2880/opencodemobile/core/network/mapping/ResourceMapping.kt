@@ -41,6 +41,8 @@ fun SessionInfo.toDomain(): Session = Session(
     createdAt = time.created.toLong(),
     updatedAt = time.updated.toLong(),
     archivedAt = time.archived?.toLong(),
+    idleAt = time.idle?.toLong(),
+    viewedAt = time.viewed?.toLong(),
     revertMessageId = revert?.messageID,
 )
 
@@ -104,7 +106,7 @@ fun ApiModelInfo.toDomain(providerNames: Map<String, String> = emptyMap()): Doma
         supportsImages = "image" in capabilities.input,
         variants = variants.map { it.id },
         releasedAt = time.released.toLong(),
-        enabled = enabled,
+        enabled = enabled ?: true,
         status = status.value,
     )
 }

@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">صور مصغرة</string>
     <string name="settings_running_in_list">إظهار الأعمال قيد التشغيل في قائمة الجلسات</string>
     <string name="settings_running_in_list_sub">عرض عدد الوكلاء الفرعيين والأوامر الخلفية قيد التشغيل أسفل كل جلسة</string>
+    <string name="settings_unread_sessions">الجلسات غير المقروءة</string>
+    <string name="settings_unread_sessions_off">إيقاف</string>
+    <string name="settings_unread_sessions_dot">نقطة</string>
+    <string name="settings_unread_sessions_group">نقطة ومجموعة</string>
+    <string name="settings_unread_sessions_off_sub">لا نقاط ولا مجموعة غير المقروءة: القائمة لا تتتبع ما قرأته</string>
+    <string name="settings_unread_sessions_dot_sub">تظهر نقطة بجوار الوقت للرد الذي لم تفتحه؛ وتبقى الجلسة في يومها</string>
+    <string name="settings_unread_sessions_group_sub">تشير النقطة إلى رد لم تفتحه، وتُجمع هذه الجلسات فوق الأيام</string>
     <string name="settings_confirm_stop">تأكيد قبل إيقاف الأوامر</string>
     <string name="settings_confirm_stop_sub">اطلب التأكيد قبل إيقاف أمر خلفي من ورقة قيد التشغيل</string>
     <string name="settings_running_chips">العمل الجاري فوق مربع الرسالة</string>
@@ -418,7 +425,7 @@
     <string name="settings_close_model_picker_sub">عطّل هذا الخيار لاختيار النموذج ومستوى الاستدلال معًا، ثم اضغط على تم للإغلاق.</string>
     <string name="feature_section_changelog">سجل التغييرات</string>
     <string name="feature_new">جديد</string>
-    <string name="feature_by">بواسطة %1$s · #%2$d</string>
+    <string name="feature_by">بواسطة %1$s · %2$s</string>
     <string name="feature_math_title">رياضيات تُقرأ كما هي</string>
     <string name="feature_math_body">تُنسَّق الصيغ الرياضية في الردود أثناء وصولها: كسور وجذور وتكاملات ومصفوفات بدلًا من LaTeX الخام. ولا يزال نسخ الرسالة يعطيك مصدر LaTeX.</string>
     <string name="feature_math_demo">يصل رد بشكل متدفق فتتحول صيغه من مصدر LaTeX إلى رياضيات منسّقة.</string>

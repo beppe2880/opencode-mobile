@@ -22,6 +22,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -164,6 +165,7 @@ sealed interface SettingsEvent {
     data class SwipeSensitivityChanged(val sensitivity: SwipeSensitivity) : SettingsEvent
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
+    data class UnreadSessionsChanged(val unread: UnreadSessions) : SettingsEvent
     data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent

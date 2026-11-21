@@ -99,6 +99,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCa
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsD
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsE
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsF
+import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards.tipsCardsG
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -121,14 +122,22 @@ internal class FeatureCard(
     val author: String,
     /** Null for what came with the first release, before pull requests. */
     val pullRequest: Int?,
+    /** Further pull requests that shaped the same feature, oldest first; the card links to the newest. */
+    val morePullRequests: List<Int> = emptyList(),
     /** The demo; it plays only while [active], otherwise it shows its last frame. */
     val demo: @Composable (active: Boolean) -> Unit,
-)
+) {
+    /** Every pull request that shaped the feature, oldest first. */
+    val pullRequests: List<Int> get() = listOfNotNull(pullRequest) + morePullRequests
+
+    /** The newest one, for links; null when the feature predates pull requests. */
+    val latestPullRequest: Int? get() = pullRequests.lastOrNull()
+}
 
 private const val REPOSITORY = "https://github.com/beppe2880/opencode-mobile"
 
 /** Every card, newest version first within the page (the page groups and sorts them by version). */
-internal val featureCards: List<FeatureCard> by lazy { baseCards + tipsCardsA + tipsCardsB + tipsCardsC + tipsCardsD + tipsCardsE + tipsCardsF }
+internal val featureCards: List<FeatureCard> by lazy { baseCards + tipsCardsA + tipsCardsB + tipsCardsC + tipsCardsD + tipsCardsE + tipsCardsF + tipsCardsG }
 
 private val baseCards = listOf(
     FeatureCard(
@@ -179,7 +188,9 @@ internal fun Author(card: FeatureCard, onOpenUrl: (String) -> Unit, modifier: Mo
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(OcRadius.sm))
-            .clickable(role = Role.Button, enabled = card.pullRequest != null) { card.pullRequest?.let { onOpenUrl("$REPOSITORY/pull/$it") } }
+            .clickable(role = Role.Button, enabled = card.latestPullRequest != null) {
+                card.latestPullRequest?.let { onOpenUrl("$REPOSITORY/pull/$it") }
+            }
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.sm),
@@ -188,7 +199,11 @@ internal fun Author(card: FeatureCard, onOpenUrl: (String) -> Unit, modifier: Mo
             Text(card.author.take(1).uppercase(), style = MaterialTheme.typography.labelMedium, color = c.onAccent)
         }
         Text(
-            if (card.pullRequest != null) stringResource(Res.string.feature_by, "@${card.author}", card.pullRequest) else "@${card.author}",
+            if (card.pullRequests.isEmpty()) {
+                "@${card.author}"
+            } else {
+                stringResource(Res.string.feature_by, "@${card.author}", card.pullRequests.joinToString(", ") { "#$it" })
+            },
             style = MaterialTheme.typography.labelLarge,
             color = c.textAccent,
         )

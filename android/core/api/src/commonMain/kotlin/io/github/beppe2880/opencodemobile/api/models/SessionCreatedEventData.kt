@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.LocationRef
+import io.github.beppe2880.opencodemobile.api.models.LocationRef1
 import io.github.beppe2880.opencodemobile.api.models.ModelRef
 import io.github.beppe2880.opencodemobile.api.models.PermissionRule
 
@@ -56,10 +56,10 @@ data class SessionCreatedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     @SerialName(value = "location")
-    val location: LocationRef,
+    val location: LocationRef1,
 
     @SerialName(value = "slug")
     val slug: kotlin.String,

@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">السياق والسجل</string>
+    <string name="chat_menu_tools">الأدوات</string>
+    <string name="chat_new">محادثة جديدة</string>
+    <string name="chat_fork">إنشاء تفرع</string>
+    <string name="chat_undo">التراجع عن آخر طلب</string>
+    <string name="chat_redo">استعادة الطلبات المتراجع عنها</string>
+</resources>

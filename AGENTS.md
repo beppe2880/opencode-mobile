@@ -72,6 +72,13 @@ from the Ktor-based `multiplatform` library) -> `android/core/api/src/commonMain
   user-flow planning or audits.
 - Commits and pull request titles follow Conventional Commits:
   `type(scope): Description`, see `CONTRIBUTING.md`.
+- Every user-visible feature (`feat` PR) adds its card to the Tips & new features page in the
+  same PR: a `FeatureCard` with a live demo in
+  `android/feature/settings/.../whatsnew/cards/` (`TipsCards*.kt`, demos built with
+  `whatsnew/DemoKit.kt`), `version` set to the next release, author and PR number, and its
+  strings in every locale. Before merging a release PR, check that each feature it lists has a
+  card for that version; the page groups cards by version, so a release without cards shows
+  nothing new.
 - Prompts sent during verification go only to a disposable session in a scratch directory,
   with a cheap model; never prompt in real sessions.
 - After UI or behavior changes, install the debug build on the emulator and inspect the

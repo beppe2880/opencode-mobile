@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.apis
 
+import io.github.beppe2880.opencodemobile.api.models.EventSubscribeTypesParameter
 import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEvent
 import io.github.beppe2880.opencodemobile.api.models.UnauthorizedErrorEncoded
@@ -59,10 +60,11 @@ open class EventApi : ApiClient {
     /**
      * Subscribe to events
      * Subscribe to native events and plugin RPC events across all server locations. Volatile by contract: a slow consumer overflows and fails the stream, and events during disconnection are missed.
+     * @param types  (optional)
      * @return OpenCodeEvent
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun eventSubscribe(): HttpResponse<OpenCodeEvent> {
+    open suspend fun eventSubscribe(types: EventSubscribeTypesParameter? = null): HttpResponse<OpenCodeEvent> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -70,6 +72,7 @@ open class EventApi : ApiClient {
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
+        types?.apply { localVariableQuery["types"] = listOf("$types") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
         val localVariableConfig = RequestConfig<kotlin.Any?>(

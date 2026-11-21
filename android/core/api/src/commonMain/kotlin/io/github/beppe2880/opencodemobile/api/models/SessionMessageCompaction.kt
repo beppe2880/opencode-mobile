@@ -30,7 +30,6 @@ import io.github.beppe2880.opencodemobile.api.models.SessionMessageCompactionCom
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageCompactionFailed
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageCompactionRunning
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageIdleTime
-import io.github.beppe2880.opencodemobile.api.models.SessionProviderContext
 import io.github.beppe2880.opencodemobile.api.models.SessionStructuredError
 import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
 

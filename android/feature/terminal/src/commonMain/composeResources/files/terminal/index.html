@@ -12,11 +12,18 @@
   <style>
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: transparent; }
     #terminal { position: absolute; top: 0; bottom: 0; left: 4px; right: 4px; }
+    #terminal, #terminal textarea { -webkit-touch-callout: none; }
     .xterm .xterm-viewport { overflow-y: auto; }
     .xterm { touch-action: pan-x; }
+    .oc-selection-layer { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+    .oc-selection-handle { position: absolute; width: 48px; height: 48px; pointer-events: auto; touch-action: none; cursor: grab; }
+    .oc-selection-handle[hidden] { display: none; }
+    .oc-selection-handle span { position: absolute; left: 16px; top: 8px; width: 16px; height: 20px; background: currentColor; border-radius: 0 50% 50% 50%; }
+    .oc-selection-handle:focus-visible { outline: 2px solid currentColor; }
   </style>
   <script src="xterm.js"></script>
   <script src="addon-fit.js"></script>
+  <script src="selection.js"></script>
 </head>
 <body>
   <div id="terminal"></div>

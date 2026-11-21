@@ -79,7 +79,7 @@ class SettingsCategoriesTest {
             SettingsArea.Composer.options,
         )
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)
-        assertEquals(listOf(SettingOption.RunningInList, SettingOption.ConfirmStop), SettingsArea.Sessions.options)
+        assertEquals(listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.ConfirmStop), SettingsArea.Sessions.options)
         assertEquals(listOf(SettingOption.UpdateNotice), SettingsArea.Updates.options)
         assertTrue(SettingsArea.Servers.groups.isEmpty() && SettingsArea.About.groups.isEmpty())
     }

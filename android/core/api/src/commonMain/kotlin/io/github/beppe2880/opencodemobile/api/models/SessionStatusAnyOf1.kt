@@ -34,7 +34,7 @@ import kotlinx.serialization.Contextual
  *
  * @param type 
  * @param attempt 
- * @param message 
+ * @param message Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param next 
  * @param action 
  */
@@ -48,6 +48,7 @@ data class SessionStatusAnyOf1 (
     @SerialName(value = "attempt")
     val attempt: kotlin.Long,
 
+    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "message")
     val message: kotlin.String,
 

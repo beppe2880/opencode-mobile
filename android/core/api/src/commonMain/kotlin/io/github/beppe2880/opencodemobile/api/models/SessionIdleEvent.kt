@@ -24,7 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.LocationRef
-import io.github.beppe2880.opencodemobile.api.models.SessionDeletedEventData
+import io.github.beppe2880.opencodemobile.api.models.SessionArchivedEventData
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -54,7 +54,7 @@ data class SessionIdleEvent (
     val type: SessionIdleEvent.Type,
 
     @SerialName(value = "data")
-    val `data`: SessionDeletedEventData,
+    val `data`: SessionArchivedEventData,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,

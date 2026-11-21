@@ -45,7 +45,7 @@ data class IntegrationCommandAttemptStatusAnyOf2 (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "message")
-    val message: kotlin.String?,
+    val message: kotlin.String,
 
     @SerialName(value = "time")
     val time: IntegrationCommandAttemptStatusAnyOfTime

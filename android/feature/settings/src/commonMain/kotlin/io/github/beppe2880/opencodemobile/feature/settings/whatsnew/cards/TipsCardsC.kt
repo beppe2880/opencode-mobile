@@ -4,12 +4,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.CloudQueue
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_title
@@ -25,19 +31,72 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_sett
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_fullscreen_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_terminal_select_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_thoughts_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_background_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_cloud_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_record_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_record_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voice_record_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_title
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
 internal val tipsCardsC: List<FeatureCard> = listOf(
+    FeatureCard(
+        id = "chat-actions-menu",
+        version = "0.18.0",
+        icon = Icons.Outlined.MoreVert,
+        title = Res.string.tips_c_chat_menu_title,
+        body = Res.string.tips_c_chat_menu_body,
+        demoDescription = Res.string.tips_c_chat_menu_demo,
+        author = "Andrease11",
+        pullRequest = 243,
+        demo = { ChatMenuDemo(it) },
+    ),
+    FeatureCard(
+        id = "session-waiting-for-you",
+        version = "0.18.0",
+        icon = Icons.Outlined.QuestionAnswer,
+        title = Res.string.tips_c_waiting_title,
+        body = Res.string.tips_c_waiting_body,
+        demoDescription = Res.string.tips_c_waiting_demo,
+        author = "beppe2880",
+        pullRequest = 241,
+        demo = { WaitingForYouDemo(it) },
+    ),
+    FeatureCard(
+        id = "voice-background-recording",
+        version = "0.18.0",
+        icon = Icons.Outlined.Mic,
+        title = Res.string.tips_c_voice_background_title,
+        body = Res.string.tips_c_voice_background_body,
+        demoDescription = Res.string.tips_c_voice_background_demo,
+        author = "beppe2880",
+        pullRequest = 245,
+        demo = { VoiceBackgroundDemo(it) },
+    ),
+    FeatureCard(
+        id = "terminal-select-text",
+        version = "0.17.0",
+        icon = Icons.Outlined.ContentCopy,
+        title = Res.string.tips_c_terminal_select_title,
+        body = Res.string.tips_c_terminal_select_body,
+        demoDescription = Res.string.tips_c_terminal_select_demo,
+        author = "Andrease11",
+        pullRequest = 227,
+        demo = { TerminalSelectionDemo(it) },
+    ),
     FeatureCard(
         id = "voice-recording-waveform",
         version = "0.11.0",

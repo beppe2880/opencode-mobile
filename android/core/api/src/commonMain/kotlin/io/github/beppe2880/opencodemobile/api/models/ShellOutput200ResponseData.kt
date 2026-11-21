@@ -31,7 +31,7 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param output Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param output 
  * @param cursor 
  * @param propertySize 
  * @param truncated 
@@ -40,9 +40,8 @@ import kotlinx.serialization.Contextual
 
 data class ShellOutput200ResponseData (
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "output")
-    val output: kotlin.String?,
+    val output: kotlin.String,
 
     @SerialName(value = "cursor")
     val cursor: kotlin.Long,

@@ -5,11 +5,13 @@ import io.github.beppe2880.opencodemobile.api.models.LocationPublicRef
 import io.github.beppe2880.opencodemobile.api.models.SessionCreateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionForkRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionUpdateRequest
+import io.github.beppe2880.opencodemobile.api.models.SessionViewRequest
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.data.resultOf
+import io.github.beppe2880.opencodemobile.core.domain.AppVersion
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
@@ -22,12 +24,16 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.concurrent.Volatile
+import kotlin.time.Clock
 
 /** Sessions from the active server; the unsearched lists and projects are also kept per server in [lists]. */
 internal class RemoteSessionRepository(
     private val clients: OpenCodeClients,
     private val lists: ListCache = ListCache.None,
 ) : SessionRepository {
+
+    /** Archiving, with the archived list, exists since OpenCode 2.1.0. */
+    private val archiveSince = requireNotNull(AppVersion.parse("2.1.0"))
 
     /** Sessions last seen, by server and session id, so a chat can show its header at once. */
     private val seen = ConcurrentMap<Pair<String, String>, Session>()
@@ -52,7 +58,7 @@ internal class RemoteSessionRepository(
         sessions.forEach { seen[serverId to it.id] = it }
     }
 
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> = resultOf {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> = resultOf {
         // Resolved once, so a server switch during the request never files the list under the new server.
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
@@ -63,12 +69,60 @@ internal class RemoteSessionRepository(
                 order = SessionApi.OrderSessionList.DESC,
                 search = query,
                 parentID = ROOT_SESSIONS,
+                archived = archived?.let { if (it) SessionApi.ArchivedSessionList.TRUE else SessionApi.ArchivedSessionList.FALSE },
                 directory = directory,
             )
         }.data.map { it.toDomain() }
         remember(profile.id, sessions)
-        if (query == null) lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(sessions))
+        if (query == null && archived != true) {
+            lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(sessions))
+        }
         sessions
+    }
+
+    override suspend fun listUntil(
+        search: String?,
+        directory: String?,
+        limit: Int,
+        archived: Boolean?,
+        notBefore: Long,
+    ): Result<List<Session>> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        val query = search?.trim()?.takeIf { it.isNotEmpty() }
+        val pageSize = minOf(limit, PAGE_SIZE)
+        val seen = HashSet<String>()
+        val sessions = mutableListOf<Session>()
+        var cursor: String? = null
+        var pages = 0
+        do {
+            val page = awaitBody {
+                api.sessionList(
+                    limit = pageSize.toString(),
+                    order = SessionApi.OrderSessionList.DESC,
+                    search = query,
+                    parentID = ROOT_SESSIONS,
+                    archived = archived?.let { if (it) SessionApi.ArchivedSessionList.TRUE else SessionApi.ArchivedSessionList.FALSE },
+                    directory = directory,
+                    cursor = cursor,
+                )
+            }
+            val batch = page.data.map { it.toDomain() }
+            // A server without cursor support repeats the first page; the ids show when to stop.
+            val added = batch.filter { seen.add(it.id) }
+            sessions += added
+            cursor = page.cursor.next
+            pages++
+        } while (
+            added.isNotEmpty() && cursor != null && sessions.size < limit && pages < MAX_PAGES &&
+            batch.lastOrNull()?.updatedAt?.let { it >= notBefore } == true
+        )
+        val result = sessions.take(limit)
+        remember(profile.id, result)
+        if (query == null && archived != true) {
+            lists.write(profile.id, ListCache.sessionsKey(directory), SessionListCodec.encodeSessions(result))
+        }
+        result
     }
 
     override suspend fun cachedList(serverId: String, directory: String?): List<Session>? {
@@ -112,6 +166,32 @@ internal class RemoteSessionRepository(
         seen.remove(profile.id to sessionId)
     }
 
+    override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        awaitSuccess { api.sessionUpdate(sessionId, SessionUpdateRequest(archived = archived)) }
+        seen[profile.id to sessionId]?.let { session ->
+            seen[profile.id to sessionId] = session.copy(
+                archivedAt = if (archived) Clock.System.now().toEpochMilliseconds() else null,
+            )
+        }
+        if (archived) lists.removeSession(profile.id, sessionId)
+    }
+
+    override suspend fun archiveSupported(): Boolean = resultOf {
+        val profile = clients.activeProfile()
+        awaitBody { clients.forProfile(profile).server.serverInfo() }.version
+    }.map { version -> AppVersion.parse(version)?.let { it >= archiveSince } ?: true }
+        .getOrDefault(true)
+
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> = resultOf {
+        val profile = clients.activeProfile()
+        val api = clients.forProfile(profile).sessions
+        // The server ignores an idle it no longer has and never moves `viewed` backwards.
+        awaitSuccess { api.sessionView(sessionId, SessionViewRequest(idle = idleAt.toDouble())) }
+        seen[profile.id to sessionId]?.let { seen[profile.id to sessionId] = it.copy(viewedAt = idleAt) }
+    }
+
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = resultOf {
         val api = clients.active().sessions
         awaitBody { api.sessionFork(sessionId, SessionForkRequest(before = beforeMessageId)) }.data.toDomain()
@@ -140,5 +220,11 @@ internal class RemoteSessionRepository(
     private companion object {
         /** `parentID=null` asks the server for root sessions only. */
         const val ROOT_SESSIONS = "null"
+
+        /** Sessions read per page while filling a date range. */
+        const val PAGE_SIZE = 200
+
+        /** A server that ignores the cursor would repeat a page; the id check stops first. */
+        const val MAX_PAGES = 10
     }
 }

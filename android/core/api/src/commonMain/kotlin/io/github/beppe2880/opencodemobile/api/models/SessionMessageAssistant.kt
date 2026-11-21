@@ -48,7 +48,7 @@ import kotlinx.serialization.Contextual
  * @param snapshot 
  * @param finish 
  * @param rawFinish Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param providerState 
+ * @param native 
  * @param cost 
  * @param tokens 
  * @param error 
@@ -91,8 +91,8 @@ data class SessionMessageAssistant (
     @SerialName(value = "rawFinish")
     val rawFinish: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null,
 
     @SerialName(value = "cost")
     val cost: kotlin.Double? = null,

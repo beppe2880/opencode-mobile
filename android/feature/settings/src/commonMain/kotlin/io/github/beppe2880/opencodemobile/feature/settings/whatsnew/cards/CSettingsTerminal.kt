@@ -17,13 +17,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.FullscreenExit
 import androidx.compose.material.icons.outlined.Mic
@@ -43,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -221,6 +225,158 @@ private fun KeyCap(label: String) {
         contentAlignment = Alignment.Center,
     ) {
         Text(label, style = OcTheme.mono.codeSmall, color = c.textBase, modifier = Modifier.padding(horizontal = OcSpacing.sm))
+    }
+}
+
+/** The colors of a terminal line, as the shell prints them. */
+@Composable
+private fun terminalLineColor(line: String) = OcTheme.colors.let { c ->
+    when {
+        line.startsWith("$") -> c.textAccent
+        line.startsWith("✓") -> c.success.fg
+        line.startsWith("✗") -> c.danger.fg
+        else -> c.textMuted
+    }
+}
+
+/** How much of the failing line is selected: nothing, the long-pressed word, or up to its end. */
+private enum class TerminalSelection { None, Word, Line }
+
+/** Text that may be selected: highlighted, with a handle under each end. */
+@Composable
+private fun SelectableText(text: String, selected: Boolean, color: Color, modifier: Modifier = Modifier, handles: Boolean = selected) {
+    val c = OcTheme.colors
+    Box(modifier) {
+        Text(
+            text,
+            style = OcTheme.mono.codeSmall,
+            color = color,
+            maxLines = 1,
+            softWrap = false,
+            modifier = Modifier.background(if (selected) c.bgAccent.copy(alpha = 0.3f) else Color.Transparent),
+        )
+        if (handles) {
+            Box(Modifier.align(Alignment.BottomStart).offset(x = (-4).dp, y = 9.dp).size(8.dp).clip(CircleShape).background(c.bgAccent))
+            Box(Modifier.align(Alignment.BottomEnd).offset(x = 4.dp, y = 9.dp).size(8.dp).clip(CircleShape).background(c.bgAccent))
+        }
+    }
+}
+
+/**
+ * A long press on a word of the output selects it; a drag of its handle extends the selection,
+ * Copy puts it on the clipboard.
+ */
+@Composable
+internal fun TerminalSelectionDemo(active: Boolean) {
+    val c = OcTheme.colors
+    var selection by remember { mutableStateOf(TerminalSelection.Line) }
+    var copied by remember { mutableStateOf(false) }
+    val finger = remember { DemoFinger() }
+    val targets = remember { DemoTargets() }
+    DemoLoop(active, finalFrame = {
+        selection = TerminalSelection.Line
+        copied = false
+        finger.hide()
+    }) {
+        selection = TerminalSelection.None
+        copied = false
+        finger.hide()
+        delay(900)
+        finger.show(targets.center("word") + Offset(60f, 140f))
+        finger.moveTo(targets.center("word"))
+        finger.longPress()
+        selection = TerminalSelection.Word
+        delay(500)
+        val end = targets.bounds("word")?.bottomRight ?: Offset.Zero
+        finger.moveTo(end + Offset(0f, 24f), 350)
+        val lineEnd = targets.bounds("rest")?.bottomRight ?: Offset.Zero
+        finger.drag(lineEnd + Offset(0f, 24f), 700)
+        selection = TerminalSelection.Line
+        delay(500)
+        finger.moveTo(targets.center("copy"))
+        finger.tap()
+        selection = TerminalSelection.None
+        copied = true
+        finger.hide()
+        delay(1600)
+        copied = false
+        delay(600)
+    }
+    Box(Modifier.fillMaxSize().then(targets.root()).background(c.bgBase)) {
+        Column(Modifier.fillMaxSize()) {
+            DemoTopBar("Terminal", subtitle = "~/api")
+            TerminalSelectionOutput(selection, copied, targets, Modifier.weight(1f))
+            Row(
+                Modifier.fillMaxWidth().background(c.layer01).padding(horizontal = OcSpacing.sm, vertical = OcSpacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                KeyCap("Esc")
+                KeyCap("Tab")
+                KeyCap("Ctrl")
+                KeyCap("↑")
+            }
+        }
+        finger.Draw()
+    }
+}
+
+/** The output of the selection demo, with the selection toolbar and the Copied notice over it. */
+@Composable
+private fun TerminalSelectionOutput(selection: TerminalSelection, copied: Boolean, targets: DemoTargets, modifier: Modifier = Modifier) {
+    val c = OcTheme.colors
+    Box(modifier.fillMaxWidth().clipToBounds().background(c.bgDeep)) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs)) {
+            TERMINAL_LINES.take(9).forEach { line ->
+                if (line.startsWith("✗")) {
+                    val color = terminalLineColor(line)
+                    Row {
+                        Text("✗ ", style = OcTheme.mono.codeSmall, color = color, maxLines = 1, softWrap = false)
+                        if (selection == TerminalSelection.Line) {
+                            SelectableText("upload › retries", selected = true, color = color)
+                        } else {
+                            SelectableText("upload", selected = selection == TerminalSelection.Word, color = color, modifier = targets.target("word"))
+                            SelectableText(" › retries", selected = false, color = color, modifier = targets.target("rest"))
+                        }
+                    }
+                } else {
+                    Text(line, style = OcTheme.mono.codeSmall, color = terminalLineColor(line), maxLines = 1, softWrap = false)
+                }
+            }
+        }
+        AnimatedVisibility(
+            selection != TerminalSelection.None,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(OcSpacing.sm),
+        ) {
+            Row(
+                Modifier
+                    .clip(RoundedCornerShape(OcRadius.md))
+                    .background(c.layer02)
+                    .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.md))
+                    .padding(horizontal = OcSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
+            ) {
+                Text(
+                    "Copy",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = c.textBase,
+                    modifier = Modifier.padding(OcSpacing.sm).then(targets.target("copy")),
+                )
+                Text("Select all", style = MaterialTheme.typography.labelLarge, color = c.textBase, modifier = Modifier.padding(OcSpacing.sm))
+                Icon(Icons.Outlined.Close, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(18.dp))
+            }
+        }
+        AnimatedVisibility(copied, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.align(Alignment.BottomCenter).padding(OcSpacing.md)) {
+            Text(
+                "Copied",
+                style = MaterialTheme.typography.labelLarge,
+                color = c.textInverse,
+                modifier = Modifier.clip(RoundedCornerShape(OcRadius.md)).background(c.bgInverse).padding(horizontal = OcSpacing.md, vertical = OcSpacing.sm),
+            )
+        }
     }
 }
 

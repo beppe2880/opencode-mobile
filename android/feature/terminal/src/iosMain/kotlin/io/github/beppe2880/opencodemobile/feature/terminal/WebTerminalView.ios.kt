@@ -1,7 +1,9 @@
 package io.github.beppe2880.opencodemobile.feature.terminal
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
@@ -39,6 +41,10 @@ window.OcTerminal = (function () {
     input(data) { post({ t: "input", d: data }); },
     resize(columns, rows) { post({ t: "resize", c: String(columns), r: String(rows) }); },
     modifiersUsed() { post({ t: "modifiersUsed" }); },
+    selectionChanged(active, top) { post({ t: "selectionChanged", active: String(active), top: String(top) }); },
+    selectionAvailable(available) { post({ t: "selectionAvailable", available: String(available) }); },
+    selectionPicking(picking) { post({ t: "selectionPicking", picking: String(picking) }); },
+    copy(data) { post({ t: "copy", d: data }); },
     font() { return window.__ocFont || ""; },
   };
 })();
@@ -51,8 +57,17 @@ window.OcTerminal = (function () {
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage, openKeyboard: Boolean, modifier: Modifier) {
-    val terminal = remember(surface) { IosTerminalView(surface) }
+internal actual fun PlatformTerminalView(
+    surface: WebSurface,
+    page: TerminalPage,
+    openKeyboard: Boolean,
+    onSelectionChanged: (active: Boolean, toolbarAtTop: Boolean) -> Unit,
+    onCopy: (String) -> Unit,
+    modifier: Modifier,
+) {
+    val selectionChanged by rememberUpdatedState(onSelectionChanged)
+    val copy by rememberUpdatedState(onCopy)
+    val terminal = remember(surface) { IosTerminalView(surface, { active, top -> selectionChanged(active, top) }, { copy(it) }) }
     UIKitView(
         factory = { terminal.create(page) },
         modifier = modifier,
@@ -67,7 +82,11 @@ internal actual fun PlatformTerminalView(surface: WebSurface, page: TerminalPage
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private class IosTerminalView(private val surface: WebSurface) {
+private class IosTerminalView(
+    private val surface: WebSurface,
+    private val onSelectionChanged: (Boolean, Boolean) -> Unit,
+    private val onCopy: (String) -> Unit,
+) {
     var openKeyboard = true
     private var webView: WKWebView? = null
     private var bridgePage: WebTerminalPage? = null
@@ -87,7 +106,7 @@ private class IosTerminalView(private val surface: WebSurface) {
                 view.evaluateJavaScript("window.oc.$function(${arguments.joinToString(",")})", completionHandler = null)
             }
         }
-        content.addScriptMessageHandler(Messages(surface, calls), HANDLER)
+        content.addScriptMessageHandler(Messages(surface, calls, onSelectionChanged, onCopy), HANDLER)
         view.setOpaque(false)
         view.backgroundColor = UIColor.clearColor
         view.scrollView.backgroundColor = UIColor.clearColor
@@ -120,7 +139,12 @@ private class IosTerminalView(private val surface: WebSurface) {
 }
 
 /** Calls of the page's bridge; WebKit delivers them on the main thread. */
-private class Messages(private val surface: WebSurface, private val page: WebTerminalPage) :
+private class Messages(
+    private val surface: WebSurface,
+    private val page: WebTerminalPage,
+    private val onSelectionChanged: (Boolean, Boolean) -> Unit,
+    private val onCopy: (String) -> Unit,
+) :
     NSObject(),
     WKScriptMessageHandlerProtocol {
     override fun userContentController(userContentController: WKUserContentController, didReceiveScriptMessage: WKScriptMessage) {
@@ -134,6 +158,10 @@ private class Messages(private val surface: WebSurface, private val page: WebTer
                 if (columns > 0 && rows > 0) surface.onPageResize(columns, rows)
             }
             "modifiersUsed" -> surface.onPageModifiersUsed()
+            "selectionChanged" -> onSelectionChanged(body["active"] == "true", body["top"] == "true")
+            "selectionAvailable" -> surface.onPageSelectionAvailable(body["available"] == "true")
+            "selectionPicking" -> surface.onPageSelectionPicking(body["picking"] == "true")
+            "copy" -> (body["d"] as? String)?.let(onCopy)
         }
     }
 }

@@ -37,6 +37,7 @@ import kotlinx.serialization.Contextual
  * @param instructions Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param mode 
  * @param time 
+ * @param paste Archive the session with true or restore it with false. Repeating the current state is a no-op.
  */
 @Serializable
 
@@ -44,21 +45,25 @@ data class IntegrationAttemptEncoded (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "attemptID")
-    val attemptID: kotlin.String?,
+    val attemptID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "url")
-    val url: kotlin.String?,
+    val url: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "instructions")
-    val instructions: kotlin.String?,
+    val instructions: kotlin.String,
 
     @SerialName(value = "mode")
     val mode: IntegrationAttemptEncoded.Mode,
 
     @SerialName(value = "time")
-    val time: IntegrationCommandAttemptStatusAnyOfTime
+    val time: IntegrationCommandAttemptStatusAnyOfTime,
+
+    /* Archive the session with true or restore it with false. Repeating the current state is a no-op. */
+    @SerialName(value = "paste")
+    val paste: kotlin.Boolean? = null
 
 ) {
 

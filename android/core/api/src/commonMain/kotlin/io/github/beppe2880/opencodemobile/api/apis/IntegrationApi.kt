@@ -388,7 +388,7 @@ open class IntegrationApi : ApiClient {
 
     /**
      * Complete OAuth connection
-     * Complete a code-based OAuth attempt and store the resulting credential.
+     * Complete a code-based OAuth attempt and store the resulting credential. For an automatic attempt with &#x60;paste&#x60;, &#x60;code&#x60; is the redirect URL copied from the browser, and the result arrives through the attempt status.
      * @param integrationID 
      * @param attemptID 
      * @param integrationOauthCompleteRequest 

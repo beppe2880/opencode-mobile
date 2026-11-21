@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_g_filters_title">Filtra le tue sessioni</string>
+    <string name="tips_g_filters_body">Restringi l'elenco per data, esito o sessioni archiviate. L'archiviazione offre anche Annulla.</string>
+    <string name="tips_g_filters_demo">Un elenco di sessioni apre i filtri e mostra una sessione archiviata.</string>
+    <string name="tips_g_unread_title">Sessioni non lette</string>
+    <string name="tips_g_unread_body">Un punto segna le sessioni il cui ultimo turno è terminato dopo l'ultima volta che le hai aperte. Le sessioni non lette hanno un gruppo dedicato sotto quelle fissate, così sono sempre in cima; aprine una per togliere il punto e riportarla al suo giorno, oppure segnale tutte come lette dal gruppo. In Impostazioni → Sessioni puoi tenere solo il punto o disattivare le sessioni non lette.</string>
+    <string name="tips_g_unread_demo">Una sessione terminata riceve un punto e passa a Non lette; toccandola il punto scompare e torna in Oggi.</string>
+</resources>

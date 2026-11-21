@@ -34,6 +34,22 @@ jobs:
         working-directory: android
         # The benchmarks are only compiled here: running them needs a device.
         run: ./gradlew testDebugUnitTest :app:lintDebug :app:assembleDebug :benchmark:compileBenchmarkKotlin --console=plain
+      - name: Release code shrunk by R8
+        working-directory: android
+        # The benchmark build type is the release build signed with the debug key, so R8 runs here
+        # without the release secrets. Classes that libraries create by reflection need their
+        # no-argument constructors: without them the widget loads forever in release (#106).
+        run: |
+          ./gradlew :app:assembleBenchmark --console=plain
+          seeds=app/build/outputs/mapping/benchmark/seeds.txt
+          for constructor in \
+            'androidx.work.OverwritingInputMerger: OverwritingInputMerger()' \
+            'io.github.beppe2880.opencodemobile.widget.RefreshWidgetAction: RefreshWidgetAction()'; do
+            if ! grep -qxF "$constructor" "$seeds"; then
+              echo "::error::R8 removed $constructor; check android/app/proguard-rules.pro."
+              exit 1
+            fi
+          done
       - name: Compile shared code and common tests for iOS
         # Kotlin/Native compiles iOS klibs on Linux too; only linking needs macOS. The tests catch
         # names Kotlin/Native rejects (for example commas in backticked test names).
@@ -117,7 +133,7 @@ jobs:
           java-version: 21
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - name: Terminal touch regression tests
-        run: bun test tools/terminal-touch.test.ts
+        run: bun test tools/terminal-touch.test.ts tools/terminal-selection.test.ts
       - name: Check the iOS widget strings match the Android ones
         run: bun test tools/ios-widget-strings.test.ts
       - name: Check translation coverage and format arguments

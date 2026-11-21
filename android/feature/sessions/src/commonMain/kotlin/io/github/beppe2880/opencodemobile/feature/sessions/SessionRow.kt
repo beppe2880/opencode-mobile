@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.Delete
@@ -26,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -53,8 +55,12 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_answer
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_waiting_permission
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,6 +84,10 @@ internal fun SessionRow(
     pinned: Boolean = false,
     /** Pins or unpins the session, offered to accessibility services; the row actions have it for everyone. */
     onTogglePin: (() -> Unit)? = null,
+    /** Running but blocked on the user: a badge replaces "Working" and the dot turns to a warning. */
+    waiting: SessionWaiting? = null,
+    /** Off when the setting hides unread state: no dot and no unread label. */
+    showUnread: Boolean = true,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -89,8 +99,17 @@ internal fun SessionRow(
     val renameLabel = stringResource(Res.string.sessions_rename)
     val deleteLabel = stringResource(Res.string.sessions_delete)
     val pinLabel = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin)
-    val runningLabel = if (work == null) stringResource(Res.string.sessions_running_a11y) else runningSummary(work, running)
-    val showsWork = work != null && (running || !work.isEmpty)
+    val waitingLabel = waiting?.let { stringResource(it.label()) }
+    val workLabel = if (work == null) "" else runningSummary(work, running && waiting == null)
+    val agentRunning = stringResource(Res.string.sessions_running_a11y)
+    val runningLabel = listOfNotNull(
+        waitingLabel,
+        workLabel.ifEmpty { agentRunning.takeIf { waiting == null } },
+    ).joinToString(" · ")
+    val unreadLabel = stringResource(Res.string.sessions_unread)
+    val showsWork = workLabel.isNotEmpty()
+    // A running session shows its activity dot instead, like the desktop app.
+    val unread = showUnread && session.isUnread && !running
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
@@ -115,7 +134,11 @@ internal fun SessionRow(
                 .background(if (selected) c.layer02 else c.bgBase)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
                 .semantics {
-                    if (running || showsWork) stateDescription = runningLabel
+                    val states = buildList {
+                        if (running || showsWork) add(runningLabel)
+                        if (unread) add(unreadLabel)
+                    }
+                    if (states.isNotEmpty()) stateDescription = states.joinToString(", ")
                     customActions = listOfNotNull(
                         onTogglePin?.let { toggle -> CustomAccessibilityAction(pinLabel) { toggle(); true } },
                         CustomAccessibilityAction(renameLabel) { onLongClick(); true },
@@ -161,10 +184,13 @@ internal fun SessionRow(
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     OutcomeBadge(session.outcome, running)
+                    if (running && waitingLabel != null) {
+                        OcBadge(waitingLabel, c.warning, Modifier.testTag("session_waiting_${session.id}"))
+                    }
                 }
                 if (showsWork) {
                     Text(
-                        runningLabel,
+                        workLabel,
                         style = MaterialTheme.typography.bodySmall,
                         color = c.info.fg,
                         maxLines = 2,
@@ -175,17 +201,39 @@ internal fun SessionRow(
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (!compact) {
-                    Text(
-                        text = relativeTime(session.updatedAt, now),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = c.textFaint,
-                        maxLines = 1,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    ) {
+                        Text(
+                            text = relativeTime(session.updatedAt, now),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = c.textFaint,
+                            maxLines = 1,
+                        )
+                        if (unread) UnreadDot(session.id)
+                    }
+                } else if (unread) {
+                    UnreadDot(session.id)
                 }
-                if (running) OcPulsingDot(c.info.fg, Modifier.testTag("session_running_${session.id}"))
+                if (running) {
+                    OcPulsingDot(if (waiting != null) c.warning.fg else c.info.fg, Modifier.testTag("session_running_${session.id}"))
+                }
             }
         }
     }
+}
+
+/** The unread marker at the row's trailing edge, next to the time. */
+@Composable
+private fun UnreadDot(sessionId: String) {
+    Box(
+        modifier = Modifier
+            .size(8.dp)
+            .clip(CircleShape)
+            .background(OcTheme.colors.info.fg)
+            .testTag("session_unread_$sessionId"),
+    )
 }
 
 @Composable
@@ -197,6 +245,11 @@ private fun OutcomeBadge(outcome: SessionOutcome?, running: Boolean) {
         SessionOutcome.Interrupted -> OcBadge(stringResource(Res.string.sessions_interrupted), c.warning)
         else -> Unit
     }
+}
+
+private fun SessionWaiting.label(): StringResource = when (this) {
+    SessionWaiting.Permission -> Res.string.sessions_waiting_permission
+    SessionWaiting.Answer -> Res.string.sessions_waiting_answer
 }
 
 /** The session's title, or a placeholder while the server has not named it yet. */

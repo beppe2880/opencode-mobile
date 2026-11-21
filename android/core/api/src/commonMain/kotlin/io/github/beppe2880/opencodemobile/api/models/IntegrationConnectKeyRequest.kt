@@ -41,7 +41,7 @@ data class IntegrationConnectKeyRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "key")
-    val key: kotlin.String?,
+    val key: kotlin.String,
 
     @Contextual @SerialName(value = "answer")
     val answer: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,

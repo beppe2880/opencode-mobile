@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.SessionInstructionsUpdatedEventDataDeltaValue
+import io.github.beppe2880.opencodemobile.api.models.SessionInstructionsUpdatedDataDeltaValue
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -44,7 +44,7 @@ data class SessionInstructionsUpdatedEventData (
     val sessionID: kotlin.String,
 
     @Contextual @SerialName(value = "delta")
-    val delta: kotlin.collections.Map<kotlin.String, SessionInstructionsUpdatedEventDataDeltaValue>,
+    val delta: kotlin.collections.Map<kotlin.String, SessionInstructionsUpdatedDataDeltaValue>,
 
     @SerialName(value = "text")
     val text: kotlin.String? = null

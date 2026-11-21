@@ -48,4 +48,12 @@
     <string name="terminal_preview_fullscreen">Tela cheia: sem barra de título e sem barras do sistema</string>
     <string name="terminal_preview_keyboard_on">O teclado abre junto com o terminal</string>
     <string name="terminal_preview_keyboard_off">O teclado abre quando você toca no terminal</string>
+    <string name="terminal_select_text">Selecionar texto</string>
+    <string name="terminal_select_all">Selecionar tudo</string>
+    <string name="terminal_selection_start">Início da seleção</string>
+    <string name="terminal_selection_end">Fim da seleção</string>
+    <string name="terminal_copy_failed">Não foi possível copiar. Tente novamente.</string>
+    <string name="terminal_selection_unavailable">A seleção de texto não está disponível em apps de terminal em tela cheia ou no modo mouse.</string>
+    <string name="terminal_selection_position">Linha %1$d, coluna %2$d</string>
+    <string name="terminal_selection_tap_word">Toque em uma palavra para selecioná-la</string>
 </resources>

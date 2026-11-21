@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Miniature</string>
     <string name="settings_running_in_list">Mostra il lavoro in corso nell'elenco sessioni</string>
     <string name="settings_running_in_list_sub">Conta i sottoagenti e i comandi in background sotto ogni sessione</string>
+    <string name="settings_unread_sessions">Sessioni non lette</string>
+    <string name="settings_unread_sessions_off">Disattivato</string>
+    <string name="settings_unread_sessions_dot">Punto</string>
+    <string name="settings_unread_sessions_group">Punto e gruppo</string>
+    <string name="settings_unread_sessions_off_sub">Nessun punto e nessun gruppo «Non lette»: l'elenco non tiene traccia di ciò che hai letto</string>
+    <string name="settings_unread_sessions_dot_sub">Un punto accanto all'orario segna una risposta che non hai aperto; la sessione resta nel suo giorno</string>
+    <string name="settings_unread_sessions_group_sub">Un punto segna una risposta che non hai aperto, e queste sessioni sono raggruppate sopra i giorni</string>
     <string name="settings_confirm_stop">Conferma prima di interrompere i comandi</string>
     <string name="settings_confirm_stop_sub">Chiedi conferma prima di interrompere un comando in background dal pannello In esecuzione</string>
     <string name="settings_running_chips">Attività in corso sopra la casella del messaggio</string>
@@ -406,7 +413,7 @@
     <string name="settings_close_model_picker_sub">Disattiva per scegliere insieme modello e ragionamento, poi tocca Fine per chiudere.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">Nuovo</string>
-    <string name="feature_by">Di %1$s · #%2$d</string>
+    <string name="feature_by">Di %1$s · %2$s</string>
     <string name="feature_math_title">Formule che si leggono come formule</string>
     <string name="feature_math_body">Le formule nelle risposte vengono composte mentre arrivano: frazioni, radici, integrali e matrici al posto del LaTeX grezzo. Copiando un messaggio ottieni comunque il sorgente LaTeX.</string>
     <string name="feature_math_demo">Arriva una risposta e le sue formule passano dal sorgente LaTeX alla matematica composta.</string>

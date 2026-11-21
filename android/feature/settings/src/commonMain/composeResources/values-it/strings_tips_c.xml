@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">Continua a registrare in background</string>
+    <string name="tips_c_voice_background_body">Un messaggio vocale registrato con un modello cloud continua quando passi a un'altra app o blocchi il telefono. Su Android, Stop nella notifica lo termina; il testo ti aspetta nella casella del messaggio quando torni.</string>
+    <string name="tips_c_voice_background_demo">Una registrazione va nella casella del messaggio, poi la schermata home mostra una notifica che conta il tempo. Un dito tocca Stop e, tornando nell'app, la frase detta è nella casella del messaggio.</string>
+
     <string name="tips_c_voice_record_title">Parla invece di scrivere</string>
     <string name="tips_c_voice_record_body">Tocca il microfono nella casella del messaggio e parla: una forma d'onda in tempo reale e un timer mostrano che ti sta ascoltando. Conferma per tenere il testo o annulla per scartarlo.</string>
     <string name="tips_c_voice_record_demo">Un dito tocca il microfono, la casella del messaggio mostra una forma d'onda in movimento con un timer, poi la frase detta compare come testo.</string>
@@ -15,6 +19,12 @@
     <string name="tips_c_terminal_fullscreen_title">Più spazio per il terminale</string>
     <string name="tips_c_terminal_fullscreen_body">Entra a schermo intero per nascondere la barra del titolo e quelle di sistema e vedere più righe in una volta. Indietro o lo stesso pulsante le riporta.</string>
     <string name="tips_c_terminal_fullscreen_demo">Un dito tocca il pulsante schermo intero del terminale: la barra del titolo e quella di stato scivolano via e compaiono più righe di output.</string>
+    <string name="tips_c_waiting_title">Vedi quali chat aspettano una tua risposta</string>
+    <string name="tips_c_waiting_body">Quando un agente si ferma per farti una domanda o chiedere un permesso, la sua chat nell'elenco mostra Domanda per te o Richiede permesso al posto di In lavorazione, nel colore di avviso. Anche le richieste dei suoi subagenti contano.</string>
+    <string name="tips_c_waiting_demo">Una chat in lavorazione nell'elenco passa a Domanda per te nel colore di avviso, torna a In lavorazione dopo la risposta, poi mostra Richiede permesso.</string>
+    <string name="tips_c_terminal_select_title">Copia testo dal terminale</string>
+    <string name="tips_c_terminal_select_body">Tieni premuta una parola nell'output per selezionarla, trascina le maniglie per selezionarne altre, poi tocca Copia. Seleziona tutto seleziona l'intero contenuto, e il pulsante Seleziona testo nella barra in alto avvia anch'esso una selezione.</string>
+    <string name="tips_c_terminal_select_demo">Una parola di una riga di test fallito viene tenuta premuta ed evidenziata, la sua maniglia viene trascinata fino alla fine della riga e si tocca Copia: compare un avviso Copiato.</string>
 
     <string name="tips_c_next_message_title">Cambia modello senza aspettare</string>
     <string name="tips_c_next_message_body">Cambia agente o modello mentre una risposta è ancora in corso: la modifica vale dal messaggio successivo. Le nuove chat partono dall'ultimo modello usato.</string>

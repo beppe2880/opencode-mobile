@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.PromptFileSource
 import io.github.beppe2880.opencodemobile.api.models.PromptMention
 
 import kotlinx.serialization.Serializable
@@ -33,6 +34,7 @@ import kotlinx.serialization.Contextual
  * 
  *
  * @param uri 
+ * @param source 
  * @param name 
  * @param description 
  * @param mention 
@@ -43,6 +45,9 @@ data class PromptInputFileAttachment (
 
     @SerialName(value = "uri")
     val uri: kotlin.String,
+
+    @SerialName(value = "source")
+    val source: PromptFileSource? = null,
 
     @SerialName(value = "name")
     val name: kotlin.String? = null,

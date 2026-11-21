@@ -24,7 +24,10 @@
 package io.github.beppe2880.opencodemobile.api.apis
 
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalMcpAddRequest
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalMcpClientLocationParameter
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalMcpClientToken200Response
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalMcpRemove404Response
+import io.github.beppe2880.opencodemobile.api.models.ForbiddenErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.McpList200Response
@@ -93,6 +96,82 @@ open class McpApi : ApiClient {
         ).wrap()
     }
 
+
+
+    /**
+     * Attach client MCP server
+     * Upgrade to a WebSocket over which the client hosts an MCP server named after &#x60;name&#x60;; its tools stay available while the socket is open. One JSON-RPC message per text frame. Experimental: may change without compatibility guarantees.
+     * @param name 
+     * @param location  (optional)
+     * @param ticket  (optional)
+     * @return kotlin.Boolean
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun experimentalMcpClient(name: kotlin.String, location: ExperimentalMcpClientLocationParameter? = null, ticket: kotlin.String? = null): HttpResponse<kotlin.Boolean> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        location?.apply { localVariableQuery["location"] = listOf("$location") }
+        name?.apply { localVariableQuery["name"] = listOf("$name") }
+        ticket?.apply { localVariableQuery["ticket"] = listOf("$ticket") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/api/experimental/client-mcp",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * Create client MCP WebSocket token
+     * Create a short-lived single-use ticket for opening a client MCP WebSocket connection from a browser.
+     * @param name 
+     * @param xOpencodeTicket  (optional)
+     * @param locationDirectory  (optional)
+     * @return ExperimentalMcpClientToken200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun experimentalMcpClientToken(name: kotlin.String, xOpencodeTicket: kotlin.String? = null, locationDirectory: kotlin.String? = null): HttpResponse<ExperimentalMcpClientToken200Response> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        locationDirectory?.apply { localVariableQuery["location[directory]"] = listOf("$locationDirectory") }
+        name?.apply { localVariableQuery["name"] = listOf("$name") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xOpencodeTicket?.apply { localVariableHeaders["x-opencode-ticket"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/api/experimental/client-mcp/token",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
 
 
     /**

@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">Context &amp; history</string>
+    <string name="chat_menu_tools">Tools</string>
+    <string name="chat_new">New chat</string>
+    <string name="chat_fork">Create a fork</string>
+    <string name="chat_undo">Undo last prompt</string>
+    <string name="chat_redo">Restore undone prompts</string>
+</resources>

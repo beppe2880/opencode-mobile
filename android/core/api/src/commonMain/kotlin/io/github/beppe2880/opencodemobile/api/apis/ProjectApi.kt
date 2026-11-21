@@ -24,9 +24,8 @@
 package io.github.beppe2880.opencodemobile.api.apis
 
 import io.github.beppe2880.opencodemobile.api.models.InvalidRequestErrorEncoded
-import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.Project
-import io.github.beppe2880.opencodemobile.api.models.ProjectUpdate404Response
+import io.github.beppe2880.opencodemobile.api.models.ProjectNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.ProjectUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.UnauthorizedErrorEncoded
 

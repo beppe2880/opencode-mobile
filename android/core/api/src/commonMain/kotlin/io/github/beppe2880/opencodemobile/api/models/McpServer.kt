@@ -34,6 +34,7 @@ import kotlinx.serialization.Contextual
  *
  * @param name 
  * @param status 
+ * @param title 
  * @param integrationID Maximum number of sessions to return. Defaults to the newest 50 sessions.
  */
 @Serializable
@@ -45,6 +46,9 @@ data class McpServer (
 
     @SerialName(value = "status")
     val status: McpServerStatus,
+
+    @SerialName(value = "title")
+    val title: kotlin.String? = null,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "integrationID")

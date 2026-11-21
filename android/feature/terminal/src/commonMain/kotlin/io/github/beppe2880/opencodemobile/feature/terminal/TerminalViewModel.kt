@@ -15,15 +15,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class TerminalViewModel(
     directory: String,
     private val terminals: TerminalRepository,
     private val settings: SettingsRepository,
+    private val timelines: TerminalTimelines = TerminalTimelines(),
 ) : BaseViewModel<TerminalState, TerminalEvent, TerminalEffect>(TerminalState(directory)) {
 
     private val input = Channel<ByteArray>(Channel.UNLIMITED)
@@ -55,6 +59,7 @@ class TerminalViewModel(
 
     private fun onResize(columns: Int, rows: Int) {
         size.value = columns to rows
+        terminalId?.let { timelines[it] = surface.timeline() }
     }
 
     private fun clearTransients() = updateState { state ->
@@ -71,6 +76,9 @@ class TerminalViewModel(
             TerminalEvent.Retry -> open()
             is TerminalEvent.Fullscreen -> updateState { it.copy(fullscreen = event.enabled) }
             TerminalEvent.Restart -> {
+                terminalId?.let(timelines::remove)
+                // A new PTY starts at the server default, not the previous shell's fitted size.
+                size.value = null
                 surface.reset()
                 open()
             }
@@ -92,10 +100,18 @@ class TerminalViewModel(
                 updateState { it.copy(error = error.toUiText()) }
                 return@launch
             }
+            val firstOpen = terminalId == null
             terminalId = terminal.id
             updateState { it.copy(title = terminal.title) }
+            if (!terminal.created && firstOpen) {
+                // Reopened: replay at the sizes of the earlier visit, or at the page's own size.
+                timelines[terminal.id]?.let(surface::replayAt) ?: surface.fitBeforeReplay()
+            }
             val resizing = launch {
-                size.filterNotNull().debounce(RESIZE_DEBOUNCE_MILLIS).collectLatest { (columns, rows) ->
+                val sizes = size.filterNotNull()
+                // The first size goes out at once: until the shell gets it, it keeps
+                // drawing for the server's initial size while the page shows another.
+                merge(sizes.take(1), sizes.drop(1).debounce(RESIZE_DEBOUNCE_MILLIS)).collectLatest { (columns, rows) ->
                     terminals.resize(directory, terminal.id, columns, rows)
                 }
             }
@@ -117,6 +133,7 @@ class TerminalViewModel(
     }
 
     private fun onLink(link: TerminalLink) {
+        if (link == TerminalLink.Exited) terminalId?.let(timelines::remove)
         surface.setLive(link == TerminalLink.Connected)
         updateState { it.copy(link = link) }
     }
@@ -133,6 +150,7 @@ class TerminalViewModel(
                 }
             }
             session?.cancel()
+            terminalId?.let(timelines::remove)
             sendEffect(TerminalEffect.NavigateBack)
         }
     }

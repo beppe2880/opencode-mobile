@@ -33,7 +33,7 @@ import kotlinx.serialization.Contextual
  *
  * @param type 
  * @param text 
- * @param state 
+ * @param native 
  */
 @Serializable
 
@@ -45,8 +45,8 @@ data class SessionMessageAssistantText (
     @SerialName(value = "text")
     val text: kotlin.String,
 
-    @Contextual @SerialName(value = "state")
-    val state: kotlinx.serialization.json.JsonObject? = null
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null
 
 ) {
 

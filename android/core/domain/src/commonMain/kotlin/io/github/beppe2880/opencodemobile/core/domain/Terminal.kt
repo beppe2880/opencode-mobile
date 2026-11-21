@@ -8,6 +8,8 @@ data class TerminalInfo(
     val id: String,
     val title: String,
     val running: Boolean,
+    /** Started by this request, so the shell's first output is drawn at the server's initial size. */
+    val created: Boolean = false,
 )
 
 enum class TerminalLink { Connecting, Connected, Reconnecting, Exited }

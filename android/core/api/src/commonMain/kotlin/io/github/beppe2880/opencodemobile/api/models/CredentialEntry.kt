@@ -44,11 +44,11 @@ data class CredentialEntry (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "integrationID")
-    val integrationID: kotlin.String?,
+    val integrationID: kotlin.String,
 
     @SerialName(value = "label")
     val label: kotlin.String,
