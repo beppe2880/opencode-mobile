@@ -40,7 +40,7 @@ import kotlinx.serialization.Contextual
  * @param executed 
  * @param content 
  * @param metadata 
- * @param resultState 
+ * @param native 
  */
 @Serializable
 
@@ -67,8 +67,8 @@ data class SessionToolFailedEventData (
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,
 
-    @Contextual @SerialName(value = "resultState")
-    val resultState: kotlinx.serialization.json.JsonObject? = null
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null
 
 ) {
 

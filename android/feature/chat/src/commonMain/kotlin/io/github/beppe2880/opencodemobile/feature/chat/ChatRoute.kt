@@ -123,9 +123,10 @@ fun ChatRoute(
     val voiceModel: VoiceInputViewModel = koinViewModel(key = "voice-$sessionId")
     val voiceState by voiceModel.state.collectAsStateWithLifecycle()
     val cloud = voiceState.engine == VoiceEngine.Cloud
-    // Leaving the chat or the app ends the recording; what was said is still transcribed.
-    LifecycleStartEffect(voiceModel) {
-        onStopOrDispose { voiceModel.onEvent(VoiceInputEvent.Stop) }
+    // The recording goes on with the app in the background; leaving the chat ends it, and what
+    // was said is still transcribed.
+    DisposableEffect(voiceModel) {
+        onDispose { voiceModel.onEvent(VoiceInputEvent.Stop) }
     }
     CollectEffect(voiceModel.effect) { effect ->
         when (effect) {

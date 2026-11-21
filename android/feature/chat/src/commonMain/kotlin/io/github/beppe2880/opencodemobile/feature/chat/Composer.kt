@@ -70,12 +70,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -83,6 +86,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -205,6 +209,16 @@ internal fun Composer(
                 )
             }
             val placeholder = stringResource(Res.string.chat_composer_placeholder)
+            // A quote from the transcript: the cursor waits after it with the keyboard open.
+            val focus = remember { FocusRequester() }
+            val keyboard = LocalSoftwareKeyboardController.current
+            LaunchedEffect(state.composerFocus) {
+                if (state.composerFocus > 0) {
+                    runCatching { focus.requestFocus() }
+                    keyboard?.show()
+                }
+            }
+            val quoteStyle = remember(c) { QuoteVisualTransformation(SpanStyle(color = c.textMuted)) }
             // Keeps the selection; when the ViewModel rewrites the draft (picked mention or
             // command, reverted prompt) the cursor moves to the end of the new text.
             var field by remember { mutableStateOf(TextFieldValue(state.draft, TextRange(state.draft.length))) }
@@ -237,6 +251,7 @@ internal fun Composer(
                             },
                             textStyle = MaterialTheme.typography.bodyMedium.copy(color = c.textBase),
                             cursorBrush = SolidColor(c.bgAccent),
+                            visualTransformation = quoteStyle,
                             minLines = 1,
                             maxLines = 6,
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
@@ -244,6 +259,7 @@ internal fun Composer(
                                 .fillMaxWidth()
                                 .padding(end = OcSpacing.sm, top = OcSpacing.xs, bottom = OcSpacing.xs)
                                 .heightIn(min = 40.dp)
+                                .focusRequester(focus)
                                 .semantics { contentDescription = placeholder }
                                 .testTag("chat_composer_field"),
                             decorationBox = { inner ->

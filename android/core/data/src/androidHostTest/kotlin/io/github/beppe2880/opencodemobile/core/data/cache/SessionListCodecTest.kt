@@ -15,7 +15,8 @@ class SessionListCodecTest {
         id = "ses_1", parentId = "ses_0", projectId = "p", title = "Title", directory = "/home/user/project",
         agent = "build", model = ModelRef("m", "p", "high"), cost = 0.25,
         tokens = TokenUsage(input = 1, output = 2, reasoning = 3, cacheRead = 4, cacheWrite = 5),
-        outcome = SessionOutcome.Interrupted, createdAt = 10, updatedAt = 20, archivedAt = 30, revertMessageId = "msg_1",
+        outcome = SessionOutcome.Interrupted, createdAt = 10, updatedAt = 20, archivedAt = 30,
+        idleAt = 40, viewedAt = 35, revertMessageId = "msg_1",
     )
     private val bare = full.copy(
         id = "ses_2", parentId = null, agent = null, model = null, tokens = TokenUsage(), outcome = null,

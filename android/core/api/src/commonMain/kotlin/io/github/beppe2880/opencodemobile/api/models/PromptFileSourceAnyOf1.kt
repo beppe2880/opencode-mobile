@@ -43,7 +43,7 @@ data class PromptFileSourceAnyOf1 (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "uri")
-    val uri: kotlin.String?
+    val uri: kotlin.String
 
 ) {
 

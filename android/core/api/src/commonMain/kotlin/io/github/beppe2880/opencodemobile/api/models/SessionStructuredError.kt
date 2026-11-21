@@ -36,6 +36,7 @@ import kotlinx.serialization.Contextual
  * @param message Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param status 
  * @param response 
+ * @param retryAfterMs 
  */
 @Serializable
 
@@ -43,17 +44,20 @@ data class SessionStructuredError (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "type")
-    val type: kotlin.String?,
+    val type: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "message")
-    val message: kotlin.String?,
+    val message: kotlin.String,
 
     @SerialName(value = "status")
     val status: kotlin.Long? = null,
 
     @SerialName(value = "response")
-    val response: SessionStructuredErrorResponse? = null
+    val response: SessionStructuredErrorResponse? = null,
+
+    @SerialName(value = "retryAfterMs")
+    val retryAfterMs: kotlin.Long? = null
 
 ) {
 

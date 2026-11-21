@@ -24,7 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.SessionStructuredError
-import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
+import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -38,7 +38,7 @@ import kotlinx.serialization.Contextual
  * @param error 
  * @param finish 
  * @param rawFinish 
- * @param providerState 
+ * @param native 
  * @param cost 
  * @param tokens 
  * @param snapshot Maximum number of sessions to return. Defaults to the newest 50 sessions.
@@ -63,14 +63,14 @@ data class SessionStepFailedEventData (
     @SerialName(value = "rawFinish")
     val rawFinish: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null,
 
     @SerialName(value = "cost")
     val cost: kotlin.Double? = null,
 
     @SerialName(value = "tokens")
-    val tokens: TokenUsageInfo? = null,
+    val tokens: TokenUsageInfo1? = null,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "snapshot")

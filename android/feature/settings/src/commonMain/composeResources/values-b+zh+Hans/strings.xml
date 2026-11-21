@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">缩略图</string>
     <string name="settings_running_in_list">在会话列表中显示运行中的工作</string>
     <string name="settings_running_in_list_sub">在每个会话下统计运行中的子代理和后台命令</string>
+    <string name="settings_unread_sessions">未读会话</string>
+    <string name="settings_unread_sessions_off">关闭</string>
+    <string name="settings_unread_sessions_dot">圆点</string>
+    <string name="settings_unread_sessions_group">圆点和分组</string>
+    <string name="settings_unread_sessions_off_sub">不显示圆点和未读分组，列表不记录你是否已读</string>
+    <string name="settings_unread_sessions_dot_sub">时间旁的圆点标记你尚未打开的回复；会话仍保留在所属日期中</string>
+    <string name="settings_unread_sessions_group_sub">圆点标记你尚未打开的回复，这些会话会归入日期上方的分组</string>
     <string name="settings_confirm_stop">停止命令前需确认</string>
     <string name="settings_confirm_stop_sub">从“运行中”面板停止后台命令前进行询问</string>
     <string name="settings_running_chips">在消息框上方显示运行中的任务</string>
@@ -403,7 +410,7 @@
     <string name="settings_close_model_picker_sub">关闭此选项可一起选择模型和推理级别，然后点按“完成”关闭。</string>
     <string name="feature_section_changelog">更新日志</string>
     <string name="feature_new">新</string>
-    <string name="feature_by">作者 %1$s · #%2$d</string>
+    <string name="feature_by">作者 %1$s · %2$s</string>
     <string name="feature_math_title">数学公式，所见即所得</string>
     <string name="feature_math_body">回复中的公式会在到达时排版显示：分数、根号、积分和矩阵，而不是原始 LaTeX。复制消息仍会得到 LaTeX 源码。</string>
     <string name="feature_math_demo">一条回复逐步输出，其中的公式从 LaTeX 源码变为排版好的数学公式。</string>

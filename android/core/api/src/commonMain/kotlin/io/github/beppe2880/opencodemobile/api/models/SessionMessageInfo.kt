@@ -46,7 +46,6 @@ import io.github.beppe2880.opencodemobile.api.models.SessionMessageSkill
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageSynthetic
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageSystem
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageUser
-import io.github.beppe2880.opencodemobile.api.models.SessionProviderContext
 import io.github.beppe2880.opencodemobile.api.models.SessionStructuredError
 import io.github.beppe2880.opencodemobile.api.models.ShellOutput200ResponseData
 import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo

@@ -43,7 +43,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.beppe2880.opencodemobile.core.ui.components.OcBadge
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
+import io.github.beppe2880.opencodemobile.core.ui.components.OcProjectAvatar
+import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
+import io.github.beppe2880.opencodemobile.core.ui.components.OcSectionHeader
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -254,5 +258,61 @@ internal fun RunningWorkDemo(active: Boolean) {
             }
         }
         finger.Draw()
+    }
+}
+
+private enum class DemoWaiting { Working, Question, Permission }
+
+/** A chat in the list goes from Working to Question for you, back to Working, then to Needs permission. */
+@Composable
+internal fun WaitingForYouDemo(active: Boolean) {
+    var waiting by remember { mutableStateOf(DemoWaiting.Question) }
+    DemoLoop(active, finalFrame = { waiting = DemoWaiting.Question }) {
+        waiting = DemoWaiting.Working
+        delay(1600)
+        waiting = DemoWaiting.Question
+        delay(2200)
+        waiting = DemoWaiting.Working
+        delay(1600)
+        waiting = DemoWaiting.Permission
+        delay(2200)
+    }
+    Column(Modifier.fillMaxSize().padding(top = OcSpacing.xs)) {
+        OcSectionHeader("Today", Modifier.padding(horizontal = OcSpacing.md))
+        WaitingRow("Benchmark plan", "search", "2m", waiting)
+        WaitingRow("Refactor billing", "api", "1h", DemoWaiting.Working)
+        WaitingRow("Write release notes", "docs", "3h", null)
+    }
+}
+
+/** A session row as the list draws it, with its running line and dot. */
+@Composable
+private fun WaitingRow(title: String, project: String, time: String, waiting: DemoWaiting?) {
+    val c = OcTheme.colors
+    val blocked = waiting == DemoWaiting.Question || waiting == DemoWaiting.Permission
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = OcSpacing.md, vertical = OcSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
+    ) {
+        OcProjectAvatar(project)
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(project, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
+                when (waiting) {
+                    DemoWaiting.Question -> OcBadge("Question for you", c.warning)
+                    DemoWaiting.Permission -> OcBadge("Needs permission", c.warning)
+                    else -> Unit
+                }
+            }
+            if (waiting == DemoWaiting.Working) {
+                Text("Working", style = MaterialTheme.typography.bodySmall, color = c.info.fg)
+            }
+        }
+        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(time, style = MaterialTheme.typography.labelSmall, color = c.textFaint)
+            if (waiting != null) OcPulsingDot(if (blocked) c.warning.fg else c.info.fg)
+        }
     }
 }

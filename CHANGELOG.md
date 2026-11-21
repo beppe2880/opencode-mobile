@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.17.0](https://github.com/beppe2880/opencode-mobile/compare/v0.16.0...v0.17.0) (2026-11-17)
+
+
+### Features
+
+* **settings:** Show the terminal text selection in Tips & new features ([#238](https://github.com/beppe2880/opencode-mobile/issues/238)) ([f5f0a41](https://github.com/beppe2880/opencode-mobile/commit/f5f0a41233ffaec8da35925853a2412a321f7e5c))
+* **ui:** Add long-press terminal text selection ([#227](https://github.com/beppe2880/opencode-mobile/issues/227)) ([42c0a49](https://github.com/beppe2880/opencode-mobile/commit/42c0a4965c8715f6a34db16f7c2b2884b2557b15))
+
+
+### Bug fixes
+
+* **ui:** Avoid duplicated terminal prompts on opening ([#224](https://github.com/beppe2880/opencode-mobile/issues/224)) ([e9d29b9](https://github.com/beppe2880/opencode-mobile/commit/e9d29b934edd036de823fcd336c79a687b67a6ec))
+* **ui:** Prevent widgets from loading forever in release builds ([#228](https://github.com/beppe2880/opencode-mobile/issues/228)) ([39bc3e4](https://github.com/beppe2880/opencode-mobile/commit/39bc3e44753a4ca63ebd619e2698f32289d6ce53))
+* **ui:** Replay reopened terminals at the sizes they were drawn at ([#234](https://github.com/beppe2880/opencode-mobile/issues/234)) ([dae8685](https://github.com/beppe2880/opencode-mobile/commit/dae8685c9df57d7188dc3e7a8da1418bf9a8e19c))
+
+
+### Documentation
+
+* Add privacy policy ([#230](https://github.com/beppe2880/opencode-mobile/issues/230)) ([2c7835f](https://github.com/beppe2880/opencode-mobile/commit/2c7835f3f50015cc404a67afa1ed5fadc9e12e60))
+* Link the iOS TestFlight beta ([#236](https://github.com/beppe2880/opencode-mobile/issues/236)) ([8eafe2d](https://github.com/beppe2880/opencode-mobile/commit/8eafe2dc94052bd906aab4ac6273847b8021b441))
+* Show every setting and theme in the README ([#237](https://github.com/beppe2880/opencode-mobile/issues/237)) ([2f29ea7](https://github.com/beppe2880/opencode-mobile/commit/2f29ea757fc6f5e7a1dcdb9e0bacbf4ac613bbd8))
+
 ## [0.16.0](https://github.com/beppe2880/opencode-mobile/compare/v0.15.0...v0.16.0) (2026-11-14)
 
 

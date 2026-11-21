@@ -18,6 +18,9 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     is OpenCodeEvent.SessionmovedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessionmetadataupdatedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
     is OpenCodeEvent.SessiondeletedWrapper -> ServerEvent.SessionChanged(value.data.sessionID, deleted = true)
+    is OpenCodeEvent.SessionarchivedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
+    is OpenCodeEvent.SessionunarchivedWrapper -> ServerEvent.SessionChanged(value.data.sessionID)
+    is OpenCodeEvent.SessionviewedWrapper -> ServerEvent.Viewed(value.data.sessionID, value.data.idle.toLong())
 
     is OpenCodeEvent.SessionexecutionstartedWrapper -> ServerEvent.ExecutionStarted(value.data.sessionID)
     is OpenCodeEvent.SessionexecutionsucceededWrapper -> with(value) {
@@ -31,7 +34,7 @@ fun OpenCodeEvent.toDomain(): ServerEvent? = when (this) {
     }
 
     is OpenCodeEvent.SessionstepstartedWrapper -> with(value.data) {
-        ServerEvent.StepStarted(sessionID, assistantMessageID, agent.orEmpty(), model.toDomain(), started)
+        model?.toDomain()?.let { ServerEvent.StepStarted(sessionID, assistantMessageID, agent.orEmpty(), it, started) }
     }
     is OpenCodeEvent.SessionstependedWrapper -> with(value.data) {
         ServerEvent.StepEnded(sessionID, assistantMessageID, finish.value, cost, tokens.toDomain(), value.created.toLong())

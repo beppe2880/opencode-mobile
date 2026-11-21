@@ -39,7 +39,7 @@ data class ServerInfoPaths (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "tmp")
-    val tmp: kotlin.String?
+    val tmp: kotlin.String
 
 ) {
 

@@ -33,6 +33,7 @@ import kotlinx.serialization.Contextual
  *
  * @param created 
  * @param updated 
+ * @param busy 
  * @param idle 
  * @param viewed 
  * @param archived 
@@ -46,6 +47,9 @@ data class SessionInfoTime (
 
     @SerialName(value = "updated")
     val updated: kotlin.Double,
+
+    @SerialName(value = "busy")
+    val busy: kotlin.Double? = null,
 
     @SerialName(value = "idle")
     val idle: kotlin.Double? = null,

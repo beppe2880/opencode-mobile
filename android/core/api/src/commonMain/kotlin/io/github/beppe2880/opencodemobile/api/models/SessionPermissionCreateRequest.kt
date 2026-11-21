@@ -46,7 +46,7 @@ data class SessionPermissionCreateRequest (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "action")
-    val action: kotlin.String?,
+    val action: kotlin.String,
 
     @SerialName(value = "resources")
     val resources: kotlin.collections.List<kotlin.String>,

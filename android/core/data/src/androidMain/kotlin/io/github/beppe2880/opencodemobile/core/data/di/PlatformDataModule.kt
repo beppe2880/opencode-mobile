@@ -19,6 +19,7 @@ import io.github.beppe2880.opencodemobile.core.data.server.encryptedPreferences
 import io.github.beppe2880.opencodemobile.core.data.share.FileShareStore
 import io.github.beppe2880.opencodemobile.core.data.share.ShareStore
 import io.github.beppe2880.opencodemobile.core.data.stt.AudioRecordVoiceRecorder
+import io.github.beppe2880.opencodemobile.core.data.stt.BackgroundRecording
 import io.github.beppe2880.opencodemobile.core.domain.ServerDiscovery
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.network.OpenCodeClientFactory
@@ -44,5 +45,6 @@ internal actual val platformDataModule: Module = module {
     single<Settings>(DraftsStore) { SharedPreferencesSettings(androidContext().getSharedPreferences("drafts", Context.MODE_PRIVATE)) }
     // Speech-to-text API keys: encrypted with a Keystore key like the server passwords, never backed up.
     single<Settings>(SttKeysStore) { SharedPreferencesSettings(encryptedPreferences(androidContext(), "opencode_stt_keys")) }
-    single<VoiceRecorder> { AudioRecordVoiceRecorder() }
+    // The app binds BackgroundRecording to keep recordings going in the background.
+    single<VoiceRecorder> { AudioRecordVoiceRecorder(getOrNull<BackgroundRecording>()) }
 }

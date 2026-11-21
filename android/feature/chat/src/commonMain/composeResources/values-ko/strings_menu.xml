@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">컨텍스트 및 기록</string>
+    <string name="chat_menu_tools">도구</string>
+    <string name="chat_new">새 채팅</string>
+    <string name="chat_fork">대화 분기 만들기</string>
+    <string name="chat_undo">마지막 프롬프트 실행 취소</string>
+    <string name="chat_redo">취소한 프롬프트 복원</string>
+</resources>

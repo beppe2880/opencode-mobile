@@ -26,6 +26,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
@@ -83,6 +84,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SwipeSensitivityChanged(SwipeSensitivity.Low))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
+        vm.onEvent(SettingsEvent.UnreadSessionsChanged(UnreadSessions.Dot))
         vm.onEvent(SettingsEvent.RunningChipsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
@@ -153,6 +155,7 @@ class SettingsViewModelTest {
                 swipeSensitivity = SwipeSensitivity.Low,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
+                unreadSessions = UnreadSessions.Dot,
                 runningChips = false,
                 agentColorOutline = false,
                 dictation = false,

@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.ModelRef
+import io.github.beppe2880.opencodemobile.api.models.ModelRef1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -51,10 +51,10 @@ data class SessionStepStartedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "agent")
-    val agent: kotlin.String?,
+    val agent: kotlin.String,
 
     @SerialName(value = "model")
-    val model: ModelRef,
+    val model: ModelRef1,
 
     @SerialName(value = "started")
     val started: kotlin.Long,

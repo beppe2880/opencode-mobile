@@ -34,7 +34,7 @@ import kotlinx.serialization.Contextual
  * @param sessionID 
  * @param assistantMessageID 
  * @param ordinal 
- * @param state 
+ * @param native 
  */
 @Serializable
 
@@ -49,8 +49,8 @@ data class SessionReasoningStartedEventData (
     @SerialName(value = "ordinal")
     val ordinal: kotlin.Long,
 
-    @Contextual @SerialName(value = "state")
-    val state: kotlinx.serialization.json.JsonObject? = null
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null
 
 ) {
 

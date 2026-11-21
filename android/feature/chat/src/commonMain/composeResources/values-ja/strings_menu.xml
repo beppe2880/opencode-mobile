@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_menu_history">コンテキストと履歴</string>
+    <string name="chat_menu_tools">ツール</string>
+    <string name="chat_new">新しいチャット</string>
+    <string name="chat_fork">会話を分岐</string>
+    <string name="chat_undo">最後のプロンプトを取り消す</string>
+    <string name="chat_redo">取り消したプロンプトを復元</string>
+</resources>

@@ -23,6 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
+import io.github.beppe2880.opencodemobile.api.models.CredentialUpdatedEventData
 import io.github.beppe2880.opencodemobile.api.models.LocationRef
 
 import kotlinx.serialization.Serializable
@@ -52,8 +53,8 @@ data class CredentialUpdatedEvent (
     @SerialName(value = "type")
     val type: CredentialUpdatedEvent.Type,
 
-    @Contextual @SerialName(value = "data")
-    val `data`: kotlinx.serialization.json.JsonElement?,
+    @SerialName(value = "data")
+    val `data`: CredentialUpdatedEventData,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null,

@@ -41,15 +41,15 @@ data class LocationPublicInfoProject (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "directory")
-    val directory: kotlin.String?,
+    val directory: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "canonical")
-    val canonical: kotlin.String?
+    val canonical: kotlin.String
 
 ) {
 

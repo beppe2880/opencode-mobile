@@ -44,7 +44,7 @@ data class SkillNotFoundErrorEncoded (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "skill")
-    val skill: kotlin.String?,
+    val skill: kotlin.String,
 
     @SerialName(value = "message")
     val message: kotlin.String

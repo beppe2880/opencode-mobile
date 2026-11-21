@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.ShellInfoTime
+import io.github.beppe2880.opencodemobile.api.models.ShellInfo1Time
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -34,15 +34,15 @@ import kotlinx.serialization.Contextual
  *
  * @param id 
  * @param status 
- * @param command Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param cwd Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param shell Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param file Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param command 
+ * @param cwd 
+ * @param shell 
+ * @param file 
  * @param metadata 
  * @param time 
  * @param pid 
  * @param exit 
- * @param signal Maximum number of sessions to return. Defaults to the newest 50 sessions.
+ * @param signal 
  */
 @Serializable
 
@@ -54,27 +54,23 @@ data class ShellInfo (
     @SerialName(value = "status")
     val status: ShellInfo.Status,
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "command")
-    val command: kotlin.String?,
+    val command: kotlin.String,
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "cwd")
-    val cwd: kotlin.String?,
+    val cwd: kotlin.String,
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "shell")
-    val shell: kotlin.String?,
+    val shell: kotlin.String,
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "file")
-    val file: kotlin.String?,
+    val file: kotlin.String,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject,
 
     @SerialName(value = "time")
-    val time: ShellInfoTime,
+    val time: ShellInfo1Time,
 
     @SerialName(value = "pid")
     val pid: kotlin.Long? = null,
@@ -82,7 +78,6 @@ data class ShellInfo (
     @SerialName(value = "exit")
     val exit: kotlin.Double? = null,
 
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "signal")
     val signal: kotlin.String? = null
 

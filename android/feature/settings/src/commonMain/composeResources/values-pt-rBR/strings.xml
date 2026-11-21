@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Miniaturas</string>
     <string name="settings_running_in_list">Mostrar trabalho em andamento na lista de sessões</string>
     <string name="settings_running_in_list_sub">Contar subagentes e comandos em segundo plano em cada sessão</string>
+    <string name="settings_unread_sessions">Sessões não lidas</string>
+    <string name="settings_unread_sessions_off">Desligado</string>
+    <string name="settings_unread_sessions_dot">Ponto</string>
+    <string name="settings_unread_sessions_group">Ponto e grupo</string>
+    <string name="settings_unread_sessions_off_sub">Sem pontos e sem grupo «Não lidas»: a lista não registra o que você leu</string>
+    <string name="settings_unread_sessions_dot_sub">Um ponto ao lado da hora marca uma resposta que você não abriu; a sessão continua no seu dia</string>
+    <string name="settings_unread_sessions_group_sub">Um ponto marca uma resposta que você não abriu, e essas sessões ficam agrupadas acima dos dias</string>
     <string name="settings_confirm_stop">Confirmar antes de parar comandos</string>
     <string name="settings_confirm_stop_sub">Perguntar antes de parar um comando em segundo plano na folha Em execução</string>
     <string name="settings_running_chips">Trabalho em execução acima da caixa de mensagem</string>
@@ -406,7 +413,7 @@
     <string name="settings_close_model_picker_sub">Desative para escolher o modelo e o raciocínio juntos e depois toque em Concluído para fechar.</string>
     <string name="feature_section_changelog">Changelog</string>
     <string name="feature_new">Novo</string>
-    <string name="feature_by">Por %1$s · #%2$d</string>
+    <string name="feature_by">Por %1$s · %2$s</string>
     <string name="feature_math_title">Matemática que se lê como matemática</string>
     <string name="feature_math_body">As fórmulas nas respostas são formatadas à medida que chegam: frações, raízes, integrais e matrizes, em vez de LaTeX bruto. Copiar uma mensagem ainda dá o código LaTeX.</string>
     <string name="feature_math_demo">Uma resposta chega em fluxo e suas fórmulas passam do código LaTeX para matemática formatada.</string>

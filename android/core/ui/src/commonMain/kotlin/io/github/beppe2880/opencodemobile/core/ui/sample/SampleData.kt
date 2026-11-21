@@ -110,6 +110,7 @@ object SampleData {
         ago: Long,
         outcome: SessionOutcome? = SessionOutcome.Succeeded,
         agent: String = "build",
+        unread: Boolean = false,
     ) = Session(
         id = id,
         parentId = null,
@@ -124,13 +125,16 @@ object SampleData {
         createdAt = NOW - ago - HOUR,
         updatedAt = NOW - ago,
         archivedAt = null,
+        idleAt = NOW - ago,
+        viewedAt = NOW - ago - if (unread) MINUTE else 0,
     )
 
     val sessions = listOf(
-        session("ses_1", "Native Android client for OpenCode", "/home/user/code/opencode-mobile", 2 * MINUTE),
+        session("ses_1", "Native Android client for OpenCode", "/home/user/code/opencode-mobile", 2 * MINUTE, unread = true),
+        // ses_2 and ses_6 run (and wait) in the demo: a recent view keeps them out of the unread group.
         session("ses_2", "Tidy up shell aliases", "/home/user/dotfiles", 40 * MINUTE),
         session("ses_3", "Plan the checkout redesign", "/home/user/code/shop", 3 * HOUR, agent = "plan"),
-        session("ses_4", "Fix flaky RSS feed test", "/home/user/code/blog", 5 * HOUR, outcome = SessionOutcome.Failed),
+        session("ses_4", "Fix flaky RSS feed test", "/home/user/code/blog", 5 * HOUR, outcome = SessionOutcome.Failed, unread = true),
         session("ses_5", "Migrate config from opencode 1.0 to 2.0", "/", DAY + HOUR),
         session("ses_6", "Add coupon codes to the cart", "/home/user/code/shop", DAY + 4 * HOUR, outcome = SessionOutcome.Interrupted),
         session("ses_7", "Switch the blog theme to dark mode", "/home/user/code/blog", 3 * DAY),

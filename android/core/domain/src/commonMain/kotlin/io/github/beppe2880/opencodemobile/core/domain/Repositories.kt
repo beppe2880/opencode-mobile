@@ -76,8 +76,24 @@ interface EventRepository {
 }
 
 interface SessionRepository {
-    /** Root sessions (no parent), newest first. [search] filters by title on the server. */
-    suspend fun list(search: String? = null, directory: String? = null, limit: Int = 100): Result<List<Session>>
+    /**
+     * Root sessions (no parent), newest first. [search] filters by title on the server.
+     * [archived] true lists only archived sessions, false only active ones, null lets the server decide.
+     */
+    suspend fun list(search: String? = null, directory: String? = null, limit: Int = 100, archived: Boolean? = null): Result<List<Session>>
+
+    /**
+     * Like [list], but follows the server's cursor until [notBefore] (epoch millis) is passed or
+     * [limit] sessions are read, so a date range is filled on a large history too. Servers that do
+     * not paginate return a single page, like [list].
+     */
+    suspend fun listUntil(
+        search: String? = null,
+        directory: String? = null,
+        limit: Int = 100,
+        archived: Boolean? = null,
+        notBefore: Long,
+    ): Result<List<Session>> = list(search, directory, limit, archived)
 
     /** IDs of sessions currently executing. */
     suspend fun active(): Result<Set<String>>
@@ -86,6 +102,23 @@ interface SessionRepository {
     suspend fun create(directory: String, agent: String? = null, model: ModelRef? = null): Result<Session>
     suspend fun rename(sessionId: String, title: String): Result<Unit>
     suspend fun delete(sessionId: String): Result<Unit>
+
+    /** Archives the session (hidden from the default list) or restores it. */
+    suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Archiving is not available"))
+
+    /**
+     * Whether the server supports archiving. Servers before OpenCode 2.1.0 accept the update but
+     * ignore `archived`, so the app offers neither the action nor the archived filter there.
+     */
+    suspend fun archiveSupported(): Boolean = true
+
+    /**
+     * Reports [idleAt] (the session's `idle` watermark) as seen. The server moves `viewed` forward
+     * only, and accepts an idle it already knows; an older value is ignored.
+     */
+    suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> =
+        Result.failure(OpenCodeError.NotFound("Viewing is not available"))
 
     /**
      * Copies the session into a new root session ("… (fork #n)"): the history before
@@ -380,6 +413,18 @@ enum class SelectionApply {
     Immediately,
 }
 
+/** How the session list shows sessions whose latest turn the user has not viewed. */
+enum class UnreadSessions {
+    /** No unread dots, no Unread group and no read filter. */
+    Off,
+
+    /** A dot next to the time; the sessions stay in their day. */
+    Dot,
+
+    /** The dot, and the unread sessions grouped above the days. */
+    DotAndGroup,
+}
+
 /** The model a new chat starts with when none is picked. */
 enum class NewChatModel {
     /** The agent's configured model, else the last one used that is still available. */
@@ -515,6 +560,8 @@ data class AppSettings(
     val showRunningWorkInList: Boolean = true,
     /** Stopping a background command from the Running sheet asks first. */
     val confirmStopCommand: Boolean = true,
+    /** How the session list marks and groups unread sessions. */
+    val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */

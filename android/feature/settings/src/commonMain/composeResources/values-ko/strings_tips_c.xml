@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_voice_background_title">백그라운드에서도 계속 녹음</string>
+    <string name="tips_c_voice_background_body">클라우드 모델로 녹음한 음성 메시지는 다른 앱으로 전환하거나 휴대폰을 잠가도 계속 녹음됩니다. Android에서는 알림의 중지를 누르면 끝나며, 돌아오면 텍스트가 메시지 상자에 기다리고 있습니다.</string>
+    <string name="tips_c_voice_background_demo">녹음은 메시지 상자에서 진행되고, 홈 화면에는 시간을 세는 알림이 표시됩니다. 손가락이 중지를 누르면, 앱으로 돌아왔을 때 말한 문장이 메시지 상자에 있습니다.</string>
+
     <string name="tips_c_voice_record_title">타이핑 대신 말하기</string>
     <string name="tips_c_voice_record_body">메시지 상자의 마이크를 탭하고 말하세요. 실시간 파형과 타이머로 음성이 인식되고 있음을 확인할 수 있습니다. 확인을 누르면 텍스트가 남고, 취소를 누르면 버려집니다.</string>
     <string name="tips_c_voice_record_demo">손가락으로 마이크를 탭하면 메시지 상자에 움직이는 파형과 타이머가 나타나고, 말한 문장이 텍스트로 표시됩니다.</string>
@@ -15,6 +19,12 @@
     <string name="tips_c_terminal_fullscreen_title">터미널을 더 넓게</string>
     <string name="tips_c_terminal_fullscreen_body">전체 화면으로 들어가면 제목 표시줄과 시스템 막대가 숨겨져 한 번에 더 많은 줄을 볼 수 있습니다. 뒤로 가기나 같은 버튼을 누르면 다시 나타납니다.</string>
     <string name="tips_c_terminal_fullscreen_demo">손가락으로 터미널의 전체 화면 버튼을 탭하면 제목 표시줄과 상태 표시줄이 밀려나고, 더 많은 출력 줄이 나타납니다.</string>
+    <string name="tips_c_waiting_title">응답을 기다리는 채팅 확인</string>
+    <string name="tips_c_waiting_body">에이전트가 질문하거나 권한을 요청하며 멈추면, 목록에서 해당 채팅에 작업 중 대신 경고 색상으로 질문 있음 또는 권한 필요가 표시됩니다. 하위 에이전트의 요청도 포함됩니다.</string>
+    <string name="tips_c_waiting_demo">목록에서 작업 중인 채팅이 경고 색상의 질문 있음으로 바뀌고, 답변하면 다시 작업 중으로 돌아간 뒤, 권한 필요가 표시됩니다.</string>
+    <string name="tips_c_terminal_select_title">터미널에서 텍스트 복사</string>
+    <string name="tips_c_terminal_select_body">출력에서 단어를 길게 눌러 선택하고, 핸들을 끌어 더 선택한 다음 복사를 탭하세요. 모두 선택은 전체를 선택하며, 상단 바의 텍스트 선택 버튼으로도 선택을 시작할 수 있습니다.</string>
+    <string name="tips_c_terminal_select_demo">실패한 테스트 줄의 단어를 길게 눌러 강조 표시하고, 핸들을 줄 끝까지 끌어 복사를 탭하면 복사됨 알림이 나타납니다.</string>
 
     <string name="tips_c_next_message_title">기다리지 않고 모델 전환</string>
     <string name="tips_c_next_message_body">응답이 아직 진행 중이어도 에이전트나 모델을 바꿀 수 있습니다. 변경 사항은 다음 메시지부터 적용됩니다. 새 채팅은 마지막으로 사용한 모델로 시작합니다.</string>

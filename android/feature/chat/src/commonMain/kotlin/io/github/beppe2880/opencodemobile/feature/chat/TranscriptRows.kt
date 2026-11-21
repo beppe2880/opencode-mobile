@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -133,6 +134,8 @@ internal fun UserBubble(
                 }
             }
         }
+        // Quoted parts of the transcript are dimmed, so the question stands out.
+        val quoted = remember(item.text, c.textMuted) { styledQuotes(item.text, SpanStyle(color = c.textMuted)) }
         val bubble = inset
             .alpha(if (item.pending) PENDING_ALPHA else 1f)
             .clip(RoundedCornerShape(OcRadius.lg))
@@ -142,7 +145,7 @@ internal fun UserBubble(
         } else if (onLongPress != null) {
             // Long press opens the message actions (copy, undo), replacing text selection.
             Text(
-                text = item.text,
+                text = quoted,
                 style = MaterialTheme.typography.bodyMedium,
                 color = c.userBubbleText,
                 modifier = bubble
@@ -158,7 +161,7 @@ internal fun UserBubble(
         } else {
             SelectionContainer {
                 Text(
-                    text = item.text,
+                    text = quoted,
                     style = MaterialTheme.typography.bodyMedium,
                     color = c.userBubbleText,
                     modifier = bubble.padding(horizontal = OcSpacing.md, vertical = 10.dp),

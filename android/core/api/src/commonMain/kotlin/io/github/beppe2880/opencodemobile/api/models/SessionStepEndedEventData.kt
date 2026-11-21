@@ -38,7 +38,7 @@ import kotlinx.serialization.Contextual
  * @param cost 
  * @param tokens 
  * @param rawFinish 
- * @param providerState 
+ * @param native 
  * @param snapshot Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param files 
  */
@@ -64,8 +64,8 @@ data class SessionStepEndedEventData (
     @SerialName(value = "rawFinish")
     val rawFinish: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "providerState")
-    val providerState: kotlinx.serialization.json.JsonObject? = null,
+    @Contextual @SerialName(value = "native")
+    val native: kotlinx.serialization.json.JsonObject? = null,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "snapshot")

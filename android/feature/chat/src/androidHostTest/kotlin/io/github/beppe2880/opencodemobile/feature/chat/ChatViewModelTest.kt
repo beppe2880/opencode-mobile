@@ -890,6 +890,20 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `quoting puts the selection in the composer and asks for the keyboard`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("Why"))
+        vm.onEvent(ChatEvent.Quote("  the selected\npart "))
+        assertEquals("Why\n↳ \"the selected part\" ", vm.state.value.draft)
+        assertEquals(1, vm.state.value.composerFocus)
+        assertTrue(chat.prompts.isEmpty())
+
+        vm.onEvent(ChatEvent.Quote("   "))
+        assertEquals(1, vm.state.value.composerFocus)
+    }
+
+    @Test
     fun `the reading position is kept for the next opening of the chat`() = runTest(main.testDispatcher) {
         vm().onEvent(ChatEvent.ScrollMoved(ScrollMemory.Anchor("u1", 12)))
         assertEquals(ScrollMemory.Anchor("u1", 12), vm().state.value.savedScroll)
@@ -905,6 +919,106 @@ class ChatViewModelTest {
         ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = {
             42
         }, btwMemory = btwMemory)
+
+    @Test
+    fun `menu new and fork reuse the existing behavior without consuming the draft`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("keep my draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        vm.onEvent(ChatEvent.NewSession)
+        advanceUntilIdle()
+        assertEquals(1, sessions.creates.size)
+        assertEquals("/repo", sessions.creates.single().first)
+        assertNull(sessions.creates.single().second)
+        assertEquals("keep my draft", vm.state.value.draft)
+        vm.onEvent(ChatEvent.Fork())
+        advanceUntilIdle()
+        assertEquals(listOf("s1" to null), sessions.forks)
+        assertEquals("keep my draft", vm.state.value.draft)
+    }
+
+    @Test
+    fun `failed menu new preserves text typed while creating and can retry`() = runTest(main.testDispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val sessions = FakeSessions(model).apply {
+            createGate = gate
+            createResult = Result.failure(OpenCodeError.Unreachable("offline"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.DraftChanged("original draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        runCurrent()
+        assertTrue(vm.state.value.creatingSession)
+        vm.onEvent(ChatEvent.DraftChanged("edited draft"))
+        vm.onEvent(ChatEvent.NewSession)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.creatingSession)
+        assertEquals("edited draft", vm.state.value.draft)
+        assertEquals(1, sessions.creates.size)
+        vm.onEvent(ChatEvent.NewSession)
+        advanceUntilIdle()
+        assertEquals(2, sessions.creates.size)
+    }
+
+    @Test
+    fun `menu undo and redo use the existing revert and restore paths`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.canUndo)
+        assertFalse(vm.state.value.canRedo)
+        vm.onEvent(ChatEvent.Undo)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.canRedo)
+        assertEquals(1, vm.state.value.revertedCount)
+        assertEquals("hello", vm.state.value.draft)
+        vm.onEvent(ChatEvent.RestoreRevert)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.canRedo)
+        assertEquals(0, vm.state.value.revertedCount)
+    }
+
+    @Test
+    fun `a visible chat reports the session idle as viewed once it loaded`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+    }
+
+    @Test
+    fun `a hidden chat does not report the idle as viewed`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(false)
+        advanceUntilIdle()
+        assertTrue(sessions.viewed.isEmpty())
+
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+    }
+
+    @Test
+    fun `a turn ending while the chat is visible reports the new idle`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        val vm = vm(sessions)
+        vm.setChatVisible(true)
+        advanceUntilIdle()
+        assertEquals(listOf("s1" to 42L), sessions.viewed)
+
+        sessions.sessionInfo = sessions.sessionInfo.copy(idleAt = 84)
+        events.flow.emit(ServerEvent.ExecutionEnded("s1", SessionOutcome.Succeeded, at = 84))
+        advanceUntilIdle()
+
+        assertEquals(listOf("s1" to 42L, "s1" to 84L), sessions.viewed)
+    }
 
     @Test
     fun `the menu pins and unpins the session and follows pins changed in the list`() = runTest(main.testDispatcher) {
@@ -2873,9 +2987,10 @@ private class FakeSessions(
     private val others: List<Session> = emptyList(),
     private val order: List<String> = emptyList(),
     private val titles: Map<String, String> = emptyMap(),
+    idleAt: Long? = null,
 ) : SessionRepository {
-    private val session = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null)
-    override suspend fun list(search: String?, directory: String?, limit: Int) = Result.success(listOf(session) + others)
+    var sessionInfo = Session("s1", null, "p", "Title", "/repo", "plan", model, 0.0, TokenUsage(), null, 0, 0, null, idleAt)
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(listOf(sessionInfo) + others)
     var activeIds: Set<String> = emptySet()
     override suspend fun active(): Result<Set<String>> = Result.success(activeIds)
     var uncached = false
@@ -2886,13 +3001,13 @@ private class FakeSessions(
         loaded?.await()
         if (sessionId != "s1") gets += sessionId
         if (sessionId in failing) return Result.failure(OpenCodeError.Unreachable("offline"))
-        return Result.success(others.firstOrNull { it.id == sessionId } ?: session)
+        return Result.success(others.firstOrNull { it.id == sessionId } ?: sessionInfo)
     }
-    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { session.copy(id = sessionId, title = it) } ?: session
+    override fun cached(sessionId: String) = if (uncached) null else titles[sessionId]?.let { sessionInfo.copy(id = sessionId, title = it) } ?: sessionInfo
     override fun browseOrder() = order
     val creates = mutableListOf<Triple<String, String?, ModelRef?>>()
     var createGate: CompletableDeferred<Unit>? = null
-    var createResult: Result<Session> = Result.success(session.copy(id = "s-new", agent = "build", model = null))
+    var createResult: Result<Session> = Result.success(sessionInfo.copy(id = "s-new", agent = "build", model = null))
     override suspend fun create(directory: String, agent: String?, model: ModelRef?): Result<Session> {
         creates += Triple(directory, agent, model)
         createGate?.await()
@@ -2901,10 +3016,17 @@ private class FakeSessions(
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     val forks = mutableListOf<Pair<String, String?>>()
-    var forkResult: Result<Session> = Result.success(session.copy(id = "s2", title = "Title (fork #1)"))
+    var forkResult: Result<Session> = Result.success(sessionInfo.copy(id = "s2", title = "Title (fork #1)"))
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> {
         forks += sessionId to beforeMessageId
         return forkResult
+    }
+    val viewed = mutableListOf<Pair<String, Long>>()
+    var viewResult: Result<Unit> = Result.success(Unit)
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> {
+        viewed += sessionId to idleAt
+        if (viewResult.isSuccess) sessionInfo = sessionInfo.copy(viewedAt = idleAt)
+        return viewResult
     }
     override suspend fun projects(): Result<List<Project>> = Result.success(emptyList())
 }

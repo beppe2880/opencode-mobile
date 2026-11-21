@@ -18,6 +18,9 @@ sealed interface ServerEvent {
 
     data class SessionChanged(override val sessionId: String, val deleted: Boolean = false) : SessionScoped
 
+    /** A client reported the idle transition [idleAt] as viewed; the server stores it as `time.viewed`. */
+    data class Viewed(override val sessionId: String, val idleAt: Long) : SessionScoped
+
     data class ExecutionStarted(override val sessionId: String) : SessionScoped
 
     /**

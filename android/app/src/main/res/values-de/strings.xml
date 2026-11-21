@@ -26,6 +26,10 @@
     <string name="notif_intro_text">Während eine Sitzung läuft, bleibt die App im Hintergrund mit deinem Server verbunden, um dich zu benachrichtigen, wenn der Agent eine Berechtigung oder eine Antwort braucht und wenn er fertig ist. Eine Änderung kannst du direkt in der Benachrichtigung erlauben oder ablehnen.\n\nDie Benachrichtigungen kommen direkt von deinem Server, ohne weiteren Dienst dazwischen. Du kannst sie jederzeit in den Einstellungen ausschalten.</string>
     <string name="notif_intro_allow">Erlauben</string>
     <string name="notif_intro_later">Nicht jetzt</string>
+    <string name="voice_channel">Sprachaufnahme</string>
+    <string name="voice_recording_title">Sprachnachricht wird aufgenommen</string>
+    <string name="voice_recording_text">Tippe auf Stoppen, um sie im Nachrichtenfeld in Text umzuwandeln.</string>
+    <string name="voice_recording_stop">Stoppen</string>
     <string name="widget_label">OpenCode-Sitzungen</string>
     <string name="widget_description">Laufende und letzte Sitzungen sowie eine Schaltfläche, um eine neue zu starten.</string>
     <string name="widget_new_session">Neu</string>

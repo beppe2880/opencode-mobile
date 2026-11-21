@@ -24,7 +24,7 @@
 package io.github.beppe2880.opencodemobile.api.models
 
 import io.github.beppe2880.opencodemobile.api.models.SessionStructuredError
-import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo
+import io.github.beppe2880.opencodemobile.api.models.TokenUsageInfo1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -60,7 +60,7 @@ data class SessionCompactionFailedEventData (
     val cost: kotlin.Double? = null,
 
     @SerialName(value = "tokens")
-    val tokens: TokenUsageInfo? = null
+    val tokens: TokenUsageInfo1? = null
 
 ) {
 
