@@ -130,21 +130,41 @@
   // Upstream fixes touch scrolling in 6.1 (https://github.com/xtermjs/xterm.js/issues/5489);
   // remove this when upgrading, or the two would handle the same swipe.
   function bindTouchScroll() {
+    const root = term.element;
     const screen = term.element.querySelector(".xterm-screen");
     let gesture = null;
     let suppressClick = false;
+    // On Android/Linux xterm mirrors its selected word into the hidden input
+    // for copying. Opening the IME resizes xterm and can clear its selection
+    // without clearing this mirror. Recognize the selected input range itself,
+    // independently of term.hasSelection(), including partially selected text.
+    const hasNativeSelection = () => {
+      const text = window.getSelection()?.toString();
+      const input = term.textarea;
+      return !!text && !(input && document.activeElement === input &&
+        input.value.slice(input.selectionStart, input.selectionEnd) === text);
+    };
     const canScroll = () => term.buffer.active.type === "normal" &&
       term.buffer.active.baseY > 0 && term.modes.mouseTrackingMode === "none" &&
-      !term.hasSelection() && !window.getSelection()?.toString();
+      !hasNativeSelection();
 
-    screen.addEventListener("touchstart", (event) => {
+    // The selection controller registers first and can stop a touch before it
+    // reaches the root listeners below; the document still sees every touch, so
+    // a gesture from an earlier touch can never drive this one.
+    document.addEventListener("touchstart", () => {
+      gesture = null;
+      suppressClick = false;
+    }, { passive: true, capture: true });
+    // Capture on the root: when the IME is open the touch target can be xterm's
+    // editable helper or its scrollable wrapper, not just the rendered screen.
+    root.addEventListener("touchstart", (event) => {
       gesture = null;
       suppressClick = false;
       if (event.touches.length !== 1 || !canScroll()) return;
       const touch = event.touches[0];
       gesture = { id: touch.identifier, x: touch.clientX, y: touch.clientY, lastY: touch.clientY, remainder: 0, scrolling: false };
-    }, { passive: true });
-    screen.addEventListener("touchmove", (event) => {
+    }, { passive: true, capture: true });
+    root.addEventListener("touchmove", (event) => {
       if (!gesture) return;
       if (event.touches.length !== 1 || !canScroll()) { gesture = null; return; }
       const touch = event.touches[0];
@@ -155,6 +175,13 @@
         if (Math.max(dx, dy) < 8) return;
         if (dx >= dy) { gesture = null; return; }
         gesture.scrolling = true;
+        // A word selected by a previous double tap must not disable history
+        // scrolling forever. Native selection handles are still left alone.
+        if (term.hasSelection()) term.clearSelection();
+        const input = term.textarea;
+        if (input && document.activeElement === input && input.selectionStart !== input.selectionEnd) {
+          input.setSelectionRange(input.selectionEnd, input.selectionEnd);
+        }
       }
       const rowHeight = screen.getBoundingClientRect().height / term.rows;
       if (!(rowHeight > 0)) { gesture = null; return; }
@@ -167,18 +194,21 @@
         term.scrollLines(rows);
         gesture.remainder -= rows;
       }
-    }, { passive: false });
+    }, { passive: false, capture: true });
     for (const type of ["touchend", "touchcancel", "contextmenu"]) {
-      screen.addEventListener(type, () => { gesture = null; }, { passive: true });
+      root.addEventListener(type, () => { gesture = null; }, { passive: true, capture: true });
     }
     // Some WebViews synthesize a click after a drag; do not focus the input or open the IME.
-    screen.addEventListener("click", (event) => {
+    const suppressTouchMouse = (event) => {
       if (!suppressClick || event.pointerType === "mouse" || event.detail === 0 ||
           event.sourceCapabilities?.firesTouchEvents === false) return;
-      suppressClick = false;
+      if (event.type === "click") suppressClick = false;
       event.preventDefault();
       event.stopImmediatePropagation();
-    }, true);
+    };
+    // xterm focuses on mousedown, before our click handler gets a chance to run.
+    root.addEventListener("mousedown", suppressTouchMouse, true);
+    root.addEventListener("click", suppressTouchMouse, true);
   }
 
   // Applies the key bar modifiers to one typed character, then sends it.
