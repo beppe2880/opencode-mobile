@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Eine Nebenfrage stellen</string>
+    <string name="tips_c_btw_body">Während der Agent arbeitet, wähle oben über dem Nachrichtenfeld Nebenfrage stellen oder tippe /btw und deine Frage. Er antwortet knapp aus dem Gesprächsverlauf, ohne Werkzeuge und ohne die Aufgabe zu unterbrechen oder zu steuern. Die Antwort öffnet sich in einem eigenen Fenster mit Kopieren und landet nie im Chat. Es funktioniert auch, wenn der Chat untätig ist.</string>
+    <string name="tips_c_btw_demo">Während der Agent arbeitet, wird eine Frage im Nachrichtenfeld getippt und mit Nebenfrage stellen gesendet. Ein Chip über dem Feld zeigt, dass die Antwort vorbereitet wird, und dann, dass sie bereit ist; ein Tipp öffnet die Antwort in einem separaten Fenster.</string>
+    <string name="tips_c_btw_working">Die Wiederholungslogik wird umgebaut…</string>
+    <string name="tips_c_btw_question">Welche Datei enthält die Wiederholungslogik?</string>
+    <string name="tips_c_btw_answer">Die Wiederholungslogik steckt in **src/api/client.ts**, in `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Jetzt umsteuern\nEinreihen\nNebenfrage stellen\nAntwort wird vorbereitet…\nAntwort bereit\nNebenfrage\nKopieren\nSchließen</string>
+</resources>

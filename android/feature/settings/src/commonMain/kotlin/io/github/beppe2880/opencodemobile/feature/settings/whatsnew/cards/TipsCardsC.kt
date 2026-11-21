@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.CloudQueue
@@ -13,6 +14,9 @@ import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_title
@@ -53,6 +57,17 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
 internal val tipsCardsC: List<FeatureCard> = listOf(
+    FeatureCard(
+        id = "chat-side-question",
+        version = "0.18.0",
+        icon = Icons.AutoMirrored.Outlined.HelpOutline,
+        title = Res.string.tips_c_btw_title,
+        body = Res.string.tips_c_btw_body,
+        demoDescription = Res.string.tips_c_btw_demo,
+        author = "Andrease11",
+        pullRequest = 235,
+        demo = { BtwDemo(it) },
+    ),
     FeatureCard(
         id = "chat-actions-menu",
         version = "0.18.0",

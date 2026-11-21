@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Haz una pregunta aparte</string>
+    <string name="tips_c_btw_body">Mientras el agente trabaja, elige Preguntar aparte encima del cuadro de mensaje, o escribe /btw y tu pregunta. Responde brevemente a partir de la conversación, sin herramientas y sin interrumpir ni dirigir la tarea. La respuesta se abre en su propio panel con Copiar y nunca entra en el chat. También funciona cuando el chat está inactivo.</string>
+    <string name="tips_c_btw_demo">Mientras el agente trabaja, se escribe una pregunta en el cuadro de mensaje y se envía con Preguntar aparte. Un chip encima del cuadro muestra que la respuesta se está preparando y luego que está lista; al tocarlo, la respuesta se abre en un panel aparte.</string>
+    <string name="tips_c_btw_working">Reestructurando la lógica de reintentos…</string>
+    <string name="tips_c_btw_question">¿Qué archivo contiene la lógica de reintentos?</string>
+    <string name="tips_c_btw_answer">La lógica de reintentos está en **src/api/client.ts**, en `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Redirigir ahora\nPoner en cola\nPreguntar aparte\nPreparando respuesta…\nRespuesta lista\nPregunta aparte\nCopiar\nCerrar</string>
+</resources>

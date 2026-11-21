@@ -30,9 +30,12 @@ class SideQuestionRepositoryTest {
     @After
     fun tearDown() = server.shutdown()
 
+    private fun generated(text: String) =
+        """{"data":{"text":"$text","tokens":{"input":1,"output":1,"reasoning":0,"cache":{"read":0,"write":0}},"cost":0}}"""
+
     @Test
     fun `generation uses the session endpoint and leaves the transcript cache alone`() = runBlocking {
-        server.enqueue(MockResponse().setBody("""{"data":{"text":"An answer"}}"""))
+        server.enqueue(MockResponse().setBody(generated("An answer")))
         assertEquals("An answer", chat.generate("ses_test", "A question").getOrThrow())
         val request = server.takeRequest()
         assertEquals("POST", request.method)
@@ -42,6 +45,12 @@ class SideQuestionRepositoryTest {
         assertEquals("A question", body.getValue("prompt").jsonPrimitive.content)
         assertTrue(cache.sessions.isEmpty())
         assertEquals(1, server.requestCount)
+    }
+
+    @Test
+    fun `servers before 2_3 answer without token usage`() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"data":{"text":"Old server answer"}}"""))
+        assertEquals("Old server answer", chat.generate("ses_test", "A question").getOrThrow())
     }
 
     @Test
@@ -55,7 +64,7 @@ class SideQuestionRepositoryTest {
                 ),
             )
             val repository = RemoteChatRepository(graph.clients, cache)
-            server.enqueue(MockResponse().setBody("""{"data":{"text":"Original server"}}"""))
+            server.enqueue(MockResponse().setBody(generated("Original server")))
             assertEquals("Original server", repository.generate("ses_test", "Question", serverId = "s1").getOrThrow())
             assertEquals(1, server.requestCount)
             assertEquals(0, other.requestCount)

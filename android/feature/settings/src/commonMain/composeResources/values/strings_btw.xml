@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Ask a side question</string>
+    <string name="tips_c_btw_body">While the agent works, choose Ask aside above the message box, or type /btw and your question. It answers briefly from the conversation, without tools and without interrupting or steering the task. The answer opens in its own panel with Copy and never enters the chat. It also works when the chat is idle.</string>
+    <string name="tips_c_btw_demo">While the agent works, a question is typed in the message box and sent with Ask aside. A chip above the box shows the answer is being prepared, then ready; tapping it opens the answer in a separate panel.</string>
+    <string name="tips_c_btw_working">Refactoring the retry logic…</string>
+    <string name="tips_c_btw_question">Which file holds the retry logic?</string>
+    <string name="tips_c_btw_answer">The retry logic lives in **src/api/client.ts**, in `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Steer now\nQueue\nAsk aside\nPreparing answer…\nAnswer ready\nSide question\nCopy\nClose</string>
+</resources>
