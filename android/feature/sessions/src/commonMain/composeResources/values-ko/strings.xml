@@ -32,6 +32,10 @@
     <string name="sessions_filter_range_hint">시작일과 종료일을 선택하세요</string>
     <string name="sessions_filter_outcome">결과</string>
     <string name="sessions_unread">읽지 않음</string>
+    <string name="sessions_unread_count">읽지 않음 · %1$d</string>
+    <string name="sessions_mark_all_read">모두 읽음으로 표시</string>
+    <string name="sessions_mark_all_read_count">%1$d개 읽음으로 표시</string>
+    <string name="sessions_mark_all_read_failed">일부 세션을 읽음으로 표시하지 못했습니다</string>
     <string name="sessions_read">읽음</string>
     <string name="sessions_filter_read">읽음 상태</string>
     <string name="sessions_outcome_succeeded">성공</string>

@@ -32,6 +32,10 @@
     <string name="sessions_filter_range_hint">Выберите начальную и конечную даты</string>
     <string name="sessions_filter_outcome">Результат</string>
     <string name="sessions_unread">Непрочитанные</string>
+    <string name="sessions_unread_count">Непрочитанные · %1$d</string>
+    <string name="sessions_mark_all_read">Отметить все как прочитанные</string>
+    <string name="sessions_mark_all_read_count">Отметить %1$d как прочитанные</string>
+    <string name="sessions_mark_all_read_failed">Некоторые сессии не удалось отметить как прочитанные</string>
     <string name="sessions_read">Прочитанные</string>
     <string name="sessions_filter_read">Статус прочтения</string>
     <string name="sessions_outcome_succeeded">Успешно</string>

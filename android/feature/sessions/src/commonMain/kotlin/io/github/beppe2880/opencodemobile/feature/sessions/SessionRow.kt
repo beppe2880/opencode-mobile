@@ -86,6 +86,8 @@ internal fun SessionRow(
     onTogglePin: (() -> Unit)? = null,
     /** Running but blocked on the user: a badge replaces "Working" and the dot turns to a warning. */
     waiting: SessionWaiting? = null,
+    /** Off when the setting hides unread state: no dot and no unread label. */
+    showUnread: Boolean = true,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -107,7 +109,7 @@ internal fun SessionRow(
     val unreadLabel = stringResource(Res.string.sessions_unread)
     val showsWork = workLabel.isNotEmpty()
     // A running session shows its activity dot instead, like the desktop app.
-    val unread = session.isUnread && !running
+    val unread = showUnread && session.isUnread && !running
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,

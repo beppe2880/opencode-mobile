@@ -75,6 +75,13 @@
     <string name="settings_attached_image_size_thumbnails">Miniature</string>
     <string name="settings_running_in_list">Mostra il lavoro in corso nell'elenco sessioni</string>
     <string name="settings_running_in_list_sub">Conta i sottoagenti e i comandi in background sotto ogni sessione</string>
+    <string name="settings_unread_sessions">Sessioni non lette</string>
+    <string name="settings_unread_sessions_off">Disattivato</string>
+    <string name="settings_unread_sessions_dot">Punto</string>
+    <string name="settings_unread_sessions_group">Punto e gruppo</string>
+    <string name="settings_unread_sessions_off_sub">Nessun punto e nessun gruppo «Non lette»: l'elenco non tiene traccia di ciò che hai letto</string>
+    <string name="settings_unread_sessions_dot_sub">Un punto accanto all'orario segna una risposta che non hai aperto; la sessione resta nel suo giorno</string>
+    <string name="settings_unread_sessions_group_sub">Un punto segna una risposta che non hai aperto, e queste sessioni sono raggruppate sopra i giorni</string>
     <string name="settings_confirm_stop">Conferma prima di interrompere i comandi</string>
     <string name="settings_confirm_stop_sub">Chiedi conferma prima di interrompere un comando in background dal pannello In esecuzione</string>
     <string name="settings_running_chips">Attività in corso sopra la casella del messaggio</string>

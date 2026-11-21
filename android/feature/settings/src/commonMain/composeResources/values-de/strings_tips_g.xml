@@ -4,6 +4,6 @@
     <string name="tips_g_filters_body">Grenze die Liste nach Datum, Ergebnis oder archiviert ein. Beim Archivieren gibt es auch Rückgängig.</string>
     <string name="tips_g_filters_demo">Eine Sitzungsliste öffnet ihre Filter und zeigt eine archivierte Sitzung.</string>
     <string name="tips_g_unread_title">Ungelesene Sitzungen</string>
-    <string name="tips_g_unread_body">Ein Punkt markiert Sitzungen, deren letzter Durchlauf nach deinem letzten Blick geendet hat. Ungelesene Sitzungen stehen in einer eigenen Gruppe unter den angehefteten, also immer oben; öffne eine, um den Punkt zu entfernen und sie zu ihrem Tag zurückzubringen.</string>
+    <string name="tips_g_unread_body">Ein Punkt markiert Sitzungen, deren letzter Durchlauf nach deinem letzten Blick geendet hat. Ungelesene Sitzungen stehen in einer eigenen Gruppe unter den angehefteten, also immer oben; öffne eine, um den Punkt zu entfernen und sie zu ihrem Tag zurückzubringen, oder markiere alle über die Gruppe als gelesen. In Einstellungen → Sitzungen kannst du nur den Punkt behalten oder ungelesene Sitzungen ausschalten.</string>
     <string name="tips_g_unread_demo">Eine beendete Sitzung erhält einen Punkt und wandert zu Ungelesen; Tippen entfernt den Punkt und bringt sie zurück zu Heute.</string>
 </resources>

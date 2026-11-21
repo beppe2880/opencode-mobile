@@ -4,6 +4,6 @@
     <string name="tips_g_filters_body">日付、結果、アーカイブ状態でリストを絞り込めます。アーカイブ後は元に戻せます。</string>
     <string name="tips_g_filters_demo">セッションリストがフィルターを開き、アーカイブされたセッションを表示します。</string>
     <string name="tips_g_unread_title">未読のセッション</string>
-    <string name="tips_g_unread_body">最後に開いた後に最新のターンが終了したセッションに点が付きます。未読セッションはピン留めの下の専用グループにまとまり、常に上部に表示されます。開くと点が消え、元の日付に戻ります。</string>
+    <string name="tips_g_unread_body">最後に開いた後に最新のターンが終了したセッションに点が付きます。未読セッションはピン留めの下の専用グループにまとまり、常に上部に表示されます。開くと点が消え、元の日付に戻ります。グループからすべて既読にすることもできます。設定 → セッションでは、点だけを残すか、未読セッションをオフにできます。</string>
     <string name="tips_g_unread_demo">終了したセッションに点が付いて未読グループに移動し、タップすると点が消えて今日に戻ります。</string>
 </resources>

@@ -38,6 +38,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.testing.MainDispatcherRule
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import kotlinx.coroutines.CancellationException
@@ -1555,6 +1556,123 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `the unread setting turns the group or all unread state off`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(session("unread", now - hour, idleAt = 10, viewedAt = 5), session("read", now - 2 * hour, idleAt = 10, viewedAt = 10)),
+        )
+        val vm = vm(repository)
+        advanceUntilIdle()
+        assertEquals(listOf(DayBucket.Unread, DayBucket.Today), vm.state.value.groups.map { it.bucket })
+
+        settings.settings.value = AppSettings(unreadSessions = UnreadSessions.Dot)
+        runCurrent()
+        assertEquals(listOf(DayBucket.Today), vm.state.value.groups.map { it.bucket })
+        assertEquals(listOf("unread"), vm.state.value.unreadShown.map { it.id })
+
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+        assertEquals(SessionRead.Unread, vm.state.value.filters.readState)
+
+        settings.settings.value = AppSettings(unreadSessions = UnreadSessions.Off)
+        runCurrent()
+        // Nothing left to narrow: the read filter goes, and it cannot be picked again.
+        assertNull(vm.state.value.filters.readState)
+        assertEquals(listOf("unread", "read"), vm.state.value.ids())
+        assertTrue(vm.state.value.unreadShown.isEmpty())
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+        assertNull(vm.state.value.filters.readState)
+
+        settings.settings.value = AppSettings()
+        runCurrent()
+        assertEquals(listOf(DayBucket.Unread, DayBucket.Today), vm.state.value.groups.map { it.bucket })
+    }
+
+    @Test
+    fun `mark all as read marks the unread sessions shown at their idle watermark`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("a", now - hour, idleAt = 20, viewedAt = 5),
+                session("b", now - 2 * hour, idleAt = 30),
+                session("read", now - 3 * hour, idleAt = 10, viewedAt = 10),
+            ),
+        )
+        val vm = vm(repository)
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.MarkAllRead)
+        advanceUntilIdle()
+
+        assertEquals(setOf("a" to 20L, "b" to 30L), repository.viewedCalls.toSet())
+        assertEquals(listOf(DayBucket.Today), vm.state.value.groups.map { it.bucket })
+        assertTrue(vm.state.value.unreadShown.isEmpty())
+        assertFalse(vm.state.value.markingAllRead)
+    }
+
+    @Test
+    fun `the group header marks its own sessions and the sheet skips those waiting for the user`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("a", now - hour, idleAt = 20),
+                session("b", now - 2 * hour, idleAt = 30),
+                session("pinned", now - 3 * hour, idleAt = 40),
+                session("waiting", now - 4 * hour, idleAt = 50),
+            ),
+        )
+        pins.setPinned("pinned", true)
+        val vm = vm(repository)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.Visible(true))
+        try {
+            // Only a running session can wait for the user.
+            events.flow.emit(ServerEvent.ExecutionStarted("waiting"))
+            chat.pendingForms = mapOf("waiting" to listOf(Form("f1", "waiting", "Which one?", emptyList())))
+            events.flow.emit(ServerEvent.FormsChanged("waiting"))
+            advanceTimeBy(1_000)
+            assertEquals(SessionWaiting.Answer, vm.state.value.waiting["waiting"])
+            assertEquals(listOf("a", "b"), vm.state.value.unreadGroup.map { it.id })
+            assertEquals(listOf("pinned", "a", "b"), vm.state.value.unreadShown.map { it.id })
+
+            // The header's count is what it marks: the pinned session keeps its dot.
+            vm.onEvent(SessionsEvent.MarkUnreadGroupRead)
+            advanceTimeBy(1_000)
+            assertEquals(setOf("a", "b"), repository.viewedCalls.map { it.first }.toSet())
+            assertEquals(listOf("pinned"), vm.state.value.unreadShown.map { it.id })
+
+            vm.onEvent(SessionsEvent.MarkAllRead)
+            advanceTimeBy(1_000)
+            assertEquals(setOf("a", "b", "pinned"), repository.viewedCalls.map { it.first }.toSet())
+            assertTrue(vm.state.value.unreadShown.isEmpty())
+        } finally {
+            vm.onEvent(SessionsEvent.Visible(false))
+        }
+    }
+
+    @Test
+    fun `mark all as read keeps the sessions it could not mark`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("a", now - hour, idleAt = 20),
+                session("b", now - 2 * hour, idleAt = 30),
+                session("c", now - 3 * hour, idleAt = 40),
+            ),
+        ).apply { viewFailures = setOf("b") }
+        val vm = vm(repository)
+        advanceUntilIdle()
+        // The unread filter on and no Unread group: the action reaches every unread session listed.
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+        settings.settings.value = AppSettings(unreadSessions = UnreadSessions.Dot)
+        runCurrent()
+        val effect = backgroundScope.async { vm.effect.first() }
+
+        vm.onEvent(SessionsEvent.MarkAllRead)
+        advanceUntilIdle()
+
+        assertEquals(setOf("a", "b", "c"), repository.viewedCalls.map { it.first }.toSet())
+        assertTrue(effect.await() is SessionsEffect.ShowMessage)
+        // The failed one is still unread, the others are not.
+        assertEquals(listOf("b"), vm.state.value.unreadShown.map { it.id })
+    }
+
+    @Test
     fun `a viewed event clears the row without reloading the list`() = runTest(main.testDispatcher) {
         val repository = FakeSessionRepository(listOf(session("today", now - hour, idleAt = 10)))
         val vm = vm(repository)
@@ -1638,6 +1756,13 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
         return listResult.map { it.first().copy(id = "new", directory = directory) }
     }
     override suspend fun rename(sessionId: String, title: String): Result<Unit> = Result.success(Unit)
+
+    val viewedCalls = mutableListOf<Pair<String, Long>>()
+    var viewFailures: Set<String> = emptySet()
+    override suspend fun markViewed(sessionId: String, idleAt: Long): Result<Unit> {
+        viewedCalls += sessionId to idleAt
+        return if (sessionId in viewFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+    }
     override suspend fun delete(sessionId: String): Result<Unit> = deleteResult
     override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
         archivedCalls += sessionId to archived

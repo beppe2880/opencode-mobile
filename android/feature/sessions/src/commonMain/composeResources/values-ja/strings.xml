@@ -32,6 +32,10 @@
     <string name="sessions_filter_range_hint">開始日と終了日を選択</string>
     <string name="sessions_filter_outcome">結果</string>
     <string name="sessions_unread">未読</string>
+    <string name="sessions_unread_count">未読 · %1$d</string>
+    <string name="sessions_mark_all_read">すべて既読にする</string>
+    <string name="sessions_mark_all_read_count">%1$d件を既読にする</string>
+    <string name="sessions_mark_all_read_failed">一部のセッションを既読にできませんでした</string>
     <string name="sessions_read">既読</string>
     <string name="sessions_filter_read">既読状態</string>
     <string name="sessions_outcome_succeeded">成功</string>
