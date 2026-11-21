@@ -663,24 +663,19 @@ private fun UnreadGroupHeader(count: Int, marking: Boolean, onEvent: (SessionsEv
             stringResource(Res.string.sessions_unread_count, count),
             Modifier.weight(1f).testTag("sessions_group_unread"),
         )
-        if (count >= MARK_ALL_READ_MIN) {
-            TextButton(
-                onClick = { onEvent(SessionsEvent.MarkAllRead) },
-                enabled = !marking,
-                modifier = Modifier.testTag("sessions_mark_all_read"),
-            ) {
-                Text(
-                    stringResource(Res.string.sessions_mark_all_read),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = OcTheme.colors.textAccent,
-                )
-            }
+        TextButton(
+            onClick = { onEvent(SessionsEvent.MarkUnreadGroupRead) },
+            enabled = !marking,
+            modifier = Modifier.testTag("sessions_mark_all_read"),
+        ) {
+            Text(
+                stringResource(Res.string.sessions_mark_all_read),
+                style = MaterialTheme.typography.labelMedium,
+                color = OcTheme.colors.textAccent,
+            )
         }
     }
 }
-
-/** With a single unread session, opening it is as quick as the action. */
-private const val MARK_ALL_READ_MIN = 2
 
 private fun DayBucket.label(): StringResource = when (this) {
     DayBucket.Pinned -> Res.string.sessions_pinned

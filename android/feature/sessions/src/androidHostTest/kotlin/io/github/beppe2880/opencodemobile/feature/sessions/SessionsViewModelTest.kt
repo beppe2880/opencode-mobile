@@ -1608,6 +1608,45 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `the group header marks its own sessions and the sheet skips those waiting for the user`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("a", now - hour, idleAt = 20),
+                session("b", now - 2 * hour, idleAt = 30),
+                session("pinned", now - 3 * hour, idleAt = 40),
+                session("waiting", now - 4 * hour, idleAt = 50),
+            ),
+        )
+        pins.setPinned("pinned", true)
+        val vm = vm(repository)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.Visible(true))
+        try {
+            // Only a running session can wait for the user.
+            events.flow.emit(ServerEvent.ExecutionStarted("waiting"))
+            chat.pendingForms = mapOf("waiting" to listOf(Form("f1", "waiting", "Which one?", emptyList())))
+            events.flow.emit(ServerEvent.FormsChanged("waiting"))
+            advanceTimeBy(1_000)
+            assertEquals(SessionWaiting.Answer, vm.state.value.waiting["waiting"])
+            assertEquals(listOf("a", "b"), vm.state.value.unreadGroup.map { it.id })
+            assertEquals(listOf("pinned", "a", "b"), vm.state.value.unreadShown.map { it.id })
+
+            // The header's count is what it marks: the pinned session keeps its dot.
+            vm.onEvent(SessionsEvent.MarkUnreadGroupRead)
+            advanceTimeBy(1_000)
+            assertEquals(setOf("a", "b"), repository.viewedCalls.map { it.first }.toSet())
+            assertEquals(listOf("pinned"), vm.state.value.unreadShown.map { it.id })
+
+            vm.onEvent(SessionsEvent.MarkAllRead)
+            advanceTimeBy(1_000)
+            assertEquals(setOf("a", "b", "pinned"), repository.viewedCalls.map { it.first }.toSet())
+            assertTrue(vm.state.value.unreadShown.isEmpty())
+        } finally {
+            vm.onEvent(SessionsEvent.Visible(false))
+        }
+    }
+
+    @Test
     fun `mark all as read keeps the sessions it could not mark`() = runTest(main.testDispatcher) {
         val repository = FakeSessionRepository(
             listOf(

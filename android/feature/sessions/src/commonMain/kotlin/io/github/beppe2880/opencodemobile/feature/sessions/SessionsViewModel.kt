@@ -176,7 +176,8 @@ class SessionsViewModel(
                 )
             }
             is SessionsEvent.ToggleRead -> if (currentState.unreadSessions != UnreadSessions.Off) updateFilters { it.toggleRead(event.state) }
-            SessionsEvent.MarkAllRead -> markAllRead()
+            SessionsEvent.MarkAllRead -> markRead(currentState.unreadShown)
+            SessionsEvent.MarkUnreadGroupRead -> markRead(currentState.unreadGroup)
             SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
@@ -581,13 +582,12 @@ class SessionsViewModel(
         groupSessions(list, pinnedIds, clock(), zone, filters, waiting, currentState.unreadSessions)
 
     /**
-     * Marks the unread sessions the list shows as viewed at their idle watermark, a few requests
-     * at a time. The rows clear at once; those the server refuses become unread again, with one
-     * message for all of them.
+     * Marks [unread] as viewed at their idle watermark, a few requests at a time. The rows clear at
+     * once; those the server refuses become unread again, with one message for all of them.
      */
-    private fun markAllRead() {
+    private fun markRead(unread: List<Session>) {
         if (currentState.markingAllRead) return
-        val marks = currentState.unreadShown.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
+        val marks = unread.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
         if (marks.isEmpty()) return
         val previous = sessionList.filter { it.id in marks }.associate { it.id to it.viewedAt }
         sessionList = sessionList.map { session -> marks[session.id]?.let { session.copy(viewedAt = it) } ?: session }

@@ -113,9 +113,20 @@ data class SessionsState(
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
 
-    /** The unread sessions the list shows, those [SessionsEvent.MarkAllRead] marks; none while unread state is off. */
+    /**
+     * The unread sessions the list shows, those [SessionsEvent.MarkAllRead] marks; none while unread
+     * state is off. Sessions waiting for a permission or an answer are left out: marking them read
+     * would hide that they need the user.
+     */
     val unreadShown: List<Session>
-        get() = if (unreadSessions == UnreadSessions.Off) emptyList() else groups.flatMap { it.sessions }.filter { it.isUnread }
+        get() = if (unreadSessions == UnreadSessions.Off) {
+            emptyList()
+        } else {
+            groups.flatMap { it.sessions }.filter { it.isUnread && it.id !in waiting }
+        }
+
+    /** The sessions of the Unread group, those [SessionsEvent.MarkUnreadGroupRead] marks. */
+    val unreadGroup: List<Session> get() = groups.firstOrNull { it.bucket == DayBucket.Unread }?.sessions.orEmpty()
     val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
@@ -138,6 +149,9 @@ sealed interface SessionsEvent {
 
     /** Marks every unread session the list shows (filters and search applied) as viewed. */
     data object MarkAllRead : SessionsEvent
+
+    /** Marks exactly the sessions of the Unread group as viewed, the count its header shows. */
+    data object MarkUnreadGroupRead : SessionsEvent
     data object ResetFilters : SessionsEvent
 
     data class HideProject(val directory: String) : SessionsEvent
