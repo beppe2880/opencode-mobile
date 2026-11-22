@@ -10,7 +10,10 @@ import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -52,6 +55,90 @@ class SessionListCacheTest {
         assertTrue(exported.any { it is Message.Assistant })
         server.enqueue(MockResponse().setResponseCode(404))
         assertTrue(repository.export("ses_test").exceptionOrNull() is OpenCodeError.NotFound)
+    }
+
+    @Test
+    fun `export accepts legacy provider metadata and current native metadata with identical content`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        val info = Json.parseToJsonElement(fixture("session_get.json")).jsonObject.getValue("data")
+        val original = Json.parseToJsonElement(fixture("session_messages.json")).jsonObject.getValue("data").jsonArray
+        val metadata = JsonObject(mapOf("opaque" to JsonPrimitive("fixture-metadata")))
+        val baseline = JsonObject(mapOf("data" to JsonObject(mapOf("info" to info, "messages" to original))))
+        server.enqueue(MockResponse().setHeader("Content-Type", "application/json").setBody(baseline.toString()))
+        val expected = repository.export("ses_test").getOrThrow()
+        server.takeRequest()
+
+        // Contract refresh #246 replaced optional providerState/state with native, and added
+        // optional time.firstToken. None should change the user-facing export or require 2.3.2.
+        for (legacy in listOf(true, false)) {
+            val messages = JsonArray(
+                original.map { element ->
+                    val message = element.jsonObject
+                    if (message["type"] != JsonPrimitive("assistant")) return@map element
+                    val content = JsonArray(
+                        message.getValue("content").jsonArray.map { item ->
+                            val part = item.jsonObject
+                            val key = if (legacy) {
+                                if (part["type"] == JsonPrimitive("tool")) "providerState" else "state"
+                            } else {
+                                "native"
+                            }
+                            val fields = part - "native" - "providerState" - "providerResultState"
+                            // A tool's state is its actual input/output, not provider metadata.
+                            val clean = if (part["type"] == JsonPrimitive("tool")) fields else fields - "state"
+                            JsonObject(clean + (key to metadata))
+                        },
+                    )
+                    val time = message.getValue("time").jsonObject
+                    JsonObject(
+                        (message - "providerState" - "native") + mapOf(
+                            (if (legacy) "providerState" else "native") to metadata,
+                            "content" to content,
+                            "time" to if (legacy) time else JsonObject(time + ("firstToken" to time.getValue("created"))),
+                        ),
+                    )
+                },
+            )
+            val body = JsonObject(mapOf("data" to JsonObject(mapOf("info" to info, "messages" to messages))))
+            server.enqueue(MockResponse().setHeader("Content-Type", "application/json").setBody(body.toString()))
+            assertEquals(expected, repository.export("ses_test").getOrThrow())
+            assertEquals("/api/experimental/session/ses_test/export?sanitize=false", server.takeRequest().path)
+        }
+    }
+
+    @Test
+    fun `JSON export preserves native metadata and unknown messages without the HTTP envelope`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        val info = Json.parseToJsonElement(fixture("session_get.json")).jsonObject.getValue("data").jsonObject
+        val original = Json.parseToJsonElement(fixture("session_messages.json")).jsonObject.getValue("data").jsonArray
+        val unknown = Json.parseToJsonElement("""{"type":"future-message","native":{"providerState":"retained"}}""")
+        val data = JsonObject(
+            mapOf(
+                "info" to JsonObject(info + ("future-info" to JsonPrimitive("retained"))),
+                "messages" to JsonArray(original + unknown),
+                "future-field" to JsonPrimitive("retained"),
+            ),
+        )
+        server.enqueue(MockResponse().setBody(JsonObject(mapOf("data" to data)).toString()))
+        val exported = Json.parseToJsonElement(repository.exportJson("ses_test").getOrThrow())
+        assertEquals(data, exported)
+        assertEquals("/api/experimental/session/ses_test/export?sanitize=false", server.takeRequest().path)
+    }
+
+    @Test
+    fun `JSON export rejects invalid documents and preserves HTTP failures`() = runBlocking<Unit> {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        for (body in listOf("not json", "{}", """{"data":{"info":{},"messages":"invalid"}}""")) {
+            server.enqueue(MockResponse().setBody(body))
+            assertTrue(repository.exportJson("ses_test").exceptionOrNull() is OpenCodeError.Server)
+            server.takeRequest()
+        }
+        server.enqueue(MockResponse().setResponseCode(404))
+        assertTrue(repository.exportJson("ses_test").exceptionOrNull() is OpenCodeError.NotFound)
+        server.takeRequest()
+        server.enqueue(MockResponse().setResponseCode(401))
+        assertTrue(repository.exportJson("ses_test").exceptionOrNull() is OpenCodeError.Unauthorized)
+        server.takeRequest()
     }
 
     @Test

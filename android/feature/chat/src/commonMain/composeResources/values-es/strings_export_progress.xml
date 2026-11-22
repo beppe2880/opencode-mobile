@@ -1,0 +1,9 @@
+<resources>
+    <string name="chat_export_waiting_server">Esperando al servidor…</string>
+    <string name="chat_export_decoding">Procesando datos…</string>
+    <string name="chat_export_preparing_messages">Preparando mensajes…</string>
+    <string name="chat_export_percent">%1$s %</string>
+    <string name="chat_export_downloading">Descargando chat…</string>
+    <string name="chat_export_preparing_markdown">Preparando Markdown…</string>
+    <string name="chat_export_preparing_file">Preparando archivo…</string>
+</resources>

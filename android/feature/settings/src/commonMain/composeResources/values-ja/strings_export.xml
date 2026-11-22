@@ -1,0 +1,17 @@
+<resources>
+    <string name="tips_export_title">会話を保存・共有</string>
+    <string name="tips_export_body">チャットメニューの「コンテキストと履歴」から、会話全体を Markdown または OpenCode の元の JSON として保存・共有できます。サーバーの応答待ちと各段階の進行状況を確認でき、測定可能な場合は割合が表示されます。有効なキャッシュがあれば同じチャットの再ダウンロードを省略します。JSON には Markdown で省略される非公開のコンテキストが含まれる場合があります。</string>
+    <string name="tips_export_demo">Markdown のエクスポートでサーバーの応答待ち、ダウンロード、準備の進行状況を示します。次に JSON に切り替え、キャッシュを再利用してダウンロードを省略します。</string>
+    <string name="tips_export_panel_title">エクスポート / 共有…</string>
+    <string name="tips_export_waiting">サーバーの応答を待機中…</string>
+    <string name="tips_export_downloading">チャットをダウンロード中…</string>
+    <string name="tips_export_processing">データを処理中…</string>
+    <string name="tips_export_messages">メッセージを準備中…</string>
+    <string name="tips_export_markdown">Markdown を準備中…</string>
+    <string name="tips_export_file">ファイルを準備中…</string>
+    <string name="tips_export_ready">保存・共有するファイルの準備完了</string>
+    <string name="tips_export_cached">同じチャット：キャッシュ済み JSON を再利用</string>
+    <string name="tips_export_percent">%1$s%</string>
+    <string name="tips_export_share">%1$s を共有</string>
+    <string name="tips_export_save">%1$s ファイルを保存</string>
+</resources>

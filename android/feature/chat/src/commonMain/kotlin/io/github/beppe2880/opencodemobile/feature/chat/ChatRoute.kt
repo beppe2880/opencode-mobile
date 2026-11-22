@@ -29,7 +29,9 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
@@ -68,7 +70,16 @@ fun ChatRoute(
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
-    val export = rememberMarkdownExport { viewModel.onEvent(ChatEvent.ExportFailed) }
+    val export = rememberTranscriptExport(
+        onReady = { viewModel.onEvent(ChatEvent.ExportReady) },
+        onFailure = { viewModel.onEvent(ChatEvent.ExportFailed) },
+        onCancelled = { viewModel.onEvent(ChatEvent.ExportCancelled) },
+        onProgress = { completed, total ->
+            withContext(Dispatchers.Main.immediate) {
+                viewModel.onEvent(ChatEvent.ExportFileProgress(completed, total))
+            }
+        },
+    )
     val scope = rememberCoroutineScope()
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
@@ -157,7 +168,7 @@ fun ChatRoute(
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is ChatEffect.ExportMarkdown -> export(effect.title, effect.markdown, effect.save)
+            is ChatEffect.ExportTranscript -> export(effect.file, effect.save)
             ChatEffect.OpenProviders -> {
                 providerModel.onEvent(ProviderConnectionEvent.Open(state.directory))
                 providersOpen = true

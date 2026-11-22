@@ -34,7 +34,10 @@ data class ChatState(
     /** Pinned to the top of the session list on this device. */
     val pinned: Boolean = false,
     val exportOpen: Boolean = false,
+    val exportFormat: TranscriptFormat = TranscriptFormat.Markdown,
     val exporting: Boolean = false,
+    val exportPhase: ExportPhase = ExportPhase.PreparingFile,
+    val exportFraction: Float? = null,
     val directory: String = "",
     val agent: String? = null,
     val model: ModelRef? = null,
@@ -354,8 +357,12 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
 
 sealed interface ChatEvent {
     data class ExportSheet(val open: Boolean) : ChatEvent
+    data class SelectExportFormat(val format: TranscriptFormat) : ChatEvent
     data class Export(val save: Boolean) : ChatEvent
     data object ExportFailed : ChatEvent
+    data object ExportReady : ChatEvent
+    data object ExportCancelled : ChatEvent
+    data class ExportFileProgress(val completed: Long, val total: Long) : ChatEvent
 
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent
@@ -499,7 +506,7 @@ sealed interface ChatEvent {
 }
 
 sealed interface ChatEffect {
-    data class ExportMarkdown(val title: String, val markdown: String, val save: Boolean) : ChatEffect
+    data class ExportTranscript(val file: TranscriptFile, val save: Boolean) : ChatEffect
     data object OpenProviders : ChatEffect
     data class ShowMessage(val message: UiText) : ChatEffect
     data object NavigateBack : ChatEffect

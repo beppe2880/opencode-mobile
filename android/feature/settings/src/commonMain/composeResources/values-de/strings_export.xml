@@ -1,0 +1,17 @@
+<resources>
+    <string name="tips_export_title">Unterhaltung speichern oder teilen</string>
+    <string name="tips_export_body">Öffne Kontext und Verlauf im Chatmenü, um die ganze Unterhaltung als Markdown oder originales OpenCode-JSON zu speichern oder zu teilen. Verfolge die Serverwartezeit und den Fortschritt je Phase, mit Prozenten, wo messbar. Ein gültiger Cache verhindert einen erneuten Download desselben Chats. JSON kann privaten Kontext enthalten, der in Markdown fehlt.</string>
+    <string name="tips_export_demo">Ein Markdown-Export zeigt Serverwartezeit, Download und Vorbereitung. Der nächste wechselt zu JSON und nutzt den Cache ohne erneuten Download.</string>
+    <string name="tips_export_panel_title">Exportieren / Teilen…</string>
+    <string name="tips_export_waiting">Warten auf den Server…</string>
+    <string name="tips_export_downloading">Chat wird heruntergeladen…</string>
+    <string name="tips_export_processing">Daten werden verarbeitet…</string>
+    <string name="tips_export_messages">Nachrichten werden vorbereitet…</string>
+    <string name="tips_export_markdown">Markdown wird vorbereitet…</string>
+    <string name="tips_export_file">Datei wird vorbereitet…</string>
+    <string name="tips_export_ready">Datei bereit zum Speichern oder Teilen</string>
+    <string name="tips_export_cached">Derselbe Chat: JSON aus dem Cache nutzen</string>
+    <string name="tips_export_percent">%1$s %</string>
+    <string name="tips_export_share">%1$s teilen</string>
+    <string name="tips_export_save">%1$s-Datei speichern</string>
+</resources>

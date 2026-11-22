@@ -1,0 +1,17 @@
+<resources>
+    <string name="tips_export_title">Salva o condividi una conversazione</string>
+    <string name="tips_export_body">Apri Contesto e cronologia nel menu della chat per salvare o condividere l’intera conversazione in Markdown o nel JSON originale di OpenCode. Segui l’attesa del server e l’avanzamento delle fasi, con percentuali dove misurabili. Una cache valida evita di scaricare di nuovo la stessa chat. Il JSON può includere contesto privato escluso dal Markdown.</string>
+    <string name="tips_export_demo">Un export Markdown mostra l’attesa del server, lo scaricamento e la preparazione. L’export successivo passa a JSON e salta lo scaricamento riusando la cache.</string>
+    <string name="tips_export_panel_title">Esporta / Condividi…</string>
+    <string name="tips_export_waiting">In attesa del server…</string>
+    <string name="tips_export_downloading">Scaricamento della chat…</string>
+    <string name="tips_export_processing">Elaborazione dati…</string>
+    <string name="tips_export_messages">Preparazione messaggi…</string>
+    <string name="tips_export_markdown">Preparazione Markdown…</string>
+    <string name="tips_export_file">Preparazione file…</string>
+    <string name="tips_export_ready">File pronto da salvare o condividere</string>
+    <string name="tips_export_cached">Stessa chat: riusa il JSON in cache</string>
+    <string name="tips_export_percent">%1$s%</string>
+    <string name="tips_export_share">Condividi %1$s</string>
+    <string name="tips_export_save">Salva file %1$s</string>
+</resources>

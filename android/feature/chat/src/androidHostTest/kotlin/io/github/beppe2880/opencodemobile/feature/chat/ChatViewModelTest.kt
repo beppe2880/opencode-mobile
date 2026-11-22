@@ -43,6 +43,8 @@ import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportStage
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -932,20 +934,116 @@ class ChatViewModelTest {
         vm.onEvent(ChatEvent.Export(save = false))
         advanceUntilIdle()
         runCurrent()
-        val exported = effects.filterIsInstance<ChatEffect.ExportMarkdown>().single()
-        assertTrue(exported.markdown.contains("not loaded in chat"))
+        val exported = effects.filterIsInstance<ChatEffect.ExportTranscript>().single()
+        assertTrue(exported.file.content.contains("not loaded in chat"))
+        assertEquals(TranscriptFormat.Markdown, exported.file.format)
         assertFalse(exported.save)
+        assertTrue(vm.state.value.exporting)
+        assertTrue(vm.state.value.exportOpen)
+        assertEquals(ExportPhase.PreparingFile, vm.state.value.exportPhase)
+        vm.onEvent(ChatEvent.ExportReady)
         assertFalse(vm.state.value.exportOpen)
         assertEquals("keep draft", vm.state.value.draft)
+    }
+
+    @Test
+    fun `JSON export uses the native document without the Markdown projection and can retry`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        backgroundScope.launch { vm.effect.collect { effects += it } }
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("keep draft"))
+        vm.onEvent(ChatEvent.ExportSheet(true))
+        vm.onEvent(ChatEvent.SelectExportFormat(TranscriptFormat.Json))
+        vm.onEvent(ChatEvent.Export(save = true))
+        vm.onEvent(ChatEvent.Export(save = true))
+        vm.onEvent(ChatEvent.SelectExportFormat(TranscriptFormat.Markdown))
+        advanceUntilIdle()
+        assertEquals(1, sessions.jsonExports)
+        assertEquals(0, sessions.exports)
+        assertTrue(vm.state.value.exportOpen)
+        assertFalse(vm.state.value.exporting)
+        assertEquals(TranscriptFormat.Json, vm.state.value.exportFormat)
+        val native = """{"info":{"id":"s1"},"messages":[],"future":"retained"}"""
+        sessions.jsonExportResult = Result.success(native)
+        vm.onEvent(ChatEvent.Export(save = true))
+        advanceUntilIdle()
+        runCurrent()
+        val exported = effects.filterIsInstance<ChatEffect.ExportTranscript>().single()
+        assertEquals(native, exported.file.content)
+        assertEquals(TranscriptFormat.Json, exported.file.format)
+        assertTrue(exported.file.name.endsWith(".json"))
+        assertTrue(exported.save)
+        assertTrue(vm.state.value.exporting)
+        assertTrue(vm.state.value.exportOpen)
+        vm.onEvent(ChatEvent.ExportReady)
+        assertFalse(vm.state.value.exportOpen)
+        assertEquals("keep draft", vm.state.value.draft)
+        vm.onEvent(ChatEvent.ExportSheet(true))
+        vm.onEvent(ChatEvent.SelectExportFormat(TranscriptFormat.Markdown))
+        assertEquals(TranscriptFormat.Markdown, vm.state.value.exportFormat)
     }
 
     private val pins = InMemoryPinnedSessions()
     private val catalog = FakeCatalog(model)
 
+    @Test
+    fun `export shows real stages until the native file is ready and native failure allows retry`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val responseStarted = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val downloaded = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val prepared = kotlinx.coroutines.CompletableDeferred<Unit>()
+        sessions.exportResult = Result.success(listOf(Message.User("u", 0, "text")))
+        sessions.exportWork = { progress ->
+            progress(SessionExportProgress(SessionExportStage.WaitingForServer))
+            responseStarted.await()
+            progress(SessionExportProgress(SessionExportStage.Downloading, 30, 100))
+            downloaded.await()
+            progress(SessionExportProgress(SessionExportStage.PreparingMessages, 1, 4))
+            prepared.await()
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.ExportSheet(true))
+        vm.onEvent(ChatEvent.Export(save = false))
+        runCurrent()
+        assertEquals(ExportPhase.WaitingForServer, vm.state.value.exportPhase)
+        assertNull(vm.state.value.exportFraction)
+        responseStarted.complete(Unit)
+        runCurrent()
+        assertEquals(ExportPhase.Downloading, vm.state.value.exportPhase)
+        assertEquals(0.3f, vm.state.value.exportFraction)
+        assertTrue(vm.state.value.exportOpen)
+        downloaded.complete(Unit)
+        runCurrent()
+        assertEquals(ExportPhase.PreparingMessages, vm.state.value.exportPhase)
+        assertEquals(0.25f, vm.state.value.exportFraction)
+        prepared.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(ExportPhase.PreparingFile, vm.state.value.exportPhase)
+        assertNull(vm.state.value.exportFraction)
+        vm.onEvent(ChatEvent.ExportFileProgress(1, 2))
+        assertEquals(0.5f, vm.state.value.exportFraction)
+        assertTrue(vm.state.value.exporting)
+        vm.onEvent(ChatEvent.Export(save = false))
+        assertEquals(1, sessions.exports)
+        vm.onEvent(ChatEvent.ExportFailed)
+        assertFalse(vm.state.value.exporting)
+        assertTrue(vm.state.value.exportOpen)
+        vm.onEvent(ChatEvent.Export(save = false))
+        advanceUntilIdle()
+        assertEquals(2, sessions.exports)
+        vm.onEvent(ChatEvent.ExportReady)
+        assertFalse(vm.state.value.exportOpen)
+        assertFalse(vm.state.value.exporting)
+    }
+
     private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel =
         ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = {
             42
-        }, btwMemory = btwMemory)
+        }, btwMemory = btwMemory, exportDispatcher = main.testDispatcher)
 
     @Test
     fun `menu new and fork reuse the existing behavior without consuming the draft`() = runTest(main.testDispatcher) {
@@ -3041,9 +3139,18 @@ private class FakeSessions(
         return createResult
     }
     var exports = 0
+    var jsonExports = 0
+    var exportWork: suspend (suspend (SessionExportProgress) -> Unit) -> Unit = {}
+    var jsonExportResult: Result<String> = Result.failure(OpenCodeError.NotFound("unsupported"))
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<String> {
+        jsonExports++
+        exportWork(onProgress)
+        return jsonExportResult
+    }
     var exportResult: Result<List<Message>> = Result.failure(OpenCodeError.NotFound("unsupported"))
-    override suspend fun export(sessionId: String): Result<List<Message>> {
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<List<Message>> {
         exports++
+        exportWork(onProgress)
         return exportResult
     }
     override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)

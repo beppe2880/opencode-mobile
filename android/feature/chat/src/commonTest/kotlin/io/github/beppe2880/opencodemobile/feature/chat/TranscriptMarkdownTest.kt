@@ -5,12 +5,26 @@ import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Part
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TranscriptMarkdownTest {
+    @Test
+    fun measuredFormatterPreservesContentAndCompletesAllMessages() = runTest {
+        val messages = listOf(Message.User("u", 0, "text"), Message.Synthetic("s", 1))
+        val progress = mutableListOf<Pair<Long, Long>>()
+        assertEquals(transcriptMarkdown("Title", messages), transcriptMarkdown("Title", messages) { done, total -> progress += done to total })
+        assertEquals(0L to 2L, progress.first())
+        assertEquals(2L to 2L, progress.last())
+        assertTrue(progress.zipWithNext().all { (a, b) -> a.first <= b.first })
+        progress.clear()
+        assertEquals("# Empty\n\n", transcriptMarkdown("Empty", emptyList()) { done, total -> progress += done to total })
+        assertEquals(listOf(0L to 0L), progress)
+    }
+
     @Test
     fun preservesMathDelimitersAndLatexExactly() {
         val formulas = listOf(
@@ -115,10 +129,14 @@ class TranscriptMarkdownTest {
 
     @Test
     fun filenamesAreBoundedAndCannotEscapeTheExportDirectory() {
-        assertEquals("OpenCode.md", markdownFileName("..."))
-        assertFalse(markdownFileName("../../a/b\\c").contains('/'))
-        assertTrue(markdownFileName("a".repeat(200)).length <= 83)
-        assertEquals("Conversazione italiana.md", markdownFileName("Conversazione italiana"))
+        for (format in TranscriptFormat.entries) {
+            assertEquals("OpenCode.${format.extension}", transcriptFileName("...", format))
+            assertFalse(transcriptFileName("../../a/b\\c", format).contains('/'))
+            assertTrue(transcriptFileName("a".repeat(200), format).length <= 81 + format.extension.length)
+            assertEquals("Conversazione italiana.${format.extension}", transcriptFileName("Conversazione italiana", format))
+        }
+        assertEquals("text/markdown", TranscriptFormat.Markdown.mimeType)
+        assertEquals("application/json", TranscriptFormat.Json.mimeType)
     }
 
     @Test

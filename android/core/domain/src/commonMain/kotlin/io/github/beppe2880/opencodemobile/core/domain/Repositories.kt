@@ -127,7 +127,11 @@ interface SessionRepository {
     suspend fun fork(sessionId: String, beforeMessageId: String? = null): Result<Session>
 
     /** Complete projected transcript, not just the locally loaded page; no inline images. */
-    suspend fun export(sessionId: String): Result<List<Message>> =
+    suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit = {}): Result<List<Message>> =
+        Result.failure(OpenCodeError.NotFound("Session export is not available"))
+
+    /** Native OpenCode export document (`info` and `messages`), including original metadata. */
+    suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit = {}): Result<String> =
         Result.failure(OpenCodeError.NotFound("Session export is not available"))
 
     suspend fun projects(): Result<List<Project>>
