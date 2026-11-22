@@ -191,7 +191,7 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Terminal -> listOf(
             OptionGroup(null, listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard, SettingOption.TerminalFullscreen)),
         )
-        SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice)))
+        SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)))
     }
 
 /** Every option of this category, in page order. */

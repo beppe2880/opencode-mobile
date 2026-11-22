@@ -76,6 +76,8 @@ data class SettingsState(
     /** Models a provider listed when asked (OpenRouter); shown with the curated ones. */
     val sttListedModels: Map<SttProvider, List<String>> = emptyMap(),
     val sttModelsLoading: Boolean = false,
+    /** "Star on GitHub" was opened in this run of the app: About thanks for it until a restart. */
+    val starred: Boolean = false,
 ) {
     /** Notifications are on and the system lets the app post them. */
     val notificationsOn: Boolean get() = settings.notifications && notificationsAllowed
@@ -100,6 +102,9 @@ sealed interface SettingsEvent {
 
     /** The release history of the app, from About. */
     data object OpenWhatsNew : SettingsEvent
+
+    /** "Star on GitHub" in About: opens the repository of the app. */
+    data object StarOnGitHub : SettingsEvent
 
     /** Opens a category, at [part] of its preview or at [option] (the part of [option] in the Preview style). */
     data class OpenArea(val area: SettingsArea, val part: SettingsPart? = null, val option: SettingOption? = null) : SettingsEvent
@@ -198,6 +203,7 @@ sealed interface SettingsEvent {
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
     data class UpdateNoticeChanged(val style: UpdateNoticeStyle) : SettingsEvent
+    data class WhatsNewButtonChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent
@@ -208,6 +214,7 @@ sealed interface SettingsEffect {
     data object OpenConnect : SettingsEffect
     data object OpenUsage : SettingsEffect
     data object OpenWhatsNew : SettingsEffect
+    data class OpenUrl(val url: String) : SettingsEffect
     data object RequestNotificationPermission : SettingsEffect
     data object OpenNotificationSettings : SettingsEffect
 }

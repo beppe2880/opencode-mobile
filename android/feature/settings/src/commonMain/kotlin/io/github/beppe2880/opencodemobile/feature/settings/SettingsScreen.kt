@@ -26,11 +26,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Science
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -110,6 +112,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.customize.searchOptio
 import io.github.beppe2880.opencodemobile.feature.settings.customize.titleRes
 import io.github.beppe2880.opencodemobile.feature.settings.customize.visibleAreas
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.github_star_button
+import io.github.beppe2880.opencodemobile.feature.settings.resources.github_star_thanks
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_about
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_active
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_add_server
@@ -118,6 +122,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ap
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_areas
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server_hint
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_github_star_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_live_demo_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_paired
@@ -659,6 +664,15 @@ internal fun AboutSection(state: SettingsState, onEvent: (SettingsEvent) -> Unit
                 onClick = { onEvent(SettingsEvent.OpenWhatsNew) },
                 trailing = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = c.iconMuted) },
                 modifier = Modifier.testTag("settings_whats_new_row"),
+            )
+            OcDivider()
+            OcListRow(
+                title = stringResource(Res.string.github_star_button),
+                subtitle = stringResource(if (state.starred) Res.string.github_star_thanks else Res.string.settings_github_star_sub),
+                onClick = { onEvent(SettingsEvent.StarOnGitHub) },
+                leading = { Icon(Icons.Outlined.StarOutline, contentDescription = null, tint = c.textAccent) },
+                trailing = { Icon(Icons.AutoMirrored.Outlined.OpenInNew, contentDescription = null, tint = c.iconMuted, modifier = Modifier.size(18.dp)) },
+                modifier = Modifier.testTag("settings_github_star_row"),
             )
             if (showUpdateNotice) {
                 OcDivider()

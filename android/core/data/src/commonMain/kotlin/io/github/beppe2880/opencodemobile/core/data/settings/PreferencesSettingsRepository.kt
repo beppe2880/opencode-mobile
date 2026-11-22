@@ -128,6 +128,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_UPDATE_NOTICE, next.updateNotice.name)
         // Kept for older versions of the app, which only had the switch.
         prefs.putBoolean(KEY_CHECK_UPDATES, next.updateNotice != UpdateNoticeStyle.Off)
+        prefs.putBoolean(KEY_WHATS_NEW_BUTTON, next.whatsNewButton)
         prefs.putBoolean(KEY_EDIT_MARKS, next.showEditMarks)
         prefs.putString(KEY_SETTINGS_STYLE, next.settingsStyle.name)
         val previewFraction = next.settingsPreviewFraction
@@ -210,6 +211,7 @@ internal class PreferencesSettingsRepository(
             updateNotice = UpdateNoticeStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UPDATE_NOTICE) }
                 // Before the choice there was a switch: off stays off.
                 ?: if (prefs.getBooleanOrNull(KEY_CHECK_UPDATES) == false) UpdateNoticeStyle.Off else defaults.updateNotice,
+            whatsNewButton = prefs.getBoolean(KEY_WHATS_NEW_BUTTON, defaults.whatsNewButton),
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
             unfoldedLayout = UnfoldedLayout.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLDED_LAYOUT) } ?: defaults.unfoldedLayout,
             unfoldOpenChat = UnfoldChat.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLD_OPEN_CHAT) } ?: defaults.unfoldOpenChat,
@@ -300,6 +302,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_UPDATE_NOTICE = "update_notice"
+        const val KEY_WHATS_NEW_BUTTON = "whats_new_button"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         const val KEY_UNFOLDED_LAYOUT = "unfolded_layout"
         const val KEY_UNFOLD_OPEN_CHAT = "unfold_open_chat"

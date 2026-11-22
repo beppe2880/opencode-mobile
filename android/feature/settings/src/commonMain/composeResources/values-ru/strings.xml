@@ -293,6 +293,17 @@
     <string name="whats_new_empty_message">Здесь будут показаны новые версии приложения.</string>
     <string name="whats_new_error">Не удалось загрузить версии</string>
     <string name="whats_new_offline">Не удалось обновить. Показаны версии, сохранённые на этом устройстве.</string>
+    <string name="settings_whats_new_button">Кнопка «Советы &amp; новинки»</string>
+    <string name="settings_whats_new_button_sub">Показывает кнопку над списком сессий после каждого обновления. Её крестик скрывает кнопку до следующего обновления.</string>
+    <string name="github_star_banner_sub">Звезда на GitHub помогает другим людям его найти.</string>
+    <string name="github_star_star">Звезда</string>
+    <string name="github_star_banner_dismiss">Больше не показывать</string>
+    <string name="github_star_title">Нравится приложение?</string>
+    <string name="github_star_body">Оно бесплатное и с открытым исходным кодом. Звезда на GitHub помогает другим людям его найти.</string>
+    <string name="github_star_button">Поставить звезду на GitHub</string>
+    <string name="github_star_thanks">Спасибо за поддержку!</string>
+    <string name="github_star_thanks_body">Так другим людям проще найти приложение.</string>
+    <string name="settings_github_star_sub">Бесплатно и с открытым исходным кодом: звезда помогает другим найти приложение</string>
     <string name="settings_split_view">Чат рядом со списком</string>
     <string name="settings_split_view_sub">На широких экранах показывать открытый чат рядом со списком сессий. Перетащите ручку разделителя, чтобы изменить размер списка.</string>
     <string name="settings_list_width">Ширина списка сессий</string>

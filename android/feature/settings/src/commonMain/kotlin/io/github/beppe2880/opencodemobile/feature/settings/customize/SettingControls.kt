@@ -236,6 +236,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_vo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_provider_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_voice_style_waveform_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_whats_new_button
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_whats_new_button_sub
 import io.github.beppe2880.opencodemobile.feature.settings.update.LocalUpdateCheck
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -306,6 +308,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.NotifyQuestions -> Res.string.settings_notify_questions
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished
         SettingOption.UpdateNotice -> Res.string.settings_update_notice
+        SettingOption.WhatsNewButton -> Res.string.settings_whats_new_button
     }
 
 /** What the option does, for search; the controls may show a variant for the current value. */
@@ -373,6 +376,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.NotifyQuestions -> Res.string.settings_notify_questions_sub
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished_sub
         SettingOption.UpdateNotice -> Res.string.settings_update_notice_window_sub
+        SettingOption.WhatsNewButton -> Res.string.settings_whats_new_button_sub
     }
 
 /** The switch, choice or slider of [option]; [onEvent] receives the same events everywhere in Settings. */
@@ -754,6 +758,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             // Also with Off: that only stops the automatic checks.
             LocalUpdateCheck.current?.invoke()
         }
+        SettingOption.WhatsNewButton -> switch(settings.whatsNewButton, SettingsEvent::WhatsNewButtonChanged)()
     }
 }
 
@@ -770,6 +775,7 @@ private val SettingOption.tag: String
         SettingOption.ToolMediaSize -> "tool_media_size"
         SettingOption.AttachedImageSize -> "attached_image_size"
         SettingOption.ShowCost -> "show_cost"
+        SettingOption.WhatsNewButton -> "whats_new_button"
         SettingOption.PermissionsCollapsed -> "permissions_collapsed"
         SettingOption.QuestionsCollapsed -> "questions_collapsed"
         SettingOption.RunningChips -> "running_chips"

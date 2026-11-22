@@ -637,6 +637,8 @@ data class AppSettings(
      * most once a day, unless [UpdateNoticeStyle.Off].
      */
     val updateNotice: UpdateNoticeStyle = UpdateNoticeStyle.Window,
+    /** The "Tips & new features" button above the session list; off hides it for good. */
+    val whatsNewButton: Boolean = true,
     /** With [listPaneHandle]: Back shows a hidden session list again instead of leaving the app. */
     val backShowsList: Boolean = true,
     /** With [splitView]: whether wide windows put the list beside the chat or in a panel over it. */

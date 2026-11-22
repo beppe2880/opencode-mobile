@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.data.session.PreferencesPinnedSes
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.data.settings.PreferencesSettingsRepository
 import io.github.beppe2880.opencodemobile.core.data.share.StoredShareRepository
+import io.github.beppe2880.opencodemobile.core.data.star.PreferencesGitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.data.stt.CloudSpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.data.stt.appLanguage
 import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepository
@@ -35,6 +36,7 @@ import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FileRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
@@ -132,4 +134,5 @@ val dataModule = module {
         val releases = GitHubReleases()
         GitHubWhatsNewRepository(releases::history, get(SettingsStore))
     }
+    single<GitHubStarRepository> { PreferencesGitHubStarRepository(get(SettingsStore)) }
 }

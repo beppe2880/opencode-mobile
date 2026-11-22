@@ -64,6 +64,18 @@ class WhatsNewTest {
     }
 
     @Test
+    fun aHiddenButtonComesBackAfterAnUpdate() {
+        val hidden = WhatsNewHistory(releases = listOf(release("1.1.0")), hiddenVersion = "1.1.0", hiddenInstalledVersion = "1.0.0")
+        assertFalse(hidden.buttonVisible("1.0.0"))
+        assertTrue(hidden.buttonVisible("1.1.0"))
+        // Hidden by a version that did not keep the installed one: the newest release then stands in.
+        val older = WhatsNewHistory(releases = listOf(release("1.1.0")), hiddenVersion = "1.1.0")
+        assertFalse(older.buttonVisible("1.1.0"))
+        assertTrue(older.buttonVisible("1.2.0"))
+        assertFalse(older.buttonVisible("dev"))
+    }
+
+    @Test
     fun theHistoryDecidesFromItsReleases() {
         val history = WhatsNewHistory(releases = listOf(release("1.1.0"), release("1.0.0")), seenVersion = "1.0.0", hiddenVersion = "1.0.0")
         assertEquals("1.1.0", history.latestVersion)

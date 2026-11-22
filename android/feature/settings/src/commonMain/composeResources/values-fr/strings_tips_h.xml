@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_h_star_title">Mettez une étoile à l'application sur GitHub</string>
+    <string name="tips_h_star_body">L'application est gratuite et open source, et une étoile sur GitHub aide d'autres personnes à la trouver. Juste après une mise à jour, ou après l'avoir utilisée un moment, une bannière au-dessus des sessions le propose une seule fois. Appuyez dessus pour ouvrir GitHub, puis fermez-la avec sa croix : elle ne reviendra pas. Vous trouverez aussi Mettre une étoile sur GitHub ici et dans Paramètres → À propos.</string>
+    <string name="tips_h_star_demo">Une bannière au-dessus des sessions invite à mettre une étoile à l'application sur GitHub ; un appui ouvre GitHub, et la bannière remercie jusqu'à ce que vous la fermiez avec sa croix.</string>
+</resources>

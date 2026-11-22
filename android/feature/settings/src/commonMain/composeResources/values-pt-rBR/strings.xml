@@ -287,6 +287,17 @@
     <string name="whats_new_empty_message">As novas versões do app aparecerão aqui.</string>
     <string name="whats_new_error">Não foi possível carregar as versões</string>
     <string name="whats_new_offline">Não foi possível atualizar. Mostrando as versões salvas neste dispositivo.</string>
+    <string name="settings_whats_new_button">Botão Dicas &amp; novidades</string>
+    <string name="settings_whats_new_button_sub">Mostra o botão acima da lista de sessões após cada atualização. O seu X o oculta até a próxima atualização.</string>
+    <string name="github_star_banner_sub">Uma estrela no GitHub ajuda outras pessoas a encontrá-lo.</string>
+    <string name="github_star_star">Estrela</string>
+    <string name="github_star_banner_dismiss">Não mostrar novamente</string>
+    <string name="github_star_title">Gostando do app?</string>
+    <string name="github_star_body">É gratuito e de código aberto. Uma estrela no GitHub ajuda outras pessoas a encontrá-lo.</string>
+    <string name="github_star_button">Dar estrela no GitHub</string>
+    <string name="github_star_thanks">Obrigado pelo seu apoio!</string>
+    <string name="github_star_thanks_body">Isso ajuda outras pessoas a encontrar o app.</string>
+    <string name="settings_github_star_sub">Gratuito e de código aberto: uma estrela ajuda outras pessoas a encontrar o app</string>
     <string name="settings_split_view">Chat ao lado da lista</string>
     <string name="settings_split_view_sub">Em telas largas, mostrar o chat aberto ao lado da lista de sessões. Arraste a alça do divisor para redimensionar a lista.</string>
     <string name="settings_list_width">Largura da lista de sessões</string>

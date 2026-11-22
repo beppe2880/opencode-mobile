@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -72,6 +73,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_show_c
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_show_list
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_version
 import io.github.beppe2880.opencodemobile.feature.settings.resources.whats_new_title
+import io.github.beppe2880.opencodemobile.feature.settings.star.GitHubStarCardRoute
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -134,9 +136,15 @@ fun TipsRoute(
                 ),
                 verticalArrangement = Arrangement.spacedBy(OcSpacing.xl),
             ) {
-                items(versions, key = { it.first }) { (version, cards) ->
-                    VersionSection(version, cards, versionStatus(version, installed), tipsLayout, onOpenVersion = { onOpenVersion(version) }, onOpenFeature)
+                val section: LazyListScope.(List<Pair<String, List<FeatureCard>>>) -> Unit = { list ->
+                    items(list, key = { it.first }) { (version, cards) ->
+                        VersionSection(version, cards, versionStatus(version, installed), tipsLayout, onOpenVersion = { onOpenVersion(version) }, onOpenFeature)
+                    }
                 }
+                // After the newest features, where people who like what changed already are.
+                section(versions.take(1))
+                item(key = "github_star") { GitHubStarCardRoute() }
+                section(versions.drop(1))
             }
         }
     }
