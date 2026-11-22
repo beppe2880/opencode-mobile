@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Pregunta sobre una parte de una respuesta</string>
+    <string name="tips_c_ask_body">Selecciona un texto de una respuesta y toca Preguntar: se añade al cuadro de mensaje como cita, lista para tu pregunta. Vuelve a tocar Preguntar para citar más de una parte. Solo en Android.</string>
+    <string name="tips_c_ask_demo">Una frase de la respuesta se mantiene pulsada y se selecciona, se toca Preguntar en el menú y la frase aparece como cita en el cuadro de mensaje; debajo se escribe una pregunta y se envía, con la cita atenuada en la burbuja.</string>
     <string name="tips_c_voice_background_title">Sigue grabando en segundo plano</string>
     <string name="tips_c_voice_background_body">Un mensaje de voz grabado con un modelo en la nube sigue grabándose cuando cambias a otra app o bloqueas el teléfono. En Android, Detener en la notificación lo termina; el texto te espera en el cuadro de mensaje al volver.</string>
     <string name="tips_c_voice_background_demo">Una grabación se ejecuta en el cuadro de mensaje, luego la pantalla de inicio muestra una notificación que cuenta el tiempo. Un dedo toca Detener y, de vuelta en la app, la frase dictada está en el cuadro de mensaje.</string>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">回答の一部について質問する</string>
+    <string name="tips_c_ask_body">回答の文章を選択して「質問」をタップすると、引用として入力欄に入ります。そのまま質問を入力できます。「質問」をもう一度タップすると、複数の部分を引用できます。Androidのみ。</string>
+    <string name="tips_c_ask_demo">回答の一文を長押しして選択し、メニューの「質問」をタップすると、その文が入力欄に引用として表示されます。その下に質問を入力して送信すると、引用は吹き出し内で薄く表示されます。</string>
     <string name="tips_c_voice_background_title">バックグラウンドでも録音を続ける</string>
     <string name="tips_c_voice_background_body">クラウドモデルで録音したボイスメッセージは、別のアプリに切り替えたり端末をロックしたりしても録音が続きます。Android では通知の「停止」で終了し、戻るとテキストがメッセージ欄に入っています。</string>
     <string name="tips_c_voice_background_demo">録音はメッセージ欄で行われ、ホーム画面には経過時間を示す通知が表示されます。指が「停止」をタップすると、アプリに戻ったときに話した文がメッセージ欄に入っています。</string>

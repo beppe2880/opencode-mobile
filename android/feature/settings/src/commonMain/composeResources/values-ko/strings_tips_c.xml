@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">답변의 일부에 대해 질문하기</string>
+    <string name="tips_c_ask_body">답변의 텍스트를 선택한 뒤 질문을 누르면 인용으로 메시지 상자에 들어가, 질문할 준비가 됩니다. 질문을 다시 누르면 여러 부분을 인용할 수 있습니다. Android에서만 가능합니다.</string>
+    <string name="tips_c_ask_demo">답변의 문장 하나를 길게 눌러 선택하고 메뉴에서 질문을 누르면, 그 문장이 인용으로 메시지 상자에 나타납니다. 그 아래 질문을 입력해 보내면 인용이 말풍선에서 흐리게 표시됩니다.</string>
     <string name="tips_c_voice_background_title">백그라운드에서도 계속 녹음</string>
     <string name="tips_c_voice_background_body">클라우드 모델로 녹음한 음성 메시지는 다른 앱으로 전환하거나 휴대폰을 잠가도 계속 녹음됩니다. Android에서는 알림의 중지를 누르면 끝나며, 돌아오면 텍스트가 메시지 상자에 기다리고 있습니다.</string>
     <string name="tips_c_voice_background_demo">녹음은 메시지 상자에서 진행되고, 홈 화면에는 시간을 세는 알림이 표시됩니다. 손가락이 중지를 누르면, 앱으로 돌아왔을 때 말한 문장이 메시지 상자에 있습니다.</string>

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.CloudQueue
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.FormatQuote
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
@@ -14,6 +15,9 @@ import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_ask_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_ask_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_ask_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_title
@@ -57,6 +61,17 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
 internal val tipsCardsC: List<FeatureCard> = listOf(
+    FeatureCard(
+        id = "chat-ask-selection",
+        version = "0.18.0",
+        icon = Icons.Outlined.FormatQuote,
+        title = Res.string.tips_c_ask_title,
+        body = Res.string.tips_c_ask_body,
+        demoDescription = Res.string.tips_c_ask_demo,
+        author = "beppe2880",
+        pullRequest = 240,
+        demo = { AskSelectionDemo(it) },
+    ),
     FeatureCard(
         id = "chat-side-question",
         version = "0.18.0",
