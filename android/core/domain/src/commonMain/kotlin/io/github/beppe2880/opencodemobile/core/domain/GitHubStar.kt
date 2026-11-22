@@ -48,7 +48,8 @@ interface GitHubStarRepository {
 
     /**
      * The session list was opened: counts today as a day of use and, when the banner is due
-     * ([GitHubStarPrompt.bannerDue]), shows it for this run of the app and never again.
+     * ([GitHubStarPrompt.bannerDue]), shows it for this run of the app and never again. After an
+     * update from a version without the invitation it is due at once.
      */
     suspend fun recordUse()
 

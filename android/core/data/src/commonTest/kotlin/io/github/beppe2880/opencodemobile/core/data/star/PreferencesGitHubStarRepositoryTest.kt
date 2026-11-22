@@ -35,6 +35,31 @@ class PreferencesGitHubStarRepositoryTest {
     }
 
     @Test
+    fun anUpdateFromAVersionWithoutTheInvitationShowsTheBannerAtOnce() = runTest {
+        prefs.putString("theme", "Dark")
+        val repo = repository()
+        repo.recordUse()
+        assertTrue(repo.state.value.bannerVisible)
+        now += DAY_MS
+        val nextRun = repository()
+        nextRun.recordUse()
+        assertFalse(nextRun.state.value.bannerVisible)
+    }
+
+    @Test
+    fun aNewInstallWaitsEvenWhenItWritesSettingsLater() = runTest {
+        val repo = repository()
+        prefs.putString("theme", "Dark")
+        repo.recordUse()
+        assertFalse(repo.state.value.bannerVisible)
+        now += DAY_MS
+        repository().apply {
+            recordUse()
+            assertFalse(state.value.bannerVisible)
+        }
+    }
+
+    @Test
     fun openingTheAppManyTimesOnOneDayCountsOneDay() = runTest {
         val repo = repository()
         repeat(10) { repo.recordUse() }

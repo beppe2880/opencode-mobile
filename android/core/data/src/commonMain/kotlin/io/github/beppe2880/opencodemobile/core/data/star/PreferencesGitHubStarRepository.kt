@@ -25,6 +25,12 @@ internal class PreferencesGitHubStarRepository(
 
     private val mutex = Mutex()
 
+    /**
+     * Other preferences were there before the invitation looked at them: the app was used with a
+     * version without it. Read once, before anything in this run writes its own keys.
+     */
+    private val usedBefore = prefs.keys.any { !it.startsWith(KEY_PREFIX) }
+
     private val current = MutableStateFlow(GitHubStarState(choice = storedChoice()))
 
     override val state: StateFlow<GitHubStarState> = current.asStateFlow()
@@ -32,7 +38,7 @@ internal class PreferencesGitHubStarRepository(
     override suspend fun recordUse() {
         mutex.withLock {
             val today = now() / DAY_MS
-            val firstDay = prefs.getLongOrNull(KEY_FIRST_DAY) ?: today.also { prefs.putLong(KEY_FIRST_DAY, it) }
+            val firstDay = prefs.getLongOrNull(KEY_FIRST_DAY) ?: firstUse(today)
             var daysUsed = prefs.getInt(KEY_DAYS_USED, 0)
             if (prefs.getLongOrNull(KEY_LAST_DAY) != today) {
                 daysUsed++
@@ -57,6 +63,17 @@ internal class PreferencesGitHubStarRepository(
         }
     }
 
+    /**
+     * Today, for a new install. Someone updating from a version without the invitation has used
+     * the app for a while already: counted as due, so the banner shows at once.
+     */
+    private fun firstUse(today: Long): Long {
+        val first = if (usedBefore) today - GitHubStarPrompt.DAYS_SINCE_FIRST_USE else today
+        if (usedBefore) prefs.putInt(KEY_DAYS_USED, GitHubStarPrompt.DAYS_USED - 1)
+        prefs.putLong(KEY_FIRST_DAY, first)
+        return first
+    }
+
     private fun save(choice: GitHubStarChoice) {
         prefs.putString(KEY_CHOICE, choice.name)
         current.value = GitHubStarState(choice = choice, bannerVisible = false)
@@ -67,6 +84,7 @@ internal class PreferencesGitHubStarRepository(
 
     internal companion object {
         const val DAY_MS = 24L * 60 * 60 * 1000
+        const val KEY_PREFIX = "github_star_"
         const val KEY_CHOICE = "github_star_choice"
         const val KEY_FIRST_DAY = "github_star_first_day"
         const val KEY_LAST_DAY = "github_star_last_day"
