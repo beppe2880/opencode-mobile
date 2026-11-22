@@ -73,7 +73,7 @@ internal val tipsCardsC: List<FeatureCard> = listOf(
         body = Res.string.tips_export_body,
         demoDescription = Res.string.tips_export_demo,
         author = "Andrease11",
-        pullRequest = null, // Fill when the export PR is opened.
+        pullRequest = 260,
         demo = { TranscriptExportDemo(it) },
     ),
     FeatureCard(
