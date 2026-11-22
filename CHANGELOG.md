@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.18.0](https://github.com/beppe2880/opencode-mobile/compare/v0.17.0...v0.18.0) (2026-11-22)
+
+
+### Features
+
+* **chat:** Add one-shot /btw side questions ([#235](https://github.com/beppe2880/opencode-mobile/issues/235)) ([e1034d5](https://github.com/beppe2880/opencode-mobile/commit/e1034d5eb3f915ad33ea4389e1dea13146d1a977))
+* **chat:** Ask about a selected part of an answer ([#240](https://github.com/beppe2880/opencode-mobile/issues/240)) ([48867fe](https://github.com/beppe2880/opencode-mobile/commit/48867feec27056617ede28a44bb5c5bb6421a947))
+* **chat:** Keep voice recording when the app goes to the background ([#245](https://github.com/beppe2880/opencode-mobile/issues/245)) ([4c10377](https://github.com/beppe2880/opencode-mobile/commit/4c10377ab2a21eab02d33cbb4487adf5885c940a))
+* **chat:** Organize existing actions in the chat menu ([#243](https://github.com/beppe2880/opencode-mobile/issues/243)) ([b63c626](https://github.com/beppe2880/opencode-mobile/commit/b63c626b386d10b7551f5e3818c8dfbb1b421378))
+* **sessions:** Add session filters and archive ([#247](https://github.com/beppe2880/opencode-mobile/issues/247)) ([45e70d7](https://github.com/beppe2880/opencode-mobile/commit/45e70d7f2b54ec8af8f8f3b27ed83f34ec6d7b64))
+* **sessions:** Group unread sessions above the date groups ([#251](https://github.com/beppe2880/opencode-mobile/issues/251)) ([addceca](https://github.com/beppe2880/opencode-mobile/commit/addcecab40bd035ddb2b49ff5838d6220f5b3655))
+* **sessions:** Setting for unread sessions and Mark all as read ([#253](https://github.com/beppe2880/opencode-mobile/issues/253)) ([3177d00](https://github.com/beppe2880/opencode-mobile/commit/3177d001b6831b827eca554272855afc0c259155))
+* **sessions:** Track unread sessions ([#248](https://github.com/beppe2880/opencode-mobile/issues/248)) ([e223262](https://github.com/beppe2880/opencode-mobile/commit/e223262f2c1934b5896c49c4e03b110c62550aa8))
+* **settings:** Invite people to star the app on GitHub ([#256](https://github.com/beppe2880/opencode-mobile/issues/256)) ([1de9615](https://github.com/beppe2880/opencode-mobile/commit/1de96156349f4cfc2ad12f38425743a57efec078))
+
+
+### Bug fixes
+
+* **chat:** Read tool arguments without a regex so long ones no longer crash iOS ([#258](https://github.com/beppe2880/opencode-mobile/issues/258)) ([d33763d](https://github.com/beppe2880/opencode-mobile/commit/d33763d1d3198197ab49d95fd87d01cf4dd023d6))
+* **ui:** Keep terminal scrolling after text selection ([#226](https://github.com/beppe2880/opencode-mobile/issues/226)) ([1f99dc6](https://github.com/beppe2880/opencode-mobile/commit/1f99dc66abb3581a69491050f9d7c604aa9b10cb))
+
+
+### Documentation
+
+* **settings:** Add the Ask about part of an answer card to Tips & new features ([#259](https://github.com/beppe2880/opencode-mobile/issues/259)) ([070307c](https://github.com/beppe2880/opencode-mobile/commit/070307c329e65f3a6ead5918072e454f3702d2a6))
+
 ## [0.17.0](https://github.com/beppe2880/opencode-mobile/compare/v0.16.0...v0.17.0) (2026-11-17)
 
 
