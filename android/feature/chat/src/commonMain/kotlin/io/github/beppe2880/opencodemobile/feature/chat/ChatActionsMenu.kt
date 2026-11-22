@@ -78,9 +78,6 @@ internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () 
             stringResource(if (state.pinned) Res.string.chat_unpin else Res.string.chat_pin),
             Icons.Outlined.PushPin, "chat_menu_pin", state.directory.isNotBlank(),
         ) { act(ChatEvent.SetPinned(!state.pinned)) }
-        MenuAction(stringResource(Res.string.chat_export), Icons.Outlined.Share, "chat_menu_export", ready, state.exporting) {
-            act(ChatEvent.ExportSheet(true))
-        }
         MenuGroup(stringResource(Res.string.chat_menu_history))
         MenuAction(
             stringResource(if (state.compacting) Res.string.chat_compacting else Res.string.chat_compact),
@@ -94,6 +91,9 @@ internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () 
             MenuAction(stringResource(Res.string.chat_redo), Icons.AutoMirrored.Outlined.Redo, "chat_menu_redo", history) {
                 act(ChatEvent.RestoreRevert)
             }
+        }
+        MenuAction(stringResource(Res.string.chat_export), Icons.Outlined.Share, "chat_menu_export", ready, state.exporting) {
+            act(ChatEvent.ExportSheet(true))
         }
         MenuGroup(stringResource(Res.string.chat_menu_tools))
         MenuAction(stringResource(UiRes.string.oc_running), Icons.Outlined.PlayCircleOutline, "chat_running_menu_item", ready) {

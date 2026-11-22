@@ -18,7 +18,6 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export
-import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_hint
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_save
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_share
 import org.jetbrains.compose.resources.stringResource
@@ -28,10 +27,6 @@ internal fun ChatExportSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
     if (state.exportOpen) OcBottomSheet(onDismiss = { onEvent(ChatEvent.ExportSheet(false)) }, testTag = "chat_export_sheet") {
         Column(Modifier.padding(OcSpacing.lg)) {
             Text(stringResource(Res.string.chat_export), style = MaterialTheme.typography.titleMedium, color = OcTheme.colors.textBase)
-            Text(
-                stringResource(Res.string.chat_export_hint), style = MaterialTheme.typography.bodySmall, color = OcTheme.colors.textMuted,
-                modifier = Modifier.padding(vertical = OcSpacing.md),
-            )
             if (state.exporting) OcSpinner() else {
                 OcListRow(
                     title = stringResource(Res.string.chat_export_share),
