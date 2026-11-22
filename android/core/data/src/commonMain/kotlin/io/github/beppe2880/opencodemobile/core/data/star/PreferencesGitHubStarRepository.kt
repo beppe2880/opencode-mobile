@@ -54,7 +54,10 @@ internal class PreferencesGitHubStarRepository(
     }
 
     override suspend fun starred() {
-        mutex.withLock { save(GitHubStarChoice.Starred) }
+        mutex.withLock {
+            save(GitHubStarChoice.Starred)
+            current.update { it.copy(thanked = true) }
+        }
     }
 
     override suspend fun dismissBanner() {
@@ -74,9 +77,10 @@ internal class PreferencesGitHubStarRepository(
         return first
     }
 
+    /** A star leaves the banner up, thanking, until its X; closing it hides it. */
     private fun save(choice: GitHubStarChoice) {
         prefs.putString(KEY_CHOICE, choice.name)
-        current.value = GitHubStarState(choice = choice, bannerVisible = false)
+        current.update { it.copy(choice = choice, bannerVisible = it.bannerVisible && choice == GitHubStarChoice.Starred) }
     }
 
     private fun storedChoice(): GitHubStarChoice =

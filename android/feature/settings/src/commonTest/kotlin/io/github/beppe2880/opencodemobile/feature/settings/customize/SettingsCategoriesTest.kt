@@ -80,7 +80,7 @@ class SettingsCategoriesTest {
         )
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)
         assertEquals(listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.ConfirmStop), SettingsArea.Sessions.options)
-        assertEquals(listOf(SettingOption.UpdateNotice), SettingsArea.Updates.options)
+        assertEquals(listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton), SettingsArea.Updates.options)
         assertTrue(SettingsArea.Servers.groups.isEmpty() && SettingsArea.About.groups.isEmpty())
     }
 

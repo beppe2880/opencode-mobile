@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_h_star_title">GitHub에서 앱에 별표를 눌러 주세요</string>
-    <string name="tips_h_star_body">이 앱은 무료이며 오픈 소스입니다. GitHub에서 별표를 누르면 다른 사람들이 앱을 찾는 데 도움이 됩니다. 일정 기간 사용하면 세션 위의 배너가 한 번 물어봅니다. 닫으면 다시 표시되지 않습니다. 여기와 설정 → 정보에서도 GitHub에서 별표 누르기를 찾을 수 있습니다.</string>
-    <string name="tips_h_star_demo">세션 위의 배너가 GitHub에서 앱에 별표를 눌러 달라고 안내합니다. 누르면 GitHub가 열리고 배너가 사라집니다.</string>
+    <string name="tips_h_star_body">이 앱은 무료이며 오픈 소스입니다. GitHub에서 별표를 누르면 다른 사람들이 앱을 찾는 데 도움이 됩니다. 업데이트 직후나 일정 기간 사용한 뒤, 세션 위의 배너가 한 번 물어봅니다. 누르면 GitHub가 열리고, X로 닫으면 다시 나타나지 않습니다. 여기와 설정 → 정보에서도 GitHub에서 별표 누르기를 찾을 수 있습니다.</string>
+    <string name="tips_h_star_demo">세션 위의 배너가 GitHub에서 앱에 별표를 눌러 달라고 안내합니다. 누르면 GitHub가 열리고, X로 닫을 때까지 배너가 감사 인사를 표시합니다.</string>
 </resources>

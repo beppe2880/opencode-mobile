@@ -140,7 +140,7 @@ val fakeDataModule = module {
             override suspend fun refreshIfDue() = Unit
             override suspend fun markSeen() = Unit
             override suspend fun hide(installedVersion: String) {
-                state.value = state.value.copy(hiddenVersion = installedVersion)
+                state.value = state.value.copy(hiddenVersion = installedVersion, hiddenInstalledVersion = installedVersion)
             }
         }
     }

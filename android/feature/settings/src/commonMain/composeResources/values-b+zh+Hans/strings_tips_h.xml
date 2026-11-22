@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_h_star_title">在 GitHub 上为应用点星</string>
-    <string name="tips_h_star_body">这个应用免费且开源，在 GitHub 上点星能帮助更多人找到它。使用一段时间后，会话上方会出现一次提示横幅。关闭它后将永久隐藏。你也可以在此处以及 设置 → 关于 中找到“在 GitHub 上点星”。</string>
-    <string name="tips_h_star_demo">会话上方的横幅邀请你在 GitHub 上为应用点星；点按后会打开 GitHub，横幅随即消失。</string>
+    <string name="tips_h_star_body">这个应用免费且开源，在 GitHub 上点星能帮助更多人找到它。更新后或使用一段时间后，会话上方会出现一次提示横幅。点按即可打开 GitHub，然后用它的 X 关闭，它就不会再出现。你也可以在此处以及 设置 → 关于 中找到“在 GitHub 上点星”。</string>
+    <string name="tips_h_star_demo">会话上方的横幅邀请你在 GitHub 上为应用点星；点按后会打开 GitHub，横幅会表示感谢，直到你用 X 将其关闭。</string>
 </resources>

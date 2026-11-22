@@ -82,6 +82,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     NotifyQuestions(listOf("notifyQuestions"), requires = Notifications),
     NotifyFinished(listOf("notifyFinished"), requires = Notifications),
     UpdateNotice(listOf("updateNotice")),
+    WhatsNewButton(listOf("whatsNewButton")),
     ;
 
     /** The first part of its [area] that offers this option: where the Preview style opens it. */
@@ -149,7 +150,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.PermissionNotification -> listOf(SettingOption.NotifyPermissions)
         SettingsPart.QuestionNotification -> listOf(SettingOption.NotifyQuestions)
         SettingsPart.FinishedNotification -> listOf(SettingOption.NotifyFinished)
-        SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice)
+        SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)
     }
 
 /** The microphone and what turns the voice into text, in the order Settings lists them. */
@@ -217,6 +218,7 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.UnreadSessions -> listOf("unread", "read", "dot", "group", "viewed")
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
+        SettingOption.WhatsNewButton -> listOf("tips", "whats new", "features", "changelog", "button")
         else -> emptyList()
     }
 

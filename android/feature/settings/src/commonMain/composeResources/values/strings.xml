@@ -287,12 +287,15 @@
     <string name="whats_new_empty_message">New versions of the app will be listed here.</string>
     <string name="whats_new_error">Could not load the releases</string>
     <string name="whats_new_offline">Couldn't refresh. Showing the releases saved on this device.</string>
-    <string name="github_star_banner">Enjoying the app? Leave a star on GitHub</string>
+    <string name="settings_whats_new_button">Tips &amp; new features button</string>
+    <string name="settings_whats_new_button_sub">Show the button above the session list after every update. Its X hides it until the next update.</string>
+    <string name="github_star_banner_sub">A star on GitHub helps other people find it.</string>
+    <string name="github_star_star">Star</string>
     <string name="github_star_banner_dismiss">Don't show again</string>
     <string name="github_star_title">Enjoying the app?</string>
     <string name="github_star_body">It's free and open source. A star on GitHub helps other people find it.</string>
     <string name="github_star_button">Star on GitHub</string>
-    <string name="github_star_thanks">Thanks for the star!</string>
+    <string name="github_star_thanks">Thanks for your support!</string>
     <string name="github_star_thanks_body">It helps other people find the app.</string>
     <string name="settings_github_star_sub">Free and open source: a star helps other people find the app</string>
     <string name="settings_split_view">Chat beside the list</string>

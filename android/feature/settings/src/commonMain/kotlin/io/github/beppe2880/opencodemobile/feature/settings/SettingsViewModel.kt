@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.feature.settings
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.APP_REPOSITORY_URL
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
-import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
@@ -45,7 +44,7 @@ class SettingsViewModel(
         viewModelScope.launch { servers.servers.collect { list -> updateState { it.copy(servers = list) } } }
         viewModelScope.launch { settings.settings.collect { s -> updateState { it.copy(settings = s) } } }
         viewModelScope.launch { stt.savedKeys.collect { keys -> updateState { it.copy(sttKeys = keys) } } }
-        viewModelScope.launch { star.state.collect { s -> updateState { it.copy(starred = s.choice == GitHubStarChoice.Starred) } } }
+        viewModelScope.launch { star.state.collect { s -> updateState { it.copy(starred = s.thanked) } } }
         viewModelScope.launch {
             servers.activeServer.distinctUntilChangedBy { it?.id }.collect { active ->
                 updateState { it.copy(activeServerId = active?.id) }

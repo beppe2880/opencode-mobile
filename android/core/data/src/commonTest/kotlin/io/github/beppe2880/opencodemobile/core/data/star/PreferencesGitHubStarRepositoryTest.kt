@@ -84,14 +84,21 @@ class PreferencesGitHubStarRepositoryTest {
     }
 
     @Test
-    fun starringHidesTheBannerAndIsKept() = runTest {
+    fun starringKeepsTheBannerUntilItsCloseAndIsKept() = runTest {
         val repo = repository()
         repo.useOn(4)
         now += 4 * DAY_MS
         repo.recordUse()
         repo.starred()
+        assertTrue(repo.state.value.bannerVisible)
+        repo.dismissBanner()
         assertFalse(repo.state.value.bannerVisible)
-        assertEquals(GitHubStarChoice.Starred, repository().state.value.choice)
+        assertEquals(GitHubStarChoice.Starred, repo.state.value.choice)
+        assertTrue(repo.state.value.thanked)
+        // After a restart the choice is kept, the thank you is not.
+        val restarted = repository()
+        assertEquals(GitHubStarChoice.Starred, restarted.state.value.choice)
+        assertFalse(restarted.state.value.thanked)
     }
 
     @Test

@@ -118,6 +118,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.CloseModelPickerOnSelectChanged(false))
         vm.onEvent(SettingsEvent.NewChatModelChanged(NewChatModel.ServerDefault))
         vm.onEvent(SettingsEvent.UpdateNoticeChanged(UpdateNoticeStyle.Banner))
+        vm.onEvent(SettingsEvent.WhatsNewButtonChanged(false))
         vm.onEvent(SettingsEvent.ShowInShareMenuChanged(false))
         vm.onEvent(SettingsEvent.ShareOpensChanged(ShareOpens.ChooseChat))
         vm.onEvent(SettingsEvent.BackShowsListChanged(false))
@@ -174,6 +175,7 @@ class SettingsViewModelTest {
                 questionsCollapsed = true,
                 permissionsCollapsed = true,
                 updateNotice = UpdateNoticeStyle.Banner,
+                whatsNewButton = false,
                 backShowsList = false,
                 unfoldedLayout = UnfoldedLayout.ListPanel,
                 unfoldOpenChat = UnfoldChat.FullScreen,
@@ -553,10 +555,11 @@ internal class FakeGitHubStar : GitHubStarRepository {
         uses++
     }
     override suspend fun starred() {
-        state.value = GitHubStarState(GitHubStarChoice.Starred)
+        state.value = state.value.copy(choice = GitHubStarChoice.Starred, thanked = true)
     }
     override suspend fun dismissBanner() {
-        state.value = GitHubStarState(GitHubStarChoice.Dismissed)
+        val choice = state.value.choice.takeIf { it == GitHubStarChoice.Starred } ?: GitHubStarChoice.Dismissed
+        state.value = state.value.copy(choice = choice, bannerVisible = false)
     }
 }
 

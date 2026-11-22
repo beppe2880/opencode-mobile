@@ -21,6 +21,11 @@ data class GitHubStarState(
     val choice: GitHubStarChoice = GitHubStarChoice.None,
     /** The banner above the sessions is shown in this run of the app: its only one. */
     val bannerVisible: Boolean = false,
+    /**
+     * "Star on GitHub" was tapped in this run of the app: the invitation thanks until the app
+     * restarts, then asks again in Tips & new features and Settings (never with the banner).
+     */
+    val thanked: Boolean = false,
 )
 
 /** When the banner asks for a star: once, after the app has been used for a while. */
@@ -53,9 +58,9 @@ interface GitHubStarRepository {
      */
     suspend fun recordUse()
 
-    /** The repository was opened to leave a star; hides the banner. */
+    /** The repository was opened to leave a star; the banner stays, thanking ([GitHubStarState.thanked]), until its X. */
     suspend fun starred()
 
-    /** The banner was closed: it never comes back. Ignored once a star was left. */
+    /** The banner was closed: it never comes back. A star left before stays the answer. */
     suspend fun dismissBanner()
 }

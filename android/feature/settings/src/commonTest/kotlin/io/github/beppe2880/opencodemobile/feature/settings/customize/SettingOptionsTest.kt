@@ -54,7 +54,7 @@ class SettingOptionsTest {
         assertEquals(SettingsPart.VoiceInput, SettingOption.Dictation.part)
         assertEquals(SettingsPart.VoiceInput, SettingOption.VoiceKey.part)
         assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines), SettingsPart.LiveShell.options)
-        assertEquals(listOf(SettingOption.UpdateNotice), SettingsPart.UpdateNotice.options)
+        assertEquals(listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton), SettingsPart.UpdateNotice.options)
         assertTrue(SettingsPart.Activity.options.containsAll(SettingsPart.Thoughts.options + SettingsPart.Tools.options))
         // The images read by the agent show under the tool rows, grouped or not.
         assertEquals(

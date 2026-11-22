@@ -284,12 +284,15 @@
     <string name="whats_new_empty_message">应用的新版本将显示在这里。</string>
     <string name="whats_new_error">无法加载版本</string>
     <string name="whats_new_offline">无法刷新。正在显示此设备上保存的版本。</string>
-    <string name="github_star_banner">喜欢这个应用吗？在 GitHub 上给它点个星</string>
+    <string name="settings_whats_new_button">“使用技巧与新功能”按钮</string>
+    <string name="settings_whats_new_button_sub">每次更新后在会话列表上方显示该按钮。点击其 X 可隐藏它，直到下次更新。</string>
+    <string name="github_star_banner_sub">在 GitHub 上点星能帮助更多人找到它。</string>
+    <string name="github_star_star">点星</string>
     <string name="github_star_banner_dismiss">不再显示</string>
     <string name="github_star_title">喜欢这个应用吗？</string>
     <string name="github_star_body">它免费且开源。在 GitHub 上点星，能帮助更多人找到它。</string>
     <string name="github_star_button">在 GitHub 上点星</string>
-    <string name="github_star_thanks">感谢你的星标！</string>
+    <string name="github_star_thanks">感谢你的支持！</string>
     <string name="github_star_thanks_body">这能帮助更多人找到这个应用。</string>
     <string name="settings_github_star_sub">免费且开源：点星能帮助更多人找到这个应用</string>
     <string name="settings_split_view">聊天与列表并排</string>

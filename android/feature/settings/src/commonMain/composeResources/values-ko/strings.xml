@@ -284,12 +284,15 @@
     <string name="whats_new_empty_message">앱의 새 버전이 여기에 표시됩니다.</string>
     <string name="whats_new_error">릴리스를 불러올 수 없습니다</string>
     <string name="whats_new_offline">새로고침할 수 없습니다. 이 기기에 저장된 릴리스를 표시합니다.</string>
-    <string name="github_star_banner">앱이 마음에 드시나요? GitHub에서 별표를 눌러 주세요</string>
+    <string name="settings_whats_new_button">팁 및 새 기능 버튼</string>
+    <string name="settings_whats_new_button_sub">업데이트할 때마다 세션 목록 위에 이 버튼을 표시합니다. X를 누르면 다음 업데이트 전까지 숨겨집니다.</string>
+    <string name="github_star_banner_sub">GitHub에서 별표를 누르면 다른 사람들이 앱을 찾는 데 도움이 됩니다.</string>
+    <string name="github_star_star">별표</string>
     <string name="github_star_banner_dismiss">다시 표시하지 않기</string>
     <string name="github_star_title">앱이 마음에 드시나요?</string>
     <string name="github_star_body">무료이며 오픈 소스입니다. GitHub에서 별표를 누르면 다른 사람들이 앱을 찾는 데 도움이 됩니다.</string>
     <string name="github_star_button">GitHub에서 별표 누르기</string>
-    <string name="github_star_thanks">별표를 눌러 주셔서 감사합니다!</string>
+    <string name="github_star_thanks">응원해 주셔서 감사합니다!</string>
     <string name="github_star_thanks_body">다른 사람들이 앱을 찾는 데 도움이 됩니다.</string>
     <string name="settings_github_star_sub">무료 오픈 소스: 별표는 다른 사람들이 앱을 찾는 데 도움이 됩니다</string>
     <string name="settings_split_view">목록 옆에 채팅 표시</string>

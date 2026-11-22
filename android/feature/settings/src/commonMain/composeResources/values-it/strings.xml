@@ -287,12 +287,15 @@
     <string name="whats_new_empty_message">Qui compariranno le nuove versioni dell'app.</string>
     <string name="whats_new_error">Impossibile caricare le versioni</string>
     <string name="whats_new_offline">Impossibile aggiornare. Vengono mostrate le versioni salvate su questo dispositivo.</string>
-    <string name="github_star_banner">Ti piace l'app? Lascia una stella su GitHub</string>
+    <string name="settings_whats_new_button">Pulsante Novità e consigli</string>
+    <string name="settings_whats_new_button_sub">Mostra il pulsante sopra l'elenco delle sessioni dopo ogni aggiornamento. La sua X lo nasconde fino al prossimo aggiornamento.</string>
+    <string name="github_star_banner_sub">Una stella su GitHub aiuta altre persone a trovarla.</string>
+    <string name="github_star_star">Stella</string>
     <string name="github_star_banner_dismiss">Non mostrare più</string>
     <string name="github_star_title">Ti piace l'app?</string>
     <string name="github_star_body">È gratuita e open source. Una stella su GitHub aiuta altre persone a trovarla.</string>
     <string name="github_star_button">Metti una stella su GitHub</string>
-    <string name="github_star_thanks">Grazie per la stella!</string>
+    <string name="github_star_thanks">Grazie per il tuo supporto!</string>
     <string name="github_star_thanks_body">Aiuta altre persone a trovare l'app.</string>
     <string name="settings_github_star_sub">Gratuita e open source: una stella aiuta altre persone a trovare l'app</string>
     <string name="settings_split_view">Chat accanto all'elenco</string>

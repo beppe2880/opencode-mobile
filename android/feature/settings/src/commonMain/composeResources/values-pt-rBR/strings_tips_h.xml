@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_h_star_title">Dê uma estrela para o app no GitHub</string>
-    <string name="tips_h_star_body">O app é gratuito e de código aberto, e uma estrela no GitHub ajuda outras pessoas a encontrá-lo. Depois de usá-lo por um tempo, um banner acima das sessões pergunta uma vez. Fechá-lo o oculta para sempre. Você também encontra Dar estrela no GitHub aqui e em Configurações → Sobre.</string>
-    <string name="tips_h_star_demo">Um banner acima das sessões convida a dar uma estrela para o app no GitHub; ao tocar, o GitHub abre e o banner some.</string>
+    <string name="tips_h_star_body">O app é gratuito e de código aberto, e uma estrela no GitHub ajuda outras pessoas a encontrá-lo. Logo após uma atualização, ou depois de usá-lo por um tempo, um banner acima das sessões pergunta uma vez. Toque nele para abrir o GitHub e feche-o com o X; ele não volta. Você também encontra Dar estrela no GitHub aqui e em Configurações → Sobre.</string>
+    <string name="tips_h_star_demo">Um banner acima das sessões convida a dar uma estrela para o app no GitHub; ao tocar, o GitHub abre e o banner agradece até você fechá-lo com o X.</string>
 </resources>

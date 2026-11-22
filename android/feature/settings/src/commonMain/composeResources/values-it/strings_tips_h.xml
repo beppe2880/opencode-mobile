@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_h_star_title">Metti una stella all'app su GitHub</string>
-    <string name="tips_h_star_body">L'app è gratuita e open source, e una stella su GitHub aiuta altre persone a trovarla. Dopo averla usata per un po', un banner sopra le sessioni lo chiede una sola volta. Chiuderlo lo nasconde per sempre. Trovi Metti una stella su GitHub anche qui e in Impostazioni → Informazioni.</string>
-    <string name="tips_h_star_demo">Un banner sopra le sessioni invita a mettere una stella all'app su GitHub; toccandolo si apre GitHub e il banner scompare.</string>
+    <string name="tips_h_star_body">L'app è gratuita e open source, e una stella su GitHub aiuta altre persone a trovarla. Subito dopo un aggiornamento, o dopo averla usata per un po', un banner sopra le sessioni lo chiede una sola volta. Toccalo per aprire GitHub, poi chiudilo con la sua X: non tornerà. Trovi Metti una stella su GitHub anche qui e in Impostazioni → Informazioni.</string>
+    <string name="tips_h_star_demo">Un banner sopra le sessioni invita a mettere una stella all'app su GitHub; toccandolo si apre GitHub, e il banner ringrazia finché non lo chiudi con la sua X.</string>
 </resources>

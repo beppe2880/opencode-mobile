@@ -76,7 +76,7 @@ data class SettingsState(
     /** Models a provider listed when asked (OpenRouter); shown with the curated ones. */
     val sttListedModels: Map<SttProvider, List<String>> = emptyMap(),
     val sttModelsLoading: Boolean = false,
-    /** "Star on GitHub" was opened: About thanks for it. */
+    /** "Star on GitHub" was opened in this run of the app: About thanks for it until a restart. */
     val starred: Boolean = false,
 ) {
     /** Notifications are on and the system lets the app post them. */
@@ -203,6 +203,7 @@ sealed interface SettingsEvent {
     data class NotifyQuestionsChanged(val enabled: Boolean) : SettingsEvent
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
     data class UpdateNoticeChanged(val style: UpdateNoticeStyle) : SettingsEvent
+    data class WhatsNewButtonChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent

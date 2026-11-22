@@ -299,12 +299,15 @@
     <string name="whats_new_empty_message">ستظهر هنا الإصدارات الجديدة للتطبيق.</string>
     <string name="whats_new_error">تعذّر تحميل الإصدارات</string>
     <string name="whats_new_offline">تعذّر التحديث. يتم عرض الإصدارات المحفوظة على هذا الجهاز.</string>
-    <string name="github_star_banner">هل يعجبك التطبيق؟ اترك نجمة على GitHub</string>
+    <string name="settings_whats_new_button">زر «نصائح &amp; ميزات جديدة»</string>
+    <string name="settings_whats_new_button_sub">يعرض الزر فوق قائمة الجلسات بعد كل تحديث. تخفيه علامة X حتى التحديث التالي.</string>
+    <string name="github_star_banner_sub">تساعد النجمة على GitHub الآخرين في العثور عليه.</string>
+    <string name="github_star_star">نجمة</string>
     <string name="github_star_banner_dismiss">عدم الإظهار مرة أخرى</string>
     <string name="github_star_title">هل يعجبك التطبيق؟</string>
     <string name="github_star_body">التطبيق مجاني ومفتوح المصدر. تساعد النجمة على GitHub الآخرين في العثور عليه.</string>
     <string name="github_star_button">ضع نجمة على GitHub</string>
-    <string name="github_star_thanks">شكرًا على النجمة!</string>
+    <string name="github_star_thanks">شكرًا لدعمك!</string>
     <string name="github_star_thanks_body">تساعد الآخرين في العثور على التطبيق.</string>
     <string name="settings_github_star_sub">مجاني ومفتوح المصدر: تساعد النجمة الآخرين في العثور على التطبيق</string>
     <string name="settings_split_view">الدردشة بجانب القائمة</string>

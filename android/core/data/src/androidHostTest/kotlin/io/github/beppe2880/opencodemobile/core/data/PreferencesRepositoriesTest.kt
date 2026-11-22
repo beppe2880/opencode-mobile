@@ -110,6 +110,7 @@ class PreferencesRepositoriesTest {
             closeModelPickerOnSelect = false,
             newChatModel = NewChatModel.ServerDefault,
             updateNotice = UpdateNoticeStyle.Banner,
+            whatsNewButton = false,
             showInShareMenu = false,
             shareOpens = ShareOpens.ChooseChat,
             backShowsList = false,

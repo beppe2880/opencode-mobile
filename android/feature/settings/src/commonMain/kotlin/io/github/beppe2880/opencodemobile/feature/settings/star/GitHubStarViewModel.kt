@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.feature.settings.star
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import io.github.beppe2880.opencodemobile.core.domain.APP_REPOSITORY_URL
-import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarState
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
@@ -11,8 +10,8 @@ import kotlinx.coroutines.launch
 
 @Immutable
 data class GitHubStarUiState(
-    /** The repository was opened to leave a star: the invitation turns into a thank you. */
-    val starred: Boolean = false,
+    /** "Star on GitHub" was tapped in this run of the app: the invitation thanks until a restart. */
+    val thanked: Boolean = false,
     /** The banner above the sessions, shown once after a while of use. */
     val bannerVisible: Boolean = false,
 )
@@ -56,4 +55,4 @@ class GitHubStarViewModel(
 }
 
 internal fun GitHubStarState.toUi() =
-    GitHubStarUiState(starred = choice == GitHubStarChoice.Starred, bannerVisible = bannerVisible)
+    GitHubStarUiState(thanked = thanked, bannerVisible = bannerVisible)

@@ -38,15 +38,20 @@ class GitHubStarViewModelTest {
     }
 
     @Test
-    fun `star opens the repository and is kept`() = runTest(main.testDispatcher) {
+    fun `star opens the repository and the banner thanks until its X`() = runTest(main.testDispatcher) {
         val vm = GitHubStarViewModel(star)
         star.showBanner()
         vm.onEvent(GitHubStarEvent.Star)
         assertEquals(GitHubStarEffect.OpenUrl(APP_REPOSITORY_URL), vm.effect.first())
         advanceUntilIdle()
         assertEquals(GitHubStarChoice.Starred, star.state.value.choice)
-        assertTrue(vm.state.value.starred)
+        assertTrue(vm.state.value.thanked)
+        // It thanks until its X.
+        assertTrue(vm.state.value.bannerVisible)
+        vm.onEvent(GitHubStarEvent.DismissBanner)
+        advanceUntilIdle()
         assertFalse(vm.state.value.bannerVisible)
+        assertEquals(GitHubStarChoice.Starred, star.state.value.choice)
     }
 
     @Test
@@ -57,6 +62,6 @@ class GitHubStarViewModelTest {
         advanceUntilIdle()
         assertEquals(GitHubStarChoice.Dismissed, star.state.value.choice)
         assertFalse(vm.state.value.bannerVisible)
-        assertFalse(vm.state.value.starred)
+        assertFalse(vm.state.value.thanked)
     }
 }
