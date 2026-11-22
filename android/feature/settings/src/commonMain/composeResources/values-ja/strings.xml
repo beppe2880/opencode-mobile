@@ -284,6 +284,14 @@
     <string name="whats_new_empty_message">アプリの新しいバージョンがここに表示されます。</string>
     <string name="whats_new_error">リリースを読み込めませんでした</string>
     <string name="whats_new_offline">更新できませんでした。この端末に保存されたリリースを表示しています。</string>
+    <string name="github_star_banner">アプリはお気に入りですか？GitHubでスターをお願いします</string>
+    <string name="github_star_banner_dismiss">今後表示しない</string>
+    <string name="github_star_title">アプリはお気に入りですか？</string>
+    <string name="github_star_body">無料のオープンソースです。GitHubでスターを付けると、他の人が見つけやすくなります。</string>
+    <string name="github_star_button">GitHubでスターを付ける</string>
+    <string name="github_star_thanks">スターをありがとうございます！</string>
+    <string name="github_star_thanks_body">他の人がこのアプリを見つける助けになります。</string>
+    <string name="settings_github_star_sub">無料のオープンソース：スターは他の人がアプリを見つける助けになります</string>
     <string name="settings_split_view">チャットをリストの横に表示</string>
     <string name="settings_split_view_sub">横長の画面では、開いているチャットをセッション一覧の横に表示します。仕切り線のハンドルをドラッグして一覧の幅を変更できます。</string>
     <string name="settings_list_width">セッション一覧の幅</string>

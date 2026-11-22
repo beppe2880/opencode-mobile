@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_h_star_title">GitHubでアプリにスターを付けてください</string>
+    <string name="tips_h_star_body">このアプリは無料のオープンソースです。GitHubでスターを付けると、他の人が見つけやすくなります。しばらく使うと、セッションの上に表示されるバナーで一度だけお知らせします。閉じると二度と表示されません。「GitHubでスターを付ける」はここと、設定 → このアプリについて からも見つけられます。</string>
+    <string name="tips_h_star_demo">セッションの上のバナーがGitHubでアプリにスターを付けるよう案内します。タップするとGitHubが開き、バナーは消えます。</string>
+</resources>

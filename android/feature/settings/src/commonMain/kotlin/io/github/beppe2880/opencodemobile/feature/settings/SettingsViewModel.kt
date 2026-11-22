@@ -1,7 +1,10 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
 import androidx.lifecycle.viewModelScope
+import io.github.beppe2880.opencodemobile.core.domain.APP_REPOSITORY_URL
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -20,6 +23,7 @@ class SettingsViewModel(
     private val settings: SettingsRepository,
     appInfo: AppInfo,
     private val stt: SpeechToTextRepository,
+    private val star: GitHubStarRepository,
     /** The category to open first, from a link into Settings; null for the first page. */
     initialArea: SettingsArea? = null,
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
@@ -41,6 +45,7 @@ class SettingsViewModel(
         viewModelScope.launch { servers.servers.collect { list -> updateState { it.copy(servers = list) } } }
         viewModelScope.launch { settings.settings.collect { s -> updateState { it.copy(settings = s) } } }
         viewModelScope.launch { stt.savedKeys.collect { keys -> updateState { it.copy(sttKeys = keys) } } }
+        viewModelScope.launch { star.state.collect { s -> updateState { it.copy(starred = s.choice == GitHubStarChoice.Starred) } } }
         viewModelScope.launch {
             servers.activeServer.distinctUntilChangedBy { it?.id }.collect { active ->
                 updateState { it.copy(activeServerId = active?.id) }
@@ -56,6 +61,10 @@ class SettingsViewModel(
             SettingsEvent.AddServer -> sendEffect(SettingsEffect.OpenConnect)
             SettingsEvent.OpenUsage -> sendEffect(SettingsEffect.OpenUsage)
             SettingsEvent.OpenWhatsNew -> sendEffect(SettingsEffect.OpenWhatsNew)
+            SettingsEvent.StarOnGitHub -> {
+                sendEffect(SettingsEffect.OpenUrl(APP_REPOSITORY_URL))
+                viewModelScope.launch { star.starred() }
+            }
             is SettingsEvent.OpenArea -> updateState {
                 val part = event.part ?: event.option?.part ?: SettingsPart.of(event.area).firstOrNull()
                 it.copy(area = event.area, selected = part, focus = event.option)

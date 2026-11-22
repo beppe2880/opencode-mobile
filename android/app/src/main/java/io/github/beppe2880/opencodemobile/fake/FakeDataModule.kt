@@ -25,6 +25,9 @@ import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarState
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
@@ -139,6 +142,18 @@ val fakeDataModule = module {
             override suspend fun hide(installedVersion: String) {
                 state.value = state.value.copy(hiddenVersion = installedVersion)
             }
+        }
+    }
+    // The demo never shows the banner; the star buttons still answer.
+    single<GitHubStarRepository> {
+        object : GitHubStarRepository {
+            private val current = MutableStateFlow(GitHubStarState())
+            override val state: StateFlow<GitHubStarState> = current.asStateFlow()
+            override suspend fun recordUse() = Unit
+            override suspend fun starred() {
+                current.value = GitHubStarState(GitHubStarChoice.Starred)
+            }
+            override suspend fun dismissBanner() = Unit
         }
     }
     single<McpRepository> {

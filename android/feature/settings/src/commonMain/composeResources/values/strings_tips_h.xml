@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_h_star_title">Star the app on GitHub</string>
+    <string name="tips_h_star_body">The app is free and open source, and a star on GitHub helps other people find it. After you've used it for a while, a banner above the sessions asks once. Closing it hides it for good. You can also find Star on GitHub here and in Settings → About.</string>
+    <string name="tips_h_star_demo">A banner above the sessions invites you to star the app on GitHub; tapping it opens GitHub and the banner goes away.</string>
+</resources>

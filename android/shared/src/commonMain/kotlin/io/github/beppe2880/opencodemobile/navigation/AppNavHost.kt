@@ -85,6 +85,7 @@ import io.github.beppe2880.opencodemobile.feature.files.FileViewerRoute
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsRoute
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsRoute
+import io.github.beppe2880.opencodemobile.feature.settings.star.GitHubStarBannerRoute
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeRoute
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeSample
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateSheetRoute
@@ -678,7 +679,7 @@ private val HandleWidth = 24.dp
 /**
  * The banner of a new app release, under the search of the session list, above the sessions;
  * tapping it opens the update sheet ([UpdateSheetRoute]). The live demo never looks for releases:
- * it shows a sample of the notice instead, to reach its options.
+ * it shows a sample of the notice instead, to reach its options. Below it, the GitHub star invitation.
  */
 @Composable
 private fun UpdateBanner() {
@@ -690,6 +691,8 @@ private fun UpdateBanner() {
         UpdateNoticeSample(style, koinInject<AppInfo>().updateTarget, modifier, compact = true)
     } else {
         UpdateNoticeRoute(modifier)
+        // Once, after a while of use; never in the demo's edit mode.
+        GitHubStarBannerRoute(Modifier.padding(start = OcSpacing.gutter, end = OcSpacing.gutter, bottom = OcSpacing.md))
     }
 }
 

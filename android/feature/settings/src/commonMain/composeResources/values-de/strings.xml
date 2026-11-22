@@ -287,6 +287,14 @@
     <string name="whats_new_empty_message">Neue Versionen der App werden hier aufgelistet.</string>
     <string name="whats_new_error">Versionen konnten nicht geladen werden</string>
     <string name="whats_new_offline">Aktualisierung fehlgeschlagen. Es werden die auf diesem Gerät gespeicherten Versionen angezeigt.</string>
+    <string name="github_star_banner">Gefällt dir die App? Hinterlasse einen Stern auf GitHub</string>
+    <string name="github_star_banner_dismiss">Nicht mehr anzeigen</string>
+    <string name="github_star_title">Gefällt dir die App?</string>
+    <string name="github_star_body">Sie ist kostenlos und Open Source. Ein Stern auf GitHub hilft anderen, sie zu finden.</string>
+    <string name="github_star_button">Stern auf GitHub setzen</string>
+    <string name="github_star_thanks">Danke für den Stern!</string>
+    <string name="github_star_thanks_body">Es hilft anderen, die App zu finden.</string>
+    <string name="settings_github_star_sub">Kostenlos und Open Source: Ein Stern hilft anderen, die App zu finden</string>
     <string name="settings_split_view">Chat neben der Liste</string>
     <string name="settings_split_view_sub">Auf breiten Bildschirmen den geöffneten Chat neben der Sitzungsliste anzeigen. Ziehe den Griff am Trenner, um die Liste in der Größe anzupassen.</string>
     <string name="settings_list_width">Breite der Sitzungsliste</string>
