@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Ask about part of an answer</string>
+    <string name="tips_c_ask_body">Select some text in a reply and tap Ask: it lands in the message box as a quote, ready for your question. Ask again to quote more than one part. On Android.</string>
+    <string name="tips_c_ask_demo">A phrase of the reply is long-pressed and selected, Ask is tapped in the menu and the phrase appears as a quote in the message box; a question is typed under it and sent, with the quote dimmed in the bubble.</string>
+
     <string name="tips_c_voice_background_title">Keep recording in the background</string>
     <string name="tips_c_voice_background_body">A voice message recorded with a cloud model keeps going when you switch to another app or lock the phone. On Android, Stop in the notification ends it; the text is waiting in the message box when you come back.</string>
     <string name="tips_c_voice_background_demo">A recording runs in the message box, then the home screen shows a notification counting the time. A finger taps Stop, and back in the app the spoken sentence is in the message box.</string>

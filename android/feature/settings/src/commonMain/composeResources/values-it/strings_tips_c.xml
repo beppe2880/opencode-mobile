@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Chiedi su una parte di una risposta</string>
+    <string name="tips_c_ask_body">Seleziona un po' di testo in una risposta e tocca Chiedi: finisce nella casella del messaggio come citazione, pronta per la tua domanda. Tocca di nuovo Chiedi per citare più di una parte. Solo su Android.</string>
+    <string name="tips_c_ask_demo">Una frase della risposta viene tenuta premuta e selezionata, nel menu si tocca Chiedi e la frase compare come citazione nella casella del messaggio; sotto si scrive una domanda e la si invia, con la citazione attenuata nel fumetto.</string>
     <string name="tips_c_voice_background_title">Continua a registrare in background</string>
     <string name="tips_c_voice_background_body">Un messaggio vocale registrato con un modello cloud continua quando passi a un'altra app o blocchi il telefono. Su Android, Stop nella notifica lo termina; il testo ti aspetta nella casella del messaggio quando torni.</string>
     <string name="tips_c_voice_background_demo">Una registrazione va nella casella del messaggio, poi la schermata home mostra una notifica che conta il tempo. Un dito tocca Stop e, tornando nell'app, la frase detta è nella casella del messaggio.</string>

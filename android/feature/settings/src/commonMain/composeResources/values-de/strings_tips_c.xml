@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Zu einem Teil einer Antwort fragen</string>
+    <string name="tips_c_ask_body">Markiere Text in einer Antwort und tippe auf Fragen: Er landet als Zitat im Nachrichtenfeld, bereit für deine Frage. Tippe erneut auf Fragen, um mehr als einen Teil zu zitieren. Nur unter Android.</string>
+    <string name="tips_c_ask_demo">Ein Satz der Antwort wird lange gedrückt und markiert, im Menü wird Fragen getippt, und der Satz erscheint als Zitat im Nachrichtenfeld; darunter wird eine Frage getippt und gesendet, das Zitat ist in der Blase abgeblendet.</string>
     <string name="tips_c_voice_background_title">Im Hintergrund weiter aufnehmen</string>
     <string name="tips_c_voice_background_body">Eine Sprachnachricht, die mit einem Cloud-Modell aufgenommen wird, läuft weiter, wenn du zu einer anderen App wechselst oder das Telefon sperrst. Unter Android beendet Stoppen in der Benachrichtigung die Aufnahme; der Text wartet im Nachrichtenfeld, wenn du zurückkommst.</string>
     <string name="tips_c_voice_background_demo">Eine Aufnahme läuft im Nachrichtenfeld, dann zeigt der Startbildschirm eine Benachrichtigung mit der Zeit. Ein Finger tippt auf Stoppen, und zurück in der App steht der gesprochene Satz im Nachrichtenfeld.</string>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Demander à propos d'une partie de réponse</string>
+    <string name="tips_c_ask_body">Sélectionnez un passage d'une réponse et appuyez sur Demander : il apparaît dans la zone de message sous forme de citation, prêt pour votre question. Appuyez de nouveau sur Demander pour citer plusieurs parties. Uniquement sur Android.</string>
+    <string name="tips_c_ask_demo">Un passage de la réponse est appuyé longuement et sélectionné, Demander est touché dans le menu et le passage apparaît comme citation dans la zone de message ; une question est saisie dessous et envoyée, la citation étant atténuée dans la bulle.</string>
     <string name="tips_c_voice_background_title">Continuer l'enregistrement en arrière-plan</string>
     <string name="tips_c_voice_background_body">Un message vocal enregistré avec un modèle cloud continue lorsque vous passez à une autre application ou verrouillez le téléphone. Sur Android, Arrêter dans la notification le termine ; le texte attend dans la zone de message à votre retour.</string>
     <string name="tips_c_voice_background_demo">Un enregistrement se déroule dans la zone de message, puis l'écran d'accueil affiche une notification qui compte le temps. Un doigt touche Arrêter, et de retour dans l'app, la phrase dictée se trouve dans la zone de message.</string>

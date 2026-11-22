@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">就回答的一部分提问</string>
+    <string name="tips_c_ask_body">在回复中选中一些文字并点按“提问”：它会以引文形式进入消息框，等待你提问。再次点按“提问”可引用多个部分。仅限 Android。</string>
+    <string name="tips_c_ask_demo">长按并选中回复中的一句话，在菜单中点按“提问”，这句话会以引文形式出现在消息框中；在其下输入问题并发送，引文在气泡中淡化显示。</string>
     <string name="tips_c_voice_background_title">在后台继续录音</string>
     <string name="tips_c_voice_background_body">使用云端模型录制的语音消息，在你切换到其他应用或锁屏时仍会继续录制。在 Android 上，通知中的“停止”可结束录音；你回来时文字已在消息框中等待。</string>
     <string name="tips_c_voice_background_demo">录音在消息框中进行，然后主屏幕显示一条通知并计时。手指点按“停止”，回到应用后，说出的句子已在消息框中。</string>

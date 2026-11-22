@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">Perguntar sobre parte de uma resposta</string>
+    <string name="tips_c_ask_body">Selecione um trecho de uma resposta e toque em Perguntar: ele vai para a caixa de mensagem como citação, pronto para a sua pergunta. Toque em Perguntar de novo para citar mais de um trecho. Apenas no Android.</string>
+    <string name="tips_c_ask_demo">Uma frase da resposta é pressionada por longo tempo e selecionada, Perguntar é tocado no menu e a frase aparece como citação na caixa de mensagem; uma pergunta é digitada abaixo e enviada, com a citação esmaecida no balão.</string>
     <string name="tips_c_voice_background_title">Continue gravando em segundo plano</string>
     <string name="tips_c_voice_background_body">Uma mensagem de voz gravada com um modelo na nuvem continua quando você troca de app ou bloqueia o celular. No Android, Parar na notificação encerra a gravação; o texto espera na caixa de mensagem quando você voltar.</string>
     <string name="tips_c_voice_background_demo">Uma gravação acontece na caixa de mensagem, depois a tela inicial mostra uma notificação contando o tempo. Um dedo toca em Parar e, de volta ao app, a frase falada está na caixa de mensagem.</string>
