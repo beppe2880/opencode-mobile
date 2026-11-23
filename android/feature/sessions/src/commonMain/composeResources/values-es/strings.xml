@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">Marcar todas como leídas</string>
     <string name="sessions_mark_all_read_count">Marcar %1$d como leídas</string>
     <string name="sessions_mark_all_read_failed">No se pudieron marcar como leídas algunas sesiones</string>
+    <string name="sessions_mark_read">Marcar como leída</string>
+    <string name="sessions_mark_unread">Marcar como no leída</string>
+    <string name="sessions_mark_unread_local">Estado de no leída guardado solo en este dispositivo</string>
     <string name="sessions_read">Leídas</string>
     <string name="sessions_filter_read">Estado de lectura</string>
     <string name="sessions_outcome_succeeded">Completada</string>

@@ -99,6 +99,8 @@ internal fun SessionRow(
     waiting: SessionWaiting? = null,
     /** Off when the setting hides unread state: no dot and no unread label. */
     showUnread: Boolean = true,
+    /** Marked unread by hand on this device, on top of the server's unread state. */
+    markedUnread: Boolean = false,
 ) {
     val c = OcTheme.colors
     val currentOnDelete by rememberUpdatedState(onSwipeDelete)
@@ -120,7 +122,7 @@ internal fun SessionRow(
     val unreadLabel = stringResource(Res.string.sessions_unread)
     val showsWork = workLabel.isNotEmpty()
     // A running session shows its activity dot instead, like the desktop app.
-    val unread = showUnread && session.isUnread && !running
+    val unread = showUnread && (session.isUnread || markedUnread) && !running
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,

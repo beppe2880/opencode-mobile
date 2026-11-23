@@ -24,6 +24,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.newChatAgent
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
@@ -35,6 +36,7 @@ import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_bulk_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_failed
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_unread_local
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -64,6 +66,7 @@ class SessionsViewModel(
     private val folderPreferences: FolderPreferences,
     private val pins: PinnedSessionRepository,
     private val mutes: MutedSessionRepository,
+    private val unreadStore: UnreadSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {
@@ -118,6 +121,13 @@ class SessionsViewModel(
         viewModelScope.launch { events.events.collect(::onServerEvent) }
         viewModelScope.launch { shares.pending.collect(::onShare) }
         viewModelScope.launch { pins.changes.collect { showPins() } }
+        updateState { it.copy(manualUnread = unreadStore.unread()) }
+        viewModelScope.launch {
+            unreadStore.changes.collect {
+                val marks = unreadStore.unread()
+                updateState { s -> s.copy(manualUnread = marks, groups = group(sessionList, s.filters, s.waiting.keys, marks)) }
+            }
+        }
         viewModelScope.launch {
             settings.settings.map { it.showRunningWorkInList }.distinctUntilChanged().collect { enabled ->
                 updateState { it.copy(showRunningWork = enabled, work = if (enabled) it.work else emptyMap()) }
@@ -130,7 +140,7 @@ class SessionsViewModel(
                     // Without unread state the read filter has nothing to narrow.
                     val filters = if (unread == UnreadSessions.Off) s.filters.copy(readState = null) else s.filters
                     val next = s.copy(unreadSessions = unread, filters = filters)
-                    next.copy(groups = groupSessions(sessionList, pinnedIds, clock(), zone, filters, s.waiting.keys, unread))
+                    next.copy(groups = groupSessions(sessionList, pinnedIds, clock(), zone, filters, s.waiting.keys, unread, s.manualUnread))
                 }
             }
         }
@@ -185,7 +195,13 @@ class SessionsViewModel(
             SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
-            is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
+            is SessionsEvent.Open -> if (currentState.sharing != null) {
+                shareTo(event.sessionId)
+            } else {
+                // Opening the chat shows it, so a hand-set unread mark is done.
+                unreadStore.setUnread(event.sessionId, false)
+                sendEffect(SessionsEffect.OpenChat(event.sessionId))
+            }
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
             is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
             is SessionsEvent.SetMuted -> {
@@ -207,6 +223,8 @@ class SessionsViewModel(
             SessionsEvent.ExitSelection -> updateState { it.copy(selection = emptySet(), bulkDeleteCount = null) }
             is SessionsEvent.SetSelectedPinned -> setSelectedPinned(event.pinned)
             is SessionsEvent.SetSelectedArchived -> setSelectedArchived(event.archived)
+            SessionsEvent.MarkSelectedRead -> markSelectedRead()
+            SessionsEvent.MarkSelectedUnread -> markSelectedUnread()
             SessionsEvent.RenameSelected -> renameSelected()
             SessionsEvent.RequestDeleteSelected -> requestDeleteSelected()
             SessionsEvent.DismissDeleteFailures -> updateState { it.copy(deleteFailures = emptyList()) }
@@ -272,6 +290,7 @@ class SessionsViewModel(
                 newSession = null,
                 sharing = null,
                 selection = emptySet(),
+                manualUnread = unreadStore.unread(),
                 bulkDeleteCount = null,
                 deleteFailures = emptyList(),
                 renaming = null,
@@ -399,12 +418,14 @@ class SessionsViewModel(
                         )
                     }
                     forgetPin(event.sessionId)
+                    unreadStore.setUnread(event.sessionId, false)
                 } else {
                     scheduleReload(EVENT_DEBOUNCE_MS)
                 }
             }
             // Another client (or this one, from the chat) reported the idle transition as viewed.
             is ServerEvent.Viewed -> {
+                unreadStore.setUnread(event.sessionId, false)
                 sessionList = sessionList.map { session ->
                     if (session.id == event.sessionId) session.copy(viewedAt = event.idleAt) else session
                 }
@@ -493,7 +514,7 @@ class SessionsViewModel(
         val next = waiting.mapNotNull { (id, w) -> w?.let { id to it } }.toMap()
         updateState {
             // A session that starts or stops waiting enters or leaves the unread group.
-            it.copy(waiting = next, groups = group(sessionList, it.filters, next.keys))
+            it.copy(waiting = next, groups = group(sessionList, it.filters, next.keys, it.manualUnread))
         }
     }
 
@@ -607,10 +628,15 @@ class SessionsViewModel(
     internal fun group(list: List<Session>): List<SessionGroup> = group(list, currentState.filters)
 
     private fun group(list: List<Session>, filters: SessionFilters): List<SessionGroup> =
-        group(list, filters, currentState.waiting.keys)
+        group(list, filters, currentState.waiting.keys, currentState.manualUnread)
 
-    private fun group(list: List<Session>, filters: SessionFilters, waiting: Set<String>): List<SessionGroup> =
-        groupSessions(list, pinnedIds, clock(), zone, filters, waiting, currentState.unreadSessions)
+    private fun group(
+        list: List<Session>,
+        filters: SessionFilters,
+        waiting: Set<String>,
+        manualUnread: Set<String>,
+    ): List<SessionGroup> =
+        groupSessions(list, pinnedIds, clock(), zone, filters, waiting, currentState.unreadSessions, manualUnread)
 
     /**
      * Marks [unread] as viewed at their idle watermark, a few requests at a time. The rows clear at
@@ -618,11 +644,24 @@ class SessionsViewModel(
      */
     private fun markRead(unread: List<Session>) {
         if (currentState.markingAllRead) return
+        val ids = unread.mapTo(HashSet()) { it.id }
+        ids.forEach { unreadStore.setUnread(it, false) }
+        val remaining = currentState.manualUnread - ids
         val marks = unread.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
-        if (marks.isEmpty()) return
+        if (marks.isEmpty()) {
+            updateState { it.copy(manualUnread = remaining, groups = group(sessionList, it.filters, it.waiting.keys, remaining)) }
+            return
+        }
         val previous = sessionList.filter { it.id in marks }.associate { it.id to it.viewedAt }
         sessionList = sessionList.map { session -> marks[session.id]?.let { session.copy(viewedAt = it) } ?: session }
-        updateState { it.copy(markingAllRead = true, filterSheetOpen = false, groups = group(sessionList)) }
+        updateState {
+            it.copy(
+                markingAllRead = true,
+                filterSheetOpen = false,
+                manualUnread = remaining,
+                groups = group(sessionList, it.filters, it.waiting.keys, remaining),
+            )
+        }
         viewModelScope.launch {
             val permits = Semaphore(MARK_READ_PARALLEL)
             val failed = marks.map { (id, idle) ->
@@ -757,6 +796,29 @@ class SessionsViewModel(
         }
     }
 
+    private fun markSelectedRead() {
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        updateState { it.copy(selection = emptySet()) }
+        markRead(selected)
+    }
+
+    private fun markSelectedUnread() {
+        if (currentState.unreadSessions == UnreadSessions.Off) return
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        selected.forEach { unreadStore.setUnread(it.id, true) }
+        val marks = unreadStore.unread()
+        updateState {
+            it.copy(
+                selection = emptySet(),
+                manualUnread = marks,
+                groups = group(sessionList, it.filters, it.waiting.keys, marks),
+            )
+        }
+        sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_mark_unread_local)))
+    }
+
     private fun deleteSelected() {
         val selected = currentState.selectedSessions
         updateState { it.copy(bulkDeleteCount = null, selection = emptySet()) }
@@ -768,7 +830,10 @@ class SessionsViewModel(
         viewModelScope.launch {
             val failed = mutableListOf<Session>()
             for (session in selected) {
-                sessions.delete(session.id).onSuccess { pins.setPinned(session.id, false) }.onFailure { failed += session }
+                sessions.delete(session.id).onSuccess {
+                    pins.setPinned(session.id, false)
+                    unreadStore.setUnread(session.id, false)
+                }.onFailure { failed += session }
             }
             if (failed.isNotEmpty()) {
                 restore(previous, failed)
@@ -892,6 +957,7 @@ class SessionsViewModel(
             sessions.delete(session.id).onSuccess {
                 forgetPin(session.id)
                 mutes.setMuted(session.id, false)
+                unreadStore.setUnread(session.id, false)
             }.onFailure { error ->
                 sessionList = previous
                 updateState { it.copy(groups = group(sessionList)) }

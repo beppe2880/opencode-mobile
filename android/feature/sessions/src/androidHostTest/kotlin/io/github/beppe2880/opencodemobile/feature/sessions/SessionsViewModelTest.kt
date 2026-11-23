@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryUnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -92,11 +93,10 @@ class SessionsViewModelTest {
     private val folders = FakeFolderPreferences()
 
     private val pins = InMemoryPinnedSessions()
+    private val unread = InMemoryUnreadSessions()
 
     private fun vm(repository: FakeSessionRepository = sessions) =
-        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, mutes = InMemoryMutedSessions(), clock = {
-            now
-        }, zone = zone)
+        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, mutes = InMemoryMutedSessions(), unreadStore = unread, clock = { now }, zone = zone)
 
     @Test
     fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {
@@ -1957,6 +1957,121 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(setOf("yesterday"), pins.pinned())
+    }
+
+    @Test
+    fun `manual unread marks group the selected sessions and the read filter finds them`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+
+        assertEquals(setOf("today", "week"), vm.state.value.manualUnread)
+        assertEquals(setOf("today", "week"), unread.unread())
+        assertEquals(DayBucket.Unread, vm.state.value.groups.first().bucket)
+        assertEquals(setOf("today", "week"), vm.state.value.groups.first().sessions.mapTo(HashSet()) { it.id })
+        assertTrue(vm.state.value.selection.isEmpty())
+
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+        advanceUntilIdle()
+        assertEquals(setOf("today", "week"), vm.state.value.ids().toSet())
+    }
+
+    @Test
+    fun `marking unread shows the local-only message`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = mutableListOf<SessionsEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+        advanceUntilIdle()
+
+        assertTrue(effects.any { it is SessionsEffect.ShowMessage })
+        collector.cancel()
+    }
+
+    @Test
+    fun `mark read clears manual marks and reports the server unread sessions as read`() = runTest(main.testDispatcher) {
+        val repository = FakeSessionRepository(
+            listOf(
+                session("unread", now - hour, idleAt = 10, viewedAt = 5),
+                session("read", now - hour),
+            ),
+        )
+        val vm = vm(repository)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("unread"))
+        vm.onEvent(SessionsEvent.ToggleSelection("read"))
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+        assertEquals(setOf("unread", "read"), unread.unread())
+
+        vm.onEvent(SessionsEvent.StartSelection("unread"))
+        vm.onEvent(SessionsEvent.ToggleSelection("read"))
+        vm.onEvent(SessionsEvent.MarkSelectedRead)
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.manualUnread.isEmpty())
+        assertTrue(unread.unread().isEmpty())
+        assertEquals(listOf("unread" to 10L), repository.viewedCalls)
+    }
+
+    @Test
+    fun `opening a marked session clears its unread mark`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+        assertTrue("today" in unread.unread())
+
+        vm.onEvent(SessionsEvent.Open("today"))
+        advanceUntilIdle()
+
+        assertTrue(unread.unread().isEmpty())
+        assertTrue(vm.state.value.manualUnread.isEmpty())
+    }
+
+    @Test
+    fun `marking unread is unavailable while unread state is off`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(unreadSessions = UnreadSessions.Off)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+
+        assertTrue(unread.unread().isEmpty())
+        assertEquals(setOf("today"), vm.state.value.selection)
+    }
+
+    @Test
+    fun `a deleted session forgets its unread mark`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+
+        events.flow.emit(ServerEvent.SessionChanged("today", deleted = true))
+        advanceUntilIdle()
+
+        assertTrue(unread.unread().isEmpty())
+    }
+
+    @Test
+    fun `marking all read clears manual unread marks`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.MarkSelectedUnread)
+
+        vm.onEvent(SessionsEvent.MarkAllRead)
+        advanceUntilIdle()
+
+        assertTrue(unread.unread().isEmpty())
+        assertTrue(vm.state.value.manualUnread.isEmpty())
     }
 
     @Test

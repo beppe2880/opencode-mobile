@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_j_sessions_bulk_title">Mehrere Sitzungen auf einmal</string>
-    <string name="tips_j_sessions_bulk_body">Halte eine Sitzung gedrückt, um sie auszuwählen, und tippe weitere Zeilen an. Anheften, archivieren oder lösche sie zusammen; umbenennen, wenn nur eine ausgewählt ist. Zurück beendet die Auswahl.</string>
+    <string name="tips_j_sessions_bulk_body">Halte eine Sitzung gedrückt, um sie auszuwählen, und tippe weitere Zeilen an. Anheften, archivieren, als gelesen oder ungelesen markieren oder zusammen löschen; umbenennen, wenn nur eine ausgewählt ist. Zurück beendet die Auswahl. Ungelesen-Markierungen bleiben auf diesem Gerät.</string>
     <string name="tips_j_sessions_bulk_demo">Eine Sitzung wird gedrückt gehalten; zwei Zeilen sind ausgewählt, und das Menü löscht sie nach einer Bestätigung.</string>
 </resources>

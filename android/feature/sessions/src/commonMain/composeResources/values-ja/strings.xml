@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">すべて既読にする</string>
     <string name="sessions_mark_all_read_count">%1$d件を既読にする</string>
     <string name="sessions_mark_all_read_failed">一部のセッションを既読にできませんでした</string>
+    <string name="sessions_mark_read">既読にする</string>
+    <string name="sessions_mark_unread">未読にする</string>
+    <string name="sessions_mark_unread_local">未読状態はこの端末にのみ保存されます</string>
     <string name="sessions_read">既読</string>
     <string name="sessions_filter_read">既読状態</string>
     <string name="sessions_outcome_succeeded">成功</string>

@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">모두 읽음으로 표시</string>
     <string name="sessions_mark_all_read_count">%1$d개 읽음으로 표시</string>
     <string name="sessions_mark_all_read_failed">일부 세션을 읽음으로 표시하지 못했습니다</string>
+    <string name="sessions_mark_read">읽음으로 표시</string>
+    <string name="sessions_mark_unread">읽지 않음으로 표시</string>
+    <string name="sessions_mark_unread_local">읽지 않음 상태가 이 기기에만 저장되었습니다</string>
     <string name="sessions_read">읽음</string>
     <string name="sessions_filter_read">읽음 상태</string>
     <string name="sessions_outcome_succeeded">성공</string>

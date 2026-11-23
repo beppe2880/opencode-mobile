@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">全部标为已读</string>
     <string name="sessions_mark_all_read_count">将 %1$d 个标为已读</string>
     <string name="sessions_mark_all_read_failed">部分会话无法标为已读</string>
+    <string name="sessions_mark_read">标为已读</string>
+    <string name="sessions_mark_unread">标为未读</string>
+    <string name="sessions_mark_unread_local">未读状态仅保存在此设备上</string>
     <string name="sessions_read">已读</string>
     <string name="sessions_filter_read">阅读状态</string>
     <string name="sessions_outcome_succeeded">成功</string>

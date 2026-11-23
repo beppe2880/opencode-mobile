@@ -110,6 +110,8 @@ data class SessionsState(
     val sharing: SharedContent? = null,
     /** Sessions selected for bulk actions; empty outside selection mode. */
     val selection: Set<String> = emptySet(),
+    /** Sessions marked unread by hand on this device, on top of the server's unread state. */
+    val manualUnread: Set<String> = emptySet(),
     /** How many sessions the bulk delete confirmation covers; null when it is closed. */
     val bulkDeleteCount: Int? = null,
     /** Sessions a bulk delete could not remove; shown in a dialog until dismissed. */
@@ -128,11 +130,14 @@ data class SessionsState(
         get() = if (unreadSessions == UnreadSessions.Off) {
             emptyList()
         } else {
-            groups.flatMap { it.sessions }.filter { it.isUnread && it.id !in waiting }
+            groups.flatMap { it.sessions }.filter { isUnread(it) && it.id !in waiting }
         }
 
     /** The sessions of the Unread group, those [SessionsEvent.MarkUnreadGroupRead] marks. */
     val unreadGroup: List<Session> get() = groups.firstOrNull { it.bucket == DayBucket.Unread }?.sessions.orEmpty()
+
+    /** Whether [session] counts as unread here: the server says so, or it was marked unread on this device. */
+    fun isUnread(session: Session): Boolean = session.isUnread || session.id in manualUnread
     val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 
@@ -195,6 +200,12 @@ sealed interface SessionsEvent {
 
     /** Archives or restores every selected session, then leaves selection mode. */
     data class SetSelectedArchived(val archived: Boolean) : SessionsEvent
+
+    /** Marks every selected session read, also on the server; leaves selection mode. */
+    data object MarkSelectedRead : SessionsEvent
+
+    /** Marks every selected session unread on this device; leaves selection mode. */
+    data object MarkSelectedUnread : SessionsEvent
 
     /** Opens the rename dialog for the only selected session. */
     data object RenameSelected : SessionsEvent

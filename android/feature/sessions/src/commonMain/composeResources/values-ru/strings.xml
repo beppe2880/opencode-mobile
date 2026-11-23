@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">Отметить все как прочитанные</string>
     <string name="sessions_mark_all_read_count">Отметить %1$d как прочитанные</string>
     <string name="sessions_mark_all_read_failed">Некоторые сессии не удалось отметить как прочитанные</string>
+    <string name="sessions_mark_read">Отметить как прочитанную</string>
+    <string name="sessions_mark_unread">Отметить как непрочитанную</string>
+    <string name="sessions_mark_unread_local">Статус «не прочитано» сохранён только на этом устройстве</string>
     <string name="sessions_read">Прочитанные</string>
     <string name="sessions_filter_read">Статус прочтения</string>
     <string name="sessions_outcome_succeeded">Успешно</string>

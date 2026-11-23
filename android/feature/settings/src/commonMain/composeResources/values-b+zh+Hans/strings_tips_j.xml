@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_j_sessions_bulk_title">批量操作会话</string>
-    <string name="tips_j_sessions_bulk_body">长按会话将其选中，然后点按更多行。可一起置顶、归档或删除；仅选中一个时可重命名。返回即退出选择。</string>
+    <string name="tips_j_sessions_bulk_body">长按会话将其选中，然后点按更多行。可一起置顶、归档、标为已读或未读或删除；仅选中一个时可重命名。返回即退出选择。未读标记仅保存在此设备上。</string>
     <string name="tips_j_sessions_bulk_demo">长按一个会话；选中两行后，菜单在一次确认后将其删除。</string>
 </resources>

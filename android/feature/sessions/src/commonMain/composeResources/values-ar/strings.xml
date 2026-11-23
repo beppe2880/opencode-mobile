@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">تحديد الكل كمقروء</string>
     <string name="sessions_mark_all_read_count">تحديد %1$d كمقروءة</string>
     <string name="sessions_mark_all_read_failed">تعذّر تحديد بعض الجلسات كمقروءة</string>
+    <string name="sessions_mark_read">وضع علامة كمقروءة</string>
+    <string name="sessions_mark_unread">وضع علامة كغير مقروءة</string>
+    <string name="sessions_mark_unread_local">تم حفظ حالة عدم القراءة على هذا الجهاز فقط</string>
     <string name="sessions_read">مقروءة</string>
     <string name="sessions_filter_read">حالة القراءة</string>
     <string name="sessions_outcome_succeeded">ناجحة</string>

@@ -18,7 +18,7 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         body = Res.string.tips_j_sessions_bulk_body,
         demoDescription = Res.string.tips_j_sessions_bulk_demo,
         author = "Azykle",
-        pullRequest = null,
+        pullRequest = 266,
         demo = { SessionBulkActionsDemo(it) },
     ),
 )

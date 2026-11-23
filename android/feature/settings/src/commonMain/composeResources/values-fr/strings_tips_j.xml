@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_j_sessions_bulk_title">Actions groupées sur les sessions</string>
-    <string name="tips_j_sessions_bulk_body">Appuyez longuement sur une session pour la sélectionner, puis touchez d'autres lignes. Épinglez, archivez ou supprimez-les ensemble, ou renommez quand une seule est sélectionnée. Retour quitte la sélection.</string>
+    <string name="tips_j_sessions_bulk_body">Appuyez longuement sur une session pour la sélectionner, puis touchez d'autres lignes. Épinglez, archivez, marquez comme lues ou non lues ou supprimez-les ensemble ; renommez quand une seule est sélectionnée. Retour quitte la sélection. Les marques de non-lu restent sur cet appareil.</string>
     <string name="tips_j_sessions_bulk_demo">Une session est appuyée longuement ; deux lignes sont sélectionnées et le menu les supprime après une confirmation.</string>
 </resources>

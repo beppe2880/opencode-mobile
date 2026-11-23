@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_j_sessions_bulk_title">Bulk actions on sessions</string>
-    <string name="tips_j_sessions_bulk_body">Long-press a session to select it, then tap more rows. Pin, archive or delete them together, or rename when only one is selected. Back leaves the selection.</string>
+    <string name="tips_j_sessions_bulk_body">Long-press a session to select it, then tap more rows. Pin, archive, mark read or unread or delete them together; rename when only one is selected. Back leaves the selection. Unread marks stay on this device.</string>
     <string name="tips_j_sessions_bulk_demo">A session is long-pressed; two rows are selected and the menu deletes them after one confirmation.</string>
 </resources>

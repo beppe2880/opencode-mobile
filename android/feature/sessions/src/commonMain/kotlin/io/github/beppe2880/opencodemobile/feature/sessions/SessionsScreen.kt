@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MarkEmailRead
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
@@ -169,6 +170,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_in
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_count
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_read
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_outcome_succeeded
@@ -353,6 +356,7 @@ fun SessionsScreen(
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
                                 waiting = state.waiting[session.id],
                                 showUnread = state.unreadSessions != UnreadSessions.Off,
+                                markedUnread = session.id in state.manualUnread,
                             )
                         }
                     }
@@ -412,6 +416,9 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
     val singleMuted = single?.let { it.id in state.muted } == true
     val allPinned = selected.isNotEmpty() && selected.all { it.id in state.pinned }
     val allArchived = selected.isNotEmpty() && selected.all { it.archivedAt != null }
+    val anyUnread = selected.any(state::isUnread)
+    val anyRead = selected.any { !state.isUnread(it) }
+    val showReadState = state.unreadSessions != UnreadSessions.Off
     OcTopBar(
         title = pluralStringResource(Res.plurals.sessions_selected_count, count, count),
         leading = {
@@ -461,6 +468,22 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                                 )
                             },
                             modifier = Modifier.testTag("sessions_bulk_mute"),
+                        )
+                    }
+                    if (showReadState && anyUnread) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.sessions_mark_read)) },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.MarkSelectedRead) },
+                            leadingIcon = { Icon(Icons.Outlined.MarkEmailRead, contentDescription = null, tint = c.iconBase) },
+                            modifier = Modifier.testTag("sessions_bulk_mark_read"),
+                        )
+                    }
+                    if (showReadState && anyRead) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.sessions_mark_unread)) },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.MarkSelectedUnread) },
+                            leadingIcon = { Icon(Icons.Outlined.MarkEmailUnread, contentDescription = null, tint = c.iconBase) },
+                            modifier = Modifier.testTag("sessions_bulk_mark_unread"),
                         )
                     }
                     DropdownMenuItem(
