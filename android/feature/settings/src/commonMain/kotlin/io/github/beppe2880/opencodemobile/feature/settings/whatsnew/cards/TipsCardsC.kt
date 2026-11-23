@@ -67,7 +67,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 internal val tipsCardsC: List<FeatureCard> = listOf(
     FeatureCard(
         id = "session-export",
-        version = "0.18.0",
+        version = "0.19.0",
         icon = Icons.Outlined.Share,
         title = Res.string.tips_export_title,
         body = Res.string.tips_export_body,
