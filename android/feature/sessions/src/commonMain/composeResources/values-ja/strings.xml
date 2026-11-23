@@ -72,6 +72,21 @@
     <string name="sessions_save">保存</string>
     <string name="sessions_delete_title">セッションを削除しますか？</string>
     <string name="sessions_delete_message">「%1$s」とその履歴をサーバーから完全に削除します。</string>
+    <string name="sessions_select">選択</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="other">%1$d 件選択中</item>
+    </plurals>
+    <string name="sessions_selection_close">選択を終了</string>
+    <string name="sessions_selection_actions">選択したセッションの操作</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="other">%1$d 件のセッションを削除しますか？</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="other">履歴はサーバーから完全に削除されます。</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">一部のセッションを削除できませんでした</string>
+    <string name="sessions_delete_failed_message">これらのセッションはサーバーに残っています:\n%1$s</string>
+    <string name="sessions_bulk_failed">一部のセッションを更新できませんでした</string>
     <string name="sessions_new_title">新しいセッション</string>
     <string name="sessions_new_directory">プロジェクトのディレクトリ</string>
     <string name="sessions_new_other_directory">別のディレクトリ</string>

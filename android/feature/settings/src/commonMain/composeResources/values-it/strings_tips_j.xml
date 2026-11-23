@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_j_sessions_bulk_title">Azioni in blocco sulle sessioni</string>
+    <string name="tips_j_sessions_bulk_body">Tieni premuta una sessione per selezionarla, poi tocca altre righe. Fissale, archiviale o eliminane più insieme; rinomina quando ne hai selezionata una sola. Indietro esce dalla selezione.</string>
+    <string name="tips_j_sessions_bulk_demo">Una sessione viene tenuta premuta; due righe sono selezionate e il menu le elimina dopo una conferma.</string>
+</resources>

@@ -72,6 +72,30 @@
     <string name="sessions_save">Сохранить</string>
     <string name="sessions_delete_title">Удалить сессию?</string>
     <string name="sessions_delete_message">«%1$s» и её история будут безвозвратно удалены с сервера.</string>
+    <string name="sessions_select">Выбрать</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="one">Выбрана %1$d сессия</item>
+        <item quantity="few">Выбраны %1$d сессии</item>
+        <item quantity="many">Выбрано %1$d сессий</item>
+        <item quantity="other">Выбрано %1$d сессии</item>
+    </plurals>
+    <string name="sessions_selection_close">Выйти из выбора</string>
+    <string name="sessions_selection_actions">Действия для выбранных сессий</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="one">Удалить %1$d сессию?</item>
+        <item quantity="few">Удалить %1$d сессии?</item>
+        <item quantity="many">Удалить %1$d сессий?</item>
+        <item quantity="other">Удалить %1$d сессии?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="one">Её история будет безвозвратно удалена с сервера.</item>
+        <item quantity="few">Их истории будут безвозвратно удалены с сервера.</item>
+        <item quantity="many">Их истории будут безвозвратно удалены с сервера.</item>
+        <item quantity="other">Их истории будут безвозвратно удалены с сервера.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">Некоторые сессии не удалось удалить</string>
+    <string name="sessions_delete_failed_message">Эти сессии по-прежнему на сервере:\n%1$s</string>
+    <string name="sessions_bulk_failed">Некоторые сессии не удалось обновить</string>
     <string name="sessions_new_title">Новая сессия</string>
     <string name="sessions_new_directory">Каталог проекта</string>
     <string name="sessions_new_other_directory">Другой каталог</string>

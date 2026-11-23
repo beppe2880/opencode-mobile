@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MarkEmailRead
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
@@ -94,21 +95,24 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButtonVariant
 import io.github.beppe2880.opencodemobile.core.ui.components.OcChip
 import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
+import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
-import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
+import io.github.beppe2880.opencodemobile.core.ui.components.OcInfoDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSearchField
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSectionHeader
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
-import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteChoices
+import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
+import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_cancel
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_close
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import io.github.beppe2880.opencodemobile.core.ui.text.formatMediumDate
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
@@ -118,6 +122,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_all_projects
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archive
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archived
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_bulk_delete_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_bulk_delete_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_clear_filters
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_connected
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_connecting
@@ -125,6 +131,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_co
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_reconnecting
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_unauthorized
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_failed_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_failed_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_demo_server
@@ -173,6 +181,9 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_re
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_save
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_search
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_selected_count
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_selection_actions
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_selection_close
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_settings
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_this_week
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
@@ -182,6 +193,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_un
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread_count
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
@@ -189,6 +201,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -216,6 +229,7 @@ fun SessionsScreen(
     inDrawer: Boolean = false,
 ) {
     val c = OcTheme.colors
+    OcBackHandler(enabled = state.selectionMode) { onEvent(SessionsEvent.ExitSelection) }
     val now by produceState(nowProvider()) {
         while (true) {
             delay(30_000)
@@ -226,10 +240,12 @@ fun SessionsScreen(
         modifier = modifier,
         containerColor = c.bgBase,
         contentWindowInsets = WindowInsets(0),
-        topBar = { SessionsTopBar(state, onEvent, demo) },
+        topBar = {
+            if (state.selectionMode) SelectionTopBar(state, onEvent) else SessionsTopBar(state, onEvent, demo)
+        },
         snackbarHost = { SnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(WindowInsets.navigationBars)) },
         floatingActionButton = {
-            if (!state.isEmpty || state.query.isNotEmpty() || state.directoryFilter != null) {
+            if (!state.selectionMode && (!state.isEmpty || state.query.isNotEmpty() || state.directoryFilter != null)) {
                 val newLabel = stringResource(Res.string.sessions_new)
                 ExtendedFloatingActionButton(
                     onClick = { onEvent(SessionsEvent.StartNewSession) },
@@ -275,9 +291,11 @@ fun SessionsScreen(
                     // In the first item: a banner appearing later pushes the list down instead
                     // of opening above the scroll position. Under the search, right above the chats.
                     Column {
-                        state.sharing?.let { ShareChoice(it, onEvent) }
-                        ListHeader(state, onEvent, headerTop)
-                        banner()
+                        if (!state.selectionMode) {
+                            state.sharing?.let { ShareChoice(it, onEvent) }
+                            ListHeader(state, onEvent, headerTop)
+                            banner()
+                        }
                     }
                 }
                 when {
@@ -308,14 +326,28 @@ fun SessionsScreen(
                                 session = session,
                                 running = session.id in state.running,
                                 selected = session.id == selectedSessionId,
+                                selectionMode = state.selectionMode,
+                                checked = session.id in state.selection,
                                 now = now,
-                                onClick = { onEvent(SessionsEvent.Open(session.id)) },
-                                onLongClick = { onEvent(SessionsEvent.ShowActions(session)) },
+                                onClick = {
+                                    if (state.selectionMode) {
+                                        onEvent(SessionsEvent.ToggleSelection(session.id))
+                                    } else {
+                                        onEvent(SessionsEvent.Open(session.id))
+                                    }
+                                },
+                                onLongClick = {
+                                    if (state.selectionMode) {
+                                        onEvent(SessionsEvent.ToggleSelection(session.id))
+                                    } else {
+                                        onEvent(SessionsEvent.StartSelection(session.id))
+                                    }
+                                },
                                 onSwipeDelete = { onEvent(SessionsEvent.RequestDelete(session)) },
                                 modifier = Modifier.animateItem().editable(SettingsPart.SessionRows, LocalEditMode.current),
                                 compact = compact,
                                 work = if (state.showRunningWork) state.work[session.id] ?: RunningWork() else null,
-                                swipeToDelete = !inDrawer,
+                                swipeToDelete = !inDrawer && !state.selectionMode,
                                 pinned = pinned,
                                 muted = session.id in state.muted,
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
@@ -366,6 +398,117 @@ private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Uni
             )
         },
     )
+}
+
+/** The top bar while rows are selected: close, the count and the actions for the selection. */
+@Composable
+private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+    val c = OcTheme.colors
+    var menuOpen by remember { mutableStateOf(false) }
+    var choosingMute by remember { mutableStateOf(false) }
+    val selected = state.selectedSessions
+    val count = selected.size
+    val single = selected.singleOrNull()
+    val singleMuted = single?.let { it.id in state.muted } == true
+    val allPinned = selected.isNotEmpty() && selected.all { it.id in state.pinned }
+    val allArchived = selected.isNotEmpty() && selected.all { it.archivedAt != null }
+    OcTopBar(
+        title = pluralStringResource(Res.plurals.sessions_selected_count, count, count),
+        leading = {
+            OcIconButton(
+                icon = Icons.Outlined.Close,
+                contentDescription = stringResource(Res.string.sessions_selection_close),
+                onClick = { onEvent(SessionsEvent.ExitSelection) },
+                modifier = Modifier.testTag("sessions_selection_close"),
+            )
+        },
+        actions = {
+            Box {
+                OcIconButton(
+                    icon = Icons.Outlined.MoreVert,
+                    contentDescription = stringResource(Res.string.sessions_selection_actions),
+                    onClick = { menuOpen = true },
+                    modifier = Modifier.testTag("sessions_selection_menu_button"),
+                )
+                DropdownMenu(
+                    expanded = menuOpen,
+                    onDismissRequest = { menuOpen = false },
+                    containerColor = c.bgBase,
+                    modifier = Modifier.exposeTestTags(),
+                ) {
+                    if (count == 1) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.sessions_rename)) },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.RenameSelected) },
+                            leadingIcon = {
+                                Icon(Icons.Outlined.DriveFileRenameOutline, contentDescription = null, tint = c.iconBase)
+                            },
+                            modifier = Modifier.testTag("sessions_bulk_rename"),
+                        )
+                    }
+                    if (count == 1 && single != null && sessionNotificationsSupported) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(if (singleMuted) Res.string.sessions_unmute else Res.string.sessions_mute)) },
+                            onClick = {
+                                menuOpen = false
+                                if (singleMuted) onEvent(SessionsEvent.SetMuted(single.id, false)) else choosingMute = true
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    if (singleMuted) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff,
+                                    contentDescription = null,
+                                    tint = c.iconBase,
+                                )
+                            },
+                            modifier = Modifier.testTag("sessions_bulk_mute"),
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text(stringResource(if (allPinned) Res.string.sessions_unpin else Res.string.sessions_pin)) },
+                        onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedPinned(!allPinned)) },
+                        leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
+                        modifier = Modifier.testTag("sessions_bulk_pin"),
+                    )
+                    if (state.archiveSupported) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(
+                                        if (allArchived) Res.string.sessions_unarchive else Res.string.sessions_archive,
+                                    ),
+                                )
+                            },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedArchived(!allArchived)) },
+                            leadingIcon = {
+                                Icon(
+                                    if (allArchived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
+                                    contentDescription = null,
+                                    tint = c.iconBase,
+                                )
+                            },
+                            modifier = Modifier.testTag("sessions_bulk_archive"),
+                        )
+                    }
+                    OcDivider(Modifier.padding(vertical = OcSpacing.xs))
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.sessions_delete), color = c.danger.fg) },
+                        onClick = { menuOpen = false; onEvent(SessionsEvent.RequestDeleteSelected) },
+                        leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null, tint = c.danger.fg) },
+                        modifier = Modifier.testTag("sessions_bulk_delete"),
+                    )
+                }
+            }
+        },
+    )
+    if (choosingMute && single != null) {
+        SessionMuteSheet(
+            running = single.id in state.running && state.connection == ConnectionState.Connected,
+            onDismiss = { choosingMute = false },
+        ) { untilFinished ->
+            choosingMute = false
+            onEvent(SessionsEvent.SetMuted(single.id, true, untilFinished = untilFinished))
+        }
+    }
 }
 
 @Composable
@@ -695,69 +838,6 @@ private fun DayBucket.label(): StringResource = when (this) {
 
 @Composable
 private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
-    state.actionsFor?.let { session ->
-        var choosingMute by remember(session.id) { mutableStateOf(false) }
-        OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissActions) }, testTag = "sessions_actions_sheet") {
-            if (choosingMute) {
-                SessionMuteChoices(session.id in state.running && state.connection == ConnectionState.Connected) { temporary ->
-                    onEvent(SessionsEvent.SetMuted(session.id, true, untilFinished = temporary))
-                }
-                return@OcBottomSheet
-            }
-            Text(
-                session.displayTitle(),
-                style = MaterialTheme.typography.titleSmall,
-                color = OcTheme.colors.textBase,
-                maxLines = 2,
-                modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm),
-            )
-            val pinned = session.id in state.pinned
-            val muted = session.id in state.muted
-            if (sessionNotificationsSupported) OcListRow(
-                title = stringResource(if (muted) Res.string.sessions_unmute else Res.string.sessions_mute),
-                onClick = {
-                    if (muted) onEvent(SessionsEvent.SetMuted(session.id, false)) else choosingMute = true
-                },
-                leading = { Icon(if (muted) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
-                modifier = Modifier.testTag("sessions_action_mute"),
-            )
-            val archived = session.archivedAt != null
-            OcListRow(
-                title = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin),
-                onClick = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
-                leading = { Icon(Icons.Outlined.PushPin, null, tint = OcTheme.colors.iconBase) },
-                modifier = Modifier.testTag("sessions_action_pin"),
-            )
-            OcListRow(
-                title = stringResource(Res.string.sessions_rename),
-                onClick = { onEvent(SessionsEvent.RequestRename(session)) },
-                leading = { Icon(Icons.Outlined.DriveFileRenameOutline, null, tint = OcTheme.colors.iconBase) },
-                modifier = Modifier.testTag("sessions_action_rename"),
-            )
-            if (state.archiveSupported) {
-                OcListRow(
-                    title = stringResource(if (archived) Res.string.sessions_unarchive else Res.string.sessions_archive),
-                    onClick = { onEvent(SessionsEvent.SetArchived(session, !archived)) },
-                    leading = {
-                        Icon(
-                            if (archived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
-                            contentDescription = null,
-                            tint = OcTheme.colors.iconBase,
-                        )
-                    },
-                    modifier = Modifier.testTag("sessions_action_archive"),
-                )
-            }
-            OcListRow(
-                title = stringResource(Res.string.sessions_delete),
-                titleColor = OcTheme.colors.danger.fg,
-                onClick = { onEvent(SessionsEvent.RequestDelete(session)) },
-                leading = { Icon(Icons.Outlined.Delete, null, tint = OcTheme.colors.danger.fg) },
-                modifier = Modifier.testTag("sessions_action_delete"),
-            )
-            Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars).height(OcSpacing.lg))
-        }
-    }
     state.renaming?.let { session ->
         OcTextInputDialog(
             title = stringResource(Res.string.sessions_rename_title),
@@ -778,6 +858,28 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
             onConfirm = { onEvent(SessionsEvent.ConfirmDelete) },
             onDismiss = { onEvent(SessionsEvent.DismissDialog) },
             testTagPrefix = "sessions_delete",
+        )
+    }
+    state.bulkDeleteCount?.takeIf { it > 1 }?.let { count ->
+        OcConfirmDialog(
+            title = pluralStringResource(Res.plurals.sessions_bulk_delete_title, count, count),
+            text = pluralStringResource(Res.plurals.sessions_bulk_delete_message, count),
+            confirmLabel = stringResource(Res.string.sessions_delete),
+            destructive = true,
+            onConfirm = { onEvent(SessionsEvent.ConfirmDelete) },
+            onDismiss = { onEvent(SessionsEvent.DismissDialog) },
+            testTagPrefix = "sessions_bulk_delete",
+        )
+    }
+    if (state.deleteFailures.isNotEmpty()) {
+        val untitled = stringResource(Res.string.sessions_untitled)
+        val names = state.deleteFailures.joinToString("\n") { it.title.ifBlank { untitled } }
+        OcInfoDialog(
+            title = stringResource(Res.string.sessions_delete_failed_title),
+            text = stringResource(Res.string.sessions_delete_failed_message, names),
+            confirmLabel = stringResource(UiRes.string.oc_close),
+            onDismiss = { onEvent(SessionsEvent.DismissDeleteFailures) },
+            testTagPrefix = "sessions_delete_failed",
         )
     }
     state.newSession?.let { new ->

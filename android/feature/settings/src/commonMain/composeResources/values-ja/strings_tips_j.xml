@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_j_sessions_bulk_title">セッションの一括操作</string>
+    <string name="tips_j_sessions_bulk_body">セッションを長押しして選択し、他の行をタップします。まとめてピン留め、アーカイブ、削除でき、1つだけ選択したときは名前を変更できます。戻るで選択を終了します。</string>
+    <string name="tips_j_sessions_bulk_demo">セッションを長押しし、2行を選択して、メニューから確認後に削除します。</string>
+</resources>

@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -102,12 +103,11 @@ class SessionsViewModelTest {
         val vm = vm()
         advanceUntilIdle()
         val old = vm.state.value.groups.last().sessions.single()
-        vm.onEvent(SessionsEvent.ShowActions(old))
-
-        vm.onEvent(SessionsEvent.SetPinned("old", true))
+        vm.onEvent(SessionsEvent.StartSelection(old.id))
+        vm.onEvent(SessionsEvent.SetSelectedPinned(true))
 
         val state = vm.state.value
-        assertEquals(null, state.actionsFor)
+        assertEquals(emptySet<String>(), state.selection)
         assertEquals(setOf("old"), state.pinned)
         assertEquals(setOf("old"), pins.pinned())
         assertEquals(listOf(DayBucket.Pinned, DayBucket.Today, DayBucket.Yesterday, DayBucket.ThisWeek), state.groups.map { it.bucket })
@@ -1692,6 +1692,290 @@ class SessionsViewModelTest {
         assertEquals(loads, repository.listCalls)
     }
 
+    @Test
+    fun `long press starts selection and taps toggle the rows`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        assertTrue(vm.state.value.selectionMode)
+        assertEquals(setOf("today"), vm.state.value.selection)
+        assertEquals(listOf("today"), vm.state.value.selectedSessions.map { it.id })
+
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+        assertEquals(listOf("today", "week"), vm.state.value.selectedSessions.map { it.id })
+
+        vm.onEvent(SessionsEvent.ToggleSelection("today"))
+        assertEquals(setOf("week"), vm.state.value.selection)
+
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertFalse(vm.state.value.selectionMode)
+
+        vm.onEvent(SessionsEvent.StartSelection("old"))
+        vm.onEvent(SessionsEvent.ExitSelection)
+        assertTrue(vm.state.value.selection.isEmpty())
+    }
+
+    @Test
+    fun `leaving the screen keeps the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+
+        vm.onEvent(SessionsEvent.Visible(false))
+        vm.onEvent(SessionsEvent.Visible(true))
+
+        assertEquals(setOf("today"), vm.state.value.selection)
+        vm.onEvent(SessionsEvent.Visible(false))
+    }
+
+    @Test
+    fun `changing the search or a filter clears the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.QueryChanged("nothing like it"))
+        assertTrue(vm.state.value.selection.isEmpty())
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
+        assertTrue(vm.state.value.selection.isEmpty())
+        advanceUntilIdle()
+
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.FilterChanged("/p/week"))
+        assertTrue(vm.state.value.selection.isEmpty())
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `a reload drops selected sessions that are no longer listed`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        sessions.listResult = Result.success(listOf(session("week", now - 3 * 24 * hour)))
+        vm.onEvent(SessionsEvent.Refresh)
+        advanceUntilIdle()
+
+        assertEquals(setOf("week"), vm.state.value.selection)
+        assertEquals(listOf("week"), vm.state.value.selectedSessions.map { it.id })
+    }
+
+    @Test
+    fun `changing the server clears the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+
+        servers.activeServer.value = servers.servers.value.first { it.id == "s2" }
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertFalse(vm.state.value.selectionMode)
+    }
+
+    @Test
+    fun `a deleted session leaves the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        events.flow.emit(ServerEvent.SessionChanged("today", deleted = true))
+        advanceUntilIdle()
+        assertEquals(setOf("week"), vm.state.value.selection)
+
+        events.flow.emit(ServerEvent.SessionChanged("week", deleted = true))
+        advanceUntilIdle()
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertFalse(vm.state.value.selectionMode)
+    }
+
+    @Test
+    fun `bulk pin pins every selected session and leaves selection mode`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("old"))
+
+        vm.onEvent(SessionsEvent.SetSelectedPinned(true))
+
+        assertEquals(setOf("today", "old"), pins.pinned())
+        assertEquals(setOf("today", "old"), vm.state.value.pinned)
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertEquals(DayBucket.Pinned, vm.state.value.groups.first().bucket)
+    }
+
+    @Test
+    fun `bulk unpin unpins every selected session`() = runTest(main.testDispatcher) {
+        pins.setPinned("today", true)
+        pins.setPinned("week", true)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedPinned(false))
+
+        assertTrue(pins.pinned().isEmpty())
+        assertFalse(DayBucket.Pinned in vm.state.value.groups.map { it.bucket })
+    }
+
+    @Test
+    fun `bulk archive removes every selected row and calls the server`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedArchived(true))
+        advanceUntilIdle()
+
+        assertEquals(listOf("today", "week"), sessions.archivedCalls.map { it.first })
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertEquals(listOf("yesterday", "old"), vm.state.value.ids())
+    }
+
+    @Test
+    fun `bulk unarchive restores the selected archived sessions`() = runTest(main.testDispatcher) {
+        sessions.archivedResult = Result.success(
+            listOf(
+                session("archived-a", now - hour, archivedAt = now),
+                session("archived-b", now - 2 * hour, archivedAt = now),
+            ),
+        )
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active))
+        advanceUntilIdle()
+        assertEquals(listOf("archived-a", "archived-b"), vm.state.value.ids())
+
+        vm.onEvent(SessionsEvent.StartSelection("archived-a"))
+        vm.onEvent(SessionsEvent.ToggleSelection("archived-b"))
+        vm.onEvent(SessionsEvent.SetSelectedArchived(false))
+        advanceUntilIdle()
+
+        assertEquals(listOf("archived-a" to false, "archived-b" to false), sessions.archivedCalls)
+        assertTrue(vm.state.value.ids().isEmpty())
+        assertTrue(vm.state.value.selection.isEmpty())
+    }
+
+    @Test
+    fun `a failed bulk archive restores only the failed rows and shows an error`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.archiveFailures = setOf("week")
+        val effects = mutableListOf<SessionsEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedArchived(true))
+        advanceUntilIdle()
+
+        assertEquals(listOf("yesterday", "week", "old"), vm.state.value.ids())
+        assertTrue(effects.any { it is SessionsEffect.ShowMessage })
+        collector.cancel()
+    }
+
+    @Test
+    fun `bulk delete asks once and deletes every selected session`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        assertEquals(2, vm.state.value.bulkDeleteCount)
+        assertTrue(vm.state.value.selectionMode)
+
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertNull(vm.state.value.bulkDeleteCount)
+        assertTrue(vm.state.value.selection.isEmpty())
+        assertEquals(listOf("today", "week"), sessions.deleteCalls)
+        assertEquals(listOf("yesterday", "old"), vm.state.value.ids())
+    }
+
+    @Test
+    fun `a single selected delete reuses the named confirmation`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        assertEquals("today", vm.state.value.deleting?.id)
+        assertNull(vm.state.value.bulkDeleteCount)
+
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertEquals(listOf("today"), sessions.deleteCalls)
+        assertTrue(vm.state.value.selection.isEmpty())
+    }
+
+    @Test
+    fun `a partial bulk delete restores the failed sessions and names them`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.deleteFailures = setOf("yesterday")
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("yesterday"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertEquals(listOf("yesterday"), vm.state.value.deleteFailures.map { it.id })
+        assertTrue("yesterday" in vm.state.value.ids())
+        assertFalse("today" in vm.state.value.ids())
+
+        vm.onEvent(SessionsEvent.DismissDeleteFailures)
+        assertTrue(vm.state.value.deleteFailures.isEmpty())
+    }
+
+    @Test
+    fun `a failed bulk delete keeps the pins of the sessions that remain`() = runTest(main.testDispatcher) {
+        pins.setPinned("today", true)
+        pins.setPinned("yesterday", true)
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.deleteFailures = setOf("yesterday")
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("yesterday"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertEquals(setOf("yesterday"), pins.pinned())
+    }
+
+    @Test
+    fun `rename is available only with one selected session`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.RenameSelected)
+        assertEquals("today", vm.state.value.renaming?.id)
+        assertTrue(vm.state.value.selection.isEmpty())
+
+        vm.onEvent(SessionsEvent.DismissDialog)
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+        vm.onEvent(SessionsEvent.RenameSelected)
+        assertNull(vm.state.value.renaming)
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
+    }
+
     private fun session(
         id: String,
         updated: Long,
@@ -1710,11 +1994,14 @@ class SessionsViewModelTest {
 private class FakeSessionRepository(initial: List<Session>) : SessionRepository {
     var listResult: Result<List<Session>> = Result.success(initial)
     var deleteResult: Result<Unit> = Result.success(Unit)
+    var deleteFailures: Set<String> = emptySet()
+    val deleteCalls = mutableListOf<String>()
     var lastSearch: String? = null
     var lastDirectory: String? = null
     var lastArchived: Boolean? = null
     var archivedResult: Result<List<Session>>? = null
     var setArchivedResult: Result<Unit> = Result.success(Unit)
+    var archiveFailures: Set<String> = emptySet()
     var archiveSupported = true
     var listCalls = 0
     val archivedCalls = mutableListOf<Pair<String, Boolean>>()
@@ -1766,10 +2053,15 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
         viewedCalls += sessionId to idleAt
         return if (sessionId in viewFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
     }
-    override suspend fun delete(sessionId: String): Result<Unit> = deleteResult
+    override suspend fun delete(sessionId: String): Result<Unit> {
+        deleteCalls += sessionId
+        if (deleteResult.isFailure) return deleteResult
+        return if (sessionId in deleteFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+    }
     override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
         archivedCalls += sessionId to archived
-        return setArchivedResult
+        if (setArchivedResult.isFailure) return setArchivedResult
+        return if (sessionId in archiveFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
     }
     override suspend fun archiveSupported(): Boolean = archiveSupported
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())

@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.Refresh
@@ -123,7 +126,13 @@ fun OcConfirmDialog(
         textContentColor = c.textMuted,
         shape = RoundedCornerShape(OcRadius.xl),
         title = { Text(title, style = MaterialTheme.typography.titleMedium) },
-        text = { Text(text, style = MaterialTheme.typography.bodyMedium) },
+        text = {
+            Text(
+                text,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.heightIn(max = 320.dp).verticalScroll(rememberScrollState()),
+            )
+        },
         confirmButton = {
             TextButton(onClick = onConfirm, modifier = Modifier.testTag("${testTagPrefix}_confirm_button")) {
                 Text(confirmLabel, color = if (destructive) c.danger.fg else c.textAccent)
@@ -175,6 +184,33 @@ fun OcTextInputDialog(
         dismissButton = {
             TextButton(onClick = onDismiss, modifier = Modifier.testTag("${testTagPrefix}_cancel_button")) {
                 Text(stringResource(Res.string.oc_cancel), color = c.textMuted)
+            }
+        },
+    )
+}
+
+/** Message dialog with a single action, for results the user only has to acknowledge. */
+@Composable
+fun OcInfoDialog(
+    title: String,
+    text: String,
+    confirmLabel: String,
+    onDismiss: () -> Unit,
+    testTagPrefix: String = "info",
+) {
+    val c = OcTheme.colors
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.exposeTestTags().testTag("${testTagPrefix}_dialog"),
+        containerColor = c.bgBase,
+        titleContentColor = c.textBase,
+        textContentColor = c.textMuted,
+        shape = RoundedCornerShape(OcRadius.xl),
+        title = { Text(title, style = MaterialTheme.typography.titleMedium) },
+        text = { Text(text, style = MaterialTheme.typography.bodyMedium) },
+        confirmButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("${testTagPrefix}_confirm_button")) {
+                Text(confirmLabel, color = c.textAccent)
             }
         },
     )

@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.Icon
@@ -32,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -54,8 +58,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_in
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_muted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
-import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_running_a11y
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_select
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_untitled
@@ -71,6 +75,10 @@ internal fun SessionRow(
     session: Session,
     running: Boolean,
     selected: Boolean,
+    /** Selection mode: the row toggles its selection instead of opening the chat. */
+    selectionMode: Boolean = false,
+    /** Selected for a bulk action (only in selection mode). */
+    checked: Boolean = false,
     now: Long,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -99,7 +107,7 @@ internal fun SessionRow(
     // delete leaves it in place and swipeable again.
     val dismissState = rememberSwipeToDismissBoxState()
     val scope = rememberCoroutineScope()
-    val renameLabel = stringResource(Res.string.sessions_rename)
+    val selectLabel = stringResource(Res.string.sessions_select)
     val deleteLabel = stringResource(Res.string.sessions_delete)
     val pinLabel = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin)
     val waitingLabel = waiting?.let { stringResource(it.label()) }
@@ -116,7 +124,7 @@ internal fun SessionRow(
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
-        gesturesEnabled = swipeToDelete,
+        gesturesEnabled = swipeToDelete && !selectionMode,
         modifier = modifier,
         onDismiss = {
             currentOnDelete()
@@ -134,19 +142,29 @@ internal fun SessionRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(if (selected) c.layer02 else c.bgBase)
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = renameLabel)
+                .background(if ((checked && selectionMode) || (selected && !selectionMode)) c.layer02 else c.bgBase)
+                .then(
+                    if (selectionMode) {
+                        Modifier.selectable(selected = checked, role = Role.Checkbox, onClick = onClick)
+                    } else {
+                        Modifier.combinedClickable(onClick = onClick, onLongClick = onLongClick, onLongClickLabel = selectLabel)
+                    },
+                )
                 .semantics {
                     val states = buildList {
                         if (running || showsWork) add(runningLabel)
                         if (unread) add(unreadLabel)
                     }
                     if (states.isNotEmpty()) stateDescription = states.joinToString(", ")
-                    customActions = listOfNotNull(
-                        onTogglePin?.let { toggle -> CustomAccessibilityAction(pinLabel) { toggle(); true } },
-                        CustomAccessibilityAction(renameLabel) { onLongClick(); true },
-                        CustomAccessibilityAction(deleteLabel) { onSwipeDelete(); true },
-                    )
+                    customActions = if (selectionMode) {
+                        emptyList()
+                    } else {
+                        listOfNotNull(
+                            onTogglePin?.let { toggle -> CustomAccessibilityAction(pinLabel) { toggle(); true } },
+                            CustomAccessibilityAction(selectLabel) { onLongClick(); true },
+                            CustomAccessibilityAction(deleteLabel) { onSwipeDelete(); true },
+                        )
+                    }
                 }
                 .heightIn(min = 56.dp)
                 .padding(horizontal = OcSpacing.gutter, vertical = OcSpacing.sm)
@@ -154,7 +172,16 @@ internal fun SessionRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(OcSpacing.md),
         ) {
-            OcProjectAvatar(session.directoryName)
+            if (selectionMode) {
+                Icon(
+                    imageVector = if (checked) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                    contentDescription = null,
+                    tint = if (checked) c.textAccent else c.iconMuted,
+                    modifier = Modifier.size(20.dp).testTag("session_check_${session.id}"),
+                )
+            } else {
+                OcProjectAvatar(session.directoryName)
+            }
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
                     if (muted) Icon(

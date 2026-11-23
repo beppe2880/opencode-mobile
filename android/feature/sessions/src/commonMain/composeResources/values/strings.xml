@@ -72,6 +72,24 @@
     <string name="sessions_save">Save</string>
     <string name="sessions_delete_title">Delete session?</string>
     <string name="sessions_delete_message">“%1$s” and its history will be permanently deleted from the server.</string>
+    <string name="sessions_select">Select</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <string name="sessions_selection_close">Exit selection</string>
+    <string name="sessions_selection_actions">Actions for selected sessions</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="one">Delete %1$d session?</item>
+        <item quantity="other">Delete %1$d sessions?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="one">Its history will be permanently deleted from the server.</item>
+        <item quantity="other">Their histories will be permanently deleted from the server.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">Some sessions could not be deleted</string>
+    <string name="sessions_delete_failed_message">These sessions are still on the server:\n%1$s</string>
+    <string name="sessions_bulk_failed">Some sessions could not be updated</string>
     <string name="sessions_new_title">New session</string>
     <string name="sessions_new_directory">Project directory</string>
     <string name="sessions_new_other_directory">Other directory</string>

@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_bulk_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
@@ -153,11 +154,11 @@ class SessionsViewModel(
                 loadProjects()
             }
             is SessionsEvent.QueryChanged -> {
-                updateState { it.copy(query = event.query) }
+                updateState { it.copy(query = event.query, selection = emptySet(), bulkDeleteCount = null) }
                 scheduleReload(SEARCH_DEBOUNCE_MS)
             }
             is SessionsEvent.FilterChanged -> {
-                updateState { it.copy(directoryFilter = event.directory) }
+                updateState { it.copy(directoryFilter = event.directory, selection = emptySet(), bulkDeleteCount = null) }
                 showCachedFirst = true
                 load(initial = false)
             }
@@ -186,22 +187,29 @@ class SessionsViewModel(
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
             is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
             SessionsEvent.OpenSettings -> sendEffect(SessionsEffect.OpenSettings)
-            is SessionsEvent.ShowActions -> updateState { it.copy(actionsFor = event.session) }
-            SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
             is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
             is SessionsEvent.SetMuted -> {
                 if (!event.untilFinished || (event.sessionId in currentState.running && currentState.connection == ConnectionState.Connected)) {
                     val idle = sessionList.firstOrNull { it.id == event.sessionId }?.idleAt
                     mutes.setMuted(event.sessionId, event.muted, if (event.untilFinished) idle ?: 0 else null)
                 }
-                updateState { it.copy(actionsFor = null) }
+                updateState { it.copy(selection = emptySet()) }
             }
             is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)
-            is SessionsEvent.RequestRename -> updateState { it.copy(actionsFor = null, renaming = event.session) }
-            is SessionsEvent.RequestDelete -> updateState { it.copy(actionsFor = null, deleting = event.session) }
-            SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
+            is SessionsEvent.RequestDelete -> updateState { it.copy(deleting = event.session) }
+            SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null, bulkDeleteCount = null) }
             is SessionsEvent.ConfirmRename -> rename(event.title)
-            SessionsEvent.ConfirmDelete -> delete()
+            SessionsEvent.ConfirmDelete -> if (currentState.bulkDeleteCount != null) deleteSelected() else delete()
+            is SessionsEvent.StartSelection -> updateState { it.copy(selection = setOf(event.sessionId), deleteFailures = emptyList()) }
+            is SessionsEvent.ToggleSelection -> updateState {
+                it.copy(selection = if (event.sessionId in it.selection) it.selection - event.sessionId else it.selection + event.sessionId)
+            }
+            SessionsEvent.ExitSelection -> updateState { it.copy(selection = emptySet(), bulkDeleteCount = null) }
+            is SessionsEvent.SetSelectedPinned -> setSelectedPinned(event.pinned)
+            is SessionsEvent.SetSelectedArchived -> setSelectedArchived(event.archived)
+            SessionsEvent.RenameSelected -> renameSelected()
+            SessionsEvent.RequestDeleteSelected -> requestDeleteSelected()
+            SessionsEvent.DismissDeleteFailures -> updateState { it.copy(deleteFailures = emptyList()) }
             // While a chat is picked for a share, a new session takes it.
             SessionsEvent.StartNewSession -> startNewSession(currentState.sharing)
             SessionsEvent.DismissNewSession -> {
@@ -263,7 +271,9 @@ class SessionsViewModel(
                 error = null,
                 newSession = null,
                 sharing = null,
-                actionsFor = null,
+                selection = emptySet(),
+                bulkDeleteCount = null,
+                deleteFailures = emptyList(),
                 renaming = null,
                 deleting = null,
             )
@@ -381,7 +391,13 @@ class SessionsViewModel(
             is ServerEvent.SessionChanged -> {
                 if (event.deleted) {
                     sessionList = sessionList.filterNot { it.id == event.sessionId }
-                    updateState { it.copy(groups = group(sessionList)) }
+                    updateState {
+                        it.copy(
+                            groups = group(sessionList),
+                            selection = it.selection - event.sessionId,
+                            bulkDeleteCount = if (event.sessionId in it.selection) null else it.bulkDeleteCount,
+                        )
+                    }
                     forgetPin(event.sessionId)
                 } else {
                     scheduleReload(EVENT_DEBOUNCE_MS)
@@ -518,9 +534,14 @@ class SessionsViewModel(
                     listedForPin = beyond.mapTo(HashSet()) { it.id }
                     val list = listed + beyond
                     sessionList = list
+                    val groups = group(list, filters)
+                    val visible = groups.flatMapTo(HashSet()) { group -> group.sessions.map { it.id } }
                     updateState {
+                        val selection = it.selection.intersect(visible)
                         it.copy(
-                            groups = group(list, filters),
+                            groups = groups,
+                            selection = selection,
+                            bulkDeleteCount = it.bulkDeleteCount.takeIf { count -> count == selection.size },
                             running = active ?: it.running,
                             loading = false,
                             refreshing = false,
@@ -619,7 +640,6 @@ class SessionsViewModel(
     }
 
     private fun setPinned(sessionId: String, pinned: Boolean) {
-        updateState { it.copy(actionsFor = null) }
         pins.setPinned(sessionId, pinned)
         showPins()
     }
@@ -631,7 +651,7 @@ class SessionsViewModel(
         if (filters.statuses == currentState.filters.statuses) return
         sessionList = emptyList()
         showCachedFirst = SessionStatus.Active in filters.effectiveStatuses
-        updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+        updateState { it.copy(filters = filters, groups = emptyList(), selection = emptySet(), bulkDeleteCount = null, loading = true, error = null) }
         load(initial = true)
     }
 
@@ -639,7 +659,7 @@ class SessionsViewModel(
     private fun updateFilters(transform: (SessionFilters) -> SessionFilters) {
         val filters = transform(currentState.filters)
         if (filters == currentState.filters) return
-        updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+        updateState { it.copy(filters = filters, groups = group(sessionList, filters), selection = emptySet(), bulkDeleteCount = null) }
     }
 
     private fun resetFilters() {
@@ -650,16 +670,15 @@ class SessionsViewModel(
         if (wasFiltered) {
             sessionList = emptyList()
             showCachedFirst = true
-            updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+            updateState { it.copy(filters = filters, groups = emptyList(), selection = emptySet(), bulkDeleteCount = null, loading = true, error = null) }
             load(initial = true)
         } else {
-            updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+            updateState { it.copy(filters = filters, groups = group(sessionList, filters), selection = emptySet(), bulkDeleteCount = null) }
         }
     }
 
     /** Archives or restores [session], removing it from the list shown until the server confirms. */
     private fun setArchived(session: Session, archived: Boolean) {
-        updateState { it.copy(actionsFor = null) }
         val previous = sessionList
         val status = if (archived) SessionStatus.Archived else SessionStatus.Active
         if (status !in currentState.filters.effectiveStatuses) {
@@ -683,6 +702,87 @@ class SessionsViewModel(
                 sendEffect(SessionsEffect.ShowMessage(error.toUiText()))
             }
         }
+    }
+
+    private fun requestDeleteSelected() {
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        if (selected.size == 1) {
+            updateState { it.copy(deleting = selected.single(), bulkDeleteCount = null) }
+        } else {
+            updateState { it.copy(bulkDeleteCount = selected.size, deleting = null) }
+        }
+    }
+
+    private fun renameSelected() {
+        val session = currentState.selectedSessions.singleOrNull() ?: return
+        updateState { it.copy(selection = emptySet(), renaming = session) }
+    }
+
+    private fun setSelectedPinned(pinned: Boolean) {
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        updateState { it.copy(selection = emptySet()) }
+        selected.forEach { pins.setPinned(it.id, pinned) }
+        showPins()
+    }
+
+    private fun setSelectedArchived(archived: Boolean) {
+        if (!currentState.archiveSupported) return
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        updateState { it.copy(selection = emptySet()) }
+        if (selected.size == 1) {
+            setArchived(selected.single(), archived)
+            return
+        }
+        val previous = sessionList
+        val ids = selected.mapTo(HashSet()) { it.id }
+        val status = if (archived) SessionStatus.Archived else SessionStatus.Active
+        sessionList = if (status !in currentState.filters.effectiveStatuses) {
+            sessionList.filterNot { it.id in ids }
+        } else {
+            sessionList.map { if (it.id in ids) it.copy(archivedAt = if (archived) clock() else null) else it }
+        }
+        updateState { it.copy(groups = group(sessionList)) }
+        viewModelScope.launch {
+            val failed = mutableListOf<Session>()
+            for (session in selected) {
+                sessions.setArchived(session.id, archived).onFailure { failed += session }
+            }
+            if (failed.isNotEmpty()) {
+                restore(previous, failed)
+                sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_bulk_failed)))
+            }
+        }
+    }
+
+    private fun deleteSelected() {
+        val selected = currentState.selectedSessions
+        updateState { it.copy(bulkDeleteCount = null, selection = emptySet()) }
+        if (selected.isEmpty()) return
+        val previous = sessionList
+        val ids = selected.mapTo(HashSet()) { it.id }
+        sessionList = sessionList.filterNot { it.id in ids }
+        updateState { it.copy(groups = group(sessionList)) }
+        viewModelScope.launch {
+            val failed = mutableListOf<Session>()
+            for (session in selected) {
+                sessions.delete(session.id).onSuccess { pins.setPinned(session.id, false) }.onFailure { failed += session }
+            }
+            if (failed.isNotEmpty()) {
+                restore(previous, failed)
+                updateState { it.copy(deleteFailures = failed) }
+            }
+        }
+    }
+
+    /** Puts the failed sessions back as they were, keeping every successful change. */
+    private fun restore(previous: List<Session>, failed: List<Session>) {
+        val failedIds = failed.mapTo(HashSet()) { it.id }
+        sessionList = (sessionList.filterNot { it.id in failedIds } + previous.filter { it.id in failedIds })
+            .sortedByDescending { it.updatedAt }
+        updateState { it.copy(groups = group(sessionList)) }
     }
 
     /** A deleted session leaves no pin behind. */
@@ -784,7 +884,7 @@ class SessionsViewModel(
 
     private fun delete() {
         val session = currentState.deleting ?: return
-        updateState { it.copy(deleting = null) }
+        updateState { it.copy(deleting = null, selection = emptySet()) }
         val previous = sessionList
         sessionList = sessionList.filterNot { it.id == session.id }
         updateState { it.copy(groups = group(sessionList)) }

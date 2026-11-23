@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_j_sessions_bulk_title">Ações em lote nas sessões</string>
+    <string name="tips_j_sessions_bulk_body">Mantenha uma sessão pressionada para selecioná-la e toque em outras linhas. Fixe, arquive ou exclua várias de uma vez, ou renomeie quando apenas uma estiver selecionada. Voltar sai da seleção.</string>
+    <string name="tips_j_sessions_bulk_demo">Uma sessão é pressionada; duas linhas são selecionadas e o menu as exclui após uma confirmação.</string>
+</resources>

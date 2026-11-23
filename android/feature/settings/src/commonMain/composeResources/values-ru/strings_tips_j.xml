@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_j_sessions_bulk_title">Действия с несколькими сессиями</string>
+    <string name="tips_j_sessions_bulk_body">Удерживайте сессию, чтобы выбрать её, затем коснитесь других строк. Закрепляйте, архивируйте или удаляйте их вместе; переименование доступно для одной. Назад выходит из выбора.</string>
+    <string name="tips_j_sessions_bulk_demo">Сессию удерживают; выбираются две строки, и меню удаляет их после подтверждения.</string>
+</resources>

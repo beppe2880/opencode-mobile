@@ -72,6 +72,24 @@
     <string name="sessions_save">Guardar</string>
     <string name="sessions_delete_title">¿Eliminar sesión?</string>
     <string name="sessions_delete_message">Se eliminarán permanentemente «%1$s» y su historial del servidor.</string>
+    <string name="sessions_select">Seleccionar</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="one">%1$d seleccionada</item>
+        <item quantity="other">%1$d seleccionadas</item>
+    </plurals>
+    <string name="sessions_selection_close">Salir de la selección</string>
+    <string name="sessions_selection_actions">Acciones para las sesiones seleccionadas</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="one">¿Eliminar %1$d sesión?</item>
+        <item quantity="other">¿Eliminar %1$d sesiones?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="one">Su historial se eliminará permanentemente del servidor.</item>
+        <item quantity="other">Sus historiales se eliminarán permanentemente del servidor.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">Algunas sesiones no se pudieron eliminar</string>
+    <string name="sessions_delete_failed_message">Estas sesiones siguen en el servidor:\n%1$s</string>
+    <string name="sessions_bulk_failed">Algunas sesiones no se pudieron actualizar</string>
     <string name="sessions_new_title">Nueva sesión</string>
     <string name="sessions_new_directory">Carpeta del proyecto</string>
     <string name="sessions_new_other_directory">Otra carpeta</string>
