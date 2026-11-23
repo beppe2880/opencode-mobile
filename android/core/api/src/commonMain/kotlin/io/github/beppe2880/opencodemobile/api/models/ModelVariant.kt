@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.ModelSettings
+import io.github.beppe2880.opencodemobile.api.models.ModelVariantSettings
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -45,7 +45,7 @@ data class ModelVariant (
     val id: kotlin.String,
 
     @SerialName(value = "settings")
-    val settings: ModelSettings? = null,
+    val settings: ModelVariantSettings? = null,
 
     @SerialName(value = "headers")
     val headers: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,

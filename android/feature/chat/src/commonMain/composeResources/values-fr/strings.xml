@@ -288,4 +288,13 @@
     <string name="chat_preview_selection_now">Choisi dans le compositeur : le chat bascule vers eux immédiatement</string>
     <string name="chat_preview_stop_asks">Arrêter une commande depuis la feuille En cours demande d’abord confirmation</string>
     <string name="chat_preview_stop_direct">Arrêter une commande depuis la feuille En cours la termine immédiatement</string>
+    <string name="chat_btw_title">Question à part</string>
+    <string name="chat_btw_ask">Demander à part</string>
+    <string name="chat_btw_text_only">Les questions à part acceptent uniquement du texte. Retirez les pièces jointes avant l’envoi.</string>
+    <string name="chat_btw_unavailable">Questions à part indisponibles. Vérifiez que le serveur prend en charge /btw.</string>
+    <string name="chat_btw_empty">Aucun texte renvoyé.</string>
+    <string name="chat_btw_failed">Échec de la question</string>
+    <string name="chat_btw_loading">Préparation de la réponse…</string>
+    <string name="chat_btw_question">Votre question</string>
+    <string name="chat_btw_ready">Réponse prête</string>
 </resources>

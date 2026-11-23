@@ -41,7 +41,7 @@ data class PromptInputSkillAttachment (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "id")
-    val id: kotlin.String?,
+    val id: kotlin.String,
 
     @SerialName(value = "mention")
     val mention: PromptMention? = null

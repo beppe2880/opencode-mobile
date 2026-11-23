@@ -25,6 +25,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -114,6 +115,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attach
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attach_file
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attach_photo
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_btw_ask
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_composer_placeholder
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_listening
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_start
@@ -195,8 +197,8 @@ internal fun Composer(
         shadowElevation = 2.dp,
     ) {
         Column(Modifier.padding(start = OcSpacing.md, end = OcSpacing.xs, top = OcSpacing.sm, bottom = OcSpacing.xs)) {
-            AnimatedVisibility(visible = state.running && state.draft.isNotBlank() && !state.isShell) {
-                DeliveryToggle(state.delivery, onSelect = { onEvent(ChatEvent.DeliveryChanged(it)) })
+            AnimatedVisibility(visible = (state.running || state.btwMode) && state.draft.isNotBlank() && (!state.isShell || state.isBtw)) {
+                DeliveryToggle(state, onEvent)
             }
             AnimatedVisibility(visible = state.isShell) { ShellHint(state.directory) }
             if (state.uploads.isNotEmpty()) {
@@ -296,7 +298,7 @@ internal fun Composer(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
                     ) {
-                        AttachButton(onAttachPhoto, onAttachFile)
+                        if (!state.isBtw) AttachButton(onAttachPhoto, onAttachFile)
                         AgentSelector(state.agents, state.agent, onSelect = { onEvent(ChatEvent.SelectAgent(it)) })
                         ModelButton(
                             model = state.model,
@@ -352,7 +354,7 @@ internal fun Composer(
                     if (!state.running || state.draft.isNotBlank()) {
                         OcRoundIconButton(
                             icon = if (state.running) Icons.AutoMirrored.Outlined.Send else Icons.Outlined.ArrowUpward,
-                            contentDescription = stringResource(Res.string.chat_send),
+                            contentDescription = stringResource(if (state.isBtw) Res.string.chat_btw_ask else Res.string.chat_send),
                             onClick = {
                                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 onEvent(ChatEvent.Send)
@@ -672,23 +674,34 @@ private fun AttachmentThumbnail(attachment: PromptAttachment, bitmap: ImageBitma
 }
 
 @Composable
-private fun DeliveryToggle(selected: PromptDelivery, onSelect: (PromptDelivery) -> Unit) {
-    Row(
+private fun DeliveryToggle(state: ChatState, onEvent: (ChatEvent) -> Unit) {
+    FlowRow(
         modifier = Modifier.padding(bottom = OcSpacing.xs),
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         OcChip(
             text = stringResource(Res.string.chat_steer),
-            selected = selected == PromptDelivery.Steer,
-            onClick = { onSelect(PromptDelivery.Steer) },
+            selected = !state.isBtw && state.delivery == PromptDelivery.Steer,
+            onClick = {
+                onEvent(ChatEvent.BtwMode(false))
+                onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Steer))
+            },
             modifier = Modifier.testTag("chat_delivery_steer"),
         )
         OcChip(
             text = stringResource(Res.string.chat_queue),
-            selected = selected == PromptDelivery.Queue,
-            onClick = { onSelect(PromptDelivery.Queue) },
+            selected = !state.isBtw && state.delivery == PromptDelivery.Queue,
+            onClick = {
+                onEvent(ChatEvent.BtwMode(false))
+                onEvent(ChatEvent.DeliveryChanged(PromptDelivery.Queue))
+            },
             modifier = Modifier.testTag("chat_delivery_queue"),
+        )
+        OcChip(
+            text = stringResource(Res.string.chat_btw_ask),
+            selected = state.isBtw,
+            onClick = { onEvent(ChatEvent.BtwMode(true)) },
+            modifier = Modifier.testTag("chat_delivery_btw"),
         )
     }
 }

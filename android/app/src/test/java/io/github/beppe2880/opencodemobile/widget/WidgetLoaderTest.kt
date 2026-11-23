@@ -113,7 +113,7 @@ private class FakeSessions : SessionRepository {
     var failing = false
     var hanging = false
 
-    override suspend fun list(search: String?, directory: String?, limit: Int): Result<List<Session>> {
+    override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?): Result<List<Session>> {
         if (hanging) awaitCancellation()
         return if (failing) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(remote)
     }

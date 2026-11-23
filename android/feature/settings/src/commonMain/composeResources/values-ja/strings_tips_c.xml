@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tips_c_ask_title">回答の一部について質問する</string>
+    <string name="tips_c_ask_body">回答の文章を選択して「質問」をタップすると、引用として入力欄に入ります。そのまま質問を入力できます。「質問」をもう一度タップすると、複数の部分を引用できます。Androidのみ。</string>
+    <string name="tips_c_ask_demo">回答の一文を長押しして選択し、メニューの「質問」をタップすると、その文が入力欄に引用として表示されます。その下に質問を入力して送信すると、引用は吹き出し内で薄く表示されます。</string>
+    <string name="tips_c_voice_background_title">バックグラウンドでも録音を続ける</string>
+    <string name="tips_c_voice_background_body">クラウドモデルで録音したボイスメッセージは、別のアプリに切り替えたり端末をロックしたりしても録音が続きます。Android では通知の「停止」で終了し、戻るとテキストがメッセージ欄に入っています。</string>
+    <string name="tips_c_voice_background_demo">録音はメッセージ欄で行われ、ホーム画面には経過時間を示す通知が表示されます。指が「停止」をタップすると、アプリに戻ったときに話した文がメッセージ欄に入っています。</string>
+
     <string name="tips_c_voice_record_title">入力せずに話しかける</string>
     <string name="tips_c_voice_record_body">メッセージ欄のマイクをタップして話します。リアルタイムの波形と時間表示で、音声が認識されていることがわかります。確定すると文字が残り、キャンセルすると破棄されます。</string>
     <string name="tips_c_voice_record_demo">指でマイクをタップすると、メッセージ欄に動く波形と時間が表示され、話した文がテキストとして現れます。</string>
@@ -15,6 +22,9 @@
     <string name="tips_c_terminal_fullscreen_title">ターミナルの表示領域を広く</string>
     <string name="tips_c_terminal_fullscreen_body">全画面に切り替えると、タイトルバーとシステムバーが隠れ、一度により多くの行が見えます。戻るボタンまたは同じボタンで元に戻ります。</string>
     <string name="tips_c_terminal_fullscreen_demo">指でターミナルの全画面ボタンをタップすると、タイトルバーとステータスバーがスライドして消え、出力の行が増えて表示されます。</string>
+    <string name="tips_c_waiting_title">回答を待っているチャットを確認</string>
+    <string name="tips_c_waiting_body">エージェントが質問や許可のために停止すると、一覧のそのチャットには、作業中の代わりに「質問あり」または「要許可」が警告色で表示されます。そのサブエージェントからのリクエストも対象です。</string>
+    <string name="tips_c_waiting_demo">一覧の作業中のチャットが警告色の「質問あり」に変わり、回答すると再び「作業中」に戻り、その後「要許可」が表示されます。</string>
     <string name="tips_c_terminal_select_title">ターミナルからテキストをコピー</string>
     <string name="tips_c_terminal_select_body">出力内の単語を長押しして選択し、ハンドルをドラッグしてさらに選択してから、「コピー」をタップします。「すべて選択」はすべてを選択し、上部バーの「テキストを選択」ボタンでも選択を開始できます。</string>
     <string name="tips_c_terminal_select_demo">失敗したテスト行の単語を長押しして強調表示し、そのハンドルを行末までドラッグして「コピー」をタップすると、「コピーしました」の通知が表示されます。</string>

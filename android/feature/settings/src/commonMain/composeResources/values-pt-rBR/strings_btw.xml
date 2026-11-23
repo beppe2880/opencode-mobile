@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">Faça uma pergunta paralela</string>
+    <string name="tips_c_btw_body">Enquanto o agente trabalha, escolha Perguntar à parte acima da caixa de mensagem, ou digite /btw e sua pergunta. Ele responde brevemente com base na conversa, sem ferramentas e sem interromper ou redirecionar a tarefa. A resposta abre em painel próprio com Copiar e nunca entra no chat. Também funciona quando o chat está ocioso.</string>
+    <string name="tips_c_btw_demo">Enquanto o agente trabalha, uma pergunta é digitada na caixa de mensagem e enviada com Perguntar à parte. Um chip acima da caixa mostra que a resposta está sendo preparada e depois que está pronta; ao tocar, a resposta abre em um painel separado.</string>
+    <string name="tips_c_btw_working">Refatorando a lógica de repetição…</string>
+    <string name="tips_c_btw_question">Qual arquivo contém a lógica de repetição?</string>
+    <string name="tips_c_btw_answer">A lógica de repetição fica em **src/api/client.ts**, em `withRetry()`.</string>
+    <string name="tips_c_btw_labels">Redirecionar agora\nColocar na fila\nPerguntar à parte\nPreparando resposta…\nResposta pronta\nPergunta à parte\nCopiar\nFechar</string>
+</resources>

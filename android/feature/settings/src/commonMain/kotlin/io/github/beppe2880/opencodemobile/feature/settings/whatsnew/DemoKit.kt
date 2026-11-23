@@ -300,7 +300,14 @@ internal fun DemoTopBar(title: String, modifier: Modifier = Modifier, subtitle: 
 
 /** A session in the list: project initial, [title], [subtitle] and [time]. */
 @Composable
-internal fun DemoSessionRow(title: String, subtitle: String, time: String, modifier: Modifier = Modifier, leading: @Composable () -> Unit = {}) {
+internal fun DemoSessionRow(
+    title: String,
+    subtitle: String,
+    time: String,
+    modifier: Modifier = Modifier,
+    leading: @Composable () -> Unit = {},
+    trailing: @Composable () -> Unit = {},
+) {
     val c = OcTheme.colors
     Row(
         modifier.fillMaxWidth().padding(horizontal = OcSpacing.md, vertical = OcSpacing.sm),
@@ -317,6 +324,9 @@ internal fun DemoSessionRow(title: String, subtitle: String, time: String, modif
             }
             Text(subtitle, style = MaterialTheme.typography.labelSmall, color = c.textMuted)
         }
-        Text(time, style = MaterialTheme.typography.labelSmall, color = c.textFaint)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(time, style = MaterialTheme.typography.labelSmall, color = c.textFaint)
+            trailing()
+        }
     }
 }

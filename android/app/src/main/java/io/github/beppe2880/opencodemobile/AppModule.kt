@@ -4,12 +4,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.beppe2880.opencodemobile.api.OpenCodeApiVersion
 import io.github.beppe2880.opencodemobile.core.data.di.AppScope
+import io.github.beppe2880.opencodemobile.core.data.stt.BackgroundRecording
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateTarget
 import io.github.beppe2880.opencodemobile.notifications.AndroidMonitorNotifier
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitor
 import io.github.beppe2880.opencodemobile.notifications.SessionMonitorService
 import io.github.beppe2880.opencodemobile.share.ShareMenuSwitch
+import io.github.beppe2880.opencodemobile.voice.VoiceRecordingService
 import io.github.beppe2880.opencodemobile.widget.WidgetUpdater
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -28,6 +30,7 @@ val appModule = module {
     )
 
     single { AndroidMonitorNotifier(androidContext()) }
+    single<BackgroundRecording> { VoiceRecordingService.recording(androidContext()) }
     // Whether a screen of the app is shown.
     single(AppVisible) {
         ProcessLifecycleOwner.get().lifecycle.currentStateFlow

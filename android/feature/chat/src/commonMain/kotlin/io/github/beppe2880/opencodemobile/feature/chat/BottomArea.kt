@@ -145,6 +145,7 @@ internal fun BottomArea(
         }
         // Part of this column, so the transcript above ends before them and is never covered.
         RunningChipsBar(state, onEvent)
+        BtwStatus(state, onEvent)
         Composer(
             state,
             onEvent,

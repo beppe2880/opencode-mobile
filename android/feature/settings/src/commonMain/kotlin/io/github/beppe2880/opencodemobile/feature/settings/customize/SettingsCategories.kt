@@ -175,7 +175,7 @@ val SettingsArea.groups: List<OptionGroup>
                 ),
             ),
         )
-        SettingsArea.Sessions -> listOf(OptionGroup(null, listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)))
+        SettingsArea.Sessions -> listOf(OptionGroup(null, listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.ConfirmStop)))
         SettingsArea.LargeScreens -> listOf(
             OptionGroup(Res.string.settings_group_layout, listOf(SettingOption.SplitView, SettingOption.UnfoldedLayout, SettingOption.ListWidth)),
             OptionGroup(Res.string.settings_group_folding, listOf(SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat)),
@@ -191,7 +191,7 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Terminal -> listOf(
             OptionGroup(null, listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard, SettingOption.TerminalFullscreen)),
         )
-        SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice)))
+        SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)))
     }
 
 /** Every option of this category, in page order. */

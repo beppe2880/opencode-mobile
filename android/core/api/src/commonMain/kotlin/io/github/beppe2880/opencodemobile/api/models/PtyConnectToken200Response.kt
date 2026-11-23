@@ -41,7 +41,7 @@ import kotlinx.serialization.Contextual
 data class PtyConnectToken200Response (
 
     @SerialName(value = "location")
-    val location: LocationPublicRef?,
+    val location: LocationPublicRef,
 
     @SerialName(value = "data")
     val `data`: PtyTicketConnectToken

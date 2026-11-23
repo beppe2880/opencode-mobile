@@ -288,4 +288,13 @@
     <string name="chat_preview_selection_now">Scelto nel campo di scrittura: la chat passa a loro subito</string>
     <string name="chat_preview_stop_asks">Interrompere un comando dal foglio In esecuzione chiede prima conferma</string>
     <string name="chat_preview_stop_direct">Interrompere un comando dal foglio In esecuzione lo termina subito</string>
+    <string name="chat_btw_title">Domanda a parte</string>
+    <string name="chat_btw_ask">Chiedi a parte</string>
+    <string name="chat_btw_text_only">Le domande a parte supportano solo testo. Rimuovi gli allegati prima di inviare.</string>
+    <string name="chat_btw_unavailable">Domande a parte non disponibili. Verifica che il server supporti /btw.</string>
+    <string name="chat_btw_empty">Non è stato restituito alcun testo.</string>
+    <string name="chat_btw_failed">Domanda non riuscita</string>
+    <string name="chat_btw_loading">Preparazione della risposta…</string>
+    <string name="chat_btw_question">La tua domanda</string>
+    <string name="chat_btw_ready">Risposta pronta</string>
 </resources>

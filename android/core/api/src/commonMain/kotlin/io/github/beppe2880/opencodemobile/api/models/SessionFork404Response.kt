@@ -25,8 +25,6 @@ package io.github.beppe2880.opencodemobile.api.models
 
 import kotlin.jvm.JvmInline
 
-import io.github.beppe2880.opencodemobile.api.models.LocationNotFoundErrorEncoded
-import io.github.beppe2880.opencodemobile.api.models.LocationPublicRef
 import io.github.beppe2880.opencodemobile.api.models.MessageNotFoundErrorEncoded
 import io.github.beppe2880.opencodemobile.api.models.SessionNotFoundErrorEncoded
 
@@ -53,9 +51,6 @@ import kotlinx.serialization.json.jsonPrimitive
 @Serializable(with = SessionFork404ResponseSerializer::class)
 sealed interface SessionFork404Response {
     @JvmInline
-     value class LocationnotfounderrorWrapper(val value: LocationNotFoundErrorEncoded) : SessionFork404Response
-
-    @JvmInline
      value class MessagenotfounderrorWrapper(val value: MessageNotFoundErrorEncoded) : SessionFork404Response
 
     @JvmInline
@@ -69,11 +64,6 @@ object SessionFork404ResponseSerializer : KSerializer<SessionFork404Response> {
     override fun serialize(encoder: Encoder, value: SessionFork404Response) {
         require(encoder is JsonEncoder)
         val jsonObject = when (value) {
-            is SessionFork404Response.LocationnotfounderrorWrapper -> {
-                val jsonMap = encoder.json.encodeToJsonElement(LocationNotFoundErrorEncoded.serializer(), value.value).jsonObject.toMutableMap()
-                jsonMap["_tag"] = JsonPrimitive("LocationNotFoundError")
-                JsonObject(jsonMap)
-            }
             is SessionFork404Response.MessagenotfounderrorWrapper -> {
                 val jsonMap = encoder.json.encodeToJsonElement(MessageNotFoundErrorEncoded.serializer(), value.value).jsonObject.toMutableMap()
                 jsonMap["_tag"] = JsonPrimitive("MessageNotFoundError")
@@ -96,10 +86,6 @@ object SessionFork404ResponseSerializer : KSerializer<SessionFork404Response> {
             ?: throw SerializationException("Missing _tag field")
 
         return when (discriminatorValue) {
-            "LocationNotFoundError" -> {
-                val decoded = decoder.json.decodeFromJsonElement(LocationNotFoundErrorEncoded.serializer(), element)
-                SessionFork404Response.LocationnotfounderrorWrapper(decoded)
-            }
             "MessageNotFoundError" -> {
                 val decoded = decoder.json.decodeFromJsonElement(MessageNotFoundErrorEncoded.serializer(), element)
                 SessionFork404Response.MessagenotfounderrorWrapper(decoded)

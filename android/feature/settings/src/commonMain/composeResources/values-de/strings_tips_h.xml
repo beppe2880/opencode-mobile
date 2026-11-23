@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_h_star_title">Gib der App auf GitHub einen Stern</string>
+    <string name="tips_h_star_body">Die App ist kostenlos und Open Source, und ein Stern auf GitHub hilft anderen, sie zu finden. Direkt nach einem Update oder nach einiger Nutzung fragt ein Banner über den Sitzungen einmal danach. Tippe darauf, um GitHub zu öffnen, und schließe es dann mit seinem X, dann kommt es nicht wieder. Du findest Stern auf GitHub setzen auch hier und unter Einstellungen → Über die App.</string>
+    <string name="tips_h_star_demo">Ein Banner über den Sitzungen lädt ein, der App auf GitHub einen Stern zu geben; ein Tippen öffnet GitHub, und das Banner bedankt sich, bis du es mit seinem X schließt.</string>
+</resources>

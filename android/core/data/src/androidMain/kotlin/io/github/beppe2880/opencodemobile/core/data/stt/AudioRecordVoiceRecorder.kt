@@ -17,12 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Records 16 kHz mono PCM with [AudioRecord]; the audio stays in memory until it is sent or
- * dropped. The level is the RMS of each 40 ms chunk read.
+ * dropped. The level is the RMS of each 40 ms chunk read. With [background] the recording goes on
+ * while the app is in the background.
  */
-internal class AudioRecordVoiceRecorder : VoiceRecorder {
+internal class AudioRecordVoiceRecorder(private val background: BackgroundRecording? = null) : VoiceRecorder {
     override val needsPermission: Boolean = true
 
     private val _level = MutableStateFlow(0f)
@@ -51,18 +53,24 @@ internal class AudioRecordVoiceRecorder : VoiceRecorder {
                 if (record.state != AudioRecord.STATE_INITIALIZED) throw IOException("Microphone unavailable")
                 record.startRecording()
                 if (record.recordingState != AudioRecord.RECORDSTATE_RECORDING) throw IOException("Microphone busy")
-                val maxBytes = maxMs * rate / 1000 * 2
-                val pcm = ByteArrayOutputStream()
-                while (!stop.isCompleted && pcm.size() < maxBytes) {
-                    ensureActive()
-                    val read = record.read(chunk, 0, minOf(chunk.size.toLong(), maxBytes - pcm.size()).toInt())
-                    if (read < 0) throw IOException("Recording failed: $read")
-                    if (read == 0) continue
-                    pcm.write(chunk, 0, read)
-                    _level.value = VoiceLevel.fromPcm16(chunk, read)
-                    onProgress(pcm.size() / 2 * 1000L / rate)
+                val stoppedOutside = AtomicBoolean(false)
+                val release = background?.start { stoppedOutside.set(true) }
+                try {
+                    val maxBytes = maxMs * rate / 1000 * 2
+                    val pcm = ByteArrayOutputStream()
+                    while (!stop.isCompleted && !stoppedOutside.get() && pcm.size() < maxBytes) {
+                        ensureActive()
+                        val read = record.read(chunk, 0, minOf(chunk.size.toLong(), maxBytes - pcm.size()).toInt())
+                        if (read < 0) throw IOException("Recording failed: $read")
+                        if (read == 0) continue
+                        pcm.write(chunk, 0, read)
+                        _level.value = VoiceLevel.fromPcm16(chunk, read)
+                        onProgress(pcm.size() / 2 * 1000L / rate)
+                    }
+                    VoiceClip(pcm.toByteArray(), rate)
+                } finally {
+                    release?.invoke()
                 }
-                VoiceClip(pcm.toByteArray(), rate)
             } finally {
                 _level.value = 0f
                 if (record.recordingState == AudioRecord.RECORDSTATE_RECORDING) record.stop()

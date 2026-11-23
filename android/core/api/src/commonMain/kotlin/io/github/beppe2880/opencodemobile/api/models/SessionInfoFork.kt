@@ -32,13 +32,14 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param sessionID 
+ * @param sessionID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
  * @param boundary 
  */
 @Serializable
 
 data class SessionInfoFork (
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "sessionID")
     val sessionID: kotlin.String?,
 

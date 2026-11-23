@@ -46,6 +46,13 @@ class EventMappingTest {
     }
 
     @Test
+    fun `a viewed event carries the idle transition a client reported`() {
+        val payload = """{"id":"evt_4","created":1,"type":"session.viewed","durable":{"aggregateID":"ses_1","seq":0,"version":1},""" +
+            """"data":{"sessionID":"ses_1","idle":1791910789786}}"""
+        assertEquals(ServerEvent.Viewed("ses_1", 1791910789786), decodeEvent(payload)?.toDomain())
+    }
+
+    @Test
     fun `maps the session subset and drops the rest`() {
         val events = Fixtures.events().mapNotNull { it.toDomain() }
 

@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">提出旁支问题</string>
+    <string name="tips_c_btw_body">代理工作时，可以在消息框上方选择“单独提问”，或输入 /btw 加上你的问题。它会根据对话简要作答，不使用工具，也不会打断或改变任务。答案会在独立面板中打开，并提供复制按钮，且从不进入聊天。聊天空闲时同样可用。</string>
+    <string name="tips_c_btw_demo">代理工作时，在消息框中输入问题并通过“单独提问”发送。消息框上方的小标签会显示答案正在准备，然后显示已就绪；点击即可在单独面板中打开答案。</string>
+    <string name="tips_c_btw_working">正在重构重试逻辑…</string>
+    <string name="tips_c_btw_question">哪个文件包含重试逻辑？</string>
+    <string name="tips_c_btw_answer">重试逻辑位于 **src/api/client.ts** 中的 `withRetry()`。</string>
+    <string name="tips_c_btw_labels">立即引导\n加入队列\n单独提问\n正在准备回答…\n回答已就绪\n旁支问题\n复制\n关闭</string>
+</resources>

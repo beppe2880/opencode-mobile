@@ -13,6 +13,8 @@ data class WhatsNewHistory(
     val seenVersion: String? = null,
     /** The newest version there was when the button was hidden; null while it was never hidden. */
     val hiddenVersion: String? = null,
+    /** The version of the app installed when the button was hidden; null before this was kept. */
+    val hiddenInstalledVersion: String? = null,
 ) {
     /** The newest known version; null when no release is known. */
     val latestVersion: String? get() = WhatsNew.latestVersion(releases)
@@ -22,6 +24,10 @@ data class WhatsNewHistory(
 
     /** The button is shown above the sessions: never hidden, or a newer release came out since. */
     val buttonVisible: Boolean get() = WhatsNew.buttonVisible(latestVersion, hiddenVersion)
+
+    /** [buttonVisible], or the app was updated to [installedVersion] since the button was hidden. */
+    fun buttonVisible(installedVersion: String): Boolean =
+        buttonVisible || WhatsNew.updatedSince(installedVersion, hiddenInstalledVersion ?: hiddenVersion)
 }
 
 /** The decisions of the "What's New" button, on versions alone. */
@@ -41,6 +47,16 @@ object WhatsNew {
         val newest = latest?.let(AppVersion::parse) ?: return false
         val known = seen?.let(AppVersion::parse) ?: return true
         return newest > known
+    }
+
+    /**
+     * [installed] is newer than [hiddenAt], the installed version when the button was hidden (the
+     * newest release then, for buttons hidden before that was kept). Unknown versions never count.
+     */
+    fun updatedSince(installed: String, hiddenAt: String?): Boolean {
+        val current = AppVersion.parse(installed) ?: return false
+        val before = hiddenAt?.let(AppVersion::parse) ?: return false
+        return current > before
     }
 
     /**
@@ -73,8 +89,8 @@ interface WhatsNewRepository {
     suspend fun markSeen()
 
     /**
-     * Hides the button until a release newer than the newest known one is published;
-     * [installedVersion] stands in while no release is known.
+     * Hides the button until a release newer than the newest known one is published or the app
+     * is updated past [installedVersion], which also stands in while no release is known.
      */
     suspend fun hide(installedVersion: String)
 }

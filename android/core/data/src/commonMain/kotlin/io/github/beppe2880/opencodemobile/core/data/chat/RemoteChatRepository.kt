@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.api.models.FormReply
 import io.github.beppe2880.opencodemobile.api.models.PermissionReply
 import io.github.beppe2880.opencodemobile.api.models.SessionCommandRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionCompactRequest
+import io.github.beppe2880.opencodemobile.api.models.SessionGenerateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxDelivery
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageInfo
@@ -65,6 +66,11 @@ internal class RemoteChatRepository(
 ) : ChatRepository {
 
     private val syncLock = Mutex()
+
+    override suspend fun generate(sessionId: String, prompt: String, serverId: String?): Result<String> = resultOf {
+        val api = (serverId?.let(clients::forServer) ?: clients.active()).sessions
+        awaitBody { api.sessionGenerate(sessionId, SessionGenerateRequest(prompt = prompt)) }.data.text.orEmpty()
+    }
 
     /**
      * Per server and session, where [olderMessages] continues once the cache is full. It is

@@ -8,11 +8,16 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 
-/** Groups of the list, in the order shown. [Pinned] holds the pinned sessions of any day, above the days. */
-enum class DayBucket { Pinned, Today, Yesterday, ThisWeek, Older }
+/**
+ * Groups of the list, in the order shown. [Pinned] holds the pinned sessions of any day, [Unread] the
+ * unread sessions that are not pinned, both above the days.
+ */
+enum class DayBucket { Pinned, Unread, Today, Yesterday, ThisWeek, Older }
 
 @Immutable
 data class SessionGroup(val bucket: DayBucket, val sessions: List<Session>)
@@ -64,6 +69,9 @@ data class NewSessionState(
     val effectiveModel: ModelRef? get() = model ?: defaultModel
 }
 
+/** What a running session waits for; a permission request wins over a question. */
+enum class SessionWaiting { Permission, Answer }
+
 @Immutable
 data class SessionsState(
     val serverName: String = "",
@@ -72,14 +80,25 @@ data class SessionsState(
     val projects: List<Project> = emptyList(),
     val hiddenDirectories: Set<String> = emptySet(),
     val directoryFilter: String? = null,
+    /** The filters chosen in the filter sheet. */
+    val filters: SessionFilters = SessionFilters(),
+    /** False on servers before OpenCode 2.1.0: archive and the archived filter are hidden. */
+    val archiveSupported: Boolean = true,
+    val filterSheetOpen: Boolean = false,
     val groups: List<SessionGroup> = emptyList(),
     /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */
     val pinned: Set<String> = emptySet(),
     val muted: Set<String> = emptySet(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
+    /** Running sessions blocked on the user (their own requests or their subagents'). */
+    val waiting: Map<String, SessionWaiting> = emptyMap(),
     /** Rows show running subagents and commands (setting). */
     val showRunningWork: Boolean = true,
+    /** How unread sessions are marked and grouped (setting). */
+    val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
+    /** Marking every listed unread session as read is under way. */
+    val markingAllRead: Boolean = false,
     val loading: Boolean = true,
     val refreshing: Boolean = false,
     val error: UiText? = null,
@@ -94,6 +113,21 @@ data class SessionsState(
     val deleting: Session? = null,
 ) {
     val isEmpty: Boolean get() = groups.isEmpty()
+
+    /**
+     * The unread sessions the list shows, those [SessionsEvent.MarkAllRead] marks; none while unread
+     * state is off. Sessions waiting for a permission or an answer are left out: marking them read
+     * would hide that they need the user.
+     */
+    val unreadShown: List<Session>
+        get() = if (unreadSessions == UnreadSessions.Off) {
+            emptyList()
+        } else {
+            groups.flatMap { it.sessions }.filter { it.isUnread && it.id !in waiting }
+        }
+
+    /** The sessions of the Unread group, those [SessionsEvent.MarkUnreadGroupRead] marks. */
+    val unreadGroup: List<Session> get() = groups.firstOrNull { it.bucket == DayBucket.Unread }?.sessions.orEmpty()
     val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
 }
@@ -103,6 +137,24 @@ sealed interface SessionsEvent {
     data object Refresh : SessionsEvent
     data class QueryChanged(val query: String) : SessionsEvent
     data class FilterChanged(val directory: String?) : SessionsEvent
+    data object OpenFilters : SessionsEvent
+    data object DismissFilters : SessionsEvent
+
+    /** Adds or removes a status from the list; reloads it. */
+    data class ToggleStatus(val status: SessionStatus) : SessionsEvent
+    data class SetDateFilter(val filter: SessionDateFilter) : SessionsEvent
+    data class ToggleOutcome(val outcome: SessionOutcome) : SessionsEvent
+
+    /** Narrows the list to [state], or clears the filter when it is already picked. */
+    data class ToggleRead(val state: SessionRead) : SessionsEvent
+
+    /** Marks every unread session the list shows (filters and search applied) as viewed. */
+    data object MarkAllRead : SessionsEvent
+
+    /** Marks exactly the sessions of the Unread group as viewed, the count its header shows. */
+    data object MarkUnreadGroupRead : SessionsEvent
+    data object ResetFilters : SessionsEvent
+
     data class HideProject(val directory: String) : SessionsEvent
     data class UnhideProject(val directory: String) : SessionsEvent
     data class Open(val sessionId: String) : SessionsEvent
@@ -114,6 +166,9 @@ sealed interface SessionsEvent {
     /** Pins the session to the top of the list or unpins it; closes the row actions. */
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
     data class SetMuted(val sessionId: String, val muted: Boolean) : SessionsEvent
+
+    /** Archives the session or restores it; closes the row actions. */
+    data class SetArchived(val session: Session, val archived: Boolean) : SessionsEvent
     data class RequestRename(val session: Session) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent
     data class RequestDelete(val session: Session) : SessionsEvent
@@ -146,4 +201,7 @@ sealed interface SessionsEffect {
     data class OpenChat(val sessionId: String) : SessionsEffect
     data object OpenSettings : SessionsEffect
     data class ShowMessage(val message: UiText) : SessionsEffect
+
+    /** Shows the archive/restore confirmation with an Undo action. */
+    data class ShowArchiveUndo(val session: Session, val archived: Boolean) : SessionsEffect
 }

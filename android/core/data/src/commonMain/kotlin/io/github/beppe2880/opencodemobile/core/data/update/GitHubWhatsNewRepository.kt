@@ -36,6 +36,7 @@ internal class GitHubWhatsNewRepository(
             releases = stored(),
             seenVersion = prefs.getStringOrNull(KEY_SEEN),
             hiddenVersion = prefs.getStringOrNull(KEY_HIDDEN),
+            hiddenInstalledVersion = prefs.getStringOrNull(KEY_HIDDEN_INSTALLED),
         ),
     )
 
@@ -61,7 +62,8 @@ internal class GitHubWhatsNewRepository(
         mutex.withLock {
             val hidden = state.value.latestVersion ?: installedVersion
             prefs.putString(KEY_HIDDEN, hidden)
-            state.update { it.copy(hiddenVersion = hidden) }
+            prefs.putString(KEY_HIDDEN_INSTALLED, installedVersion)
+            state.update { it.copy(hiddenVersion = hidden, hiddenInstalledVersion = installedVersion) }
         }
     }
 
@@ -112,6 +114,7 @@ internal class GitHubWhatsNewRepository(
         const val KEY_RELEASES = "whats_new_releases"
         const val KEY_SEEN = "whats_new_seen_version"
         const val KEY_HIDDEN = "whats_new_hidden_version"
+        const val KEY_HIDDEN_INSTALLED = "whats_new_hidden_installed_version"
         private val StoreJson = Json { ignoreUnknownKeys = true }
         private val StoredReleases = ListSerializer(StoredRelease.serializer())
     }

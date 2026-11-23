@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
+import io.github.beppe2880.opencodemobile.core.domain.APP_REPOSITORY_URL
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChangesScope
@@ -8,6 +9,9 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
 import io.github.beppe2880.opencodemobile.core.domain.FoldChat
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
+import io.github.beppe2880.opencodemobile.core.domain.GitHubStarState
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
@@ -26,6 +30,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceClip
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
@@ -54,7 +59,8 @@ class SettingsViewModelTest {
     private val servers = FakeServers()
     private val settings = FakeSettings()
     private val stt = FakeStt()
-    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt)
+    private val star = FakeGitHubStar()
+    private fun vm() = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt, star)
 
     @Test
     fun `exposes servers, versions and settings`() = runTest(main.testDispatcher) {
@@ -83,6 +89,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SwipeSensitivityChanged(SwipeSensitivity.Low))
         vm.onEvent(SettingsEvent.RunningInListChanged(false))
         vm.onEvent(SettingsEvent.ConfirmStopChanged(false))
+        vm.onEvent(SettingsEvent.UnreadSessionsChanged(UnreadSessions.Dot))
         vm.onEvent(SettingsEvent.RunningChipsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
@@ -111,6 +118,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.CloseModelPickerOnSelectChanged(false))
         vm.onEvent(SettingsEvent.NewChatModelChanged(NewChatModel.ServerDefault))
         vm.onEvent(SettingsEvent.UpdateNoticeChanged(UpdateNoticeStyle.Banner))
+        vm.onEvent(SettingsEvent.WhatsNewButtonChanged(false))
         vm.onEvent(SettingsEvent.ShowInShareMenuChanged(false))
         vm.onEvent(SettingsEvent.ShareOpensChanged(ShareOpens.ChooseChat))
         vm.onEvent(SettingsEvent.BackShowsListChanged(false))
@@ -153,6 +161,7 @@ class SettingsViewModelTest {
                 swipeSensitivity = SwipeSensitivity.Low,
                 showRunningWorkInList = false,
                 confirmStopCommand = false,
+                unreadSessions = UnreadSessions.Dot,
                 runningChips = false,
                 agentColorOutline = false,
                 dictation = false,
@@ -166,6 +175,7 @@ class SettingsViewModelTest {
                 questionsCollapsed = true,
                 permissionsCollapsed = true,
                 updateNotice = UpdateNoticeStyle.Banner,
+                whatsNewButton = false,
                 backShowsList = false,
                 unfoldedLayout = UnfoldedLayout.ListPanel,
                 unfoldOpenChat = UnfoldChat.FullScreen,
@@ -307,6 +317,17 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `star on GitHub opens the repository and thanks for it`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.starred)
+        vm.onEvent(SettingsEvent.StarOnGitHub)
+        assertEquals(SettingsEffect.OpenUrl(APP_REPOSITORY_URL), vm.effect.first())
+        advanceUntilIdle()
+        assertTrue(vm.state.value.starred)
+    }
+
+    @Test
     fun `a search result opens its area at its part with the option in focus`() = runTest(main.testDispatcher) {
         val vm = vm()
         vm.onEvent(SettingsEvent.QueryChanged("refresh"))
@@ -346,7 +367,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `a link opens its category first and Leave exits even with a category open`() = runTest(main.testDispatcher) {
-        val vm = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt, initialArea = SettingsArea.Composer)
+        val vm = SettingsViewModel(servers, settings, AppInfo("1.0", "2.0.27", UpdateTarget.Android), stt, star, initialArea = SettingsArea.Composer)
         assertEquals(SettingsArea.Composer, vm.state.value.area)
         assertEquals(SettingsPart.ComposerBox, vm.state.value.selected)
 
@@ -522,6 +543,24 @@ internal class FakeStt : SpeechToTextRepository {
     override suspend fun transcribe(clip: VoiceClip) = Result.success("")
     override suspend fun test() = testResult
     override suspend fun listModels(provider: SttProvider) = Result.success(listOf("openai/whisper-1"))
+}
+
+internal class FakeGitHubStar : GitHubStarRepository {
+    var uses = 0
+    override val state = MutableStateFlow(GitHubStarState())
+    fun showBanner() {
+        state.value = state.value.copy(bannerVisible = true)
+    }
+    override suspend fun recordUse() {
+        uses++
+    }
+    override suspend fun starred() {
+        state.value = state.value.copy(choice = GitHubStarChoice.Starred, thanked = true)
+    }
+    override suspend fun dismissBanner() {
+        val choice = state.value.choice.takeIf { it == GitHubStarChoice.Starred } ?: GitHubStarChoice.Dismissed
+        state.value = state.value.copy(choice = choice, bannerVisible = false)
+    }
 }
 
 internal class FakeSettings : SettingsRepository {

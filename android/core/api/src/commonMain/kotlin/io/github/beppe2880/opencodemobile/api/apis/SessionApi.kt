@@ -30,6 +30,7 @@ import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionImport20
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionImportRequest
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionInstructionsEntryList200Response
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionInstructionsEntryPutRequest
+import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionLog200Response
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionSkill404Response
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionSkillRequest
 import io.github.beppe2880.opencodemobile.api.models.ExperimentalSessionStats200Response
@@ -63,9 +64,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionInboxList200Response
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionInterruptResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionList400Response
-import io.github.beppe2880.opencodemobile.api.models.SessionLog200Response
 import io.github.beppe2880.opencodemobile.api.models.SessionMessageGet200Response
-import io.github.beppe2880.opencodemobile.api.models.SessionMessageGet404Response
 import io.github.beppe2880.opencodemobile.api.models.SessionMessagesResponse
 import io.github.beppe2880.opencodemobile.api.models.SessionMoveRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionNotFoundErrorEncoded
@@ -167,7 +166,7 @@ open class SessionApi : ApiClient {
 
     /**
      * Import session
-     * Import a projected session transcript at the requested location. If parentID is supplied, the parent session must already exist; import parents before children.
+     * Import a projected session transcript at the requested location. Accepts transcripts exported by earlier releases. If parentID is supplied, the parent session must already exist; import parents before children.
      * @param experimentalSessionImportRequest 
      * @return ExperimentalSessionImport200Response
      */
@@ -285,6 +284,58 @@ open class SessionApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.DELETE,
             "/api/experimental/session/{sessionID}/instructions/entries/{key}".replace("{" + "sessionID" + "}", "$sessionID").replace("{" + "key" + "}", "$key"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * enum for parameter follow
+     */
+    @Serializable
+    enum class FollowExperimentalSessionLog(val value: kotlin.String) {
+        
+        @SerialName(value = "true")
+        TRUE("true"),
+        
+        @SerialName(value = "false")
+        FALSE("false")
+        
+    }
+
+    /**
+     * Read the session log
+     * Experimental durable session event log. Reads events after an exclusive aggregate sequence and continues with live events when follow&#x3D;true.
+     * @param sessionID 
+     * @param after  (optional)
+     * @param follow  (optional)
+     * @return ExperimentalSessionLog200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun experimentalSessionLog(sessionID: kotlin.String, after: kotlin.String? = null, follow: FollowExperimentalSessionLog? = null): HttpResponse<ExperimentalSessionLog200Response> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        after?.apply { localVariableQuery["after"] = listOf("$after") }
+        follow?.apply { localVariableQuery["follow"] = listOf("${ follow.value }") }
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/api/experimental/session/{sessionID}/log".replace("{" + "sessionID" + "}", "$sessionID"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -898,7 +949,7 @@ open class SessionApi : ApiClient {
 
     /**
      * Generate text from session context
-     * Generate transient text from the current session context without mutating session history.
+     * Generate transient text from the current session context without mutating session history. Its tokens and cost count toward the session&#39;s totals.
      * @param sessionID 
      * @param sessionGenerateRequest 
      * @return SessionGenerateResponse
@@ -1128,6 +1179,21 @@ open class SessionApi : ApiClient {
         
     }
 
+
+    /**
+     * enum for parameter archived
+     */
+    @Serializable
+    enum class ArchivedSessionList(val value: kotlin.String) {
+        
+        @SerialName(value = "true")
+        TRUE("true"),
+        
+        @SerialName(value = "false")
+        FALSE("false")
+        
+    }
+
     /**
      * List sessions
      * Retrieve sessions in the requested order. Items keep that order across pages; use cursor.next or cursor.previous to move through the ordered list.
@@ -1135,6 +1201,7 @@ open class SessionApi : ApiClient {
      * @param order  (optional)
      * @param search  (optional)
      * @param parentID  (optional)
+     * @param archived  (optional)
      * @param directory  (optional)
      * @param project  (optional)
      * @param subpath  (optional)
@@ -1142,7 +1209,7 @@ open class SessionApi : ApiClient {
      * @return SessionsResponse
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun sessionList(limit: kotlin.String? = null, order: OrderSessionList? = null, search: kotlin.String? = null, parentID: kotlin.String? = null, directory: kotlin.String? = null, project: kotlin.String? = null, subpath: kotlin.String? = null, cursor: kotlin.String? = null): HttpResponse<SessionsResponse> {
+    open suspend fun sessionList(limit: kotlin.String? = null, order: OrderSessionList? = null, search: kotlin.String? = null, parentID: kotlin.String? = null, archived: ArchivedSessionList? = null, directory: kotlin.String? = null, project: kotlin.String? = null, subpath: kotlin.String? = null, cursor: kotlin.String? = null): HttpResponse<SessionsResponse> {
 
         val localVariableAuthNames = listOf<String>()
 
@@ -1154,6 +1221,7 @@ open class SessionApi : ApiClient {
         order?.apply { localVariableQuery["order"] = listOf("${ order.value }") }
         search?.apply { localVariableQuery["search"] = listOf("$search") }
         parentID?.apply { localVariableQuery["parentID"] = listOf("$parentID") }
+        archived?.apply { localVariableQuery["archived"] = listOf("${ archived.value }") }
         directory?.apply { localVariableQuery["directory"] = listOf("$directory") }
         project?.apply { localVariableQuery["project"] = listOf("$project") }
         subpath?.apply { localVariableQuery["subpath"] = listOf("$subpath") }
@@ -1163,58 +1231,6 @@ open class SessionApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/api/session",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
-
-
-    /**
-     * enum for parameter follow
-     */
-    @Serializable
-    enum class FollowSessionLog(val value: kotlin.String) {
-        
-        @SerialName(value = "true")
-        TRUE("true"),
-        
-        @SerialName(value = "false")
-        FALSE("false")
-        
-    }
-
-    /**
-     * Read the session log
-     * Experimental durable session event log. Reads events after an exclusive aggregate sequence and continues with live events when follow&#x3D;true.
-     * @param sessionID 
-     * @param after  (optional)
-     * @param follow  (optional)
-     * @return SessionLog200Response
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun sessionLog(sessionID: kotlin.String, after: kotlin.String? = null, follow: FollowSessionLog? = null): HttpResponse<SessionLog200Response> {
-
-        val localVariableAuthNames = listOf<String>()
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        after?.apply { localVariableQuery["after"] = listOf("$after") }
-        follow?.apply { localVariableQuery["follow"] = listOf("${ follow.value }") }
-        val localVariableHeaders = mutableMapOf<String, String>()
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/api/experimental/session/{sessionID}/log".replace("{" + "sessionID" + "}", "$sessionID"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -1312,7 +1328,10 @@ open class SessionApi : ApiClient {
         ASSISTANT("assistant"),
         
         @SerialName(value = "compaction")
-        COMPACTION("compaction")
+        COMPACTION("compaction"),
+        
+        @SerialName(value = "idle")
+        IDLE("idle")
         
     }
 

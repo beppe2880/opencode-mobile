@@ -85,11 +85,45 @@ object ToolInfo {
         return null
     }
 
-    /** Extracts a top-level-ish JSON string field without a full parser; works on partial input. */
+    /**
+     * Extracts a top-level-ish JSON string field without a full parser; works on partial input.
+     * A plain scan rather than a regex: the Kotlin/Native regex engine recurses once per character
+     * of a repeated group, and the long values of tool input (a whole file written) overflowed
+     * the stack on iOS.
+     */
     internal fun stringField(json: String, key: String): String? {
-        val match = Regex("\"" + Regex.escape(key) + "\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)").find(json) ?: return null
-        return unescape(match.groupValues[1])
+        val quoted = "\"" + key + "\""
+        var from = 0
+        while (true) {
+            val at = json.indexOf(quoted, from)
+            if (at < 0) return null
+            from = at + 1
+            var i = json.skipSpaces(at + quoted.length)
+            if (i >= json.length || json[i] != ':') continue
+            i = json.skipSpaces(i + 1)
+            if (i >= json.length || json[i] != '"') continue
+            val start = i + 1
+            var end = start
+            while (end < json.length) {
+                when (json[end]) {
+                    '"' -> break
+                    // An escape cut off at the end of partial input is left out.
+                    '\\' -> if (end + 1 < json.length) end += 2 else break
+                    else -> end++
+                }
+            }
+            return unescape(json.substring(start, end))
+        }
     }
+
+    private fun String.skipSpaces(from: Int): Int {
+        var i = from
+        while (i < length && this[i].isJsonSpace()) i++
+        return i
+    }
+
+    /** What the regex `\s` matched before: JSON only uses space, tab, CR and LF. */
+    private fun Char.isJsonSpace() = this == ' ' || this == '\t' || this == '\n' || this == '\r' || this == '\u000B' || this == '\u000C'
 
     private fun unescape(value: String): String {
         if ('\\' !in value) return value

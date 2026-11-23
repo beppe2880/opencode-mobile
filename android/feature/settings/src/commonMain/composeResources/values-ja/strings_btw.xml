@@ -1,0 +1,9 @@
+<resources>
+    <string name="tips_c_btw_title">別の質問をする</string>
+    <string name="tips_c_btw_body">エージェントの作業中は、入力欄の上にある「別に質問」を選ぶか、/btw と質問を入力してください。会話の内容をもとに簡潔に答え、ツールは使わず、作業を中断したり方向を変えたりしません。回答は「コピー」付きの別パネルで開き、チャットには表示されません。チャットがアイドル状態でも使えます。</string>
+    <string name="tips_c_btw_demo">エージェントの作業中、入力欄に質問を入力して「別に質問」で送信します。入力欄の上のチップに、回答を準備中、そして準備完了と表示されます。タップすると回答が別パネルで開きます。</string>
+    <string name="tips_c_btw_working">リトライロジックをリファクタリング中…</string>
+    <string name="tips_c_btw_question">リトライロジックはどのファイルにありますか？</string>
+    <string name="tips_c_btw_answer">リトライロジックは **src/api/client.ts** の `withRetry()` にあります。</string>
+    <string name="tips_c_btw_labels">今すぐ方向修正\nキューに追加\n別に質問\n回答を準備中…\n回答の準備完了\n別の質問\nコピー\n閉じる</string>
+</resources>

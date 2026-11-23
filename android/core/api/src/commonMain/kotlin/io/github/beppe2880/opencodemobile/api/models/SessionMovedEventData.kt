@@ -23,7 +23,7 @@
 
 package io.github.beppe2880.opencodemobile.api.models
 
-import io.github.beppe2880.opencodemobile.api.models.LocationRef
+import io.github.beppe2880.opencodemobile.api.models.LocationRef1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -45,11 +45,11 @@ data class SessionMovedEventData (
     val sessionID: kotlin.String,
 
     @SerialName(value = "location")
-    val location: LocationRef,
+    val location: LocationRef1,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "projectID")
-    val projectID: kotlin.String?,
+    val projectID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "subpath")

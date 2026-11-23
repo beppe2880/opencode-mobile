@@ -30,7 +30,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionInboxItemAnyOf
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxItemAnyOf1
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxItemAnyOf2
 import io.github.beppe2880.opencodemobile.api.models.SessionInboxItemAnyOf3
-import io.github.beppe2880.opencodemobile.api.models.SessionInboxMovePayload
+import io.github.beppe2880.opencodemobile.api.models.SessionInboxMovePayload1
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

@@ -1,12 +1,17 @@
 package io.github.beppe2880.opencodemobile.feature.sessions
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,18 +27,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.outlined.MarkEmailRead
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Unarchive
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,7 +60,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,15 +74,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
+import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.OcButton
@@ -85,12 +106,17 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_cancel
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
+import io.github.beppe2880.opencodemobile.core.ui.text.formatMediumDate
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcRadius
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_all_projects
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archive
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_archived
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_clear_filters
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_connected
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_connecting
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_connection_disconnected
@@ -101,17 +127,45 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_de
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_demo_server
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_demo_status
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_archived_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_archived_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_filter_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_filter_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_search_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_title
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_message
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_active
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_any_time
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_apply
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_custom_range
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_last_30_days
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_last_7_days
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_last_updated
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_outcome
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_range_hint
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_read
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_remove
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_reset
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_show
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_status
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filters
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filters_active
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_count
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_outcome_succeeded
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_project_hide
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_label
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename_title
@@ -122,12 +176,21 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_th
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unmute
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unarchive
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread_count
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_yesterday
 import kotlinx.coroutines.delay
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
+import kotlin.time.Instant
+import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,10 +291,14 @@ fun SessionsScreen(
                     state.isEmpty -> item(key = "empty") { EmptyContent(state, onEvent) }
                     else -> state.groups.forEach { group ->
                         item(key = "group-${group.bucket}", contentType = "group") {
-                            OcSectionHeader(
-                                stringResource(group.bucket.label()),
-                                Modifier.padding(top = OcSpacing.sm).testTag("sessions_group_${group.bucket.name.lowercase()}"),
-                            )
+                            if (group.bucket == DayBucket.Unread) {
+                                UnreadGroupHeader(group.sessions.size, state.markingAllRead, onEvent)
+                            } else {
+                                OcSectionHeader(
+                                    stringResource(group.bucket.label()),
+                                    Modifier.padding(top = OcSpacing.sm).testTag("sessions_group_${group.bucket.name.lowercase()}"),
+                                )
+                            }
                         }
                         items(group.sessions, key = { it.id }, contentType = { "session" }) { session ->
                             val pinned = session.id in state.pinned
@@ -250,6 +317,8 @@ fun SessionsScreen(
                                 pinned = pinned,
                                 muted = session.id in state.muted,
                                 onTogglePin = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
+                                waiting = state.waiting[session.id],
+                                showUnread = state.unreadSessions != UnreadSessions.Off,
                             )
                         }
                     }
@@ -310,8 +379,140 @@ private fun ListHeader(state: SessionsState, onEvent: (SessionsEvent) -> Unit, t
             onValueChange = { onEvent(SessionsEvent.QueryChanged(it)) },
             placeholder = stringResource(Res.string.sessions_search),
             modifier = Modifier.testTag("sessions_search_field"),
+            trailingContent = { FilterAction(state, onEvent) },
         )
+        if (state.filters.isActive) ActiveFilterSummary(state, onEvent)
     }
+}
+
+@Composable
+private fun FilterAction(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+    val c = OcTheme.colors
+    val count = state.filters.activeCount
+    Box {
+        OcIconButton(
+            icon = Icons.Outlined.FilterAlt,
+            contentDescription = if (count > 0) {
+                stringResource(Res.string.sessions_filters_active, count)
+            } else {
+                stringResource(Res.string.sessions_filters)
+            },
+            onClick = { onEvent(SessionsEvent.OpenFilters) },
+            tint = if (count > 0) c.textAccent else c.iconMuted,
+            iconSize = 18.dp,
+            modifier = Modifier.testTag("sessions_filters_button"),
+        )
+        if (count > 0) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 2.dp, end = 2.dp)
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .background(c.bgAccent),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = count.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = c.onAccent,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth().testTag("sessions_filter_summary"),
+        horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+        verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+    ) {
+        val statuses = state.filters.effectiveStatuses
+        if (SessionStatus.Active in statuses && statuses.size > 1) {
+            FilterSummaryChip(
+                label = stringResource(Res.string.sessions_filter_active),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active)) },
+                testTag = "sessions_filter_active_chip",
+            )
+        }
+        if (state.archiveSupported && SessionStatus.Archived in statuses) {
+            FilterSummaryChip(
+                label = stringResource(Res.string.sessions_archived),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
+                testTag = "sessions_filter_archived_chip",
+            )
+        }
+        state.filters.readState?.let { read ->
+            FilterSummaryChip(
+                label = readStateLabel(read),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.ToggleRead(read)) },
+                testTag = "sessions_filter_read_chip",
+            )
+        }
+        if (state.filters.date != SessionDateFilter.AnyTime) {
+            FilterSummaryChip(
+                label = dateFilterLabel(state.filters.date),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.AnyTime)) },
+                testTag = "sessions_filter_date_chip",
+            )
+        }
+        state.filters.outcomes.forEach { outcome ->
+            FilterSummaryChip(
+                label = outcomeLabel(outcome),
+                onClick = { onEvent(SessionsEvent.OpenFilters) },
+                onRemove = { onEvent(SessionsEvent.ToggleOutcome(outcome)) },
+                testTag = "sessions_filter_outcome_${outcome.name.lowercase()}",
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterSummaryChip(
+    label: String,
+    onClick: () -> Unit,
+    onRemove: () -> Unit,
+    testTag: String,
+) {
+    OcChip(
+        text = label,
+        onClick = onClick,
+        selected = true,
+        trailingIcon = Icons.Outlined.Close,
+        onTrailingClick = onRemove,
+        trailingContentDescription = stringResource(Res.string.sessions_filter_remove, label),
+        modifier = Modifier.testTag(testTag),
+    )
+}
+
+@Composable
+private fun dateFilterLabel(filter: SessionDateFilter): String = when (filter) {
+    SessionDateFilter.AnyTime -> stringResource(Res.string.sessions_filter_any_time)
+    SessionDateFilter.Today -> stringResource(Res.string.sessions_today)
+    SessionDateFilter.Yesterday -> stringResource(Res.string.sessions_yesterday)
+    SessionDateFilter.Last7Days -> stringResource(Res.string.sessions_filter_last_7_days)
+    SessionDateFilter.Last30Days -> stringResource(Res.string.sessions_filter_last_30_days)
+    is SessionDateFilter.Custom -> "${formatMediumDate(filter.from)} – ${formatMediumDate(filter.to)}"
+}
+
+@Composable
+private fun outcomeLabel(outcome: SessionOutcome): String = when (outcome) {
+    SessionOutcome.Succeeded -> stringResource(Res.string.sessions_outcome_succeeded)
+    SessionOutcome.Failed -> stringResource(Res.string.sessions_failed)
+    SessionOutcome.Interrupted -> stringResource(Res.string.sessions_interrupted)
+}
+
+@Composable
+private fun readStateLabel(state: SessionRead): String = when (state) {
+    SessionRead.Read -> stringResource(Res.string.sessions_read)
+    SessionRead.Unread -> stringResource(Res.string.sessions_unread)
 }
 
 @Composable
@@ -383,20 +584,59 @@ private fun FilterProjectItem(project: Project, onClick: () -> Unit, onHide: () 
 @Composable
 private fun EmptyContent(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
     val filtered = state.query.isNotBlank() || state.directoryFilter != null
+    val unreadOnly = state.filters.readState == SessionRead.Unread && state.filters.activeCount == 1 && !filtered
+    val archivedOnly = state.filters.effectiveStatuses == setOf(SessionStatus.Archived) &&
+        state.filters.date == SessionDateFilter.AnyTime &&
+        state.filters.outcomes.isEmpty() &&
+        !filtered
     OcEmptyState(
-        icon = if (filtered) Icons.Outlined.SearchOff else Icons.Outlined.ChatBubbleOutline,
-        title = stringResource(if (filtered) Res.string.sessions_empty_search_title else Res.string.sessions_empty_title),
-        message = stringResource(if (filtered) Res.string.sessions_empty_search_message else Res.string.sessions_empty_message),
-        action = if (filtered) {
-            null
-        } else {
-            {
-                OcButton(
-                    text = stringResource(Res.string.sessions_new),
-                    onClick = { onEvent(SessionsEvent.StartNewSession) },
-                    leadingIcon = Icons.Outlined.Add,
-                    modifier = Modifier.testTag("sessions_empty_new_button"),
-                )
+        icon = when {
+            unreadOnly -> Icons.Outlined.MarkEmailRead
+            archivedOnly -> Icons.Outlined.Archive
+            state.filters.isActive -> Icons.Outlined.FilterAlt
+            filtered -> Icons.Outlined.SearchOff
+            else -> Icons.Outlined.ChatBubbleOutline
+        },
+        title = stringResource(
+            when {
+                unreadOnly -> Res.string.sessions_empty_unread_title
+                archivedOnly -> Res.string.sessions_empty_archived_title
+                state.filters.isActive -> Res.string.sessions_empty_filter_title
+                filtered -> Res.string.sessions_empty_search_title
+                else -> Res.string.sessions_empty_title
+            },
+        ),
+        message = stringResource(
+            when {
+                unreadOnly -> Res.string.sessions_empty_unread_message
+                archivedOnly -> Res.string.sessions_empty_archived_message
+                state.filters.isActive -> Res.string.sessions_empty_filter_message
+                filtered -> Res.string.sessions_empty_search_message
+                else -> Res.string.sessions_empty_message
+            },
+        ),
+        action = when {
+            state.filters.isActive -> {
+                {
+                    OcButton(
+                        text = stringResource(Res.string.sessions_clear_filters),
+                        onClick = { onEvent(SessionsEvent.ResetFilters) },
+                        variant = OcButtonVariant.Secondary,
+                        compact = true,
+                        modifier = Modifier.testTag("sessions_empty_clear_filters"),
+                    )
+                }
+            }
+            filtered -> null
+            else -> {
+                {
+                    OcButton(
+                        text = stringResource(Res.string.sessions_new),
+                        onClick = { onEvent(SessionsEvent.StartNewSession) },
+                        leadingIcon = Icons.Outlined.Add,
+                        modifier = Modifier.testTag("sessions_empty_new_button"),
+                    )
+                }
             }
         },
     )
@@ -417,8 +657,34 @@ private fun LazyListScope.skeletonItems() {
     }
 }
 
+/** The Unread group's header, with its count and the action that marks them all as read. */
+@Composable
+private fun UnreadGroupHeader(count: Int, marking: Boolean, onEvent: (SessionsEvent) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = OcSpacing.sm, end = OcSpacing.gutter - OcSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OcSectionHeader(
+            stringResource(Res.string.sessions_unread_count, count),
+            Modifier.weight(1f).testTag("sessions_group_unread"),
+        )
+        TextButton(
+            onClick = { onEvent(SessionsEvent.MarkUnreadGroupRead) },
+            enabled = !marking,
+            modifier = Modifier.testTag("sessions_mark_all_read"),
+        ) {
+            Text(
+                stringResource(Res.string.sessions_mark_all_read),
+                style = MaterialTheme.typography.labelMedium,
+                color = OcTheme.colors.textAccent,
+            )
+        }
+    }
+}
+
 private fun DayBucket.label(): StringResource = when (this) {
     DayBucket.Pinned -> Res.string.sessions_pinned
+    DayBucket.Unread -> Res.string.sessions_unread
     DayBucket.Today -> Res.string.sessions_today
     DayBucket.Yesterday -> Res.string.sessions_yesterday
     DayBucket.ThisWeek -> Res.string.sessions_this_week
@@ -443,6 +709,7 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 leading = { Icon(Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
                 modifier = Modifier.testTag("sessions_action_mute"),
             )
+            val archived = session.archivedAt != null
             OcListRow(
                 title = stringResource(if (pinned) Res.string.sessions_unpin else Res.string.sessions_pin),
                 onClick = { onEvent(SessionsEvent.SetPinned(session.id, !pinned)) },
@@ -455,6 +722,20 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 leading = { Icon(Icons.Outlined.DriveFileRenameOutline, null, tint = OcTheme.colors.iconBase) },
                 modifier = Modifier.testTag("sessions_action_rename"),
             )
+            if (state.archiveSupported) {
+                OcListRow(
+                    title = stringResource(if (archived) Res.string.sessions_unarchive else Res.string.sessions_archive),
+                    onClick = { onEvent(SessionsEvent.SetArchived(session, !archived)) },
+                    leading = {
+                        Icon(
+                            if (archived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
+                            contentDescription = null,
+                            tint = OcTheme.colors.iconBase,
+                        )
+                    },
+                    modifier = Modifier.testTag("sessions_action_archive"),
+                )
+            }
             OcListRow(
                 title = stringResource(Res.string.sessions_delete),
                 titleColor = OcTheme.colors.danger.fg,
@@ -490,7 +771,224 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
     state.newSession?.let { new ->
         NewSessionSheet(state = new, projects = state.projects, onEvent = onEvent, hidden = state.hiddenDirectories)
     }
+    if (state.filterSheetOpen) SessionsFilterSheet(state, onEvent)
 }
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissFilters) }, testTag = "sessions_filter_sheet") {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = OcSpacing.lg)
+                .padding(bottom = OcSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+        ) {
+            Text(
+                text = stringResource(Res.string.sessions_filters),
+                style = MaterialTheme.typography.titleSmall,
+                color = OcTheme.colors.textBase,
+            )
+            // Without archiving, active is the only status: the whole section would be a no-op.
+            if (state.archiveSupported) {
+                Text(
+                    text = stringResource(Res.string.sessions_filter_status),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = OcTheme.colors.textMuted,
+                )
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                ) {
+                    OcChip(
+                        text = stringResource(Res.string.sessions_filter_active),
+                        onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active)) },
+                        selected = SessionStatus.Active in state.filters.effectiveStatuses,
+                        modifier = Modifier.testTag("sessions_filter_active"),
+                    )
+                    OcChip(
+                        text = stringResource(Res.string.sessions_archived),
+                        onClick = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
+                        selected = SessionStatus.Archived in state.filters.effectiveStatuses,
+                        modifier = Modifier.testTag("sessions_filter_archived"),
+                    )
+                }
+            }
+            // Hidden when the setting turns unread state off.
+            if (state.unreadSessions != UnreadSessions.Off) {
+                Text(
+                    text = stringResource(Res.string.sessions_filter_read),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = OcTheme.colors.textMuted,
+                )
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                ) {
+                    SessionRead.entries.forEach { read ->
+                        OcChip(
+                            text = readStateLabel(read),
+                            onClick = { onEvent(SessionsEvent.ToggleRead(read)) },
+                            selected = state.filters.readState == read,
+                            modifier = Modifier.testTag("sessions_filter_read_${read.name.lowercase()}"),
+                        )
+                    }
+                }
+                // Also where there is no Unread group (dot only) or it is out of sight.
+                if (state.unreadShown.isNotEmpty()) {
+                    OcButton(
+                        text = stringResource(Res.string.sessions_mark_all_read_count, state.unreadShown.size),
+                        onClick = { onEvent(SessionsEvent.MarkAllRead) },
+                        variant = OcButtonVariant.Secondary,
+                        compact = true,
+                        loading = state.markingAllRead,
+                        leadingIcon = Icons.Outlined.MarkEmailRead,
+                        modifier = Modifier.testTag("sessions_filter_mark_all_read"),
+                    )
+                }
+            }
+            Text(
+                text = stringResource(Res.string.sessions_filter_last_updated),
+                style = MaterialTheme.typography.labelLarge,
+                color = OcTheme.colors.textMuted,
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                DateFilterChip(SessionDateFilter.AnyTime, "sessions_filter_date_any", state, onEvent)
+                DateFilterChip(SessionDateFilter.Today, "sessions_filter_date_today", state, onEvent)
+                DateFilterChip(SessionDateFilter.Yesterday, "sessions_filter_date_yesterday", state, onEvent)
+                DateFilterChip(SessionDateFilter.Last7Days, "sessions_filter_date_last_7", state, onEvent)
+                DateFilterChip(SessionDateFilter.Last30Days, "sessions_filter_date_last_30", state, onEvent)
+                val custom = state.filters.date as? SessionDateFilter.Custom
+                OcChip(
+                    text = custom?.let { dateFilterLabel(it) } ?: stringResource(Res.string.sessions_filter_custom_range),
+                    onClick = { showDatePicker = true },
+                    selected = custom != null,
+                    modifier = Modifier.testTag("sessions_filter_date_custom"),
+                )
+            }
+            Text(
+                text = stringResource(Res.string.sessions_filter_outcome),
+                style = MaterialTheme.typography.labelLarge,
+                color = OcTheme.colors.textMuted,
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.xs),
+            ) {
+                SessionOutcome.entries.forEach { outcome ->
+                    OcChip(
+                        text = outcomeLabel(outcome),
+                        onClick = { onEvent(SessionsEvent.ToggleOutcome(outcome)) },
+                        selected = outcome in state.filters.outcomes,
+                        modifier = Modifier.testTag("sessions_filter_outcome_${outcome.name.lowercase()}"),
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = OcSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(
+                    onClick = { onEvent(SessionsEvent.ResetFilters) },
+                    enabled = state.filters.isActive,
+                ) {
+                    Text(stringResource(Res.string.sessions_filter_reset))
+                }
+                Spacer(Modifier.weight(1f))
+                OcButton(
+                    text = stringResource(Res.string.sessions_filter_show),
+                    onClick = { onEvent(SessionsEvent.DismissFilters) },
+                    modifier = Modifier.testTag("sessions_filter_show"),
+                )
+            }
+            Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars).height(OcSpacing.xs))
+        }
+    }
+    if (showDatePicker) {
+        val custom = state.filters.date as? SessionDateFilter.Custom
+        val picker = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = custom?.from?.let { it.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds() },
+            initialSelectedEndDateMillis = custom?.to?.let { it.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds() },
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val start = picker.selectedStartDateMillis
+                        val end = picker.selectedEndDateMillis
+                        if (start != null && end != null) {
+                            onEvent(
+                                SessionsEvent.SetDateFilter(
+                                    SessionDateFilter.Custom(utcDate(start), utcDate(end)),
+                                ),
+                            )
+                        }
+                        showDatePicker = false
+                    },
+                    enabled = picker.selectedStartDateMillis != null && picker.selectedEndDateMillis != null,
+                ) {
+                    Text(stringResource(Res.string.sessions_filter_apply))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(UiRes.string.oc_cancel))
+                }
+            },
+        ) {
+            DateRangePicker(
+                state = picker,
+                modifier = Modifier.heightIn(max = 500.dp),
+                title = {},
+                headline = {
+                    val start = picker.selectedStartDateMillis
+                    val end = picker.selectedEndDateMillis
+                    Text(
+                        text = if (start != null && end != null) {
+                            "${formatMediumDate(utcDate(start))} – ${formatMediumDate(utcDate(end))}"
+                        } else {
+                            stringResource(Res.string.sessions_filter_range_hint)
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = OcTheme.colors.textBase,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun DateFilterChip(
+    filter: SessionDateFilter,
+    testTag: String,
+    state: SessionsState,
+    onEvent: (SessionsEvent) -> Unit,
+) {
+    OcChip(
+        text = dateFilterLabel(filter),
+        onClick = { onEvent(SessionsEvent.SetDateFilter(filter)) },
+        selected = state.filters.date == filter,
+        modifier = Modifier.testTag(testTag),
+    )
+}
+
+private fun utcDate(epochMillis: Long): LocalDate =
+    Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(TimeZone.UTC).date
 
 @PreviewLightDark
 @Composable

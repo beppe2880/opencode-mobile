@@ -59,6 +59,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ShareMenu(listOf("showInShareMenu")),
     ShareOpens(listOf("shareOpens"), requires = ShareMenu),
     RunningInList(listOf("showRunningWorkInList")),
+    UnreadSessions(listOf("unreadSessions")),
     SwipeChats(listOf("chatSwipe")),
 
     /** Only with the chat list swipe ([ChatSwipe.SessionDrawer]). */
@@ -81,6 +82,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     NotifyQuestions(listOf("notifyQuestions"), requires = Notifications),
     NotifyFinished(listOf("notifyFinished"), requires = Notifications),
     UpdateNotice(listOf("updateNotice")),
+    WhatsNewButton(listOf("whatsNewButton")),
     ;
 
     /** The first part of its [area] that offers this option: where the Preview style opens it. */
@@ -138,7 +140,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
         SettingsPart.ShareTarget -> listOf(SettingOption.ShareMenu, SettingOption.ShareOpens)
         // The running work the rows count, and stopping it.
-        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.ConfirmStop)
+        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.ConfirmStop)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats, SettingOption.SwipeSensitivity)
         SettingsPart.SplitView -> LARGE_SCREEN_OPTIONS
         SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard)
@@ -148,7 +150,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.PermissionNotification -> listOf(SettingOption.NotifyPermissions)
         SettingsPart.QuestionNotification -> listOf(SettingOption.NotifyQuestions)
         SettingsPart.FinishedNotification -> listOf(SettingOption.NotifyFinished)
-        SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice)
+        SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)
     }
 
 /** The microphone and what turns the voice into text, in the order Settings lists them. */
@@ -213,8 +215,10 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat -> listOf("fold", "unfold", "foldable", "split")
         SettingOption.ListSwipe -> listOf("swipe", "gesture", "sidebar", "split")
         SettingOption.SwipeSensitivity -> listOf("swipe", "sensitivity", "gesture", "drawer", "threshold")
+        SettingOption.UnreadSessions -> listOf("unread", "read", "dot", "group", "viewed")
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
+        SettingOption.WhatsNewButton -> listOf("tips", "whats new", "features", "changelog", "button")
         else -> emptyList()
     }
 

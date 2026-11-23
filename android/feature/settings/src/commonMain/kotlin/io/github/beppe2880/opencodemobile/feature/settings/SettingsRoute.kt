@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.feature.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -30,6 +31,7 @@ fun SettingsRoute(
 ) {
     val viewModel: SettingsViewModel = koinViewModel { if (initialArea != null) parametersOf(initialArea) else parametersOf() }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
     val notifications = rememberNotificationAccess { granted ->
         viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = granted, blocked = !granted))
     }
@@ -44,6 +46,7 @@ fun SettingsRoute(
             SettingsEffect.OpenConnect -> onAddServer()
             SettingsEffect.OpenUsage -> onOpenUsage()
             SettingsEffect.OpenWhatsNew -> onOpenWhatsNew()
+            is SettingsEffect.OpenUrl -> runCatching { uriHandler.openUri(effect.url) }
             SettingsEffect.RequestNotificationPermission ->
                 if (!demo) notifications.request() else viewModel.onEvent(SettingsEvent.NotificationAccess(allowed = true))
             SettingsEffect.OpenNotificationSettings -> if (!demo) notifications.openSettings()

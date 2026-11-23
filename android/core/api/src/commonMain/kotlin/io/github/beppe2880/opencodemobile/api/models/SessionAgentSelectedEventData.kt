@@ -44,7 +44,7 @@ data class SessionAgentSelectedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "agent")
-    val agent: kotlin.String?,
+    val agent: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "previous")

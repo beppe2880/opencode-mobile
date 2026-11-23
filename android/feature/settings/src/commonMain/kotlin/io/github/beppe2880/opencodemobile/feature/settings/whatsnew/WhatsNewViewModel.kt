@@ -5,11 +5,13 @@ import io.github.beppe2880.opencodemobile.core.domain.AppRelease
 import io.github.beppe2880.opencodemobile.core.domain.AppVersion
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
+import io.github.beppe2880.opencodemobile.core.domain.WhatsNewHistory
 import io.github.beppe2880.opencodemobile.core.domain.WhatsNewRepository
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -75,22 +77,23 @@ class WhatsNewViewModel(
 
 /**
  * The "What's New" button above the session list: shown until it is hidden, and again once a
- * newer release is published; with a dot while there are releases the page was not opened for.
- * Looks for new releases at most once a day, and never while the update notice is off.
+ * newer release is published or the app is updated; never while turned off in Settings. With a
+ * dot while there are releases the page was not opened for. Looks for new releases at most once
+ * a day, and never while the update notice is off.
  */
 class WhatsNewButtonViewModel(
     private val repository: WhatsNewRepository,
     settings: SettingsRepository,
     private val appInfo: AppInfo,
 ) : BaseViewModel<WhatsNewButtonState, WhatsNewButtonEvent, WhatsNewButtonEffect>(
-    repository.history.value.let { WhatsNewButtonState(visible = it.buttonVisible, unseen = it.hasUnseen) },
+    buttonState(repository.history.value, settings.settings.value.whatsNewButton, appInfo.versionName),
 ) {
 
     init {
         viewModelScope.launch {
-            repository.history.collect { history ->
-                updateState { it.copy(visible = history.buttonVisible, unseen = history.hasUnseen) }
-            }
+            val enabled = settings.settings.map { it.whatsNewButton }.distinctUntilChanged()
+            combine(repository.history, enabled) { history, on -> buttonState(history, on, appInfo.versionName) }
+                .collect { next -> updateState { next } }
         }
         viewModelScope.launch {
             settings.settings.map { it.updateNotice }.distinctUntilChanged().collectLatest { style ->
@@ -106,3 +109,6 @@ class WhatsNewButtonViewModel(
         }
     }
 }
+
+private fun buttonState(history: WhatsNewHistory, enabled: Boolean, installed: String) =
+    WhatsNewButtonState(visible = enabled && history.buttonVisible(installed), unseen = history.hasUnseen)

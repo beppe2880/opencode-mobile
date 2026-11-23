@@ -352,6 +352,32 @@ class WhatsNewViewModelTest {
     }
 
     @Test
+    fun `a hidden button comes back after an update of the app`() = runTest(main.testDispatcher) {
+        repository.published = listOf(v110, v100, v090)
+        val vm = button(installed = "1.0.0")
+        advanceUntilIdle()
+        vm.onEvent(WhatsNewButtonEvent.Hide)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.visible)
+
+        assertFalse(button(installed = "1.0.0").also { advanceUntilIdle() }.state.value.visible)
+        assertTrue(button(installed = "1.1.0").also { advanceUntilIdle() }.state.value.visible)
+    }
+
+    @Test
+    fun `turned off in Settings the button never shows`() = runTest(main.testDispatcher) {
+        repository.published = listOf(v110, v100, v090)
+        settings.settings.value = AppSettings(whatsNewButton = false)
+        val vm = button(installed = "1.1.0")
+        advanceUntilIdle()
+        assertFalse(vm.state.value.visible)
+
+        settings.settings.value = AppSettings(whatsNewButton = true)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.visible)
+    }
+
+    @Test
     fun `the page stays reachable and clears the dot while the button is hidden`() = runTest(main.testDispatcher) {
         repository.published = listOf(v100, v090)
         val vm = button()
@@ -420,6 +446,6 @@ private class FakeWhatsNew : WhatsNewRepository {
     }
 
     override suspend fun hide(installedVersion: String) {
-        state.update { it.copy(hiddenVersion = it.latestVersion ?: installedVersion) }
+        state.update { it.copy(hiddenVersion = it.latestVersion ?: installedVersion, hiddenInstalledVersion = installedVersion) }
     }
 }

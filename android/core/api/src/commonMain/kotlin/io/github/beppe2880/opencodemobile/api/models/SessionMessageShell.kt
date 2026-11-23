@@ -62,7 +62,7 @@ data class SessionMessageShell (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "command")
-    val command: kotlin.String?,
+    val command: kotlin.String,
 
     @SerialName(value = "status")
     val status: SessionMessageShell.Status,

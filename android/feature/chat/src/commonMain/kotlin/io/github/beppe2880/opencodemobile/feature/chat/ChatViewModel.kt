@@ -50,6 +50,7 @@ import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attachment_failed
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_btw_text_only
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_undo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
@@ -88,7 +89,11 @@ class ChatViewModel(
     private val pins: PinnedSessionRepository,
     private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
-) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId))) {
+    private val btwMemory: BtwMemory,
+    private val serverId: String = "",
+) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(
+    ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId), btw = btwMemory.get(serverId, sessionId)),
+) {
 
     private var messages: List<Message> = emptyList()
     private var showReasoning: Boolean = settings.settings.value.showReasoning
@@ -180,6 +185,11 @@ class ChatViewModel(
     private var revertMessageId: String? = null
     private var localIds = 0
 
+    /** The session's idle and viewed watermarks as last loaded; the viewed one is reported once. */
+    private var sessionIdleAt: Long? = null
+    private var sessionViewedAt: Long? = null
+    private var reportedViewedAt: Long? = null
+
     init {
         viewModelScope.launch {
             mutes.muted.collect { ids -> updateState { it.copy(muted = sessionId in ids) } }
@@ -199,6 +209,9 @@ class ChatViewModel(
         viewModelScope.launch {
             // Every change of the composer text (typing, send, revert, picked mention) is kept.
             state.map { it.draft }.distinctUntilChanged().collect { drafts.save(sessionId, it) }
+        }
+        viewModelScope.launch {
+            btwMemory.observe(serverId, sessionId).collect { btw -> updateState { it.copy(btw = btw) } }
         }
         viewModelScope.launch {
             settings.settings.collect { s ->
@@ -310,6 +323,13 @@ class ChatViewModel(
             }
             is ChatEvent.DeliveryChanged -> updateState { it.copy(delivery = event.delivery) }
             ChatEvent.Send -> send()
+            is ChatEvent.BtwMode -> updateState { it.copy(btwMode = event.selected) }
+            is ChatEvent.BtwOpen -> updateState { it.copy(btwOpen = event.open) }
+            is ChatEvent.BtwQuestion -> {
+                btwMemory.put(serverId, sessionId, BtwState(question = event.text))
+                updateState { it.copy(btw = btwMemory.get(serverId, sessionId)) }
+            }
+            ChatEvent.AskBtw -> askBtw(currentState.btw?.question.orEmpty())
             ChatEvent.Stop -> stop()
             ChatEvent.MoveToBackground -> moveToBackground()
             ChatEvent.Compact -> compact()
@@ -583,6 +603,8 @@ class ChatViewModel(
             }
             val s = sessionResult.getOrThrow()
             revertMessageId = s.revertMessageId
+            sessionIdleAt = s.idleAt
+            sessionViewedAt = s.viewedAt
             pendingForms.await().onSuccess(::showForms)
             val server = transcriptResult.getOrThrow()
             keepSentImages(server)
@@ -609,6 +631,7 @@ class ChatViewModel(
                 )
             }
             rebuild()
+            reportViewed()
             // `/mcps` can open the panel before the project directory is known.
             if (currentState.mcps?.servers == null && mcpJob?.isActive != true) refreshMcps()
             loadCatalog(s.directory)
@@ -884,6 +907,15 @@ class ChatViewModel(
                 applyEvent(event)
                 scheduleReload()
                 refreshChangedFiles()
+                // The new idle watermark is read from the session: the reload only reads messages.
+                viewModelScope.launch {
+                    if (!chatVisible.value) return@launch
+                    sessions.get(sessionId).onSuccess { s ->
+                        sessionIdleAt = s.idleAt
+                        sessionViewedAt = s.viewedAt
+                        reportViewed()
+                    }
+                }
             }
             is ServerEvent.SessionChanged -> if (event.deleted) {
                 sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_session_deleted)))
@@ -1110,6 +1142,26 @@ class ChatViewModel(
 
     fun setChatVisible(visible: Boolean) {
         chatVisible.value = visible
+        if (visible) reportViewed()
+    }
+
+    /**
+     * Reports the session's latest idle transition as viewed while this chat is on screen, once per
+     * idle, like the desktop app. A session already viewed at that idle makes no request; a failed
+     * one (an older server, a dropped connection) is retried by the next load or visit.
+     */
+    private fun reportViewed() {
+        if (!chatVisible.value) return
+        val idle = sessionIdleAt ?: return
+        val viewed = sessionViewedAt
+        if (viewed != null && viewed >= idle) return
+        if (reportedViewedAt == idle) return
+        reportedViewedAt = idle
+        viewModelScope.launch {
+            sessions.markViewed(sessionId, idle)
+                .onSuccess { sessionViewedAt = idle }
+                .onFailure { if (reportedViewedAt == idle) reportedViewedAt = null }
+        }
     }
 
     /**
@@ -1266,6 +1318,7 @@ class ChatViewModel(
         val state = currentState
         if (!state.canSend) return
         val text = state.draft.trim()
+        if (state.isBtw) return sendBtw()
         Completions.shell(text)?.let { return runShell(it, text) }
         val slash = Completions.slash(text)
         Completions.Builtin.of(slash?.name)?.let { return runBuiltin(it) }
@@ -1353,9 +1406,11 @@ class ChatViewModel(
 
     private fun runBuiltin(builtin: Completions.Builtin) {
         if (currentState.creatingSession) return
+        if (builtin == Completions.Builtin.Btw) return sendBtw(command = true)
         val draft = currentState.draft
         updateState { it.copy(draft = "", suggestions = emptyList()) }
         when (builtin) {
+            Completions.Builtin.Btw -> Unit // Handled before clearing the draft.
             Completions.Builtin.New -> newSession(draft)
             Completions.Builtin.Undo -> undo()
             Completions.Builtin.Redo -> restoreRevert()
@@ -1364,6 +1419,35 @@ class ChatViewModel(
             Completions.Builtin.Mcps -> onEvent(ChatEvent.OpenMcps)
             Completions.Builtin.Connect -> onEvent(ChatEvent.OpenProviders)
         }
+    }
+
+    private fun sendBtw(command: Boolean = false) {
+        val state = currentState
+        if (state.btw?.loading == true) return
+        if (state.attachments.isNotEmpty()) {
+            sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_btw_text_only)))
+            return
+        }
+        val slash = Completions.slash(state.draft.trim())
+        val question = if (command || slash?.name == "btw") slash?.arguments.orEmpty() else state.draft.trim()
+        updateState { it.copy(draft = "", suggestions = emptyList(), btwMode = false) }
+        if (question.isBlank()) {
+            btwMemory.put(serverId, sessionId, BtwState())
+            updateState { it.copy(btw = btwMemory.get(serverId, sessionId), btwOpen = true) }
+        } else {
+            sendEffect(ChatEffect.BtwSent)
+            askBtw(question)
+        }
+    }
+
+    private fun askBtw(question: String) {
+        btwMemory.ask(serverId, sessionId, question) {
+            val instructions = "The user is asking a quick side question about the conversation so far. " +
+                "Answer directly and concisely in markdown from what you already know. " +
+                "Do not call any tools and do not take any actions."
+            chat.generate(sessionId, "$instructions\n\n$question", serverId = serverId.takeIf { it.isNotEmpty() })
+        }
+        updateState { it.copy(btw = btwMemory.get(serverId, sessionId)) }
     }
 
     /**

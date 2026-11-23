@@ -40,7 +40,7 @@ data class CredentialSwitchedEventData (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "integrationID")
-    val integrationID: kotlin.String?,
+    val integrationID: kotlin.String,
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "credentialID")

@@ -38,7 +38,6 @@ import kotlinx.serialization.Contextual
  * @param status 
  * @param reason 
  * @param summary Maximum number of sessions to return. Defaults to the newest 50 sessions.
- * @param recent Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param metadata 
  */
 @Serializable
@@ -63,11 +62,7 @@ data class SessionMessageCompactionRunning (
 
     /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
     @SerialName(value = "summary")
-    val summary: kotlin.String?,
-
-    /* Maximum number of sessions to return. Defaults to the newest 50 sessions. */
-    @SerialName(value = "recent")
-    val recent: kotlin.String?,
+    val summary: kotlin.String,
 
     @Contextual @SerialName(value = "metadata")
     val metadata: kotlinx.serialization.json.JsonObject? = null

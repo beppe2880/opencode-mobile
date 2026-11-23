@@ -25,6 +25,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.SharedContent
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.newChatAgent
 import io.github.beppe2880.opencodemobile.core.domain.newChatModel
 import io.github.beppe2880.opencodemobile.core.domain.recentModels
@@ -33,6 +34,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.selectablePrimary
 import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_share_discarded
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -43,8 +45,12 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 class SessionsViewModel(
     private val sessions: SessionRepository,
@@ -66,6 +72,7 @@ class SessionsViewModel(
     private var projectsJob: Job? = null
     private var debounceJob: Job? = null
     private var browseJob: Job? = null
+    private var archiveJob: Job? = null
     private var newSessionDirectoryCleared = false
     private var sessionList: List<Session> = emptyList()
 
@@ -78,6 +85,7 @@ class SessionsViewModel(
     private var workPoll: Job? = null
     private var workJob: Job? = null
     private var workEventJob: Job? = null
+    private var waitingJob: Job? = null
     private val runningWork = RunningWorkLoader(sessions, chat)
     private val showRunningWork: Boolean get() = settings.settings.value.showRunningWorkInList
 
@@ -117,6 +125,16 @@ class SessionsViewModel(
             }
         }
         viewModelScope.launch {
+            settings.settings.map { it.unreadSessions }.distinctUntilChanged().collect { unread ->
+                updateState { s ->
+                    // Without unread state the read filter has nothing to narrow.
+                    val filters = if (unread == UnreadSessions.Off) s.filters.copy(readState = null) else s.filters
+                    val next = s.copy(unreadSessions = unread, filters = filters)
+                    next.copy(groups = groupSessions(sessionList, pinnedIds, clock(), zone, filters, s.waiting.keys, unread))
+                }
+            }
+        }
+        viewModelScope.launch {
             // The order shown (filters included) is the one a chat swipes through.
             state.map { s -> s.groups.flatMap { group -> group.sessions.map { it.id } } }
                 .distinctUntilChanged()
@@ -129,6 +147,7 @@ class SessionsViewModel(
             is SessionsEvent.Visible -> {
                 workVisible = event.visible
                 restartRunningPoll()
+                requestWaitingRefresh()
             }
             SessionsEvent.Refresh -> {
                 load(initial = currentState.groups.isEmpty(), pull = currentState.groups.isNotEmpty())
@@ -143,6 +162,27 @@ class SessionsViewModel(
                 showCachedFirst = true
                 load(initial = false)
             }
+            SessionsEvent.OpenFilters -> updateState { it.copy(filterSheetOpen = true) }
+            SessionsEvent.DismissFilters -> updateState { it.copy(filterSheetOpen = false) }
+            is SessionsEvent.ToggleStatus -> toggleStatus(event.status)
+            is SessionsEvent.SetDateFilter -> if (event.filter != currentState.filters.date) {
+                updateFilters { it.copy(date = event.filter) }
+                // A range is read from the server page by page; the loaded page may be too narrow.
+                load(initial = false)
+            }
+            is SessionsEvent.ToggleOutcome -> updateFilters { current ->
+                current.copy(
+                    outcomes = if (event.outcome in current.outcomes) {
+                        current.outcomes - event.outcome
+                    } else {
+                        current.outcomes + event.outcome
+                    },
+                )
+            }
+            is SessionsEvent.ToggleRead -> if (currentState.unreadSessions != UnreadSessions.Off) updateFilters { it.toggleRead(event.state) }
+            SessionsEvent.MarkAllRead -> markRead(currentState.unreadShown)
+            SessionsEvent.MarkUnreadGroupRead -> markRead(currentState.unreadGroup)
+            SessionsEvent.ResetFilters -> resetFilters()
             is SessionsEvent.HideProject -> setProjectHidden(event.directory, hidden = true)
             is SessionsEvent.UnhideProject -> setProjectHidden(event.directory, hidden = false)
             is SessionsEvent.Open -> if (currentState.sharing != null) shareTo(event.sessionId) else sendEffect(SessionsEffect.OpenChat(event.sessionId))
@@ -154,6 +194,7 @@ class SessionsViewModel(
                 mutes.setMuted(event.sessionId, event.muted)
                 updateState { it.copy(actionsFor = null) }
             }
+            is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)
             is SessionsEvent.RequestRename -> updateState { it.copy(actionsFor = null, renaming = event.session) }
             is SessionsEvent.RequestDelete -> updateState { it.copy(actionsFor = null, deleting = event.session) }
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null) }
@@ -196,7 +237,9 @@ class SessionsViewModel(
         projectsJob?.cancel()
         debounceJob?.cancel()
         browseJob?.cancel()
+        archiveJob?.cancel()
         workJob?.cancel()
+        waitingJob?.cancel()
         sessionList = emptyList()
         listedForPin = emptySet()
         pinnedIds = pins.pinned()
@@ -207,9 +250,12 @@ class SessionsViewModel(
                 projects = emptyList(),
                 hiddenDirectories = id?.let(folderPreferences::hiddenDirectories).orEmpty(),
                 directoryFilter = id?.let(filters::get),
+                filters = SessionFilters(),
+                filterSheetOpen = false,
                 groups = emptyList(),
                 running = emptySet(),
                 work = emptyMap(),
+                waiting = emptyMap(),
                 loading = id != null,
                 refreshing = false,
                 error = null,
@@ -224,9 +270,40 @@ class SessionsViewModel(
         showCachedFirst = true
         load(initial = true)
         loadProjects(cachedFirst = true)
+        checkArchiveSupport(id)
         // A share still to place opens again on the new server.
         shownShare = null
         onShare(shares.pending.value)
+    }
+
+    /**
+     * Archive arrived in OpenCode 2.1.0. Older servers accept the update and ignore `archived`, so
+     * the action and the archived filter are hidden instead of silently doing nothing; a filter
+     * already narrowed to archived sessions falls back to active ones.
+     */
+    private fun checkArchiveSupport(id: String) {
+        archiveJob?.cancel()
+        archiveJob = viewModelScope.launch {
+            val supported = sessions.archiveSupported()
+            if (serverId != id) return@launch
+            if (supported) {
+                updateState { it.copy(archiveSupported = true) }
+                return@launch
+            }
+            val dropped = SessionStatus.Archived in currentState.filters.effectiveStatuses
+            updateState {
+                it.copy(
+                    archiveSupported = false,
+                    filters = if (dropped) it.filters.copy(statuses = setOf(SessionStatus.Active)) else it.filters,
+                )
+            }
+            if (dropped) {
+                sessionList = emptyList()
+                showCachedFirst = true
+                updateState { it.copy(groups = emptyList(), loading = true) }
+                load(initial = true)
+            }
+        }
     }
 
     /**
@@ -289,11 +366,16 @@ class SessionsViewModel(
         }
         when (event) {
             ServerEvent.Connected -> load(initial = false)
-            is ServerEvent.ExecutionStarted -> updateState { it.copy(running = it.running + event.sessionId) }
-            is ServerEvent.ExecutionEnded -> {
-                updateState { it.copy(running = it.running - event.sessionId) }
-                scheduleReload(EVENT_DEBOUNCE_MS)
+            is ServerEvent.ExecutionStarted -> {
+                updateState { it.copy(running = it.running + event.sessionId) }
+                requestWaitingRefresh()
             }
+            is ServerEvent.ExecutionEnded -> {
+                updateState { it.copy(running = it.running - event.sessionId, waiting = it.waiting - event.sessionId) }
+                scheduleReload(EVENT_DEBOUNCE_MS)
+                requestWaitingRefresh()
+            }
+            is ServerEvent.PermissionChanged, is ServerEvent.FormsChanged -> requestWaitingRefresh()
             is ServerEvent.SessionChanged -> {
                 if (event.deleted) {
                     sessionList = sessionList.filterNot { it.id == event.sessionId }
@@ -302,6 +384,13 @@ class SessionsViewModel(
                 } else {
                     scheduleReload(EVENT_DEBOUNCE_MS)
                 }
+            }
+            // Another client (or this one, from the chat) reported the idle transition as viewed.
+            is ServerEvent.Viewed -> {
+                sessionList = sessionList.map { session ->
+                    if (session.id == event.sessionId) session.copy(viewedAt = event.idleAt) else session
+                }
+                updateState { it.copy(groups = group(sessionList)) }
             }
             else -> Unit
         }
@@ -349,8 +438,56 @@ class SessionsViewModel(
                     val work = snapshot.sessions.mapValues { (id, work) -> if (id in snapshot.errors) state.work[id] ?: work else work }
                     state.copy(work = work.filterValues { !it.isEmpty })
                 }
+                // Subagents found since may be the ones asking.
+                requestWaitingRefresh()
             }
         }
+    }
+
+    /** Bursts of events (a request asked and answered) cause one refresh; a newer one replaces it. */
+    private fun requestWaitingRefresh() {
+        if (!workVisible || serverId == null) return
+        waitingJob?.cancel()
+        waitingJob = viewModelScope.launch {
+            delay(WAITING_DEBOUNCE_MS)
+            refreshWaiting()
+        }
+    }
+
+    /**
+     * Reads the pending permissions and questions of the running listed sessions and of their
+     * known subagents. A session whose requests could not be read keeps what it showed.
+     */
+    private suspend fun refreshWaiting() {
+        val server = serverId
+        val state = currentState
+        val listed = sessionList.mapTo(HashSet()) { it.id }
+        val roots = state.running.filter { it in listed }
+        val waiting = coroutineScope {
+            roots.map { root ->
+                async {
+                    val ids = listOf(root) + state.work[root]?.agents.orEmpty().map { it.session.id }
+                    root to waitingFor(ids).getOrElse { state.waiting[root] }
+                }
+            }.awaitAll()
+        }
+        if (serverId != server) return
+        val next = waiting.mapNotNull { (id, w) -> w?.let { id to it } }.toMap()
+        updateState {
+            // A session that starts or stops waiting enters or leaves the unread group.
+            it.copy(waiting = next, groups = group(sessionList, it.filters, next.keys))
+        }
+    }
+
+    /** What [ids] wait for, null when nothing; a failure when a request list could not be read. */
+    private suspend fun waitingFor(ids: List<String>): Result<SessionWaiting?> {
+        var answer = false
+        for (id in ids) {
+            val permissions = chat.permissions(id).getOrElse { return Result.failure(it) }
+            if (permissions.isNotEmpty()) return Result.success(SessionWaiting.Permission)
+            if (!answer) answer = chat.forms(id).getOrElse { return Result.failure(it) }.isNotEmpty()
+        }
+        return Result.success(if (answer) SessionWaiting.Answer else null)
     }
 
     private fun scheduleReload(delayMs: Long) {
@@ -366,21 +503,22 @@ class SessionsViewModel(
         updateState { it.copy(loading = initial && it.groups.isEmpty(), refreshing = pull, error = null) }
         loadJob = viewModelScope.launch {
             val state = currentState
+            val filters = state.filters
             val search = state.query.trim().ifEmpty { null }
             if (showCachedFirst) {
                 if (search == null) showCached(state.directoryFilter) else showCachedFirst = false
             }
-            val result = sessions.list(search = search, directory = state.directoryFilter)
+            val result = listSessions(filters, search, state.directoryFilter)
             val active = sessions.active().getOrNull()
             result.fold(
                 onSuccess = { listed ->
-                    val beyond = pinnedBeyond(listed, search, state.directoryFilter)
+                    val beyond = pinnedBeyond(listed, search, state.directoryFilter, filters)
                     listedForPin = beyond.mapTo(HashSet()) { it.id }
                     val list = listed + beyond
                     sessionList = list
                     updateState {
                         it.copy(
-                            groups = group(list),
+                            groups = group(list, filters),
                             running = active ?: it.running,
                             loading = false,
                             refreshing = false,
@@ -390,6 +528,7 @@ class SessionsViewModel(
                     fillNewSessionDirectory()
                     prefetch(list)
                     refreshRunning()
+                    requestWaitingRefresh()
                 },
                 onFailure = { error ->
                     updateState { it.copy(loading = false, refreshing = false, error = if (it.groups.isEmpty()) error.toUiText() else null) }
@@ -414,7 +553,7 @@ class SessionsViewModel(
         showCachedFirst = false
         if (cached == null) return
         sessionList = cached
-        updateState { it.copy(groups = group(cached), loading = false, error = null) }
+        updateState { it.copy(groups = group(cached, currentState.filters), loading = false, error = null) }
         fillNewSessionDirectory()
     }
 
@@ -442,12 +581,106 @@ class SessionsViewModel(
     private fun listed(projects: List<Project>): List<Project> =
         projects.sortedByDescending { it.updatedAt }.filter { it.id != GLOBAL_PROJECT_ID }.distinctBy { it.directory }
 
-    internal fun group(list: List<Session>): List<SessionGroup> = groupSessions(list, pinnedIds, clock(), zone)
+    internal fun group(list: List<Session>): List<SessionGroup> = group(list, currentState.filters)
+
+    private fun group(list: List<Session>, filters: SessionFilters): List<SessionGroup> =
+        group(list, filters, currentState.waiting.keys)
+
+    private fun group(list: List<Session>, filters: SessionFilters, waiting: Set<String>): List<SessionGroup> =
+        groupSessions(list, pinnedIds, clock(), zone, filters, waiting, currentState.unreadSessions)
+
+    /**
+     * Marks [unread] as viewed at their idle watermark, a few requests at a time. The rows clear at
+     * once; those the server refuses become unread again, with one message for all of them.
+     */
+    private fun markRead(unread: List<Session>) {
+        if (currentState.markingAllRead) return
+        val marks = unread.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
+        if (marks.isEmpty()) return
+        val previous = sessionList.filter { it.id in marks }.associate { it.id to it.viewedAt }
+        sessionList = sessionList.map { session -> marks[session.id]?.let { session.copy(viewedAt = it) } ?: session }
+        updateState { it.copy(markingAllRead = true, filterSheetOpen = false, groups = group(sessionList)) }
+        viewModelScope.launch {
+            val permits = Semaphore(MARK_READ_PARALLEL)
+            val failed = marks.map { (id, idle) ->
+                async { permits.withPermit { id.takeIf { sessions.markViewed(id, idle).isFailure } } }
+            }.awaitAll().filterNotNull().toSet()
+            if (failed.isNotEmpty()) {
+                // A newer watermark from another client stays; only the failed marks are undone.
+                sessionList = sessionList.map { session ->
+                    if (session.id in failed && session.viewedAt == marks[session.id]) session.copy(viewedAt = previous[session.id]) else session
+                }
+                sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_mark_all_read_failed)))
+            }
+            updateState { it.copy(markingAllRead = false, groups = group(sessionList)) }
+        }
+    }
 
     private fun setPinned(sessionId: String, pinned: Boolean) {
         updateState { it.copy(actionsFor = null) }
         pins.setPinned(sessionId, pinned)
         showPins()
+    }
+
+    /** Adds or removes a status; when both are selected the two server lists are merged. */
+    private fun toggleStatus(status: SessionStatus) {
+        if (status == SessionStatus.Archived && !currentState.archiveSupported) return
+        val filters = currentState.filters.toggleStatus(status)
+        if (filters.statuses == currentState.filters.statuses) return
+        sessionList = emptyList()
+        showCachedFirst = SessionStatus.Active in filters.effectiveStatuses
+        updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+        load(initial = true)
+    }
+
+    /** Narrows the loaded list without asking the server; grouping applies the filters. */
+    private fun updateFilters(transform: (SessionFilters) -> SessionFilters) {
+        val filters = transform(currentState.filters)
+        if (filters == currentState.filters) return
+        updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+    }
+
+    private fun resetFilters() {
+        val current = currentState.filters
+        val wasFiltered = current.effectiveStatuses != SessionFilters().effectiveStatuses ||
+            current.date != SessionDateFilter.AnyTime
+        val filters = SessionFilters()
+        if (wasFiltered) {
+            sessionList = emptyList()
+            showCachedFirst = true
+            updateState { it.copy(filters = filters, groups = emptyList(), loading = true, error = null) }
+            load(initial = true)
+        } else {
+            updateState { it.copy(filters = filters, groups = group(sessionList, filters)) }
+        }
+    }
+
+    /** Archives or restores [session], removing it from the list shown until the server confirms. */
+    private fun setArchived(session: Session, archived: Boolean) {
+        updateState { it.copy(actionsFor = null) }
+        val previous = sessionList
+        val status = if (archived) SessionStatus.Archived else SessionStatus.Active
+        if (status !in currentState.filters.effectiveStatuses) {
+            sessionList = sessionList.filterNot { it.id == session.id }
+        } else {
+            sessionList = sessionList.map {
+                if (it.id == session.id) {
+                    it.copy(archivedAt = if (archived) clock() else null)
+                } else {
+                    it
+                }
+            }
+        }
+        updateState { it.copy(groups = group(sessionList)) }
+        viewModelScope.launch {
+            sessions.setArchived(session.id, archived).onSuccess {
+                sendEffect(SessionsEffect.ShowArchiveUndo(session, archived))
+            }.onFailure { error ->
+                sessionList = previous
+                updateState { it.copy(groups = group(sessionList)) }
+                sendEffect(SessionsEffect.ShowMessage(error.toUiText()))
+            }
+        }
     }
 
     /** A deleted session leaves no pin behind. */
@@ -473,11 +706,17 @@ class SessionsViewModel(
      * project filter and the search still include. The pin of a session that no longer exists is
      * forgotten; one that cannot be read now stays as last shown.
      */
-    private suspend fun pinnedBeyond(listed: List<Session>, search: String?, directory: String?): List<Session> {
+    private suspend fun pinnedBeyond(
+        listed: List<Session>,
+        search: String?,
+        directory: String?,
+        filters: SessionFilters,
+    ): List<Session> {
         val missing = pinnedIds - listed.mapTo(HashSet()) { it.id }
         if (missing.isEmpty()) return emptyList()
         val shown = sessionList.associateBy { it.id }
         val read = coroutineScope { missing.map { id -> async { id to sessions.get(id) } }.awaitAll() }
+        val today = Instant.fromEpochMilliseconds(clock()).toLocalDateTime(zone).date
         return read
             .mapNotNull { (id, result) ->
                 if (result.exceptionOrNull() is OpenCodeError.NotFound) {
@@ -487,7 +726,39 @@ class SessionsViewModel(
                     result.getOrNull() ?: shown[id]
                 }
             }
-            .filter { it.parentId == null && it.archivedAt == null && it.matches(search, directory) }
+            .filter { it.parentId == null && filters.matches(it, today, zone) && it.matches(search, directory) }
+    }
+
+    /** Loads one or both status lists; a single failed half of a two-list load keeps the other. */
+    private suspend fun listSessions(
+        filters: SessionFilters,
+        search: String?,
+        directory: String?,
+    ): Result<List<Session>> {
+        val statuses = filters.effectiveStatuses
+        val limit = if (filters.date == SessionDateFilter.AnyTime) DEFAULT_LIST_LIMIT else FILTERED_LIST_LIMIT
+        val today = Instant.fromEpochMilliseconds(clock()).toLocalDateTime(zone).date
+        val notBefore = filters.date.lowerBound(today, zone)
+
+        // A date range keeps reading older pages until its first day; other filters take one page.
+        suspend fun listStatus(archived: Boolean): Result<List<Session>> =
+            if (notBefore == null) {
+                sessions.list(search, directory, limit, archived = archived)
+            } else {
+                sessions.listUntil(search, directory, limit, archived = archived, notBefore = notBefore)
+            }
+        val results = if (statuses.size > 1) {
+            coroutineScope {
+                val active = async { listStatus(false) }
+                val archived = async { listStatus(true) }
+                listOf(active.await(), archived.await())
+            }
+        } else {
+            listOf(listStatus(statuses.single() == SessionStatus.Archived))
+        }
+        val successful = results.mapNotNull { it.getOrNull() }
+        if (successful.isEmpty()) return results.first()
+        return Result.success(successful.flatten().distinctBy { it.id }.sortedByDescending { it.updatedAt })
     }
 
     private fun rename(title: String) {
@@ -698,8 +969,14 @@ class SessionsViewModel(
         const val EVENT_DEBOUNCE_MS = 600L
         const val PREFETCH_SESSIONS = 5
         const val PREFETCH_MESSAGES = 2
+
+        /** The default page; a date filter may need sessions older than it. */
+        const val DEFAULT_LIST_LIMIT = 100
+        const val FILTERED_LIST_LIMIT = 500
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
+        const val MARK_READ_PARALLEL = 4
+        const val WAITING_DEBOUNCE_MS = 300L
         const val GLOBAL_PROJECT_ID = "global"
     }
 }

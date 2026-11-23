@@ -27,6 +27,10 @@
     <string name="notif_intro_text">Enquanto uma sessão está em andamento, o app fica conectado ao seu servidor em segundo plano para avisar quando o agente precisa de uma permissão ou de uma resposta, e quando termina. Você pode permitir ou rejeitar uma alteração direto na notificação.\n\nAs notificações vêm direto do seu servidor, sem outros serviços no meio. Você pode desativá-las quando quiser nas Configurações.</string>
     <string name="notif_intro_allow">Permitir</string>
     <string name="notif_intro_later">Agora não</string>
+    <string name="voice_channel">Gravação de voz</string>
+    <string name="voice_recording_title">Gravando uma mensagem de voz</string>
+    <string name="voice_recording_text">Toque em Parar para transformá-la em texto na caixa de mensagem.</string>
+    <string name="voice_recording_stop">Parar</string>
     <string name="widget_label">Sessões do OpenCode</string>
     <string name="widget_description">Sessões em execução e recentes, e um botão para iniciar uma nova.</string>
     <string name="widget_new_session">Nova</string>

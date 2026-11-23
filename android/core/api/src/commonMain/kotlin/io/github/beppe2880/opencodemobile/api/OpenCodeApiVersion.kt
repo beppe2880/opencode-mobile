@@ -3,6 +3,6 @@ package io.github.beppe2880.opencodemobile.api
 
 /** OpenCode server version whose OpenAPI document and event schemas produced this client. */
 object OpenCodeApiVersion {
-    const val OPENCODE = "2.0.27"
+    const val OPENCODE = "2.3.2"
     const val GENERATOR = "7.22.0"
 }

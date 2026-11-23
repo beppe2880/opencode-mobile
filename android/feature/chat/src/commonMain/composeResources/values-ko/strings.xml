@@ -269,4 +269,13 @@
     <string name="chat_preview_selection_now">입력창에서 선택: 채팅이 즉시 해당 항목으로 전환됩니다</string>
     <string name="chat_preview_stop_asks">실행 중 시트에서 명령을 중지하면 먼저 확인합니다</string>
     <string name="chat_preview_stop_direct">실행 중 시트에서 명령을 중지하면 즉시 종료됩니다</string>
+    <string name="chat_btw_title">별도 질문</string>
+    <string name="chat_btw_ask">별도로 질문</string>
+    <string name="chat_btw_text_only">별도 질문은 텍스트만 지원합니다. 보내기 전에 첨부 파일을 제거하세요.</string>
+    <string name="chat_btw_unavailable">별도 질문을 사용할 수 없습니다. 서버가 /btw를 지원하는지 확인하세요.</string>
+    <string name="chat_btw_empty">반환된 텍스트가 없습니다.</string>
+    <string name="chat_btw_failed">질문 실패</string>
+    <string name="chat_btw_loading">답변 준비 중…</string>
+    <string name="chat_btw_question">질문 내용</string>
+    <string name="chat_btw_ready">답변 준비 완료</string>
 </resources>

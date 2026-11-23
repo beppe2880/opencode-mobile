@@ -34,8 +34,8 @@ import kotlinx.serialization.Contextual
 /**
  * 
  *
- * @param id 
- * @param parentID 
+ * @param id Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
+ * @param parentID Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert.
  * @param title 
  * @param agent Maximum number of sessions to return. Defaults to the newest 50 sessions.
  * @param model 
@@ -47,9 +47,11 @@ import kotlinx.serialization.Contextual
 
 data class SessionCreateRequest (
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "id")
     val id: kotlin.String? = null,
 
+    /* Set parentID to create a subagent session at the parent's location; set agent to choose its agent (otherwise it uses the default) and start it with session.prompt. After each completed round, the child sends a `<subagent>` report to the parent's inbox and wakes the parent unless it has a staged revert. */
     @SerialName(value = "parentID")
     val parentID: kotlin.String? = null,
 

@@ -23,6 +23,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ThemeMode
 import io.github.beppe2880.opencodemobile.core.domain.ToolMediaSize
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldChat
 import io.github.beppe2880.opencodemobile.core.domain.UnfoldedLayout
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.UpdateNoticeStyle
 import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecordingStyle
@@ -83,6 +84,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_SWIPE_SENSITIVITY, next.swipeSensitivity.name)
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
+        prefs.putString(KEY_UNREAD_SESSIONS, next.unreadSessions.name)
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
@@ -126,6 +128,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_UPDATE_NOTICE, next.updateNotice.name)
         // Kept for older versions of the app, which only had the switch.
         prefs.putBoolean(KEY_CHECK_UPDATES, next.updateNotice != UpdateNoticeStyle.Off)
+        prefs.putBoolean(KEY_WHATS_NEW_BUTTON, next.whatsNewButton)
         prefs.putBoolean(KEY_EDIT_MARKS, next.showEditMarks)
         prefs.putString(KEY_SETTINGS_STYLE, next.settingsStyle.name)
         val previewFraction = next.settingsPreviewFraction
@@ -170,6 +173,8 @@ internal class PreferencesSettingsRepository(
                 ?: defaults.swipeSensitivity,
             showRunningWorkInList = prefs.getBoolean(KEY_RUNNING_IN_LIST, defaults.showRunningWorkInList),
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
+            unreadSessions = UnreadSessions.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNREAD_SESSIONS) }
+                ?: defaults.unreadSessions,
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
@@ -206,6 +211,7 @@ internal class PreferencesSettingsRepository(
             updateNotice = UpdateNoticeStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UPDATE_NOTICE) }
                 // Before the choice there was a switch: off stays off.
                 ?: if (prefs.getBooleanOrNull(KEY_CHECK_UPDATES) == false) UpdateNoticeStyle.Off else defaults.updateNotice,
+            whatsNewButton = prefs.getBoolean(KEY_WHATS_NEW_BUTTON, defaults.whatsNewButton),
             backShowsList = prefs.getBoolean(KEY_BACK_SHOWS_LIST, defaults.backShowsList),
             unfoldedLayout = UnfoldedLayout.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLDED_LAYOUT) } ?: defaults.unfoldedLayout,
             unfoldOpenChat = UnfoldChat.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNFOLD_OPEN_CHAT) } ?: defaults.unfoldOpenChat,
@@ -261,6 +267,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_SWIPE_SENSITIVITY = "swipe_sensitivity"
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
+        const val KEY_UNREAD_SESSIONS = "unread_sessions"
         const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_DICTATION = "dictation"
@@ -295,6 +302,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_LIST_PANE_HANDLE = "list_pane_handle"
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_UPDATE_NOTICE = "update_notice"
+        const val KEY_WHATS_NEW_BUTTON = "whats_new_button"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         const val KEY_UNFOLDED_LAYOUT = "unfolded_layout"
         const val KEY_UNFOLD_OPEN_CHAT = "unfold_open_chat"

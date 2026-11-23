@@ -1,5 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
@@ -231,6 +234,8 @@ fun OcSearchField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
+    /** Extra action after the clear button, e.g. the session filters. */
+    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     val c = OcTheme.colors
     val text = rememberSyncedText(value)
@@ -244,15 +249,20 @@ fun OcSearchField(
         leadingIcon = {
             Icon(Icons.Outlined.Search, contentDescription = null, modifier = Modifier.size(18.dp))
         },
-        trailingIcon = if (value.isNotEmpty()) {
+        trailingIcon = if (value.isNotEmpty() || trailingContent != null) {
             {
-                OcIconButton(
-                    icon = Icons.Outlined.Close,
-                    contentDescription = stringResource(Res.string.oc_clear),
-                    onClick = { onValueChange("") },
-                    tint = c.iconMuted,
-                    iconSize = 18.dp,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    if (value.isNotEmpty()) {
+                        OcIconButton(
+                            icon = Icons.Outlined.Close,
+                            contentDescription = stringResource(Res.string.oc_clear),
+                            onClick = { onValueChange("") },
+                            tint = c.iconMuted,
+                            iconSize = 18.dp,
+                        )
+                    }
+                    trailingContent?.invoke()
+                }
             }
         } else {
             null

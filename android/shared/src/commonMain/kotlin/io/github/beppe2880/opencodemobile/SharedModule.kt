@@ -1,7 +1,9 @@
 package io.github.beppe2880.opencodemobile
 
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
+import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.ui.theme.OpenCodeThemes
+import io.github.beppe2880.opencodemobile.feature.chat.BtwMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ChatViewModel
 import io.github.beppe2880.opencodemobile.feature.chat.ImageMemory
 import io.github.beppe2880.opencodemobile.feature.chat.ProviderConnectionViewModel
@@ -12,6 +14,7 @@ import io.github.beppe2880.opencodemobile.feature.files.FileViewerViewModel
 import io.github.beppe2880.opencodemobile.feature.sessions.SessionsViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.AppInfo
 import io.github.beppe2880.opencodemobile.feature.settings.SettingsViewModel
+import io.github.beppe2880.opencodemobile.feature.settings.star.GitHubStarViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateNoticeViewModel
 import io.github.beppe2880.opencodemobile.feature.settings.update.UpdateSheetSession
 import io.github.beppe2880.opencodemobile.feature.settings.usage.UsageViewModel
@@ -22,7 +25,9 @@ import io.github.beppe2880.opencodemobile.feature.terminal.TerminalViewModel
 import io.github.beppe2880.opencodemobile.widget.WidgetLoader
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 
 /** ViewModels and UI state holders shared by the Android and iOS apps. */
 fun sharedModule(appInfo: AppInfo): Module = module {
@@ -34,12 +39,17 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     // Kept across chats for the whole app run.
     single { ImageMemory() }
     single { ScrollMemory() }
+    // The process-wide scope supplied by the real and demo data modules.
+    single { BtwMemory(get(named("AppScope"))) } onClose { it?.close() }
     viewModel { params ->
-        ChatViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), mutes = get())
+        ChatViewModel(
+            params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+            mutes = get(), btwMemory = get(), serverId = get<ServerRepository>().activeServer.value?.id.orEmpty(),
+        )
     }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
-    viewModel { params -> SettingsViewModel(get(), get(), get(), get(), params.getOrNull()) }
+    viewModel { params -> SettingsViewModel(get(), get(), get(), get(), get(), params.getOrNull()) }
     viewModel { UsageViewModel(get(), get()) }
     // The update sheet is offered once per app run; an update found by "Check for updates" is
     // shared with the session list.
@@ -48,6 +58,8 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params -> UpdateNoticeViewModel(get(), get(), get(), get(), automatic = params.getOrNull<Boolean>() ?: true) }
     viewModel { WhatsNewViewModel(get(), get()) }
     viewModel { WhatsNewButtonViewModel(get(), get(), get()) }
+    // The banner above the sessions passes true: opening it counts a day of use.
+    viewModel { params -> GitHubStarViewModel(get(), countUse = params.getOrNull<Boolean>() ?: false) }
     single { TerminalTimelines() }
     viewModel { params -> TerminalViewModel(params.get(), get(), get(), get()) }
     viewModel { params -> FileViewerViewModel(params.get(), get()) }
