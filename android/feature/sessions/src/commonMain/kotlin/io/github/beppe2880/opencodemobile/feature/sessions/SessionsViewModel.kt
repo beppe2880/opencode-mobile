@@ -832,6 +832,7 @@ class SessionsViewModel(
             for (session in selected) {
                 sessions.delete(session.id).onSuccess {
                     pins.setPinned(session.id, false)
+                    mutes.setMuted(session.id, false)
                     unreadStore.setUnread(session.id, false)
                 }.onFailure { failed += session }
             }

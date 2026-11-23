@@ -94,11 +94,12 @@ class SessionsViewModelTest {
 
     private val pins = InMemoryPinnedSessions()
     private val unread = InMemoryUnreadSessions()
+    private val mutes = InMemoryMutedSessions()
 
     private fun vm(repository: FakeSessionRepository = sessions) =
         SessionsViewModel(
             repository, catalog, events, servers, chat, settings, recents, shares, folders, pins,
-            mutes = InMemoryMutedSessions(), unreadStore = unread, clock = { now }, zone = zone,
+            mutes = mutes, unreadStore = unread, clock = { now }, zone = zone,
         )
 
     @Test
@@ -1943,6 +1944,37 @@ class SessionsViewModelTest {
 
         vm.onEvent(SessionsEvent.DismissDeleteFailures)
         assertTrue(vm.state.value.deleteFailures.isEmpty())
+    }
+
+    @Test
+    fun `bulk delete forgets the mutes of deleted sessions`() = runTest(main.testDispatcher) {
+        mutes.setMuted("today", true)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertFalse("today" in mutes.muted.value)
+    }
+
+    @Test
+    fun `a failed bulk delete keeps the mutes of the restored sessions`() = runTest(main.testDispatcher) {
+        mutes.setMuted("yesterday", true)
+        val vm = vm()
+        advanceUntilIdle()
+        sessions.deleteFailures = setOf("yesterday")
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("yesterday"))
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertTrue("yesterday" in mutes.muted.value)
     }
 
     @Test
