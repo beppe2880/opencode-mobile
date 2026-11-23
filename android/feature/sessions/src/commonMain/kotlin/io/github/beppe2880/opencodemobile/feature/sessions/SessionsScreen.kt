@@ -80,6 +80,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -232,6 +233,10 @@ fun SessionsScreen(
     inDrawer: Boolean = false,
 ) {
     val c = OcTheme.colors
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(state.selectionMode) {
+        if (state.selectionMode) focusManager.clearFocus()
+    }
     OcBackHandler(enabled = state.selectionMode) { onEvent(SessionsEvent.ExitSelection) }
     val now by produceState(nowProvider()) {
         while (true) {
@@ -293,12 +298,12 @@ fun SessionsScreen(
                 item(key = "header", contentType = "header") {
                     // In the first item: a banner appearing later pushes the list down instead
                     // of opening above the scroll position. Under the search, right above the chats.
+                    // Kept mounted while selecting, so removing it cannot move the rows under
+                    // the finger; only its controls are disabled.
                     Column {
-                        if (!state.selectionMode) {
-                            state.sharing?.let { ShareChoice(it, onEvent) }
-                            ListHeader(state, onEvent, headerTop)
-                            banner()
-                        }
+                        state.sharing?.let { ShareChoice(it, onEvent) }
+                        ListHeader(state, onEvent, headerTop, enabled = !state.selectionMode)
+                        banner()
                     }
                 }
                 when {
@@ -535,26 +540,32 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
 }
 
 @Composable
-private fun ListHeader(state: SessionsState, onEvent: (SessionsEvent) -> Unit, top: @Composable () -> Unit) {
+private fun ListHeader(
+    state: SessionsState,
+    onEvent: (SessionsEvent) -> Unit,
+    top: @Composable () -> Unit,
+    enabled: Boolean = true,
+) {
     Column(
         modifier = Modifier.padding(horizontal = OcSpacing.gutter, vertical = OcSpacing.md),
         verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
     ) {
         top()
-        ProjectFilter(state, onEvent)
+        ProjectFilter(state, onEvent, enabled)
         OcSearchField(
             value = state.query,
             onValueChange = { onEvent(SessionsEvent.QueryChanged(it)) },
             placeholder = stringResource(Res.string.sessions_search),
             modifier = Modifier.testTag("sessions_search_field"),
-            trailingContent = { FilterAction(state, onEvent) },
+            trailingContent = { FilterAction(state, onEvent, enabled) },
+            enabled = enabled,
         )
-        if (state.filters.isActive) ActiveFilterSummary(state, onEvent)
+        if (state.filters.isActive) ActiveFilterSummary(state, onEvent, enabled)
     }
 }
 
 @Composable
-private fun FilterAction(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+private fun FilterAction(state: SessionsState, onEvent: (SessionsEvent) -> Unit, enabled: Boolean = true) {
     val c = OcTheme.colors
     val count = state.filters.activeCount
     Box {
@@ -566,6 +577,7 @@ private fun FilterAction(state: SessionsState, onEvent: (SessionsEvent) -> Unit)
                 stringResource(Res.string.sessions_filters)
             },
             onClick = { onEvent(SessionsEvent.OpenFilters) },
+            enabled = enabled,
             tint = if (count > 0) c.textAccent else c.iconMuted,
             iconSize = 18.dp,
             modifier = Modifier.testTag("sessions_filters_button"),
@@ -592,7 +604,7 @@ private fun FilterAction(state: SessionsState, onEvent: (SessionsEvent) -> Unit)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -> Unit, enabled: Boolean = true) {
     FlowRow(
         modifier = Modifier.fillMaxWidth().testTag("sessions_filter_summary"),
         horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs),
@@ -605,6 +617,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
                 onRemove = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Active)) },
                 testTag = "sessions_filter_active_chip",
+                enabled = enabled,
             )
         }
         if (state.archiveSupported && SessionStatus.Archived in statuses) {
@@ -613,6 +626,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
                 onRemove = { onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived)) },
                 testTag = "sessions_filter_archived_chip",
+                enabled = enabled,
             )
         }
         state.filters.readState?.let { read ->
@@ -621,6 +635,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
                 onRemove = { onEvent(SessionsEvent.ToggleRead(read)) },
                 testTag = "sessions_filter_read_chip",
+                enabled = enabled,
             )
         }
         if (state.filters.date != SessionDateFilter.AnyTime) {
@@ -629,6 +644,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
                 onRemove = { onEvent(SessionsEvent.SetDateFilter(SessionDateFilter.AnyTime)) },
                 testTag = "sessions_filter_date_chip",
+                enabled = enabled,
             )
         }
         state.filters.outcomes.forEach { outcome ->
@@ -637,6 +653,7 @@ private fun ActiveFilterSummary(state: SessionsState, onEvent: (SessionsEvent) -
                 onClick = { onEvent(SessionsEvent.OpenFilters) },
                 onRemove = { onEvent(SessionsEvent.ToggleOutcome(outcome)) },
                 testTag = "sessions_filter_outcome_${outcome.name.lowercase()}",
+                enabled = enabled,
             )
         }
     }
@@ -648,10 +665,12 @@ private fun FilterSummaryChip(
     onClick: () -> Unit,
     onRemove: () -> Unit,
     testTag: String,
+    enabled: Boolean = true,
 ) {
     OcChip(
         text = label,
         onClick = onClick,
+        enabled = enabled,
         selected = true,
         trailingIcon = Icons.Outlined.Close,
         onTrailingClick = onRemove,
@@ -684,12 +703,13 @@ private fun readStateLabel(state: SessionRead): String = when (state) {
 }
 
 @Composable
-private fun ProjectFilter(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
+private fun ProjectFilter(state: SessionsState, onEvent: (SessionsEvent) -> Unit, enabled: Boolean = true) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Box {
         OcChip(
             text = state.filterLabel ?: stringResource(Res.string.sessions_all_projects),
             onClick = { expanded = true },
+            enabled = enabled,
             selected = state.directoryFilter != null,
             leadingIcon = Icons.Outlined.Folder,
             trailingIcon = Icons.Outlined.ExpandMore,
