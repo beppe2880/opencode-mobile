@@ -5,4 +5,7 @@
     <string name="chat_fork">Crea un fork</string>
     <string name="chat_undo">Annulla ultimo prompt</string>
     <string name="chat_redo">Ripristina prompt annullati</string>
+    <string name="chat_muted">Notifiche silenziate su questo dispositivo</string>
+    <string name="chat_mute">Silenzia notifiche</string>
+    <string name="chat_unmute">Riattiva notifiche</string>
 </resources>

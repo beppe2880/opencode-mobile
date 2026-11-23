@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">Silenzia notifiche</string>
+    <string name="sessions_unmute">Riattiva notifiche</string>
+    <string name="sessions_muted">Notifiche silenziate su questo dispositivo</string>
+</resources>

@@ -39,10 +39,12 @@ class SessionMonitorTest {
     private val servers = FakeServers()
     private val notifier = RecordingNotifier()
     private val visible = MutableStateFlow(false)
+    private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
     private var serviceStarts = 0
 
     private fun TestScope.monitor() = SessionMonitor(
         events, sessions, chat, settings, servers, notifier, visible, startService = { serviceStarts++ },
+        mutes = mutes,
     ).also {
         it.start(backgroundScope)
         runCurrent()
@@ -51,6 +53,94 @@ class SessionMonitorTest {
     private suspend fun TestScope.emit(event: ServerEvent) {
         events.flow.emit(event)
         runCurrent()
+    }
+
+    @Test
+    fun `muted sessions send no attention or finished notifications and unmuting restores pending ones`() = runTest {
+        sessions.add(session("ses_a", "Muted"))
+        monitor()
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        chat.forms["ses_a"] = listOf(Form("frm_1", "ses_a", "Question", emptyList()))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded))
+        assertTrue(notifier.attention().isEmpty())
+        assertTrue(notifier.log.none { it.startsWith("finished") })
+        mutes.setMuted("ses_a", false)
+        runCurrent()
+        assertTrue(notifier.attention().any { it.startsWith("permission") })
+        assertTrue(notifier.attention().any { it.startsWith("question") })
+    }
+
+    @Test
+    fun `back to back start and end finish even before the title lookup`() = runTest {
+        sessions.add(session("ses_a", "Quick turn"))
+        val monitor = monitor()
+        assertTrue(events.flow.tryEmit(ServerEvent.ExecutionStarted("ses_a")))
+        assertTrue(events.flow.tryEmit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Failed)))
+        runCurrent()
+
+        assertTrue(monitor.running.value.isEmpty())
+        assertEquals(listOf("cancelFinished ses_a", "finished ses_a Quick turn Failed"), notifier.log)
+    }
+
+    @Test
+    fun `changing a mute only reloads pending attention for that session on unmute`() = runTest {
+        monitor()
+        chat.forms["ses_a"] = listOf(Form("frm_1", "ses_a", "Question", emptyList()))
+        chat.forms["ses_b"] = listOf(Form("frm_2", "ses_b", "Question", emptyList()))
+        emit(ServerEvent.FormsChanged("ses_a"))
+        emit(ServerEvent.FormsChanged("ses_b"))
+        chat.formReads.clear()
+
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        assertTrue(chat.formReads.isEmpty())
+        mutes.setMuted("ses_a", false)
+        runCurrent()
+        assertEquals(listOf("ses_a"), chat.formReads)
+    }
+
+    @Test
+    fun `temporary mute silences its completion but not the next execution`() = runTest {
+        sessions.add(session("ses_a", "Title"))
+        monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        mutes.setMuted("ses_a", true, untilIdleAfter = 12)
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded, at = 24))
+        assertTrue(mutes.muted.value.isEmpty())
+        assertTrue(notifier.log.none { it.startsWith("finished") })
+
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded, at = 36))
+        assertTrue("finished ses_a Title Succeeded" in notifier.log)
+    }
+
+    @Test
+    fun `reconnect expires saved temporary mutes after an intervening idle but not manual mutes`() = runTest {
+        sessions.add(session("still-running", "Same turn").copy(idleAt = 12))
+        sessions.add(session("new-turn", "Next turn").copy(idleAt = 24))
+        sessions.activeIds = setOf("still-running", "new-turn")
+        mutes.setMuted("still-running", true, untilIdleAfter = 12)
+        mutes.setMuted("new-turn", true, untilIdleAfter = 12)
+        mutes.setMuted("no-longer-running", true, untilIdleAfter = 12)
+        mutes.setMuted("manual", true)
+        monitor()
+        emit(ServerEvent.Connected)
+        assertEquals(setOf("still-running", "manual"), mutes.muted.value)
+    }
+
+    @Test
+    fun `muting cancels attention notifications already posted`() = runTest {
+        sessions.add(session("ses_a", "Title"))
+        monitor()
+        chat.permissions["ses_a"] = listOf(permission("per_1"))
+        emit(ServerEvent.PermissionChanged("ses_a"))
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        assertTrue(notifier.attention().contains("cancel per_1"))
     }
 
     @Test
@@ -227,7 +317,7 @@ private class RecordingNotifier : MonitorNotifier {
 }
 
 private class FakeEvents : EventRepository {
-    val flow = MutableSharedFlow<ServerEvent>()
+    val flow = MutableSharedFlow<ServerEvent>(extraBufferCapacity = 2)
     override val connection = MutableStateFlow(ConnectionState.Connected)
     override val events = flow
 }
@@ -236,6 +326,7 @@ private class FakeSessions : SessionRepository {
     private val byId = mutableMapOf<String, Session>()
     var activeIds: Set<String> = emptySet()
     fun add(session: Session) { byId[session.id] = session }
+    override fun cached(sessionId: String) = byId[sessionId]
     override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(byId.values.toList())
     override suspend fun active() = Result.success(activeIds)
     override suspend fun get(sessionId: String) =
@@ -250,6 +341,7 @@ private class FakeSessions : SessionRepository {
 private class FakeChat : ChatRepository {
     val permissions = mutableMapOf<String, List<PermissionRequest>>()
     val forms = mutableMapOf<String, List<Form>>()
+    val formReads = mutableListOf<String>()
     override suspend fun messages(sessionId: String) = Result.success(emptyList<Message>())
     override suspend fun prompt(
         sessionId: String,
@@ -261,7 +353,10 @@ private class FakeChat : ChatRepository {
     override suspend fun switchAgent(sessionId: String, agent: String) = Result.success(Unit)
     override suspend fun switchModel(sessionId: String, model: ModelRef) = Result.success(Unit)
     override suspend fun permissions(sessionId: String) = Result.success(permissions[sessionId].orEmpty())
-    override suspend fun forms(sessionId: String) = Result.success(forms[sessionId].orEmpty())
+    override suspend fun forms(sessionId: String): Result<List<Form>> {
+        formReads += sessionId
+        return Result.success(forms[sessionId].orEmpty())
+    }
     override suspend fun replyPermission(sessionId: String, requestId: String, decision: PermissionDecision, message: String?) =
         Result.success(Unit)
 }

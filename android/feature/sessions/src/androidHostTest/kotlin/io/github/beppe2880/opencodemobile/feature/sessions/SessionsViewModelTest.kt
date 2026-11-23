@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderListing
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
@@ -92,7 +93,9 @@ class SessionsViewModelTest {
     private val pins = InMemoryPinnedSessions()
 
     private fun vm(repository: FakeSessionRepository = sessions) =
-        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, clock = { now }, zone = zone)
+        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, mutes = InMemoryMutedSessions(), clock = {
+            now
+        }, zone = zone)
 
     @Test
     fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {

@@ -913,12 +913,26 @@ class ChatViewModelTest {
     }
 
     private val pins = InMemoryPinnedSessions()
+    private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
     private val catalog = FakeCatalog(model)
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel =
-        ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, clock = {
+        ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, mutes = mutes, clock = {
             42
         }, btwMemory = btwMemory)
+
+    @Test
+    fun `mute toggles are shared with the session list`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(ChatEvent.SetMuted(true))
+        runCurrent()
+        assertEquals(setOf("s1"), mutes.muted.value)
+        assertTrue(vm.state.value.muted)
+        mutes.setMuted("s1", false)
+        runCurrent()
+        assertFalse(vm.state.value.muted)
+    }
 
     @Test
     fun `menu new and fork reuse the existing behavior without consuming the draft`() = runTest(main.testDispatcher) {

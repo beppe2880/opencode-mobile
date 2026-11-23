@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -50,6 +51,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.Res
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_delete
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_muted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_pinned
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_rename
@@ -82,6 +84,7 @@ internal fun SessionRow(
     swipeToDelete: Boolean = true,
     /** Pinned to the top of the list: a pin marks the title. */
     pinned: Boolean = false,
+    muted: Boolean = false,
     /** Pins or unpins the session, offered to accessibility services; the row actions have it for everyone. */
     onTogglePin: (() -> Unit)? = null,
     /** Running but blocked on the user: a badge replaces "Working" and the dot turns to a warning. */
@@ -154,6 +157,10 @@ internal fun SessionRow(
             OcProjectAvatar(session.directoryName)
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(OcSpacing.xs)) {
+                    if (muted) Icon(
+                        Icons.Outlined.NotificationsOff, contentDescription = stringResource(Res.string.sessions_muted), tint = c.textFaint,
+                        modifier = Modifier.size(16.dp).testTag("session_row_muted_${session.id}"),
+                    )
                     if (pinned) {
                         val titleStyle = MaterialTheme.typography.bodyMedium
                         Icon(

@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
@@ -85,6 +86,7 @@ class ChatViewModel(
     private val vcs: VcsRepository,
     private val shares: ShareRepository,
     private val pins: PinnedSessionRepository,
+    private val mutes: MutedSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val btwMemory: BtwMemory,
     private val serverId: String = "",
@@ -188,6 +190,9 @@ class ChatViewModel(
     private var reportedViewedAt: Long? = null
 
     init {
+        viewModelScope.launch {
+            mutes.muted.collect { ids -> updateState { it.copy(muted = sessionId in ids) } }
+        }
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
             revertMessageId = s.revertMessageId
@@ -242,6 +247,11 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
+            is ChatEvent.SetMuted -> {
+                if (!event.untilFinished || (currentState.running && currentState.connection == ConnectionState.Connected)) {
+                    mutes.setMuted(sessionId, event.muted, if (event.untilFinished) sessionIdleAt ?: 0 else null)
+                }
+            }
             ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
             ChatEvent.Undo -> if (currentState.historyReady) undo()
             is ChatEvent.Visible -> {

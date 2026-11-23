@@ -5,4 +5,7 @@
     <string name="chat_fork">Abzweigung erstellen</string>
     <string name="chat_undo">Letzten Prompt rückgängig machen</string>
     <string name="chat_redo">Prompts wiederherstellen</string>
+    <string name="chat_muted">Benachrichtigungen auf diesem Gerät stummgeschaltet</string>
+    <string name="chat_mute">Benachrichtigungen stummschalten</string>
+    <string name="chat_unmute">Benachrichtigungen aktivieren</string>
 </resources>

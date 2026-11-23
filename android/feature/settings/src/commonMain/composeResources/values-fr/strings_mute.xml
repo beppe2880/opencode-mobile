@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">Couper les notifications d’une session</string>
+    <string name="tips_c_mute_body">Sur Android, coupez les notifications d’une session depuis le menu du chat ou de la ligne, sans toucher aux autres. Réactivez-les manuellement ou laissez-les revenir à la fin du travail en cours.</string>
+    <string name="tips_c_mute_demo">Les choix de durée apparaissent, puis une cloche barrée marque la session jusqu’à la fin du travail.</string>
+</resources>

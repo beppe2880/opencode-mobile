@@ -5,4 +5,7 @@
     <string name="chat_fork">会話を分岐</string>
     <string name="chat_undo">最後のプロンプトを取り消す</string>
     <string name="chat_redo">取り消したプロンプトを復元</string>
+    <string name="chat_muted">このデバイスでは通知がミュートされています</string>
+    <string name="chat_mute">通知をミュート</string>
+    <string name="chat_unmute">通知を再開</string>
 </resources>

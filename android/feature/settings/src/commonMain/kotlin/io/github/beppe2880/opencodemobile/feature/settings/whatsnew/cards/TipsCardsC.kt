@@ -11,9 +11,11 @@ import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
+import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_ask_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_ask_demo
@@ -24,6 +26,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_btw_
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_chat_menu_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_mute_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_mute_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_mute_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_next_message_title
@@ -60,7 +65,18 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_wait
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
-internal val tipsCardsC: List<FeatureCard> = listOf(
+internal val tipsCardsC: List<FeatureCard> = listOfNotNull(
+    if (sessionNotificationsSupported) FeatureCard(
+        id = "session-mute",
+        version = "0.19.0",
+        icon = Icons.Outlined.NotificationsOff,
+        title = Res.string.tips_c_mute_title,
+        body = Res.string.tips_c_mute_body,
+        demoDescription = Res.string.tips_c_mute_demo,
+        author = "Andrease11",
+        pullRequest = 263,
+        demo = { SessionMuteDemo(it) },
+    ) else null,
     FeatureCard(
         id = "chat-ask-selection",
         version = "0.18.0",

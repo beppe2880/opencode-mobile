@@ -5,6 +5,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
@@ -69,6 +70,7 @@ class SessionMonitor(
     private val notifier: MonitorNotifier,
     private val visible: StateFlow<Boolean>,
     private val startService: () -> Unit,
+    private val mutes: MutedSessionRepository,
 ) {
     private val _running = MutableStateFlow<Map<String, RunningSession>>(emptyMap())
 
@@ -87,20 +89,37 @@ class SessionMonitor(
 
     fun start(scope: CoroutineScope) {
         scope.launch {
-            combine(settings.settings.map { it.notifications }, servers.activeServer.map { it?.id }) { on, server ->
-                server.takeIf { on }
+            combine(settings.settings.map { it.notifications }, servers.activeServer.map { it?.id }, mutes.temporary) { on, server, temporary ->
+                // Temporary mutes still need to expire when notifications are disabled.
+                server.takeIf { on || temporary.isNotEmpty() }
             }
                 .distinctUntilChanged()
                 .collectLatest { server ->
                     reset()
-                    if (server != null) coroutineScope { follow(this) }
+                    if (server != null) coroutineScope { follow(this, server) }
                 }
         }
     }
 
-    private suspend fun follow(scope: CoroutineScope) {
+    private suspend fun follow(scope: CoroutineScope, serverId: String) {
         scope.launch {
-            combine(_running.map { it.isNotEmpty() }, visible) { running, shown -> running && shown }
+            var previous = emptySet<String>()
+            mutes.muted.collect { muted ->
+                val unmutedPending = lock.withLock {
+                    for (id in muted - previous) {
+                        notifier.cancelFinished(id)
+                        pending[id].orEmpty().filter { notified.remove(it) }.forEach(notifier::cancelAttention)
+                    }
+                    (previous - muted).filter { it in pending }
+                }
+                previous = muted
+                unmutedPending.forEach { refresh(scope, it) }
+            }
+        }
+        scope.launch {
+            combine(_running, visible, mutes.muted, settings.settings) { running, shown, muted, preferences ->
+                preferences.notifications && shown && running.keys.any { it !in muted }
+            }
                 .distinctUntilChanged()
                 .filter { it }
                 .collect { startService() }
@@ -113,33 +132,39 @@ class SessionMonitor(
         scope.launch {
             events.connection.filter { it == ConnectionState.Unauthorized }.collect { reset() }
         }
-        events.events.collect { onEvent(scope, it) }
+        // There may already be a live stream when the monitor starts (e.g. after enabling it).
+        if (events.connection.value == ConnectionState.Connected) scope.launch { reconcile(scope, serverId) }
+        events.events.collect { if (servers.activeServer.value?.id == serverId) onEvent(scope, serverId, it) }
     }
 
-    private fun onEvent(scope: CoroutineScope, event: ServerEvent) {
+    private fun onEvent(scope: CoroutineScope, serverId: String, event: ServerEvent) {
         when (event) {
-            ServerEvent.Connected -> scope.launch { reconcile(scope) }
-            is ServerEvent.ExecutionStarted -> scope.launch { started(event.sessionId) }
-            is ServerEvent.ExecutionEnded -> scope.launch { ended(event.sessionId, event.outcome) }
+            ServerEvent.Connected -> scope.launch { reconcile(scope, serverId) }
+            is ServerEvent.ExecutionStarted -> started(scope, event.sessionId)
+            is ServerEvent.ExecutionEnded -> ended(event.sessionId, event.outcome, event.at.takeIf { it > 0 })
             is ServerEvent.PermissionChanged -> refresh(scope, event.sessionId)
             is ServerEvent.FormsChanged -> refresh(scope, event.sessionId)
             is ServerEvent.ReasoningStarted -> activity(event.sessionId, SessionActivity.Thinking)
             is ServerEvent.TextStarted -> activity(event.sessionId, SessionActivity.Writing)
             is ServerEvent.ToolInputStarted -> activity(event.sessionId, SessionActivity.Tool(event.name))
             is ServerEvent.SessionChanged -> when {
-                event.deleted -> scope.launch { forget(event.sessionId) }
+                event.deleted -> {
+                    mutes.setMuted(event.sessionId, false)
+                    scope.launch { forget(event.sessionId) }
+                }
                 event.sessionId in _running.value -> scope.launch { retitle(event.sessionId) }
             }
             else -> Unit
         }
     }
 
-    private suspend fun started(sessionId: String) {
+    /** Record the start before reading another event; only the title lookup can suspend. */
+    private fun started(scope: CoroutineScope, sessionId: String) {
         val cached = sessions.cached(sessionId)
         if (cached?.parentId != null) return
         _running.update { it + (sessionId to (it[sessionId] ?: RunningSession(sessionId, cached?.title.orEmpty()))) }
         notifier.cancelFinished(sessionId)
-        retitle(sessionId)
+        scope.launch { retitle(sessionId) }
     }
 
     /** Refreshes the title (generated after the first prompt) and drops subagent sessions. */
@@ -151,12 +176,16 @@ class SessionMonitor(
         }
     }
 
-    private suspend fun ended(sessionId: String, outcome: SessionOutcome) {
+    private fun ended(sessionId: String, outcome: SessionOutcome, idleAt: Long? = null) {
+        val muted = sessionId in mutes.muted.value
         val session = _running.value[sessionId]
         _running.update { it - sessionId }
-        if (session != null && !visible.value && settings.settings.value.notifyFinished) {
+        val preferences = settings.settings.value
+        if (session != null && !muted && !visible.value && preferences.notifications && preferences.notifyFinished) {
             notifier.finished(sessionId, session.title, outcome)
         }
+        // The completion itself belongs to the muted turn, not to the next one.
+        mutes.finishTemporary(sessionId, idleAt)
     }
 
     private suspend fun forget(sessionId: String) {
@@ -175,13 +204,22 @@ class SessionMonitor(
     }
 
     /** After a (re)connect: catches up with executions and requests missed while disconnected. */
-    private suspend fun reconcile(scope: CoroutineScope) {
+    private suspend fun reconcile(scope: CoroutineScope, serverId: String) {
         val active = sessions.active().getOrNull() ?: return
+        if (servers.activeServer.value?.id != serverId) return
         for (id in _running.value.keys - active) {
             val outcome = sessions.get(id).getOrNull()?.outcome ?: SessionOutcome.Succeeded
+            if (servers.activeServer.value?.id != serverId) return
             ended(id, outcome)
         }
-        for (id in active - _running.value.keys) started(id)
+        // A saved temporary mute may outlive the process or the SSE connection. Check for an
+        // intervening idle even if a new turn is already running by the time we reconnect.
+        for (id in mutes.temporary.value.keys) {
+            val idleAt = if (id in active) sessions.get(id).getOrNull()?.idleAt ?: continue else null
+            if (servers.activeServer.value?.id != serverId) return
+            mutes.finishTemporary(id, idleAt)
+        }
+        for (id in active - _running.value.keys) started(scope, id)
         (active + pendingSessions()).forEach { refresh(scope, it) }
     }
 
@@ -207,12 +245,14 @@ class SessionMonitor(
                 if (notified.remove(gone)) notifier.cancelAttention(gone)
             }
             if (now.isEmpty()) pending.remove(sessionId) else pending[sessionId] = now
-            if (visible.value) return
+            if (visible.value || sessionId in mutes.muted.value) return
             val enabled = settings.settings.value
+            if (!enabled.notifications) return
             val newPermissions = if (enabled.notifyPermissions) permissions.filter { it.id !in notified } else emptyList()
             val newForms = if (enabled.notifyQuestions) forms.filter { it.id !in notified } else emptyList()
             if (newPermissions.isEmpty() && newForms.isEmpty()) return
             val title = titleOf(sessionId)
+            if (visible.value || sessionId in mutes.muted.value || !settings.settings.value.notifications) return
             newPermissions.forEach { notifier.permission(title, it) }
             newForms.forEach { notifier.question(title, it) }
             notified += newPermissions.map { it.id } + newForms.map { it.id }

@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">静音通知</string>
+    <string name="sessions_unmute">恢复通知</string>
+    <string name="sessions_muted">此设备上的通知已静音</string>
+</resources>

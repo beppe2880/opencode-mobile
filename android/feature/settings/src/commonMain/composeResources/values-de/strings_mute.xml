@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">Eine Sitzung stummschalten</string>
+    <string name="tips_c_mute_body">Schalte unter Android eine Sitzung im Chat- oder Zeilenmenü stumm, ohne andere Sitzungen zu ändern. Wähle zwischen manueller Reaktivierung und dem Ende der laufenden Arbeit.</string>
+    <string name="tips_c_mute_demo">Die Daueroptionen erscheinen. Danach zeigt eine durchgestrichene Glocke die Stummschaltung bis zum Arbeitsende an.</string>
+</resources>

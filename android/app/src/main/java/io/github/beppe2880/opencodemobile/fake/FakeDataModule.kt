@@ -28,6 +28,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FormAnswer
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarChoice
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarRepository
 import io.github.beppe2880.opencodemobile.core.domain.GitHubStarState
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
 import io.github.beppe2880.opencodemobile.core.domain.IntegrationRepository
 import io.github.beppe2880.opencodemobile.core.domain.KeyIntegration
@@ -38,6 +39,7 @@ import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelInfo
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.ModelUsage
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.PermissionDecision
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
@@ -121,6 +123,7 @@ val fakeDataModule = module {
     single<FolderPreferences> { FakeFolderPreferences() }
     // Pins the newest and an old session, so the list shows Pinned above the days, with an unread and a read pin.
     single<PinnedSessionRepository> { InMemoryPinnedSessions(setOf("ses_1", "ses_8")) }
+    single<MutedSessionRepository> { InMemoryMutedSessions() }
     // Shares from other apps go to a real server, never to the demo: nothing is ever waiting.
     single<ShareRepository> { StoredShareRepository(MemoryShareStore(), get(AppScope)) }
     single<TerminalRepository> { FakeTerminals() }

@@ -5,4 +5,7 @@
     <string name="chat_fork">Créer une bifurcation</string>
     <string name="chat_undo">Annuler le dernier prompt</string>
     <string name="chat_redo">Restaurer les prompts annulés</string>
+    <string name="chat_muted">Notifications coupées sur cet appareil</string>
+    <string name="chat_mute">Couper les notifications</string>
+    <string name="chat_unmute">Réactiver les notifications</string>
 </resources>

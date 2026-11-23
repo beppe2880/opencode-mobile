@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">كتم الإشعارات</string>
+    <string name="sessions_unmute">إلغاء كتم الإشعارات</string>
+    <string name="sessions_muted">الإشعارات مكتومة على هذا الجهاز</string>
+</resources>

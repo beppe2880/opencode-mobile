@@ -5,4 +5,7 @@
     <string name="chat_fork">Создать ответвление</string>
     <string name="chat_undo">Отменить последний запрос</string>
     <string name="chat_redo">Восстановить отменённые запросы</string>
+    <string name="chat_muted">Уведомления отключены на этом устройстве</string>
+    <string name="chat_mute">Отключить уведомления</string>
+    <string name="chat_unmute">Включить уведомления</string>
 </resources>
