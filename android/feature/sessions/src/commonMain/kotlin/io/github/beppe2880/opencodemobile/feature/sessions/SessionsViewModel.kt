@@ -6,7 +6,6 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.FolderPreferences
-import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
@@ -63,7 +62,7 @@ class SessionsViewModel(
     private val shares: ShareRepository,
     private val folderPreferences: FolderPreferences,
     private val pins: PinnedSessionRepository,
-    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
+    private val mutes: MutedSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BaseViewModel<SessionsState, SessionsEvent, SessionsEffect>(SessionsState()) {

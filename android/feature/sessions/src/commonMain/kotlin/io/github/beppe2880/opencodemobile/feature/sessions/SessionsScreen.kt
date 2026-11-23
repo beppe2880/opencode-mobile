@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MarkEmailRead
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
@@ -711,12 +712,13 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
                 modifier = Modifier.padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm),
             )
             val pinned = session.id in state.pinned
+            val muted = session.id in state.muted
             if (sessionNotificationsSupported) OcListRow(
-                title = stringResource(if (session.id in state.muted) Res.string.sessions_unmute else Res.string.sessions_mute),
+                title = stringResource(if (muted) Res.string.sessions_unmute else Res.string.sessions_mute),
                 onClick = {
-                    if (session.id in state.muted) onEvent(SessionsEvent.SetMuted(session.id, false)) else choosingMute = true
+                    if (muted) onEvent(SessionsEvent.SetMuted(session.id, false)) else choosingMute = true
                 },
-                leading = { Icon(Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
+                leading = { Icon(if (muted) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
                 modifier = Modifier.testTag("sessions_action_mute"),
             )
             val archived = session.archivedAt != null

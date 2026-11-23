@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_mute_duration
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_mute_until_finished
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_mute_until_finished_unavailable
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_mute_until_unmuted
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -50,10 +51,12 @@ fun ColumnScope.SessionMuteChoices(running: Boolean, onMute: (untilFinished: Boo
     )
     OcListRow(
         title = stringResource(Res.string.oc_mute_until_finished),
+        subtitle = if (!running) stringResource(Res.string.oc_mute_until_finished_unavailable) else null,
         leading = { Icon(Icons.Outlined.Schedule, null, tint = colors.iconBase) },
         titleColor = if (running) colors.textBase else colors.textFaint,
         onClick = if (running) ({ onMute(true) }) else null,
         titleMaxLines = 2,
+        subtitleMaxLines = 2,
         modifier = Modifier.testTag("session_mute_until_finished").semantics { if (!running) disabled() },
     )
     Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = OcSpacing.lg))

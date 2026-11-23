@@ -2,4 +2,5 @@
     <string name="oc_mute_duration">Silenzia notifiche</string>
     <string name="oc_mute_until_unmuted">Fino alla riattivazione manuale</string>
     <string name="oc_mute_until_finished">Fino alla fine del lavoro in corso</string>
+    <string name="oc_mute_until_finished_unavailable">Solo se sei connesso e la sessione è in esecuzione.</string>
 </resources>

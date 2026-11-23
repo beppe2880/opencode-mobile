@@ -5,7 +5,6 @@ import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
-import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.PermissionRequest
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
@@ -71,7 +70,7 @@ class SessionMonitor(
     private val notifier: MonitorNotifier,
     private val visible: StateFlow<Boolean>,
     private val startService: () -> Unit,
-    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
+    private val mutes: MutedSessionRepository,
 ) {
     private val _running = MutableStateFlow<Map<String, RunningSession>>(emptyMap())
 
@@ -91,6 +90,7 @@ class SessionMonitor(
     fun start(scope: CoroutineScope) {
         scope.launch {
             combine(settings.settings.map { it.notifications }, servers.activeServer.map { it?.id }, mutes.temporary) { on, server, temporary ->
+                // Temporary mutes still need to expire when notifications are disabled.
                 server.takeIf { on || temporary.isNotEmpty() }
             }
                 .distinctUntilChanged()
@@ -103,14 +103,17 @@ class SessionMonitor(
 
     private suspend fun follow(scope: CoroutineScope, serverId: String) {
         scope.launch {
+            var previous = emptySet<String>()
             mutes.muted.collect { muted ->
-                lock.withLock {
-                    for (id in muted) {
+                val unmutedPending = lock.withLock {
+                    for (id in muted - previous) {
                         notifier.cancelFinished(id)
                         pending[id].orEmpty().filter { notified.remove(it) }.forEach(notifier::cancelAttention)
                     }
+                    (previous - muted).filter { it in pending }
                 }
-                pendingSessions().filterNot { it in muted }.forEach { refresh(scope, it) }
+                previous = muted
+                unmutedPending.forEach { refresh(scope, it) }
             }
         }
         scope.launch {
@@ -137,7 +140,7 @@ class SessionMonitor(
     private fun onEvent(scope: CoroutineScope, serverId: String, event: ServerEvent) {
         when (event) {
             ServerEvent.Connected -> scope.launch { reconcile(scope, serverId) }
-            is ServerEvent.ExecutionStarted -> scope.launch { started(event.sessionId) }
+            is ServerEvent.ExecutionStarted -> started(scope, event.sessionId)
             is ServerEvent.ExecutionEnded -> ended(event.sessionId, event.outcome, event.at.takeIf { it > 0 })
             is ServerEvent.PermissionChanged -> refresh(scope, event.sessionId)
             is ServerEvent.FormsChanged -> refresh(scope, event.sessionId)
@@ -155,12 +158,13 @@ class SessionMonitor(
         }
     }
 
-    private suspend fun started(sessionId: String) {
+    /** Record the start before reading another event; only the title lookup can suspend. */
+    private fun started(scope: CoroutineScope, sessionId: String) {
         val cached = sessions.cached(sessionId)
         if (cached?.parentId != null) return
         _running.update { it + (sessionId to (it[sessionId] ?: RunningSession(sessionId, cached?.title.orEmpty()))) }
         notifier.cancelFinished(sessionId)
-        retitle(sessionId)
+        scope.launch { retitle(sessionId) }
     }
 
     /** Refreshes the title (generated after the first prompt) and drops subagent sessions. */
@@ -215,7 +219,7 @@ class SessionMonitor(
             if (servers.activeServer.value?.id != serverId) return
             mutes.finishTemporary(id, idleAt)
         }
-        for (id in active - _running.value.keys) started(id)
+        for (id in active - _running.value.keys) started(scope, id)
         (active + pendingSessions()).forEach { refresh(scope, it) }
     }
 

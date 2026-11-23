@@ -2,4 +2,5 @@
     <string name="oc_mute_duration">静音通知</string>
     <string name="oc_mute_until_unmuted">直到手动解除静音</string>
     <string name="oc_mute_until_finished">直到当前工作完成</string>
+    <string name="oc_mute_until_finished_unavailable">仅在已连接且会话正在运行时可用。</string>
 </resources>

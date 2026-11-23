@@ -75,6 +75,35 @@ class SessionMonitorTest {
     }
 
     @Test
+    fun `back to back start and end finish even before the title lookup`() = runTest {
+        sessions.add(session("ses_a", "Quick turn"))
+        val monitor = monitor()
+        assertTrue(events.flow.tryEmit(ServerEvent.ExecutionStarted("ses_a")))
+        assertTrue(events.flow.tryEmit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Failed)))
+        runCurrent()
+
+        assertTrue(monitor.running.value.isEmpty())
+        assertEquals(listOf("cancelFinished ses_a", "finished ses_a Quick turn Failed"), notifier.log)
+    }
+
+    @Test
+    fun `changing a mute only reloads pending attention for that session on unmute`() = runTest {
+        monitor()
+        chat.forms["ses_a"] = listOf(Form("frm_1", "ses_a", "Question", emptyList()))
+        chat.forms["ses_b"] = listOf(Form("frm_2", "ses_b", "Question", emptyList()))
+        emit(ServerEvent.FormsChanged("ses_a"))
+        emit(ServerEvent.FormsChanged("ses_b"))
+        chat.formReads.clear()
+
+        mutes.setMuted("ses_a", true)
+        runCurrent()
+        assertTrue(chat.formReads.isEmpty())
+        mutes.setMuted("ses_a", false)
+        runCurrent()
+        assertEquals(listOf("ses_a"), chat.formReads)
+    }
+
+    @Test
     fun `temporary mute silences its completion but not the next execution`() = runTest {
         sessions.add(session("ses_a", "Title"))
         monitor()
@@ -288,7 +317,7 @@ private class RecordingNotifier : MonitorNotifier {
 }
 
 private class FakeEvents : EventRepository {
-    val flow = MutableSharedFlow<ServerEvent>()
+    val flow = MutableSharedFlow<ServerEvent>(extraBufferCapacity = 2)
     override val connection = MutableStateFlow(ConnectionState.Connected)
     override val events = flow
 }
@@ -297,6 +326,7 @@ private class FakeSessions : SessionRepository {
     private val byId = mutableMapOf<String, Session>()
     var activeIds: Set<String> = emptySet()
     fun add(session: Session) { byId[session.id] = session }
+    override fun cached(sessionId: String) = byId[sessionId]
     override suspend fun list(search: String?, directory: String?, limit: Int, archived: Boolean?) = Result.success(byId.values.toList())
     override suspend fun active() = Result.success(activeIds)
     override suspend fun get(sessionId: String) =
@@ -311,6 +341,7 @@ private class FakeSessions : SessionRepository {
 private class FakeChat : ChatRepository {
     val permissions = mutableMapOf<String, List<PermissionRequest>>()
     val forms = mutableMapOf<String, List<Form>>()
+    val formReads = mutableListOf<String>()
     override suspend fun messages(sessionId: String) = Result.success(emptyList<Message>())
     override suspend fun prompt(
         sessionId: String,
@@ -322,7 +353,10 @@ private class FakeChat : ChatRepository {
     override suspend fun switchAgent(sessionId: String, agent: String) = Result.success(Unit)
     override suspend fun switchModel(sessionId: String, model: ModelRef) = Result.success(Unit)
     override suspend fun permissions(sessionId: String) = Result.success(permissions[sessionId].orEmpty())
-    override suspend fun forms(sessionId: String) = Result.success(forms[sessionId].orEmpty())
+    override suspend fun forms(sessionId: String): Result<List<Form>> {
+        formReads += sessionId
+        return Result.success(forms[sessionId].orEmpty())
+    }
     override suspend fun replyPermission(sessionId: String, requestId: String, decision: PermissionDecision, message: String?) =
         Result.success(Unit)
 }

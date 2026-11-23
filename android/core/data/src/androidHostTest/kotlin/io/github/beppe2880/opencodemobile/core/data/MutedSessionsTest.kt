@@ -3,6 +3,7 @@ package io.github.beppe2880.opencodemobile.core.data
 import com.russhwolf.settings.SharedPreferencesSettings
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.session.PreferencesMutedSessionRepository
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -50,6 +51,19 @@ class MutedSessionsTest {
         assertEquals(setOf("temporary", "manual"), restored.muted.value)
         restored.finishTemporary("temporary", 24)
         assertEquals(setOf("manual"), restored.muted.value)
+    }
+
+    @Test
+    fun `server snapshot includes saved mutes before the active server observer runs`() = runTest {
+        raw.edit().putString("muted_sessions/s1", "[\"manual\"]")
+            .putString("muted_sessions_until_idle/s1", "{\"temporary\":12}")
+            .putString("muted_sessions/s2", "[\"other\"]").commit()
+        val servers = TestGraph(store, StandardTestDispatcher(testScheduler)).servers
+        val mutes = PreferencesMutedSessionRepository(prefs, servers, backgroundScope)
+
+        assertEquals(emptySet<String>(), mutes.muted.value)
+        assertEquals(setOf("manual", "temporary"), mutes.mutedForServer("s1"))
+        assertEquals(setOf("other"), mutes.mutedForServer("s2"))
     }
 
     @Test

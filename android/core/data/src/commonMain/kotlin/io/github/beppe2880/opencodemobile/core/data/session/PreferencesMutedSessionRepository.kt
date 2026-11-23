@@ -17,7 +17,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-/** One JSON list per saved server; corrupt or absent data means notifications are not muted. */
+/** Persists manual and temporary mutes per saved server; corrupt or absent data means no mutes. */
 internal class PreferencesMutedSessionRepository(
     private val prefs: Settings,
     private val servers: ServerRepository,
@@ -28,6 +28,10 @@ internal class PreferencesMutedSessionRepository(
     private val ids = MutableStateFlow(read(servers.activeServer.value?.id) + timed.value.keys)
     override val muted = ids.asStateFlow()
     override val temporary = timed.asStateFlow()
+
+    override fun mutedForServer(serverId: String): Set<String> = synchronized(lock) {
+        read(serverId) + readTemporary(serverId).keys
+    }
 
     init {
         scope.launch {

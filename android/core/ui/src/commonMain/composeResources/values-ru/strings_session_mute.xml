@@ -2,4 +2,5 @@
     <string name="oc_mute_duration">Отключить уведомления</string>
     <string name="oc_mute_until_unmuted">Пока я не включу их снова</string>
     <string name="oc_mute_until_finished">До завершения текущей работы</string>
+    <string name="oc_mute_until_finished_unavailable">Только при наличии соединения и выполнении задачи в сеансе.</string>
 </resources>

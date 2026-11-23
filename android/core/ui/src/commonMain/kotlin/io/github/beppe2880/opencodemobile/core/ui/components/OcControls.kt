@@ -315,6 +315,7 @@ fun OcListRow(
     titleColor: Color = OcTheme.colors.textBase,
     monoSubtitle: Boolean = false,
     titleMaxLines: Int = 1,
+    subtitleMaxLines: Int = 1,
 ) {
     val c = OcTheme.colors
     Row(
@@ -334,7 +335,7 @@ fun OcListRow(
                     subtitle,
                     style = if (monoSubtitle) OcTheme.mono.codeSmall else MaterialTheme.typography.bodySmall,
                     color = c.textMuted,
-                    maxLines = 1,
+                    maxLines = subtitleMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

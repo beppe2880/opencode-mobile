@@ -1,7 +1,9 @@
 package io.github.beppe2880.opencodemobile.widget
 
 import io.github.beppe2880.opencodemobile.core.domain.CredentialKind
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
@@ -20,7 +22,7 @@ class WidgetLoaderTest {
 
     private val servers = FakeServers()
     private val sessions = FakeSessions()
-    private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
+    private val mutes = InMemoryMutedSessions()
     private val loader = WidgetLoader(servers, sessions, timeoutMillis = 1_000, mutes = mutes)
 
     @Test
@@ -32,6 +34,20 @@ class WidgetLoaderTest {
         assertEquals(0, model.runningCount)
         assertEquals(true, model.sessions.single().muted)
         assertEquals(true, model.sessions.single().running)
+    }
+
+    @Test
+    fun `the widget uses saved mutes for its server even if the observable set is still empty`() = runTest {
+        val saved = object : MutedSessionRepository by mutes {
+            override fun mutedForServer(serverId: String) = if (serverId == "srv") setOf("ses_a") else emptySet()
+        }
+        sessions.remote = listOf(session("ses_a", updatedAt = 1))
+        sessions.running = setOf("ses_a")
+
+        val model = WidgetLoader(servers, sessions, mutes = saved).load() as WidgetModel.Sessions
+
+        assertEquals(0, model.runningCount)
+        assertEquals(true, model.sessions.single().muted)
     }
 
     @Test

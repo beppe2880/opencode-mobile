@@ -11,7 +11,6 @@ import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
 import io.github.beppe2880.opencodemobile.core.domain.Form
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
-import io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
@@ -87,7 +86,7 @@ class ChatViewModel(
     private val vcs: VcsRepository,
     private val shares: ShareRepository,
     private val pins: PinnedSessionRepository,
-    private val mutes: MutedSessionRepository = InMemoryMutedSessions(),
+    private val mutes: MutedSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val btwMemory: BtwMemory,
     private val serverId: String = "",
