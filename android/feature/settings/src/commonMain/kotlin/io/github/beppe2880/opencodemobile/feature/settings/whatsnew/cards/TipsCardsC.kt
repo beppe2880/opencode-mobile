@@ -74,7 +74,7 @@ internal val tipsCardsC: List<FeatureCard> = listOfNotNull(
         body = Res.string.tips_c_mute_body,
         demoDescription = Res.string.tips_c_mute_demo,
         author = "Andrease11",
-        pullRequest = null,
+        pullRequest = 263,
         demo = { SessionMuteDemo(it) },
     ) else null,
     FeatureCard(
