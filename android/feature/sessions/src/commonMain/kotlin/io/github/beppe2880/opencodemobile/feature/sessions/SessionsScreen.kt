@@ -42,10 +42,10 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.MarkEmailRead
-import androidx.compose.material.icons.outlined.NotificationsActive
-import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
@@ -110,8 +110,8 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
-import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
 import io.github.beppe2880.opencodemobile.core.ui.platform.OcBackHandler
+import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_cancel
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_close
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
@@ -169,9 +169,9 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_count
-import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_unread
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_outcome_succeeded
@@ -315,7 +315,7 @@ fun SessionsScreen(
                     else -> state.groups.forEach { group ->
                         item(key = "group-${group.bucket}", contentType = "group") {
                             if (group.bucket == DayBucket.Unread) {
-                                UnreadGroupHeader(group.sessions.size, state.markingAllRead, onEvent)
+                                UnreadGroupHeader(group.sessions.size, state.markingAllRead, state.selectionMode, onEvent)
                             } else {
                                 OcSectionHeader(
                                     stringResource(group.bucket.label()),
@@ -430,7 +430,7 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
             )
         },
         actions = {
-            Box {
+            Box(Modifier.padding(end = OcSpacing.sm)) {
                 OcIconButton(
                     icon = Icons.Outlined.MoreVert,
                     contentDescription = stringResource(Res.string.sessions_selection_actions),
@@ -827,7 +827,12 @@ private fun LazyListScope.skeletonItems() {
 
 /** The Unread group's header, with its count and the action that marks them all as read. */
 @Composable
-private fun UnreadGroupHeader(count: Int, marking: Boolean, onEvent: (SessionsEvent) -> Unit) {
+private fun UnreadGroupHeader(
+    count: Int,
+    marking: Boolean,
+    selectionMode: Boolean,
+    onEvent: (SessionsEvent) -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = OcSpacing.sm, end = OcSpacing.gutter - OcSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
@@ -836,16 +841,21 @@ private fun UnreadGroupHeader(count: Int, marking: Boolean, onEvent: (SessionsEv
             stringResource(Res.string.sessions_unread_count, count),
             Modifier.weight(1f).testTag("sessions_group_unread"),
         )
-        TextButton(
-            onClick = { onEvent(SessionsEvent.MarkUnreadGroupRead) },
-            enabled = !marking,
-            modifier = Modifier.testTag("sessions_mark_all_read"),
-        ) {
-            Text(
-                stringResource(Res.string.sessions_mark_all_read),
-                style = MaterialTheme.typography.labelMedium,
-                color = OcTheme.colors.textAccent,
-            )
+        if (selectionMode) {
+            // Keep the row height stable while the action is unavailable.
+            Spacer(Modifier.height(48.dp))
+        } else {
+            TextButton(
+                onClick = { onEvent(SessionsEvent.MarkUnreadGroupRead) },
+                enabled = !marking,
+                modifier = Modifier.testTag("sessions_mark_all_read"),
+            ) {
+                Text(
+                    stringResource(Res.string.sessions_mark_all_read),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = OcTheme.colors.textAccent,
+                )
+            }
         }
     }
 }

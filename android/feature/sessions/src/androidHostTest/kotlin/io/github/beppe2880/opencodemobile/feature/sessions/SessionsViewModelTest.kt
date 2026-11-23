@@ -96,7 +96,10 @@ class SessionsViewModelTest {
     private val unread = InMemoryUnreadSessions()
 
     private fun vm(repository: FakeSessionRepository = sessions) =
-        SessionsViewModel(repository, catalog, events, servers, chat, settings, recents, shares, folders, pins, mutes = InMemoryMutedSessions(), unreadStore = unread, clock = { now }, zone = zone)
+        SessionsViewModel(
+            repository, catalog, events, servers, chat, settings, recents, shares, folders, pins,
+            mutes = InMemoryMutedSessions(), unreadStore = unread, clock = { now }, zone = zone,
+        )
 
     @Test
     fun `pinning from the row actions moves the session to the pinned group and back`() = runTest(main.testDispatcher) {
