@@ -38,7 +38,7 @@ val appModule = module {
             .stateIn(get(AppScope), SharingStarted.Eagerly, false)
     }
     single { ShareMenuSwitch(androidContext(), get()) }
-    single { WidgetUpdater(androidContext(), get(), get(), get(AppVisible)) }
+    single { WidgetUpdater(androidContext(), get(), get(), get(AppVisible), get()) }
     single {
         SessionMonitor(
             events = get(),

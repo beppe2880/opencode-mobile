@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">알림 끄기</string>
+    <string name="oc_mute_until_unmuted">직접 다시 켤 때까지</string>
+    <string name="oc_mute_until_finished">현재 작업이 끝날 때까지</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">将单个会话静音</string>
+    <string name="tips_c_mute_body">在 Android 上，可从聊天菜单或会话行菜单将单个会话静音，而不影响其他会话。可手动解除静音，也可在当前工作结束时自动解除。</string>
+    <string name="tips_c_mute_demo">先显示静音时长选项，随后用带斜线的铃铛标记会话，直到工作结束。</string>
+</resources>

@@ -75,6 +75,35 @@ class SessionMonitorTest {
     }
 
     @Test
+    fun `temporary mute silences its completion but not the next execution`() = runTest {
+        sessions.add(session("ses_a", "Title"))
+        monitor()
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        mutes.setMuted("ses_a", true, untilIdleAfter = 12)
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded, at = 24))
+        assertTrue(mutes.muted.value.isEmpty())
+        assertTrue(notifier.log.none { it.startsWith("finished") })
+
+        emit(ServerEvent.ExecutionStarted("ses_a"))
+        emit(ServerEvent.ExecutionEnded("ses_a", SessionOutcome.Succeeded, at = 36))
+        assertTrue("finished ses_a Title Succeeded" in notifier.log)
+    }
+
+    @Test
+    fun `reconnect expires saved temporary mutes after an intervening idle but not manual mutes`() = runTest {
+        sessions.add(session("still-running", "Same turn").copy(idleAt = 12))
+        sessions.add(session("new-turn", "Next turn").copy(idleAt = 24))
+        sessions.activeIds = setOf("still-running", "new-turn")
+        mutes.setMuted("still-running", true, untilIdleAfter = 12)
+        mutes.setMuted("new-turn", true, untilIdleAfter = 12)
+        mutes.setMuted("no-longer-running", true, untilIdleAfter = 12)
+        mutes.setMuted("manual", true)
+        monitor()
+        emit(ServerEvent.Connected)
+        assertEquals(setOf("still-running", "manual"), mutes.muted.value)
+    }
+
+    @Test
     fun `muting cancels attention notifications already posted`() = runTest {
         sessions.add(session("ses_a", "Title"))
         monitor()

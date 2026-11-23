@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">كتم إشعارات جلسة واحدة</string>
+    <string name="tips_c_mute_body">على Android، اكتم إشعارات جلسة من قائمة الدردشة أو صف الجلسة دون التأثير على الجلسات الأخرى. اختر إلغاء الكتم يدويًا أو عند انتهاء العمل الجاري.</string>
+    <string name="tips_c_mute_demo">تظهر خيارات المدة، ثم يميّز جرس مشطوب الجلسة إلى أن ينتهي العمل.</string>
+</resources>

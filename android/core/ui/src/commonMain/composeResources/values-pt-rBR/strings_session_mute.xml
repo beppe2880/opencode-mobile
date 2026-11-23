@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">Silenciar notificações</string>
+    <string name="oc_mute_until_unmuted">Até eu reativar as notificações</string>
+    <string name="oc_mute_until_finished">Até o trabalho atual terminar</string>
+</resources>

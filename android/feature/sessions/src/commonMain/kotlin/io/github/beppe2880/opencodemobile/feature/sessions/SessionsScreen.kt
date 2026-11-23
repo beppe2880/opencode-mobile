@@ -41,8 +41,8 @@ import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.MarkEmailRead
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Settings
@@ -103,6 +103,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcSkeleton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcStatusDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteChoices
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
 import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
@@ -138,7 +139,6 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_em
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_message
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_empty_unread_title
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_error_title
-import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_failed
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_active
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_filter_any_time
@@ -159,6 +159,7 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_fi
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_interrupted
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mark_all_read_count
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_mute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_new
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_older
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_outcome_succeeded
@@ -175,8 +176,8 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_se
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_this_week
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
-import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unmute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unarchive
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unmute
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unpin
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_unread_count
@@ -694,7 +695,14 @@ private fun DayBucket.label(): StringResource = when (this) {
 @Composable
 private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
     state.actionsFor?.let { session ->
+        var choosingMute by remember(session.id) { mutableStateOf(false) }
         OcBottomSheet(onDismiss = { onEvent(SessionsEvent.DismissActions) }, testTag = "sessions_actions_sheet") {
+            if (choosingMute) {
+                SessionMuteChoices(session.id in state.running && state.connection == ConnectionState.Connected) { temporary ->
+                    onEvent(SessionsEvent.SetMuted(session.id, true, untilFinished = temporary))
+                }
+                return@OcBottomSheet
+            }
             Text(
                 session.displayTitle(),
                 style = MaterialTheme.typography.titleSmall,
@@ -705,7 +713,9 @@ private fun SessionsOverlays(state: SessionsState, onEvent: (SessionsEvent) -> U
             val pinned = session.id in state.pinned
             if (sessionNotificationsSupported) OcListRow(
                 title = stringResource(if (session.id in state.muted) Res.string.sessions_unmute else Res.string.sessions_mute),
-                onClick = { onEvent(SessionsEvent.SetMuted(session.id, session.id !in state.muted)) },
+                onClick = {
+                    if (session.id in state.muted) onEvent(SessionsEvent.SetMuted(session.id, false)) else choosingMute = true
+                },
                 leading = { Icon(Icons.Outlined.NotificationsOff, null, tint = OcTheme.colors.iconBase) },
                 modifier = Modifier.testTag("sessions_action_mute"),
             )

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -19,10 +20,11 @@ class WidgetUpdater(
     private val events: EventRepository,
     private val servers: ServerRepository,
     private val visible: StateFlow<Boolean>,
+    private val mutes: MutedSessionRepository,
 ) {
     fun start(scope: CoroutineScope) {
         scope.launch {
-            widgetRefreshes(events, servers, visible).collect { updateIfPlaced() }
+            widgetRefreshes(events, servers, visible, mutes.muted).collect { updateIfPlaced() }
         }
     }
 

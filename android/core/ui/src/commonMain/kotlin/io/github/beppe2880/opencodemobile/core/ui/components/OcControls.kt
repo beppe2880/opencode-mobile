@@ -314,6 +314,7 @@ fun OcListRow(
     trailing: (@Composable () -> Unit)? = null,
     titleColor: Color = OcTheme.colors.textBase,
     monoSubtitle: Boolean = false,
+    titleMaxLines: Int = 1,
 ) {
     val c = OcTheme.colors
     Row(
@@ -327,7 +328,7 @@ fun OcListRow(
     ) {
         leading?.invoke()
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium, color = titleColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = titleColor, maxLines = titleMaxLines, overflow = TextOverflow.Ellipsis)
             if (subtitle != null) {
                 Text(
                     subtitle,

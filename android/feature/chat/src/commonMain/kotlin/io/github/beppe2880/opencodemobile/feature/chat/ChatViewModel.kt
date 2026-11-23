@@ -248,7 +248,11 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
-            is ChatEvent.SetMuted -> mutes.setMuted(sessionId, event.muted)
+            is ChatEvent.SetMuted -> {
+                if (!event.untilFinished || (currentState.running && currentState.connection == ConnectionState.Connected)) {
+                    mutes.setMuted(sessionId, event.muted, if (event.untilFinished) sessionIdleAt ?: 0 else null)
+                }
+            }
             ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
             ChatEvent.Undo -> if (currentState.historyReady) undo()
             is ChatEvent.Visible -> {

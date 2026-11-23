@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderStyle
 import io.github.beppe2880.opencodemobile.core.domain.ChatSwipe
+import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
@@ -73,6 +74,7 @@ import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
+import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
 import io.github.beppe2880.opencodemobile.core.ui.markdown.MarkdownCache
 import io.github.beppe2880.opencodemobile.core.ui.markdown.rememberMarkdownCache
@@ -328,13 +330,21 @@ internal fun ChatTopBar(
                     onClick = { menuOpen = true },
                     modifier = Modifier.testTag("chat_more_button"),
                 )
+                var choosingMute by remember(state.sessionId) { mutableStateOf(false) }
                 ChatActionsMenu(state, menuOpen, onDismiss = { menuOpen = false }) { event ->
                     when (event) {
+                        is ChatEvent.SetMuted -> if (event.muted) choosingMute = true else onMenuEvent(event)
                         is ChatEvent.SetPinned -> onPin(event.pinned)
                         is ChatEvent.RunningSheet -> onRunning()
                         ChatEvent.OpenProviders -> onProviders()
                         ChatEvent.OpenMcps -> onMcps()
                         else -> onMenuEvent(event)
+                    }
+                }
+                if (choosingMute) {
+                    SessionMuteSheet(state.running && state.connection == ConnectionState.Connected, onDismiss = { choosingMute = false }) { temporary ->
+                        choosingMute = false
+                        onMenuEvent(ChatEvent.SetMuted(true, untilFinished = temporary))
                     }
                 }
             }

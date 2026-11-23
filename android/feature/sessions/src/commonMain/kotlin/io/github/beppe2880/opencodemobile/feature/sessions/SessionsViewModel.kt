@@ -191,7 +191,10 @@ class SessionsViewModel(
             SessionsEvent.DismissActions -> updateState { it.copy(actionsFor = null) }
             is SessionsEvent.SetPinned -> setPinned(event.sessionId, event.pinned)
             is SessionsEvent.SetMuted -> {
-                mutes.setMuted(event.sessionId, event.muted)
+                if (!event.untilFinished || (event.sessionId in currentState.running && currentState.connection == ConnectionState.Connected)) {
+                    val idle = sessionList.firstOrNull { it.id == event.sessionId }?.idleAt
+                    mutes.setMuted(event.sessionId, event.muted, if (event.untilFinished) idle ?: 0 else null)
+                }
                 updateState { it.copy(actionsFor = null) }
             }
             is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)

@@ -36,6 +36,23 @@ class MutedSessionsTest {
     }
 
     @Test
+    fun `temporary mute survives restart and only a later idle clears it`() = runTest {
+        val servers = TestGraph(store).servers
+        val mutes = PreferencesMutedSessionRepository(prefs, servers, backgroundScope)
+        runCurrent()
+        mutes.setMuted("temporary", true, untilIdleAfter = 12)
+        mutes.setMuted("manual", true)
+
+        val restored = PreferencesMutedSessionRepository(prefs, servers, backgroundScope)
+        assertEquals(mapOf("temporary" to 12L), restored.temporary.value)
+        restored.finishTemporary("temporary", 12)
+        restored.finishTemporary("manual", 24)
+        assertEquals(setOf("temporary", "manual"), restored.muted.value)
+        restored.finishTemporary("temporary", 24)
+        assertEquals(setOf("manual"), restored.muted.value)
+    }
+
+    @Test
     fun `corrupt data recovers and removing a server clears only its mutes`() = runTest {
         raw.edit().putString("muted_sessions/s1", "[null]").putString("muted_sessions/s2", "[\"kept\"]").commit()
         val mutes = PreferencesMutedSessionRepository(prefs, TestGraph(store).servers, backgroundScope)

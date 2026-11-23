@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">静音通知</string>
+    <string name="oc_mute_until_unmuted">直到手动解除静音</string>
+    <string name="oc_mute_until_finished">直到当前工作完成</string>
+</resources>

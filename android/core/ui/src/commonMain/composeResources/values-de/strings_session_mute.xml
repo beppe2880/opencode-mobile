@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">Benachrichtigungen stummschalten</string>
+    <string name="oc_mute_until_unmuted">Bis ich sie wieder aktiviere</string>
+    <string name="oc_mute_until_finished">Bis die laufende Arbeit endet</string>
+</resources>

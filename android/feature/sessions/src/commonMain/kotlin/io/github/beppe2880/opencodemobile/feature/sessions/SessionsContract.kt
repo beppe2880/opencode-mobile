@@ -165,7 +165,7 @@ sealed interface SessionsEvent {
 
     /** Pins the session to the top of the list or unpins it; closes the row actions. */
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
-    data class SetMuted(val sessionId: String, val muted: Boolean) : SessionsEvent
+    data class SetMuted(val sessionId: String, val muted: Boolean, val untilFinished: Boolean = false) : SessionsEvent
 
     /** Archives the session or restores it; closes the row actions. */
     data class SetArchived(val session: Session, val archived: Boolean) : SessionsEvent

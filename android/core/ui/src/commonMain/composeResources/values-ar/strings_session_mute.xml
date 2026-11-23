@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">كتم الإشعارات</string>
+    <string name="oc_mute_until_unmuted">حتى ألغي الكتم</string>
+    <string name="oc_mute_until_finished">حتى ينتهي العمل الجاري</string>
+</resources>

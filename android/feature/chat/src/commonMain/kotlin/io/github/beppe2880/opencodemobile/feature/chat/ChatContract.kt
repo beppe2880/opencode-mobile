@@ -352,7 +352,7 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
         ?: ModelLabel(ref.id, ref.providerId)
 
 sealed interface ChatEvent {
-    data class SetMuted(val muted: Boolean) : ChatEvent
+    data class SetMuted(val muted: Boolean, val untilFinished: Boolean = false) : ChatEvent
 
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent

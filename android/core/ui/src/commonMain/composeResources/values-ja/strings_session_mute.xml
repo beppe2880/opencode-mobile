@@ -1,0 +1,5 @@
+<resources>
+    <string name="oc_mute_duration">通知をミュート</string>
+    <string name="oc_mute_until_unmuted">手動で解除するまで</string>
+    <string name="oc_mute_until_finished">現在の作業が終わるまで</string>
+</resources>

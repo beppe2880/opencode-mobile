@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">セッションを個別にミュート</string>
+    <string name="tips_c_mute_body">Android では、チャットや一覧の行のメニューから、ほかのセッションに影響を与えずに通知をミュートできます。手動で解除するか、現在の作業が終わるまでミュートするかを選べます。</string>
+    <string name="tips_c_mute_demo">期間の選択肢が表示され、作業が終わるまで斜線付きのベルでセッションが示されます。</string>
+</resources>
