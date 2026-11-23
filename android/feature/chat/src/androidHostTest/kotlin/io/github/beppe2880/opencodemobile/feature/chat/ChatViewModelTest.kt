@@ -21,6 +21,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FormField
 import io.github.beppe2880.opencodemobile.core.domain.FormOption
 import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.InMemoryPinnedSessions
+import io.github.beppe2880.opencodemobile.core.domain.InMemoryUnreadSessions
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.McpServer
 import io.github.beppe2880.opencodemobile.core.domain.McpStatus
@@ -914,12 +915,13 @@ class ChatViewModelTest {
 
     private val pins = InMemoryPinnedSessions()
     private val mutes = io.github.beppe2880.opencodemobile.core.domain.InMemoryMutedSessions()
+    private val unread = InMemoryUnreadSessions()
     private val catalog = FakeCatalog(model)
 
     private fun vm(sessions: FakeSessions = FakeSessions(model)): ChatViewModel =
         ChatViewModel("s1", sessions, chat, catalog, events, settings, drafts, ImageMemory(), scroll, mcps, recents, vcs, shares, pins, mutes = mutes, clock = {
             42
-        }, btwMemory = btwMemory)
+        }, btwMemory = btwMemory, unreadStore = unread)
 
     @Test
     fun `mute toggles are shared with the session list`() = runTest(main.testDispatcher) {
@@ -1017,6 +1019,21 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf("s1" to 42L), sessions.viewed)
+    }
+
+    @Test
+    fun `opening a chat clears a hand-set unread mark even at the same idle`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model, idleAt = 42)
+        sessions.sessionInfo = sessions.sessionInfo.copy(viewedAt = 42)
+        unread.setUnread("s1", true)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+
+        vm.setChatVisible(true)
+        runCurrent()
+
+        assertFalse("s1" in unread.unread())
+        assertTrue(sessions.viewed.isEmpty())
     }
 
     @Test

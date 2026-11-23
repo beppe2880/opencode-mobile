@@ -44,7 +44,8 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     viewModel { params ->
         ChatViewModel(
             params.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
-            mutes = get(), btwMemory = get(), serverId = get<ServerRepository>().activeServer.value?.id.orEmpty(),
+            mutes = get(), unreadStore = get(), btwMemory = get(),
+            serverId = get<ServerRepository>().activeServer.value?.id.orEmpty(),
         )
     }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
