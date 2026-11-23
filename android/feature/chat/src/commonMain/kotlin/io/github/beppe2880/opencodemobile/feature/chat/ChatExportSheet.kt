@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_dow
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_json
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_json_save
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_json_share
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_json_warning
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_markdown
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_percent
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_preparing_file
@@ -95,6 +96,13 @@ internal fun ChatExportSheet(state: ChatState, onEvent: (ChatEvent) -> Unit) {
                     selected = state.exportFormat,
                     onSelect = { onEvent(ChatEvent.SelectExportFormat(it)) },
                     modifier = Modifier.padding(vertical = OcSpacing.md),
+                )
+                if (json) Text(
+                    stringResource(Res.string.chat_export_json_warning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OcTheme.colors.textMuted,
+                    modifier = Modifier.padding(bottom = OcSpacing.sm).testTag("chat_export_json_warning")
+                        .semantics { liveRegion = LiveRegionMode.Polite },
                 )
                 OcListRow(
                     title = stringResource(if (json) Res.string.chat_export_json_share else Res.string.chat_export_share),

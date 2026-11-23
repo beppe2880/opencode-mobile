@@ -17,6 +17,7 @@ data class TranscriptFile(val title: String, val content: String, val format: Tr
 @Composable
 internal expect fun rememberTranscriptExport(
     onReady: () -> Unit,
+    onSaved: () -> Unit,
     onFailure: () -> Unit,
     onCancelled: () -> Unit,
     onProgress: suspend (Long, Long) -> Unit,

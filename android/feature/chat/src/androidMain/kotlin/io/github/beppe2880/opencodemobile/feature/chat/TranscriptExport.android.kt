@@ -25,6 +25,7 @@ import kotlin.time.TimeSource
 @Composable
 internal actual fun rememberTranscriptExport(
     onReady: () -> Unit,
+    onSaved: () -> Unit,
     onFailure: () -> Unit,
     onCancelled: () -> Unit,
     onProgress: suspend (Long, Long) -> Unit,
@@ -33,6 +34,7 @@ internal actual fun rememberTranscriptExport(
     val scope = rememberCoroutineScope()
     val failed = rememberUpdatedState(onFailure)
     val ready = rememberUpdatedState(onReady)
+    val saved = rememberUpdatedState(onSaved)
     val cancelled = rememberUpdatedState(onCancelled)
     val progress = rememberUpdatedState(onProgress)
     // Only a private file path enters saved state, never a potentially large transcript Bundle.
@@ -41,18 +43,31 @@ internal actual fun rememberTranscriptExport(
         val uri = result.data?.data.takeIf { result.resultCode == Activity.RESULT_OK }
         val path = pending.value
         pending.value = null
-        if (uri != null && path != null) scope.launch {
+        if (path != null) scope.launch {
+            val file = File(path)
             try {
-                withContext(Dispatchers.IO) {
-                    File(path).inputStream().use { input ->
-                        checkNotNull(context.contentResolver.openOutputStream(uri)).use { input.copyTo(it) }
+                if (uri != null) {
+                    withContext(Dispatchers.IO) {
+                        file.inputStream().use { input ->
+                            checkNotNull(context.contentResolver.openOutputStream(uri)).use { input.copyTo(it) }
+                        }
                     }
+                    saved.value()
+                } else if (result.resultCode == Activity.RESULT_OK) {
+                    failed.value()
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
                 failed.value()
+            } finally {
+                withContext(kotlinx.coroutines.NonCancellable + Dispatchers.IO) {
+                    file.delete()
+                    file.parentFile?.delete()
+                }
             }
+        } else if (result.resultCode == Activity.RESULT_OK) {
+            failed.value()
         }
     }
     return { transcript, saveFile ->

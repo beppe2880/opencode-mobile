@@ -8,6 +8,8 @@ import io.github.beppe2880.opencodemobile.core.data.server.StoredServers
 import io.github.beppe2880.opencodemobile.core.data.session.RemoteSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportStage
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -123,6 +125,20 @@ class SessionListCacheTest {
         val exported = Json.parseToJsonElement(repository.exportJson("ses_test").getOrThrow())
         assertEquals(data, exported)
         assertEquals("/api/experimental/session/ses_test/export?sanitize=false", server.takeRequest().path)
+    }
+
+    @Test
+    fun `repeat exports download the current session again`() = runBlocking {
+        val repository = RemoteSessionRepository(graph.clients, lists)
+        for (title in listOf("First version", "Updated version")) {
+            server.enqueue(MockResponse().setBody("""{"data":{"info":{"title":"$title"},"messages":[]}}"""))
+            val stages = mutableListOf<SessionExportProgress>()
+            val exported = Json.parseToJsonElement(repository.exportJson("ses_test", stages::add).getOrThrow()).jsonObject
+            assertEquals(JsonPrimitive(title), exported.getValue("info").jsonObject.getValue("title"))
+            assertEquals("/api/experimental/session/ses_test/export?sanitize=false", server.takeRequest().path)
+            assertEquals(SessionExportStage.WaitingForServer, stages.first().stage)
+        }
+        assertEquals(2, server.requestCount)
     }
 
     @Test

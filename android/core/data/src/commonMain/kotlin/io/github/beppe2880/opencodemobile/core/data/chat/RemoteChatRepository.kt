@@ -18,7 +18,6 @@ import io.github.beppe2880.opencodemobile.api.models.SessionSwitchModelRequest
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.CachedEntry
-import io.github.beppe2880.opencodemobile.core.data.cache.ExportCache
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.files.fileLocation
 import io.github.beppe2880.opencodemobile.core.data.resultOf
@@ -64,7 +63,6 @@ internal class RemoteChatRepository(
     private val clients: OpenCodeClients,
     private val cache: MessageCache,
     private val maxMessages: Int = 1_000,
-    private val exports: ExportCache = ExportCache(),
 ) : ChatRepository {
 
     private val syncLock = Mutex()
@@ -282,8 +280,9 @@ internal class RemoteChatRepository(
         delivery: PromptDelivery,
         attachments: List<PromptAttachment>,
     ): Result<Unit> = resultOf {
+        val api = clients.active().sessions
         val request = SessionPromptRequest(text = text, files = attachments.toApi(text), delivery = delivery.toApi())
-        mutation(sessionId) { api -> awaitSuccess { api.sessionPrompt(sessionId, request) } }
+        awaitSuccess { api.sessionPrompt(sessionId, request) }
     }
 
     override suspend fun command(
@@ -293,13 +292,14 @@ internal class RemoteChatRepository(
         delivery: PromptDelivery,
         attachments: List<PromptAttachment>,
     ): Result<Unit> = resultOf {
+        val api = clients.active().sessions
         val request = SessionCommandRequest(
             name = name,
             text = arguments,
             files = attachments.toApi(arguments),
             delivery = delivery.toApi(),
         )
-        mutation(sessionId) { api -> awaitSuccess { api.sessionCommand(sessionId, request) } }
+        awaitSuccess { api.sessionCommand(sessionId, request) }
     }
 
     /**
@@ -341,8 +341,9 @@ internal class RemoteChatRepository(
     }
 
     override suspend fun shell(sessionId: String, command: String): Result<Unit> = resultOf {
+        val api = clients.active().sessions
         try {
-            mutation(sessionId) { api -> awaitSuccess { api.sessionShell(sessionId, SessionShellRequest(command = command)) } }
+            awaitSuccess { api.sessionShell(sessionId, SessionShellRequest(command = command)) }
         } catch (e: OpenCodeError.Unreachable) {
             if (!e.isTimeout) throw e
         }
@@ -374,7 +375,8 @@ internal class RemoteChatRepository(
     }
 
     override suspend fun compact(sessionId: String): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionCompact(sessionId, SessionCompactRequest()) } }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionCompact(sessionId, SessionCompactRequest()) }
     }
 
     override suspend fun awaitIdle(sessionId: String): Result<Unit> = resultOf {
@@ -398,7 +400,8 @@ internal class RemoteChatRepository(
     }
 
     override suspend fun revert(sessionId: String, messageId: String): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionRevertStage(sessionId, SessionRevertStageRequest(messageID = messageId)) } }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionRevertStage(sessionId, SessionRevertStageRequest(messageID = messageId)) }
     }
 
     /** Message ids sort by creation, so the prompts are paged newest first until one is older. */
@@ -424,11 +427,13 @@ internal class RemoteChatRepository(
     }
 
     override suspend fun clearRevert(sessionId: String): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionRevertClear(sessionId) } }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionRevertClear(sessionId) }
     }
 
     override suspend fun commitRevert(sessionId: String): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionRevertCommit(sessionId) } }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionRevertCommit(sessionId) }
     }
 
     /**
@@ -462,22 +467,13 @@ internal class RemoteChatRepository(
     }
 
     override suspend fun switchAgent(sessionId: String, agent: String): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionSwitchAgent(sessionId, SessionSwitchAgentRequest(agent)) } }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionSwitchAgent(sessionId, SessionSwitchAgentRequest(agent)) }
     }
 
     override suspend fun switchModel(sessionId: String, model: ModelRef): Result<Unit> = resultOf {
-        mutation(sessionId) { api -> awaitSuccess { api.sessionSwitchModel(sessionId, SessionSwitchModelRequest(model.toApi())) } }
-    }
-
-    private suspend fun mutation(sessionId: String, block: suspend (SessionApi) -> Unit) {
-        val profile = clients.activeProfile()
-        val api = clients.forProfile(profile).sessions
-        exports.invalidate(profile.id, sessionId)
-        try {
-            block(api)
-        } finally {
-            withContext(kotlinx.coroutines.NonCancellable) { exports.invalidate(profile.id, sessionId) }
-        }
+        val api = clients.active().sessions
+        awaitSuccess { api.sessionSwitchModel(sessionId, SessionSwitchModelRequest(model.toApi())) }
     }
 
     override suspend fun permissions(sessionId: String): Result<List<PermissionRequest>> = resultOf {

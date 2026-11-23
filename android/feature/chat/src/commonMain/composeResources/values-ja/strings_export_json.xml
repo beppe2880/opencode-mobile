@@ -3,4 +3,6 @@
     <string name="chat_export_json">JSON</string>
     <string name="chat_export_json_share">JSON を共有</string>
     <string name="chat_export_json_save">JSON ファイルを保存</string>
+    <string name="chat_export_json_warning">JSON にはツールの出力がすべて含まれ、機密データが含まれる場合があります。</string>
+    <string name="chat_export_saved">ファイルを保存しました</string>
 </resources>

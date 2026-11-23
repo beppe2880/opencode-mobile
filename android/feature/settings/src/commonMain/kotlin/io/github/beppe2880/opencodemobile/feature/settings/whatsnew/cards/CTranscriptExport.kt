@@ -30,7 +30,6 @@ import io.github.beppe2880.opencodemobile.core.ui.text.formatInteger
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
-import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_cached
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_downloading
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_file
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_markdown
@@ -55,7 +54,6 @@ internal fun TranscriptExportDemo(active: Boolean) {
     var json by remember { mutableStateOf(false) }
     var step by remember { mutableStateOf(ExportDemoStep.Choose) }
     var fraction by remember { mutableStateOf<Float?>(null) }
-    var cached by remember { mutableStateOf(false) }
     val finger = remember { DemoFinger() }
     val targets = remember { DemoTargets() }
 
@@ -71,11 +69,9 @@ internal fun TranscriptExportDemo(active: Boolean) {
         json = true
         step = ExportDemoStep.Choose
         fraction = null
-        cached = false
         finger.hide()
     }) {
         json = false
-        cached = false
         step = ExportDemoStep.Choose
         fraction = null
         delay(600)
@@ -94,10 +90,8 @@ internal fun TranscriptExportDemo(active: Boolean) {
         step = ExportDemoStep.Ready
         delay(900)
 
-        // Same native JSON, another format: demonstrate a cache hit without another download.
         step = ExportDemoStep.Choose
         fraction = null
-        cached = true
         delay(400)
         finger.show(targets.center("formats"))
         finger.tap()
@@ -105,8 +99,13 @@ internal fun TranscriptExportDemo(active: Boolean) {
         delay(500)
         finger.moveTo(targets.center("share"))
         finger.tap()
-        step = ExportDemoStep.File
+        step = ExportDemoStep.Waiting
         finger.hide()
+        delay(600)
+        measured(ExportDemoStep.Downloading)
+        step = ExportDemoStep.Processing
+        fraction = null
+        delay(500)
         measured(ExportDemoStep.File, 50)
         step = ExportDemoStep.Ready
         delay(1500)
@@ -134,13 +133,6 @@ internal fun TranscriptExportDemo(active: Boolean) {
                     modifier = Modifier.testTag("demo_export_save"),
                 )
             } else {
-                // Explanatory demo caption, not a cache notification in the real export sheet.
-                if (cached) Text(
-                    stringResource(Res.string.tips_export_cached),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = OcTheme.colors.textMuted,
-                    modifier = Modifier.padding(top = OcSpacing.md),
-                )
                 if (step == ExportDemoStep.Ready) {
                     Row(
                         Modifier.padding(top = OcSpacing.lg),

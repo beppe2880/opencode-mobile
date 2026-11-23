@@ -1,7 +1,7 @@
 <resources>
     <string name="tips_export_title">Сохранение и отправка беседы</string>
-    <string name="tips_export_body">Откройте «Контекст и история» в меню чата, чтобы сохранить или отправить всю беседу в Markdown или исходном JSON OpenCode. Следите за ожиданием сервера и ходом этапов, с процентами там, где прогресс измерим. Действительный кэш позволяет не скачивать тот же чат повторно. JSON может содержать личный контекст, исключённый из Markdown.</string>
-    <string name="tips_export_demo">Экспорт Markdown показывает ожидание сервера, загрузку и подготовку. Следующий переключается на JSON и использует кэш без повторной загрузки.</string>
+    <string name="tips_export_body">Откройте «Контекст и история» в меню чата, чтобы сохранить или отправить всю беседу в Markdown или исходном JSON OpenCode. Следите за ожиданием сервера и ходом этапов, с процентами там, где прогресс измерим. JSON может содержать личный контекст, исключённый из Markdown.</string>
+    <string name="tips_export_demo">Экспорт Markdown показывает ожидание сервера, загрузку и подготовку. Следующий переключается на JSON.</string>
     <string name="tips_export_panel_title">Экспорт / Отправка…</string>
     <string name="tips_export_waiting">Ожидание ответа сервера…</string>
     <string name="tips_export_downloading">Загрузка чата…</string>
@@ -10,7 +10,6 @@
     <string name="tips_export_markdown">Подготовка Markdown…</string>
     <string name="tips_export_file">Подготовка файла…</string>
     <string name="tips_export_ready">Файл готов к сохранению или отправке</string>
-    <string name="tips_export_cached">Тот же чат: JSON берётся из кэша</string>
     <string name="tips_export_percent">%1$s %</string>
     <string name="tips_export_share">Поделиться %1$s</string>
     <string name="tips_export_save">Сохранить файл %1$s</string>

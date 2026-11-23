@@ -8,9 +8,7 @@ import io.github.beppe2880.opencodemobile.api.models.SessionUpdateRequest
 import io.github.beppe2880.opencodemobile.api.models.SessionViewRequest
 import io.github.beppe2880.opencodemobile.core.data.ConcurrentMap
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
-import io.github.beppe2880.opencodemobile.core.data.cache.ExportCache
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
-import io.github.beppe2880.opencodemobile.core.data.cache.NativeExport
 import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.AppVersion
@@ -30,7 +28,6 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toApi
 import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlin.concurrent.Volatile
@@ -41,7 +38,6 @@ import kotlin.time.TimeSource
 internal class RemoteSessionRepository(
     private val clients: OpenCodeClients,
     private val lists: ListCache = ListCache.None,
-    private val exports: ExportCache = ExportCache(),
 ) : SessionRepository {
 
     /** Archiving, with the archived list, exists since OpenCode 2.1.0. */
@@ -167,7 +163,6 @@ internal class RemoteSessionRepository(
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionUpdate(sessionId, SessionUpdateRequest(title = title)) }
-        exports.invalidate(profile.id, sessionId)
         seen[profile.id to sessionId]?.let { seen[profile.id to sessionId] = it.copy(title = title) }
     }
 
@@ -175,7 +170,6 @@ internal class RemoteSessionRepository(
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionRemove(sessionId) }
-        exports.invalidate(profile.id, sessionId)
         lists.removeSession(profile.id, sessionId)
         seen.remove(profile.id to sessionId)
     }
@@ -184,7 +178,6 @@ internal class RemoteSessionRepository(
         val profile = clients.activeProfile()
         val api = clients.forProfile(profile).sessions
         awaitSuccess { api.sessionUpdate(sessionId, SessionUpdateRequest(archived = archived)) }
-        exports.invalidate(profile.id, sessionId)
         seen[profile.id to sessionId]?.let { session ->
             seen[profile.id to sessionId] = session.copy(
                 archivedAt = if (archived) Clock.System.now().toEpochMilliseconds() else null,
@@ -204,7 +197,6 @@ internal class RemoteSessionRepository(
         val api = clients.forProfile(profile).sessions
         // The server ignores an idle it no longer has and never moves `viewed` backwards.
         awaitSuccess { api.sessionView(sessionId, SessionViewRequest(idle = idleAt.toDouble())) }
-        exports.invalidate(profile.id, sessionId)
         seen[profile.id to sessionId]?.let { seen[profile.id to sessionId] = it.copy(viewedAt = idleAt) }
     }
 
@@ -222,15 +214,13 @@ internal class RemoteSessionRepository(
     }
 
     override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<List<Message>> = resultOf {
-        val native = nativeExport(sessionId, onProgress)
-        onProgress(SessionExportProgress(SessionExportStage.Decoding))
-        val document = native.document ?: Json.parseToJsonElement(native.json) as JsonObject
+        val document = downloadNativeExport(sessionId, onProgress)
         val messages = document["messages"] as JsonArray
         val result = mutableListOf<Message>()
         var lastUpdate = TimeSource.Monotonic.markNow()
         onProgress(SessionExportProgress(SessionExportStage.PreparingMessages, 0, messages.size.toLong()))
         messages.forEachIndexed { index, element ->
-            MessageCodec.decode(element.toString())?.toDomain()?.let(result::add)
+            MessageCodec.decode(element)?.toDomain()?.let(result::add)
             if (index == messages.lastIndex || lastUpdate.elapsedNow().inWholeMilliseconds >= 50) {
                 onProgress(SessionExportProgress(SessionExportStage.PreparingMessages, index + 1L, messages.size.toLong()))
                 lastUpdate = TimeSource.Monotonic.markNow()
@@ -240,29 +230,24 @@ internal class RemoteSessionRepository(
     }
 
     override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<String> = resultOf {
-        nativeExport(sessionId, onProgress).json.also { onProgress(SessionExportProgress(SessionExportStage.Preparing)) }
+        val document = downloadNativeExport(sessionId, onProgress)
+        onProgress(SessionExportProgress(SessionExportStage.Preparing))
+        document.toString()
     }
 
-    private suspend fun nativeExport(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): NativeExport {
-        val profile = clients.activeProfile()
-        val client = clients.forProfile(profile)
-        return exports.load(profile.id, sessionId) {
-            onProgress(SessionExportProgress(SessionExportStage.WaitingForServer))
-            // Reuse the generated request and HTTP error handling, but do not decode through DTOs:
-            // older/newer provider metadata and unknown message kinds must survive a JSON export.
-            val body = client.downloadSessionExport(
-                sessionId,
-                onDownload = { received, total -> onProgress(SessionExportProgress(SessionExportStage.Downloading, received, total)) },
-                onDownloaded = { onProgress(SessionExportProgress(SessionExportStage.Decoding)) },
-            )
-            val data = body["data"] as? JsonObject
-            if (data == null || data["info"] !is JsonObject || data["messages"] !is JsonArray) {
-                throw OpenCodeError.Server(status = 0, tag = null, message = "Invalid session export document")
-            }
-            // Remove only the HTTP envelope. This is the native document accepted by session import.
-            onProgress(SessionExportProgress(SessionExportStage.Preparing))
-            NativeExport(data.toString(), data)
+    private suspend fun downloadNativeExport(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): JsonObject {
+        onProgress(SessionExportProgress(SessionExportStage.WaitingForServer))
+        // Decode only the envelope so native metadata and future message kinds survive.
+        val body = clients.active().downloadSessionExport(
+            sessionId,
+            onDownload = { received, total -> onProgress(SessionExportProgress(SessionExportStage.Downloading, received, total)) },
+            onDownloaded = { onProgress(SessionExportProgress(SessionExportStage.Decoding)) },
+        )
+        val data = body["data"] as? JsonObject
+        if (data == null || data["info"] !is JsonObject || data["messages"] !is JsonArray) {
+            throw OpenCodeError.Server(status = 0, tag = null, message = "Invalid session export document")
         }
+        return data
     }
 
     override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> = resultOf {

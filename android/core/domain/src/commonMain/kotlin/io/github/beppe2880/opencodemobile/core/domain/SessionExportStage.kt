@@ -1,6 +1,6 @@
 package io.github.beppe2880.opencodemobile.core.domain
 
-/** Waiting and downloading are skipped for a cache hit; cached JSON still needs decoding for Markdown. */
+/** Stages of downloading and preparing an export. */
 enum class SessionExportStage { WaitingForServer, Downloading, Decoding, PreparingMessages, Preparing }
 
 /** Work completed in this stage (bytes or messages), never a time estimate. */

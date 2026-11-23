@@ -26,6 +26,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_saved
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
@@ -70,8 +71,10 @@ fun ChatRoute(
     val snackbar = remember { SnackbarHostState() }
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
+    val scope = rememberCoroutineScope()
     val export = rememberTranscriptExport(
         onReady = { viewModel.onEvent(ChatEvent.ExportReady) },
+        onSaved = { scope.launch { snackbar.showSnackbar(getString(Res.string.chat_export_saved)) } },
         onFailure = { viewModel.onEvent(ChatEvent.ExportFailed) },
         onCancelled = { viewModel.onEvent(ChatEvent.ExportCancelled) },
         onProgress = { completed, total ->
@@ -80,7 +83,6 @@ fun ChatRoute(
             }
         },
     )
-    val scope = rememberCoroutineScope()
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
     LifecycleStartEffect(providerModel) {

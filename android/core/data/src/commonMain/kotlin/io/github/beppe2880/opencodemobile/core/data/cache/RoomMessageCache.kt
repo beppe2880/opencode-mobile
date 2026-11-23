@@ -147,16 +147,11 @@ internal abstract class MessageCacheDao {
     }
 }
 
-@Database(
-    entities = [MessageEntity::class, SessionSyncEntity::class, ListCacheEntity::class, ExportEntry::class, ExportChunk::class],
-    version = 4,
-    exportSchema = false,
-)
+@Database(entities = [MessageEntity::class, SessionSyncEntity::class, ListCacheEntity::class], version = 3, exportSchema = false)
 @ConstructedBy(CacheDatabaseConstructor::class)
 internal abstract class CacheDatabase : RoomDatabase() {
     abstract fun messages(): MessageCacheDao
     abstract fun lists(): ListCacheDao
-    abstract fun exports(): ExportCacheDao
 
     companion object {
         const val FILE_NAME = "message-cache.db"

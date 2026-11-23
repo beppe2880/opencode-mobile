@@ -3,7 +3,6 @@ package io.github.beppe2880.opencodemobile.core.data.di
 import com.russhwolf.settings.Settings
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
 import io.github.beppe2880.opencodemobile.core.data.cache.CacheDatabase
-import io.github.beppe2880.opencodemobile.core.data.cache.ExportCache
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.MessageCache
 import io.github.beppe2880.opencodemobile.core.data.cache.RoomListCache
@@ -87,12 +86,10 @@ val dataModule = module {
 
     single<MessageCache> { RoomMessageCache(get<CacheDatabase>().messages()) }
     single<ListCache> { RoomListCache(get<CacheDatabase>().lists()) }
-    single { ExportCache(get<CacheDatabase>().exports()) }
 
     single<ServerRepository> {
         val messages = get<MessageCache>()
         val lists = get<ListCache>()
-        val exports = get<ExportCache>()
         val drafts = get<Settings>(DraftsStore)
         val settings = get<Settings>(SettingsStore)
         StoredServerRepository(
@@ -100,7 +97,6 @@ val dataModule = module {
             factory = get(),
             scope = get(AppScope),
             onRemoved = { serverId ->
-                exports.clearServer(serverId)
                 messages.clearServer(serverId)
                 lists.clearServer(serverId)
                 withContext(Dispatchers.IO) {
@@ -112,9 +108,9 @@ val dataModule = module {
             },
         )
     }
-    single<EventRepository> { SseEventRepository(get(), get(), get(), get(), get(AppScope), lists = get(), exports = get()) }
-    single<SessionRepository> { RemoteSessionRepository(get(), get(), get()) }
-    single<ChatRepository> { RemoteChatRepository(get(), get(), exports = get()) }
+    single<EventRepository> { SseEventRepository(get(), get(), get(), get(), get(AppScope), lists = get()) }
+    single<SessionRepository> { RemoteSessionRepository(get(), get()) }
+    single<ChatRepository> { RemoteChatRepository(get(), get()) }
     single<CatalogRepository> { RemoteCatalogRepository(get()) }
     single<TerminalRepository> { RemoteTerminalRepository(get(), network = get()) }
     single<FileRepository> { RemoteFileRepository(get()) }

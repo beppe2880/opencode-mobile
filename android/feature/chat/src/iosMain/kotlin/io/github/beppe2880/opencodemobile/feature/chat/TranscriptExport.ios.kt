@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.feature.chat
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -20,21 +21,33 @@ import platform.Foundation.NSUUID
 import platform.Foundation.create
 import platform.Foundation.writeToFile
 import platform.UIKit.UIActivityViewController
+import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.popoverPresentationController
+import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
 internal actual fun rememberTranscriptExport(
     onReady: () -> Unit,
+    onSaved: () -> Unit,
     onFailure: () -> Unit,
     onCancelled: () -> Unit,
     onProgress: suspend (Long, Long) -> Unit,
 ): (TranscriptFile, Boolean) -> Unit {
     val failed = rememberUpdatedState(onFailure)
     val ready = rememberUpdatedState(onReady)
+    val saved = rememberUpdatedState(onSaved)
     val cancelled = rememberUpdatedState(onCancelled)
     val scope = rememberCoroutineScope()
+    // UIKit's delegate is weak. Keep it alive for the chat while the picker is open.
+    val delegate = remember {
+        object : NSObject(), UIDocumentPickerDelegateProtocol {
+            override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentsAtURLs: List<*>) {
+                if (didPickDocumentsAtURLs.any { it is NSURL }) saved.value() else failed.value()
+            }
+        }
+    }
     return { transcript, save ->
         scope.launch {
             try {
@@ -53,6 +66,7 @@ internal actual fun rememberTranscriptExport(
                     ready.value()
                     if (save) {
                         val picker = UIDocumentPickerViewController(forExportingURLs = listOf(url), asCopy = true)
+                        picker.delegate = delegate
                         host.presentViewController(picker, animated = true, completion = null)
                     } else {
                         val sheet = UIActivityViewController(activityItems = listOf(url), applicationActivities = null)

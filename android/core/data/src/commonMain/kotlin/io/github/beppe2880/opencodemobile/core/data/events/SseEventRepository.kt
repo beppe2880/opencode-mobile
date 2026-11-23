@@ -1,7 +1,6 @@
 package io.github.beppe2880.opencodemobile.core.data.events
 
 import io.github.beppe2880.opencodemobile.core.data.OpenCodeClients
-import io.github.beppe2880.opencodemobile.core.data.cache.ExportCache
 import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
@@ -14,7 +13,6 @@ import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 /**
@@ -53,7 +50,6 @@ internal class SseEventRepository(
     stopTimeoutMillis: Long = 5_000,
     private val readTimeoutMillis: Long = OpenCodeClient.STREAM_READ_TIMEOUT_MILLIS,
     private val lists: ListCache = ListCache.None,
-    private val exports: ExportCache = ExportCache(),
 ) : EventRepository {
 
     private val _connection = MutableStateFlow(ConnectionState.Disconnected)
@@ -109,19 +105,14 @@ internal class SseEventRepository(
             if (!open) {
                 open = true
                 onOpen()
-                exports.connection(server.id, true)
                 _connection.value = ConnectionState.Connected
                 emit(ServerEvent.Connected)
             }
-            val mapped = event.toDomain()
-            if (mapped is ServerEvent.SessionScoped) exports.invalidate(server.id, mapped.sessionId)
-            // A known wire event not understood by this app may still change native export metadata.
-            if (mapped == null) exports.connection(server.id, true)
-            if (mapped == null || mapped == ServerEvent.Connected) return@collect
+            val mapped = event.toDomain()?.takeUnless { it == ServerEvent.Connected } ?: return@collect
             if (mapped is ServerEvent.SessionChanged && mapped.deleted) lists.removeSession(server.id, mapped.sessionId)
             emit(mapped)
         }
-    }.onCompletion { withContext(NonCancellable) { exports.connection(server.id, false) } }
+    }
 
     private fun sameConnection(a: ServerProfile?, b: ServerProfile?): Boolean =
         a?.id == b?.id && a?.baseUrl == b?.baseUrl && a?.secret == b?.secret
