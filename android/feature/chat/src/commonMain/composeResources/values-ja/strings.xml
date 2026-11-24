@@ -78,6 +78,17 @@
     <string name="chat_empty_message">エージェントへのタスクを説明してください。作業場所は %1$s です。</string>
     <string name="chat_error_title">セッションを読み込めませんでした</string>
     <string name="chat_session_deleted">このセッションは削除されました</string>
+    <string name="chat_rename">チャット名を変更</string>
+    <string name="chat_rename_label">タイトル</string>
+    <string name="chat_save">保存</string>
+    <string name="chat_delete">チャットを削除</string>
+    <string name="chat_delete_title">チャットを削除しますか？</string>
+    <string name="chat_delete_message">「%1$s」とその履歴をサーバーから完全に削除します。</string>
+    <string name="chat_archive">アーカイブ</string>
+    <string name="chat_unarchive">アーカイブを解除</string>
+    <string name="chat_archived_message">セッションをアーカイブしました</string>
+    <string name="chat_restored_message">セッションを復元しました</string>
+    <string name="chat_archive_undo">元に戻す</string>
     <string name="chat_agent">エージェント</string>
     <string name="chat_model">モデル</string>
     <string name="chat_model_description">モデル: %1$s（%2$s）</string>

@@ -23,10 +23,13 @@ import io.github.beppe2880.opencodemobile.core.ui.platform.rememberTextClipboard
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_copied
 import io.github.beppe2880.opencodemobile.core.ui.text.asString
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_archive_undo
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_archived_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_restored_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
 import kotlinx.coroutines.launch
@@ -161,6 +164,23 @@ fun ChatRoute(
                 providersOpen = true
             }
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
+            is ChatEffect.ShowArchiveUndo -> {
+                // Its own coroutine: the snackbar must not hold up later effects.
+                scope.launch {
+                    val result = withTimeoutOrNull(ARCHIVE_UNDO_MS) {
+                        snackbar.showSnackbar(
+                            message = getString(
+                                if (effect.archived) Res.string.chat_archived_message else Res.string.chat_restored_message,
+                            ),
+                            actionLabel = getString(Res.string.chat_archive_undo),
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                    }
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.onEvent(ChatEvent.SetArchived(!effect.archived))
+                    }
+                }
+            }
             ChatEffect.NavigateBack -> onBack()
             ChatEffect.PromptSent -> {
                 dictation.cancel()
@@ -228,3 +248,5 @@ fun ChatRoute(
         onShare = share,
     )
 }
+
+private const val ARCHIVE_UNDO_MS = 5_000L

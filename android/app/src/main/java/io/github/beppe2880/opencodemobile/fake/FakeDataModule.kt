@@ -363,6 +363,15 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
         return Result.success(Unit)
     }
 
+    override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
+        delay(LATENCY)
+        val now = System.currentTimeMillis()
+        store.sessions.value = store.sessions.value.map {
+            if (it.id == sessionId) it.copy(archivedAt = if (archived) now else null) else it
+        }
+        return Result.success(Unit)
+    }
+
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> {
         delay(LATENCY)
         val original = store.sessions.value.firstOrNull { it.id == sessionId }

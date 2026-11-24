@@ -31,9 +31,17 @@ import io.github.beppe2880.opencodemobile.core.ui.text.UiText
 data class ChatState(
     val sessionId: String = "",
     val title: String = "",
+    /** The rename dialog is open. */
+    val renaming: Boolean = false,
+    /** The delete confirmation is open. */
+    val deleting: Boolean = false,
     /** Pinned to the top of the session list on this device. */
     val pinned: Boolean = false,
     val muted: Boolean = false,
+    /** The session is in the server's archive. */
+    val archived: Boolean = false,
+    /** The server supports archiving sessions. */
+    val archiveSupported: Boolean = true,
     val directory: String = "",
     val agent: String? = null,
     val model: ModelRef? = null,
@@ -354,6 +362,9 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
 sealed interface ChatEvent {
     data class SetMuted(val muted: Boolean, val untilFinished: Boolean = false) : ChatEvent
 
+    /** Archives the session or restores it from the archive. */
+    data class SetArchived(val archived: Boolean) : ChatEvent
+
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent
 
@@ -476,6 +487,16 @@ sealed interface ChatEvent {
 
     /** Pins the session to the top of the session list, or unpins it. */
     data class SetPinned(val pinned: Boolean) : ChatEvent
+
+    /** Opens the rename dialog for this chat. */
+    data object RequestRename : ChatEvent
+    data class ConfirmRename(val title: String) : ChatEvent
+
+    /** Opens the delete confirmation for this chat. */
+    data object RequestDelete : ChatEvent
+    data object ConfirmDelete : ChatEvent
+    data object DismissDialog : ChatEvent
+
     data object OpenProviders : ChatEvent
     data object ProvidersConnected : ChatEvent
     data object CloseMcps : ChatEvent
@@ -498,6 +519,9 @@ sealed interface ChatEvent {
 sealed interface ChatEffect {
     data object OpenProviders : ChatEffect
     data class ShowMessage(val message: UiText) : ChatEffect
+
+    /** Offers Undo after archiving or restoring the session. */
+    data class ShowArchiveUndo(val archived: Boolean) : ChatEffect
     data object NavigateBack : ChatEffect
     data object PromptSent : ChatEffect
     data object BtwSent : ChatEffect
