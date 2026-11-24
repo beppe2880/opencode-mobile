@@ -418,7 +418,7 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
     val selected = state.selectedSessions
     val count = selected.size
     val single = selected.singleOrNull()
-    val singleMuted = single?.let { it.id in state.muted } == true
+    val muteActions = bulkMuteActions(selected, state.muted)
     val pinActions = bulkPinActions(selected, state.pinned)
     val archiveActions = if (state.archiveSupported) bulkArchiveActions(selected) else emptyList()
     val anyUnread = selected.any(state::isUnread)
@@ -458,22 +458,29 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                             modifier = Modifier.testTag("sessions_bulk_rename"),
                         )
                     }
-                    if (count == 1 && single != null && sessionNotificationsSupported) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(if (singleMuted) Res.string.sessions_unmute else Res.string.sessions_mute)) },
-                            onClick = {
-                                menuOpen = false
-                                if (singleMuted) onEvent(SessionsEvent.SetMuted(single.id, false)) else choosingMute = true
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    if (singleMuted) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff,
-                                    contentDescription = null,
-                                    tint = c.iconBase,
-                                )
-                            },
-                            modifier = Modifier.testTag("sessions_bulk_mute"),
-                        )
+                    if (sessionNotificationsSupported) {
+                        muteActions.forEach { action ->
+                            val mute = action == BulkMuteAction.Mute
+                            DropdownMenuItem(
+                                text = { Text(stringResource(if (mute) Res.string.sessions_mute else Res.string.sessions_unmute)) },
+                                onClick = {
+                                    menuOpen = false
+                                    if (mute && count == 1) {
+                                        choosingMute = true
+                                    } else {
+                                        onEvent(SessionsEvent.SetSelectedMuted(mute))
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        if (mute) Icons.Outlined.NotificationsOff else Icons.Outlined.NotificationsActive,
+                                        contentDescription = null,
+                                        tint = c.iconBase,
+                                    )
+                                },
+                                modifier = Modifier.testTag(if (mute) "sessions_bulk_mute" else "sessions_bulk_unmute"),
+                            )
+                        }
                     }
                     if (showReadState && anyUnread) {
                         DropdownMenuItem(
