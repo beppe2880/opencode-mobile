@@ -140,12 +140,13 @@ internal fun BottomArea(
         if (state.queued.isNotEmpty()) {
             QueuedPrompts(state.queued, onEvent)
         }
-        if (state.suggestions.isNotEmpty()) {
-            SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
-        }
         // Part of this column, so the transcript above ends before them and is never covered.
         RunningChipsBar(state, onEvent)
         BtwStatus(state, onEvent)
+        // Right above the message box, so the list stays next to the text it completes.
+        if (state.suggestions.isNotEmpty()) {
+            SuggestionList(state.suggestions, onPick = { onEvent(ChatEvent.PickSuggestion(it)) })
+        }
         Composer(
             state,
             onEvent,
