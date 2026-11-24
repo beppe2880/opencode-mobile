@@ -210,6 +210,7 @@ class SessionsViewModel(
                     mutes.setMuted(event.sessionId, event.muted, if (event.untilFinished) idle ?: 0 else null)
                 }
             }
+            is SessionsEvent.SetSelectedMuted -> setSelectedMuted(event.muted)
             is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)
             is SessionsEvent.RequestDelete -> updateState { it.copy(deleting = event.session) }
             SessionsEvent.DismissDialog -> updateState { it.copy(renaming = null, deleting = null, bulkDeleteCount = null) }
@@ -664,7 +665,7 @@ class SessionsViewModel(
         }
         retainVisibleSelection()
         viewModelScope.launch {
-            val permits = Semaphore(MARK_READ_PARALLEL)
+            val permits = Semaphore(BULK_PARALLEL)
             val failed = marks.map { (id, idle) ->
                 async { permits.withPermit { id.takeIf { sessions.markViewed(id, idle).isFailure } } }
             }.awaitAll().filterNotNull().toSet()
@@ -768,6 +769,13 @@ class SessionsViewModel(
         retainVisibleSelection()
     }
 
+    /** Permanent mute: the single-session sheet keeps offering the temporary choice. */
+    private fun setSelectedMuted(muted: Boolean) {
+        val selected = currentState.selectedSessions
+        if (selected.isEmpty()) return
+        selected.forEach { mutes.setMuted(it.id, muted) }
+    }
+
     private fun setSelectedArchived(archived: Boolean) {
         if (!currentState.archiveSupported) return
         val selected = currentState.selectedSessions
@@ -788,10 +796,10 @@ class SessionsViewModel(
         updateState { it.copy(groups = group(sessionList)) }
         retainVisibleSelection()
         viewModelScope.launch {
-            val failed = mutableListOf<Session>()
-            for (session in selected) {
-                sessions.setArchived(session.id, archived).onFailure { failed += session }
-            }
+            val permits = Semaphore(BULK_PARALLEL)
+            val failed = selected.map { session ->
+                async { session.takeIf { permits.withPermit { sessions.setArchived(session.id, archived).isFailure } } }
+            }.awaitAll().filterNotNull()
             if (failed.isNotEmpty()) {
                 restore(previous, failed)
                 retainVisibleSelection()
@@ -832,14 +840,18 @@ class SessionsViewModel(
         updateState { it.copy(groups = group(sessionList)) }
         retainVisibleSelection()
         viewModelScope.launch {
-            val failed = mutableListOf<Session>()
-            for (session in selected) {
-                sessions.delete(session.id).onSuccess {
+            val permits = Semaphore(BULK_PARALLEL)
+            val results = selected.map { session ->
+                async { session to permits.withPermit { sessions.delete(session.id) } }
+            }.awaitAll()
+            results.forEach { (session, result) ->
+                if (result.isSuccess) {
                     pins.setPinned(session.id, false)
                     mutes.setMuted(session.id, false)
                     unreadStore.setUnread(session.id, false)
-                }.onFailure { failed += session }
+                }
             }
+            val failed = results.mapNotNull { (session, result) -> session.takeIf { result.isFailure } }
             if (failed.isNotEmpty()) {
                 restore(previous, failed)
                 retainVisibleSelection()
@@ -1157,7 +1169,7 @@ class SessionsViewModel(
         const val FILTERED_LIST_LIMIT = 500
         const val RUNNING_POLL_MS = 15_000L
         const val RUNNING_EVENT_DEBOUNCE_MS = 1_000L
-        const val MARK_READ_PARALLEL = 4
+        const val BULK_PARALLEL = 4
         const val WAITING_DEBOUNCE_MS = 300L
         const val GLOBAL_PROJECT_ID = "global"
     }
