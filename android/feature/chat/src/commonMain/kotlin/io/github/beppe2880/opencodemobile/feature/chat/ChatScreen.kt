@@ -170,7 +170,9 @@ fun ChatScreen(
         snackbarHost = {
             SnackbarHost(
                 snackbarHostState,
-                modifier = Modifier.padding(bottom = with(LocalDensity.current) { bottomBarHeight.toDp() }),
+                // Above the bottom area, and above the keyboard when it is up: the content
+                // column rises with the IME, so the snackbar must follow it.
+                modifier = Modifier.imePadding().padding(bottom = with(LocalDensity.current) { bottomBarHeight.toDp() }),
             )
         },
     ) { padding ->
@@ -213,7 +215,10 @@ fun ChatScreen(
                     }
                 }
             }
-            Box(Modifier.fillMaxWidth().onSizeChanged { bottomBarHeight = it.height }) {
+            Box(
+                Modifier.fillMaxWidth().onSizeChanged { bottomBarHeight = it.height },
+                contentAlignment = Alignment.Center,
+            ) {
                 BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
             }
         }

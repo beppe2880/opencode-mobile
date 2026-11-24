@@ -3069,7 +3069,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `delete asks for confirmation leaves after success and forgets the pin`() = runTest(main.testDispatcher) {
+    fun `delete asks for confirmation leaves after success and forgets the pin and mute`() = runTest(main.testDispatcher) {
         val sessions = FakeSessions(model)
         pins.setPinned("s1", true)
         mutes.setMuted("s1", true)
@@ -3093,11 +3093,12 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `a failed delete keeps the chat open the pin and shows the error`() = runTest(main.testDispatcher) {
+    fun `a failed delete keeps the chat open the pin and mute and shows the error`() = runTest(main.testDispatcher) {
         val sessions = FakeSessions(model).apply {
             deleteResult = Result.failure(OpenCodeError.Server(500, null, "no"))
         }
         pins.setPinned("s1", true)
+        mutes.setMuted("s1", true)
         val vm = vm(sessions)
         advanceUntilIdle()
         val effects = mutableListOf<ChatEffect>()
@@ -3112,6 +3113,7 @@ class ChatViewModelTest {
         assertTrue(effects.any { it is ChatEffect.ShowMessage })
         assertTrue(effects.none { it is ChatEffect.NavigateBack })
         assertTrue("s1" in pins.pinned())
+        assertTrue("s1" in mutes.muted.value)
         collector.cancel()
     }
 

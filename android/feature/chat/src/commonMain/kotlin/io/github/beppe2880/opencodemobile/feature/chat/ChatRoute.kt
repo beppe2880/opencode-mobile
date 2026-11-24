@@ -32,6 +32,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_restored_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
@@ -72,6 +73,8 @@ fun ChatRoute(
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
     val scope = rememberCoroutineScope()
+    // The running archive-undo snackbar, so a new one replaces only its own predecessor.
+    var archiveUndoJob by remember { mutableStateOf<Job?>(null) }
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
     LifecycleStartEffect(providerModel) {
@@ -165,21 +168,26 @@ fun ChatRoute(
             }
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
             is ChatEffect.ShowArchiveUndo -> {
-                // Its own coroutine: the snackbar must not hold up later effects. Dismiss the
-                // previous one so a quick archive/restore cannot leave a stale Undo behind.
-                scope.launch {
-                    snackbar.currentSnackbarData?.dismiss()
-                    val result = withTimeoutOrNull(ARCHIVE_UNDO_MS) {
-                        snackbar.showSnackbar(
-                            message = getString(
-                                if (effect.archived) Res.string.chat_archived_message else Res.string.chat_restored_message,
-                            ),
-                            actionLabel = getString(Res.string.chat_archive_undo),
-                            duration = SnackbarDuration.Indefinite,
-                        )
-                    }
-                    if (result == SnackbarResult.ActionPerformed && viewModel.state.value.archived == effect.archived) {
-                        viewModel.onEvent(ChatEvent.SetArchived(!effect.archived))
+                // A stale effect (a slower toggle completing last) must not replace a newer
+                // snackbar with an outdated message.
+                if (viewModel.state.value.archived == effect.archived) {
+                    // Its own coroutine: the snackbar must not hold up later effects. Cancelling
+                    // it removes its own snackbar and leaves unrelated ones (errors, voice undo)
+                    // alone, so a quick archive/restore cannot leave a stale Undo behind.
+                    archiveUndoJob?.cancel()
+                    archiveUndoJob = scope.launch {
+                        val result = withTimeoutOrNull(ARCHIVE_UNDO_MS) {
+                            snackbar.showSnackbar(
+                                message = getString(
+                                    if (effect.archived) Res.string.chat_archived_message else Res.string.chat_restored_message,
+                                ),
+                                actionLabel = getString(Res.string.chat_archive_undo),
+                                duration = SnackbarDuration.Indefinite,
+                            )
+                        }
+                        if (result == SnackbarResult.ActionPerformed && viewModel.state.value.archived == effect.archived) {
+                            viewModel.onEvent(ChatEvent.SetArchived(!effect.archived))
+                        }
                     }
                 }
             }
