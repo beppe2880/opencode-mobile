@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">Marcar todas como lidas</string>
     <string name="sessions_mark_all_read_count">Marcar %1$d como lidas</string>
     <string name="sessions_mark_all_read_failed">Algumas sessões não puderam ser marcadas como lidas</string>
+    <string name="sessions_mark_read">Marcar como lida</string>
+    <string name="sessions_mark_unread">Marcar como não lida</string>
+    <string name="sessions_mark_unread_local">Estado de não lida salvo apenas neste dispositivo</string>
     <string name="sessions_read">Lidas</string>
     <string name="sessions_filter_read">Status de leitura</string>
     <string name="sessions_outcome_succeeded">Concluída</string>
@@ -72,6 +75,24 @@
     <string name="sessions_save">Salvar</string>
     <string name="sessions_delete_title">Excluir sessão?</string>
     <string name="sessions_delete_message">“%1$s” e seu histórico serão excluídos permanentemente do servidor.</string>
+    <string name="sessions_select">Selecionar</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="one">%1$d selecionada</item>
+        <item quantity="other">%1$d selecionadas</item>
+    </plurals>
+    <string name="sessions_selection_close">Sair da seleção</string>
+    <string name="sessions_selection_actions">Ações para as sessões selecionadas</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="one">Excluir %1$d sessão?</item>
+        <item quantity="other">Excluir %1$d sessões?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="one">O histórico dela será excluído permanentemente do servidor.</item>
+        <item quantity="other">Os históricos delas serão excluídos permanentemente do servidor.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">Algumas sessões não puderam ser excluídas</string>
+    <string name="sessions_delete_failed_message">Estas sessões ainda estão no servidor:\n%1$s</string>
+    <string name="sessions_bulk_failed">Algumas sessões não puderam ser atualizadas</string>
     <string name="sessions_new_title">Nova sessão</string>
     <string name="sessions_new_directory">Diretório do projeto</string>
     <string name="sessions_new_other_directory">Outro diretório</string>

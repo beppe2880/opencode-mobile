@@ -236,12 +236,14 @@ fun OcSearchField(
     modifier: Modifier = Modifier,
     /** Extra action after the clear button, e.g. the session filters. */
     trailingContent: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
 ) {
     val c = OcTheme.colors
     val text = rememberSyncedText(value)
     OutlinedTextField(
         value = text.sync(value),
         onValueChange = { text.input(it, onValueChange) },
+        enabled = enabled,
         modifier = modifier.fillMaxWidth(),
         singleLine = true,
         textStyle = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
@@ -257,6 +259,7 @@ fun OcSearchField(
                             icon = Icons.Outlined.Close,
                             contentDescription = stringResource(Res.string.oc_clear),
                             onClick = { onValueChange("") },
+                            enabled = enabled,
                             tint = c.iconMuted,
                             iconSize = 18.dp,
                         )

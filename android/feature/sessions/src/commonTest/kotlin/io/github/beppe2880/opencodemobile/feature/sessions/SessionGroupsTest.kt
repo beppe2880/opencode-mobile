@@ -230,4 +230,31 @@ class SessionGroupsTest {
         assertEquals(4, sessionRowIndex(groups, "unread-today"))
         assertEquals(6, sessionRowIndex(groups, "today"))
     }
+
+    @Test
+    fun manualUnreadMarksGroupAndFilterLikeServerUnreadState() {
+        val list = listOf(today, yesterday, week)
+        val marks = setOf("yesterday")
+
+        assertEquals(
+            listOf(
+                DayBucket.Unread to listOf("yesterday"),
+                DayBucket.Today to listOf("today"),
+                DayBucket.ThisWeek to listOf("week"),
+            ),
+            groupSessions(list, emptySet(), now, zone, manualUnread = marks).ids(),
+        )
+
+        assertEquals(
+            listOf(DayBucket.Yesterday to listOf("yesterday")),
+            groupSessions(
+                list,
+                emptySet(),
+                now,
+                zone,
+                SessionFilters(readState = SessionRead.Unread),
+                manualUnread = marks,
+            ).ids(),
+        )
+    }
 }

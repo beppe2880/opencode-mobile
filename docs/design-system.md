@@ -132,7 +132,7 @@ control is smaller (chips 32dp, round send button 36dp inside a 48dp target).
 | `OcProjectAvatar` | Rounded-square initial, like the web session list. |
 | `OcPulsingDot`, `OcStatusDot`, `OcSpinner`, `OcSkeleton` | Running / connection indicators and loading placeholders. |
 | `OcEmptyState`, `OcErrorState` | Centered icon + title + message + action (retry). |
-| `OcConfirmDialog`, `OcTextInputDialog` | Destructive confirmations and rename flows. |
+| `OcConfirmDialog`, `OcTextInputDialog`, `OcInfoDialog` | Destructive confirmations, rename flows and acknowledged messages. |
 | `OcBottomSheet` | Modal sheet with token colors, starts below the status bar. |
 | `OcModelPicker` | Searchable model list grouped by provider with a "Recently used" section; with a `providerMark` slot rows show the mark and the short name. |
 | `OcModelName`, `OcProviderInitial` | Short model name with its variant in the muted color (the variant ellipsizes first); initial of a provider without a logo. Short names come from `shortModelName` (`core/ui/text/ModelText.kt`). |

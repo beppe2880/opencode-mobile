@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">모두 읽음으로 표시</string>
     <string name="sessions_mark_all_read_count">%1$d개 읽음으로 표시</string>
     <string name="sessions_mark_all_read_failed">일부 세션을 읽음으로 표시하지 못했습니다</string>
+    <string name="sessions_mark_read">읽음으로 표시</string>
+    <string name="sessions_mark_unread">읽지 않음으로 표시</string>
+    <string name="sessions_mark_unread_local">읽지 않음 상태가 이 기기에만 저장되었습니다</string>
     <string name="sessions_read">읽음</string>
     <string name="sessions_filter_read">읽음 상태</string>
     <string name="sessions_outcome_succeeded">성공</string>
@@ -72,6 +75,21 @@
     <string name="sessions_save">저장</string>
     <string name="sessions_delete_title">세션을 삭제할까요?</string>
     <string name="sessions_delete_message">“%1$s” 및 기록이 서버에서 영구적으로 삭제됩니다.</string>
+    <string name="sessions_select">선택</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="other">%1$d개 선택됨</item>
+    </plurals>
+    <string name="sessions_selection_close">선택 종료</string>
+    <string name="sessions_selection_actions">선택한 세션 작업</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="other">세션 %1$d개를 삭제할까요?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="other">기록이 서버에서 영구적으로 삭제됩니다.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">일부 세션을 삭제하지 못했습니다</string>
+    <string name="sessions_delete_failed_message">이 세션은 서버에 그대로 남아 있습니다:\n%1$s</string>
+    <string name="sessions_bulk_failed">일부 세션을 업데이트하지 못했습니다</string>
     <string name="sessions_new_title">새 세션</string>
     <string name="sessions_new_directory">프로젝트 디렉터리</string>
     <string name="sessions_new_other_directory">다른 디렉터리</string>
