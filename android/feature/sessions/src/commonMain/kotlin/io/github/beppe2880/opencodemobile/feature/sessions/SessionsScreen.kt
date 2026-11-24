@@ -419,8 +419,8 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
     val count = selected.size
     val single = selected.singleOrNull()
     val singleMuted = single?.let { it.id in state.muted } == true
-    val allPinned = selected.isNotEmpty() && selected.all { it.id in state.pinned }
-    val allArchived = selected.isNotEmpty() && selected.all { it.archivedAt != null }
+    val pinActions = bulkPinActions(selected, state.pinned)
+    val archiveActions = if (state.archiveSupported) bulkArchiveActions(selected) else emptyList()
     val anyUnread = selected.any(state::isUnread)
     val anyRead = selected.any { !state.isUnread(it) }
     val showReadState = state.unreadSessions != UnreadSessions.Off
@@ -491,30 +491,30 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                             modifier = Modifier.testTag("sessions_bulk_mark_unread"),
                         )
                     }
-                    DropdownMenuItem(
-                        text = { Text(stringResource(if (allPinned) Res.string.sessions_unpin else Res.string.sessions_pin)) },
-                        onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedPinned(!allPinned)) },
-                        leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
-                        modifier = Modifier.testTag("sessions_bulk_pin"),
-                    )
-                    if (state.archiveSupported) {
+                    pinActions.forEach { action ->
+                        val pin = action == BulkPinAction.Pin
+                        DropdownMenuItem(
+                            text = { Text(stringResource(if (pin) Res.string.sessions_pin else Res.string.sessions_unpin)) },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedPinned(pin)) },
+                            leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
+                            modifier = Modifier.testTag(if (pin) "sessions_bulk_pin" else "sessions_bulk_unpin"),
+                        )
+                    }
+                    archiveActions.forEach { action ->
+                        val archive = action == BulkArchiveAction.Archive
                         DropdownMenuItem(
                             text = {
-                                Text(
-                                    stringResource(
-                                        if (allArchived) Res.string.sessions_unarchive else Res.string.sessions_archive,
-                                    ),
-                                )
+                                Text(stringResource(if (archive) Res.string.sessions_archive else Res.string.sessions_unarchive))
                             },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedArchived(!allArchived)) },
+                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedArchived(archive)) },
                             leadingIcon = {
                                 Icon(
-                                    if (allArchived) Icons.Outlined.Unarchive else Icons.Outlined.Archive,
+                                    if (archive) Icons.Outlined.Archive else Icons.Outlined.Unarchive,
                                     contentDescription = null,
                                     tint = c.iconBase,
                                 )
                             },
-                            modifier = Modifier.testTag("sessions_bulk_archive"),
+                            modifier = Modifier.testTag(if (archive) "sessions_bulk_archive" else "sessions_bulk_unarchive"),
                         )
                     }
                     OcDivider(Modifier.padding(vertical = OcSpacing.xs))
