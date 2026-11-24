@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tips_j_sessions_bulk_title">세션 일괄 작업</string>
-    <string name="tips_j_sessions_bulk_body">세션을 길게 눌러 선택한 다음 다른 행을 탭하세요. 함께 고정, 보관, 읽음/읽지 않음 표시 또는 삭제할 수 있고, 하나만 선택하면 이름을 바꿀 수 있습니다. 뒤로 가면 선택이 해제됩니다. 읽지 않음 표시는 이 기기에만 저장됩니다.</string>
+    <string name="tips_j_sessions_bulk_body">세션을 길게 눌러 선택한 다음 다른 행을 탭하세요. 함께 고정, 음소거/음소거 해제, 보관, 읽음/읽지 않음 표시 또는 삭제할 수 있고, 하나만 선택하면 이름을 바꿀 수 있습니다. 뒤로 가면 선택이 해제됩니다. 읽지 않음 표시는 이 기기에만 저장됩니다.</string>
     <string name="tips_j_sessions_bulk_demo">세션을 길게 누르고 두 행을 선택한 뒤 메뉴에서 한 번 확인하여 삭제합니다.</string>
 </resources>
