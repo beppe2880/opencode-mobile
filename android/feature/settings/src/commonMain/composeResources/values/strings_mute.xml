@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">Mute one session</string>
+    <string name="tips_c_mute_body">On Android, mute a session from its chat or row menu without affecting other sessions. Choose manual unmute or mute until the current work finishes.</string>
+    <string name="tips_c_mute_demo">The duration choices appear, then a crossed-out bell marks the session until its work ends.</string>
+</resources>

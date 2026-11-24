@@ -14,6 +14,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ImageAttachment
 import io.github.beppe2880.opencodemobile.core.domain.McpRepository
 import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.NoticeKind
 import io.github.beppe2880.opencodemobile.core.domain.Part
@@ -35,6 +36,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
@@ -91,6 +93,8 @@ class ChatViewModel(
     private val vcs: VcsRepository,
     private val shares: ShareRepository,
     private val pins: PinnedSessionRepository,
+    private val mutes: MutedSessionRepository,
+    private val unreadStore: UnreadSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val btwMemory: BtwMemory,
     private val serverId: String = "",
@@ -195,6 +199,9 @@ class ChatViewModel(
     private var reportedViewedAt: Long? = null
 
     init {
+        viewModelScope.launch {
+            mutes.muted.collect { ids -> updateState { it.copy(muted = sessionId in ids) } }
+        }
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
             revertMessageId = s.revertMessageId
@@ -261,6 +268,11 @@ class ChatViewModel(
             ChatEvent.ExportFailed -> {
                 updateState { it.copy(exporting = false) }
                 sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_export_failed)))
+            }
+            is ChatEvent.SetMuted -> {
+                if (!event.untilFinished || (currentState.running && currentState.connection == ConnectionState.Connected)) {
+                    mutes.setMuted(sessionId, event.muted, if (event.untilFinished) sessionIdleAt ?: 0 else null)
+                }
             }
             ChatEvent.NewSession -> if (currentState.menuReady) newSession(currentState.draft)
             ChatEvent.Undo -> if (currentState.historyReady) undo()
@@ -1155,7 +1167,10 @@ class ChatViewModel(
 
     fun setChatVisible(visible: Boolean) {
         chatVisible.value = visible
-        if (visible) reportViewed()
+        if (visible) {
+            unreadStore.setUnread(sessionId, false)
+            reportViewed()
+        }
     }
 
     /**

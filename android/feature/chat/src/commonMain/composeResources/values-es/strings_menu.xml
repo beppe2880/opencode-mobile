@@ -10,4 +10,7 @@
     <string name="chat_export_share">Compartir Markdown</string>
     <string name="chat_export_save">Guardar archivo Markdown</string>
     <string name="chat_export_failed">No se pudo exportar la conversación. Inténtalo de nuevo.</string>
+    <string name="chat_muted">Notificaciones silenciadas en este dispositivo</string>
+    <string name="chat_mute">Silenciar notificaciones</string>
+    <string name="chat_unmute">Activar notificaciones</string>
 </resources>

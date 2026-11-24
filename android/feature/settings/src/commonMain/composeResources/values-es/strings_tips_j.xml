@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_j_sessions_bulk_title">Acciones en lote en sesiones</string>
+    <string name="tips_j_sessions_bulk_body">Mantén pulsada una sesión para seleccionarla y luego toca más filas. Fija, archiva, marca como leídas o no leídas o elimina varias a la vez; cambia el nombre cuando solo hay una seleccionada. Atrás sale de la selección. Las marcas de no leída se guardan en este dispositivo.</string>
+    <string name="tips_j_sessions_bulk_demo">Se mantiene pulsada una sesión; se seleccionan dos filas y el menú las elimina tras una confirmación.</string>
+</resources>

@@ -12,15 +12,16 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import io.github.beppe2880.opencodemobile.core.domain.EventRepository
+import io.github.beppe2880.opencodemobile.core.domain.MutedSessionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -34,6 +35,7 @@ class SessionMonitorService : Service() {
     private val monitor: SessionMonitor by inject()
     private val events: EventRepository by inject()
     private val notifier: AndroidMonitorNotifier by inject()
+    private val mutes: MutedSessionRepository by inject()
     private var scope: CoroutineScope? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -50,7 +52,9 @@ class SessionMonitorService : Service() {
 
     private fun observe(scope: CoroutineScope) {
         scope.launch {
-            monitor.running.map { it.values.toList() }.distinctUntilChanged().conflate().collect { running ->
+            combine(monitor.running, mutes.muted) { running, muted ->
+                running.filterKeys { it !in muted }.values.toList()
+            }.distinctUntilChanged().conflate().collect { running ->
                 if (running.isNotEmpty()) {
                     update(running)
                     delay(UPDATE_INTERVAL_MS)
@@ -59,7 +63,7 @@ class SessionMonitorService : Service() {
         }
         // A queued prompt ends one execution and starts the next: wait before stopping.
         scope.launch {
-            monitor.running.map { it.isEmpty() }.distinctUntilChanged().collectLatest { idle ->
+            combine(monitor.running, mutes.muted) { running, muted -> running.keys.none { it !in muted } }.distinctUntilChanged().collectLatest { idle ->
                 if (idle) {
                     delay(STOP_DELAY_MS)
                     stopSelf()
@@ -74,7 +78,7 @@ class SessionMonitorService : Service() {
         if (manager.areNotificationsEnabled()) manager.notify(AndroidMonitorNotifier.ONGOING_ID, notifier.ongoing(running))
     }
 
-    private fun running() = monitor.running.value.values.toList()
+    private fun running() = monitor.running.value.filterKeys { it !in mutes.muted.value }.values.toList()
 
     /** Android 15+ limits data sync services to about 6 hours a day. */
     override fun onTimeout(startId: Int, fgsType: Int) {

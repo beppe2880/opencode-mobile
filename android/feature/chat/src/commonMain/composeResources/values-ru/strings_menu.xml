@@ -10,4 +10,7 @@
     <string name="chat_export_share">Поделиться Markdown</string>
     <string name="chat_export_save">Сохранить файл Markdown</string>
     <string name="chat_export_failed">Не удалось экспортировать беседу. Повторите попытку.</string>
+    <string name="chat_muted">Уведомления отключены на этом устройстве</string>
+    <string name="chat_mute">Отключить уведомления</string>
+    <string name="chat_unmute">Включить уведомления</string>
 </resources>

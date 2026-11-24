@@ -10,4 +10,7 @@
     <string name="chat_export_share">مشاركة Markdown</string>
     <string name="chat_export_save">حفظ ملف Markdown</string>
     <string name="chat_export_failed">تعذر تصدير المحادثة. حاول مجدداً.</string>
+    <string name="chat_muted">الإشعارات مكتومة على هذا الجهاز</string>
+    <string name="chat_mute">كتم الإشعارات</string>
+    <string name="chat_unmute">إلغاء كتم الإشعارات</string>
 </resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">알림 음소거</string>
+    <string name="sessions_unmute">알림 다시 켜기</string>
+    <string name="sessions_muted">이 기기에서 알림이 음소거됨</string>
+</resources>

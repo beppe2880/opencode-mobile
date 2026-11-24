@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -18,10 +19,11 @@ import kotlinx.coroutines.flow.merge
  * Events only arrive while the app is open or the session notifications keep the stream alive.
  */
 @OptIn(FlowPreview::class)
-fun widgetRefreshes(events: EventRepository, servers: ServerRepository, visible: Flow<Boolean>): Flow<Unit> = merge(
+fun widgetRefreshes(events: EventRepository, servers: ServerRepository, visible: Flow<Boolean>, muted: Flow<Set<String>> = emptyFlow()): Flow<Unit> = merge(
     events.events.filter { it.changesSessionList() }.map { },
     servers.activeServer.map { it?.id }.distinctUntilChanged().drop(1).map { },
     visible.drop(1).filter { !it }.map { },
+    muted.drop(1).map { },
 ).debounce(UPDATE_DEBOUNCE_MILLIS)
 
 private fun ServerEvent.changesSessionList(): Boolean = when (this) {

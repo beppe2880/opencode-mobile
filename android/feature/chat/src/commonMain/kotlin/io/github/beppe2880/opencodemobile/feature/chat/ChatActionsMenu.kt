@@ -12,6 +12,8 @@ import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.Hub
+import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Share
@@ -34,6 +36,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ConnectionState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcSpinner
 import io.github.beppe2880.opencodemobile.core.ui.components.exposeTestTags
+import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_running
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcSpacing
 import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
@@ -45,11 +48,13 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_fork
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_menu_history
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_menu_tools
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mute
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_new
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pin
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_undo
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unmute
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_unpin
 import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
@@ -78,6 +83,13 @@ internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () 
             stringResource(if (state.pinned) Res.string.chat_unpin else Res.string.chat_pin),
             Icons.Outlined.PushPin, "chat_menu_pin", state.directory.isNotBlank(),
         ) { act(ChatEvent.SetPinned(!state.pinned)) }
+        if (sessionNotificationsSupported) {
+            MenuAction(
+                stringResource(if (state.muted) Res.string.chat_unmute else Res.string.chat_mute),
+                if (state.muted) Icons.Outlined.NotificationsActive else Icons.Outlined.NotificationsOff,
+                "chat_menu_mute", state.directory.isNotEmpty(),
+            ) { act(ChatEvent.SetMuted(!state.muted)) }
+        }
         MenuGroup(stringResource(Res.string.chat_menu_history))
         MenuAction(
             stringResource(if (state.compacting) Res.string.chat_compacting else Res.string.chat_compact),

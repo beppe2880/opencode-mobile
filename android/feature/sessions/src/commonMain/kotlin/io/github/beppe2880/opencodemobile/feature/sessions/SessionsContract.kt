@@ -88,6 +88,7 @@ data class SessionsState(
     val groups: List<SessionGroup> = emptyList(),
     /** Sessions pinned on this server; those listed are in the [DayBucket.Pinned] group. */
     val pinned: Set<String> = emptySet(),
+    val muted: Set<String> = emptySet(),
     val running: Set<String> = emptySet(),
     val work: Map<String, RunningWork> = emptyMap(),
     /** Running sessions blocked on the user (their own requests or their subagents'). */
@@ -107,7 +108,14 @@ data class SessionsState(
      * Choose a chat): tapping a session sends it there, a new session takes it too.
      */
     val sharing: SharedContent? = null,
-    val actionsFor: Session? = null,
+    /** Sessions selected for bulk actions; empty outside selection mode. */
+    val selection: Set<String> = emptySet(),
+    /** Sessions marked unread by hand on this device, on top of the server's unread state. */
+    val manualUnread: Set<String> = emptySet(),
+    /** How many sessions the bulk delete confirmation covers; null when it is closed. */
+    val bulkDeleteCount: Int? = null,
+    /** Sessions a bulk delete could not remove; shown in a dialog until dismissed. */
+    val deleteFailures: List<Session> = emptyList(),
     val renaming: Session? = null,
     val deleting: Session? = null,
 ) {
@@ -122,13 +130,23 @@ data class SessionsState(
         get() = if (unreadSessions == UnreadSessions.Off) {
             emptyList()
         } else {
-            groups.flatMap { it.sessions }.filter { it.isUnread && it.id !in waiting }
+            groups.flatMap { it.sessions }.filter { isUnread(it) && it.id !in waiting }
         }
 
     /** The sessions of the Unread group, those [SessionsEvent.MarkUnreadGroupRead] marks. */
     val unreadGroup: List<Session> get() = groups.firstOrNull { it.bucket == DayBucket.Unread }?.sessions.orEmpty()
+
+    /** Whether [session] counts as unread here: the server says so, or it was marked unread on this device. */
+    fun isUnread(session: Session): Boolean = session.isUnread || session.id in manualUnread
     val visibleProjects: List<Project> get() = projects.filter { it.directory !in hiddenDirectories }
     val filterLabel: String? get() = directoryFilter?.let { dir -> projects.firstOrNull { it.directory == dir }?.displayName ?: dir }
+
+    /** The selected sessions of the list shown, in list order. */
+    val selectedSessions: List<Session>
+        get() = groups.flatMap { it.sessions }.filter { it.id in selection }
+
+    /** Selection mode is on while at least one visible session is selected. */
+    val selectionMode: Boolean get() = selectedSessions.isNotEmpty()
 }
 
 sealed interface SessionsEvent {
@@ -159,19 +177,44 @@ sealed interface SessionsEvent {
     data class Open(val sessionId: String) : SessionsEvent
     data object OpenSettings : SessionsEvent
 
-    data class ShowActions(val session: Session) : SessionsEvent
-    data object DismissActions : SessionsEvent
-
-    /** Pins the session to the top of the list or unpins it; closes the row actions. */
+    /** Pins the session to the top of the list or unpins it. */
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
+    data class SetMuted(val sessionId: String, val muted: Boolean, val untilFinished: Boolean = false) : SessionsEvent
 
-    /** Archives the session or restores it; closes the row actions. */
+    /** Archives the session or restores it. */
     data class SetArchived(val session: Session, val archived: Boolean) : SessionsEvent
-    data class RequestRename(val session: Session) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent
     data class RequestDelete(val session: Session) : SessionsEvent
     data object ConfirmDelete : SessionsEvent
     data object DismissDialog : SessionsEvent
+
+    /** Starts selection mode with this session selected. */
+    data class StartSelection(val sessionId: String) : SessionsEvent
+
+    /** Adds or removes a session from the selection; an empty selection leaves selection mode. */
+    data class ToggleSelection(val sessionId: String) : SessionsEvent
+    data object ExitSelection : SessionsEvent
+
+    /** Pins or unpins every selected session, then leaves selection mode. */
+    data class SetSelectedPinned(val pinned: Boolean) : SessionsEvent
+
+    /** Archives or restores every selected session, then leaves selection mode. */
+    data class SetSelectedArchived(val archived: Boolean) : SessionsEvent
+
+    /** Marks every selected session read, also on the server; leaves selection mode. */
+    data object MarkSelectedRead : SessionsEvent
+
+    /** Marks every selected session unread on this device; leaves selection mode. */
+    data object MarkSelectedUnread : SessionsEvent
+
+    /** Opens the rename dialog for the only selected session. */
+    data object RenameSelected : SessionsEvent
+
+    /** Asks to delete the selected sessions; one saves its title, several show the count. */
+    data object RequestDeleteSelected : SessionsEvent
+
+    /** Closes the list of sessions a bulk delete could not remove. */
+    data object DismissDeleteFailures : SessionsEvent
 
     data object StartNewSession : SessionsEvent
     data object DismissNewSession : SessionsEvent

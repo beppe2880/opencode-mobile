@@ -1,0 +1,5 @@
+<resources>
+    <string name="tips_c_mute_title">Silencia una sesión</string>
+    <string name="tips_c_mute_body">En Android, silencia una sesión desde el menú del chat o de la fila sin afectar a las demás. Elige reactivar las notificaciones manualmente o al terminar el trabajo en curso.</string>
+    <string name="tips_c_mute_demo">Aparecen las opciones de duración y luego una campana tachada indica el silencio hasta que termina el trabajo.</string>
+</resources>

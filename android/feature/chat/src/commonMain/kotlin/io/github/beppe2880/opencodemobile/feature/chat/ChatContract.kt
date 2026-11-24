@@ -38,6 +38,7 @@ data class ChatState(
     val exporting: Boolean = false,
     val exportPhase: ExportPhase = ExportPhase.PreparingFile,
     val exportFraction: Float? = null,
+    val muted: Boolean = false,
     val directory: String = "",
     val agent: String? = null,
     val model: ModelRef? = null,
@@ -363,6 +364,7 @@ sealed interface ChatEvent {
     data object ExportReady : ChatEvent
     data object ExportCancelled : ChatEvent
     data class ExportFileProgress(val completed: Long, val total: Long) : ChatEvent
+    data class SetMuted(val muted: Boolean, val untilFinished: Boolean = false) : ChatEvent
 
     /** Starts a fresh chat in the same folder, like /new, without consuming the draft. */
     data object NewSession : ChatEvent

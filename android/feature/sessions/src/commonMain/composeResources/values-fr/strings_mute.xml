@@ -1,0 +1,5 @@
+<resources>
+    <string name="sessions_mute">Couper les notifications</string>
+    <string name="sessions_unmute">Réactiver les notifications</string>
+    <string name="sessions_muted">Notifications coupées sur cet appareil</string>
+</resources>

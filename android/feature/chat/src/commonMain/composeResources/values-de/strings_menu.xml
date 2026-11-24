@@ -10,4 +10,7 @@
     <string name="chat_export_share">Markdown teilen</string>
     <string name="chat_export_save">Markdown-Datei speichern</string>
     <string name="chat_export_failed">Die Unterhaltung konnte nicht exportiert werden. Bitte erneut versuchen.</string>
+    <string name="chat_muted">Benachrichtigungen auf diesem Gerät stummgeschaltet</string>
+    <string name="chat_mute">Benachrichtigungen stummschalten</string>
+    <string name="chat_unmute">Benachrichtigungen aktivieren</string>
 </resources>

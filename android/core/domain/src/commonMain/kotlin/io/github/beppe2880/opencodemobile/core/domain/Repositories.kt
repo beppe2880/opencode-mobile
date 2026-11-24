@@ -195,6 +195,38 @@ class InMemoryPinnedSessions(initial: Set<String> = emptySet()) : PinnedSessionR
     }
 }
 
+/**
+ * Sessions marked unread by hand. The server only moves its `viewed` watermark forward, so an
+ * unread mark is kept on the device, separately for each saved server, and every call is about the
+ * active one. Opening the session or marking it read clears its mark.
+ */
+interface UnreadSessionRepository {
+    /** Emits after each [setUnread] that changed something; screens showing unread marks read [unread] again. */
+    val changes: Flow<Unit>
+
+    /** IDs of the sessions marked unread on the active server. */
+    fun unread(): Set<String>
+
+    /** Marks a session unread (true) or clears its mark (false). */
+    fun setUnread(sessionId: String, unread: Boolean)
+}
+
+/** Unread marks kept in memory only, for the offline demo and tests. */
+class InMemoryUnreadSessions(initial: Set<String> = emptySet()) : UnreadSessionRepository {
+    private val ids = MutableStateFlow(initial)
+    private val changed = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    override val changes: Flow<Unit> = changed
+
+    override fun unread(): Set<String> = ids.value
+
+    override fun setUnread(sessionId: String, unread: Boolean) {
+        val next = if (unread) ids.value + sessionId else ids.value - sessionId
+        if (next == ids.value) return
+        ids.value = next
+        changed.tryEmit(Unit)
+    }
+}
+
 /** Models this device sent prompts with on the active server, kept on the device. */
 interface RecentModelRepository {
     /** Most recently used first, at most [RECENT_MODELS]. */

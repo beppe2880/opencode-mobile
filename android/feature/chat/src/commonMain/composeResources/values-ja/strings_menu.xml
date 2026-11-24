@@ -10,4 +10,7 @@
     <string name="chat_export_share">Markdown を共有</string>
     <string name="chat_export_save">Markdown ファイルを保存</string>
     <string name="chat_export_failed">会話をエクスポートできませんでした。再試行してください。</string>
+    <string name="chat_muted">このデバイスでは通知がミュートされています</string>
+    <string name="chat_mute">通知をミュート</string>
+    <string name="chat_unmute">通知を再開</string>
 </resources>

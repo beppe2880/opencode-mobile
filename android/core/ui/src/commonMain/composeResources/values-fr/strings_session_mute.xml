@@ -1,0 +1,6 @@
+<resources>
+    <string name="oc_mute_duration">Couper les notifications</string>
+    <string name="oc_mute_until_unmuted">Jusqu’à leur réactivation manuelle</string>
+    <string name="oc_mute_until_finished">Jusqu’à la fin du travail en cours</string>
+    <string name="oc_mute_until_finished_unavailable">Uniquement si la connexion est active et la session en cours.</string>
+</resources>
