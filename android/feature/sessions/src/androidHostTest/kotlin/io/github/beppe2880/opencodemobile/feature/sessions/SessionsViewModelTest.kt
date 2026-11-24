@@ -111,7 +111,7 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.SetSelectedPinned(true))
 
         val state = vm.state.value
-        assertEquals(emptySet<String>(), state.selection)
+        assertEquals(setOf("old"), state.selection)
         assertEquals(setOf("old"), state.pinned)
         assertEquals(setOf("old"), pins.pinned())
         assertEquals(listOf(DayBucket.Pinned, DayBucket.Today, DayBucket.Yesterday, DayBucket.ThisWeek), state.groups.map { it.bucket })
@@ -1802,7 +1802,7 @@ class SessionsViewModelTest {
     }
 
     @Test
-    fun `bulk pin pins every selected session and leaves selection mode`() = runTest(main.testDispatcher) {
+    fun `bulk pin pins every selected session and keeps the selection`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
         vm.onEvent(SessionsEvent.StartSelection("today"))
@@ -1812,7 +1812,8 @@ class SessionsViewModelTest {
 
         assertEquals(setOf("today", "old"), pins.pinned())
         assertEquals(setOf("today", "old"), vm.state.value.pinned)
-        assertTrue(vm.state.value.selection.isEmpty())
+        assertEquals(setOf("today", "old"), vm.state.value.selection)
+        assertTrue(vm.state.value.selectionMode)
         assertEquals(DayBucket.Pinned, vm.state.value.groups.first().bucket)
     }
 
@@ -1829,6 +1830,7 @@ class SessionsViewModelTest {
 
         assertTrue(pins.pinned().isEmpty())
         assertFalse(DayBucket.Pinned in vm.state.value.groups.map { it.bucket })
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
     }
 
     @Test
@@ -2007,7 +2009,7 @@ class SessionsViewModelTest {
         assertEquals(setOf("today", "week"), unread.unread())
         assertEquals(DayBucket.Unread, vm.state.value.groups.first().bucket)
         assertEquals(setOf("today", "week"), vm.state.value.groups.first().sessions.mapTo(HashSet()) { it.id })
-        assertTrue(vm.state.value.selection.isEmpty())
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
 
         vm.onEvent(SessionsEvent.ToggleRead(SessionRead.Unread))
         advanceUntilIdle()
@@ -2052,6 +2054,24 @@ class SessionsViewModelTest {
         assertTrue(vm.state.value.manualUnread.isEmpty())
         assertTrue(unread.unread().isEmpty())
         assertEquals(listOf("unread" to 10L), repository.viewedCalls)
+        assertEquals(setOf("unread", "read"), vm.state.value.selection)
+    }
+
+    @Test
+    fun `the selection remains after an action so another action can follow`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.MarkSelectedRead)
+        advanceUntilIdle()
+
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
+        vm.onEvent(SessionsEvent.SetSelectedArchived(true))
+        advanceUntilIdle()
+
+        assertEquals(listOf("today", "week"), sessions.archivedCalls.map { it.first })
     }
 
     @Test

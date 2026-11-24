@@ -209,7 +209,6 @@ class SessionsViewModel(
                     val idle = sessionList.firstOrNull { it.id == event.sessionId }?.idleAt
                     mutes.setMuted(event.sessionId, event.muted, if (event.untilFinished) idle ?: 0 else null)
                 }
-                updateState { it.copy(selection = emptySet()) }
             }
             is SessionsEvent.SetArchived -> setArchived(event.session, event.archived)
             is SessionsEvent.RequestDelete -> updateState { it.copy(deleting = event.session) }
@@ -650,6 +649,7 @@ class SessionsViewModel(
         val marks = unread.mapNotNull { session -> session.idleAt?.let { session.id to it } }.toMap()
         if (marks.isEmpty()) {
             updateState { it.copy(manualUnread = remaining, groups = group(sessionList, it.filters, it.waiting.keys, remaining)) }
+            retainVisibleSelection()
             return
         }
         val previous = sessionList.filter { it.id in marks }.associate { it.id to it.viewedAt }
@@ -662,6 +662,7 @@ class SessionsViewModel(
                 groups = group(sessionList, it.filters, it.waiting.keys, remaining),
             )
         }
+        retainVisibleSelection()
         viewModelScope.launch {
             val permits = Semaphore(MARK_READ_PARALLEL)
             val failed = marks.map { (id, idle) ->
@@ -675,6 +676,7 @@ class SessionsViewModel(
                 sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_mark_all_read_failed)))
             }
             updateState { it.copy(markingAllRead = false, groups = group(sessionList)) }
+            retainVisibleSelection()
         }
     }
 
@@ -761,18 +763,18 @@ class SessionsViewModel(
     private fun setSelectedPinned(pinned: Boolean) {
         val selected = currentState.selectedSessions
         if (selected.isEmpty()) return
-        updateState { it.copy(selection = emptySet()) }
         selected.forEach { pins.setPinned(it.id, pinned) }
         showPins()
+        retainVisibleSelection()
     }
 
     private fun setSelectedArchived(archived: Boolean) {
         if (!currentState.archiveSupported) return
         val selected = currentState.selectedSessions
         if (selected.isEmpty()) return
-        updateState { it.copy(selection = emptySet()) }
         if (selected.size == 1) {
             setArchived(selected.single(), archived)
+            retainVisibleSelection()
             return
         }
         val previous = sessionList
@@ -784,6 +786,7 @@ class SessionsViewModel(
             sessionList.map { if (it.id in ids) it.copy(archivedAt = if (archived) clock() else null) else it }
         }
         updateState { it.copy(groups = group(sessionList)) }
+        retainVisibleSelection()
         viewModelScope.launch {
             val failed = mutableListOf<Session>()
             for (session in selected) {
@@ -791,6 +794,7 @@ class SessionsViewModel(
             }
             if (failed.isNotEmpty()) {
                 restore(previous, failed)
+                retainVisibleSelection()
                 sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_bulk_failed)))
             }
         }
@@ -799,7 +803,6 @@ class SessionsViewModel(
     private fun markSelectedRead() {
         val selected = currentState.selectedSessions
         if (selected.isEmpty()) return
-        updateState { it.copy(selection = emptySet()) }
         markRead(selected)
     }
 
@@ -811,22 +814,23 @@ class SessionsViewModel(
         val marks = unreadStore.unread()
         updateState {
             it.copy(
-                selection = emptySet(),
                 manualUnread = marks,
                 groups = group(sessionList, it.filters, it.waiting.keys, marks),
             )
         }
+        retainVisibleSelection()
         sendEffect(SessionsEffect.ShowMessage(UiText.Resource(Res.string.sessions_mark_unread_local)))
     }
 
     private fun deleteSelected() {
         val selected = currentState.selectedSessions
-        updateState { it.copy(bulkDeleteCount = null, selection = emptySet()) }
+        updateState { it.copy(bulkDeleteCount = null) }
         if (selected.isEmpty()) return
         val previous = sessionList
         val ids = selected.mapTo(HashSet()) { it.id }
         sessionList = sessionList.filterNot { it.id in ids }
         updateState { it.copy(groups = group(sessionList)) }
+        retainVisibleSelection()
         viewModelScope.launch {
             val failed = mutableListOf<Session>()
             for (session in selected) {
@@ -838,8 +842,17 @@ class SessionsViewModel(
             }
             if (failed.isNotEmpty()) {
                 restore(previous, failed)
+                retainVisibleSelection()
                 updateState { it.copy(deleteFailures = failed) }
             }
+        }
+    }
+
+    /** Drops selected ids that an action removed from the visible list, keeping the rest. */
+    private fun retainVisibleSelection() {
+        updateState { state ->
+            val visible = state.groups.flatMapTo(HashSet()) { group -> group.sessions.map { it.id } }
+            state.copy(selection = state.selection.filterTo(HashSet()) { it in visible })
         }
     }
 
