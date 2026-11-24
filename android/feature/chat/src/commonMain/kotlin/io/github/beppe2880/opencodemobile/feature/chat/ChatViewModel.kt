@@ -29,6 +29,8 @@ import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.RunningWorkLoader
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerEvent
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportStage
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
@@ -51,12 +53,15 @@ import io.github.beppe2880.opencodemobile.core.ui.text.toUiText
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_attachment_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_btw_text_only
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_redo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_nothing_to_undo
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_agents_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_running_stop_commands_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_session_deleted
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -69,6 +74,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.PluralStringResource
 import kotlin.time.Clock
 
@@ -92,6 +98,7 @@ class ChatViewModel(
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val btwMemory: BtwMemory,
     private val serverId: String = "",
+    private val exportDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : BaseViewModel<ChatState, ChatEvent, ChatEffect>(
     ChatState(sessionId = sessionId, savedScroll = scroll.get(sessionId), btw = btwMemory.get(serverId, sessionId)),
 ) {
@@ -249,6 +256,19 @@ class ChatViewModel(
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
+            is ChatEvent.ExportSheet -> updateState { it.copy(exportOpen = event.open) }
+            is ChatEvent.SelectExportFormat -> if (!currentState.exporting) updateState { it.copy(exportFormat = event.format) }
+            is ChatEvent.Export -> exportSession(event.save)
+            ChatEvent.ExportReady -> updateState { it.copy(exporting = false, exportOpen = false) }
+            ChatEvent.ExportCancelled -> updateState { it.copy(exporting = false) }
+            is ChatEvent.ExportFileProgress -> if (currentState.exporting) {
+                val fraction = SessionExportProgress(SessionExportStage.Preparing, event.completed, event.total).fraction
+                updateState { it.copy(exportPhase = ExportPhase.PreparingFile, exportFraction = fraction) }
+            }
+            ChatEvent.ExportFailed -> {
+                updateState { it.copy(exporting = false) }
+                sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_export_failed)))
+            }
             is ChatEvent.SetMuted -> {
                 if (!event.untilFinished || (currentState.running && currentState.connection == ConnectionState.Connected)) {
                     mutes.setMuted(sessionId, event.muted, if (event.untilFinished) sessionIdleAt ?: 0 else null)
@@ -1456,6 +1476,46 @@ class ChatViewModel(
             chat.generate(sessionId, "$instructions\n\n$question", serverId = serverId.takeIf { it.isNotEmpty() })
         }
         updateState { it.copy(btw = btwMemory.get(serverId, sessionId)) }
+    }
+
+    private fun exportSession(save: Boolean) {
+        if (!currentState.menuReady || currentState.exporting) return
+        val title = currentState.title
+        val format = currentState.exportFormat
+        updateState { it.copy(exporting = true, exportPhase = ExportPhase.PreparingFile, exportFraction = null) }
+        viewModelScope.launch {
+            val progress: suspend (SessionExportProgress) -> Unit = { progress ->
+                val phase = when (progress.stage) {
+                    SessionExportStage.WaitingForServer -> ExportPhase.WaitingForServer
+                    SessionExportStage.Downloading -> ExportPhase.Downloading
+                    SessionExportStage.Decoding, SessionExportStage.Preparing -> ExportPhase.Decoding
+                    SessionExportStage.PreparingMessages -> ExportPhase.PreparingMessages
+                }
+                withContext(Dispatchers.Main.immediate) { updateState { it.copy(exportPhase = phase, exportFraction = progress.fraction) } }
+            }
+            val content = when (format) {
+                TranscriptFormat.Markdown -> sessions.export(sessionId, progress).map { messages ->
+                    updateState { it.copy(exportPhase = ExportPhase.PreparingMarkdown, exportFraction = null) }
+                    withContext(exportDispatcher) {
+                        transcriptMarkdown(title, messages) { completed, total ->
+                            val fraction = SessionExportProgress(SessionExportStage.Preparing, completed, total).fraction
+                            withContext(Dispatchers.Main.immediate) { updateState { it.copy(exportFraction = fraction) } }
+                        }
+                    }
+                }
+                TranscriptFormat.Json -> sessions.exportJson(sessionId, progress)
+            }
+            content.fold(
+                onSuccess = { text ->
+                    updateState { it.copy(exportPhase = ExportPhase.PreparingFile, exportFraction = null) }
+                    sendEffect(ChatEffect.ExportTranscript(TranscriptFile(title, text, format), save))
+                },
+                onFailure = { error ->
+                    updateState { it.copy(exporting = false) }
+                    sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+                },
+            )
+        }
     }
 
     /**

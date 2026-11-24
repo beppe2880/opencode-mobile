@@ -1,0 +1,16 @@
+<resources>
+    <string name="tips_export_title">Save or share a conversation</string>
+    <string name="tips_export_body">Open Context &amp; history in the chat menu to save or share the full conversation as Markdown or original OpenCode JSON. Follow the server wait and per-stage progress, with percentages where measurable. JSON can include private context omitted from Markdown.</string>
+    <string name="tips_export_demo">A Markdown export shows the server wait, download and preparation progress. The next export switches to JSON.</string>
+    <string name="tips_export_panel_title">Export / Share…</string>
+    <string name="tips_export_waiting">Waiting for server…</string>
+    <string name="tips_export_downloading">Downloading chat…</string>
+    <string name="tips_export_processing">Processing data…</string>
+    <string name="tips_export_messages">Preparing messages…</string>
+    <string name="tips_export_markdown">Preparing Markdown…</string>
+    <string name="tips_export_file">Preparing file…</string>
+    <string name="tips_export_ready">File ready to save or share</string>
+    <string name="tips_export_percent">%1$s%</string>
+    <string name="tips_export_share">Share %1$s</string>
+    <string name="tips_export_save">Save %1$s file</string>
+</resources>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_export_markdown">Markdown</string>
+    <string name="chat_export_json">JSON</string>
+    <string name="chat_export_json_share">Compartir JSON</string>
+    <string name="chat_export_json_save">Guardar archivo JSON</string>
+    <string name="chat_export_json_warning">El JSON incluye toda la salida de las herramientas y puede contener datos sensibles.</string>
+    <string name="chat_export_saved">Archivo guardado</string>
+</resources>

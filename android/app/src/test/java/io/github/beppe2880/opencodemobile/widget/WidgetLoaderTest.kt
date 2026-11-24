@@ -10,6 +10,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import kotlinx.coroutines.awaitCancellation
@@ -144,6 +145,8 @@ private class FakeSessions : SessionRepository {
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     override suspend fun fork(sessionId: String, beforeMessageId: String?) = error("unused")
     override suspend fun projects() = Result.success(emptyList<Project>())
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
 }
 
 private class FakeServers : ServerRepository {

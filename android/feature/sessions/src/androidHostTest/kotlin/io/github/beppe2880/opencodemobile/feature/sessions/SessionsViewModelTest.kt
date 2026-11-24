@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -2324,6 +2325,9 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     override suspend fun archiveSupported(): Boolean = archiveSupported
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())
     var serverProjects = listOf(Project("p", "/p/today", null, null, 0))
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+
     override suspend fun projects(): Result<List<Project>> {
         gate?.await()
         return Result.success(serverProjects)

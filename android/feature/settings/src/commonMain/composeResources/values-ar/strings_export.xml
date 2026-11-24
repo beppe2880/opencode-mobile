@@ -1,0 +1,16 @@
+<resources>
+    <string name="tips_export_title">حفظ محادثة أو مشاركتها</string>
+    <string name="tips_export_body">افتح السياق والسجل في قائمة الدردشة لحفظ المحادثة كاملة أو مشاركتها بتنسيق Markdown أو JSON الأصلي من OpenCode. تابع انتظار الخادم وتقدم كل مرحلة، مع نسب مئوية عندما يكون القياس ممكنًا. قد يتضمن JSON سياقًا خاصًا غير موجود في Markdown.</string>
+    <string name="tips_export_demo">يعرض تصدير Markdown انتظار الخادم والتنزيل وتقدم الإعداد. ثم يتحول التصدير التالي إلى JSON.</string>
+    <string name="tips_export_panel_title">تصدير / مشاركة…</string>
+    <string name="tips_export_waiting">في انتظار الخادم…</string>
+    <string name="tips_export_downloading">جارٍ تنزيل المحادثة…</string>
+    <string name="tips_export_processing">جارٍ معالجة البيانات…</string>
+    <string name="tips_export_messages">جارٍ إعداد الرسائل…</string>
+    <string name="tips_export_markdown">جارٍ إعداد Markdown…</string>
+    <string name="tips_export_file">جارٍ إعداد الملف…</string>
+    <string name="tips_export_ready">الملف جاهز للحفظ أو المشاركة</string>
+    <string name="tips_export_percent">%1$s٪</string>
+    <string name="tips_export_share">مشاركة %1$s</string>
+    <string name="tips_export_save">حفظ ملف %1$s</string>
+</resources>

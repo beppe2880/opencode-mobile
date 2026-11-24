@@ -5,6 +5,11 @@
     <string name="chat_fork">会話を分岐</string>
     <string name="chat_undo">最後のプロンプトを取り消す</string>
     <string name="chat_redo">取り消したプロンプトを復元</string>
+    <string name="chat_export">エクスポート / 共有…</string>
+    <string name="chat_export_hint">会話全体を Markdown で出力します。ツール出力は折りたたみ、画像は含めません。個人情報、コード、ファイルパスが含まれる場合があります。共有前に確認してください。</string>
+    <string name="chat_export_share">Markdown を共有</string>
+    <string name="chat_export_save">Markdown ファイルを保存</string>
+    <string name="chat_export_failed">会話をエクスポートできませんでした。再試行してください。</string>
     <string name="chat_muted">このデバイスでは通知がミュートされています</string>
     <string name="chat_mute">通知をミュート</string>
     <string name="chat_unmute">通知を再開</string>

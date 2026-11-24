@@ -12,19 +12,27 @@ import io.github.beppe2880.opencodemobile.core.data.cache.ListCache
 import io.github.beppe2880.opencodemobile.core.data.cache.SessionListCodec
 import io.github.beppe2880.opencodemobile.core.data.resultOf
 import io.github.beppe2880.opencodemobile.core.domain.AppVersion
+import io.github.beppe2880.opencodemobile.core.domain.Message
 import io.github.beppe2880.opencodemobile.core.domain.ModelRef
+import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportStage
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
+import io.github.beppe2880.opencodemobile.core.network.MessageCodec
 import io.github.beppe2880.opencodemobile.core.network.awaitBody
 import io.github.beppe2880.opencodemobile.core.network.awaitSuccess
 import io.github.beppe2880.opencodemobile.core.network.mapping.toApi
 import io.github.beppe2880.opencodemobile.core.network.mapping.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import kotlin.concurrent.Volatile
 import kotlin.time.Clock
+import kotlin.time.TimeSource
 
 /** Sessions from the active server; the unsearched lists and projects are also kept per server in [lists]. */
 internal class RemoteSessionRepository(
@@ -203,6 +211,43 @@ internal class RemoteSessionRepository(
         val api = clients.forProfile(profile).projects
         awaitBody { api.projectList() }.map { it.toDomain() }.sortedByDescending { it.updatedAt }
             .also { lists.write(profile.id, ListCache.PROJECTS_KEY, SessionListCodec.encodeProjects(it)) }
+    }
+
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<List<Message>> = resultOf {
+        val document = downloadNativeExport(sessionId, onProgress)
+        val messages = document["messages"] as JsonArray
+        val result = mutableListOf<Message>()
+        var lastUpdate = TimeSource.Monotonic.markNow()
+        onProgress(SessionExportProgress(SessionExportStage.PreparingMessages, 0, messages.size.toLong()))
+        messages.forEachIndexed { index, element ->
+            MessageCodec.decode(element)?.toDomain()?.let(result::add)
+            if (index == messages.lastIndex || lastUpdate.elapsedNow().inWholeMilliseconds >= 50) {
+                onProgress(SessionExportProgress(SessionExportStage.PreparingMessages, index + 1L, messages.size.toLong()))
+                lastUpdate = TimeSource.Monotonic.markNow()
+            }
+        }
+        result
+    }
+
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<String> = resultOf {
+        val document = downloadNativeExport(sessionId, onProgress)
+        onProgress(SessionExportProgress(SessionExportStage.Preparing))
+        document.toString()
+    }
+
+    private suspend fun downloadNativeExport(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): JsonObject {
+        onProgress(SessionExportProgress(SessionExportStage.WaitingForServer))
+        // Decode only the envelope so native metadata and future message kinds survive.
+        val body = clients.active().downloadSessionExport(
+            sessionId,
+            onDownload = { received, total -> onProgress(SessionExportProgress(SessionExportStage.Downloading, received, total)) },
+            onDownloaded = { onProgress(SessionExportProgress(SessionExportStage.Decoding)) },
+        )
+        val data = body["data"] as? JsonObject
+        if (data == null || data["info"] !is JsonObject || data["messages"] !is JsonArray) {
+            throw OpenCodeError.Server(status = 0, tag = null, message = "Invalid session export document")
+        }
+        return data
     }
 
     override suspend fun usage(from: Long, to: Long, timeZone: String): Result<UsageStats> = resultOf {

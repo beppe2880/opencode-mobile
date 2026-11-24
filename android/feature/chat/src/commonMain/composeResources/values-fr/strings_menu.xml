@@ -5,6 +5,11 @@
     <string name="chat_fork">Créer une bifurcation</string>
     <string name="chat_undo">Annuler le dernier prompt</string>
     <string name="chat_redo">Restaurer les prompts annulés</string>
+    <string name="chat_export">Exporter / Partager…</string>
+    <string name="chat_export_hint">Exporte toute la conversation en Markdown, avec les sorties des outils repliées et sans images. Elle peut contenir du texte privé, du code et des chemins de fichiers. Vérifiez-la avant de la partager.</string>
+    <string name="chat_export_share">Partager le Markdown</string>
+    <string name="chat_export_save">Enregistrer le fichier Markdown</string>
+    <string name="chat_export_failed">Impossible d'exporter la conversation. Réessayez.</string>
     <string name="chat_muted">Notifications coupées sur cet appareil</string>
     <string name="chat_mute">Couper les notifications</string>
     <string name="chat_unmute">Réactiver les notifications</string>

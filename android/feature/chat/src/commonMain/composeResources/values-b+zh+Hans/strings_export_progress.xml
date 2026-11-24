@@ -1,0 +1,9 @@
+<resources>
+    <string name="chat_export_waiting_server">正在等待服务器…</string>
+    <string name="chat_export_decoding">正在处理数据…</string>
+    <string name="chat_export_preparing_messages">正在准备消息…</string>
+    <string name="chat_export_percent">%1$s%</string>
+    <string name="chat_export_downloading">正在下载聊天…</string>
+    <string name="chat_export_preparing_markdown">正在准备 Markdown…</string>
+    <string name="chat_export_preparing_file">正在准备文件…</string>
+</resources>

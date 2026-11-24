@@ -16,12 +16,15 @@ import io.github.beppe2880.opencodemobile.api.apis.ServerApi
 import io.github.beppe2880.opencodemobile.api.apis.SessionApi
 import io.github.beppe2880.opencodemobile.api.apis.ShellApi
 import io.github.beppe2880.opencodemobile.api.apis.VcsApi
+import io.github.beppe2880.opencodemobile.api.infrastructure.wrap
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEvent
 import io.github.beppe2880.opencodemobile.api.models.OpenCodeEventSerializer
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeoutConfig
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.contentnegotiation.exclude
+import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.websocket.WebSocketException
 import io.ktor.client.plugins.websocket.webSocket
@@ -51,6 +54,7 @@ import kotlinx.io.readByteArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import kotlin.time.TimeSource
 
 /** Authenticated access to one OpenCode server. Create through [OpenCodeClientFactory]. */
 class OpenCodeClient internal constructor(
@@ -78,6 +82,50 @@ class OpenCodeClient internal constructor(
     val pty: PtyApi = PtyApi(baseUrl, http)
     val shells: ShellApi = ShellApi(baseUrl, http)
     val vcs: VcsApi = VcsApi(baseUrl, http)
+
+    /**
+     * The generated request with a call-local download listener; no global callback to leak
+     * progress between sessions. The short-lived child shares the authenticated HTTP engine.
+     * Ktor reports received bytes while saving the response, before [onDownloaded] and JSON decoding.
+     */
+    suspend fun downloadSessionExport(
+        sessionId: String,
+        onDownload: suspend (Long, Long?) -> Unit,
+        onDownloaded: suspend () -> Unit,
+    ): JsonObject {
+        var reported = false
+        var receivedBytes = 0L
+        var totalBytes: Long? = null
+        var reportedBytes = -1L
+        var lastUpdate = TimeSource.Monotonic.markNow()
+        val tracked = http.config {
+            install(
+                createClientPlugin("SessionExportDownload") {
+                    onRequest { request, _ ->
+                        request.onDownload { received, total ->
+                            receivedBytes = received
+                            totalBytes = total?.takeIf { it > 0 && received <= it }
+                            // Keep fast packet streams from queuing hundreds of UI updates.
+                            if (!reported || lastUpdate.elapsedNow().inWholeMilliseconds >= 50 || (total != null && received == total)) {
+                                onDownload(received, totalBytes)
+                                reportedBytes = received
+                                reported = true
+                                lastUpdate = TimeSource.Monotonic.markNow()
+                            }
+                        }
+                    }
+                },
+            )
+        }
+        return try {
+            val response = SessionApi(baseUrl, tracked).experimentalSessionExport(sessionId, SessionApi.SanitizeExperimentalSessionExport.FALSE)
+            if (reportedBytes != receivedBytes) onDownload(receivedBytes, totalBytes)
+            onDownloaded()
+            awaitBody { response.response.wrap<JsonObject>() }
+        } finally {
+            tracked.close()
+        }
+    }
 
     /**
      * Cold WebSocket stream of PTY [ptyId], authenticated like every other call. The server

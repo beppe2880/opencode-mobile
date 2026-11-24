@@ -26,10 +26,13 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_failed
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_no_speech
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_dictation_permission
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export_saved
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_providers_error
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_discarded
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_voice_undo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
@@ -69,6 +72,17 @@ fun ChatRoute(
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
     val scope = rememberCoroutineScope()
+    val export = rememberTranscriptExport(
+        onReady = { viewModel.onEvent(ChatEvent.ExportReady) },
+        onSaved = { scope.launch { snackbar.showSnackbar(getString(Res.string.chat_export_saved)) } },
+        onFailure = { viewModel.onEvent(ChatEvent.ExportFailed) },
+        onCancelled = { viewModel.onEvent(ChatEvent.ExportCancelled) },
+        onProgress = { completed, total ->
+            withContext(Dispatchers.Main.immediate) {
+                viewModel.onEvent(ChatEvent.ExportFileProgress(completed, total))
+            }
+        },
+    )
     val providerModel: ProviderConnectionViewModel = koinViewModel(key = "providers-$sessionId")
     val providerBrowser = LocalUriHandler.current
     LifecycleStartEffect(providerModel) {
@@ -156,6 +170,7 @@ fun ChatRoute(
 
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
+            is ChatEffect.ExportTranscript -> export(effect.file, effect.save)
             ChatEffect.OpenProviders -> {
                 providerModel.onEvent(ProviderConnectionEvent.Open(state.directory))
                 providersOpen = true
