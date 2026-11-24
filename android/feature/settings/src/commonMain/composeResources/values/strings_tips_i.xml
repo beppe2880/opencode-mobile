@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Manage the open chat</string>
+    <string name="tips_i_chat_actions_body">Rename, archive or delete the chat from its three-dot menu, without going back to the session list. Deleting asks first and names the chat.</string>
+    <string name="tips_i_chat_actions_demo">The chat menu opens: Rename chat edits the title, Delete chat asks for confirmation.</string>
+</resources>

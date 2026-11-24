@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Управление открытым чатом</string>
+    <string name="tips_i_chat_actions_body">Переименуйте, архивируйте или удалите чат через меню с тремя точками, не возвращаясь к списку сессий. Перед удалением приложение попросит подтверждение и назовёт чат.</string>
+    <string name="tips_i_chat_actions_demo">Открывается меню чата: «Переименовать чат» меняет название, «Удалить чат» просит подтверждение.</string>
+</resources>
