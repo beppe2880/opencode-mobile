@@ -165,8 +165,10 @@ fun ChatRoute(
             }
             is ChatEffect.ShowMessage -> snackbar.showSnackbar(effect.message.asString())
             is ChatEffect.ShowArchiveUndo -> {
-                // Its own coroutine: the snackbar must not hold up later effects.
+                // Its own coroutine: the snackbar must not hold up later effects. Dismiss the
+                // previous one so a quick archive/restore cannot leave a stale Undo behind.
                 scope.launch {
+                    snackbar.currentSnackbarData?.dismiss()
                     val result = withTimeoutOrNull(ARCHIVE_UNDO_MS) {
                         snackbar.showSnackbar(
                             message = getString(
@@ -176,7 +178,7 @@ fun ChatRoute(
                             duration = SnackbarDuration.Indefinite,
                         )
                     }
-                    if (result == SnackbarResult.ActionPerformed) {
+                    if (result == SnackbarResult.ActionPerformed && viewModel.state.value.archived == effect.archived) {
                         viewModel.onEvent(ChatEvent.SetArchived(!effect.archived))
                     }
                 }

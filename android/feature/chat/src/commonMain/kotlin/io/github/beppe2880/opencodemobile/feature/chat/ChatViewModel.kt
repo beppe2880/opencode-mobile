@@ -931,6 +931,7 @@ class ChatViewModel(
         viewModelScope.launch {
             sessions.delete(sessionId).onSuccess {
                 pins.setPinned(sessionId, false)
+                mutes.setMuted(sessionId, false)
                 leaveDeletedChat(inform = false)
             }.onFailure { error ->
                 deleteRequested = false

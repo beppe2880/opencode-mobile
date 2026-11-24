@@ -3072,6 +3072,7 @@ class ChatViewModelTest {
     fun `delete asks for confirmation leaves after success and forgets the pin`() = runTest(main.testDispatcher) {
         val sessions = FakeSessions(model)
         pins.setPinned("s1", true)
+        mutes.setMuted("s1", true)
         val vm = vm(sessions)
         advanceUntilIdle()
         assertTrue(vm.state.value.pinned)
@@ -3087,6 +3088,7 @@ class ChatViewModelTest {
         assertEquals(listOf("s1"), sessions.deletes)
         assertEquals(1, effects.count { it is ChatEffect.NavigateBack })
         assertFalse("s1" in pins.pinned())
+        assertFalse("s1" in mutes.muted.value)
         collector.cancel()
     }
 

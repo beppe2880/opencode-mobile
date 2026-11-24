@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -141,6 +142,7 @@ fun ChatScreen(
 ) {
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
+    var bottomBarHeight by remember { mutableStateOf(0) }
     BtwAutoOpen(state, allowed = !contextOpen && !externalOverlayOpen, onEvent)
     Scaffold(
         modifier = modifier,
@@ -165,7 +167,12 @@ fun ChatScreen(
                 if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                snackbarHostState,
+                modifier = Modifier.padding(bottom = with(LocalDensity.current) { bottomBarHeight.toDp() }),
+            )
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -206,7 +213,9 @@ fun ChatScreen(
                     }
                 }
             }
-            BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
+            Box(Modifier.fillMaxWidth().onSizeChanged { bottomBarHeight = it.height }) {
+                BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
+            }
         }
     }
     if (state.modelSheetOpen) {
