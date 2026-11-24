@@ -29,14 +29,17 @@ internal fun groupSessions(
     filters: SessionFilters = SessionFilters(),
     waiting: Set<String> = emptySet(),
     unread: UnreadSessions = UnreadSessions.DotAndGroup,
+    /** Sessions marked unread on this device, on top of the server's own unread state. */
+    manualUnread: Set<String> = emptySet(),
 ): List<SessionGroup> {
     fun localDate(epochMillis: Long): LocalDate = Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(zone).date
     val today = localDate(now)
+    fun Session.isUnreadHere(): Boolean = isUnread || id in manualUnread
     return sessions
-        .filter { filters.matches(it, today, zone) }
+        .filter { filters.matches(it, today, zone, manualUnread) }
         .distinctBy { it.id }
         .sortedWith(
-            compareByDescending<Session> { unread != UnreadSessions.Off && it.id in pinned && it.isUnread }
+            compareByDescending<Session> { unread != UnreadSessions.Off && it.id in pinned && it.isUnreadHere() }
                 .thenByDescending { it.updatedAt },
         )
         .groupBy { session ->
@@ -45,7 +48,7 @@ internal fun groupSessions(
                 session.id in pinned -> DayBucket.Pinned
                 unread == UnreadSessions.DotAndGroup &&
                     filters.readState != SessionRead.Unread &&
-                    session.isUnread &&
+                    session.isUnreadHere() &&
                     session.id !in waiting -> DayBucket.Unread
                 day >= today -> DayBucket.Today
                 day == today.minus(1, DateTimeUnit.DAY) -> DayBucket.Yesterday

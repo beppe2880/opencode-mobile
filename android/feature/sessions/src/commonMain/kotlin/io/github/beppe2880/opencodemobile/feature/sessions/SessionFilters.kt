@@ -62,11 +62,14 @@ data class SessionFilters(
     /** Picks [state], or clears the filter when it is already picked. */
     fun toggleRead(state: SessionRead): SessionFilters = copy(readState = if (readState == state) null else state)
 
-    /** Whether [session] passes every filter; [today] is the device's local date. */
-    fun matches(session: Session, today: LocalDate, zone: TimeZone): Boolean {
+    /**
+     * Whether [session] passes every filter; [today] is the device's local date. [manualUnread]
+     * holds the sessions marked unread on this device, which the read filter counts as unread.
+     */
+    fun matches(session: Session, today: LocalDate, zone: TimeZone, manualUnread: Set<String> = emptySet()): Boolean {
         val status = if (session.archivedAt != null) SessionStatus.Archived else SessionStatus.Active
         if (status !in effectiveStatuses) return false
-        if (readState != null && (session.isUnread != (readState == SessionRead.Unread))) return false
+        if (readState != null && ((session.isUnread || session.id in manualUnread) != (readState == SessionRead.Unread))) return false
         if (outcomes.isNotEmpty() && session.outcome !in outcomes) return false
         return date.matches(session.updatedAt, today, zone)
     }

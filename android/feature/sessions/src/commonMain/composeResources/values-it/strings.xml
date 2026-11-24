@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">Segna tutte come lette</string>
     <string name="sessions_mark_all_read_count">Segna %1$d come lette</string>
     <string name="sessions_mark_all_read_failed">Alcune sessioni non sono state segnate come lette</string>
+    <string name="sessions_mark_read">Segna come letta</string>
+    <string name="sessions_mark_unread">Segna come non letta</string>
+    <string name="sessions_mark_unread_local">Stato di non letta salvato solo su questo dispositivo</string>
     <string name="sessions_read">Lette</string>
     <string name="sessions_filter_read">Stato di lettura</string>
     <string name="sessions_outcome_succeeded">Completata</string>
@@ -72,6 +75,24 @@
     <string name="sessions_save">Salva</string>
     <string name="sessions_delete_title">Eliminare la sessione?</string>
     <string name="sessions_delete_message">“%1$s” e la sua cronologia verranno eliminati definitivamente dal server.</string>
+    <string name="sessions_select">Seleziona</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="one">%1$d selezionata</item>
+        <item quantity="other">%1$d selezionate</item>
+    </plurals>
+    <string name="sessions_selection_close">Esci dalla selezione</string>
+    <string name="sessions_selection_actions">Azioni per le sessioni selezionate</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="one">Eliminare %1$d sessione?</item>
+        <item quantity="other">Eliminare %1$d sessioni?</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="one">La sua cronologia verrà eliminata definitivamente dal server.</item>
+        <item quantity="other">Le loro cronologie verranno eliminate definitivamente dal server.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">Alcune sessioni non sono state eliminate</string>
+    <string name="sessions_delete_failed_message">Queste sessioni sono ancora sul server:\n%1$s</string>
+    <string name="sessions_bulk_failed">Alcune sessioni non sono state aggiornate</string>
     <string name="sessions_new_title">Nuova sessione</string>
     <string name="sessions_new_directory">Cartella del progetto</string>
     <string name="sessions_new_other_directory">Altra cartella</string>

@@ -34,6 +34,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.ShareRepository
 import io.github.beppe2880.opencodemobile.core.domain.ToolStatus
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptReducer
+import io.github.beppe2880.opencodemobile.core.domain.UnreadSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.VcsBranch
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.initialAnswers
@@ -87,6 +88,7 @@ class ChatViewModel(
     private val shares: ShareRepository,
     private val pins: PinnedSessionRepository,
     private val mutes: MutedSessionRepository,
+    private val unreadStore: UnreadSessionRepository,
     private val clock: () -> Long = { Clock.System.now().toEpochMilliseconds() },
     private val btwMemory: BtwMemory,
     private val serverId: String = "",
@@ -1211,7 +1213,10 @@ class ChatViewModel(
 
     fun setChatVisible(visible: Boolean) {
         chatVisible.value = visible
-        if (visible) reportViewed()
+        if (visible) {
+            unreadStore.setUnread(sessionId, false)
+            reportViewed()
+        }
     }
 
     /**

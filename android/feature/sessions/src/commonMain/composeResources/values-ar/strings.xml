@@ -36,6 +36,9 @@
     <string name="sessions_mark_all_read">تحديد الكل كمقروء</string>
     <string name="sessions_mark_all_read_count">تحديد %1$d كمقروءة</string>
     <string name="sessions_mark_all_read_failed">تعذّر تحديد بعض الجلسات كمقروءة</string>
+    <string name="sessions_mark_read">وضع علامة كمقروءة</string>
+    <string name="sessions_mark_unread">وضع علامة كغير مقروءة</string>
+    <string name="sessions_mark_unread_local">تم حفظ حالة عدم القراءة على هذا الجهاز فقط</string>
     <string name="sessions_read">مقروءة</string>
     <string name="sessions_filter_read">حالة القراءة</string>
     <string name="sessions_outcome_succeeded">ناجحة</string>
@@ -72,6 +75,36 @@
     <string name="sessions_save">حفظ</string>
     <string name="sessions_delete_title">حذف الجلسة؟</string>
     <string name="sessions_delete_message">سيتم حذف «%1$s» وسجلها نهائيًا من الخادم.</string>
+    <string name="sessions_select">تحديد</string>
+    <plurals name="sessions_selected_count">
+        <item quantity="zero">تم تحديد %1$d جلسة</item>
+        <item quantity="one">تم تحديد جلسة %1$d</item>
+        <item quantity="two">تم تحديد جلستين (%1$d)</item>
+        <item quantity="few">تم تحديد %1$d جلسات</item>
+        <item quantity="many">تم تحديد %1$d جلسة</item>
+        <item quantity="other">تم تحديد %1$d جلسة</item>
+    </plurals>
+    <string name="sessions_selection_close">إنهاء التحديد</string>
+    <string name="sessions_selection_actions">إجراءات الجلسات المحددة</string>
+    <plurals name="sessions_bulk_delete_title">
+        <item quantity="zero">حذف %1$d جلسات؟</item>
+        <item quantity="one">حذف جلسة %1$d؟</item>
+        <item quantity="two">حذف جلستين (%1$d)؟</item>
+        <item quantity="few">حذف %1$d جلسات؟</item>
+        <item quantity="many">حذف %1$d جلسة؟</item>
+        <item quantity="other">حذف %1$d جلسة؟</item>
+    </plurals>
+    <plurals name="sessions_bulk_delete_message">
+        <item quantity="zero">ستُحذف سجلاتها نهائيًا من الخادم.</item>
+        <item quantity="one">سيُحذف سجلّها نهائيًا من الخادم.</item>
+        <item quantity="two">سيُحذف سجلّاهما نهائيًا من الخادم.</item>
+        <item quantity="few">ستُحذف سجلاتها نهائيًا من الخادم.</item>
+        <item quantity="many">ستُحذف سجلاتها نهائيًا من الخادم.</item>
+        <item quantity="other">ستُحذف سجلاتها نهائيًا من الخادم.</item>
+    </plurals>
+    <string name="sessions_delete_failed_title">تعذّر حذف بعض الجلسات</string>
+    <string name="sessions_delete_failed_message">لا تزال هذه الجلسات على الخادم:\n%1$s</string>
+    <string name="sessions_bulk_failed">تعذّر تحديث بعض الجلسات</string>
     <string name="sessions_new_title">جلسة جديدة</string>
     <string name="sessions_new_directory">مجلد المشروع</string>
     <string name="sessions_new_other_directory">مجلد آخر</string>
