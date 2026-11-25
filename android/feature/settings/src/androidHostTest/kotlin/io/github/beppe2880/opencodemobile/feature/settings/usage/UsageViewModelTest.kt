@@ -7,6 +7,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeError
 import io.github.beppe2880.opencodemobile.core.domain.Project
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.TokenUsage
 import io.github.beppe2880.opencodemobile.core.domain.UsageStats
@@ -94,6 +95,8 @@ private class FakeSessions : SessionRepository {
     override suspend fun delete(sessionId: String) = Result.success(Unit)
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(OpenCodeError.NotFound(sessionId))
     override suspend fun projects(): Result<List<Project>> = Result.success(emptyList())
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
 }
 
 private class FakeCatalog : CatalogRepository {

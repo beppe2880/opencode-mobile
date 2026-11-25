@@ -5,6 +5,11 @@
     <string name="chat_fork">Создать ответвление</string>
     <string name="chat_undo">Отменить последний запрос</string>
     <string name="chat_redo">Восстановить отменённые запросы</string>
+    <string name="chat_export">Экспорт / Поделиться…</string>
+    <string name="chat_export_hint">Экспорт всей беседы в Markdown со свёрнутым выводом инструментов и без изображений. Возможны личные тексты, код и пути к файлам. Проверьте перед отправкой.</string>
+    <string name="chat_export_share">Поделиться Markdown</string>
+    <string name="chat_export_save">Сохранить файл Markdown</string>
+    <string name="chat_export_failed">Не удалось экспортировать беседу. Повторите попытку.</string>
     <string name="chat_muted">Уведомления отключены на этом устройстве</string>
     <string name="chat_mute">Отключить уведомления</string>
     <string name="chat_unmute">Включить уведомления</string>

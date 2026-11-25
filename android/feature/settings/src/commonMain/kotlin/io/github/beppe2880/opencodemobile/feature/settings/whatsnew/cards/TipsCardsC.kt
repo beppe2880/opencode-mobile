@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import io.github.beppe2880.opencodemobile.core.ui.platform.sessionNotificationsSupported
@@ -62,6 +63,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_voic
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_c_waiting_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_export_title
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group C; see the toolkit in ../DemoKit.kt. */
@@ -77,6 +81,17 @@ internal val tipsCardsC: List<FeatureCard> = listOfNotNull(
         pullRequest = 263,
         demo = { SessionMuteDemo(it) },
     ) else null,
+    FeatureCard(
+        id = "session-export",
+        version = "0.19.0",
+        icon = Icons.Outlined.Share,
+        title = Res.string.tips_export_title,
+        body = Res.string.tips_export_body,
+        demoDescription = Res.string.tips_export_demo,
+        author = "Andrease11",
+        pullRequest = 260,
+        demo = { TranscriptExportDemo(it) },
+    ),
     FeatureCard(
         id = "chat-ask-selection",
         version = "0.18.0",

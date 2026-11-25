@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Unarchive
 import androidx.compose.material.icons.outlined.VpnKey
 import androidx.compose.material3.DropdownMenu
@@ -51,6 +52,7 @@ import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_archive
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_compact
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_compacting
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_delete
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_export
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_fork
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_mcps
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_menu_history
@@ -69,7 +71,7 @@ import org.jetbrains.compose.resources.stringResource
 import io.github.beppe2880.opencodemobile.core.ui.resources.Res as UiRes
 
 internal val ChatState.menuReady: Boolean
-    get() = directory.isNotBlank() && !loading && error == null && connection == ConnectionState.Connected && !creatingSession && !forking
+    get() = directory.isNotBlank() && !loading && error == null && connection == ConnectionState.Connected && !creatingSession && !forking && !exporting
 
 internal val ChatState.historyReady: Boolean
     get() = menuReady && !running && !sending && !reverting && !compacting
@@ -127,6 +129,9 @@ internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () 
             MenuAction(stringResource(Res.string.chat_redo), Icons.AutoMirrored.Outlined.Redo, "chat_menu_redo", history) {
                 act(ChatEvent.RestoreRevert)
             }
+        }
+        MenuAction(stringResource(Res.string.chat_export), Icons.Outlined.Share, "chat_menu_export", ready, state.exporting) {
+            act(ChatEvent.ExportSheet(true))
         }
         MenuGroup(stringResource(Res.string.chat_menu_tools))
         MenuAction(stringResource(UiRes.string.oc_running), Icons.Outlined.PlayCircleOutline, "chat_running_menu_item", ready) {

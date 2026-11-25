@@ -33,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -1892,6 +1893,24 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `bulk archive bounds parallel requests`() = runTest(main.testDispatcher) {
+        val many = FakeSessionRepository((1..6).map { session("s$it", now - it * hour) })
+        many.archiveGate = CompletableDeferred()
+        val vm = vm(many)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("s1"))
+        (2..6).forEach { vm.onEvent(SessionsEvent.ToggleSelection("s$it")) }
+
+        vm.onEvent(SessionsEvent.SetSelectedArchived(true))
+        runCurrent()
+
+        assertEquals(4, many.maxActiveArchives)
+        many.archiveGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals((1..6).map { "s$it" to true }, many.archivedCalls)
+    }
+
+    @Test
     fun `bulk delete asks once and deletes every selected session`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -1909,6 +1928,25 @@ class SessionsViewModelTest {
         assertTrue(vm.state.value.selection.isEmpty())
         assertEquals(listOf("today", "week"), sessions.deleteCalls)
         assertEquals(listOf("yesterday", "old"), vm.state.value.ids())
+    }
+
+    @Test
+    fun `bulk delete bounds parallel requests`() = runTest(main.testDispatcher) {
+        val many = FakeSessionRepository((1..6).map { session("s$it", now - it * hour) })
+        many.deleteGate = CompletableDeferred()
+        val vm = vm(many)
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("s1"))
+        (2..6).forEach { vm.onEvent(SessionsEvent.ToggleSelection("s$it")) }
+
+        vm.onEvent(SessionsEvent.RequestDeleteSelected)
+        vm.onEvent(SessionsEvent.ConfirmDelete)
+        runCurrent()
+
+        assertEquals(4, many.maxActiveDeletes)
+        many.deleteGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals((1..6).map { "s$it" }, many.deleteCalls)
     }
 
     @Test
@@ -1977,6 +2015,37 @@ class SessionsViewModelTest {
         advanceUntilIdle()
 
         assertTrue("yesterday" in mutes.muted.value)
+    }
+
+    @Test
+    fun `bulk mute applies to every selected session and keeps the selection`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedMuted(true))
+        runCurrent()
+
+        assertEquals(setOf("today", "week"), mutes.muted.value)
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
+    }
+
+    @Test
+    fun `bulk unmute clears permanent and temporary mutes`() = runTest(main.testDispatcher) {
+        mutes.setMuted("today", true)
+        mutes.setMuted("week", true, untilIdleAfter = 0)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedMuted(false))
+        runCurrent()
+
+        assertTrue(mutes.muted.value.isEmpty())
+        assertTrue(mutes.temporary.value.isEmpty())
+        assertEquals(setOf("today", "week"), vm.state.value.selection)
     }
 
     @Test
@@ -2166,6 +2235,9 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var deleteResult: Result<Unit> = Result.success(Unit)
     var deleteFailures: Set<String> = emptySet()
     val deleteCalls = mutableListOf<String>()
+    var deleteGate: CompletableDeferred<Unit>? = null
+    var activeDeletes = 0
+    var maxActiveDeletes = 0
     var lastSearch: String? = null
     var lastDirectory: String? = null
     var lastArchived: Boolean? = null
@@ -2173,6 +2245,9 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     var setArchivedResult: Result<Unit> = Result.success(Unit)
     var archiveFailures: Set<String> = emptySet()
     var archiveSupported = true
+    var archiveGate: CompletableDeferred<Unit>? = null
+    var activeArchives = 0
+    var maxActiveArchives = 0
     var listCalls = 0
     val archivedCalls = mutableListOf<Pair<String, Boolean>>()
     val untilCalls = mutableListOf<Long>()
@@ -2225,17 +2300,34 @@ private class FakeSessionRepository(initial: List<Session>) : SessionRepository 
     }
     override suspend fun delete(sessionId: String): Result<Unit> {
         deleteCalls += sessionId
-        if (deleteResult.isFailure) return deleteResult
-        return if (sessionId in deleteFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+        activeDeletes++
+        maxActiveDeletes = maxOf(maxActiveDeletes, activeDeletes)
+        try {
+            deleteGate?.await()
+            if (deleteResult.isFailure) return deleteResult
+            return if (sessionId in deleteFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+        } finally {
+            activeDeletes--
+        }
     }
     override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
         archivedCalls += sessionId to archived
-        if (setArchivedResult.isFailure) return setArchivedResult
-        return if (sessionId in archiveFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+        activeArchives++
+        maxActiveArchives = maxOf(maxActiveArchives, activeArchives)
+        try {
+            archiveGate?.await()
+            if (setArchivedResult.isFailure) return setArchivedResult
+            return if (sessionId in archiveFailures) Result.failure(OpenCodeError.Unreachable("down")) else Result.success(Unit)
+        } finally {
+            activeArchives--
+        }
     }
     override suspend fun archiveSupported(): Boolean = archiveSupported
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> = Result.failure(UnsupportedOperationException())
     var serverProjects = listOf(Project("p", "/p/today", null, null, 0))
+    override suspend fun export(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit) = error("unused")
+
     override suspend fun projects(): Result<List<Project>> {
         gate?.await()
         return Result.success(serverProjects)

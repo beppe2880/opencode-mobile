@@ -181,6 +181,9 @@ sealed interface SessionsEvent {
     data class SetPinned(val sessionId: String, val pinned: Boolean) : SessionsEvent
     data class SetMuted(val sessionId: String, val muted: Boolean, val untilFinished: Boolean = false) : SessionsEvent
 
+    /** Mutes or unmutes every selected session, permanently. */
+    data class SetSelectedMuted(val muted: Boolean) : SessionsEvent
+
     /** Archives the session or restores it. */
     data class SetArchived(val session: Session, val archived: Boolean) : SessionsEvent
     data class ConfirmRename(val title: String) : SessionsEvent

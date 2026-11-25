@@ -19,6 +19,7 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         demoDescription = Res.string.tips_j_sessions_bulk_demo,
         author = "Azykle",
         pullRequest = 266,
+        morePullRequests = listOf(269),
         demo = { SessionBulkActionsDemo(it) },
     ),
 )

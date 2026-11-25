@@ -60,6 +60,13 @@ object MessageCodec {
         null
     }
 
+    /** An export already has a JSON tree; don't serialize and parse every message again. */
+    fun decode(element: JsonElement): SessionMessageInfo? = try {
+        OpenCodeJson.decodeFromJsonElement(SessionMessageInfo.serializer(), element)
+    } catch (_: SerializationException) {
+        null
+    }
+
     /** False while the server may still change the message: a running step, shell or compaction. */
     fun isSettled(message: SessionMessageInfo): Boolean = when (message) {
         is SessionMessageInfo.SessionMessageAssistantValue -> message.value.time.completed != null

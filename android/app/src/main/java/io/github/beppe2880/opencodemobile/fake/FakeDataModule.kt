@@ -57,6 +57,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ServerInfo
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.Session
+import io.github.beppe2880.opencodemobile.core.domain.SessionExportProgress
 import io.github.beppe2880.opencodemobile.core.domain.SessionOutcome
 import io.github.beppe2880.opencodemobile.core.domain.SessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
@@ -386,6 +387,15 @@ internal class FakeSessions(private val store: FakeStore, private val events: Fa
         store.transcripts[fork.id] = beforeMessageId?.let { id -> history.takeWhile { it.id != id } } ?: history
         return Result.success(fork)
     }
+
+    override suspend fun export(
+        sessionId: String,
+        onProgress: suspend (SessionExportProgress) -> Unit,
+    ): Result<List<Message>> =
+        store.transcripts[sessionId]?.let { Result.success(it) } ?: Result.failure(OpenCodeError.NotFound("session"))
+
+    override suspend fun exportJson(sessionId: String, onProgress: suspend (SessionExportProgress) -> Unit): Result<String> =
+        Result.failure(OpenCodeError.NotFound("Native export requires a server"))
 
     override suspend fun projects(): Result<List<Project>> = Result.success(SampleData.projects)
 

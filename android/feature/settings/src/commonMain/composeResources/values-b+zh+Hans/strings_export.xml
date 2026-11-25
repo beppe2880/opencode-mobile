@@ -1,0 +1,16 @@
+<resources>
+    <string name="tips_export_title">保存或分享对话</string>
+    <string name="tips_export_body">在聊天菜单中打开“上下文与历史记录”，将完整对话保存或分享为 Markdown 或 OpenCode 原始 JSON。查看等待服务器及各阶段的进度，可测量时显示百分比。JSON 可能包含 Markdown 中省略的私人上下文。</string>
+    <string name="tips_export_demo">先导出 Markdown，展示等待服务器、下载和准备进度。随后切换到 JSON。</string>
+    <string name="tips_export_panel_title">导出 / 分享…</string>
+    <string name="tips_export_waiting">正在等待服务器…</string>
+    <string name="tips_export_downloading">正在下载聊天…</string>
+    <string name="tips_export_processing">正在处理数据…</string>
+    <string name="tips_export_messages">正在准备消息…</string>
+    <string name="tips_export_markdown">正在准备 Markdown…</string>
+    <string name="tips_export_file">正在准备文件…</string>
+    <string name="tips_export_ready">文件已准备好，可保存或分享</string>
+    <string name="tips_export_percent">%1$s%</string>
+    <string name="tips_export_share">分享 %1$s</string>
+    <string name="tips_export_save">保存 %1$s 文件</string>
+</resources>

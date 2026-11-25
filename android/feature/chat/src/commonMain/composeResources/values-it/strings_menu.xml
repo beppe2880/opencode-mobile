@@ -5,6 +5,11 @@
     <string name="chat_fork">Crea un fork</string>
     <string name="chat_undo">Annulla ultimo prompt</string>
     <string name="chat_redo">Ripristina prompt annullati</string>
+    <string name="chat_export">Esporta / Condividi…</string>
+    <string name="chat_export_hint">Esporta l'intera conversazione in Markdown, con l'output degli strumenti compresso e senza immagini. Può contenere testo privato, codice e percorsi di file. Controllala prima di condividerla.</string>
+    <string name="chat_export_share">Condividi Markdown</string>
+    <string name="chat_export_save">Salva file Markdown</string>
+    <string name="chat_export_failed">Impossibile esportare la conversazione. Riprova.</string>
     <string name="chat_muted">Notifiche silenziate su questo dispositivo</string>
     <string name="chat_mute">Silenzia notifiche</string>
     <string name="chat_unmute">Riattiva notifiche</string>

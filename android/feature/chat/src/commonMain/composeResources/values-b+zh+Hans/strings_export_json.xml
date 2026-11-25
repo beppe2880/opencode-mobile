@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_export_markdown">Markdown</string>
+    <string name="chat_export_json">JSON</string>
+    <string name="chat_export_json_share">分享 JSON</string>
+    <string name="chat_export_json_save">保存 JSON 文件</string>
+    <string name="chat_export_json_warning">JSON 包含完整的工具输出，可能含有敏感数据。</string>
+    <string name="chat_export_saved">文件已保存</string>
+</resources>

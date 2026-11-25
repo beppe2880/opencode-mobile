@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -170,6 +171,7 @@ private fun BulkMenu(modifier: Modifier = Modifier, delete: Modifier) {
             .border(1.dp, c.borderBase, RoundedCornerShape(OcRadius.md))
             .padding(vertical = OcSpacing.xs),
     ) {
+        DemoMenuItem("Mute notifications", Icons.Outlined.NotificationsOff)
         DemoMenuItem("Mark as unread", Icons.Outlined.MarkEmailUnread)
         DemoMenuItem("Pin", Icons.Outlined.PushPin)
         DemoMenuItem("Archive", Icons.Outlined.Archive)

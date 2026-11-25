@@ -1,0 +1,8 @@
+<resources>
+    <string name="chat_export_markdown">Markdown</string>
+    <string name="chat_export_json">JSON</string>
+    <string name="chat_export_json_share">JSON 공유</string>
+    <string name="chat_export_json_save">JSON 파일 저장</string>
+    <string name="chat_export_json_warning">JSON에는 도구의 전체 출력이 포함되며 민감한 데이터가 들어 있을 수 있습니다.</string>
+    <string name="chat_export_saved">파일을 저장했습니다</string>
+</resources>

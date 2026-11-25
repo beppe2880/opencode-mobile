@@ -37,6 +37,11 @@ data class ChatState(
     val deleting: Boolean = false,
     /** Pinned to the top of the session list on this device. */
     val pinned: Boolean = false,
+    val exportOpen: Boolean = false,
+    val exportFormat: TranscriptFormat = TranscriptFormat.Markdown,
+    val exporting: Boolean = false,
+    val exportPhase: ExportPhase = ExportPhase.PreparingFile,
+    val exportFraction: Float? = null,
     val muted: Boolean = false,
     /** The session is in the server's archive. */
     val archived: Boolean = false,
@@ -360,6 +365,13 @@ fun List<ModelInfo>.labelFor(ref: ModelRef): ModelLabel =
         ?: ModelLabel(ref.id, ref.providerId)
 
 sealed interface ChatEvent {
+    data class ExportSheet(val open: Boolean) : ChatEvent
+    data class SelectExportFormat(val format: TranscriptFormat) : ChatEvent
+    data class Export(val save: Boolean) : ChatEvent
+    data object ExportFailed : ChatEvent
+    data object ExportReady : ChatEvent
+    data object ExportCancelled : ChatEvent
+    data class ExportFileProgress(val completed: Long, val total: Long) : ChatEvent
     data class SetMuted(val muted: Boolean, val untilFinished: Boolean = false) : ChatEvent
 
     /** Archives the session or restores it from the archive. */
@@ -517,6 +529,7 @@ sealed interface ChatEvent {
 }
 
 sealed interface ChatEffect {
+    data class ExportTranscript(val file: TranscriptFile, val save: Boolean) : ChatEffect
     data object OpenProviders : ChatEffect
     data class ShowMessage(val message: UiText) : ChatEffect
 

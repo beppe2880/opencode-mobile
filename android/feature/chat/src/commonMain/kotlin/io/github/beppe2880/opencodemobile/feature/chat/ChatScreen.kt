@@ -253,6 +253,7 @@ fun ChatScreen(
     }
     // After the sheets, so a confirmation shows over the one that asked for it.
     RunningStopDialogs(state, onEvent)
+    ChatExportSheet(state, onEvent)
     if (contextOpen) {
         ContextSheet(
             context = state.context,
