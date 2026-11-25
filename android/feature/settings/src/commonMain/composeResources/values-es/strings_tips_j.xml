@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">Acciones en lote en sesiones</string>
     <string name="tips_j_sessions_bulk_body">Mantén pulsada una sesión para seleccionarla y luego toca más filas. Fija, silencia o reactiva el sonido, archiva, marca como leídas o no leídas o elimina varias a la vez; cambia el nombre cuando solo hay una seleccionada. Atrás sale de la selección. Las marcas de no leída se guardan en este dispositivo.</string>
     <string name="tips_j_sessions_bulk_demo">Se mantiene pulsada una sesión; se seleccionan dos filas y el menú las elimina tras una confirmación.</string>
+    <string name="tips_j_hide_keyboard_title">Ocultar el teclado al enviar</string>
+    <string name="tips_j_hide_keyboard_body">Activa Ocultar el teclado al enviar en Ajustes → Cuadro del mensaje: al enviar un mensaje, el teclado se cierra para que puedas leer la respuesta mientras llega. Toca el cuadro del mensaje para volver a escribir. Si el envío falla, el texto y el teclado se mantienen.</string>
+    <string name="tips_j_hide_keyboard_demo">Se escribe un prompt y se envía; el teclado se desliza fuera y la respuesta aparece en streaming sobre todo el chat.</string>
+    <string name="tips_j_hide_keyboard_prompt">¿Por qué falla la compilación?</string>
+    <string name="tips_j_hide_keyboard_answer">El test **ParserTest** espera un salto de línea final. Lo añadí a `fixtures/input.txt` y la compilación vuelve a pasar.</string>
 </resources>

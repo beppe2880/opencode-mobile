@@ -71,6 +71,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -2916,6 +2918,107 @@ class ChatViewModelTest {
         vm.onEvent(ChatEvent.SelectModel(model))
         assertFalse(vm.state.value.modelSheetOpen)
         assertEquals("high", vm.state.value.model?.variant)
+    }
+
+    private fun TestScope.effectsOf(vm: ChatViewModel): List<ChatEffect> {
+        val effects = mutableListOf<ChatEffect>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.effect.collect { effects += it } }
+        return effects
+    }
+
+    @Test
+    fun `the keyboard stays open after sending by default`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = effectsOf(vm)
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("go" to PromptDelivery.Steer), chat.prompts)
+        assertEquals(listOf<ChatEffect>(ChatEffect.PromptSent), effects)
+    }
+
+    @Test
+    fun `with the setting a sent prompt hides the keyboard once the server accepts it`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(hideKeyboardAfterSend = true)
+        val vm = vm()
+        advanceUntilIdle()
+        assertTrue(vm.state.value.hideKeyboardAfterSend)
+        val effects = effectsOf(vm)
+        chat.promptGate = CompletableDeferred()
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        assertEquals(listOf<ChatEffect>(ChatEffect.PromptSent), effects)
+
+        chat.promptGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(listOf(ChatEffect.PromptSent, ChatEffect.HideKeyboard), effects)
+    }
+
+    @Test
+    fun `with the setting an answer sent while the agent runs also hides the keyboard`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(hideKeyboardAfterSend = true)
+        val vm = vm()
+        advanceUntilIdle()
+        events.flow.emit(ServerEvent.ExecutionStarted("s1"))
+        runCurrent()
+        assertTrue(vm.state.value.running)
+        val effects = effectsOf(vm)
+        vm.onEvent(ChatEvent.DraftChanged("also check the tests"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals(listOf("also check the tests" to PromptDelivery.Steer), chat.prompts)
+        assertTrue(ChatEffect.HideKeyboard in effects)
+    }
+
+    @Test
+    fun `with the setting a failed send keeps the text and the keyboard`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(hideKeyboardAfterSend = true)
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = effectsOf(vm)
+        chat.promptResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals("go", vm.state.value.draft)
+        assertFalse(ChatEffect.HideKeyboard in effects)
+    }
+
+    @Test
+    fun `with the setting the keyboard stays when a new message was typed while sending`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(hideKeyboardAfterSend = true)
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = effectsOf(vm)
+        chat.promptGate = CompletableDeferred()
+        vm.onEvent(ChatEvent.DraftChanged("go"))
+        vm.onEvent(ChatEvent.Send)
+        runCurrent()
+        vm.onEvent(ChatEvent.DraftChanged("and then"))
+        chat.promptGate!!.complete(Unit)
+        advanceUntilIdle()
+        assertFalse(ChatEffect.HideKeyboard in effects)
+    }
+
+    @Test
+    fun `with the setting a shell command hides the keyboard only when it runs`() = runTest(main.testDispatcher) {
+        settings.settings.value = AppSettings(hideKeyboardAfterSend = true)
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = effectsOf(vm)
+        chat.shellResult = Result.failure(OpenCodeError.Unreachable("down"))
+        vm.onEvent(ChatEvent.DraftChanged("!ls"))
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertEquals("!ls", vm.state.value.draft)
+        assertFalse(ChatEffect.HideKeyboard in effects)
+
+        chat.shellResult = Result.success(Unit)
+        vm.onEvent(ChatEvent.Send)
+        advanceUntilIdle()
+        assertTrue(ChatEffect.HideKeyboard in effects)
     }
 
     @Test

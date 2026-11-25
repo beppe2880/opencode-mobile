@@ -1386,6 +1386,7 @@ class ChatViewModel(
                     updateState { it.copy(sending = false, running = true) }
                     rebuild()
                     scheduleReload()
+                    hideKeyboardIfWanted()
                 },
                 onFailure = { error ->
                     messages = messages.filterNot { it.id == local.id }
@@ -1421,7 +1422,10 @@ class ChatViewModel(
             // The server answers when the command exits; the composer is free again at once.
             updateState { it.copy(sending = false) }
             ready.fold(onSuccess = { chat.shell(sessionId, command) }, onFailure = { Result.failure(it) }).fold(
-                onSuccess = { scheduleReload() },
+                onSuccess = {
+                    scheduleReload()
+                    hideKeyboardIfWanted()
+                },
                 onFailure = { error ->
                     if (revert != null && !committed) restoreReverted(revert, reverted)
                     rebuild()
@@ -1965,6 +1969,14 @@ class ChatViewModel(
     private fun sent() {
         sessionModel?.let(recents::used)
         updateState { it.copy(recentModels = recentModels()) }
+    }
+
+    /**
+     * After a message reached the server, closes the keyboard when the setting asks to; never over
+     * a new message typed while it was sending. A failed send keeps the text and the keyboard.
+     */
+    private fun hideKeyboardIfWanted() {
+        if (currentState.hideKeyboardAfterSend && currentState.draft.isEmpty()) sendEffect(ChatEffect.HideKeyboard)
     }
 
     /** Loads [scope] into the changes sheet; files of the same scope stay shown while it reloads. */

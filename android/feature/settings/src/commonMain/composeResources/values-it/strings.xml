@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">Le richieste di permesso si aprono come una barra di una riga sopra il riquadro di scrittura; toccala per rispondere</string>
     <string name="settings_agent_outline">Bordo col colore dell'agente</string>
     <string name="settings_agent_outline_sub">Colora il bordo del riquadro di scrittura con il colore dell'agente selezionato</string>
+    <string name="settings_hide_keyboard_after_send">Chiudi la tastiera dopo l'invio</string>
+    <string name="settings_hide_keyboard_after_send_sub">Chiudi la tastiera quando invii un messaggio, così la risposta occupa tutto lo schermo; tocca il riquadro di scrittura per scrivere di nuovo</string>
     <string name="settings_dictation">Input vocale</string>
     <string name="settings_dictation_sub">Pulsante del microfono nel riquadro di scrittura, con il riconoscimento vocale del telefono</string>
     <string name="settings_dictation_cloud_sub">Pulsante del microfono nel riquadro di scrittura, con il fornitore cloud qui sotto</string>

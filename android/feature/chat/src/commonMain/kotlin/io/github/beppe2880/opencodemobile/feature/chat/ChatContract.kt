@@ -88,6 +88,8 @@ data class ChatState(
     val attachedImageSize: AttachedImageSize = AttachedImageSize.Medium,
     val showCost: Boolean = true,
     val agentColorOutline: Boolean = true,
+    /** A sent message closes the keyboard (setting). */
+    val hideKeyboardAfterSend: Boolean = false,
     /** The microphone button of the composer (setting). */
     val dictation: Boolean = true,
     /** Uploaded files and picked `@` mentions for the next prompt. */
@@ -216,6 +218,7 @@ internal fun ChatState.withSettings(s: AppSettings): ChatState = copy(
     swipe = s.chatSwipe,
     swipeSensitivity = s.swipeSensitivity,
     agentColorOutline = s.agentColorOutline,
+    hideKeyboardAfterSend = s.hideKeyboardAfterSend,
     closeModelPickerOnSelect = s.closeModelPickerOnSelect,
     dictation = s.dictation,
     permissionsCollapsedByDefault = s.permissionsCollapsed,
@@ -513,6 +516,9 @@ sealed interface ChatEffect {
     data class ShowMessage(val message: UiText) : ChatEffect
     data object NavigateBack : ChatEffect
     data object PromptSent : ChatEffect
+
+    /** A message reached the server with the hide keyboard setting on: the message box lets go of the keyboard. */
+    data object HideKeyboard : ChatEffect
     data object BtwSent : ChatEffect
     data class OpenSession(val sessionId: String) : ChatEffect
     data class SwitchSession(val sessionId: String) : ChatEffect

@@ -87,6 +87,7 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_UNREAD_SESSIONS, next.unreadSessions.name)
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
+        prefs.putBoolean(KEY_HIDE_KEYBOARD_AFTER_SEND, next.hideKeyboardAfterSend)
         prefs.putBoolean(KEY_DICTATION, next.dictation)
         prefs.putString(KEY_VOICE_ENGINE, next.voiceEngine.name)
         prefs.putString(KEY_STT_PROVIDER, next.sttProvider.name)
@@ -177,6 +178,7 @@ internal class PreferencesSettingsRepository(
                 ?: defaults.unreadSessions,
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
+            hideKeyboardAfterSend = prefs.getBoolean(KEY_HIDE_KEYBOARD_AFTER_SEND, defaults.hideKeyboardAfterSend),
             dictation = prefs.getBoolean(KEY_DICTATION, defaults.dictation),
             voiceEngine = VoiceEngine.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_VOICE_ENGINE) } ?: defaults.voiceEngine,
             sttProvider = SttProvider.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_STT_PROVIDER) } ?: defaults.sttProvider,
@@ -270,6 +272,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_UNREAD_SESSIONS = "unread_sessions"
         const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
+        const val KEY_HIDE_KEYBOARD_AFTER_SEND = "hide_keyboard_after_send"
         const val KEY_DICTATION = "dictation"
         const val KEY_VOICE_ENGINE = "voice_engine"
         const val KEY_STT_PROVIDER = "stt_provider"

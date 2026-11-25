@@ -50,7 +50,10 @@ class SettingOptionsTest {
         // The running chips sit above the composer like the pending cards, in the chat's category.
         assertEquals(SettingsPart.PendingCards, SettingOption.RunningChips.part)
         assertEquals(SettingsArea.Chat, SettingOption.RunningChips.area)
-        assertEquals(listOf(SettingOption.AgentOutline, SettingOption.Dictation), SettingsPart.ComposerBox.options)
+        assertEquals(
+            listOf(SettingOption.AgentOutline, SettingOption.HideKeyboardAfterSend, SettingOption.Dictation),
+            SettingsPart.ComposerBox.options,
+        )
         assertEquals(SettingsPart.VoiceInput, SettingOption.Dictation.part)
         assertEquals(SettingsPart.VoiceInput, SettingOption.VoiceKey.part)
         assertEquals(listOf(SettingOption.LiveShell, SettingOption.LiveInterval, SettingOption.OutputLines), SettingsPart.LiveShell.options)

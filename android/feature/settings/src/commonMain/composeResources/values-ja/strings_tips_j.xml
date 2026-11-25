@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">セッションの一括操作</string>
     <string name="tips_j_sessions_bulk_body">セッションを長押しして選択し、他の行をタップします。まとめてピン留め、ミュート／ミュート解除、アーカイブ、既読／未読の設定、削除ができ、1つだけ選択したときは名前を変更できます。戻るで選択を終了します。未読マークはこの端末にのみ保存されます。</string>
     <string name="tips_j_sessions_bulk_demo">セッションを長押しし、2行を選択して、メニューから確認後に削除します。</string>
+    <string name="tips_j_hide_keyboard_title">送信後にキーボードを隠す</string>
+    <string name="tips_j_hide_keyboard_body">設定 → 入力欄 で「送信後にキーボードを隠す」をオンにすると、メッセージを送信した後にキーボードが閉じるので、回答がストリーミングされる様子をそのまま読めます。入力欄をタップすると再び入力できます。送信に失敗した場合は、テキストとキーボードはそのまま残ります。</string>
+    <string name="tips_j_hide_keyboard_demo">プロンプトを入力して送信すると、キーボードが下に隠れ、回答がチャット全体にストリーミング表示されます。</string>
+    <string name="tips_j_hide_keyboard_prompt">ビルドが失敗するのはなぜですか？</string>
+    <string name="tips_j_hide_keyboard_answer">テスト **ParserTest** は末尾の改行を期待しています。`fixtures/input.txt` に追加したところ、ビルドが再び通りました。</string>
 </resources>

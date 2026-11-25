@@ -43,6 +43,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     LiveReads(listOf("liveReads"), requires = FollowRunning),
     LiveOther(listOf("liveOther"), requires = FollowRunning),
     AgentOutline(listOf("agentColorOutline")),
+    HideKeyboardAfterSend(listOf("hideKeyboardAfterSend")),
     Dictation(listOf("dictation")),
     VoiceMode(listOf("voiceEngine"), requires = Dictation),
     VoiceProvider(listOf("sttProvider", "sttBaseUrl"), requires = VoiceMode),
@@ -133,7 +134,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.LiveEdits -> listOf(SettingOption.LiveEdits)
         SettingsPart.LiveReads -> listOf(SettingOption.LiveReads)
         SettingsPart.LiveOther -> listOf(SettingOption.LiveOther)
-        SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.Dictation)
+        SettingsPart.ComposerBox -> listOf(SettingOption.AgentOutline, SettingOption.HideKeyboardAfterSend, SettingOption.Dictation)
         SettingsPart.VoiceInput -> VOICE_OPTIONS
         SettingsPart.SelectionTiming -> listOf(SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.AgentOutline)
         // Sharing from other apps opens the new chat sheet: the live demo reaches sharing there.
@@ -210,6 +211,7 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.ToolMediaSize -> listOf("screenshot", "image", "picture", "preview")
         SettingOption.AttachedImageSize -> listOf("attachment", "image", "picture", "photo", "screenshot", "thumbnail", "size")
         SettingOption.CloseModelPickerOnSelect -> listOf("model", "picker", "reasoning", "default", "close")
+        SettingOption.HideKeyboardAfterSend -> listOf("keyboard", "send", "hide", "close", "focus")
         SettingOption.SwipeChats -> listOf("swipe", "gesture", "drawer", "sidebar")
         SettingOption.SplitView, SettingOption.UnfoldedLayout -> listOf("split", "tablet", "foldable", "wide", "sidebar")
         SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat -> listOf("fold", "unfold", "foldable", "split")

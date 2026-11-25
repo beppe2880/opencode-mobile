@@ -92,6 +92,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.UnreadSessionsChanged(UnreadSessions.Dot))
         vm.onEvent(SettingsEvent.RunningChipsChanged(false))
         vm.onEvent(SettingsEvent.AgentColorOutlineChanged(false))
+        vm.onEvent(SettingsEvent.HideKeyboardAfterSendChanged(true))
         vm.onEvent(SettingsEvent.GroupActivityChanged(false))
         vm.onEvent(SettingsEvent.GroupThoughtsChanged(false))
         vm.onEvent(SettingsEvent.QuestionsCollapsedChanged(true))
@@ -164,6 +165,7 @@ class SettingsViewModelTest {
                 unreadSessions = UnreadSessions.Dot,
                 runningChips = false,
                 agentColorOutline = false,
+                hideKeyboardAfterSend = true,
                 dictation = false,
                 selectionApply = SelectionApply.Immediately,
                 closeModelPickerOnSelect = false,

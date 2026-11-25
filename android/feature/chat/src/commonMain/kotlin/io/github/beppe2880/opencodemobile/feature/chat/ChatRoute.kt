@@ -13,6 +13,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -72,6 +74,8 @@ fun ChatRoute(
     val clipboard = rememberTextClipboard()
     val share = rememberTextShare()
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     val export = rememberTranscriptExport(
         onReady = { viewModel.onEvent(ChatEvent.ExportReady) },
         onSaved = { scope.launch { snackbar.showSnackbar(getString(Res.string.chat_export_saved)) } },
@@ -180,6 +184,11 @@ fun ChatRoute(
             ChatEffect.PromptSent -> {
                 dictation.cancel()
                 listState.scrollToLatest()
+            }
+            ChatEffect.HideKeyboard -> {
+                // Without the focus the message box opens the keyboard again on the next tap.
+                focusManager.clearFocus()
+                keyboard?.hide()
             }
             ChatEffect.BtwSent -> dictation.cancel()
             is ChatEffect.OpenSession -> onOpenSession(effect.sessionId)

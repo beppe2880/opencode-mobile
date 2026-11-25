@@ -75,7 +75,13 @@ class SettingsCategoriesTest {
         assertEquals(0, SettingOption.AttachedImageSize.depthIn(SettingOption.AttachedImageSize.group))
         assertEquals(SettingsArea.LiveActivity, SettingOption.OutputLines.area)
         assertEquals(
-            listOf(SettingOption.AgentOutline, SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.NewChatModel),
+            listOf(
+                SettingOption.AgentOutline,
+                SettingOption.HideKeyboardAfterSend,
+                SettingOption.SelectionApply,
+                SettingOption.CloseModelPickerOnSelect,
+                SettingOption.NewChatModel,
+            ),
             SettingsArea.Composer.options,
         )
         assertEquals(VOICE_OPTIONS, SettingsArea.VoiceInput.options)

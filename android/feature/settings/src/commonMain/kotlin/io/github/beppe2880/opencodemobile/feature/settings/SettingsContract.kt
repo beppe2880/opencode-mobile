@@ -173,6 +173,7 @@ sealed interface SettingsEvent {
     data class UnreadSessionsChanged(val unread: UnreadSessions) : SettingsEvent
     data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
+    data class HideKeyboardAfterSendChanged(val enabled: Boolean) : SettingsEvent
     data class DictationChanged(val enabled: Boolean) : SettingsEvent
     data class VoiceEngineChanged(val engine: VoiceEngine) : SettingsEvent
     data class SttProviderChanged(val provider: SttProvider) : SettingsEvent

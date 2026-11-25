@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">تظهر طلبات الأذونات كشريط من سطر واحد فوق حقل الكتابة؛ انقر عليه للرد</string>
     <string name="settings_agent_outline">إطار بلون الوكيل</string>
     <string name="settings_agent_outline_sub">تحديد مربع الرسالة بلون الوكيل المختار</string>
+    <string name="settings_hide_keyboard_after_send">إخفاء لوحة المفاتيح بعد الإرسال</string>
+    <string name="settings_hide_keyboard_after_send_sub">إغلاق لوحة المفاتيح بعد إرسال رسالة، لتأخذ الإجابة الشاشة كاملة؛ اضغط على مربع الرسالة للكتابة من جديد</string>
     <string name="settings_dictation">الإدخال الصوتي</string>
     <string name="settings_dictation_sub">زر الميكروفون في مربع الرسالة، باستخدام التعرف على الكلام في الهاتف</string>
     <string name="settings_dictation_cloud_sub">زر الميكروفون في مربع الرسالة، باستخدام مزود السحابة أدناه</string>
