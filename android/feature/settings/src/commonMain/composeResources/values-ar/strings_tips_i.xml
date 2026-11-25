@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">إدارة الدردشة المفتوحة</string>
+    <string name="tips_i_chat_actions_body">أعد تسمية الدردشة أو أرشفها أو احذفها من قائمة النقاط الثلاث دون العودة إلى قائمة الجلسات. يطلب الحذف التأكيد أولاً ويذكر اسم الدردشة.</string>
+    <string name="tips_i_chat_actions_demo">تُفتح قائمة الدردشة: إعادة تسمية الدردشة تعدّل العنوان، وحذف الدردشة يطلب التأكيد.</string>
+</resources>

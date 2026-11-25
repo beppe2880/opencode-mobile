@@ -87,6 +87,17 @@
     <string name="chat_empty_message">Descreva uma tarefa para o agente. Ele trabalha em %1$s.</string>
     <string name="chat_error_title">Não foi possível carregar a sessão</string>
     <string name="chat_session_deleted">Esta sessão foi excluída</string>
+    <string name="chat_rename">Renomear conversa</string>
+    <string name="chat_rename_label">Título</string>
+    <string name="chat_save">Salvar</string>
+    <string name="chat_delete">Excluir conversa</string>
+    <string name="chat_delete_title">Excluir conversa?</string>
+    <string name="chat_delete_message">“%1$s” e seu histórico serão excluídos permanentemente do servidor.</string>
+    <string name="chat_archive">Arquivar</string>
+    <string name="chat_unarchive">Desarquivar</string>
+    <string name="chat_archived_message">Sessão arquivada</string>
+    <string name="chat_restored_message">Sessão restaurada</string>
+    <string name="chat_archive_undo">Desfazer</string>
     <string name="chat_agent">Agente</string>
     <string name="chat_model">Modelo</string>
     <string name="chat_model_description">Modelo: %1$s (%2$s)</string>

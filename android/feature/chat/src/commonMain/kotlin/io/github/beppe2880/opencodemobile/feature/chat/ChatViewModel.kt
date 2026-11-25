@@ -198,6 +198,12 @@ class ChatViewModel(
     private var sessionViewedAt: Long? = null
     private var reportedViewedAt: Long? = null
 
+    /** A delete was started here: the server's deleted event must not add a message. */
+    private var deleteRequested = false
+
+    /** The chat already left after deletion: the REST result and the event leave only once. */
+    private var sessionDeleted = false
+
     init {
         viewModelScope.launch {
             mutes.muted.collect { ids -> updateState { it.copy(muted = sessionId in ids) } }
@@ -205,7 +211,7 @@ class ChatViewModel(
         // Header from the session list, so the title shows before anything loads.
         sessions.cached(sessionId)?.let { s ->
             revertMessageId = s.revertMessageId
-            updateState { it.copy(title = s.title, directory = s.directory) }
+            updateState { it.copy(title = s.title, directory = s.directory, archived = s.archivedAt != null) }
             sessionSelection(s.agent, s.model)
         }
         drafts.load(sessionId).takeIf { it.isNotEmpty() }?.let { text -> updateState { it.copy(draft = text) } }
@@ -213,6 +219,10 @@ class ChatViewModel(
         viewModelScope.launch {
             // Also pinned or unpinned from the session list while this chat is open beside it.
             pins.changes.collect { updateState { it.copy(pinned = sessionId in pins.pinned()) } }
+        }
+        viewModelScope.launch {
+            val supported = sessions.archiveSupported()
+            updateState { it.copy(archiveSupported = supported) }
         }
         viewModelScope.launch {
             // Every change of the composer text (typing, send, revert, picked mention) is kept.
@@ -413,6 +423,12 @@ class ChatViewModel(
                 pins.setPinned(sessionId, event.pinned)
                 updateState { it.copy(pinned = sessionId in pins.pinned()) }
             }
+            ChatEvent.RequestRename -> updateState { it.copy(renaming = true) }
+            is ChatEvent.ConfirmRename -> rename(event.title)
+            is ChatEvent.SetArchived -> setArchived(event.archived)
+            ChatEvent.RequestDelete -> updateState { it.copy(deleting = true) }
+            ChatEvent.ConfirmDelete -> delete()
+            ChatEvent.DismissDialog -> updateState { it.copy(renaming = false, deleting = false) }
             ChatEvent.OpenProviders -> if (currentState.directory.isNotEmpty()) sendEffect(ChatEffect.OpenProviders)
             ChatEvent.ProvidersConnected -> {
                 viewModelScope.launch {
@@ -643,6 +659,7 @@ class ChatViewModel(
                 it.copy(
                     title = s.title,
                     directory = s.directory,
+                    archived = s.archivedAt != null,
                     running = activeIds?.contains(sessionId) ?: it.running,
                     // Stop only asks the server to interrupt. If its ExecutionEnded was lost with
                     // the connection, a fresh server view must not leave the button disabled.
@@ -900,6 +917,57 @@ class ChatViewModel(
         }
     }
 
+    private fun rename(title: String) {
+        val next = title.trim()
+        val previous = currentState.title
+        updateState { it.copy(renaming = false) }
+        if (next.isEmpty() || next == previous) return
+        updateState { it.copy(title = next) }
+        viewModelScope.launch {
+            sessions.rename(sessionId, next).onFailure { error ->
+                updateState { it.copy(title = previous) }
+                sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+            }
+        }
+    }
+
+    private fun setArchived(archived: Boolean) {
+        if (currentState.archived == archived) return
+        val previous = currentState.archived
+        updateState { it.copy(archived = archived) }
+        viewModelScope.launch {
+            sessions.setArchived(sessionId, archived).onSuccess {
+                sendEffect(ChatEffect.ShowArchiveUndo(archived))
+            }.onFailure { error ->
+                updateState { it.copy(archived = previous) }
+                sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+            }
+        }
+    }
+
+    private fun delete() {
+        updateState { it.copy(deleting = false) }
+        deleteRequested = true
+        viewModelScope.launch {
+            sessions.delete(sessionId).onSuccess {
+                pins.setPinned(sessionId, false)
+                mutes.setMuted(sessionId, false)
+                leaveDeletedChat(inform = false)
+            }.onFailure { error ->
+                deleteRequested = false
+                if (!sessionDeleted) sendEffect(ChatEffect.ShowMessage(error.toUiText()))
+            }
+        }
+    }
+
+    /** Leaves a deleted chat once, whichever of the server event and the delete call reports it first. */
+    private fun leaveDeletedChat(inform: Boolean) {
+        if (sessionDeleted) return
+        sessionDeleted = true
+        if (inform) sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_session_deleted)))
+        sendEffect(ChatEffect.NavigateBack)
+    }
+
     private fun onServerEvent(event: ServerEvent) {
         if (event == ServerEvent.Connected || event is ServerEvent.ExecutionStarted || event is ServerEvent.ExecutionEnded ||
             event is ServerEvent.ToolProgress || event is ServerEvent.ToolSucceeded
@@ -943,12 +1011,11 @@ class ChatViewModel(
                 }
             }
             is ServerEvent.SessionChanged -> if (event.deleted) {
-                sendEffect(ChatEffect.ShowMessage(UiText.Resource(Res.string.chat_session_deleted)))
-                sendEffect(ChatEffect.NavigateBack)
+                leaveDeletedChat(inform = !deleteRequested)
             } else {
                 viewModelScope.launch {
                     sessions.get(sessionId).onSuccess { s ->
-                        updateState { it.copy(title = s.title) }
+                        updateState { it.copy(title = s.title, archived = s.archivedAt != null) }
                         sessionSelection(s.agent, s.model)
                     }
                 }

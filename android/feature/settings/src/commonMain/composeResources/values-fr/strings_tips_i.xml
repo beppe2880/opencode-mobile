@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Gérer la conversation ouverte</string>
+    <string name="tips_i_chat_actions_body">Renommez, archivez ou supprimez la conversation depuis son menu à trois points, sans revenir à la liste des sessions. La suppression demande confirmation et nomme la conversation.</string>
+    <string name="tips_i_chat_actions_demo">Le menu de la conversation s'ouvre : Renommer la conversation modifie le titre, Supprimer la conversation demande confirmation.</string>
+</resources>

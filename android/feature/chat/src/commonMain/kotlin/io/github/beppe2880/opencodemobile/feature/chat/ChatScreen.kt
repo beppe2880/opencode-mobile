@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -67,12 +68,14 @@ import io.github.beppe2880.opencodemobile.core.domain.RunningWork
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.ui.components.LocalEditMode
 import io.github.beppe2880.opencodemobile.core.ui.components.OcBottomSheet
+import io.github.beppe2880.opencodemobile.core.ui.components.OcConfirmDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcDivider
 import io.github.beppe2880.opencodemobile.core.ui.components.OcEmptyState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcErrorState
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcModelPicker
 import io.github.beppe2880.opencodemobile.core.ui.components.OcPulsingDot
+import io.github.beppe2880.opencodemobile.core.ui.components.OcTextInputDialog
 import io.github.beppe2880.opencodemobile.core.ui.components.OcTopBar
 import io.github.beppe2880.opencodemobile.core.ui.components.SessionMuteSheet
 import io.github.beppe2880.opencodemobile.core.ui.components.editable
@@ -88,12 +91,18 @@ import io.github.beppe2880.opencodemobile.core.ui.theme.OcTheme
 import io.github.beppe2880.opencodemobile.feature.chat.resources.Res
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_files
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_changes_open
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_delete
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_delete_message
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_delete_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_message
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_empty_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_error_title
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_more
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_muted
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_pinned
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_rename
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_rename_label
+import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_save
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_terminal_open
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_untitled
 import io.github.beppe2880.opencodemobile.feature.chat.resources.chat_vcs_branch_description
@@ -133,6 +142,7 @@ fun ChatScreen(
 ) {
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
+    var bottomBarHeight by remember { mutableStateOf(0) }
     BtwAutoOpen(state, allowed = !contextOpen && !externalOverlayOpen, onEvent)
     Scaffold(
         modifier = modifier,
@@ -157,7 +167,14 @@ fun ChatScreen(
                 if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                snackbarHostState,
+                // Above the bottom area, and above the keyboard when it is up: the content
+                // column rises with the IME, so the snackbar must follow it.
+                modifier = Modifier.imePadding().padding(bottom = with(LocalDensity.current) { bottomBarHeight.toDp() }),
+            )
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -198,7 +215,12 @@ fun ChatScreen(
                     }
                 }
             }
-            BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
+            Box(
+                Modifier.fillMaxWidth().onSizeChanged { bottomBarHeight = it.height },
+                contentAlignment = Alignment.Center,
+            ) {
+                BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
+            }
         }
     }
     if (state.modelSheetOpen) {
@@ -238,6 +260,31 @@ fun ChatScreen(
             compacting = state.compacting,
             onCompact = { onEvent(ChatEvent.Compact) },
             onDismiss = { contextOpen = false },
+        )
+    }
+    if (state.renaming) {
+        OcTextInputDialog(
+            title = stringResource(Res.string.chat_rename),
+            initialValue = state.title,
+            confirmLabel = stringResource(Res.string.chat_save),
+            label = stringResource(Res.string.chat_rename_label),
+            onConfirm = { onEvent(ChatEvent.ConfirmRename(it)) },
+            onDismiss = { onEvent(ChatEvent.DismissDialog) },
+            testTagPrefix = "chat_rename",
+        )
+    }
+    if (state.deleting) {
+        OcConfirmDialog(
+            title = stringResource(Res.string.chat_delete_title),
+            text = stringResource(
+                Res.string.chat_delete_message,
+                state.title.ifBlank { stringResource(Res.string.chat_untitled) },
+            ),
+            confirmLabel = stringResource(Res.string.chat_delete),
+            destructive = true,
+            onConfirm = { onEvent(ChatEvent.ConfirmDelete) },
+            onDismiss = { onEvent(ChatEvent.DismissDialog) },
+            testTagPrefix = "chat_delete",
         )
     }
 }
