@@ -4,6 +4,7 @@ import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.plugins.HttpTimeoutCapability
 import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
+import io.ktor.http.URLBuilder
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
 import kotlinx.cinterop.alloc
@@ -54,7 +55,7 @@ internal val ConnectProbe = createClientPlugin("ConnectProbe") {
     on(Send) { request ->
         val timeout = request.getCapabilityOrNull(HttpTimeoutCapability)?.connectTimeoutMillis
         val host = request.url.host
-        val port = request.url.port
+        val port = request.url.connectPort()
         val key = "$host:$port"
         if (timeout != null && !reachable.recently(key) && !tcpConnects(host, port, timeout)) {
             throw ConnectTimeoutException("Connect timeout has expired [url=${request.url}, connect_timeout=$timeout ms]")
@@ -63,6 +64,12 @@ internal val ConnectProbe = createClientPlugin("ConnectProbe") {
         proceed(request).also { reachable.mark(key) }
     }
 }
+
+/**
+ * The TCP port of the request. [URLBuilder.port] is 0 when the URL has none (for example
+ * `https://host`); the built [io.ktor.http.Url] falls back to the scheme's default port.
+ */
+internal fun URLBuilder.connectPort(): Int = build().port
 
 /** Hosts that answered within [TTL]; their calls skip the probe. */
 private class ReachableHosts {
