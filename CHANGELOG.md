@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.19.0](https://github.com/beppe2880/opencode-mobile/compare/v0.18.0...v0.19.0) (2026-11-26)
+
+
+### Features
+
+* **chat:** Add rename, archive and delete to the chat menu ([#267](https://github.com/beppe2880/opencode-mobile/issues/267)) ([0c59b22](https://github.com/beppe2880/opencode-mobile/commit/0c59b2252839f5edfd5035c50109e3f12f8e8320))
+* **chat:** Export sessions as Markdown or JSON ([#260](https://github.com/beppe2880/opencode-mobile/issues/260)) ([20681e1](https://github.com/beppe2880/opencode-mobile/commit/20681e11779955cea633598db364b04c05b4c8a8))
+* **chat:** Option to hide the keyboard after sending a message ([#275](https://github.com/beppe2880/opencode-mobile/issues/275)) ([4e5d01c](https://github.com/beppe2880/opencode-mobile/commit/4e5d01cf2b5183be34c726febf36db7e6692b103))
+* **sessions:** Add bulk actions to the session list ([#266](https://github.com/beppe2880/opencode-mobile/issues/266)) ([50e3626](https://github.com/beppe2880/opencode-mobile/commit/50e36262f52fe48ffb106688c21e3b12334b34d0))
+* **sessions:** Add bulk mute and parallel bulk actions ([#269](https://github.com/beppe2880/opencode-mobile/issues/269)) ([6dc3e3c](https://github.com/beppe2880/opencode-mobile/commit/6dc3e3c276111c5babccc046b4f145a9c880b531))
+* **sessions:** Mute notifications for a session ([#263](https://github.com/beppe2880/opencode-mobile/issues/263)) ([041f161](https://github.com/beppe2880/opencode-mobile/commit/041f16136af0d51f4d8cf17c15987b5ff2aa30c0))
+
+
+### Bug fixes
+
+* **chat:** Show command suggestions right above the message box ([#273](https://github.com/beppe2880/opencode-mobile/issues/273)) ([291f7c3](https://github.com/beppe2880/opencode-mobile/commit/291f7c3751b312626736bcb4904b38caf3ba2851))
+* **settings:** Do not send the app language to voice input by default ([#276](https://github.com/beppe2880/opencode-mobile/issues/276)) ([b337ed8](https://github.com/beppe2880/opencode-mobile/commit/b337ed82b16117ad11611204496a5369d6d3545e))
+
 ## [0.18.0](https://github.com/beppe2880/opencode-mobile/compare/v0.17.0...v0.18.0) (2026-11-22)
 
 
