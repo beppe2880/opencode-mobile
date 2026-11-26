@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">Berechtigungsanfragen erscheinen als einzeilige Leiste über dem Eingabefeld; tippen, um zu antworten</string>
     <string name="settings_agent_outline">Umrandung in Agentenfarbe</string>
     <string name="settings_agent_outline_sub">Nachrichtenfeld in der Farbe des ausgewählten Agenten umranden</string>
+    <string name="settings_hide_keyboard_after_send">Tastatur nach dem Senden ausblenden</string>
+    <string name="settings_hide_keyboard_after_send_sub">Schließt die Tastatur, sobald eine Nachricht gesendet ist, damit die Antwort den ganzen Bildschirm nutzt; tippe auf das Nachrichtenfeld, um wieder zu schreiben</string>
     <string name="settings_dictation">Spracheingabe</string>
     <string name="settings_dictation_sub">Mikrofon-Taste im Nachrichtenfeld, nutzt die Spracherkennung des Telefons</string>
     <string name="settings_dictation_cloud_sub">Mikrofon-Taste im Nachrichtenfeld, nutzt den Cloud-Anbieter unten</string>

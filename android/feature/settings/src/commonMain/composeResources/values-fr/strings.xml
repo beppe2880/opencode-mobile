@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">Les demandes d'autorisation apparaissent sous forme de barre d'une ligne au-dessus de la zone de saisie ; touchez-la pour répondre</string>
     <string name="settings_agent_outline">Contour aux couleurs de l’agent</string>
     <string name="settings_agent_outline_sub">Utiliser la couleur de l’agent sélectionné pour le contour du champ de message</string>
+    <string name="settings_hide_keyboard_after_send">Masquer le clavier après l'envoi</string>
+    <string name="settings_hide_keyboard_after_send_sub">Fermer le clavier une fois un message envoyé, pour que la réponse occupe tout l'écran ; touchez le champ de message pour écrire à nouveau</string>
     <string name="settings_dictation">Saisie vocale</string>
     <string name="settings_dictation_sub">Bouton micro dans le champ de message, utilisant la reconnaissance vocale du téléphone</string>
     <string name="settings_dictation_cloud_sub">Bouton micro dans le champ de message, utilisant le fournisseur cloud ci-dessous</string>

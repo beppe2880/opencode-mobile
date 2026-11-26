@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">As solicitações de permissão aparecem como uma barra de uma linha acima do campo de mensagem; toque nela para responder</string>
     <string name="settings_agent_outline">Borda na cor do agente</string>
     <string name="settings_agent_outline_sub">Contornar a caixa de mensagem com a cor do agente selecionado</string>
+    <string name="settings_hide_keyboard_after_send">Ocultar o teclado após enviar</string>
+    <string name="settings_hide_keyboard_after_send_sub">Fecha o teclado quando uma mensagem é enviada, para que a resposta ocupe a tela inteira; toque na caixa de mensagem para digitar de novo</string>
     <string name="settings_dictation">Entrada de voz</string>
     <string name="settings_dictation_sub">Botão do microfone na caixa de mensagem, usando o reconhecimento de voz do telefone</string>
     <string name="settings_dictation_cloud_sub">Botão do microfone na caixa de mensagem, usando o provedor na nuvem abaixo</string>

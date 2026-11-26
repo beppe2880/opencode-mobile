@@ -608,6 +608,8 @@ data class AppSettings(
     val swipeSensitivity: SwipeSensitivity = SwipeSensitivity.Medium,
     /** The composer outline takes the selected agent's color. */
     val agentColorOutline: Boolean = true,
+    /** Once a message is sent, the keyboard closes and the message box loses the focus, leaving the transcript the whole screen. */
+    val hideKeyboardAfterSend: Boolean = false,
     /** A microphone button in the composer dictates through the system speech recognizer. */
     val dictation: Boolean = true,
     /** With [dictation]: what turns the voice into text. */

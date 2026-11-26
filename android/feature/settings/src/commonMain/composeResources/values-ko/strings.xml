@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">권한 요청은 입력창 위에 한 줄 막대로 표시됩니다. 탭하여 응답하세요</string>
     <string name="settings_agent_outline">에이전트 색상 테두리</string>
     <string name="settings_agent_outline_sub">선택한 에이전트의 색상으로 메시지 상자 테두리 표시</string>
+    <string name="settings_hide_keyboard_after_send">전송 후 키보드 숨기기</string>
+    <string name="settings_hide_keyboard_after_send_sub">메시지를 보내면 키보드를 닫아 답변이 화면 전체에 보이게 합니다. 메시지 상자를 탭하면 다시 입력할 수 있습니다</string>
     <string name="settings_dictation">음성 입력</string>
     <string name="settings_dictation_sub">메시지 상자의 마이크 버튼, 휴대폰의 음성 인식 사용</string>
     <string name="settings_dictation_cloud_sub">메시지 상자의 마이크 버튼, 아래 클라우드 제공업체 사용</string>

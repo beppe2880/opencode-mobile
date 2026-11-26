@@ -91,6 +91,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_he
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_icons_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_header_style_short_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_hide_keyboard_after_send
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_hide_keyboard_after_send_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_keep_live_open_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_list_handle
@@ -275,6 +277,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.LiveReads -> Res.string.settings_live_reads
         SettingOption.LiveOther -> Res.string.settings_live_other
         SettingOption.AgentOutline -> Res.string.settings_agent_outline
+        SettingOption.HideKeyboardAfterSend -> Res.string.settings_hide_keyboard_after_send
         SettingOption.Dictation -> Res.string.settings_dictation
         SettingOption.VoiceMode -> Res.string.settings_voice_mode
         SettingOption.VoiceProvider -> Res.string.settings_voice_provider
@@ -343,6 +346,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.LiveReads -> Res.string.settings_live_reads_sub
         SettingOption.LiveOther -> Res.string.settings_live_other_sub
         SettingOption.AgentOutline -> Res.string.settings_agent_outline_sub
+        SettingOption.HideKeyboardAfterSend -> Res.string.settings_hide_keyboard_after_send_sub
         SettingOption.Dictation -> Res.string.settings_dictation_sub
         SettingOption.VoiceMode -> Res.string.settings_voice_mode_cloud_sub
         SettingOption.VoiceProvider -> Res.string.settings_voice_provider_sub
@@ -523,6 +527,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         SettingOption.LiveReads -> switch(settings.liveReads, SettingsEvent::LiveReadsChanged)()
         SettingOption.LiveOther -> switch(settings.liveOther, SettingsEvent::LiveOtherChanged)()
         SettingOption.AgentOutline -> switch(settings.agentColorOutline, SettingsEvent::AgentColorOutlineChanged)()
+        SettingOption.HideKeyboardAfterSend -> switch(settings.hideKeyboardAfterSend, SettingsEvent::HideKeyboardAfterSendChanged)()
         SettingOption.Dictation -> switch(
             settings.dictation,
             SettingsEvent::DictationChanged,
@@ -788,6 +793,7 @@ private val SettingOption.tag: String
         SettingOption.LiveReads -> "live_reads"
         SettingOption.LiveOther -> "live_other"
         SettingOption.AgentOutline -> "agent_outline"
+        SettingOption.HideKeyboardAfterSend -> "hide_keyboard_after_send"
         SettingOption.Dictation -> "dictation"
         SettingOption.VoiceMode -> "voice_mode"
         SettingOption.VoiceProvider -> "voice_provider"

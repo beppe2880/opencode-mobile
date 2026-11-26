@@ -93,6 +93,7 @@ class PreferencesRepositoriesTest {
             confirmStopCommand = false,
             unreadSessions = UnreadSessions.Off,
             runningChips = false,
+            hideKeyboardAfterSend = true,
             questionsCollapsed = true,
             permissionsCollapsed = true,
             terminalKeys = keys,
@@ -141,6 +142,8 @@ class PreferencesRepositoriesTest {
         assertEquals(false, prefs.values["running_chips"])
         assertEquals(false, prefs.values["close_model_picker_on_select"])
         assertTrue(AppSettings().closeModelPickerOnSelect)
+        assertEquals(true, prefs.values["hide_keyboard_after_send"])
+        assertFalse(AppSettings().hideKeyboardAfterSend)
         assertEquals(AppSettings(), PreferencesSettingsRepository(SharedPreferencesSettings(InMemoryPreferences())).settings.value)
     }
 

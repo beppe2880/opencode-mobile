@@ -43,6 +43,7 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.UnreadSessionsChanged -> copy(unreadSessions = event.unread)
     is SettingsEvent.RunningChipsChanged -> copy(runningChips = event.enabled)
     is SettingsEvent.AgentColorOutlineChanged -> copy(agentColorOutline = event.enabled)
+    is SettingsEvent.HideKeyboardAfterSendChanged -> copy(hideKeyboardAfterSend = event.enabled)
     is SettingsEvent.DictationChanged -> copy(dictation = event.enabled)
     is SettingsEvent.VoiceEngineChanged -> copy(voiceEngine = event.engine)
     is SettingsEvent.SttProviderChanged -> copy(sttProvider = event.provider)

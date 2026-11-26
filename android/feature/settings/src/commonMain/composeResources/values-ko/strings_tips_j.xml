@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">세션 일괄 작업</string>
     <string name="tips_j_sessions_bulk_body">세션을 길게 눌러 선택한 다음 다른 행을 탭하세요. 함께 고정, 음소거/음소거 해제, 보관, 읽음/읽지 않음 표시 또는 삭제할 수 있고, 하나만 선택하면 이름을 바꿀 수 있습니다. 뒤로 가면 선택이 해제됩니다. 읽지 않음 표시는 이 기기에만 저장됩니다.</string>
     <string name="tips_j_sessions_bulk_demo">세션을 길게 누르고 두 행을 선택한 뒤 메뉴에서 한 번 확인하여 삭제합니다.</string>
+    <string name="tips_j_hide_keyboard_title">전송 후 키보드 숨기기</string>
+    <string name="tips_j_hide_keyboard_body">설정 → 메시지 상자에서 '전송 후 키보드 숨기기'를 켜면, 메시지를 보낸 뒤 키보드가 닫혀 답변이 스트리밍되는 동안 읽을 수 있습니다. 메시지 상자를 탭하면 다시 입력할 수 있습니다. 전송에 실패하면 텍스트와 키보드는 그대로 유지됩니다.</string>
+    <string name="tips_j_hide_keyboard_demo">프롬프트를 입력해 보내면 키보드가 밀려 사라지고, 답변이 채팅 전체에 스트리밍됩니다.</string>
+    <string name="tips_j_hide_keyboard_prompt">빌드가 왜 실패하나요?</string>
+    <string name="tips_j_hide_keyboard_answer">**ParserTest** 테스트는 끝에 줄바꿈이 있어야 합니다. `fixtures/input.txt`에 줄바꿈을 추가했더니 빌드가 다시 통과합니다.</string>
 </resources>

@@ -155,7 +155,7 @@ val SettingsArea.groups: List<OptionGroup>
             OptionGroup(Res.string.settings_group_output, listOf(SettingOption.OutputLines)),
         )
         SettingsArea.Composer -> listOf(
-            OptionGroup(null, listOf(SettingOption.AgentOutline)),
+            OptionGroup(null, listOf(SettingOption.AgentOutline, SettingOption.HideKeyboardAfterSend)),
             OptionGroup(
                 Res.string.settings_group_agent_model,
                 listOf(SettingOption.SelectionApply, SettingOption.CloseModelPickerOnSelect, SettingOption.NewChatModel),

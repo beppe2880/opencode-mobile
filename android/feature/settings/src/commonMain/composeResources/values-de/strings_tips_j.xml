@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">Mehrere Sitzungen auf einmal</string>
     <string name="tips_j_sessions_bulk_body">Halte eine Sitzung gedrückt, um sie auszuwählen, und tippe weitere Zeilen an. Anheften, stummschalten oder die Stummschaltung aufheben, archivieren, als gelesen oder ungelesen markieren oder zusammen löschen; umbenennen, wenn nur eine ausgewählt ist. Zurück beendet die Auswahl. Ungelesen-Markierungen bleiben auf diesem Gerät.</string>
     <string name="tips_j_sessions_bulk_demo">Eine Sitzung wird gedrückt gehalten; zwei Zeilen sind ausgewählt, und das Menü löscht sie nach einer Bestätigung.</string>
+    <string name="tips_j_hide_keyboard_title">Tastatur nach dem Senden ausblenden</string>
+    <string name="tips_j_hide_keyboard_body">Aktiviere unter Einstellungen → Nachrichtenfeld die Option Tastatur nach dem Senden ausblenden: Sobald eine Nachricht gesendet ist, schließt sich die Tastatur, sodass du die Antwort beim Eintreffen lesen kannst. Tippe auf das Nachrichtenfeld, um wieder zu schreiben. Schlägt das Senden fehl, bleiben Text und Tastatur erhalten.</string>
+    <string name="tips_j_hide_keyboard_demo">Ein Prompt wird getippt und gesendet; die Tastatur gleitet weg und die Antwort erscheint live über den ganzen Chat.</string>
+    <string name="tips_j_hide_keyboard_prompt">Warum schlägt der Build fehl?</string>
+    <string name="tips_j_hide_keyboard_answer">Der Test **ParserTest** erwartet einen abschließenden Zeilenumbruch. Ich habe ihn in `fixtures/input.txt` ergänzt, und der Build läuft wieder durch.</string>
 </resources>

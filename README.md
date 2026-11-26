@@ -150,7 +150,7 @@ you tap any part of the real screens, filled with sample data, to change it.
 | **Appearance** | System, light or dark theme · 33 OpenCode terminal themes for the whole app and the markdown in answers · chat text size |
 | **Chat** | Reasoning on or off · grouped thoughts · grouped thinking and tools · expanded tool calls · tool details · full commands · size of images read by the agent and of attached images · cost per reply · header line under the chat title, its style and what tapping it opens · permission requests and questions shown collapsed · running work above the message box · swipe between chats or to the chat list, and its sensitivity |
 | **Live activity** | Follow running work · which steps stay open while the agent works: thinking, shell commands, file changes, reads and searches, other tools · keep steps open · shell output refresh rate · output lines |
-| **Message box** | Agent color outline · apply agent and model changes now or with the next message · close the model picker after choosing · model for new chats: last used or the server default |
+| **Message box** | Agent color outline · hide the keyboard after sending · apply agent and model changes now or with the next message · close the model picker after choosing · model for new chats: last used or the server default |
 | **Voice input** | On or off · the phone's speech recognition or a cloud provider · provider, model and API key · send the app language · recording style · hold to record |
 | **Sessions** | Running work in the session list · confirm before stopping commands |
 | **Terminal** | Custom key bar · open the keyboard · full screen by default |

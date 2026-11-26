@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">权限请求会以单行条显示在输入框上方；点击即可回复</string>
     <string name="settings_agent_outline">智能体颜色边框</string>
     <string name="settings_agent_outline_sub">使用所选智能体的颜色描绘消息框边框</string>
+    <string name="settings_hide_keyboard_after_send">发送后隐藏键盘</string>
+    <string name="settings_hide_keyboard_after_send_sub">发送消息后关闭键盘，让回复占满整个屏幕；点按消息框即可再次输入</string>
     <string name="settings_dictation">语音输入</string>
     <string name="settings_dictation_sub">消息框中的麦克风按钮，使用手机的语音识别</string>
     <string name="settings_dictation_cloud_sub">消息框中的麦克风按钮，使用下方的云端服务商</string>

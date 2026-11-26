@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">Bulk actions on sessions</string>
     <string name="tips_j_sessions_bulk_body">Long-press a session to select it, then tap more rows. Pin, mute or unmute, archive, mark read or unread or delete them together; rename when only one is selected. Back leaves the selection. Unread marks stay on this device.</string>
     <string name="tips_j_sessions_bulk_demo">A session is long-pressed; two rows are selected and the menu deletes them after one confirmation.</string>
+    <string name="tips_j_hide_keyboard_title">Hide the keyboard after sending</string>
+    <string name="tips_j_hide_keyboard_body">Turn on Hide keyboard after sending in Settings → Message box: once a message is sent, the keyboard closes so you can read the answer as it streams. Tap the message box to type again. If sending fails, the text and the keyboard stay.</string>
+    <string name="tips_j_hide_keyboard_demo">A prompt is typed and sent; the keyboard slides away and the answer streams in over the whole chat.</string>
+    <string name="tips_j_hide_keyboard_prompt">Why does the build fail?</string>
+    <string name="tips_j_hide_keyboard_answer">The test **ParserTest** expects a trailing newline. I added it to `fixtures/input.txt` and the build passes again.</string>
 </resources>

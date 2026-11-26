@@ -13,6 +13,7 @@ class SettingsSearchTest {
         SettingOption.Theme to "Theme",
         SettingOption.LiveShell to "Running commands",
         SettingOption.TerminalKeyboard to "Open the keyboard",
+        SettingOption.HideKeyboardAfterSend to "Hide keyboard after sending",
     )
     private val descriptions = mapOf(
         SettingOption.ShowCost to "Cost of each turn · Answer footer · Chat",
@@ -33,8 +34,9 @@ class SettingsSearchTest {
     @Test
     fun titlesMatchIgnoringCaseAndComeFirst() {
         assertEquals(SettingOption.ShowCost, search("COST").first())
-        // "keyboard" is in a title and in a description: the title match leads.
-        assertEquals(listOf(SettingOption.TerminalKeyboard), search("keyboard").take(1))
+        // "keyboard" is in titles and in a description: the title matches lead, in Settings order.
+        assertEquals(listOf(SettingOption.HideKeyboardAfterSend, SettingOption.TerminalKeyboard), search("keyboard").take(2))
+        assertEquals(listOf(SettingOption.TerminalKeyboard), search("open keyboard"))
     }
 
     @Test

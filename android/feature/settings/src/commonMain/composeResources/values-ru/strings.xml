@@ -130,6 +130,8 @@
     <string name="settings_permissions_collapsed_sub">Запросы разрешений появляются в виде однострочной полосы над полем ввода; нажмите на неё, чтобы ответить</string>
     <string name="settings_agent_outline">Рамка цвета агента</string>
     <string name="settings_agent_outline_sub">Выделять поле сообщения цветом выбранного агента</string>
+    <string name="settings_hide_keyboard_after_send">Скрывать клавиатуру после отправки</string>
+    <string name="settings_hide_keyboard_after_send_sub">Закрывать клавиатуру после отправки сообщения, чтобы ответ занимал весь экран; коснитесь поля сообщения, чтобы снова печатать</string>
     <string name="settings_dictation">Голосовой ввод</string>
     <string name="settings_dictation_sub">Кнопка микрофона в поле сообщения, использует распознавание речи телефона</string>
     <string name="settings_dictation_cloud_sub">Кнопка микрофона в поле сообщения, использует облачного провайдера ниже</string>

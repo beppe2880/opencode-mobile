@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">批量操作会话</string>
     <string name="tips_j_sessions_bulk_body">长按会话将其选中，然后点按更多行。可一起置顶、静音或取消静音、归档、标为已读或未读或删除；仅选中一个时可重命名。返回即退出选择。未读标记仅保存在此设备上。</string>
     <string name="tips_j_sessions_bulk_demo">长按一个会话；选中两行后，菜单在一次确认后将其删除。</string>
+    <string name="tips_j_hide_keyboard_title">发送后隐藏键盘</string>
+    <string name="tips_j_hide_keyboard_body">在 设置 → 消息框 中开启“发送后隐藏键盘”：消息发送后，键盘会关闭，方便你边看边读回复。点按消息框即可再次输入。如果发送失败，文本和键盘保持不变。</string>
+    <string name="tips_j_hide_keyboard_demo">输入并发送一条提示词；键盘滑走，回复在整个聊天中逐字显示。</string>
+    <string name="tips_j_hide_keyboard_prompt">为什么构建失败？</string>
+    <string name="tips_j_hide_keyboard_answer">测试 **ParserTest** 需要文件末尾有换行符。我已将其添加到 `fixtures/input.txt`，构建又通过了。</string>
 </resources>

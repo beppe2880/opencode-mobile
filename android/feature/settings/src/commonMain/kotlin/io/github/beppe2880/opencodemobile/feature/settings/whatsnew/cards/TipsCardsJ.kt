@@ -2,7 +2,11 @@ package io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.KeyboardHide
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_title
@@ -21,5 +25,16 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         pullRequest = 266,
         morePullRequests = listOf(269),
         demo = { SessionBulkActionsDemo(it) },
+    ),
+    FeatureCard(
+        id = "hide-keyboard-after-send",
+        version = "0.19.0",
+        icon = Icons.Outlined.KeyboardHide,
+        title = Res.string.tips_j_hide_keyboard_title,
+        body = Res.string.tips_j_hide_keyboard_body,
+        demoDescription = Res.string.tips_j_hide_keyboard_demo,
+        author = "beppe2880",
+        pullRequest = 275,
+        demo = { HideKeyboardDemo(it) },
     ),
 )

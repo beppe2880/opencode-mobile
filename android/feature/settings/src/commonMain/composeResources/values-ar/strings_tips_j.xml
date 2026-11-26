@@ -3,4 +3,9 @@
     <string name="tips_j_sessions_bulk_title">إجراءات دفعية للجلسات</string>
     <string name="tips_j_sessions_bulk_body">اضغط مطوّلاً على جلسة لتحديدها ثم اضغط على صفوف أخرى. ثبّت أو اكتم الصوت أو ألغِ الكتم أو أرشف أو ضع علامة مقروءة أو غير مقروءة أو احذفها معًا، أو أعد تسميتها عند تحديد واحدة فقط. زر الرجوع ينهي التحديد. تبقى علامات عدم القراءة على هذا الجهاز فقط.</string>
     <string name="tips_j_sessions_bulk_demo">يُضغط مطوّلًا على جلسة؛ يُحدد صفّان ثم تحذفهما القائمة بعد تأكيد واحد.</string>
+    <string name="tips_j_hide_keyboard_title">إخفاء لوحة المفاتيح بعد الإرسال</string>
+    <string name="tips_j_hide_keyboard_body">فعّل «إخفاء لوحة المفاتيح بعد الإرسال» من الإعدادات ← مربع الرسالة: بعد إرسال الرسالة، تُغلق لوحة المفاتيح لتقرأ الإجابة أثناء ظهورها. اضغط على مربع الرسالة للكتابة من جديد. إذا فشل الإرسال، يبقى النص ولوحة المفاتيح كما هما.</string>
+    <string name="tips_j_hide_keyboard_demo">يُكتب موجّه ويُرسل؛ تنزلق لوحة المفاتيح بعيدًا وتظهر الإجابة تدريجيًا فوق المحادثة كلها.</string>
+    <string name="tips_j_hide_keyboard_prompt">لماذا يفشل البناء؟</string>
+    <string name="tips_j_hide_keyboard_answer">يتوقع الاختبار **ParserTest** سطرًا جديدًا في نهاية الملف. أضفته إلى `fixtures/input.txt` فيمرّ البناء مجددًا.</string>
 </resources>
