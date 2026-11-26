@@ -169,7 +169,7 @@
     <string name="settings_voice_test_network">プロバイダーに接続できませんでした</string>
     <string name="settings_voice_test_provider">プロバイダーがエラーを返しました：%1$s</string>
     <string name="settings_voice_language">アプリの言語を送信</string>
-    <string name="settings_voice_language_sub">録音の言語をプロバイダーに伝え、精度を高めます。オフの場合は言語を自動検出します</string>
+    <string name="settings_voice_language_sub">アプリの言語で話すと精度が上がりますが、ほかの言語の音声は翻訳されて返ることがあります。オフの場合はプロバイダーが言語を自動検出します</string>
     <string name="settings_voice_style">録音スタイル</string>
     <string name="settings_voice_style_waveform">波形</string>
     <string name="settings_voice_style_compact">コンパクト</string>

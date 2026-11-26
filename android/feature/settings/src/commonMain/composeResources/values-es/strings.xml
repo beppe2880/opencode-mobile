@@ -169,7 +169,7 @@
     <string name="settings_voice_test_network">No se pudo conectar con el proveedor</string>
     <string name="settings_voice_test_provider">El proveedor respondió con un error: %1$s</string>
     <string name="settings_voice_language">Enviar el idioma de la app</string>
-    <string name="settings_voice_language_sub">Indica al proveedor el idioma de la grabación, lo que mejora la precisión; desactivado deja que detecte el idioma</string>
+    <string name="settings_voice_language_sub">Mejora la precisión al hablar en el idioma de la app, pero el habla en otro idioma puede devolverse traducida. Desactivado deja que el proveedor detecte el idioma</string>
     <string name="settings_voice_style">Estilo de grabación</string>
     <string name="settings_voice_style_waveform">Onda</string>
     <string name="settings_voice_style_compact">Compacto</string>

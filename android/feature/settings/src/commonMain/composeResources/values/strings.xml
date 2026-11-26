@@ -169,7 +169,7 @@
     <string name="settings_voice_test_network">Couldn't reach the provider</string>
     <string name="settings_voice_test_provider">The provider answered with an error: %1$s</string>
     <string name="settings_voice_language">Send the app language</string>
-    <string name="settings_voice_language_sub">Tells the provider the language of the recording, which helps accuracy; off lets it detect the language</string>
+    <string name="settings_voice_language_sub">Helps accuracy when you speak the app language, but speech in another language may come back translated. Off lets the provider detect the language</string>
     <string name="settings_voice_style">Recording style</string>
     <string name="settings_voice_style_waveform">Waveform</string>
     <string name="settings_voice_style_compact">Compact</string>

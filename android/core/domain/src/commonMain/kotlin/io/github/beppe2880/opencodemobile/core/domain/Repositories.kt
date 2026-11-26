@@ -618,8 +618,11 @@ data class AppSettings(
     val sttModels: Map<SttProvider, String> = emptyMap(),
     /** Address of the [SttProvider.Custom] server, e.g. `http://192.168.1.10:8000/v1`. */
     val sttBaseUrl: String = "",
-    /** With [VoiceEngine.Cloud]: the app language is sent as the language of the audio, otherwise the provider detects it. */
-    val sttLanguageHint: Boolean = true,
+    /**
+     * With [VoiceEngine.Cloud]: the app language is sent as the language of the audio, otherwise the provider detects it.
+     * Off by default: some providers translate speech in another language into the hinted one.
+     */
+    val sttLanguageHint: Boolean = false,
     /** With [VoiceEngine.Cloud]: how the message box shows the recording. */
     val voiceRecordingStyle: VoiceRecordingStyle = VoiceRecordingStyle.Waveform,
     /** With [VoiceEngine.Cloud]: holding the microphone records, releasing transcribes, sliding away cancels. */

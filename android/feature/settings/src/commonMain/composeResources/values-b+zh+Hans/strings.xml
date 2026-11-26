@@ -169,7 +169,7 @@
     <string name="settings_voice_test_network">无法连接服务商</string>
     <string name="settings_voice_test_provider">服务商返回错误：%1$s</string>
     <string name="settings_voice_language">发送应用语言</string>
-    <string name="settings_voice_language_sub">告知服务商录音的语言，有助于提高准确度；关闭则由服务商自动检测语言</string>
+    <string name="settings_voice_language_sub">说应用语言时有助于提高准确度，但其他语言的语音可能会被翻译后返回。关闭则由服务商自动检测语言</string>
     <string name="settings_voice_style">录音样式</string>
     <string name="settings_voice_style_waveform">波形</string>
     <string name="settings_voice_style_compact">紧凑</string>

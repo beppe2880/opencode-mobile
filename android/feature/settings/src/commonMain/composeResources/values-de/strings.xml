@@ -169,7 +169,7 @@
     <string name="settings_voice_test_network">Der Anbieter ist nicht erreichbar</string>
     <string name="settings_voice_test_provider">Der Anbieter hat mit einem Fehler geantwortet: %1$s</string>
     <string name="settings_voice_language">App-Sprache senden</string>
-    <string name="settings_voice_language_sub">Teilt dem Anbieter die Sprache der Aufnahme mit, das verbessert die Genauigkeit; aus lässt ihn die Sprache erkennen</string>
+    <string name="settings_voice_language_sub">Verbessert die Genauigkeit bei der App-Sprache; andere Sprachen können übersetzt zurückkommen. Aus lässt den Anbieter die Sprache erkennen</string>
     <string name="settings_voice_style">Aufnahmestil</string>
     <string name="settings_voice_style_waveform">Wellenform</string>
     <string name="settings_voice_style_compact">Kompakt</string>

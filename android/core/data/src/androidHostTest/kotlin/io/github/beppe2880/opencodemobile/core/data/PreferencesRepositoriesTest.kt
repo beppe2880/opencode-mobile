@@ -125,7 +125,7 @@ class PreferencesRepositoriesTest {
             sttProvider = SttProvider.Custom,
             sttModels = mapOf(SttProvider.Groq to "whisper-large-v3", SttProvider.Custom to "Systran/faster-whisper-small"),
             sttBaseUrl = "http://192.168.1.10:8000/v1",
-            sttLanguageHint = false,
+            sttLanguageHint = true,
             voiceRecordingStyle = VoiceRecordingStyle.Compact,
             voiceHoldToRecord = true,
             toolMediaSize = ToolMediaSize.Large,

@@ -426,7 +426,7 @@ class SettingsViewModelTest {
         vm.onEvent(SettingsEvent.SttProviderChanged(SttProvider.Custom))
         vm.onEvent(SettingsEvent.SttBaseUrlChanged(" http://192.168.1.10:8000/v1 "))
         vm.onEvent(SettingsEvent.SttModelChanged(" Systran/faster-whisper-small "))
-        vm.onEvent(SettingsEvent.SttLanguageHintChanged(false))
+        vm.onEvent(SettingsEvent.SttLanguageHintChanged(true))
         vm.onEvent(SettingsEvent.VoiceRecordingStyleChanged(VoiceRecordingStyle.Compact))
         vm.onEvent(SettingsEvent.VoiceHoldToRecordChanged(true))
         advanceUntilIdle()
@@ -436,7 +436,7 @@ class SettingsViewModelTest {
         assertEquals(SttProvider.Custom, saved.sttProvider)
         assertEquals("http://192.168.1.10:8000/v1", saved.sttBaseUrl)
         assertEquals(mapOf(SttProvider.Custom to "Systran/faster-whisper-small"), saved.sttModels)
-        assertFalse(saved.sttLanguageHint)
+        assertTrue(saved.sttLanguageHint)
         assertEquals(VoiceRecordingStyle.Compact, saved.voiceRecordingStyle)
         assertTrue(saved.voiceHoldToRecord)
 
