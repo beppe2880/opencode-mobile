@@ -171,7 +171,7 @@
     <string name="settings_voice_test_network">제공업체에 연결할 수 없습니다</string>
     <string name="settings_voice_test_provider">제공업체가 오류를 반환했습니다: %1$s</string>
     <string name="settings_voice_language">앱 언어 보내기</string>
-    <string name="settings_voice_language_sub">녹음의 언어를 제공업체에 알려 정확도를 높입니다. 끄면 제공업체가 언어를 감지합니다</string>
+    <string name="settings_voice_language_sub">앱 언어로 말할 때 정확도가 높아지지만, 다른 언어의 음성은 번역되어 돌아올 수 있습니다. 끄면 제공업체가 언어를 감지합니다</string>
     <string name="settings_voice_style">녹음 스타일</string>
     <string name="settings_voice_style_waveform">파형</string>
     <string name="settings_voice_style_compact">간결</string>

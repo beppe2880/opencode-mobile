@@ -76,7 +76,7 @@ class CloudSpeechToTextRepositoryTest {
         assertTrue(repository.transcribe(clip).exceptionOrNull() is TranscriptionError.BadAddress)
         assertEquals(0, server.requestCount)
 
-        settings.settings.value = settings.settings.value.copy(sttBaseUrl = server.url("/v1/").toString())
+        settings.settings.value = settings.settings.value.copy(sttBaseUrl = server.url("/v1/").toString(), sttLanguageHint = true)
         answer("""{"text":" ciao "}""")
         assertEquals("ciao", repository.transcribe(clip).getOrThrow())
 
@@ -89,11 +89,10 @@ class CloudSpeechToTextRepositoryTest {
     }
 
     @Test
-    fun `the saved key, the chosen model and no language hint when it is off`() = runBlocking {
+    fun `the saved key, the chosen model and no language hint by default`() = runBlocking {
         repository.saveKey(SttProvider.Custom, "local-key")
         settings.settings.value = settings.settings.value.copy(
             sttModels = mapOf(SttProvider.Custom to "Systran/faster-whisper-small"),
-            sttLanguageHint = false,
         )
         answer("""{"text":"hello"}""")
 

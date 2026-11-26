@@ -171,7 +171,7 @@
     <string name="settings_voice_test_network">تعذّر الوصول إلى المزود</string>
     <string name="settings_voice_test_provider">ردّ المزود بخطأ: %1$s</string>
     <string name="settings_voice_language">إرسال لغة التطبيق</string>
-    <string name="settings_voice_language_sub">يخبر المزود بلغة التسجيل، مما يحسّن الدقة؛ عند الإيقاف يكتشف المزود اللغة بنفسه</string>
+    <string name="settings_voice_language_sub">يحسّن الدقة عند التحدث بلغة التطبيق، لكن الكلام بلغة أخرى قد يُعاد مترجمًا. عند الإيقاف يكتشف المزود اللغة بنفسه</string>
     <string name="settings_voice_style">نمط التسجيل</string>
     <string name="settings_voice_style_waveform">الموجة</string>
     <string name="settings_voice_style_compact">مضغوط</string>

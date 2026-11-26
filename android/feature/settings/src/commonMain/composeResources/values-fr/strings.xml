@@ -171,7 +171,7 @@
     <string name="settings_voice_test_network">Impossible de joindre le fournisseur</string>
     <string name="settings_voice_test_provider">Le fournisseur a répondu par une erreur : %1$s</string>
     <string name="settings_voice_language">Envoyer la langue de l'app</string>
-    <string name="settings_voice_language_sub">Indique au fournisseur la langue de l'enregistrement, ce qui améliore la précision ; désactivé, il détecte la langue</string>
+    <string name="settings_voice_language_sub">Améliore la précision si vous parlez la langue de l'application, mais une parole dans une autre langue peut revenir traduite. Désactivé, le fournisseur détecte la langue</string>
     <string name="settings_voice_style">Style d'enregistrement</string>
     <string name="settings_voice_style_waveform">Onde</string>
     <string name="settings_voice_style_compact">Compact</string>

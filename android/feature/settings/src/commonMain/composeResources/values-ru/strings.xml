@@ -171,7 +171,7 @@
     <string name="settings_voice_test_network">Не удалось связаться с провайдером</string>
     <string name="settings_voice_test_provider">Провайдер ответил ошибкой: %1$s</string>
     <string name="settings_voice_language">Отправлять язык приложения</string>
-    <string name="settings_voice_language_sub">Сообщает провайдеру язык записи, что повышает точность; если выключено, он определяет язык сам</string>
+    <string name="settings_voice_language_sub">Повышает точность, если вы говорите на языке приложения, но речь на другом языке может вернуться переведённой. Если выключено, провайдер определяет язык сам</string>
     <string name="settings_voice_style">Стиль записи</string>
     <string name="settings_voice_style_waveform">Волна</string>
     <string name="settings_voice_style_compact">Компактный</string>

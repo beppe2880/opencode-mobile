@@ -171,7 +171,7 @@
     <string name="settings_voice_test_network">Impossibile raggiungere il fornitore</string>
     <string name="settings_voice_test_provider">Il fornitore ha risposto con un errore: %1$s</string>
     <string name="settings_voice_language">Invia la lingua dell'app</string>
-    <string name="settings_voice_language_sub">Indica al fornitore la lingua della registrazione, il che migliora la precisione; disattivato lascia che la lingua venga rilevata</string>
+    <string name="settings_voice_language_sub">Migliora la precisione se parli la lingua dell'app, ma il parlato in altre lingue può risultare tradotto. Disattivato lascia che il fornitore rilevi la lingua</string>
     <string name="settings_voice_style">Stile di registrazione</string>
     <string name="settings_voice_style_waveform">Forma d'onda</string>
     <string name="settings_voice_style_compact">Compatto</string>
