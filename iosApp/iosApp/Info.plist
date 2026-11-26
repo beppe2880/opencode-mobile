@@ -53,12 +53,13 @@
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<!-- OpenCode servers are self-hosted on a LAN or VPN and usually served over plain HTTP. -->
+	<!-- OpenCode servers are self-hosted on a LAN or VPN and usually served over plain HTTP,
+	     also on host names such as Tailscale MagicDNS (*.ts.net). Do not add
+	     NSAllowsLocalNetworking: when present, iOS ignores NSAllowsArbitraryLoads and blocks
+	     plain HTTP to every qualified host name. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
