@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -78,10 +77,19 @@ internal val ChatState.historyReady: Boolean
 
 /** Session actions first, history next, tools last. No nested menus on phones. */
 @Composable
-internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () -> Unit, onEvent: (ChatEvent) -> Unit) {
-    // Keep the menu above the message area's footer and composer; the rest scrolls.
-    val maxMenuHeight = (with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() } - 370.dp)
-        .coerceAtLeast(320.dp)
+internal fun ChatActionsMenu(
+    state: ChatState,
+    expanded: Boolean,
+    availableHeightPx: Float,
+    onDismiss: () -> Unit,
+    onEvent: (ChatEvent) -> Unit,
+) {
+    // Keep room for a usable scroll viewport even if a pending card takes most of the space.
+    val maxMenuHeight = if (availableHeightPx.isFinite()) {
+        (with(LocalDensity.current) { availableHeightPx.toDp() } - OcSpacing.sm).coerceAtLeast(96.dp)
+    } else {
+        320.dp
+    }
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
