@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">管理当前聊天</string>
+    <string name="tips_i_chat_actions_body">无需返回会话列表，即可从三点菜单重命名、归档或删除聊天。删除前会先确认并显示聊天名称。</string>
+    <string name="tips_i_chat_actions_demo">聊天菜单打开：重命名聊天会编辑标题，删除聊天会请求确认。</string>
+</resources>

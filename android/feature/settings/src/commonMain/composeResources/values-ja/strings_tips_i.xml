@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">開いているチャットを管理</string>
+    <string name="tips_i_chat_actions_body">セッション一覧に戻らずに、3点メニューからチャット名の変更、アーカイブ、削除ができます。削除前には確認が表示され、チャット名が示されます。</string>
+    <string name="tips_i_chat_actions_demo">チャットメニューが開きます。チャット名を変更するとタイトルを編集でき、チャットを削除すると確認が表示されます。</string>
+</resources>

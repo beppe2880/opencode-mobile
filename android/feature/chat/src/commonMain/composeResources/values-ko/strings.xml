@@ -78,6 +78,17 @@
     <string name="chat_empty_message">에이전트에게 작업을 설명하세요. 작업 위치: %1$s.</string>
     <string name="chat_error_title">세션을 불러올 수 없습니다</string>
     <string name="chat_session_deleted">삭제된 세션입니다</string>
+    <string name="chat_rename">채팅 이름 변경</string>
+    <string name="chat_rename_label">제목</string>
+    <string name="chat_save">저장</string>
+    <string name="chat_delete">채팅 삭제</string>
+    <string name="chat_delete_title">채팅을 삭제할까요?</string>
+    <string name="chat_delete_message">“%1$s” 및 기록이 서버에서 영구적으로 삭제됩니다.</string>
+    <string name="chat_archive">보관</string>
+    <string name="chat_unarchive">보관 해제</string>
+    <string name="chat_archived_message">세션이 보관되었습니다</string>
+    <string name="chat_restored_message">세션이 복원되었습니다</string>
+    <string name="chat_archive_undo">실행 취소</string>
     <string name="chat_agent">에이전트</string>
     <string name="chat_model">모델</string>
     <string name="chat_model_description">모델: %1$s (%2$s)</string>

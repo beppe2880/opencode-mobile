@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Den offenen Chat verwalten</string>
+    <string name="tips_i_chat_actions_body">Benenne den Chat über sein Drei-Punkte-Menü um, archiviere oder lösche ihn, ohne zur Sitzungsliste zurückzugehen. Beim Löschen wird zuerst bestätigt und der Chat genannt.</string>
+    <string name="tips_i_chat_actions_demo">Das Chat-Menü öffnet sich: Chat umbenennen ändert den Titel, Chat löschen fragt nach einer Bestätigung.</string>
+</resources>

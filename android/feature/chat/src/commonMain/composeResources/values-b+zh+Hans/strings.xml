@@ -78,6 +78,17 @@
     <string name="chat_empty_message">为智能体描述任务。工作目录为 %1$s。</string>
     <string name="chat_error_title">无法加载会话</string>
     <string name="chat_session_deleted">此会话已删除</string>
+    <string name="chat_rename">重命名聊天</string>
+    <string name="chat_rename_label">标题</string>
+    <string name="chat_save">保存</string>
+    <string name="chat_delete">删除聊天</string>
+    <string name="chat_delete_title">删除聊天？</string>
+    <string name="chat_delete_message">将从服务器永久删除“%1$s”及其历史记录。</string>
+    <string name="chat_archive">归档</string>
+    <string name="chat_unarchive">取消归档</string>
+    <string name="chat_archived_message">会话已归档</string>
+    <string name="chat_restored_message">会话已恢复</string>
+    <string name="chat_archive_undo">撤销</string>
     <string name="chat_agent">智能体</string>
     <string name="chat_model">模型</string>
     <string name="chat_model_description">模型：%1$s（%2$s）</string>

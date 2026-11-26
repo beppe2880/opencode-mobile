@@ -123,6 +123,17 @@
     <string name="chat_empty_message">صف مهمة للوكيل. يعمل في %1$s.</string>
     <string name="chat_error_title">تعذر تحميل الجلسة</string>
     <string name="chat_session_deleted">تم حذف هذه الجلسة</string>
+    <string name="chat_rename">إعادة تسمية الدردشة</string>
+    <string name="chat_rename_label">العنوان</string>
+    <string name="chat_save">حفظ</string>
+    <string name="chat_delete">حذف الدردشة</string>
+    <string name="chat_delete_title">حذف الدردشة؟</string>
+    <string name="chat_delete_message">سيتم حذف «%1$s» وسجلها نهائيًا من الخادم.</string>
+    <string name="chat_archive">أرشفة</string>
+    <string name="chat_unarchive">إلغاء الأرشفة</string>
+    <string name="chat_archived_message">تمت أرشفة الجلسة</string>
+    <string name="chat_restored_message">تمت استعادة الجلسة</string>
+    <string name="chat_archive_undo">تراجع</string>
     <string name="chat_agent">الوكيل</string>
     <string name="chat_model">النموذج</string>
     <string name="chat_model_description">النموذج: %1$s (%2$s)</string>

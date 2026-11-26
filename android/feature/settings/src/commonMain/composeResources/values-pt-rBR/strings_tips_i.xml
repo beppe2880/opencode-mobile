@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Gerencie a conversa aberta</string>
+    <string name="tips_i_chat_actions_body">Renomeie, arquive ou exclua a conversa pelo menu de três pontos, sem voltar à lista de sessões. A exclusão pede confirmação e mostra o nome da conversa.</string>
+    <string name="tips_i_chat_actions_demo">O menu da conversa abre: Renomear conversa edita o título e Excluir conversa pede confirmação.</string>
+</resources>

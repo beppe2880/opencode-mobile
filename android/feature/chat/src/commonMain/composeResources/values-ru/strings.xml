@@ -105,6 +105,17 @@
     <string name="chat_empty_message">Опишите задачу агенту. Он работает в %1$s.</string>
     <string name="chat_error_title">Не удалось загрузить сессию</string>
     <string name="chat_session_deleted">Эта сессия удалена</string>
+    <string name="chat_rename">Переименовать чат</string>
+    <string name="chat_rename_label">Название</string>
+    <string name="chat_save">Сохранить</string>
+    <string name="chat_delete">Удалить чат</string>
+    <string name="chat_delete_title">Удалить чат?</string>
+    <string name="chat_delete_message">«%1$s» и его история будут безвозвратно удалены с сервера.</string>
+    <string name="chat_archive">Архивировать</string>
+    <string name="chat_unarchive">Разархивировать</string>
+    <string name="chat_archived_message">Сессия архивирована</string>
+    <string name="chat_restored_message">Сессия восстановлена</string>
+    <string name="chat_archive_undo">Отменить</string>
     <string name="chat_agent">Агент</string>
     <string name="chat_model">Модель</string>
     <string name="chat_model_description">Модель: %1$s (%2$s)</string>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Gestisci la chat aperta</string>
+    <string name="tips_i_chat_actions_body">Rinomina, archivia o elimina la chat dal menu a tre punti, senza tornare all'elenco delle sessioni. L'eliminazione chiede prima conferma e indica il nome della chat.</string>
+    <string name="tips_i_chat_actions_demo">Si apre il menu della chat: Rinomina chat modifica il titolo, Elimina chat chiede conferma.</string>
+</resources>

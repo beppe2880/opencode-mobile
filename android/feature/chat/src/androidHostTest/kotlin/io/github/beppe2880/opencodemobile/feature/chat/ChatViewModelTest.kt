@@ -3239,6 +3239,213 @@ class ChatViewModelTest {
         advanceUntilIdle()
         assertEquals(listOf("agent:build", "prompt:go"), chat.calls)
     }
+
+    @Test
+    fun `rename asks for the new title and saves it trimmed`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.RequestRename)
+        assertTrue(vm.state.value.renaming)
+        vm.onEvent(ChatEvent.ConfirmRename("  New title  "))
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.renaming)
+        assertEquals("New title", vm.state.value.title)
+        assertEquals(listOf("s1" to "New title"), sessions.renames)
+    }
+
+    @Test
+    fun `a blank or unchanged rename is dropped`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+
+        vm.onEvent(ChatEvent.RequestRename)
+        vm.onEvent(ChatEvent.ConfirmRename("   "))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.renaming)
+        assertTrue(sessions.renames.isEmpty())
+
+        vm.onEvent(ChatEvent.RequestRename)
+        vm.onEvent(ChatEvent.ConfirmRename("Title"))
+        advanceUntilIdle()
+        assertFalse(vm.state.value.renaming)
+        assertTrue(sessions.renames.isEmpty())
+        assertEquals("Title", vm.state.value.title)
+    }
+
+    @Test
+    fun `a failed rename restores the title and shows the error`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply {
+            renameResult = Result.failure(OpenCodeError.Server(500, null, "no"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.RequestRename)
+        vm.onEvent(ChatEvent.ConfirmRename("New title"))
+        advanceUntilIdle()
+
+        assertEquals("Title", vm.state.value.title)
+        assertEquals(listOf("s1" to "New title"), sessions.renames)
+        assertTrue(effects.any { it is ChatEffect.ShowMessage })
+        collector.cancel()
+    }
+
+    @Test
+    fun `delete asks for confirmation leaves after success and forgets the pin and mute`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        pins.setPinned("s1", true)
+        mutes.setMuted("s1", true)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.pinned)
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.RequestDelete)
+        assertTrue(vm.state.value.deleting)
+        vm.onEvent(ChatEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.deleting)
+        assertEquals(listOf("s1"), sessions.deletes)
+        assertEquals(1, effects.count { it is ChatEffect.NavigateBack })
+        assertFalse("s1" in pins.pinned())
+        assertFalse("s1" in mutes.muted.value)
+        collector.cancel()
+    }
+
+    @Test
+    fun `a failed delete keeps the chat open the pin and mute and shows the error`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply {
+            deleteResult = Result.failure(OpenCodeError.Server(500, null, "no"))
+        }
+        pins.setPinned("s1", true)
+        mutes.setMuted("s1", true)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.RequestDelete)
+        vm.onEvent(ChatEvent.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.deleting)
+        assertEquals(listOf("s1"), sessions.deletes)
+        assertTrue(effects.any { it is ChatEffect.ShowMessage })
+        assertTrue(effects.none { it is ChatEffect.NavigateBack })
+        assertTrue("s1" in pins.pinned())
+        assertTrue("s1" in mutes.muted.value)
+        collector.cancel()
+    }
+
+    @Test
+    fun `a session deleted elsewhere leaves once with a message`() = runTest(main.testDispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        events.flow.emit(ServerEvent.SessionChanged("s1", deleted = true))
+        advanceUntilIdle()
+
+        assertEquals(1, effects.count { it is ChatEffect.NavigateBack })
+        assertTrue(effects.any { it is ChatEffect.ShowMessage })
+        collector.cancel()
+    }
+
+    @Test
+    fun `deleting here and the server event leave the chat once without the deleted message`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val gate = CompletableDeferred<Unit>()
+        sessions.deleteGate = gate
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.RequestDelete)
+        vm.onEvent(ChatEvent.ConfirmDelete)
+        runCurrent()
+        assertEquals(listOf("s1"), sessions.deletes)
+        events.flow.emit(ServerEvent.SessionChanged("s1", deleted = true))
+        runCurrent()
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(1, effects.count { it is ChatEffect.NavigateBack })
+        assertTrue(effects.none { it is ChatEffect.ShowMessage })
+        collector.cancel()
+    }
+
+    @Test
+    fun `archiving asks the repository and offers undo`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model)
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.SetArchived(true))
+        advanceUntilIdle()
+
+        assertTrue(vm.state.value.archived)
+        assertEquals(listOf("s1" to true), sessions.archives)
+        assertTrue(effects.any { it == ChatEffect.ShowArchiveUndo(true) })
+        collector.cancel()
+    }
+
+    @Test
+    fun `unarchiving asks the repository and offers undo`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { sessionInfo = sessionInfo.copy(archivedAt = 1L) }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        assertTrue(vm.state.value.archived)
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.SetArchived(false))
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.archived)
+        assertEquals(listOf("s1" to false), sessions.archives)
+        assertTrue(effects.any { it == ChatEffect.ShowArchiveUndo(false) })
+        collector.cancel()
+    }
+
+    @Test
+    fun `a failed archive restores the state and shows the error`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply {
+            archiveResult = Result.failure(OpenCodeError.Server(500, null, "no"))
+        }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        val effects = mutableListOf<ChatEffect>()
+        val collector = launch { vm.effect.collect { effects += it } }
+
+        vm.onEvent(ChatEvent.SetArchived(true))
+        advanceUntilIdle()
+
+        assertFalse(vm.state.value.archived)
+        assertEquals(listOf("s1" to true), sessions.archives)
+        assertTrue(effects.any { it is ChatEffect.ShowMessage })
+        assertTrue(effects.none { it is ChatEffect.ShowArchiveUndo })
+        collector.cancel()
+    }
+
+    @Test
+    fun `archive is unavailable when the server does not support it`() = runTest(main.testDispatcher) {
+        val sessions = FakeSessions(model).apply { archiveSupport = false }
+        val vm = vm(sessions)
+        advanceUntilIdle()
+        assertFalse(vm.state.value.archiveSupported)
+    }
 }
 
 private class FakeSessions(
@@ -3272,6 +3479,32 @@ private class FakeSessions(
         createGate?.await()
         return createResult
     }
+    val renames = mutableListOf<Pair<String, String>>()
+    var renameResult: Result<Unit> = Result.success(Unit)
+    override suspend fun rename(sessionId: String, title: String): Result<Unit> {
+        renames += sessionId to title
+        if (renameResult.isSuccess) sessionInfo = sessionInfo.copy(title = title)
+        return renameResult
+    }
+    val deletes = mutableListOf<String>()
+    var deleteResult: Result<Unit> = Result.success(Unit)
+    var deleteGate: CompletableDeferred<Unit>? = null
+    override suspend fun delete(sessionId: String): Result<Unit> {
+        deletes += sessionId
+        deleteGate?.await()
+        return deleteResult
+    }
+    var archiveSupport = true
+    override suspend fun archiveSupported() = archiveSupport
+    val archives = mutableListOf<Pair<String, Boolean>>()
+    var archiveResult: Result<Unit> = Result.success(Unit)
+    override suspend fun setArchived(sessionId: String, archived: Boolean): Result<Unit> {
+        archives += sessionId to archived
+        if (archiveResult.isSuccess) {
+            sessionInfo = sessionInfo.copy(archivedAt = if (archived) 42L else null)
+        }
+        return archiveResult
+    }
     var exports = 0
     var jsonExports = 0
     var exportWork: suspend (suspend (SessionExportProgress) -> Unit) -> Unit = {}
@@ -3287,8 +3520,6 @@ private class FakeSessions(
         exportWork(onProgress)
         return exportResult
     }
-    override suspend fun rename(sessionId: String, title: String) = Result.success(Unit)
-    override suspend fun delete(sessionId: String) = Result.success(Unit)
     val forks = mutableListOf<Pair<String, String?>>()
     var forkResult: Result<Session> = Result.success(sessionInfo.copy(id = "s2", title = "Title (fork #1)"))
     override suspend fun fork(sessionId: String, beforeMessageId: String?): Result<Session> {

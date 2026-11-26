@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tips_i_chat_actions_title">Gestiona el chat abierto</string>
+    <string name="tips_i_chat_actions_body">Cambia el nombre, archiva o elimina el chat desde su menú de tres puntos, sin volver a la lista de sesiones. Al eliminar se pide confirmación y se nombra el chat.</string>
+    <string name="tips_i_chat_actions_demo">Se abre el menú del chat: Renombrar chat edita el título y Eliminar chat pide confirmación.</string>
+</resources>
