@@ -391,6 +391,7 @@ internal fun ChatTopBar(
                 ChatActionsMenu(
                     state,
                     menuOpen,
+                    // Read layout positions only while open so streaming and IME movement don't invalidate the closed menu.
                     availableHeightPx = if (menuOpen) bottomAreaTop() - menuAnchorBottom else Float.NaN,
                     onDismiss = { menuOpen = false },
                 ) { event ->
