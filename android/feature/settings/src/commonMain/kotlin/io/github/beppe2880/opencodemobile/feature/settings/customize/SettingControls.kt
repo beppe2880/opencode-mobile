@@ -148,6 +148,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_notifications_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_menu
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_menu_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens
@@ -293,6 +295,7 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.ShareOpens -> Res.string.settings_share_opens
         SettingOption.RunningInList -> Res.string.settings_running_in_list
         SettingOption.UnreadSessions -> Res.string.settings_unread_sessions
+        SettingOption.SessionShortcuts -> Res.string.settings_session_shortcuts
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats
         SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity
         SettingOption.SplitView -> Res.string.settings_split_view
@@ -362,6 +365,7 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.ShareOpens -> Res.string.settings_share_opens_sub
         SettingOption.RunningInList -> Res.string.settings_running_in_list_sub
         SettingOption.UnreadSessions -> Res.string.settings_unread_sessions_group_sub
+        SettingOption.SessionShortcuts -> Res.string.settings_session_shortcuts_sub
         SettingOption.SwipeChats -> Res.string.settings_swipe_chats_sub
         SettingOption.SwipeSensitivity -> Res.string.settings_swipe_sensitivity_medium_sub
         SettingOption.SplitView -> Res.string.settings_split_view_sub
@@ -592,6 +596,13 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             onSelect = { onEvent(SettingsEvent.ShareOpensChanged(it)) },
         )
         SettingOption.RunningInList -> switch(settings.showRunningWorkInList, SettingsEvent::RunningInListChanged)()
+        SettingOption.SessionShortcuts -> SessionShortcutsControl(
+            title = title,
+            subtitle = subtitle,
+            shortcuts = settings.sessionShortcuts,
+            onChange = { onEvent(SettingsEvent.SessionShortcutsChanged(it)) },
+            modifier = modifier.testTag(tag),
+        )
         SettingOption.UnreadSessions -> ChoiceRow(
             title = title,
             subtitle = stringResource(
@@ -804,6 +815,7 @@ private val SettingOption.tag: String
         SettingOption.VoiceHold -> "voice_hold"
         SettingOption.RunningInList -> "running_in_list"
         SettingOption.UnreadSessions -> "unread_sessions"
+        SettingOption.SessionShortcuts -> "session_shortcuts"
         SettingOption.ShareMenu -> "share_menu"
         SettingOption.SwipeChats -> "swipe_chats"
         SettingOption.SwipeSensitivity -> "swipe_sensitivity"

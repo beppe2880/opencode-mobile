@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">세션 선택 바로가기</string>
+    <string name="settings_session_shortcuts_sub">도구 모음에 표시할 작업과 순서를 선택합니다. 공간이 부족한 작업은 점 세 개 메뉴에 남습니다.</string>
+    <string name="settings_shortcut_pin">고정 / 고정 해제</string>
+    <string name="settings_shortcut_read">읽음 / 읽지 않음으로 표시</string>
+    <string name="settings_shortcut_mute">알림 끄기 / 켜기</string>
+    <string name="settings_shortcut_archive">보관 / 보관 해제</string>
+    <string name="settings_shortcut_rename">이름 변경</string>
+    <string name="settings_shortcut_delete">삭제</string>
+    <string name="settings_shortcut_up">%1$s 위로 이동</string>
+    <string name="settings_shortcut_down">%1$s 아래로 이동</string>
+</resources>

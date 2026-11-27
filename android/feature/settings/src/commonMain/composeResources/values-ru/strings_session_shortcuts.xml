@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Быстрые действия для выбранных сессий</string>
+    <string name="settings_session_shortcuts_sub">Выберите действия для панели и настройте их порядок. Действия, которые не помещаются, остаются в меню с тремя точками.</string>
+    <string name="settings_shortcut_pin">Закрепить / Открепить</string>
+    <string name="settings_shortcut_read">Отметить прочитанными / непрочитанными</string>
+    <string name="settings_shortcut_mute">Отключить / Включить уведомления</string>
+    <string name="settings_shortcut_archive">В архив / Из архива</string>
+    <string name="settings_shortcut_rename">Переименовать</string>
+    <string name="settings_shortcut_delete">Удалить</string>
+    <string name="settings_shortcut_up">Переместить вверх: %1$s</string>
+    <string name="settings_shortcut_down">Переместить вниз: %1$s</string>
+</resources>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Kurzbefehle für die Sitzungsauswahl</string>
+    <string name="settings_session_shortcuts_sub">Wähle und sortiere Aktionen für die Leiste. Was nicht hineinpasst, bleibt im Drei-Punkte-Menü.</string>
+    <string name="settings_shortcut_pin">Anheften / Lösen</string>
+    <string name="settings_shortcut_read">Als gelesen / ungelesen markieren</string>
+    <string name="settings_shortcut_mute">Stummschalten / Stummschaltung aufheben</string>
+    <string name="settings_shortcut_archive">Archivieren / Aus Archiv holen</string>
+    <string name="settings_shortcut_rename">Umbenennen</string>
+    <string name="settings_shortcut_delete">Löschen</string>
+    <string name="settings_shortcut_up">%1$s nach oben verschieben</string>
+    <string name="settings_shortcut_down">%1$s nach unten verschieben</string>
+</resources>

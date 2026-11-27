@@ -61,6 +61,7 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     ShareOpens(listOf("shareOpens"), requires = ShareMenu),
     RunningInList(listOf("showRunningWorkInList")),
     UnreadSessions(listOf("unreadSessions")),
+    SessionShortcuts(listOf("sessionShortcuts")),
     SwipeChats(listOf("chatSwipe")),
 
     /** Only with the chat list swipe ([ChatSwipe.SessionDrawer]). */
@@ -141,7 +142,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.NewChat -> listOf(SettingOption.NewChatModel, SettingOption.ShareMenu, SettingOption.ShareOpens)
         SettingsPart.ShareTarget -> listOf(SettingOption.ShareMenu, SettingOption.ShareOpens)
         // The running work the rows count, and stopping it.
-        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.ConfirmStop)
+        SettingsPart.SessionRows -> listOf(SettingOption.RunningInList, SettingOption.UnreadSessions, SettingOption.SessionShortcuts, SettingOption.ConfirmStop)
         SettingsPart.SwipeChats -> listOf(SettingOption.SwipeChats, SettingOption.SwipeSensitivity)
         SettingsPart.SplitView -> LARGE_SCREEN_OPTIONS
         SettingsPart.KeyBar -> listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard)
@@ -218,6 +219,7 @@ internal val SettingOption.searchKeywords: List<String>
         SettingOption.ListSwipe -> listOf("swipe", "gesture", "sidebar", "split")
         SettingOption.SwipeSensitivity -> listOf("swipe", "sensitivity", "gesture", "drawer", "threshold")
         SettingOption.UnreadSessions -> listOf("unread", "read", "dot", "group", "viewed")
+        SettingOption.SessionShortcuts -> listOf("bulk", "selection", "toolbar", "overflow", "shortcuts", "pin", "rename", "delete")
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
         SettingOption.WhatsNewButton -> listOf("tips", "whats new", "features", "changelog", "button")

@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">セッション選択時のショートカット</string>
+    <string name="settings_session_shortcuts_sub">ツールバーに表示する操作と順序を選びます。収まらない操作は三点メニューに残ります。</string>
+    <string name="settings_shortcut_pin">ピン留め / ピン留めを解除</string>
+    <string name="settings_shortcut_read">既読 / 未読にする</string>
+    <string name="settings_shortcut_mute">ミュート / ミュートを解除</string>
+    <string name="settings_shortcut_archive">アーカイブ / アーカイブを解除</string>
+    <string name="settings_shortcut_rename">名前を変更</string>
+    <string name="settings_shortcut_delete">削除</string>
+    <string name="settings_shortcut_up">%1$sを上に移動</string>
+    <string name="settings_shortcut_down">%1$sを下に移動</string>
+</resources>

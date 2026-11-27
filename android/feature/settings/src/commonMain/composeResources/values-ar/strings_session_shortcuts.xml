@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">اختصارات تحديد الجلسات</string>
+    <string name="settings_session_shortcuts_sub">اختر إجراءات شريط الأدوات ورتّبها. تبقى الإجراءات التي لا تتسع لها المساحة في قائمة النقاط الثلاث.</string>
+    <string name="settings_shortcut_pin">تثبيت / إلغاء التثبيت</string>
+    <string name="settings_shortcut_read">تمييز كمقروءة / غير مقروءة</string>
+    <string name="settings_shortcut_mute">كتم الإشعارات / إلغاء الكتم</string>
+    <string name="settings_shortcut_archive">أرشفة / إلغاء الأرشفة</string>
+    <string name="settings_shortcut_rename">إعادة التسمية</string>
+    <string name="settings_shortcut_delete">حذف</string>
+    <string name="settings_shortcut_up">نقل %1$s إلى الأعلى</string>
+    <string name="settings_shortcut_down">نقل %1$s إلى الأسفل</string>
+</resources>

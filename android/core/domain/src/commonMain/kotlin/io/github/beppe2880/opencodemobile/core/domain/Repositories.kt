@@ -452,6 +452,20 @@ enum class SelectionApply {
 }
 
 /** How the session list shows sessions whose latest turn the user has not viewed. */
+enum class SessionShortcut {
+    Pin,
+    Read,
+    Mute,
+    Archive,
+    Rename,
+    Delete,
+    ;
+
+    companion object {
+        val defaults = listOf(Pin, Read)
+    }
+}
+
 enum class UnreadSessions {
     /** No unread dots, no Unread group and no read filter. */
     Off,
@@ -600,6 +614,7 @@ data class AppSettings(
     val confirmStopCommand: Boolean = true,
     /** How the session list marks and groups unread sessions. */
     val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
+    val sessionShortcuts: List<SessionShortcut> = SessionShortcut.defaults,
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */

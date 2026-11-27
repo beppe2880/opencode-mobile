@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Raccourcis de sélection des sessions</string>
+    <string name="settings_session_shortcuts_sub">Choisissez et ordonnez les actions de la barre. Celles qui n’y tiennent pas restent dans le menu à trois points.</string>
+    <string name="settings_shortcut_pin">Épingler / Désépingler</string>
+    <string name="settings_shortcut_read">Marquer comme lues / non lues</string>
+    <string name="settings_shortcut_mute">Couper / Réactiver les notifications</string>
+    <string name="settings_shortcut_archive">Archiver / Désarchiver</string>
+    <string name="settings_shortcut_rename">Renommer</string>
+    <string name="settings_shortcut_delete">Supprimer</string>
+    <string name="settings_shortcut_up">Remonter : %1$s</string>
+    <string name="settings_shortcut_down">Descendre : %1$s</string>
+</resources>

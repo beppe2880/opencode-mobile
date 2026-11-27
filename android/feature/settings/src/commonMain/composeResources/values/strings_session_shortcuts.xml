@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Session selection shortcuts</string>
+    <string name="settings_session_shortcuts_sub">Choose and order toolbar actions. Anything that does not fit stays in the three-dot menu.</string>
+    <string name="settings_shortcut_pin">Pin / Unpin</string>
+    <string name="settings_shortcut_read">Mark as read / unread</string>
+    <string name="settings_shortcut_mute">Mute / Unmute</string>
+    <string name="settings_shortcut_archive">Archive / Unarchive</string>
+    <string name="settings_shortcut_rename">Rename</string>
+    <string name="settings_shortcut_delete">Delete</string>
+    <string name="settings_shortcut_up">Move %1$s up</string>
+    <string name="settings_shortcut_down">Move %1$s down</string>
+</resources>

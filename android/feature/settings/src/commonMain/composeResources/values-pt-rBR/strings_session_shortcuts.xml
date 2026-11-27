@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Atalhos para sessões selecionadas</string>
+    <string name="settings_session_shortcuts_sub">Escolha e ordene as ações na barra. O que não couber fica no menu de três pontos.</string>
+    <string name="settings_shortcut_pin">Fixar / Desafixar</string>
+    <string name="settings_shortcut_read">Marcar como lidas / não lidas</string>
+    <string name="settings_shortcut_mute">Silenciar / Reativar notificações</string>
+    <string name="settings_shortcut_archive">Arquivar / Desarquivar</string>
+    <string name="settings_shortcut_rename">Renomear</string>
+    <string name="settings_shortcut_delete">Excluir</string>
+    <string name="settings_shortcut_up">Mover %1$s para cima</string>
+    <string name="settings_shortcut_down">Mover %1$s para baixo</string>
+</resources>

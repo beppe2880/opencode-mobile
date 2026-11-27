@@ -1,0 +1,12 @@
+<resources>
+    <string name="settings_session_shortcuts">Scorciatoie per le sessioni selezionate</string>
+    <string name="settings_session_shortcuts_sub">Scegli e ordina le azioni in barra. Quelle che non entrano restano nel menu dei tre puntini.</string>
+    <string name="settings_shortcut_pin">Fissa / Rimuovi dai fissati</string>
+    <string name="settings_shortcut_read">Segna come lette / non lette</string>
+    <string name="settings_shortcut_mute">Silenzia / Riattiva notifiche</string>
+    <string name="settings_shortcut_archive">Archivia / Ripristina dall’archivio</string>
+    <string name="settings_shortcut_rename">Rinomina</string>
+    <string name="settings_shortcut_delete">Elimina</string>
+    <string name="settings_shortcut_up">Sposta in alto: %1$s</string>
+    <string name="settings_shortcut_down">Sposta in basso: %1$s</string>
+</resources>

@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -37,12 +38,13 @@ import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Drafts
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.MarkEmailRead
-import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.NotificationsOff
@@ -78,10 +80,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -409,132 +416,89 @@ private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Uni
     )
 }
 
-/** The top bar while rows are selected: close, the count and the actions for the selection. */
+private val SelectionTouchTarget = 48.dp
+
 @Composable
 private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
     val c = OcTheme.colors
     var menuOpen by remember { mutableStateOf(false) }
     var choosingMute by remember { mutableStateOf(false) }
-    val selected = state.selectedSessions
-    val count = selected.size
-    val single = selected.singleOrNull()
-    val muteActions = bulkMuteActions(selected, state.muted)
-    val pinActions = bulkPinActions(selected, state.pinned)
-    val archiveActions = if (state.archiveSupported) bulkArchiveActions(selected) else emptyList()
-    val anyUnread = selected.any(state::isUnread)
-    val anyRead = selected.any { !state.isUnread(it) }
-    val showReadState = state.unreadSessions != UnreadSessions.Off
-    OcTopBar(
-        title = pluralStringResource(Res.plurals.sessions_selected_count, count, count),
-        leading = {
-            OcIconButton(
-                icon = Icons.Outlined.Close,
-                contentDescription = stringResource(Res.string.sessions_selection_close),
-                onClick = { onEvent(SessionsEvent.ExitSelection) },
-                modifier = Modifier.testTag("sessions_selection_close"),
-            )
-        },
-        actions = {
-            Box(Modifier.padding(end = OcSpacing.sm)) {
+    val count = state.selectedSessions.size
+    val single = state.selectedSessions.singleOrNull()
+    val available = selectionActions(state, sessionNotificationsSupported)
+    val title = pluralStringResource(Res.plurals.sessions_selected_count, count, count)
+    val textMeasurer = rememberTextMeasurer()
+    val titleWidth = textMeasurer.measure(title, style = MaterialTheme.typography.titleSmall, maxLines = 1).size.width
+    val runAction: (SelectionAction) -> Unit = { action ->
+        menuOpen = false
+        if (action == SelectionAction.Mute && single != null) choosingMute = true else onEvent(action.event)
+    }
+
+    BoxWithConstraints {
+        val slots = with(LocalDensity.current) {
+            // OcTopBar's row padding, title start padding, and our trailing action padding.
+            val fixed = SelectionTouchTarget.roundToPx() + 3 * OcSpacing.xs.roundToPx() + OcSpacing.sm.roundToPx()
+            (constraints.maxWidth - fixed - titleWidth).coerceAtLeast(0) / SelectionTouchTarget.roundToPx()
+        }
+        val (toolbar, overflow) = placeSelectionActions(available, state.sessionShortcuts, slots)
+        LaunchedEffect(overflow.isEmpty()) {
+            if (overflow.isEmpty()) menuOpen = false
+        }
+        OcTopBar(
+            title = title,
+            leading = {
                 OcIconButton(
-                    icon = Icons.Outlined.MoreVert,
-                    contentDescription = stringResource(Res.string.sessions_selection_actions),
-                    onClick = { menuOpen = true },
-                    modifier = Modifier.testTag("sessions_selection_menu_button"),
+                    icon = Icons.Outlined.Close,
+                    contentDescription = stringResource(Res.string.sessions_selection_close),
+                    onClick = { onEvent(SessionsEvent.ExitSelection) },
+                    modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_selection_close"),
                 )
-                DropdownMenu(
-                    expanded = menuOpen,
-                    onDismissRequest = { menuOpen = false },
-                    containerColor = c.bgBase,
-                    modifier = Modifier.exposeTestTags(),
-                ) {
-                    if (count == 1) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.sessions_rename)) },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.RenameSelected) },
-                            leadingIcon = {
-                                Icon(Icons.Outlined.DriveFileRenameOutline, contentDescription = null, tint = c.iconBase)
-                            },
-                            modifier = Modifier.testTag("sessions_bulk_rename"),
+            },
+            actions = {
+                Row(Modifier.padding(end = OcSpacing.sm)) {
+                    toolbar.forEach { action ->
+                        OcIconButton(
+                            icon = action.icon,
+                            contentDescription = stringResource(action.label),
+                            onClick = { runAction(action) },
+                            enabled = action != SelectionAction.MarkRead || !state.markingAllRead,
+                            tint = if (action == SelectionAction.Delete) c.danger.fg else c.iconBase,
+                            modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_bulk_${action.id}"),
                         )
                     }
-                    if (sessionNotificationsSupported) {
-                        muteActions.forEach { action ->
-                            val mute = action == BulkMuteAction.Mute
-                            DropdownMenuItem(
-                                text = { Text(stringResource(if (mute) Res.string.sessions_mute else Res.string.sessions_unmute)) },
-                                onClick = {
-                                    menuOpen = false
-                                    if (mute && count == 1) {
-                                        choosingMute = true
-                                    } else {
-                                        onEvent(SessionsEvent.SetSelectedMuted(mute))
-                                    }
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        if (mute) Icons.Outlined.NotificationsOff else Icons.Outlined.NotificationsActive,
-                                        contentDescription = null,
-                                        tint = c.iconBase,
-                                    )
-                                },
-                                modifier = Modifier.testTag(if (mute) "sessions_bulk_mute" else "sessions_bulk_unmute"),
+                    if (overflow.isNotEmpty()) {
+                        Box {
+                            OcIconButton(
+                                icon = Icons.Outlined.MoreVert,
+                                contentDescription = stringResource(Res.string.sessions_selection_actions),
+                                onClick = { menuOpen = true },
+                                modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_selection_menu_button"),
                             )
+                            DropdownMenu(
+                                expanded = menuOpen,
+                                onDismissRequest = { menuOpen = false },
+                                containerColor = c.bgBase,
+                                modifier = Modifier.exposeTestTags(),
+                            ) {
+                                overflow.forEach { action ->
+                                    val delete = action == SelectionAction.Delete
+                                    if (delete && overflow.size > 1) OcDivider(Modifier.padding(vertical = OcSpacing.xs))
+                                    val tint = if (delete) c.danger.fg else c.iconBase
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(action.label), color = if (delete) tint else Color.Unspecified) },
+                                        onClick = { runAction(action) },
+                                        enabled = action != SelectionAction.MarkRead || !state.markingAllRead,
+                                        leadingIcon = { Icon(action.icon, contentDescription = null, tint = tint) },
+                                        modifier = Modifier.testTag("sessions_bulk_${action.id}"),
+                                    )
+                                }
+                            }
                         }
                     }
-                    if (showReadState && anyUnread) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.sessions_mark_read)) },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.MarkSelectedRead) },
-                            leadingIcon = { Icon(Icons.Outlined.MarkEmailRead, contentDescription = null, tint = c.iconBase) },
-                            modifier = Modifier.testTag("sessions_bulk_mark_read"),
-                        )
-                    }
-                    if (showReadState && anyRead) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(Res.string.sessions_mark_unread)) },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.MarkSelectedUnread) },
-                            leadingIcon = { Icon(Icons.Outlined.MarkEmailUnread, contentDescription = null, tint = c.iconBase) },
-                            modifier = Modifier.testTag("sessions_bulk_mark_unread"),
-                        )
-                    }
-                    pinActions.forEach { action ->
-                        val pin = action == BulkPinAction.Pin
-                        DropdownMenuItem(
-                            text = { Text(stringResource(if (pin) Res.string.sessions_pin else Res.string.sessions_unpin)) },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedPinned(pin)) },
-                            leadingIcon = { Icon(Icons.Outlined.PushPin, contentDescription = null, tint = c.iconBase) },
-                            modifier = Modifier.testTag(if (pin) "sessions_bulk_pin" else "sessions_bulk_unpin"),
-                        )
-                    }
-                    archiveActions.forEach { action ->
-                        val archive = action == BulkArchiveAction.Archive
-                        DropdownMenuItem(
-                            text = {
-                                Text(stringResource(if (archive) Res.string.sessions_archive else Res.string.sessions_unarchive))
-                            },
-                            onClick = { menuOpen = false; onEvent(SessionsEvent.SetSelectedArchived(archive)) },
-                            leadingIcon = {
-                                Icon(
-                                    if (archive) Icons.Outlined.Archive else Icons.Outlined.Unarchive,
-                                    contentDescription = null,
-                                    tint = c.iconBase,
-                                )
-                            },
-                            modifier = Modifier.testTag(if (archive) "sessions_bulk_archive" else "sessions_bulk_unarchive"),
-                        )
-                    }
-                    OcDivider(Modifier.padding(vertical = OcSpacing.xs))
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.sessions_delete), color = c.danger.fg) },
-                        onClick = { menuOpen = false; onEvent(SessionsEvent.RequestDeleteSelected) },
-                        leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null, tint = c.danger.fg) },
-                        modifier = Modifier.testTag("sessions_bulk_delete"),
-                    )
                 }
-            }
-        },
-    )
+            },
+        )
+    }
     if (choosingMute && single != null) {
         SessionMuteSheet(
             running = single.id in state.running && state.connection == ConnectionState.Connected,
@@ -545,6 +509,43 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
         }
     }
 }
+
+private val SelectionAction.label
+    get() = when (this) {
+        SelectionAction.Rename -> Res.string.sessions_rename
+        SelectionAction.Mute -> Res.string.sessions_mute
+        SelectionAction.Unmute -> Res.string.sessions_unmute
+        SelectionAction.MarkUnread -> Res.string.sessions_mark_unread
+        SelectionAction.MarkRead -> Res.string.sessions_mark_read
+        SelectionAction.Pin -> Res.string.sessions_pin
+        SelectionAction.Unpin -> Res.string.sessions_unpin
+        SelectionAction.Archive -> Res.string.sessions_archive
+        SelectionAction.Unarchive -> Res.string.sessions_unarchive
+        SelectionAction.Delete -> Res.string.sessions_delete
+    }
+
+private val SelectionAction.icon
+    get() = when (this) {
+        SelectionAction.Rename -> Icons.Outlined.DriveFileRenameOutline
+        SelectionAction.Mute -> Icons.Outlined.NotificationsOff
+        SelectionAction.Unmute -> Icons.Outlined.NotificationsActive
+        SelectionAction.MarkUnread -> Icons.Outlined.MailOutline
+        SelectionAction.MarkRead -> Icons.Outlined.Drafts
+        SelectionAction.Pin -> Icons.Outlined.PushPin
+        SelectionAction.Unpin -> UnpinIcon
+        SelectionAction.Archive -> Icons.Outlined.Archive
+        SelectionAction.Unarchive -> Icons.Outlined.Unarchive
+        SelectionAction.Delete -> Icons.Outlined.Delete
+    }
+
+// Pin outline split along the diagonal so the slash remains distinct at toolbar size.
+private val UnpinIcon = ImageVector.Builder("Unpin", 24.dp, 24.dp, 24f, 24f)
+    .addPath(
+        pathData = PathParser().parsePathString(
+            "M4 2.6 21.4 20 20 21.4 13 14.4V22L12 23 11 22V16H6V14L8 12V9.4L2.6 4ZM8 14H12.6L10 11.4V12.8ZM8 3H16V5H15V11.2L18 14V16H17.4L13 11.6V5H10Z",
+        ).toNodes(),
+        fill = SolidColor(Color.Black),
+    ).build()
 
 @Composable
 private fun ListHeader(

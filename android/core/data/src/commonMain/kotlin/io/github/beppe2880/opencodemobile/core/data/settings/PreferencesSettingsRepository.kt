@@ -13,6 +13,7 @@ import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OUTPUT_LINE_CHOICES
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
+import io.github.beppe2880.opencodemobile.core.domain.SessionShortcut
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
@@ -85,6 +86,7 @@ internal class PreferencesSettingsRepository(
         prefs.putBoolean(KEY_RUNNING_IN_LIST, next.showRunningWorkInList)
         prefs.putBoolean(KEY_CONFIRM_STOP, next.confirmStopCommand)
         prefs.putString(KEY_UNREAD_SESSIONS, next.unreadSessions.name)
+        prefs.putString(KEY_SESSION_SHORTCUTS, next.sessionShortcuts.joinToString(",") { it.name })
         prefs.putBoolean(KEY_RUNNING_CHIPS, next.runningChips)
         prefs.putBoolean(KEY_AGENT_OUTLINE, next.agentColorOutline)
         prefs.putBoolean(KEY_HIDE_KEYBOARD_AFTER_SEND, next.hideKeyboardAfterSend)
@@ -176,6 +178,9 @@ internal class PreferencesSettingsRepository(
             confirmStopCommand = prefs.getBoolean(KEY_CONFIRM_STOP, defaults.confirmStopCommand),
             unreadSessions = UnreadSessions.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_UNREAD_SESSIONS) }
                 ?: defaults.unreadSessions,
+            sessionShortcuts = prefs.getStringOrNull(KEY_SESSION_SHORTCUTS)?.split(',')
+                ?.mapNotNull { name -> SessionShortcut.entries.firstOrNull { it.name == name } }
+                ?.distinct() ?: defaults.sessionShortcuts,
             runningChips = prefs.getBoolean(KEY_RUNNING_CHIPS, defaults.runningChips),
             agentColorOutline = prefs.getBoolean(KEY_AGENT_OUTLINE, defaults.agentColorOutline),
             hideKeyboardAfterSend = prefs.getBoolean(KEY_HIDE_KEYBOARD_AFTER_SEND, defaults.hideKeyboardAfterSend),
@@ -270,6 +275,7 @@ internal class PreferencesSettingsRepository(
         const val KEY_RUNNING_IN_LIST = "show_running_work_in_list"
         const val KEY_CONFIRM_STOP = "confirm_stop_command"
         const val KEY_UNREAD_SESSIONS = "unread_sessions"
+        const val KEY_SESSION_SHORTCUTS = "session_shortcuts"
         const val KEY_RUNNING_CHIPS = "running_chips"
         const val KEY_AGENT_OUTLINE = "agent_color_outline"
         const val KEY_HIDE_KEYBOARD_AFTER_SEND = "hide_keyboard_after_send"

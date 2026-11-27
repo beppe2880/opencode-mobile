@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.domain.ModelRef
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.OpenCodeThemeIds
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
+import io.github.beppe2880.opencodemobile.core.domain.SessionShortcut
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
 import io.github.beppe2880.opencodemobile.core.domain.ShareOpens
 import io.github.beppe2880.opencodemobile.core.domain.SttProvider
@@ -41,6 +42,23 @@ class PreferencesRepositoriesTest {
 
     /** The themes this test pretends to ship. */
     private val knownThemes = OpenCodeThemeIds { it in setOf("opencode", "dracula", "tokyonight") }
+
+    @Test
+    fun `session shortcuts preserve priority and distinguish empty from missing`() = runBlocking {
+        val prefs = SharedPreferencesSettings(InMemoryPreferences())
+        fun repository() = PreferencesSettingsRepository(prefs)
+        assertEquals(SessionShortcut.defaults, repository().settings.value.sessionShortcuts)
+
+        val shortcuts = listOf(SessionShortcut.Delete, SessionShortcut.Rename, SessionShortcut.Pin)
+        repository().update { it.copy(sessionShortcuts = shortcuts) }
+        assertEquals(shortcuts, repository().settings.value.sessionShortcuts)
+
+        prefs.putString("session_shortcuts", "Delete,Unknown,Rename,Delete,Pin")
+        assertEquals(shortcuts, repository().settings.value.sessionShortcuts)
+
+        repository().update { it.copy(sessionShortcuts = emptyList()) }
+        assertEquals(emptyList<SessionShortcut>(), repository().settings.value.sessionShortcuts)
+    }
 
     @Test
     fun `voice input settings keep system dictation until changed and drop unknown values`() = runBlocking {

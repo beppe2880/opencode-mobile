@@ -4,6 +4,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.KeyboardHide
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_title
@@ -25,6 +27,17 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         pullRequest = 266,
         morePullRequests = listOf(269),
         demo = { SessionBulkActionsDemo(it) },
+    ),
+    FeatureCard(
+        id = "session-selection-shortcuts",
+        version = "0.20.0",
+        icon = Icons.Outlined.Checklist,
+        title = Res.string.settings_session_shortcuts,
+        body = Res.string.settings_session_shortcuts_sub,
+        demoDescription = Res.string.settings_session_shortcuts,
+        author = "Andrease11",
+        pullRequest = null,
+        demo = { SessionBulkActionsDemo(it, shortcuts = true) },
     ),
     FeatureCard(
         id = "hide-keyboard-after-send",
