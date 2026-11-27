@@ -36,7 +36,7 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         body = Res.string.settings_session_shortcuts_sub,
         demoDescription = Res.string.settings_session_shortcuts,
         author = "Andrease11",
-        pullRequest = null,
+        pullRequest = 287,
         demo = { SessionBulkActionsDemo(it, shortcuts = true) },
     ),
     FeatureCard(
