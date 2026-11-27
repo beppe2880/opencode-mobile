@@ -5,13 +5,13 @@ import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.KeyboardHide
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts
-import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_sessions_bulk_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_session_shortcuts_body
 import io.github.beppe2880.opencodemobile.feature.settings.whatsnew.FeatureCard
 
 /** Feature cards of group J; see the toolkit in ../DemoKit.kt. */
@@ -33,7 +33,7 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         version = "0.20.0",
         icon = Icons.Outlined.Checklist,
         title = Res.string.settings_session_shortcuts,
-        body = Res.string.settings_session_shortcuts_sub,
+        body = Res.string.tips_session_shortcuts_body,
         demoDescription = Res.string.settings_session_shortcuts,
         author = "Andrease11",
         pullRequest = 287,

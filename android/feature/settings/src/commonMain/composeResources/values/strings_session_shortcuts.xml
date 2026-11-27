@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Delete</string>
     <string name="settings_shortcut_up">Move %1$s up</string>
     <string name="settings_shortcut_down">Move %1$s down</string>
+    <string name="settings_shortcut_read_disabled">Turn on Unread sessions to use this shortcut.</string>
+    <string name="tips_session_shortcuts_body">Pin and Mark as unread are one tap away after you select sessions. Choose and order your shortcuts in Settings → Sessions.</string>
 </resources>

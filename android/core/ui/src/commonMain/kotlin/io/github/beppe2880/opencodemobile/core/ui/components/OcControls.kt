@@ -232,18 +232,19 @@ fun OcSwitchRow(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    enabled: Boolean = true,
 ) {
     val c = OcTheme.colors
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
+            .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
             .heightIn(min = 56.dp)
             .padding(horizontal = OcSpacing.lg, vertical = OcSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyMedium, color = c.textBase)
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = if (enabled) c.textBase else c.textMuted)
             if (subtitle != null) {
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = c.textMuted)
             }
@@ -251,6 +252,7 @@ fun OcSwitchRow(
         Box(Modifier.width(OcSpacing.md))
         Switch(
             checked = checked,
+            enabled = enabled,
             onCheckedChange = null,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = c.onAccent,

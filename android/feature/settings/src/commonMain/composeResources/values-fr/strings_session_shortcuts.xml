@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Supprimer</string>
     <string name="settings_shortcut_up">Remonter : %1$s</string>
     <string name="settings_shortcut_down">Descendre : %1$s</string>
+    <string name="settings_shortcut_read_disabled">Activez « Sessions non lues » pour utiliser ce raccourci.</string>
+    <string name="tips_session_shortcuts_body">Une fois les sessions sélectionnées, épinglez-les ou marquez-les comme non lues d’un geste. Choisissez et ordonnez les raccourcis dans Paramètres → Sessions.</string>
 </resources>

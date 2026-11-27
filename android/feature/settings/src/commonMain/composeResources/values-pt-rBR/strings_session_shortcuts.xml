@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Excluir</string>
     <string name="settings_shortcut_up">Mover %1$s para cima</string>
     <string name="settings_shortcut_down">Mover %1$s para baixo</string>
+    <string name="settings_shortcut_read_disabled">Ative «Sessões não lidas» para usar este atalho.</string>
+    <string name="tips_session_shortcuts_body">Depois de selecionar sessões, você pode fixá-las ou marcá-las como não lidas com um toque. Escolha e ordene os atalhos em Configurações → Sessões.</string>
 </resources>

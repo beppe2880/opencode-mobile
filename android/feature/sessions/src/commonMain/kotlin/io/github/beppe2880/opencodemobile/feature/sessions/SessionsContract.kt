@@ -98,6 +98,7 @@ data class SessionsState(
     val showRunningWork: Boolean = true,
     /** How unread sessions are marked and grouped (setting). */
     val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
+    /** Preferred toolbar slots in order; the selection bar may move them into its overflow menu. */
     val sessionShortcuts: List<SessionShortcut> = SessionShortcut.defaults,
     /** Marking every listed unread session as read is under way. */
     val markingAllRead: Boolean = false,

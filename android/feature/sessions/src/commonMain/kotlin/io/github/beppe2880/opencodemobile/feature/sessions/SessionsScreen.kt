@@ -61,16 +61,22 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -417,7 +423,9 @@ private fun SessionsTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Uni
 }
 
 private val SelectionTouchTarget = 48.dp
+private val MarkReadIcon get() = Icons.Outlined.Drafts
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Unit) {
     val c = OcTheme.colors
@@ -451,20 +459,30 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                     icon = Icons.Outlined.Close,
                     contentDescription = stringResource(Res.string.sessions_selection_close),
                     onClick = { onEvent(SessionsEvent.ExitSelection) },
-                    modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_selection_close"),
+                    modifier = Modifier.testTag("sessions_selection_close"),
                 )
             },
             actions = {
                 Row(Modifier.padding(end = OcSpacing.sm)) {
                     toolbar.forEach { action ->
-                        OcIconButton(
-                            icon = action.icon,
-                            contentDescription = stringResource(action.label),
-                            onClick = { runAction(action) },
-                            enabled = action != SelectionAction.MarkRead || !state.markingAllRead,
-                            tint = if (action == SelectionAction.Delete) c.danger.fg else c.iconBase,
-                            modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_bulk_${action.id}"),
-                        )
+                        key(action) {
+                            val label = stringResource(action.label)
+                            TooltipBox(
+                                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
+                                tooltip = { PlainTooltip { Text(label) } },
+                                state = rememberTooltipState(),
+                                focusable = false,
+                            ) {
+                                OcIconButton(
+                                    icon = action.icon,
+                                    contentDescription = label,
+                                    onClick = { runAction(action) },
+                                    enabled = action != SelectionAction.MarkRead || !state.markingAllRead,
+                                    tint = if (action == SelectionAction.Delete) c.danger.fg else c.iconBase,
+                                    modifier = Modifier.testTag("sessions_bulk_${action.id}"),
+                                )
+                            }
+                        }
                     }
                     if (overflow.isNotEmpty()) {
                         Box {
@@ -472,7 +490,7 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                                 icon = Icons.Outlined.MoreVert,
                                 contentDescription = stringResource(Res.string.sessions_selection_actions),
                                 onClick = { menuOpen = true },
-                                modifier = Modifier.size(SelectionTouchTarget).testTag("sessions_selection_menu_button"),
+                                modifier = Modifier.testTag("sessions_selection_menu_button"),
                             )
                             DropdownMenu(
                                 expanded = menuOpen,
@@ -530,7 +548,7 @@ private val SelectionAction.icon
         SelectionAction.Mute -> Icons.Outlined.NotificationsOff
         SelectionAction.Unmute -> Icons.Outlined.NotificationsActive
         SelectionAction.MarkUnread -> Icons.Outlined.MailOutline
-        SelectionAction.MarkRead -> Icons.Outlined.Drafts
+        SelectionAction.MarkRead -> MarkReadIcon
         SelectionAction.Pin -> Icons.Outlined.PushPin
         SelectionAction.Unpin -> UnpinIcon
         SelectionAction.Archive -> Icons.Outlined.Archive
@@ -878,10 +896,13 @@ private fun UnreadGroupHeader(
                 enabled = !marking,
                 modifier = Modifier.testTag("sessions_mark_all_read"),
             ) {
+                val tint = if (marking) OcTheme.colors.textFaint else OcTheme.colors.textAccent
+                Icon(MarkReadIcon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(OcSpacing.xs))
                 Text(
                     stringResource(Res.string.sessions_mark_all_read),
                     style = MaterialTheme.typography.labelMedium,
-                    color = OcTheme.colors.textAccent,
+                    color = tint,
                 )
             }
         }
@@ -1022,7 +1043,7 @@ private fun SessionsFilterSheet(state: SessionsState, onEvent: (SessionsEvent) -
                         variant = OcButtonVariant.Secondary,
                         compact = true,
                         loading = state.markingAllRead,
-                        leadingIcon = Icons.Outlined.MarkEmailRead,
+                        leadingIcon = MarkReadIcon,
                         modifier = Modifier.testTag("sessions_filter_mark_all_read"),
                     )
                 }

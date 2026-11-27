@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Eliminar</string>
     <string name="settings_shortcut_up">Subir %1$s</string>
     <string name="settings_shortcut_down">Bajar %1$s</string>
+    <string name="settings_shortcut_read_disabled">Activa «Sesiones no leídas» para usar este atajo.</string>
+    <string name="tips_session_shortcuts_body">Tras seleccionar sesiones, puedes fijarlas o marcarlas como no leídas con un toque. Elige y ordena los atajos en Ajustes → Sesiones.</string>
 </resources>

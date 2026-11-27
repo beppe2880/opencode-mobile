@@ -600,6 +600,7 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
             title = title,
             subtitle = subtitle,
             shortcuts = settings.sessionShortcuts,
+            unreadEnabled = settings.unreadSessions != UnreadSessions.Off,
             onChange = { onEvent(SettingsEvent.SessionShortcutsChanged(it)) },
             modifier = modifier.testTag(tag),
         )

@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">削除</string>
     <string name="settings_shortcut_up">%1$sを上に移動</string>
     <string name="settings_shortcut_down">%1$sを下に移動</string>
+    <string name="settings_shortcut_read_disabled">このショートカットを使うには「未読セッション」をオンにしてください。</string>
+    <string name="tips_session_shortcuts_body">セッションを選択すると、ワンタップでピン留めしたり未読にしたりできます。「設定 → セッション」でショートカットと順序を選べます。</string>
 </resources>

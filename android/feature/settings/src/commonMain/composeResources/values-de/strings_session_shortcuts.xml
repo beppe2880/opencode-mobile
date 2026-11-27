@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Löschen</string>
     <string name="settings_shortcut_up">%1$s nach oben verschieben</string>
     <string name="settings_shortcut_down">%1$s nach unten verschieben</string>
+    <string name="settings_shortcut_read_disabled">Aktiviere „Ungelesene Sitzungen“, um diesen Kurzbefehl zu verwenden.</string>
+    <string name="tips_session_shortcuts_body">Nach der Sitzungsauswahl kannst du Sitzungen mit einem Tipp anheften oder als ungelesen markieren. Unter Einstellungen → Sitzungen kannst du die Kurzbefehle auswählen und sortieren.</string>
 </resources>

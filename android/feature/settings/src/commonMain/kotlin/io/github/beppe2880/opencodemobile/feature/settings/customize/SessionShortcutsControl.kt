@@ -2,7 +2,11 @@ package io.github.beppe2880.opencodemobile.feature.settings.customize
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Icon
@@ -15,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import io.github.beppe2880.opencodemobile.core.domain.SessionShortcut
 import io.github.beppe2880.opencodemobile.core.ui.components.OcIconButton
 import io.github.beppe2880.opencodemobile.core.ui.components.OcListRow
@@ -27,15 +32,19 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_sh
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_mute
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_pin
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_read
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_read_disabled
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_rename
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_shortcut_up
 import org.jetbrains.compose.resources.stringResource
+
+private val ReorderButtonWidth = 48.dp
 
 @Composable
 internal fun SessionShortcutsControl(
     title: String,
     subtitle: String,
     shortcuts: List<SessionShortcut>,
+    unreadEnabled: Boolean,
     onChange: (List<SessionShortcut>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -53,33 +62,40 @@ internal fun SessionShortcutsControl(
         if (expanded) {
             val eligible = SessionShortcut.entries.filter { it != SessionShortcut.Mute || sessionNotificationsSupported }
             val enabled = shortcuts.filter { it in eligible }
+            val reorderable = enabled.filter { it != SessionShortcut.Read || unreadEnabled }
             (enabled + (eligible - enabled.toSet())).forEach { shortcut ->
                 key(shortcut) {
                     val label = stringResource(shortcut.label)
-                    val index = enabled.indexOf(shortcut)
+                    val available = shortcut != SessionShortcut.Read || unreadEnabled
+                    val index = reorderable.indexOf(shortcut)
                     val tag = "settings_session_shortcut_${shortcut.name.lowercase()}"
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OcSwitchRow(
                             title = label,
-                            checked = index >= 0,
+                            checked = shortcut in enabled,
                             onCheckedChange = { onChange(if (it) shortcuts + shortcut else shortcuts - shortcut) },
                             modifier = Modifier.weight(1f).testTag(tag),
+                            subtitle = if (available) null else stringResource(Res.string.settings_shortcut_read_disabled),
+                            enabled = available,
                         )
-                        if (index >= 0 && enabled.size > 1) {
+                        if (index >= 0 && reorderable.size > 1) {
                             OcIconButton(
-                                icon = Icons.Outlined.ExpandLess,
+                                icon = Icons.Outlined.ArrowUpward,
                                 contentDescription = stringResource(Res.string.settings_shortcut_up, label),
                                 enabled = index > 0,
-                                onClick = { onChange(shortcuts.swap(shortcut, enabled[index - 1])) },
-                                modifier = Modifier.testTag("${tag}_up"),
+                                onClick = { onChange(shortcuts.swap(shortcut, reorderable[index - 1])) },
+                                modifier = Modifier.width(ReorderButtonWidth).testTag("${tag}_up"),
                             )
                             OcIconButton(
-                                icon = Icons.Outlined.ExpandMore,
+                                icon = Icons.Outlined.ArrowDownward,
                                 contentDescription = stringResource(Res.string.settings_shortcut_down, label),
-                                enabled = index < enabled.lastIndex,
-                                onClick = { onChange(shortcuts.swap(shortcut, enabled[index + 1])) },
-                                modifier = Modifier.testTag("${tag}_down"),
+                                enabled = index < reorderable.lastIndex,
+                                onClick = { onChange(shortcuts.swap(shortcut, reorderable[index + 1])) },
+                                modifier = Modifier.width(ReorderButtonWidth).testTag("${tag}_down"),
                             )
+                        } else {
+                            // Keep the switches in one column without adding inactive accessibility controls.
+                            repeat(2) { Spacer(Modifier.width(ReorderButtonWidth)) }
                         }
                     }
                 }

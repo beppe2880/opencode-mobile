@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Удалить</string>
     <string name="settings_shortcut_up">Переместить вверх: %1$s</string>
     <string name="settings_shortcut_down">Переместить вниз: %1$s</string>
+    <string name="settings_shortcut_read_disabled">Включите «Непрочитанные сессии», чтобы использовать это быстрое действие.</string>
+    <string name="tips_session_shortcuts_body">Выберите сессии, чтобы закрепить их или отметить непрочитанными одним нажатием. Выберите быстрые действия и их порядок в разделе «Настройки → Сессии».</string>
 </resources>

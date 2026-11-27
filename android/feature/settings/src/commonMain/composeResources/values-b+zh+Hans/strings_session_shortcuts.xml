@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">删除</string>
     <string name="settings_shortcut_up">上移 %1$s</string>
     <string name="settings_shortcut_down">下移 %1$s</string>
+    <string name="settings_shortcut_read_disabled">开启「未读会话」后即可使用此快捷操作。</string>
+    <string name="tips_session_shortcuts_body">选中会话后，轻点即可置顶或标为未读。前往「设置 → 会话」选择并排列快捷操作。</string>
 </resources>

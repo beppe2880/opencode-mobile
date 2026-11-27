@@ -9,4 +9,6 @@
     <string name="settings_shortcut_delete">Elimina</string>
     <string name="settings_shortcut_up">Sposta in alto: %1$s</string>
     <string name="settings_shortcut_down">Sposta in basso: %1$s</string>
+    <string name="settings_shortcut_read_disabled">Attiva «Sessioni non lette» per usare questa scorciatoia.</string>
+    <string name="tips_session_shortcuts_body">Dopo aver selezionato le sessioni, basta un tocco per fissarle o segnarle come non lette. Scegli e ordina le scorciatoie in Impostazioni → Sessioni.</string>
 </resources>
