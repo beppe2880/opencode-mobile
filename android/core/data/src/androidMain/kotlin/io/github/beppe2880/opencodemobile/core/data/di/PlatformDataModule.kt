@@ -12,6 +12,10 @@ import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.ProcessLifecycleVisibility
 import io.github.beppe2880.opencodemobile.core.data.integration.AndroidOAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.integration.OAuthPlatform
+import io.github.beppe2880.opencodemobile.core.data.lock.AndroidLocalNetworks
+import io.github.beppe2880.opencodemobile.core.data.lock.LocalNetworks
+import io.github.beppe2880.opencodemobile.core.data.lock.PowerScreenState
+import io.github.beppe2880.opencodemobile.core.data.lock.ScreenState
 import io.github.beppe2880.opencodemobile.core.data.server.EncryptedServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.LanServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
@@ -36,8 +40,10 @@ internal actual val platformDataModule: Module = module {
     }
     single<ServerStore> { EncryptedServerStore(androidContext()) }
     single<AppVisibility> { ProcessLifecycleVisibility() }
+    single<ScreenState> { PowerScreenState(androidContext()) }
     single { cacheDatabase(androidContext()) }
-    single<ServerDiscovery> { LanServerDiscovery(androidContext().getSystemService(ConnectivityManager::class.java)) }
+    single<LocalNetworks> { AndroidLocalNetworks(androidContext()) }
+    single<ServerDiscovery> { LanServerDiscovery(get()) }
     single<NetworkMonitor> { ConnectivityNetworkMonitor(androidContext().getSystemService(ConnectivityManager::class.java)) }
     single<Settings>(SettingsStore) { SharedPreferencesSettings(androidContext().getSharedPreferences("settings", Context.MODE_PRIVATE)) }
     // What another app shared, until it is used: private and never backed up.

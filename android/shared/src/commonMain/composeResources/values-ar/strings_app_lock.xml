@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode مقفل</string>
+    <string name="app_lock_message">استخدم وجهك أو بصمة أو رمز قفل الجهاز لفتحه.</string>
+    <string name="app_lock_unlock">فتح القفل</string>
+    <string name="app_lock_prompt_title">فتح قفل OpenCode</string>
+    <string name="app_lock_prompt_subtitle">أكّد أنك صاحب الجهاز لعرض جلساتك</string>
+    <string name="app_lock_failed">محاولات كثيرة جدًا. انتظر قليلًا ثم حاول مجددًا.</string>
+</resources>

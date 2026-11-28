@@ -72,6 +72,8 @@
 	<string>Turns your dictated prompts into text.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Attaches images to your prompts.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlocks OpenCode when the app lock is on.</string>
 	<!-- A voice recording goes on with the app in the background. -->
 	<key>UIBackgroundModes</key>
 	<array>

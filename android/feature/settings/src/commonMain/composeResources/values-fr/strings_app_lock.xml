@@ -1,0 +1,51 @@
+<resources>
+    <string name="settings_area_security_sub">Verrouillage de l'app par visage, empreinte ou code de l'appareil</string>
+    <string name="settings_app_lock">Verrouillage de l'app</string>
+    <string name="settings_app_lock_sub">Demander votre visage, une empreinte ou le code de l'appareil avant d'afficher l'app. Quel que soit le moyen configuré sur l'appareil, il fonctionne.</string>
+    <string name="settings_app_lock_unavailable">Configurez d'abord un verrouillage d'écran sur cet appareil : visage, empreinte ou code.</string>
+    <string name="settings_app_lock_confirm_title">Activer le verrouillage de l'app</string>
+    <string name="settings_app_lock_confirm_subtitle">Confirmez que c'est bien vous pour verrouiller OpenCode</string>
+    <string name="settings_group_app_lock_when">Quand redemander</string>
+    <string name="settings_app_lock_on_leave">Quand vous quittez l'app</string>
+    <string name="settings_app_lock_on_leave_sub">Vous passez à une autre app ou à l'écran d'accueil.</string>
+    <string name="settings_app_lock_on_screen_off">Quand vous éteignez l'écran</string>
+    <string name="settings_app_lock_on_screen_off_sub">L'écran s'éteint pendant que l'app est ouverte.</string>
+    <string name="settings_app_lock_after">Après</string>
+    <string name="settings_app_lock_after_always_sub">À chaque retour d'une autre app ou de l'écran d'accueil.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">Au retour après %1$d minute dans d'autres apps.</item>
+        <item quantity="other">Au retour après %1$d minutes dans d'autres apps.</item>
+    </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">À chaque rallumage de l'écran.</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="one">Au rallumage de l'écran après %1$d minute.</item>
+        <item quantity="other">Au rallumage de l'écran après %1$d minutes.</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">Ne pas demander</string>
+    <string name="settings_app_lock_wifi">Sur les réseaux Wi-Fi de confiance</string>
+    <string name="settings_app_lock_wifi_sub">Tant que le téléphone est sur l'un de ces réseaux, l'app s'ouvre sans demander. Android a besoin de l'autorisation de localisation pour lire le nom du réseau.</string>
+    <string name="settings_app_lock_wifi_add">Ajouter le Wi-Fi actuel</string>
+    <string name="settings_app_lock_wifi_remove">Retirer %1$s</string>
+    <string name="settings_app_lock_wifi_denied">Sans l'autorisation de localisation, l'app ne peut pas savoir à quel réseau Wi-Fi vous êtes connecté.</string>
+    <string name="settings_app_lock_wifi_missing">Aucun réseau Wi-Fi trouvé. Connectez-vous au Wi-Fi, activez la localisation, puis réessayez.</string>
+    <string name="settings_app_lock_local_server">Quand le serveur est sur votre réseau local</string>
+    <string name="settings_app_lock_local_server_sub">L'app s'ouvre sans demander tant que le serveur actif répond sur le même réseau Wi-Fi que le téléphone. Un accès via VPN ne compte pas.</string>
+    <string name="settings_app_lock_always">Toujours</string>
+    <string name="settings_app_lock_minutes">%1$d min</string>
+    <string name="settings_app_lock_custom">Personnalisé</string>
+    <string name="settings_app_lock_custom_title">Minutes hors de l'app avant de redemander</string>
+    <string name="settings_app_lock_custom_label">Minutes, de 1 à 1440</string>
+    <string name="settings_summary_app_lock_always">à chaque fois</string>
+    <string name="settings_summary_app_lock_minutes">après %1$d min</string>
+    <string name="settings_summary_app_lock_leave">En quittant : %1$s</string>
+    <string name="settings_summary_app_lock_screen_off">Écran éteint : %1$s</string>
+    <string name="settings_summary_app_lock_launch">Au lancement uniquement</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="one">%1$d Wi-Fi de confiance</item>
+        <item quantity="other">%1$d réseaux Wi-Fi de confiance</item>
+    </plurals>
+    <string name="settings_summary_app_lock_local_server">Serveur local de confiance</string>
+    <string name="settings_preview_lock_title">OpenCode est verrouillé</string>
+    <string name="settings_preview_lock_unlock">Déverrouiller</string>
+    <string name="settings_preview_lock_off">S'ouvre sans demander</string>
+</resources>

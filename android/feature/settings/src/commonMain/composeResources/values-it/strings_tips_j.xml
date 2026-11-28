@@ -8,4 +8,7 @@
     <string name="tips_j_hide_keyboard_demo">Un prompt viene scritto e inviato; la tastiera scivola via e la risposta arriva in streaming su tutta la chat.</string>
     <string name="tips_j_hide_keyboard_prompt">Perché la build fallisce?</string>
     <string name="tips_j_hide_keyboard_answer">Il test **ParserTest** si aspetta una newline finale. L'ho aggiunta a `fixtures/input.txt` e la build di nuovo passa.</string>
+    <string name="tips_j_app_lock_title">Blocca l'app con il volto o l'impronta</string>
+    <string name="tips_j_app_lock_body">Attiva Blocco app in Impostazioni → Sicurezza: OpenCode chiede il tuo volto, un'impronta o il codice del dispositivo prima di mostrare le tue sessioni. Scegli quando chiede di nuovo: quando esci dall'app e quando spegni lo schermo, subito o dopo alcuni minuti. Sulle reti Wi-Fi fidate, o con il server sulla rete locale, si apre senza chiedere.</string>
+    <string name="tips_j_app_lock_demo">L'app torna bloccata; Sblocca apre la richiesta di sistema e un'impronta mostra di nuovo le sessioni.</string>
 </resources>

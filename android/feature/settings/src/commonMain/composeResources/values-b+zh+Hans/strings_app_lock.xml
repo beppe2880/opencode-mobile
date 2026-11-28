@@ -1,0 +1,48 @@
+<resources>
+    <string name="settings_area_security_sub">使用面容、指纹或设备密码锁定应用</string>
+    <string name="settings_app_lock">应用锁</string>
+    <string name="settings_app_lock_sub">在显示应用前要求面容、指纹或设备密码。设备上已设置的任一方式即可。</string>
+    <string name="settings_app_lock_unavailable">请先在此设备上设置屏幕锁：面容、指纹或密码。</string>
+    <string name="settings_app_lock_confirm_title">开启应用锁</string>
+    <string name="settings_app_lock_confirm_subtitle">确认是你本人，以锁定 OpenCode</string>
+    <string name="settings_group_app_lock_when">再次询问时机</string>
+    <string name="settings_app_lock_on_leave">离开应用时</string>
+    <string name="settings_app_lock_on_leave_sub">切换到其他应用或返回主屏幕。</string>
+    <string name="settings_app_lock_on_screen_off">关闭屏幕时</string>
+    <string name="settings_app_lock_on_screen_off_sub">应用打开期间屏幕关闭。</string>
+    <string name="settings_app_lock_after">之后</string>
+    <string name="settings_app_lock_after_always_sub">每次从其他应用或主屏幕返回时。</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="other">在其他应用中停留 %1$d 分钟后返回时。</item>
+    </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">每次重新亮屏时。</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="other">屏幕关闭 %1$d 分钟后重新亮屏时。</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">不再询问</string>
+    <string name="settings_app_lock_wifi">在受信任的 Wi-Fi 网络上</string>
+    <string name="settings_app_lock_wifi_sub">手机连接其中任一网络时，应用无需询问即可打开。Android 需要位置权限才能识别网络名称。</string>
+    <string name="settings_app_lock_wifi_add">添加当前 Wi-Fi</string>
+    <string name="settings_app_lock_wifi_remove">移除 %1$s</string>
+    <string name="settings_app_lock_wifi_denied">没有位置权限，应用无法识别你连接的 Wi-Fi 网络。</string>
+    <string name="settings_app_lock_wifi_missing">未找到 Wi-Fi 网络。请连接 Wi-Fi 并开启位置信息，然后重试。</string>
+    <string name="settings_app_lock_local_server">服务器在本地网络中时</string>
+    <string name="settings_app_lock_local_server_sub">当活动服务器在与手机相同的 Wi-Fi 网络上响应时，应用无需询问即可打开。通过 VPN 访问不算。</string>
+    <string name="settings_app_lock_always">始终</string>
+    <string name="settings_app_lock_minutes">%1$d 分钟</string>
+    <string name="settings_app_lock_custom">自定义</string>
+    <string name="settings_app_lock_custom_title">离开多久后再次询问</string>
+    <string name="settings_app_lock_custom_label">分钟，1 到 1440</string>
+    <string name="settings_summary_app_lock_always">每次</string>
+    <string name="settings_summary_app_lock_minutes">%1$d 分钟后</string>
+    <string name="settings_summary_app_lock_leave">离开时：%1$s</string>
+    <string name="settings_summary_app_lock_screen_off">关屏时：%1$s</string>
+    <string name="settings_summary_app_lock_launch">仅启动时</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="other">%1$d 个受信任的 Wi-Fi</item>
+    </plurals>
+    <string name="settings_summary_app_lock_local_server">已信任本地服务器</string>
+    <string name="settings_preview_lock_title">OpenCode 已锁定</string>
+    <string name="settings_preview_lock_unlock">解锁</string>
+    <string name="settings_preview_lock_off">无需询问即可打开</string>
+</resources>

@@ -1,0 +1,57 @@
+<resources>
+    <string name="settings_area_security_sub">Блокировка приложения по лицу, отпечатку пальца или коду-паролю устройства</string>
+    <string name="settings_app_lock">Блокировка приложения</string>
+    <string name="settings_app_lock_sub">Запрашивать лицо, отпечаток пальца или код-пароль устройства перед показом приложения. Подойдёт любой способ, настроенный на устройстве.</string>
+    <string name="settings_app_lock_unavailable">Сначала настройте блокировку экрана на этом устройстве: лицо, отпечаток пальца или код-пароль.</string>
+    <string name="settings_app_lock_confirm_title">Включить блокировку приложения</string>
+    <string name="settings_app_lock_confirm_subtitle">Подтвердите, что это вы, чтобы заблокировать OpenCode</string>
+    <string name="settings_group_app_lock_when">Когда запрашивать снова</string>
+    <string name="settings_app_lock_on_leave">Когда вы выходите из приложения</string>
+    <string name="settings_app_lock_on_leave_sub">Вы переключаетесь на другое приложение или на главный экран.</string>
+    <string name="settings_app_lock_on_screen_off">Когда вы выключаете экран</string>
+    <string name="settings_app_lock_on_screen_off_sub">Экран выключается, пока приложение открыто.</string>
+    <string name="settings_app_lock_after">Через</string>
+    <string name="settings_app_lock_after_always_sub">Каждый раз, когда вы возвращаетесь из другого приложения или с главного экрана.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">Когда вы вернётесь, проведя в других приложениях %1$d минуту.</item>
+        <item quantity="few">Когда вы вернётесь, проведя в других приложениях %1$d минуты.</item>
+        <item quantity="many">Когда вы вернётесь, проведя в других приложениях %1$d минут.</item>
+        <item quantity="other">Когда вы вернётесь, проведя в других приложениях %1$d минут.</item>
+    </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">Каждый раз, когда вы снова включаете экран.</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="one">Когда вы включите экран после %1$d минуты простоя.</item>
+        <item quantity="few">Когда вы включите экран после %1$d минут простоя.</item>
+        <item quantity="many">Когда вы включите экран после %1$d минут простоя.</item>
+        <item quantity="other">Когда вы включите экран после %1$d минут простоя.</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">Не запрашивать</string>
+    <string name="settings_app_lock_wifi">В доверенных сетях Wi-Fi</string>
+    <string name="settings_app_lock_wifi_sub">Пока телефон подключён к одной из этих сетей, приложение открывается без запроса. Android нужно разрешение на геолокацию, чтобы узнать название сети.</string>
+    <string name="settings_app_lock_wifi_add">Добавить текущую сеть Wi-Fi</string>
+    <string name="settings_app_lock_wifi_remove">Удалить %1$s</string>
+    <string name="settings_app_lock_wifi_denied">Без разрешения на геолокацию приложение не может определить, к какой сети Wi-Fi вы подключены.</string>
+    <string name="settings_app_lock_wifi_missing">Сеть Wi-Fi не найдена. Подключитесь к Wi-Fi, включите геолокацию и попробуйте снова.</string>
+    <string name="settings_app_lock_local_server">Когда сервер в вашей локальной сети</string>
+    <string name="settings_app_lock_local_server_sub">Приложение открывается без запроса, пока активный сервер отвечает в той же сети Wi-Fi, что и телефон. Подключение через VPN не считается.</string>
+    <string name="settings_app_lock_always">Всегда</string>
+    <string name="settings_app_lock_minutes">%1$d мин</string>
+    <string name="settings_app_lock_custom">Своё</string>
+    <string name="settings_app_lock_custom_title">Сколько минут вне приложения до повторного запроса</string>
+    <string name="settings_app_lock_custom_label">Минуты, от 1 до 1440</string>
+    <string name="settings_summary_app_lock_always">каждый раз</string>
+    <string name="settings_summary_app_lock_minutes">через %1$d мин</string>
+    <string name="settings_summary_app_lock_leave">При выходе: %1$s</string>
+    <string name="settings_summary_app_lock_screen_off">Экран выключен: %1$s</string>
+    <string name="settings_summary_app_lock_launch">Только при запуске</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="one">%1$d доверенная сеть Wi-Fi</item>
+        <item quantity="few">%1$d доверенные сети Wi-Fi</item>
+        <item quantity="many">%1$d доверенных сетей Wi-Fi</item>
+        <item quantity="other">%1$d доверенных сетей Wi-Fi</item>
+    </plurals>
+    <string name="settings_summary_app_lock_local_server">Локальный сервер доверен</string>
+    <string name="settings_preview_lock_title">OpenCode заблокирован</string>
+    <string name="settings_preview_lock_unlock">Разблокировать</string>
+    <string name="settings_preview_lock_off">Открывается без запроса</string>
+</resources>

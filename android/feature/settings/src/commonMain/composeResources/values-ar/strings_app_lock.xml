@@ -1,0 +1,63 @@
+<resources>
+    <string name="settings_area_security_sub">قفل التطبيق بالوجه أو البصمة أو رمز قفل الجهاز</string>
+    <string name="settings_app_lock">قفل التطبيق</string>
+    <string name="settings_app_lock_sub">اطلب وجهك أو بصمتك أو رمز قفل الجهاز قبل عرض التطبيق. أي طريقة أعددتها على الجهاز تعمل.</string>
+    <string name="settings_app_lock_unavailable">اضبط قفل الشاشة على هذا الجهاز أولًا: الوجه أو البصمة أو رمز.</string>
+    <string name="settings_app_lock_confirm_title">تفعيل قفل التطبيق</string>
+    <string name="settings_app_lock_confirm_subtitle">أكّد أنك صاحب الجهاز لقفل OpenCode</string>
+    <string name="settings_group_app_lock_when">متى تُطلب مجددًا</string>
+    <string name="settings_app_lock_on_leave">عند مغادرة التطبيق</string>
+    <string name="settings_app_lock_on_leave_sub">عند الانتقال إلى تطبيق آخر أو الذهاب إلى الشاشة الرئيسية.</string>
+    <string name="settings_app_lock_on_screen_off">عند إطفاء الشاشة</string>
+    <string name="settings_app_lock_on_screen_off_sub">تنطفئ الشاشة أثناء فتح التطبيق.</string>
+    <string name="settings_app_lock_after">بعد</string>
+    <string name="settings_app_lock_after_always_sub">في كل مرة تعود فيها من تطبيق آخر أو من الشاشة الرئيسية.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="zero">عند العودة بعد %1$d دقيقة في تطبيقات أخرى.</item>
+        <item quantity="one">عند العودة بعد %1$d دقيقة في تطبيقات أخرى.</item>
+        <item quantity="two">عند العودة بعد %1$d دقيقتين في تطبيقات أخرى.</item>
+        <item quantity="few">عند العودة بعد %1$d دقائق في تطبيقات أخرى.</item>
+        <item quantity="many">عند العودة بعد %1$d دقيقة في تطبيقات أخرى.</item>
+        <item quantity="other">عند العودة بعد %1$d دقيقة في تطبيقات أخرى.</item>
+    </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">في كل مرة تعيد فيها تشغيل الشاشة.</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="zero">عند تشغيل الشاشة مجددًا بعد %1$d دقيقة.</item>
+        <item quantity="one">عند تشغيل الشاشة مجددًا بعد %1$d دقيقة.</item>
+        <item quantity="two">عند تشغيل الشاشة مجددًا بعد %1$d دقيقتين.</item>
+        <item quantity="few">عند تشغيل الشاشة مجددًا بعد %1$d دقائق.</item>
+        <item quantity="many">عند تشغيل الشاشة مجددًا بعد %1$d دقيقة.</item>
+        <item quantity="other">عند تشغيل الشاشة مجددًا بعد %1$d دقيقة.</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">عدم الطلب</string>
+    <string name="settings_app_lock_wifi">على شبكات Wi-Fi الموثوقة</string>
+    <string name="settings_app_lock_wifi_sub">بينما يكون الهاتف على إحدى هذه الشبكات، يُفتح التطبيق دون طلب. يحتاج Android إلى إذن الموقع لقراءة اسم الشبكة.</string>
+    <string name="settings_app_lock_wifi_add">إضافة شبكة Wi-Fi الحالية</string>
+    <string name="settings_app_lock_wifi_remove">إزالة %1$s</string>
+    <string name="settings_app_lock_wifi_denied">من دون إذن الموقع لا يستطيع التطبيق معرفة شبكة Wi-Fi التي تتصل بها.</string>
+    <string name="settings_app_lock_wifi_missing">لم يتم العثور على شبكة Wi-Fi. اتصل بشبكة Wi-Fi وفعّل الموقع، ثم حاول مجددًا.</string>
+    <string name="settings_app_lock_local_server">عندما يكون الخادم على شبكتك المحلية</string>
+    <string name="settings_app_lock_local_server_sub">يُفتح التطبيق دون طلب طالما يستجيب الخادم النشط على شبكة Wi-Fi نفسها التي يتصل بها الهاتف. الوصول عبر VPN لا يُحسب.</string>
+    <string name="settings_app_lock_always">دائمًا</string>
+    <string name="settings_app_lock_minutes">%1$d د</string>
+    <string name="settings_app_lock_custom">مخصص</string>
+    <string name="settings_app_lock_custom_title">الدقائق بعيدًا قبل الطلب مجددًا</string>
+    <string name="settings_app_lock_custom_label">دقائق، من 1 إلى 1440</string>
+    <string name="settings_summary_app_lock_always">في كل مرة</string>
+    <string name="settings_summary_app_lock_minutes">بعد %1$d د</string>
+    <string name="settings_summary_app_lock_leave">عند المغادرة: %1$s</string>
+    <string name="settings_summary_app_lock_screen_off">الشاشة مُطفأة: %1$s</string>
+    <string name="settings_summary_app_lock_launch">عند التشغيل فقط</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="zero">%1$d شبكة Wi-Fi موثوقة</item>
+        <item quantity="one">%1$d شبكة Wi-Fi موثوقة</item>
+        <item quantity="two">%1$d شبكتا Wi-Fi موثوقتان</item>
+        <item quantity="few">%1$d شبكات Wi-Fi موثوقة</item>
+        <item quantity="many">%1$d شبكة Wi-Fi موثوقة</item>
+        <item quantity="other">%1$d شبكة Wi-Fi موثوقة</item>
+    </plurals>
+    <string name="settings_summary_app_lock_local_server">الخادم المحلي موثوق</string>
+    <string name="settings_preview_lock_title">OpenCode مقفل</string>
+    <string name="settings_preview_lock_unlock">فتح القفل</string>
+    <string name="settings_preview_lock_off">يُفتح دون أن يطلب</string>
+</resources>

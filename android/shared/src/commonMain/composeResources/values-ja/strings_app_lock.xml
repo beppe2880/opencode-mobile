@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode はロックされています</string>
+    <string name="app_lock_message">顔、指紋、またはデバイスのパスコードで開いてください。</string>
+    <string name="app_lock_unlock">ロック解除</string>
+    <string name="app_lock_prompt_title">OpenCode のロックを解除</string>
+    <string name="app_lock_prompt_subtitle">セッションを表示するには本人確認をしてください</string>
+    <string name="app_lock_failed">試行回数が多すぎます。しばらく待ってから再試行してください。</string>
+</resources>

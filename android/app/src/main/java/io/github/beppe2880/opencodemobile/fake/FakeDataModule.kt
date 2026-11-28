@@ -77,6 +77,7 @@ import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.VoiceRecorder
 import io.github.beppe2880.opencodemobile.core.domain.WhatsNewHistory
 import io.github.beppe2880.opencodemobile.core.domain.WhatsNewRepository
+import io.github.beppe2880.opencodemobile.core.domain.WifiNetworks
 import io.github.beppe2880.opencodemobile.core.network.ConnectLinkParser
 import io.github.beppe2880.opencodemobile.core.ui.sample.SampleData
 import kotlinx.coroutines.CoroutineScope
@@ -205,6 +206,8 @@ val fakeDataModule = module {
     // Voice input never reaches a provider in the demo.
     single<VoiceRecorder> { FakeVoiceRecorder() }
     single<SpeechToTextRepository> { FakeSpeechToText() }
+    // The app lock's trusted networks are not offered from the demo's sample server.
+    single<WifiNetworks> { WifiNetworks { null } }
 }
 
 private const val LATENCY = 350L

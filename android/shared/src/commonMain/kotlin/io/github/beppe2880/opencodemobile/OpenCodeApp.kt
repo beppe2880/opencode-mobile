@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.beppe2880.opencodemobile.core.domain.AppLock
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -45,6 +47,8 @@ fun OpenCodeApp(
     val appSettings by settings.settings.collectAsStateWithLifecycle()
     val loaded by servers.loaded.collectAsStateWithLifecycle()
     val activeServer by servers.activeServer.collectAsStateWithLifecycle()
+    val appLock = koinInject<AppLock>()
+    val locked by appLock.locked.collectAsStateWithLifecycle()
     val dark = appSettings.theme.isDark()
     // A single-mode OpenCode theme is dark or light whatever the app setting: the bars follow it.
     val barsDark = isDarkTheme(appSettings.openCodeTheme, dark)
@@ -52,21 +56,24 @@ fun OpenCodeApp(
     OcTheme(darkTheme = dark, openCodeTheme = appSettings.openCodeTheme) {
         Box(modifier.fillMaxSize().background(OcTheme.colors.bgBase).dismissKeyboardOnTap()) {
             // Choosing the start screen needs the saved servers, read off the main thread.
-            if (loaded) {
+            // Hidden from accessibility services too while the lock screen covers it.
+            if (loaded) Box(if (locked) Modifier.clearAndSetSemantics {} else Modifier) {
                 AppNavHost(
                     onTryDemo = onTryDemo,
                     hasActiveServer = activeServer != null,
-                    openSessionId = openSessionId,
+                    // Links from notifications and widgets wait for the unlock.
+                    openSessionId = openSessionId.takeUnless { locked },
                     onSessionOpened = onSessionOpened,
-                    openNewSession = openNewSession,
+                    openNewSession = openNewSession && !locked,
                     onNewSessionOpened = onNewSessionOpened,
                     onCustomizeInDemo = onCustomizeInDemo,
                     openSettings = openSettings,
                     openSettingsArea = openSettingsArea,
                     onSettingsOpened = onSettingsOpened,
                 )
-                if (activeServer != null) overlay(appSettings)
+                if (activeServer != null && !locked) overlay(appSettings)
             }
+            if (locked) AppLockScreen(appLock, darkBars = barsDark)
         }
     }
 }

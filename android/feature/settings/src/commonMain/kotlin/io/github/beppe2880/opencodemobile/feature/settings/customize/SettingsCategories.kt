@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_large_screens_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_live_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_notifications_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_security_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_servers_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_sessions_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_sharing_sub
@@ -39,6 +40,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_voice_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_demo_server
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_agent_model
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_app_lock_trusted
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_app_lock_when
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_cloud
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_divider
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_group_folding
@@ -60,6 +63,13 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_now
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_choose
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_new
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_always
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_launch
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_leave
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_local_server
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_minutes
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_screen_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_wifi
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_apply
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_confirm_stop
@@ -193,6 +203,14 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Terminal -> listOf(
             OptionGroup(null, listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard, SettingOption.TerminalFullscreen)),
         )
+        SettingsArea.Security -> listOf(
+            OptionGroup(null, listOf(SettingOption.AppLock)),
+            OptionGroup(
+                Res.string.settings_group_app_lock_when,
+                listOf(SettingOption.AppLockOnLeave, SettingOption.AppLockAfter, SettingOption.AppLockOnScreenOff, SettingOption.AppLockScreenOffAfter),
+            ),
+            OptionGroup(Res.string.settings_group_app_lock_trusted, listOf(SettingOption.AppLockTrustedWifi, SettingOption.AppLockTrustLocalServer)),
+        )
         SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)))
     }
 
@@ -269,6 +287,7 @@ val SettingsArea.description: StringResource
         SettingsArea.Sharing -> Res.string.settings_area_sharing_sub
         SettingsArea.Terminal -> Res.string.settings_area_terminal_sub
         SettingsArea.Notifications -> Res.string.settings_area_notifications_sub
+        SettingsArea.Security -> Res.string.settings_area_security_sub
         SettingsArea.Updates -> Res.string.settings_area_updates_sub
         SettingsArea.About -> Res.string.settings_area_about_sub
     }
@@ -365,6 +384,23 @@ fun summary(area: SettingsArea, state: SettingsState, demo: Boolean = false): Li
             s.terminalOpenKeyboard to Res.string.settings_summary_keyboard,
             s.terminalFullscreenByDefault to Res.string.settings_summary_fullscreen,
         )
+        SettingsArea.Security -> if (!s.appLock) {
+            listOf(res(Res.string.settings_summary_off))
+        } else {
+            fun minutes(
+                value: Int,
+            ) = if (value == 0) res(Res.string.settings_summary_app_lock_always) else res(Res.string.settings_summary_app_lock_minutes, value)
+            listOfNotNull(
+                if (s.appLockOnLeave) res(Res.string.settings_summary_app_lock_leave, minutes(s.appLockAfterMinutes)) else null,
+                if (s.appLockOnScreenOff) res(Res.string.settings_summary_app_lock_screen_off, minutes(s.appLockScreenOffMinutes)) else null,
+                if (s.appLockTrustedWifi.isNotEmpty()) {
+                    UiText.Plural(Res.plurals.settings_summary_app_lock_wifi, s.appLockTrustedWifi.size, listOf(s.appLockTrustedWifi.size))
+                } else {
+                    null
+                },
+                if (s.appLockTrustLocalServer) res(Res.string.settings_summary_app_lock_local_server) else null,
+            ).ifEmpty { listOf(res(Res.string.settings_summary_app_lock_launch)) }
+        }
         SettingsArea.Updates -> listOf(res(Res.string.settings_summary_notice, res(s.updateNotice.labelRes)))
         SettingsArea.About -> listOfNotNull(
             res(Res.string.settings_summary_version, state.appVersion),

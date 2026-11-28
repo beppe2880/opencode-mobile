@@ -1,0 +1,48 @@
+<resources>
+    <string name="settings_area_security_sub">顔、指紋、またはデバイスのパスコードでアプリをロック</string>
+    <string name="settings_app_lock">アプリのロック</string>
+    <string name="settings_app_lock_sub">アプリを表示する前に、顔、指紋、またはデバイスのパスコードを求めます。デバイスに設定されている方法であれば使えます。</string>
+    <string name="settings_app_lock_unavailable">このデバイスで先に画面ロックを設定してください：顔、指紋、またはパスコード。</string>
+    <string name="settings_app_lock_confirm_title">アプリのロックをオンにする</string>
+    <string name="settings_app_lock_confirm_subtitle">本人確認をして OpenCode をロックします</string>
+    <string name="settings_group_app_lock_when">再確認するタイミング</string>
+    <string name="settings_app_lock_on_leave">アプリを離れたとき</string>
+    <string name="settings_app_lock_on_leave_sub">別のアプリに切り替えたり、ホーム画面に戻ったりしたとき。</string>
+    <string name="settings_app_lock_on_screen_off">画面をオフにしたとき</string>
+    <string name="settings_app_lock_on_screen_off_sub">アプリを開いている間に画面がオフになったとき。</string>
+    <string name="settings_app_lock_after">経過後</string>
+    <string name="settings_app_lock_after_always_sub">別のアプリやホーム画面から戻るたび。</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="other">他のアプリで %1$d 分過ごした後に戻ったとき。</item>
+    </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">画面を点けるたび。</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="other">画面オフ後 %1$d 分たってから画面を点けたとき。</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">確認しない</string>
+    <string name="settings_app_lock_wifi">信頼できる Wi-Fi ネットワーク上では</string>
+    <string name="settings_app_lock_wifi_sub">この中のいずれかのネットワークに接続している間は、確認なしでアプリが開きます。ネットワーク名を取得するには位置情報の許可が必要です。</string>
+    <string name="settings_app_lock_wifi_add">現在の Wi-Fi を追加</string>
+    <string name="settings_app_lock_wifi_remove">%1$s を削除</string>
+    <string name="settings_app_lock_wifi_denied">位置情報の許可がないと、接続中の Wi-Fi ネットワークを判別できません。</string>
+    <string name="settings_app_lock_wifi_missing">Wi-Fi ネットワークが見つかりません。Wi-Fi に接続し、位置情報をオンにして、もう一度お試しください。</string>
+    <string name="settings_app_lock_local_server">サーバーがローカルネットワーク上にあるとき</string>
+    <string name="settings_app_lock_local_server_sub">有効なサーバーが端末と同じ Wi-Fi ネットワーク上で応答している間は、確認なしでアプリが開きます。VPN 経由の接続は含まれません。</string>
+    <string name="settings_app_lock_always">常に</string>
+    <string name="settings_app_lock_minutes">%1$d 分</string>
+    <string name="settings_app_lock_custom">カスタム</string>
+    <string name="settings_app_lock_custom_title">再確認までに離れている時間</string>
+    <string name="settings_app_lock_custom_label">分、1～1440</string>
+    <string name="settings_summary_app_lock_always">毎回</string>
+    <string name="settings_summary_app_lock_minutes">%1$d 分後</string>
+    <string name="settings_summary_app_lock_leave">離れたとき：%1$s</string>
+    <string name="settings_summary_app_lock_screen_off">画面オフ：%1$s</string>
+    <string name="settings_summary_app_lock_launch">起動時のみ</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="other">信頼できる Wi-Fi %1$d 件</item>
+    </plurals>
+    <string name="settings_summary_app_lock_local_server">ローカルサーバーを信頼</string>
+    <string name="settings_preview_lock_title">OpenCode はロックされています</string>
+    <string name="settings_preview_lock_unlock">ロック解除</string>
+    <string name="settings_preview_lock_off">確認なしで開きます</string>
+</resources>

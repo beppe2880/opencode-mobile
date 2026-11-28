@@ -718,7 +718,60 @@ data class AppSettings(
     val settingsStyle: SettingsStyle = SettingsStyle.List,
     /** Share of the height the preview takes above its options on narrow screens; 0 hides it, null for the default. */
     val settingsPreviewFraction: Float? = null,
+    /** The app asks for the face, a fingerprint or the device passcode before showing anything. */
+    val appLock: Boolean = false,
+    /** With [appLock]: it asks again when the user comes back from another app or the home screen. */
+    val appLockOnLeave: Boolean = true,
+    /** With [appLockOnLeave]: minutes in other apps before it asks again; 0 asks every time. */
+    val appLockAfterMinutes: Int = 0,
+    /** With [appLock]: it asks again when the screen turned off while the app was open. */
+    val appLockOnScreenOff: Boolean = true,
+    /** With [appLockOnScreenOff]: minutes with the screen off before it asks again; 0 asks every time. */
+    val appLockScreenOffMinutes: Int = 0,
+    /** With [appLock]: Wi-Fi networks (by name) where it never asks. */
+    val appLockTrustedWifi: List<String> = emptyList(),
+    /**
+     * With [appLock]: it never asks while the active server answers on the local network of the
+     * phone's Wi-Fi (same subnet, with its credentials).
+     */
+    val appLockTrustLocalServer: Boolean = false,
 )
+
+/** The name of the Wi-Fi network the phone is connected to, for [AppSettings.appLockTrustedWifi]. */
+fun interface WifiNetworks {
+    /** Null when not on Wi-Fi, or when the system hides the name (location permission or location off). */
+    suspend fun currentName(): String?
+}
+
+/** The minutes Settings offers for the app lock besides a custom value. */
+val APP_LOCK_MINUTE_CHOICES = listOf(0, 1, 5, 15)
+
+/** The longest custom wait before the app lock asks again: one day. */
+const val APP_LOCK_MAX_MINUTES = 24 * 60
+
+/**
+ * Whether the app content is hidden behind the lock screen (see [AppSettings.appLock]): it locks
+ * at launch, when the user comes back from other apps ([AppSettings.appLockOnLeave]) or turns the
+ * screen on again ([AppSettings.appLockOnScreenOff]), unless the phone is on a trusted network.
+ */
+interface AppLock {
+    val locked: StateFlow<Boolean>
+
+    /**
+     * Counts the times the lock screen should open the system prompt by itself: at launch and at
+     * each return that locks, once the trusted networks were checked; 0 until the first.
+     */
+    val promptRequests: StateFlow<Int>
+
+    /** The user authenticated: the app shows until the next time it locks. */
+    fun unlock()
+
+    /**
+     * A system authentication screen is about to cover the app (or has closed): leaving the
+     * app for it neither counts as time away nor locks it again.
+     */
+    fun authenticating(active: Boolean)
+}
 
 /** Wide windows show the session list beside the chat: [AppSettings.splitView] with [UnfoldedLayout.SideBySide]. */
 val AppSettings.listBesideChat: Boolean get() = splitView && unfoldedLayout == UnfoldedLayout.SideBySide

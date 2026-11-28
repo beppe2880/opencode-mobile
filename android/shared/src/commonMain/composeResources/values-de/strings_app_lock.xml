@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode ist gesperrt</string>
+    <string name="app_lock_message">Öffne sie mit deinem Gesicht, einem Fingerabdruck oder dem Gerätecode.</string>
+    <string name="app_lock_unlock">Entsperren</string>
+    <string name="app_lock_prompt_title">OpenCode entsperren</string>
+    <string name="app_lock_prompt_subtitle">Bestätige, dass du es bist, um deine Sitzungen zu sehen</string>
+    <string name="app_lock_failed">Zu viele Versuche. Warte kurz und versuche es dann erneut.</string>
+</resources>

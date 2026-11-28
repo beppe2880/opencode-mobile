@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode is locked</string>
+    <string name="app_lock_message">Use your face, a fingerprint or the device passcode to open it.</string>
+    <string name="app_lock_unlock">Unlock</string>
+    <!-- Shown by the system prompt (Android) and as its reason (iOS). -->
+    <string name="app_lock_prompt_title">Unlock OpenCode</string>
+    <string name="app_lock_prompt_subtitle">Confirm it's you to see your sessions</string>
+    <string name="app_lock_failed">Too many attempts. Wait a moment, then try again.</string>
+</resources>

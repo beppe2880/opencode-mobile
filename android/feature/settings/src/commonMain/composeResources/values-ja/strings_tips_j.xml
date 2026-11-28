@@ -8,4 +8,7 @@
     <string name="tips_j_hide_keyboard_demo">プロンプトを入力して送信すると、キーボードが下に隠れ、回答がチャット全体にストリーミング表示されます。</string>
     <string name="tips_j_hide_keyboard_prompt">ビルドが失敗するのはなぜですか？</string>
     <string name="tips_j_hide_keyboard_answer">テスト **ParserTest** は末尾の改行を期待しています。`fixtures/input.txt` に追加したところ、ビルドが再び通りました。</string>
+    <string name="tips_j_app_lock_title">顔や指紋でアプリをロック</string>
+    <string name="tips_j_app_lock_body">設定 → セキュリティ で「アプリのロック」をオンにすると、セッションを表示する前に顔、指紋、またはデバイスのパスコードを求めます。再確認するタイミングを選べます。アプリを離れたときと画面をオフにしたときに、すぐ確認するか、数分後に確認するかを設定できます。信頼できる Wi-Fi ネットワーク上、またはサーバーがローカルネットワーク上にあるときは、確認なしで開きます。</string>
+    <string name="tips_j_app_lock_demo">アプリに戻るとロックされています。ロック解除を押すとシステムの認証が開き、指紋認証でセッションが再び表示されます。</string>
 </resources>

@@ -8,6 +8,7 @@ import io.github.beppe2880.opencodemobile.core.domain.VoiceEngine
 import io.github.beppe2880.opencodemobile.core.domain.listBesideChat
 import io.github.beppe2880.opencodemobile.core.ui.platform.ScreenCapabilities
 import io.github.beppe2880.opencodemobile.core.ui.platform.shareTargetSupported
+import io.github.beppe2880.opencodemobile.core.ui.platform.wifiNameSupported
 
 /**
  * One control of Settings. [fields] are the [AppSettings] properties it changes (a test checks
@@ -85,6 +86,15 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     NotifyFinished(listOf("notifyFinished"), requires = Notifications),
     UpdateNotice(listOf("updateNotice")),
     WhatsNewButton(listOf("whatsNewButton")),
+    AppLock(listOf("appLock")),
+    AppLockOnLeave(listOf("appLockOnLeave"), requires = AppLock),
+    AppLockAfter(listOf("appLockAfterMinutes"), requires = AppLockOnLeave),
+    AppLockOnScreenOff(listOf("appLockOnScreenOff"), requires = AppLock),
+    AppLockScreenOffAfter(listOf("appLockScreenOffMinutes"), requires = AppLockOnScreenOff),
+
+    /** Android only: the name of the Wi-Fi network needs the location permission there. */
+    AppLockTrustedWifi(listOf("appLockTrustedWifi"), requires = AppLock),
+    AppLockTrustLocalServer(listOf("appLockTrustLocalServer"), requires = AppLock),
     ;
 
     /** The first part of its [area] that offers this option: where the Preview style opens it. */
@@ -153,7 +163,19 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.QuestionNotification -> listOf(SettingOption.NotifyQuestions)
         SettingsPart.FinishedNotification -> listOf(SettingOption.NotifyFinished)
         SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)
+        SettingsPart.LockScreen -> APP_LOCK_OPTIONS
     }
+
+/** The app lock, when it asks again and where it does not, in the order Settings lists them. */
+val APP_LOCK_OPTIONS: List<SettingOption> = listOf(
+    SettingOption.AppLock,
+    SettingOption.AppLockOnLeave,
+    SettingOption.AppLockAfter,
+    SettingOption.AppLockOnScreenOff,
+    SettingOption.AppLockScreenOffAfter,
+    SettingOption.AppLockTrustedWifi,
+    SettingOption.AppLockTrustLocalServer,
+)
 
 /** The microphone and what turns the voice into text, in the order Settings lists them. */
 val VOICE_OPTIONS: List<SettingOption> = listOf(
@@ -202,6 +224,11 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ShareMenu -> supported
     SettingOption.ShareOpens -> supported && settings.showInShareMenu
     SettingOption.SwipeSensitivity -> settings.chatSwipe == ChatSwipe.SessionDrawer
+    SettingOption.AppLockOnLeave, SettingOption.AppLockOnScreenOff, SettingOption.AppLockTrustedWifi,
+    SettingOption.AppLockTrustLocalServer,
+    -> settings.appLock
+    SettingOption.AppLockAfter -> settings.appLock && settings.appLockOnLeave
+    SettingOption.AppLockScreenOffAfter -> settings.appLock && settings.appLockOnScreenOff
     else -> true
 }
 
@@ -223,12 +250,21 @@ internal val SettingOption.searchKeywords: List<String>
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
         SettingOption.WhatsNewButton -> listOf("tips", "whats new", "features", "changelog", "button")
+        SettingOption.AppLock -> listOf("lock", "security", "privacy", "biometric", "face id", "touch id", "fingerprint", "passcode", "pin")
+        SettingOption.AppLockOnLeave, SettingOption.AppLockAfter -> listOf("lock", "timeout", "leave", "background", "minutes", "away")
+        SettingOption.AppLockOnScreenOff, SettingOption.AppLockScreenOffAfter -> listOf("lock", "screen", "off", "sleep", "minutes")
+        SettingOption.AppLockTrustedWifi -> listOf("lock", "wifi", "wi-fi", "network", "trusted", "home", "ssid")
+        SettingOption.AppLockTrustLocalServer -> listOf("lock", "lan", "local", "network", "server", "trusted", "home")
         else -> emptyList()
     }
 
-/** Whether the option exists on this platform: nothing can be shared to the iOS app yet. */
+/** Whether the option exists on this platform: nothing can be shared to the iOS app yet, nor can it read the Wi-Fi name. */
 val SettingOption.supported: Boolean
-    get() = shareTargetSupported || (this != SettingOption.ShareMenu && this != SettingOption.ShareOpens)
+    get() = when (this) {
+        SettingOption.ShareMenu, SettingOption.ShareOpens -> shareTargetSupported
+        SettingOption.AppLockTrustedWifi -> wifiNameSupported
+        else -> true
+    }
 
 /** What folding and unfolding do with an open chat: only foldables have them. */
 val FOLDING_OPTIONS: List<SettingOption> = listOf(SettingOption.UnfoldOpenChat, SettingOption.FoldOpenChat)

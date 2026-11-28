@@ -51,6 +51,8 @@ data class SettingsState(
     val updateTarget: UpdateTarget = UpdateTarget.Android,
     val renaming: ServerProfile? = null,
     val removing: ServerProfile? = null,
+    /** Adding the current Wi-Fi network failed: not on Wi-Fi, or the system hid its name. */
+    val wifiNameMissing: Boolean = false,
     /** The confirmation to reset every setting is open. */
     val resetting: Boolean = false,
     /** The system lets the app post notifications. */
@@ -207,6 +209,18 @@ sealed interface SettingsEvent {
     data class NotifyFinishedChanged(val enabled: Boolean) : SettingsEvent
     data class UpdateNoticeChanged(val style: UpdateNoticeStyle) : SettingsEvent
     data class WhatsNewButtonChanged(val enabled: Boolean) : SettingsEvent
+
+    /** Sent once the user authenticated to turn it on; turning it off needs nothing. */
+    data class AppLockChanged(val enabled: Boolean) : SettingsEvent
+    data class AppLockOnLeaveChanged(val enabled: Boolean) : SettingsEvent
+    data class AppLockAfterChanged(val minutes: Int) : SettingsEvent
+    data class AppLockOnScreenOffChanged(val enabled: Boolean) : SettingsEvent
+    data class AppLockScreenOffAfterChanged(val minutes: Int) : SettingsEvent
+
+    /** Adds the Wi-Fi network the phone is on (the location permission is already granted). */
+    data object AddCurrentWifi : SettingsEvent
+    data class RemoveTrustedWifi(val name: String) : SettingsEvent
+    data class AppLockTrustLocalServerChanged(val enabled: Boolean) : SettingsEvent
 
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent

@@ -50,7 +50,7 @@ fun sharedModule(appInfo: AppInfo): Module = module {
     }
     viewModel { VoiceInputViewModel(get(), get(), get()) }
     viewModel { ProviderConnectionViewModel(get(), get(), get()) }
-    viewModel { params -> SettingsViewModel(get(), get(), get(), get(), get(), params.getOrNull()) }
+    viewModel { params -> SettingsViewModel(get(), get(), get(), get(), get(), params.getOrNull(), wifi = get()) }
     viewModel { UsageViewModel(get(), get()) }
     // The update sheet is offered once per app run; an update found by "Check for updates" is
     // shared with the session list.

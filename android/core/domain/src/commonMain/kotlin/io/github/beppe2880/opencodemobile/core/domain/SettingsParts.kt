@@ -27,6 +27,9 @@ enum class SettingsArea {
     Sharing,
     Notifications,
     Terminal,
+
+    /** The app lock: Face ID, a fingerprint or the device passcode before showing the app. */
+    Security,
     Updates,
 
     /** Versions and resetting every setting; no options of its own. */
@@ -99,6 +102,9 @@ enum class SettingsPart(val area: SettingsArea) {
     QuestionNotification(SettingsArea.Notifications),
     FinishedNotification(SettingsArea.Notifications),
     UpdateNotice(SettingsArea.Updates),
+
+    /** The lock screen the app shows until the user authenticates. */
+    LockScreen(SettingsArea.Security),
     ;
 
     companion object {
