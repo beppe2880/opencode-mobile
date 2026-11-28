@@ -78,10 +78,21 @@ internal val ChatState.historyReady: Boolean
 
 /** Session actions first, history next, tools last. No nested menus on phones. */
 @Composable
-internal fun ChatActionsMenu(state: ChatState, expanded: Boolean, onDismiss: () -> Unit, onEvent: (ChatEvent) -> Unit) {
-    // Keep the menu above the message area's footer and composer; the rest scrolls.
-    val maxMenuHeight = (with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() } - 370.dp)
-        .coerceAtLeast(320.dp)
+internal fun ChatActionsMenu(
+    state: ChatState,
+    expanded: Boolean,
+    availableHeightPx: Float,
+    onDismiss: () -> Unit,
+    onEvent: (ChatEvent) -> Unit,
+) {
+    val density = LocalDensity.current
+    val belowAnchor = with(density) { availableHeightPx.toDp() } - OcSpacing.sm
+    val maxMenuHeight = when {
+        !availableHeightPx.isFinite() -> 320.dp
+        belowAnchor >= 240.dp -> belowAnchor
+        // If the gap is too small to scroll comfortably, let the menu cover the composer.
+        else -> (with(density) { LocalWindowInfo.current.containerSize.height.toDp() } - 370.dp).coerceAtLeast(320.dp)
+    }
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,

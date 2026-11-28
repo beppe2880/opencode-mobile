@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,7 +50,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -143,6 +146,7 @@ fun ChatScreen(
     val c = OcTheme.colors
     var contextOpen by rememberSaveable { mutableStateOf(false) }
     var bottomBarHeight by remember { mutableStateOf(0) }
+    var bottomAreaTop by remember { mutableFloatStateOf(Float.NaN) }
     BtwAutoOpen(state, allowed = !contextOpen && !externalOverlayOpen, onEvent)
     Scaffold(
         modifier = modifier,
@@ -163,6 +167,7 @@ fun ChatScreen(
                     onPin = { onEvent(ChatEvent.SetPinned(it)) },
                     onRunning = { onEvent(ChatEvent.RunningSheet(true)) },
                     onMenuEvent = onEvent,
+                    bottomAreaTop = { bottomAreaTop },
                 )
                 if (state.showsRunningLine) RunningLine(state.work, state.headerStyle, onClick = { onEvent(ChatEvent.RunningSheet(true)) })
             }
@@ -216,7 +221,9 @@ fun ChatScreen(
                 }
             }
             Box(
-                Modifier.fillMaxWidth().onSizeChanged { bottomBarHeight = it.height },
+                Modifier.fillMaxWidth()
+                    .onSizeChanged { bottomBarHeight = it.height }
+                    .onGloballyPositioned { bottomAreaTop = it.positionInWindow().y },
                 contentAlignment = Alignment.Center,
             ) {
                 BottomArea(state, onEvent, onAttachPhoto, onAttachFile, voice, onDictate, onVoice, onHoldVoice)
@@ -305,6 +312,7 @@ internal fun ChatTopBar(
     onPin: (Boolean) -> Unit = {},
     onMenuEvent: (ChatEvent) -> Unit = {},
     applyStatusBarInset: Boolean = true,
+    bottomAreaTop: () -> Float = { Float.NaN },
 ) {
     val c = OcTheme.colors
     val editMode = LocalEditMode.current
@@ -371,7 +379,8 @@ internal fun ChatTopBar(
                 enabled = state.directory.isNotEmpty(),
                 modifier = Modifier.testTag("chat_terminal_button"),
             )
-            Box {
+            var menuAnchorBottom by remember { mutableFloatStateOf(Float.NaN) }
+            Box(Modifier.onGloballyPositioned { menuAnchorBottom = it.positionInWindow().y + it.size.height }) {
                 OcIconButton(
                     icon = Icons.Outlined.MoreVert,
                     contentDescription = stringResource(Res.string.chat_more),
@@ -379,7 +388,13 @@ internal fun ChatTopBar(
                     modifier = Modifier.testTag("chat_more_button"),
                 )
                 var choosingMute by remember(state.sessionId) { mutableStateOf(false) }
-                ChatActionsMenu(state, menuOpen, onDismiss = { menuOpen = false }) { event ->
+                ChatActionsMenu(
+                    state,
+                    menuOpen,
+                    // Read layout positions only while open so streaming and IME movement don't invalidate the closed menu.
+                    availableHeightPx = if (menuOpen) bottomAreaTop() - menuAnchorBottom else Float.NaN,
+                    onDismiss = { menuOpen = false },
+                ) { event ->
                     when (event) {
                         is ChatEvent.SetMuted -> if (event.muted) choosingMute = true else onMenuEvent(event)
                         is ChatEvent.SetPinned -> onPin(event.pinned)
