@@ -135,6 +135,11 @@ class SessionsViewModel(
             }
         }
         viewModelScope.launch {
+            settings.settings.map { it.sessionShortcuts }.distinctUntilChanged().collect { shortcuts ->
+                updateState { it.copy(sessionShortcuts = shortcuts) }
+            }
+        }
+        viewModelScope.launch {
             settings.settings.map { it.unreadSessions }.distinctUntilChanged().collect { unread ->
                 updateState { s ->
                     // Without unread state the read filter has nothing to narrow.
@@ -762,7 +767,7 @@ class SessionsViewModel(
     }
 
     private fun setSelectedPinned(pinned: Boolean) {
-        val selected = currentState.selectedSessions
+        val selected = currentState.selectedSessions.filter { (it.id in currentState.pinned) != pinned }
         if (selected.isEmpty()) return
         selected.forEach { pins.setPinned(it.id, pinned) }
         showPins()
@@ -771,16 +776,17 @@ class SessionsViewModel(
 
     /** Permanent mute: the single-session sheet keeps offering the temporary choice. */
     private fun setSelectedMuted(muted: Boolean) {
-        val selected = currentState.selectedSessions
+        val selected = currentState.selectedSessions.filter { (it.id in currentState.muted) != muted }
         if (selected.isEmpty()) return
         selected.forEach { mutes.setMuted(it.id, muted) }
     }
 
     private fun setSelectedArchived(archived: Boolean) {
         if (!currentState.archiveSupported) return
-        val selected = currentState.selectedSessions
+        val selection = currentState.selectedSessions
+        val selected = selection.filter { (it.archivedAt != null) != archived }
         if (selected.isEmpty()) return
-        if (selected.size == 1) {
+        if (selection.size == 1) {
             setArchived(selected.single(), archived)
             retainVisibleSelection()
             return
@@ -809,14 +815,14 @@ class SessionsViewModel(
     }
 
     private fun markSelectedRead() {
-        val selected = currentState.selectedSessions
+        val selected = currentState.selectedSessions.filter(currentState::isUnread)
         if (selected.isEmpty()) return
         markRead(selected)
     }
 
     private fun markSelectedUnread() {
         if (currentState.unreadSessions == UnreadSessions.Off) return
-        val selected = currentState.selectedSessions
+        val selected = currentState.selectedSessions.filterNot(currentState::isUnread)
         if (selected.isEmpty()) return
         selected.forEach { unreadStore.setUnread(it.id, true) }
         val marks = unreadStore.unread()

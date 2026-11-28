@@ -451,6 +451,21 @@ enum class SelectionApply {
     Immediately,
 }
 
+/** A configurable slot for one action or a pair of opposite actions in selection mode. */
+enum class SessionShortcut {
+    Pin,
+    Read,
+    Mute,
+    Archive,
+    Rename,
+    Delete,
+    ;
+
+    companion object {
+        val defaults = listOf(Pin, Read)
+    }
+}
+
 /** How the session list shows sessions whose latest turn the user has not viewed. */
 enum class UnreadSessions {
     /** No unread dots, no Unread group and no read filter. */
@@ -600,6 +615,8 @@ data class AppSettings(
     val confirmStopCommand: Boolean = true,
     /** How the session list marks and groups unread sessions. */
     val unreadSessions: UnreadSessions = UnreadSessions.DotAndGroup,
+    /** Preferred selection toolbar slots in priority order; empty keeps all actions in the menu. */
+    val sessionShortcuts: List<SessionShortcut> = SessionShortcut.defaults,
     /** Chips above the composer count the running shells and subagents, and open them. */
     val runningChips: Boolean = true,
     /** What a horizontal swipe in a chat does. */

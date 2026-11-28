@@ -1,0 +1,14 @@
+<resources>
+    <string name="settings_session_shortcuts">会话选择快捷操作</string>
+    <string name="settings_session_shortcuts_sub">选择并排列工具栏操作。放不下的操作仍可在三点菜单中找到。</string>
+    <string name="settings_shortcut_pin">置顶 / 取消置顶</string>
+    <string name="settings_shortcut_read">标为已读 / 未读</string>
+    <string name="settings_shortcut_mute">静音 / 取消静音</string>
+    <string name="settings_shortcut_archive">归档 / 取消归档</string>
+    <string name="settings_shortcut_rename">重命名</string>
+    <string name="settings_shortcut_delete">删除</string>
+    <string name="settings_shortcut_up">上移 %1$s</string>
+    <string name="settings_shortcut_down">下移 %1$s</string>
+    <string name="settings_shortcut_read_disabled">开启「未读会话」后即可使用此快捷操作。</string>
+    <string name="tips_session_shortcuts_body">选中会话后，轻点即可置顶或标为未读。前往「设置 → 会话」选择并排列快捷操作。</string>
+</resources>

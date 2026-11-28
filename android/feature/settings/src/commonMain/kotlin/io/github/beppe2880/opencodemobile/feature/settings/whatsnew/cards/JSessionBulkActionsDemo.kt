@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.NotificationsOff
@@ -53,7 +55,7 @@ import kotlinx.coroutines.delay
 
 /** Long-press selects a row, a tap adds another, and the menu deletes both after one confirmation. */
 @Composable
-internal fun SessionBulkActionsDemo(active: Boolean) {
+internal fun SessionBulkActionsDemo(active: Boolean, shortcuts: Boolean = false) {
     val c = OcTheme.colors
     var selected by remember { mutableStateOf(emptySet<String>()) }
     var menu by remember { mutableStateOf(false) }
@@ -114,6 +116,12 @@ internal fun SessionBulkActionsDemo(active: Boolean) {
                 DemoTopBar("Sessions", subtitle = "my-api")
             } else {
                 SelectionBar(selected.size) {
+                    if (shortcuts) {
+                        Icon(Icons.Outlined.PushPin, null, Modifier.size(20.dp), tint = c.iconBase)
+                        Spacer(Modifier.width(OcSpacing.md))
+                        Icon(Icons.Outlined.MailOutline, null, Modifier.size(20.dp), tint = c.iconBase)
+                        Spacer(Modifier.width(OcSpacing.md))
+                    }
                     Icon(
                         Icons.Outlined.MoreVert,
                         contentDescription = null,
@@ -132,6 +140,7 @@ internal fun SessionBulkActionsDemo(active: Boolean) {
                     .align(Alignment.TopEnd)
                     .padding(top = 44.dp, end = OcSpacing.md),
                 delete = Modifier.then(targets.target("delete")),
+                shortcuts = shortcuts,
             )
         }
         if (dialog) DeleteDialog(confirm = Modifier.then(targets.target("confirm")))
@@ -161,7 +170,7 @@ private fun SelectionBar(count: Int, trailing: @Composable () -> Unit) {
 }
 
 @Composable
-private fun BulkMenu(modifier: Modifier = Modifier, delete: Modifier) {
+private fun BulkMenu(modifier: Modifier = Modifier, delete: Modifier, shortcuts: Boolean) {
     val c = OcTheme.colors
     Column(
         modifier
@@ -172,8 +181,10 @@ private fun BulkMenu(modifier: Modifier = Modifier, delete: Modifier) {
             .padding(vertical = OcSpacing.xs),
     ) {
         DemoMenuItem("Mute notifications", Icons.Outlined.NotificationsOff)
-        DemoMenuItem("Mark as unread", Icons.Outlined.MarkEmailUnread)
-        DemoMenuItem("Pin", Icons.Outlined.PushPin)
+        if (!shortcuts) {
+            DemoMenuItem("Mark as unread", Icons.Outlined.MarkEmailUnread)
+            DemoMenuItem("Pin", Icons.Outlined.PushPin)
+        }
         DemoMenuItem("Archive", Icons.Outlined.Archive)
         OcDivider(Modifier.padding(vertical = OcSpacing.xs))
         DemoMenuItem("Delete", Icons.Outlined.Delete, tint = c.danger.fg, modifier = delete)

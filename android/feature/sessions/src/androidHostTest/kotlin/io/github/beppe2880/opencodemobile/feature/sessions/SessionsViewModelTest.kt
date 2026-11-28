@@ -1875,6 +1875,23 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `bulk archive does not rewrite an existing archive date`() = runTest(main.testDispatcher) {
+        sessions.archivedResult = Result.success(listOf(session("archived", now - hour, archivedAt = now - hour)))
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.ToggleStatus(SessionStatus.Archived))
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("archived"))
+        vm.onEvent(SessionsEvent.ToggleSelection("today"))
+
+        vm.onEvent(SessionsEvent.SetSelectedArchived(true))
+        advanceUntilIdle()
+
+        assertEquals(listOf("today" to true), sessions.archivedCalls)
+        assertEquals(now - hour, vm.state.value.selectedSessions.first { it.id == "archived" }.archivedAt)
+    }
+
+    @Test
     fun `a failed bulk archive restores only the failed rows and shows an error`() = runTest(main.testDispatcher) {
         val vm = vm()
         advanceUntilIdle()
@@ -2032,6 +2049,21 @@ class SessionsViewModelTest {
     }
 
     @Test
+    fun `bulk mute leaves an existing temporary mute intact`() = runTest(main.testDispatcher) {
+        mutes.setMuted("today", true, untilIdleAfter = 0)
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onEvent(SessionsEvent.StartSelection("today"))
+        vm.onEvent(SessionsEvent.ToggleSelection("week"))
+
+        vm.onEvent(SessionsEvent.SetSelectedMuted(true))
+        runCurrent()
+
+        assertEquals(setOf("today", "week"), mutes.muted.value)
+        assertEquals(mapOf("today" to 0L), mutes.temporary.value)
+    }
+
+    @Test
     fun `bulk unmute clears permanent and temporary mutes`() = runTest(main.testDispatcher) {
         mutes.setMuted("today", true)
         mutes.setMuted("week", true, untilIdleAfter = 0)
@@ -2113,7 +2145,7 @@ class SessionsViewModelTest {
         vm.onEvent(SessionsEvent.StartSelection("unread"))
         vm.onEvent(SessionsEvent.ToggleSelection("read"))
         vm.onEvent(SessionsEvent.MarkSelectedUnread)
-        assertEquals(setOf("unread", "read"), unread.unread())
+        assertEquals(setOf("read"), unread.unread())
 
         vm.onEvent(SessionsEvent.StartSelection("unread"))
         vm.onEvent(SessionsEvent.ToggleSelection("read"))

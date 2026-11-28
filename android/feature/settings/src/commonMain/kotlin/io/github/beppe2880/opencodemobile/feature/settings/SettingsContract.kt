@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.FoldChat
 import io.github.beppe2880.opencodemobile.core.domain.NewChatModel
 import io.github.beppe2880.opencodemobile.core.domain.SelectionApply
 import io.github.beppe2880.opencodemobile.core.domain.ServerProfile
+import io.github.beppe2880.opencodemobile.core.domain.SessionShortcut
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
 import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsStyle
@@ -171,6 +172,7 @@ sealed interface SettingsEvent {
     data class RunningInListChanged(val enabled: Boolean) : SettingsEvent
     data class ConfirmStopChanged(val enabled: Boolean) : SettingsEvent
     data class UnreadSessionsChanged(val unread: UnreadSessions) : SettingsEvent
+    data class SessionShortcutsChanged(val shortcuts: List<SessionShortcut>) : SettingsEvent
     data class RunningChipsChanged(val enabled: Boolean) : SettingsEvent
     data class AgentColorOutlineChanged(val enabled: Boolean) : SettingsEvent
     data class HideKeyboardAfterSendChanged(val enabled: Boolean) : SettingsEvent
