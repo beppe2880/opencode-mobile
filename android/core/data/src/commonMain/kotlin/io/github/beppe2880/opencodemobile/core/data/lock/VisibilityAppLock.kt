@@ -5,7 +5,9 @@ import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,31 +18,38 @@ import kotlinx.coroutines.launch
 import kotlin.time.Clock
 
 /**
- * [AppLock] driven by whether the app is in the foreground ([visible]): a launch with the lock on
- * starts locked, and coming back locks again once the app was away for
- * [AppSettings.appLockAfterMinutes]. With 0 it locks as soon as it goes to the background, so the
- * app never shows unlocked on return. The process lifecycle ignores rotations and other
- * configuration changes.
+ * [AppLock] driven by whether the app is in the foreground ([appVisible], from the process
+ * lifecycle, which ignores rotations) and whether the screen is on ([screenOn]).
+ *
+ * Two absences count separately: leaving for other apps or the home screen
+ * ([AppSettings.appLockOnLeave]) and turning the screen off while the app is open
+ * ([AppSettings.appLockOnScreenOff]), each with its own minutes. With 0 the app locks as soon as
+ * it is left, so it never shows unlocked on return. A launch with the lock on starts locked. Before
+ * asking, [trusted] can open the app on a trusted network.
  */
 internal class VisibilityAppLock(
     private val settings: SettingsRepository,
-    visible: Flow<Boolean>,
-    scope: CoroutineScope,
+    appVisible: Flow<Boolean>,
+    screenOn: Flow<Boolean>,
+    private val scope: CoroutineScope,
+    private val trusted: suspend () -> Boolean = { false },
     private val now: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : AppLock {
 
     private val guard = SynchronizedObject()
     private val _locked = MutableStateFlow(settings.settings.value.appLock)
     override val locked: StateFlow<Boolean> = _locked.asStateFlow()
-    private val _returns = MutableStateFlow(0)
-    override val returns: StateFlow<Int> = _returns.asStateFlow()
+    private val _promptRequests = MutableStateFlow(0)
+    override val promptRequests: StateFlow<Int> = _promptRequests.asStateFlow()
 
-    /** The app left the foreground on its own, not for the system authentication screen. */
-    private var away = false
+    private var visible = true
+    private var screen = true
 
-    /** When the app went to the background; null while it is in the foreground or unlocked since. */
-    private var hiddenAt: Long? = null
+    /** When the user left for other apps, or turned the screen off in the app; null otherwise. */
+    private var leftAt: Long? = null
+    private var screenOffAt: Long? = null
     private var authenticating = false
+    private var check: Job? = null
 
     init {
         scope.launch {
@@ -49,13 +58,15 @@ internal class VisibilityAppLock(
                 if (!on) synchronized(guard) { _locked.value = false }
             }
         }
-        scope.launch {
-            visible.collect { if (it) onShown() else onHidden() }
-        }
+        scope.launch { appVisible.collect(::onAppVisible) }
+        scope.launch { screenOn.collect(::onScreen) }
+        if (_locked.value) checkThenAsk()
     }
 
     override fun unlock() = synchronized(guard) {
-        hiddenAt = null
+        check?.cancel()
+        leftAt = null
+        screenOffAt = null
         _locked.value = false
     }
 
@@ -63,23 +74,68 @@ internal class VisibilityAppLock(
         authenticating = active
     }
 
-    private fun onHidden() = synchronized(guard) {
-        if (authenticating) return
-        away = true
-        val s = settings.settings.value
-        if (!s.appLock) return
-        hiddenAt = now()
-        if (s.appLockAfterMinutes == 0) _locked.value = true
+    private fun onAppVisible(value: Boolean) = synchronized(guard) {
+        val was = visible && screen
+        visible = value
+        // The system authentication screen covers the app: not the user leaving.
+        if (!value && was && !authenticating && leftAt == null) {
+            leftAt = now()
+            val s = settings.settings.value
+            if (s.appLock && s.appLockOnLeave && s.appLockAfterMinutes == 0) _locked.value = true
+        }
+        if (value && screen) onBack()
     }
 
-    private fun onShown() = synchronized(guard) {
-        if (!away) return
-        away = false
-        _returns.value++
+    private fun onScreen(on: Boolean) = synchronized(guard) {
+        val wasShown = visible && screen
+        screen = on
+        // Only the screen turned off while the app was open: leaving it first is a leave.
+        if (!on && wasShown && !authenticating && screenOffAt == null) {
+            screenOffAt = now()
+            val s = settings.settings.value
+            if (s.appLock && s.appLockOnScreenOff && s.appLockScreenOffMinutes == 0) _locked.value = true
+        }
+        if (on && visible) onBack()
+    }
+
+    /** The app is in front again with the screen on: lock when an absence was long enough. */
+    private fun onBack() {
+        val left = leftAt
+        val off = screenOffAt
+        if (left == null && off == null) return
+        leftAt = null
+        screenOffAt = null
         val s = settings.settings.value
-        val since = hiddenAt ?: return
-        hiddenAt = null
-        if (s.appLock && now() - since >= s.appLockAfterMinutes * MINUTE) _locked.value = true
+        if (!s.appLock) return
+        val time = now()
+        val lock = _locked.value ||
+            (left != null && s.appLockOnLeave && time - left >= s.appLockAfterMinutes * MINUTE) ||
+            (off != null && s.appLockOnScreenOff && time - off >= s.appLockScreenOffMinutes * MINUTE)
+        if (!lock) return
+        _locked.value = true
+        checkThenAsk()
+    }
+
+    /** Opens the app on a trusted network, or asks the lock screen to show the system prompt. */
+    private fun checkThenAsk() {
+        check?.cancel()
+        check = scope.launch {
+            val trusted = try {
+                trusted()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                false
+            }
+            synchronized(guard) {
+                if (!_locked.value) return@launch
+                if (trusted) {
+                    _locked.value = false
+                } else {
+                    _promptRequests.value++
+                }
+            }
+        }
     }
 
     private companion object {

@@ -6,23 +6,50 @@
     <!-- The system prompt shown when turning the lock on. -->
     <string name="settings_app_lock_confirm_title">Turn on app lock</string>
     <string name="settings_app_lock_confirm_subtitle">Confirm it's you to lock OpenCode</string>
-    <string name="settings_app_lock_after">Ask again</string>
-    <string name="settings_app_lock_after_always_sub">Every time the app opens or comes back from the background.</string>
+    <string name="settings_group_app_lock_when">When to ask again</string>
+    <string name="settings_app_lock_on_leave">When you leave the app</string>
+    <string name="settings_app_lock_on_leave_sub">You switch to another app or go to the home screen.</string>
+    <string name="settings_app_lock_on_screen_off">When you turn the screen off</string>
+    <string name="settings_app_lock_on_screen_off_sub">The screen turns off while the app is open.</string>
+    <string name="settings_app_lock_after">After</string>
+    <string name="settings_app_lock_after_always_sub">Every time you come back from another app or the home screen.</string>
     <plurals name="settings_app_lock_after_sub">
-        <item quantity="one">When you come back after %1$d minute away from the app, and every time it starts.</item>
-        <item quantity="other">When you come back after %1$d minutes away from the app, and every time it starts.</item>
+        <item quantity="one">When you come back after %1$d minute in other apps.</item>
+        <item quantity="other">When you come back after %1$d minutes in other apps.</item>
     </plurals>
+    <string name="settings_app_lock_screen_off_always_sub">Every time you turn the screen back on.</string>
+    <plurals name="settings_app_lock_screen_off_sub">
+        <item quantity="one">When you turn the screen back on after %1$d minute.</item>
+        <item quantity="other">When you turn the screen back on after %1$d minutes.</item>
+    </plurals>
+    <string name="settings_group_app_lock_trusted">Don't ask</string>
+    <string name="settings_app_lock_wifi">On trusted Wi-Fi networks</string>
+    <string name="settings_app_lock_wifi_sub">While the phone is on one of these networks, the app opens without asking. Android needs the location permission to tell the network name.</string>
+    <string name="settings_app_lock_wifi_add">Add the current Wi-Fi</string>
+    <!-- %1$s is the name of the Wi-Fi network. -->
+    <string name="settings_app_lock_wifi_remove">Remove %1$s</string>
+    <string name="settings_app_lock_wifi_denied">Without the location permission the app can't tell which Wi-Fi network you're on.</string>
+    <string name="settings_app_lock_wifi_missing">No Wi-Fi network found. Connect to Wi-Fi and turn on location, then try again.</string>
+    <string name="settings_app_lock_local_server">When the server is on your local network</string>
+    <string name="settings_app_lock_local_server_sub">The app opens without asking while the active server answers on the same Wi-Fi network as the phone. Reaching it through a VPN doesn't count.</string>
     <string name="settings_app_lock_always">Always</string>
     <!-- A choice of minutes, as short as possible: "5 min". -->
     <string name="settings_app_lock_minutes">%1$d min</string>
     <string name="settings_app_lock_custom">Custom</string>
     <string name="settings_app_lock_custom_title">Minutes away before asking again</string>
     <string name="settings_app_lock_custom_label">Minutes, 1 to 1440</string>
-    <string name="settings_summary_app_lock_always">Every time</string>
-    <plurals name="settings_summary_app_lock_after">
-        <item quantity="one">After %1$d minute away</item>
-        <item quantity="other">After %1$d minutes away</item>
+    <string name="settings_summary_app_lock_always">every time</string>
+    <!-- Short: "5 min", inside the summary lines below. -->
+    <string name="settings_summary_app_lock_minutes">after %1$d min</string>
+    <!-- %1$s is "every time" or "after 5 min". -->
+    <string name="settings_summary_app_lock_leave">Leaving: %1$s</string>
+    <string name="settings_summary_app_lock_screen_off">Screen off: %1$s</string>
+    <string name="settings_summary_app_lock_launch">Only at launch</string>
+    <plurals name="settings_summary_app_lock_wifi">
+        <item quantity="one">%1$d trusted Wi-Fi</item>
+        <item quantity="other">%1$d trusted Wi-Fi networks</item>
     </plurals>
+    <string name="settings_summary_app_lock_local_server">Local server trusted</string>
     <!-- The preview of the lock screen in Settings. -->
     <string name="settings_preview_lock_title">OpenCode is locked</string>
     <string name="settings_preview_lock_unlock">Unlock</string>

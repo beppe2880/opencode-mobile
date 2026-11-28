@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">Why does the build fail?</string>
     <string name="tips_j_hide_keyboard_answer">The test **ParserTest** expects a trailing newline. I added it to `fixtures/input.txt` and the build passes again.</string>
     <string name="tips_j_app_lock_title">Lock the app with your face or fingerprint</string>
-    <string name="tips_j_app_lock_body">Turn on App lock in Settings → Security: OpenCode asks for your face, a fingerprint or the device passcode before showing your sessions. Choose whether it asks every time the app opens or only after some minutes away, from 1 minute up to a custom time.</string>
+    <string name="tips_j_app_lock_body">Turn on App lock in Settings → Security: OpenCode asks for your face, a fingerprint or the device passcode before showing your sessions. Choose when it asks again, when you leave the app and when you turn the screen off, right away or after some minutes. On trusted Wi-Fi networks, or with the server on your local network, it opens without asking.</string>
     <string name="tips_j_app_lock_demo">The app comes back locked; Unlock opens the system prompt and a fingerprint shows the sessions again.</string>
 </resources>

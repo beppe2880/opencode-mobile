@@ -48,8 +48,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Covers the whole app while [lock] is locked, and asks for the
- * system prompt each time the app comes to the foreground; the button asks again after a cancel.
+ * Covers the whole app while [lock] is locked, and opens the system prompt when the lock asks
+ * for it; the button asks again after a cancel.
  * A device without any screen lock cannot authenticate (removing it needed the passcode), so it
  * opens.
  */
@@ -84,9 +84,10 @@ internal fun AppLockScreen(lock: AppLock, darkBars: Boolean) {
     }
 
     LaunchedEffect(Unit) { focus.clearFocus(force = true) }
-    // Once when it appears and at each return to the foreground: leaving the app for the
-    // prompt itself (the device passcode screen) does not count, so a cancel does not loop.
-    LaunchedEffect(lock) { lock.returns.collect { prompt() } }
+    // When the lock asks for it: at launch and at each return that locks, after the trusted
+    // networks were checked. Leaving the app for the prompt itself (the device passcode screen)
+    // does not count, so a cancel does not loop.
+    LaunchedEffect(lock) { lock.promptRequests.collect { if (it > 0) prompt() } }
     // A window of its own covers the dialogs and sheets the app had open, and takes Back.
     Dialog(onDismissRequest = {}, properties = lockDialogProperties()) {
         LockWindowBars(darkBars)

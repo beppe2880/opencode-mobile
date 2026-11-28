@@ -139,6 +139,11 @@ internal class PreferencesSettingsRepository(
         if (previewFraction == null) prefs.remove(KEY_PREVIEW_FRACTION) else prefs.putFloat(KEY_PREVIEW_FRACTION, previewFraction)
         prefs.putBoolean(KEY_APP_LOCK, next.appLock)
         prefs.putInt(KEY_APP_LOCK_MINUTES, next.appLockAfterMinutes)
+        prefs.putBoolean(KEY_APP_LOCK_ON_LEAVE, next.appLockOnLeave)
+        prefs.putBoolean(KEY_APP_LOCK_ON_SCREEN_OFF, next.appLockOnScreenOff)
+        prefs.putInt(KEY_APP_LOCK_SCREEN_OFF_MINUTES, next.appLockScreenOffMinutes)
+        prefs.putString(KEY_APP_LOCK_TRUSTED_WIFI, Json.encodeToString(ListSerializer(String.serializer()), next.appLockTrustedWifi))
+        prefs.putBoolean(KEY_APP_LOCK_TRUST_LOCAL_SERVER, next.appLockTrustLocalServer)
     }
 
     private fun read(): AppSettings {
@@ -233,6 +238,18 @@ internal class PreferencesSettingsRepository(
             appLock = prefs.getBoolean(KEY_APP_LOCK, defaults.appLock),
             appLockAfterMinutes = prefs.getInt(KEY_APP_LOCK_MINUTES, defaults.appLockAfterMinutes)
                 .takeIf { it in 0..APP_LOCK_MAX_MINUTES } ?: defaults.appLockAfterMinutes,
+            appLockOnLeave = prefs.getBoolean(KEY_APP_LOCK_ON_LEAVE, defaults.appLockOnLeave),
+            appLockOnScreenOff = prefs.getBoolean(KEY_APP_LOCK_ON_SCREEN_OFF, defaults.appLockOnScreenOff),
+            appLockScreenOffMinutes = prefs.getInt(KEY_APP_LOCK_SCREEN_OFF_MINUTES, defaults.appLockScreenOffMinutes)
+                .takeIf { it in 0..APP_LOCK_MAX_MINUTES } ?: defaults.appLockScreenOffMinutes,
+            appLockTrustedWifi = prefs.getStringOrNull(KEY_APP_LOCK_TRUSTED_WIFI)?.let { stored ->
+                try {
+                    Json.decodeFromString(ListSerializer(String.serializer()), stored).distinct()
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            } ?: defaults.appLockTrustedWifi,
+            appLockTrustLocalServer = prefs.getBoolean(KEY_APP_LOCK_TRUST_LOCAL_SERVER, defaults.appLockTrustLocalServer),
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -320,6 +337,11 @@ internal class PreferencesSettingsRepository(
         const val KEY_WHATS_NEW_BUTTON = "whats_new_button"
         const val KEY_APP_LOCK = "app_lock"
         const val KEY_APP_LOCK_MINUTES = "app_lock_after_minutes"
+        const val KEY_APP_LOCK_ON_LEAVE = "app_lock_on_leave"
+        const val KEY_APP_LOCK_ON_SCREEN_OFF = "app_lock_on_screen_off"
+        const val KEY_APP_LOCK_SCREEN_OFF_MINUTES = "app_lock_screen_off_minutes"
+        const val KEY_APP_LOCK_TRUSTED_WIFI = "app_lock_trusted_wifi"
+        const val KEY_APP_LOCK_TRUST_LOCAL_SERVER = "app_lock_trust_local_server"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         const val KEY_UNFOLDED_LAYOUT = "unfolded_layout"
         const val KEY_UNFOLD_OPEN_CHAT = "unfold_open_chat"

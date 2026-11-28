@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">¿Por qué falla la compilación?</string>
     <string name="tips_j_hide_keyboard_answer">El test **ParserTest** espera un salto de línea final. Lo añadí a `fixtures/input.txt` y la compilación vuelve a pasar.</string>
     <string name="tips_j_app_lock_title">Bloquea la app con tu rostro o huella</string>
-    <string name="tips_j_app_lock_body">Activa Bloqueo de la app en Ajustes → Seguridad: OpenCode pide tu rostro, una huella o el código del dispositivo antes de mostrar tus sesiones. Elige si lo pide cada vez que se abre la app o solo tras algunos minutos fuera, desde 1 minuto hasta un tiempo personalizado.</string>
+    <string name="tips_j_app_lock_body">Activa Bloqueo de la app en Ajustes → Seguridad: OpenCode pide tu rostro, una huella o el código del dispositivo antes de mostrar tus sesiones. Elige cuándo vuelve a pedirlo: al salir de la app y al apagar la pantalla, al instante o tras unos minutos. En redes Wi-Fi de confianza, o con el servidor en tu red local, se abre sin pedir nada.</string>
     <string name="tips_j_app_lock_demo">La app vuelve bloqueada; Desbloquear abre la petición del sistema y una huella vuelve a mostrar las sesiones.</string>
 </resources>

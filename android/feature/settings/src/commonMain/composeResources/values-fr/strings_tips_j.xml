@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">Pourquoi la compilation échoue-t-elle ?</string>
     <string name="tips_j_hide_keyboard_answer">Le test **ParserTest** attend un saut de ligne final. Je l'ai ajouté à `fixtures/input.txt` et la compilation passe à nouveau.</string>
     <string name="tips_j_app_lock_title">Verrouillez l'app avec votre visage ou une empreinte</string>
-    <string name="tips_j_app_lock_body">Activez Verrouillage de l'app dans Paramètres → Sécurité : OpenCode demande votre visage, une empreinte ou le code de l'appareil avant d'afficher vos sessions. Choisissez de demander à chaque ouverture de l'app ou seulement après quelques minutes hors de l'app, de 1 minute à une durée personnalisée.</string>
+    <string name="tips_j_app_lock_body">Activez Verrouillage de l'app dans Paramètres → Sécurité : OpenCode demande votre visage, une empreinte ou le code de l'appareil avant d'afficher vos sessions. Choisissez quand redemander : en quittant l'app et en éteignant l'écran, tout de suite ou après quelques minutes. Sur les réseaux Wi-Fi de confiance, ou avec le serveur sur votre réseau local, l'app s'ouvre sans demander.</string>
     <string name="tips_j_app_lock_demo">L'app revient verrouillée ; Déverrouiller ouvre l'invite système et une empreinte affiche à nouveau les sessions.</string>
 </resources>

@@ -50,7 +50,16 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ag
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_after
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_after_always_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_local_server
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_local_server_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_on_leave
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_on_leave_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_on_screen_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_on_screen_off_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_screen_off_always_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_wifi
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_app_lock_wifi_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_attached_image_size_thumbnails
@@ -319,7 +328,12 @@ internal val SettingOption.titleRes: StringResource
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished
         SettingOption.UpdateNotice -> Res.string.settings_update_notice
         SettingOption.AppLock -> Res.string.settings_app_lock
+        SettingOption.AppLockOnLeave -> Res.string.settings_app_lock_on_leave
         SettingOption.AppLockAfter -> Res.string.settings_app_lock_after
+        SettingOption.AppLockOnScreenOff -> Res.string.settings_app_lock_on_screen_off
+        SettingOption.AppLockScreenOffAfter -> Res.string.settings_app_lock_after
+        SettingOption.AppLockTrustedWifi -> Res.string.settings_app_lock_wifi
+        SettingOption.AppLockTrustLocalServer -> Res.string.settings_app_lock_local_server
         SettingOption.WhatsNewButton -> Res.string.settings_whats_new_button
     }
 
@@ -391,7 +405,12 @@ internal val SettingOption.descriptionRes: StringResource
         SettingOption.NotifyFinished -> Res.string.settings_notify_finished_sub
         SettingOption.UpdateNotice -> Res.string.settings_update_notice_window_sub
         SettingOption.AppLock -> Res.string.settings_app_lock_sub
+        SettingOption.AppLockOnLeave -> Res.string.settings_app_lock_on_leave_sub
         SettingOption.AppLockAfter -> Res.string.settings_app_lock_after_always_sub
+        SettingOption.AppLockOnScreenOff -> Res.string.settings_app_lock_on_screen_off_sub
+        SettingOption.AppLockScreenOffAfter -> Res.string.settings_app_lock_screen_off_always_sub
+        SettingOption.AppLockTrustedWifi -> Res.string.settings_app_lock_wifi_sub
+        SettingOption.AppLockTrustLocalServer -> Res.string.settings_app_lock_local_server_sub
         SettingOption.WhatsNewButton -> Res.string.settings_whats_new_button_sub
     }
 
@@ -785,7 +804,16 @@ internal fun SettingOptionControl(option: SettingOption, state: SettingsState, o
         }
         SettingOption.WhatsNewButton -> switch(settings.whatsNewButton, SettingsEvent::WhatsNewButtonChanged)()
         SettingOption.AppLock -> AppLockControl(title, subtitle, settings.appLock, onEvent, modifier.testTag("${tag}_switch"))
-        SettingOption.AppLockAfter -> AppLockAfterControl(title, settings.appLockAfterMinutes, onEvent)
+        SettingOption.AppLockOnLeave -> switch(settings.appLockOnLeave, SettingsEvent::AppLockOnLeaveChanged)()
+        SettingOption.AppLockAfter -> AppLockMinutesControl(title, LockAbsence.Leave, settings.appLockAfterMinutes) {
+            onEvent(SettingsEvent.AppLockAfterChanged(it))
+        }
+        SettingOption.AppLockOnScreenOff -> switch(settings.appLockOnScreenOff, SettingsEvent::AppLockOnScreenOffChanged)()
+        SettingOption.AppLockScreenOffAfter -> AppLockMinutesControl(title, LockAbsence.ScreenOff, settings.appLockScreenOffMinutes) {
+            onEvent(SettingsEvent.AppLockScreenOffAfterChanged(it))
+        }
+        SettingOption.AppLockTrustedWifi -> TrustedWifiControl(title, subtitle, settings.appLockTrustedWifi, state.wifiNameMissing, onEvent)
+        SettingOption.AppLockTrustLocalServer -> switch(settings.appLockTrustLocalServer, SettingsEvent::AppLockTrustLocalServerChanged)()
     }
 }
 
@@ -844,6 +872,11 @@ private val SettingOption.tag: String
         SettingOption.NotifyQuestions -> "notify_questions"
         SettingOption.NotifyFinished -> "notify_finished"
         SettingOption.AppLock -> "app_lock"
+        SettingOption.AppLockOnLeave -> "app_lock_on_leave"
         SettingOption.AppLockAfter -> "app_lock_after"
+        SettingOption.AppLockOnScreenOff -> "app_lock_on_screen_off"
+        SettingOption.AppLockScreenOffAfter -> "app_lock_screen_off_after"
+        SettingOption.AppLockTrustedWifi -> "app_lock_wifi"
+        SettingOption.AppLockTrustLocalServer -> "app_lock_local_server"
         else -> name.lowercase()
     }

@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">Warum schlägt der Build fehl?</string>
     <string name="tips_j_hide_keyboard_answer">Der Test **ParserTest** erwartet einen abschließenden Zeilenumbruch. Ich habe ihn in `fixtures/input.txt` ergänzt, und der Build läuft wieder durch.</string>
     <string name="tips_j_app_lock_title">Sperre die App mit Gesicht oder Fingerabdruck</string>
-    <string name="tips_j_app_lock_body">Aktiviere unter Einstellungen → Sicherheit die App-Sperre: OpenCode fragt vor dem Anzeigen deiner Sitzungen nach deinem Gesicht, einem Fingerabdruck oder dem Gerätecode. Lege fest, ob jedes Mal beim Öffnen der App gefragt wird oder nur nach einigen Minuten außerhalb, von 1 Minute bis zu einer eigenen Zeit.</string>
+    <string name="tips_j_app_lock_body">Aktiviere unter Einstellungen → Sicherheit die App-Sperre: OpenCode fragt vor dem Anzeigen deiner Sitzungen nach deinem Gesicht, einem Fingerabdruck oder dem Gerätecode. Lege fest, wann erneut gefragt wird: wenn du die App verlässt und wenn du den Bildschirm ausschaltest, sofort oder nach einigen Minuten. In vertrauenswürdigen WLAN-Netzen oder mit dem Server im lokalen Netz öffnet sich die App ohne Nachfrage.</string>
     <string name="tips_j_app_lock_demo">Die App kehrt gesperrt zurück; Entsperren öffnet die Systemabfrage, und ein Fingerabdruck zeigt die Sitzungen wieder an.</string>
 </resources>

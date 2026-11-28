@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">Por que a compilação falha?</string>
     <string name="tips_j_hide_keyboard_answer">O teste **ParserTest** espera uma quebra de linha no final. Eu a adicionei a `fixtures/input.txt` e a compilação volta a passar.</string>
     <string name="tips_j_app_lock_title">Bloqueie o app com rosto ou impressão digital</string>
-    <string name="tips_j_app_lock_body">Ative o Bloqueio do app em Configurações → Segurança: o OpenCode pede seu rosto, uma impressão digital ou a senha do aparelho antes de mostrar suas sessões. Escolha se ele pede toda vez que o app abre ou só depois de alguns minutos fora, de 1 minuto até um tempo personalizado.</string>
+    <string name="tips_j_app_lock_body">Ative o Bloqueio do app em Configurações → Segurança: o OpenCode pede seu rosto, uma impressão digital ou a senha do aparelho antes de mostrar suas sessões. Escolha quando ele pede de novo: ao sair do app e ao desligar a tela, na hora ou depois de alguns minutos. Em redes Wi-Fi confiáveis, ou com o servidor na sua rede local, ele abre sem pedir.</string>
     <string name="tips_j_app_lock_demo">O app volta bloqueado; Desbloquear abre o pedido do sistema e uma impressão digital mostra as sessões de novo.</string>
 </resources>

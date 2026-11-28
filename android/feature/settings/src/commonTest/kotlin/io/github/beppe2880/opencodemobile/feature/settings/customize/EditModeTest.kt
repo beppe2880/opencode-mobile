@@ -68,9 +68,7 @@ class EditModeTest {
             SettingOption.NotifyQuestions,
             SettingOption.NotifyFinished,
             // Only while the app is locked.
-            SettingOption.AppLock,
-            SettingOption.AppLockAfter,
-        )
+        ) + APP_LOCK_OPTIONS
         assertEquals(SettingOption.entries.toSet() - withoutElement, reachable)
     }
 }

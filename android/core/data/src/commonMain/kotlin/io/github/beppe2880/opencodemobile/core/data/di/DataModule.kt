@@ -17,6 +17,8 @@ import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
 import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
 import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
+import io.github.beppe2880.opencodemobile.core.data.lock.LocalNetworks
+import io.github.beppe2880.opencodemobile.core.data.lock.LockTrust
 import io.github.beppe2880.opencodemobile.core.data.lock.ScreenState
 import io.github.beppe2880.opencodemobile.core.data.lock.VisibilityAppLock
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
@@ -58,14 +60,13 @@ import io.github.beppe2880.opencodemobile.core.domain.UnreadSessionRepository
 import io.github.beppe2880.opencodemobile.core.domain.UpdateRepository
 import io.github.beppe2880.opencodemobile.core.domain.VcsRepository
 import io.github.beppe2880.opencodemobile.core.domain.WhatsNewRepository
+import io.github.beppe2880.opencodemobile.core.domain.WifiNetworks
 import io.github.beppe2880.opencodemobile.core.network.GitHubReleases
 import io.github.beppe2880.opencodemobile.core.network.SpeechToTextClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
@@ -82,7 +83,7 @@ internal val DraftsStore = named("drafts")
 internal val SttKeysStore = named("stt_keys")
 
 /**
- * Platform bindings: `OpenCodeClientFactory`, `ServerStore`, `CacheDatabase`, `AppVisibility`, `ScreenState`,
+ * Platform bindings: `OpenCodeClientFactory`, `ServerStore`, `CacheDatabase`, `AppVisibility`, `ScreenState`, `LocalNetworks`,
  * `ServerDiscovery`, `NetworkMonitor`, `ShareStore`, `VoiceRecorder` and the [SettingsStore] /
  * [DraftsStore] / [SttKeysStore] [Settings].
  */
@@ -148,9 +149,10 @@ val dataModule = module {
         GitHubWhatsNewRepository(releases::history, get(SettingsStore))
     }
     single<GitHubStarRepository> { PreferencesGitHubStarRepository(get(SettingsStore)) }
+    single<WifiNetworks> { get<LocalNetworks>() }
     single<AppLock> {
-        // In the foreground with the screen on: some phones only pause the app when the screen turns off.
-        val visible = combine(get<AppVisibility>().isVisible, get<ScreenState>().on) { app, screen -> app && screen }.distinctUntilChanged()
-        VisibilityAppLock(get(), visible, get(AppScope))
+        val trust = LockTrust(get(), get(), get(), get())
+        // The screen apart: some phones only pause the app when the screen turns off.
+        VisibilityAppLock(get(), get<AppVisibility>().isVisible, get<ScreenState>().on, get(AppScope), trusted = trust::trusted)
     }
 }

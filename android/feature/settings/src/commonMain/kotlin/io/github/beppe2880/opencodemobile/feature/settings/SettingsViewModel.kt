@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.domain.SettingsPart
 import io.github.beppe2880.opencodemobile.core.domain.SettingsRepository
 import io.github.beppe2880.opencodemobile.core.domain.SpeechToTextRepository
 import io.github.beppe2880.opencodemobile.core.domain.TranscriptionError
+import io.github.beppe2880.opencodemobile.core.domain.WifiNetworks
 import io.github.beppe2880.opencodemobile.core.domain.reset
 import io.github.beppe2880.opencodemobile.core.mvi.BaseViewModel
 import kotlinx.coroutines.Job
@@ -25,6 +26,7 @@ class SettingsViewModel(
     private val star: GitHubStarRepository,
     /** The category to open first, from a link into Settings; null for the first page. */
     initialArea: SettingsArea? = null,
+    private val wifi: WifiNetworks = WifiNetworks { null },
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>(
     SettingsState(
         appVersion = appInfo.versionName,
@@ -152,6 +154,11 @@ class SettingsViewModel(
                         )
                     }
                 }
+            }
+            SettingsEvent.AddCurrentWifi -> viewModelScope.launch {
+                val name = wifi.currentName()
+                updateState { it.copy(wifiNameMissing = name == null) }
+                if (name != null) settings.update { it.copy(appLockTrustedWifi = (it.appLockTrustedWifi + name).distinct()) }
             }
             // Switches and choices of a single setting.
             else -> {

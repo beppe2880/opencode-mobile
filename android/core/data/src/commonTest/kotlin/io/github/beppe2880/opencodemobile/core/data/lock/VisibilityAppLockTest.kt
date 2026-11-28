@@ -21,14 +21,19 @@ class VisibilityAppLockTest {
     }
 
     private val visible = MutableStateFlow(true)
+    private val screen = MutableStateFlow(true)
     private var clock = 0L
+    private var trusted = false
 
     private fun TestScope.lock(settings: AppSettings): Pair<VisibilityAppLock, FakeSettings> {
         val repository = FakeSettings(settings)
-        return VisibilityAppLock(repository, visible, backgroundScope, now = { clock }).also { runCurrent() } to repository
+        val lock = VisibilityAppLock(repository, visible, screen, backgroundScope, trusted = { trusted }, now = { clock })
+        runCurrent()
+        return lock to repository
     }
 
-    private fun TestScope.away(minutes: Int) {
+    /** Other apps or the home screen for [minutes]. */
+    private fun TestScope.leave(minutes: Int) {
         visible.value = false
         runCurrent()
         clock += minutes * 60_000L
@@ -36,14 +41,25 @@ class VisibilityAppLockTest {
         runCurrent()
     }
 
+    /** The screen off for [minutes] with the app open, as on phones that only pause it. */
+    private fun TestScope.screenOff(minutes: Int) {
+        screen.value = false
+        runCurrent()
+        clock += minutes * 60_000L
+        screen.value = true
+        runCurrent()
+    }
+
     @Test
-    fun `a launch starts locked only with the lock on`() = runTest {
-        assertTrue(lock(AppSettings(appLock = true)).first.locked.value)
+    fun `a launch starts locked only with the lock on and then asks`() = runTest {
+        val (lock, _) = lock(AppSettings(appLock = true))
+        assertTrue(lock.locked.value)
+        assertEquals(1, lock.promptRequests.value)
         assertFalse(lock(AppSettings(appLock = false)).first.locked.value)
     }
 
     @Test
-    fun `every time mode locks as soon as the app goes to the background`() = runTest {
+    fun `every time locks as soon as the app is left`() = runTest {
         val (lock, _) = lock(AppSettings(appLock = true))
         lock.unlock()
 
@@ -58,29 +74,82 @@ class VisibilityAppLockTest {
         val (lock, _) = lock(AppSettings(appLock = true, appLockAfterMinutes = 5))
         lock.unlock()
 
-        away(minutes = 4)
+        leave(minutes = 4)
         assertFalse(lock.locked.value)
 
-        away(minutes = 5)
+        leave(minutes = 5)
         assertTrue(lock.locked.value)
     }
 
     @Test
-    fun `time spent in the system authentication screen does not count`() = runTest {
+    fun `leaving and turning the screen off follow their own switches and minutes`() = runTest {
+        val (lock, settings) = lock(AppSettings(appLock = true, appLockOnLeave = false, appLockScreenOffMinutes = 2))
+        lock.unlock()
+
+        leave(minutes = 30)
+        assertFalse(lock.locked.value, "Leaving does not lock when its switch is off")
+
+        screenOff(minutes = 1)
+        assertFalse(lock.locked.value)
+        screenOff(minutes = 2)
+        assertTrue(lock.locked.value)
+
+        lock.unlock()
+        settings.update { it.copy(appLockOnLeave = true, appLockOnScreenOff = false) }
+        screenOff(minutes = 30)
+        assertFalse(lock.locked.value, "Turning the screen off does not lock when its switch is off")
+        leave(minutes = 0)
+        assertTrue(lock.locked.value)
+    }
+
+    @Test
+    fun `the screen turned off after leaving the app counts as leaving`() = runTest {
+        val (lock, _) = lock(AppSettings(appLock = true, appLockAfterMinutes = 15, appLockScreenOffMinutes = 0))
+        lock.unlock()
+
+        visible.value = false
+        runCurrent()
+        screen.value = false
+        runCurrent()
+        clock += 60_000L
+        screen.value = true
+        visible.value = true
+        runCurrent()
+
+        assertFalse(lock.locked.value)
+    }
+
+    @Test
+    fun `a trusted network opens the app without asking`() = runTest {
+        trusted = true
         val (lock, _) = lock(AppSettings(appLock = true))
+        assertFalse(lock.locked.value)
+        assertEquals(0, lock.promptRequests.value)
+
+        leave(minutes = 0)
+        assertFalse(lock.locked.value)
+
+        trusted = false
+        leave(minutes = 0)
+        assertTrue(lock.locked.value)
+        assertEquals(1, lock.promptRequests.value)
+    }
+
+    @Test
+    fun `time spent in the system authentication screen neither counts nor asks again`() = runTest {
+        val (lock, _) = lock(AppSettings(appLock = true))
+        val requests = lock.promptRequests.value
         lock.authenticating(true)
 
-        val returns = lock.returns.value
-        away(minutes = 10)
-        assertTrue(lock.locked.value)
+        leave(minutes = 10)
+        screenOff(minutes = 10)
         lock.authenticating(false)
-        // The system screen closed after the app came back: still not a return of the user.
-        assertEquals(returns, lock.returns.value)
+        assertEquals(requests, lock.promptRequests.value)
         lock.unlock()
 
         assertFalse(lock.locked.value)
-        away(minutes = 0)
-        assertEquals(returns + 1, lock.returns.value)
+        leave(minutes = 0)
+        assertEquals(requests + 1, lock.promptRequests.value)
     }
 
     @Test
@@ -94,7 +163,17 @@ class VisibilityAppLockTest {
         runCurrent()
         assertFalse(lock.locked.value)
 
-        away(minutes = 0)
+        leave(minutes = 0)
         assertTrue(lock.locked.value)
+    }
+
+    @Test
+    fun `subnets contain the addresses of their network only`() {
+        val home = Subnet(ipv4Bytes("192.168.100.38")!!, 24)
+        assertTrue(ipv4Bytes("192.168.100.7")!! in home)
+        assertFalse(ipv4Bytes("192.168.1.7")!! in home)
+        assertTrue(ipv4Bytes("10.1.2.3")!! in Subnet(ipv4Bytes("10.0.0.1")!!, 8))
+        assertEquals("192.168.100.38", hostOf("http://192.168.100.38:4096/"))
+        assertEquals(null, ipv4Bytes(hostOf("https://server.local")))
     }
 }

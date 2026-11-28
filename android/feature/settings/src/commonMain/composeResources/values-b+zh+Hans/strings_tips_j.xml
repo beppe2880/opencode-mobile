@@ -9,6 +9,6 @@
     <string name="tips_j_hide_keyboard_prompt">为什么构建失败？</string>
     <string name="tips_j_hide_keyboard_answer">测试 **ParserTest** 需要文件末尾有换行符。我已将其添加到 `fixtures/input.txt`，构建又通过了。</string>
     <string name="tips_j_app_lock_title">用面容或指纹锁定应用</string>
-    <string name="tips_j_app_lock_body">在 设置 → 安全 中开启“应用锁”：在显示你的会话前，OpenCode 会要求面容、指纹或设备密码。你可以选择每次打开应用时询问，或仅在离开一段时间后询问，时长从 1 分钟到自定义时间。</string>
+    <string name="tips_j_app_lock_body">在 设置 → 安全 中开启“应用锁”：在显示你的会话前，OpenCode 会要求面容、指纹或设备密码。你可以选择何时再次询问：离开应用时和关闭屏幕时，立即或间隔几分钟后。在受信任的 Wi-Fi 网络上，或服务器位于本地网络时，应用无需询问即可打开。</string>
     <string name="tips_j_app_lock_demo">应用返回时已锁定；点按“解锁”会打开系统验证，指纹验证后即可再次看到会话。</string>
 </resources>

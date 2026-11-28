@@ -95,10 +95,12 @@ class SettingOptionsTest {
         // Out of the box every option of this platform has an effect, but the cloud voice ones (phone dictation
         // is the default) and when the app lock asks again (the lock is off).
         val cloudVoice = VOICE_OPTIONS - SettingOption.Dictation - SettingOption.VoiceMode
-        val offByDefault = cloudVoice + SettingOption.AppLockAfter
+        val offByDefault = cloudVoice + APP_LOCK_OPTIONS - SettingOption.AppLock
         assertTrue(SettingOption.entries.filter { it.supported && it !in offByDefault }.all { it.appliesTo(defaults) })
-        assertFalse(SettingOption.AppLockAfter.appliesTo(defaults))
-        assertTrue(SettingOption.AppLockAfter.appliesTo(AppSettings(appLock = true)))
+        assertTrue(offByDefault.none { it in APP_LOCK_OPTIONS && it.appliesTo(defaults) })
+        assertTrue(APP_LOCK_OPTIONS.all { it.appliesTo(AppSettings(appLock = true)) })
+        assertFalse(SettingOption.AppLockAfter.appliesTo(AppSettings(appLock = true, appLockOnLeave = false)))
+        assertFalse(SettingOption.AppLockScreenOffAfter.appliesTo(AppSettings(appLock = true, appLockOnScreenOff = false)))
         assertTrue(cloudVoice.none { it.appliesTo(defaults) })
         assertTrue(cloudVoice.all { it.appliesTo(AppSettings(voiceEngine = VoiceEngine.Cloud)) })
         assertFalse(SettingOption.VoiceMode.appliesTo(AppSettings(dictation = false)))
