@@ -1,0 +1,13 @@
+<resources>
+    <!-- أسماء تحت أيقونات شريط الاختيار: كلمة قصيرة واحدة، 9 أحرف كحد أقصى. -->
+    <string name="sessions_short_rename">إعادة تسمية</string>
+    <string name="sessions_short_mute">كتم</string>
+    <string name="sessions_short_unmute">إلغاء الكتم</string>
+    <string name="sessions_short_unread">غير مقروءة</string>
+    <string name="sessions_short_read">مقروءة</string>
+    <string name="sessions_short_pin">تثبيت</string>
+    <string name="sessions_short_unpin">إلغاء التثبيت</string>
+    <string name="sessions_short_archive">أرشفة</string>
+    <string name="sessions_short_unarchive">استعادة</string>
+    <string name="sessions_short_delete">حذف</string>
+</resources>

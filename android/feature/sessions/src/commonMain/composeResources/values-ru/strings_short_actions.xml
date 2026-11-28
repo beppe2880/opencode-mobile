@@ -1,0 +1,13 @@
+<resources>
+    <!-- Подписи под значками панели выбора: одно короткое слово, не более 9 символов. -->
+    <string name="sessions_short_rename">Переименовать</string>
+    <string name="sessions_short_mute">Заглушить</string>
+    <string name="sessions_short_unmute">Вкл. звук</string>
+    <string name="sessions_short_unread">Непрочит.</string>
+    <string name="sessions_short_read">Прочитано</string>
+    <string name="sessions_short_pin">Закрепить</string>
+    <string name="sessions_short_unpin">Открепить</string>
+    <string name="sessions_short_archive">Архив</string>
+    <string name="sessions_short_unarchive">Вернуть</string>
+    <string name="sessions_short_delete">Удалить</string>
+</resources>

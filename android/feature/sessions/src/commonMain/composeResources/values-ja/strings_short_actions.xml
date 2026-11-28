@@ -1,0 +1,13 @@
+<resources>
+    <!-- 選択ツールバーのアイコン下に表示する名前：短い単語1語（最大4文字程度）。 -->
+    <string name="sessions_short_rename">名前変更</string>
+    <string name="sessions_short_mute">ミュート</string>
+    <string name="sessions_short_unmute">ミュート解除</string>
+    <string name="sessions_short_unread">未読</string>
+    <string name="sessions_short_read">既読</string>
+    <string name="sessions_short_pin">固定</string>
+    <string name="sessions_short_unpin">固定解除</string>
+    <string name="sessions_short_archive">アーカイブ</string>
+    <string name="sessions_short_unarchive">復元</string>
+    <string name="sessions_short_delete">削除</string>
+</resources>

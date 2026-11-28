@@ -1,0 +1,13 @@
+<resources>
+    <!-- 选择工具栏图标下方的名称：一个简短词语，最多约 4 个字。 -->
+    <string name="sessions_short_rename">重命名</string>
+    <string name="sessions_short_mute">静音</string>
+    <string name="sessions_short_unmute">取消静音</string>
+    <string name="sessions_short_unread">标为未读</string>
+    <string name="sessions_short_read">标为已读</string>
+    <string name="sessions_short_pin">置顶</string>
+    <string name="sessions_short_unpin">取消置顶</string>
+    <string name="sessions_short_archive">归档</string>
+    <string name="sessions_short_unarchive">恢复</string>
+    <string name="sessions_short_delete">删除</string>
+</resources>

@@ -2,6 +2,7 @@ package io.github.beppe2880.opencodemobile.feature.sessions
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -94,6 +95,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -202,6 +208,16 @@ import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_se
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_selection_actions
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_selection_close
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_settings
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_archive
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_delete
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_mute
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_pin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_read
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_rename
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_unarchive
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_unmute
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_unpin
+import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_short_unread
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_this_week
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_title_fallback
 import io.github.beppe2880.opencodemobile.feature.sessions.resources.sessions_today
@@ -446,7 +462,9 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
         val slots = with(LocalDensity.current) {
             // OcTopBar's row padding, title start padding, and our trailing action padding.
             val fixed = SelectionTouchTarget.roundToPx() + 3 * OcSpacing.xs.roundToPx() + OcSpacing.sm.roundToPx()
-            (constraints.maxWidth - fixed - titleWidth).coerceAtLeast(0) / SelectionTouchTarget.roundToPx()
+            // Labeled shortcuts are wider; the overflow button stays icon-only.
+            val free = constraints.maxWidth - fixed - titleWidth - SelectionTouchTarget.roundToPx()
+            free.coerceAtLeast(0) / LabeledActionWidth.roundToPx() + 1
         }
         val (toolbar, overflow) = placeSelectionActions(available, state.sessionShortcuts, slots)
         LaunchedEffect(overflow.isEmpty()) {
@@ -463,7 +481,7 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                 )
             },
             actions = {
-                Row(Modifier.padding(end = OcSpacing.sm)) {
+                Row(Modifier.padding(end = OcSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
                     toolbar.forEach { action ->
                         key(action) {
                             val label = stringResource(action.label)
@@ -473,12 +491,13 @@ private fun SelectionTopBar(state: SessionsState, onEvent: (SessionsEvent) -> Un
                                 state = rememberTooltipState(),
                                 focusable = false,
                             ) {
-                                OcIconButton(
+                                LabeledAction(
                                     icon = action.icon,
+                                    label = stringResource(action.shortLabel),
                                     contentDescription = label,
                                     onClick = { runAction(action) },
                                     enabled = action != SelectionAction.MarkRead || !state.markingAllRead,
-                                    tint = if (action == SelectionAction.Delete) c.danger.fg else c.iconBase,
+                                    danger = action == SelectionAction.Delete,
                                     modifier = Modifier.testTag("sessions_bulk_${action.id}"),
                                 )
                             }
@@ -541,6 +560,66 @@ private val SelectionAction.label
         SelectionAction.Unarchive -> Res.string.sessions_unarchive
         SelectionAction.Delete -> Res.string.sessions_delete
     }
+
+/** One or two words that fit under the toolbar icon; [label] stays the accessible name. */
+private val SelectionAction.shortLabel
+    get() = when (this) {
+        SelectionAction.Rename -> Res.string.sessions_short_rename
+        SelectionAction.Mute -> Res.string.sessions_short_mute
+        SelectionAction.Unmute -> Res.string.sessions_short_unmute
+        SelectionAction.MarkUnread -> Res.string.sessions_short_unread
+        SelectionAction.MarkRead -> Res.string.sessions_short_read
+        SelectionAction.Pin -> Res.string.sessions_short_pin
+        SelectionAction.Unpin -> Res.string.sessions_short_unpin
+        SelectionAction.Archive -> Res.string.sessions_short_archive
+        SelectionAction.Unarchive -> Res.string.sessions_short_unarchive
+        SelectionAction.Delete -> Res.string.sessions_short_delete
+    }
+
+private val LabeledActionWidth = 64.dp
+
+/** A toolbar action with its name under the icon, as tall as the top bar. */
+@Composable
+private fun LabeledAction(
+    icon: ImageVector,
+    label: String,
+    contentDescription: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    danger: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val c = OcTheme.colors
+    val iconTint = when {
+        !enabled -> c.textFaint
+        danger -> c.danger.fg
+        else -> c.iconBase
+    }
+    Column(
+        modifier
+            .width(LabeledActionWidth)
+            .height(56.dp)
+            .clip(MaterialTheme.shapes.small)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .clearAndSetSemantics {
+                this.contentDescription = contentDescription
+                role = Role.Button
+                if (!enabled) disabled()
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (danger || !enabled) iconTint else c.textMuted,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 2.dp, start = 2.dp, end = 2.dp),
+        )
+    }
+}
 
 private val SelectionAction.icon
     get() = when (this) {

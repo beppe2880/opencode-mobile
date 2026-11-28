@@ -1,0 +1,13 @@
+<resources>
+    <!-- Namen unter den Symbolen der Auswahlleiste: ein kurzes Wort, höchstens etwa 9 Zeichen. -->
+    <string name="sessions_short_rename">Umbenennen</string>
+    <string name="sessions_short_mute">Stumm</string>
+    <string name="sessions_short_unmute">Laut</string>
+    <string name="sessions_short_unread">Ungelesen</string>
+    <string name="sessions_short_read">Gelesen</string>
+    <string name="sessions_short_pin">Anheften</string>
+    <string name="sessions_short_unpin">Lösen</string>
+    <string name="sessions_short_archive">Archivieren</string>
+    <string name="sessions_short_unarchive">Zurück</string>
+    <string name="sessions_short_delete">Löschen</string>
+</resources>
