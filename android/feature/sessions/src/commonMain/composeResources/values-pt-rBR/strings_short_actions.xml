@@ -1,0 +1,13 @@
+<resources>
+    <!-- Nomes sob os ícones da barra de seleção: uma palavra curta, no máximo 9 caracteres. -->
+    <string name="sessions_short_rename">Renomear</string>
+    <string name="sessions_short_mute">Silenciar</string>
+    <string name="sessions_short_unmute">Ativar</string>
+    <string name="sessions_short_unread">Não lida</string>
+    <string name="sessions_short_read">Lida</string>
+    <string name="sessions_short_pin">Fixar</string>
+    <string name="sessions_short_unpin">Desafixar</string>
+    <string name="sessions_short_archive">Arquivar</string>
+    <string name="sessions_short_unarchive">Restaurar</string>
+    <string name="sessions_short_delete">Excluir</string>
+</resources>

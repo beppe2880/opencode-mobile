@@ -117,10 +117,9 @@ internal fun SessionBulkActionsDemo(active: Boolean, shortcuts: Boolean = false)
             } else {
                 SelectionBar(selected.size) {
                     if (shortcuts) {
-                        Icon(Icons.Outlined.PushPin, null, Modifier.size(20.dp), tint = c.iconBase)
-                        Spacer(Modifier.width(OcSpacing.md))
-                        Icon(Icons.Outlined.MailOutline, null, Modifier.size(20.dp), tint = c.iconBase)
-                        Spacer(Modifier.width(OcSpacing.md))
+                        DemoShortcut(Icons.Outlined.PushPin, "Pin")
+                        DemoShortcut(Icons.Outlined.MailOutline, "Unread")
+                        Spacer(Modifier.width(OcSpacing.xs))
                     }
                     Icon(
                         Icons.Outlined.MoreVert,
@@ -145,6 +144,15 @@ internal fun SessionBulkActionsDemo(active: Boolean, shortcuts: Boolean = false)
         }
         if (dialog) DeleteDialog(confirm = Modifier.then(targets.target("confirm")))
         finger.Draw()
+    }
+}
+
+@Composable
+private fun DemoShortcut(icon: ImageVector, label: String) {
+    val c = OcTheme.colors
+    Column(Modifier.width(52.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(icon, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(18.dp))
+        Text(label, style = MaterialTheme.typography.labelSmall, color = c.textMuted, maxLines = 1)
     }
 }
 

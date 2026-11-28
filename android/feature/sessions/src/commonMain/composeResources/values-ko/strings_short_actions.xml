@@ -1,0 +1,13 @@
+<resources>
+    <!-- 선택 도구 모음 아이콘 아래에 표시되는 이름: 짧은 단어 하나(최대 4글자 내외). -->
+    <string name="sessions_short_rename">이름 변경</string>
+    <string name="sessions_short_mute">음소거</string>
+    <string name="sessions_short_unmute">음소거 해제</string>
+    <string name="sessions_short_unread">읽지 않음</string>
+    <string name="sessions_short_read">읽음</string>
+    <string name="sessions_short_pin">고정</string>
+    <string name="sessions_short_unpin">고정 해제</string>
+    <string name="sessions_short_archive">보관</string>
+    <string name="sessions_short_unarchive">복원</string>
+    <string name="sessions_short_delete">삭제</string>
+</resources>
