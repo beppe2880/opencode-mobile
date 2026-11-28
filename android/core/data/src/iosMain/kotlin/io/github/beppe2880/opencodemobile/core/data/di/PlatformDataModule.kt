@@ -10,6 +10,8 @@ import io.github.beppe2880.opencodemobile.core.data.events.NetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.events.PathNetworkMonitor
 import io.github.beppe2880.opencodemobile.core.data.integration.OAuthPlatform
 import io.github.beppe2880.opencodemobile.core.data.integration.UnsupportedOAuthPlatform
+import io.github.beppe2880.opencodemobile.core.data.lock.AlwaysOnScreenState
+import io.github.beppe2880.opencodemobile.core.data.lock.ScreenState
 import io.github.beppe2880.opencodemobile.core.data.server.InterfaceServerDiscovery
 import io.github.beppe2880.opencodemobile.core.data.server.KeychainServerStore
 import io.github.beppe2880.opencodemobile.core.data.server.ServerStore
@@ -30,6 +32,7 @@ internal actual val platformDataModule: Module = module {
     single { OpenCodeClientFactory(debugLogging = Platform.isDebugBinary) }
     single<ServerStore> { KeychainServerStore() }
     single<AppVisibility> { ApplicationStateVisibility() }
+    single<ScreenState> { AlwaysOnScreenState() }
     single { cacheDatabase() }
     single<ServerDiscovery> { InterfaceServerDiscovery() }
     single<NetworkMonitor> { PathNetworkMonitor() }
