@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
@@ -146,7 +147,7 @@ fun OcConfirmDialog(
     )
 }
 
-/** Single text field dialog (rename flows). */
+/** Single text field dialog (rename flows); [isValid] enables the confirm button. */
 @Composable
 fun OcTextInputDialog(
     title: String,
@@ -156,9 +157,12 @@ fun OcTextInputDialog(
     onDismiss: () -> Unit,
     testTagPrefix: String,
     label: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isValid: (String) -> Boolean = { it.isNotBlank() },
 ) {
     val c = OcTheme.colors
     val value = androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(initialValue) }
+    val valid = isValid(value.value.trim())
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.exposeTestTags().testTag("${testTagPrefix}_dialog"),
@@ -171,15 +175,16 @@ fun OcTextInputDialog(
                 value = value.value,
                 onValueChange = { value.value = it },
                 label = label,
+                keyboardOptions = keyboardOptions,
                 modifier = Modifier.testTag("${testTagPrefix}_field"),
             )
         },
         confirmButton = {
             TextButton(
                 onClick = { onConfirm(value.value.trim()) },
-                enabled = value.value.isNotBlank(),
+                enabled = valid,
                 modifier = Modifier.testTag("${testTagPrefix}_confirm_button"),
-            ) { Text(confirmLabel, color = if (value.value.isNotBlank()) c.textAccent else c.textFaint) }
+            ) { Text(confirmLabel, color = if (valid) c.textAccent else c.textFaint) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss, modifier = Modifier.testTag("${testTagPrefix}_cancel_button")) {

@@ -37,6 +37,6 @@ internal val settingsPreviews: AreaPreviewContent = { area, preview, modifier ->
         SettingsArea.Sharing -> SharingPreview(preview, modifier)
         SettingsArea.Terminal -> TerminalPreview(preview, modifier)
         // Drawn by Settings itself, or without a preview.
-        SettingsArea.Notifications, SettingsArea.Updates, SettingsArea.Servers, SettingsArea.About -> Unit
+        SettingsArea.Notifications, SettingsArea.Updates, SettingsArea.Security, SettingsArea.Servers, SettingsArea.About -> Unit
     }
 }

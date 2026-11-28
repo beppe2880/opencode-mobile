@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.beppe2880.opencodemobile.core.domain.ServerRepository
 import io.github.beppe2880.opencodemobile.core.domain.SettingsArea
@@ -32,7 +32,8 @@ import io.github.beppe2880.opencodemobile.notifications.NotificationsIntro
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.android.inject
 
-class MainActivity : ComponentActivity() {
+/** A [FragmentActivity] for the system biometric prompt of the app lock. */
+class MainActivity : FragmentActivity() {
 
     private val servers: ServerRepository by inject()
     private val settings: SettingsRepository by inject()

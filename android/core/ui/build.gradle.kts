@@ -37,6 +37,7 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.biometric)
         }
         iosMain.dependencies {
             implementation(libs.jb.navigationevent.compose)

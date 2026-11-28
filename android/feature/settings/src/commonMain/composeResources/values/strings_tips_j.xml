@@ -8,4 +8,7 @@
     <string name="tips_j_hide_keyboard_demo">A prompt is typed and sent; the keyboard slides away and the answer streams in over the whole chat.</string>
     <string name="tips_j_hide_keyboard_prompt">Why does the build fail?</string>
     <string name="tips_j_hide_keyboard_answer">The test **ParserTest** expects a trailing newline. I added it to `fixtures/input.txt` and the build passes again.</string>
+    <string name="tips_j_app_lock_title">Lock the app with your face or fingerprint</string>
+    <string name="tips_j_app_lock_body">Turn on App lock in Settings → Security: OpenCode asks for your face, a fingerprint or the device passcode before showing your sessions. Choose whether it asks every time the app opens or only after some minutes away, from 1 minute up to a custom time.</string>
+    <string name="tips_j_app_lock_demo">The app comes back locked; Unlock opens the system prompt and a fingerprint shows the sessions again.</string>
 </resources>

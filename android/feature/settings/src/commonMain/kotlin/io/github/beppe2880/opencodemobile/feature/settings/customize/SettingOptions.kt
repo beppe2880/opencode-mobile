@@ -85,6 +85,8 @@ enum class SettingOption(val fields: List<String>, val requires: SettingOption? 
     NotifyFinished(listOf("notifyFinished"), requires = Notifications),
     UpdateNotice(listOf("updateNotice")),
     WhatsNewButton(listOf("whatsNewButton")),
+    AppLock(listOf("appLock")),
+    AppLockAfter(listOf("appLockAfterMinutes"), requires = AppLock),
     ;
 
     /** The first part of its [area] that offers this option: where the Preview style opens it. */
@@ -153,6 +155,7 @@ val SettingsPart.options: List<SettingOption>
         SettingsPart.QuestionNotification -> listOf(SettingOption.NotifyQuestions)
         SettingsPart.FinishedNotification -> listOf(SettingOption.NotifyFinished)
         SettingsPart.UpdateNotice -> listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)
+        SettingsPart.LockScreen -> listOf(SettingOption.AppLock, SettingOption.AppLockAfter)
     }
 
 /** The microphone and what turns the voice into text, in the order Settings lists them. */
@@ -202,6 +205,7 @@ fun SettingOption.appliesTo(settings: AppSettings, notificationsOn: Boolean = se
     SettingOption.ShareMenu -> supported
     SettingOption.ShareOpens -> supported && settings.showInShareMenu
     SettingOption.SwipeSensitivity -> settings.chatSwipe == ChatSwipe.SessionDrawer
+    SettingOption.AppLockAfter -> settings.appLock
     else -> true
 }
 
@@ -223,6 +227,8 @@ internal val SettingOption.searchKeywords: List<String>
         // "Check for updates" is under this choice.
         SettingOption.UpdateNotice -> listOf("check", "update", "version", "release", "changelog")
         SettingOption.WhatsNewButton -> listOf("tips", "whats new", "features", "changelog", "button")
+        SettingOption.AppLock -> listOf("lock", "security", "privacy", "biometric", "face id", "touch id", "fingerprint", "passcode", "pin")
+        SettingOption.AppLockAfter -> listOf("lock", "timeout", "inactivity", "minutes", "away")
         else -> emptyList()
     }
 

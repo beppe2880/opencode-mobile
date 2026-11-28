@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode 已锁定</string>
+    <string name="app_lock_message">使用面容、指纹或设备密码打开。</string>
+    <string name="app_lock_unlock">解锁</string>
+    <string name="app_lock_prompt_title">解锁 OpenCode</string>
+    <string name="app_lock_prompt_subtitle">确认是你本人，以查看会话</string>
+    <string name="app_lock_failed">尝试次数过多。请稍候再试。</string>
+</resources>

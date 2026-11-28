@@ -3,8 +3,12 @@ package io.github.beppe2880.opencodemobile.feature.settings.whatsnew.cards
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.KeyboardHide
+import androidx.compose.material.icons.outlined.Lock
 import io.github.beppe2880.opencodemobile.feature.settings.resources.Res
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_session_shortcuts
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_app_lock_body
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_app_lock_demo
+import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_app_lock_title
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_body
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_demo
 import io.github.beppe2880.opencodemobile.feature.settings.resources.tips_j_hide_keyboard_title
@@ -50,5 +54,16 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         author = "beppe2880",
         pullRequest = 275,
         demo = { HideKeyboardDemo(it) },
+    ),
+    FeatureCard(
+        id = "app-lock",
+        version = "0.20.0",
+        icon = Icons.Outlined.Lock,
+        title = Res.string.tips_j_app_lock_title,
+        body = Res.string.tips_j_app_lock_body,
+        demoDescription = Res.string.tips_j_app_lock_demo,
+        author = "beppe2880",
+        pullRequest = 0,
+        demo = { AppLockDemo(it) },
     ),
 )

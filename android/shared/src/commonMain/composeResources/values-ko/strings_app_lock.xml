@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode가 잠겨 있습니다</string>
+    <string name="app_lock_message">얼굴, 지문 또는 기기 잠금 코드로 여세요.</string>
+    <string name="app_lock_unlock">잠금 해제</string>
+    <string name="app_lock_prompt_title">OpenCode 잠금 해제</string>
+    <string name="app_lock_prompt_subtitle">세션을 보려면 본인임을 확인하세요</string>
+    <string name="app_lock_failed">시도 횟수가 너무 많습니다. 잠시 후 다시 시도하세요.</string>
+</resources>

@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +34,9 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_pr
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_app
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_finished_text
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_finished_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_lock_off
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_lock_title
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_lock_unlock
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_not_sent
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_permission_text
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_preview_permission_title
@@ -61,6 +68,7 @@ internal fun AreaPreview(
     when (area) {
         SettingsArea.Notifications -> NotificationsPreview(preview, modifier)
         SettingsArea.Updates -> UpdatesPreview(preview, updateTarget, modifier)
+        SettingsArea.Security -> SecurityPreview(preview, modifier)
         else -> content(area, preview, modifier)
     }
 }
@@ -138,6 +146,41 @@ private fun UpdatesPreview(preview: PartPreview, target: UpdateTarget, modifier:
     Column(modifier.fillMaxWidth().padding(OcSpacing.md)) {
         OcCustomizable(SettingsPart.UpdateNotice, preview) {
             UpdateNoticeSample(preview.settings.updateNotice, target)
+        }
+    }
+}
+
+/** The lock screen as the app shows it, faded when the app opens without asking. */
+@Composable
+private fun SecurityPreview(preview: PartPreview, modifier: Modifier) {
+    val c = OcTheme.colors
+    val on = preview.settings.appLock
+    Column(modifier.fillMaxWidth().padding(OcSpacing.md)) {
+        OcCustomizable(SettingsPart.LockScreen, preview) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(c.layer01, RoundedCornerShape(OcRadius.xl))
+                    .padding(vertical = OcSpacing.xl, horizontal = OcSpacing.md),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+            ) {
+                if (!on) OcBadge(stringResource(Res.string.settings_preview_lock_off), c.warning)
+                Column(
+                    Modifier.alpha(if (on) 1f else 0.4f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(OcSpacing.sm),
+                ) {
+                    Icon(Icons.Outlined.Lock, contentDescription = null, tint = c.iconBase, modifier = Modifier.size(32.dp))
+                    Text(stringResource(Res.string.settings_preview_lock_title), style = MaterialTheme.typography.titleSmall, color = c.textBase)
+                    Text(
+                        stringResource(Res.string.settings_preview_lock_unlock),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = c.onAccent,
+                        modifier = Modifier.background(c.bgAccent, RoundedCornerShape(OcRadius.lg)).padding(horizontal = OcSpacing.lg, vertical = OcSpacing.xs),
+                    )
+                }
+            }
         }
     }
 }

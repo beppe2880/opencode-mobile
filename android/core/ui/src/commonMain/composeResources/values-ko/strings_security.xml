@@ -1,0 +1,4 @@
+<resources>
+    <string name="oc_area_security">보안</string>
+    <string name="oc_part_lock_screen">잠금 화면</string>
+</resources>

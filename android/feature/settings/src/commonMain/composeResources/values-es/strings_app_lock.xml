@@ -1,0 +1,27 @@
+<resources>
+    <string name="settings_area_security_sub">Bloqueo de la app con tu rostro, una huella o el código del dispositivo</string>
+    <string name="settings_app_lock">Bloqueo de la app</string>
+    <string name="settings_app_lock_sub">Pide tu rostro, una huella o el código del dispositivo antes de mostrar la app. Funciona cualquiera que hayas configurado en el dispositivo.</string>
+    <string name="settings_app_lock_unavailable">Configura antes un bloqueo de pantalla en este dispositivo: rostro, huella o código.</string>
+    <string name="settings_app_lock_confirm_title">Activar el bloqueo de la app</string>
+    <string name="settings_app_lock_confirm_subtitle">Confirma que eres tú para bloquear OpenCode</string>
+    <string name="settings_app_lock_after">Volver a pedir</string>
+    <string name="settings_app_lock_after_always_sub">Cada vez que la app se abre o vuelve desde segundo plano.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">Cuando vuelvas tras %1$d minuto fuera de la app, y cada vez que se inicie.</item>
+        <item quantity="other">Cuando vuelvas tras %1$d minutos fuera de la app, y cada vez que se inicie.</item>
+    </plurals>
+    <string name="settings_app_lock_always">Siempre</string>
+    <string name="settings_app_lock_minutes">%1$d min</string>
+    <string name="settings_app_lock_custom">Personal</string>
+    <string name="settings_app_lock_custom_title">Minutos fuera antes de volver a pedirlo</string>
+    <string name="settings_app_lock_custom_label">Minutos, de 1 a 1440</string>
+    <string name="settings_summary_app_lock_always">Cada vez</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="one">Tras %1$d minuto fuera</item>
+        <item quantity="other">Tras %1$d minutos fuera</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode está bloqueado</string>
+    <string name="settings_preview_lock_unlock">Desbloquear</string>
+    <string name="settings_preview_lock_off">Se abre sin pedir nada</string>
+</resources>

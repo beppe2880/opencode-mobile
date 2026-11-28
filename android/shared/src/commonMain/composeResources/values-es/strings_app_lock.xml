@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode está bloqueado</string>
+    <string name="app_lock_message">Usa tu rostro, una huella o el código del dispositivo para abrirlo.</string>
+    <string name="app_lock_unlock">Desbloquear</string>
+    <string name="app_lock_prompt_title">Desbloquear OpenCode</string>
+    <string name="app_lock_prompt_subtitle">Confirma que eres tú para ver tus sesiones</string>
+    <string name="app_lock_failed">Demasiados intentos. Espera un momento y vuelve a intentarlo.</string>
+</resources>

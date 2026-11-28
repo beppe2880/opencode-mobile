@@ -1,0 +1,30 @@
+<resources>
+    <string name="settings_area_security_sub">App lock with your face, a fingerprint or the device passcode</string>
+    <string name="settings_app_lock">App lock</string>
+    <string name="settings_app_lock_sub">Ask for your face, a fingerprint or the device passcode before showing the app. Whichever you set up on the device works.</string>
+    <string name="settings_app_lock_unavailable">Set up a screen lock on this device first: a face, a fingerprint or a passcode.</string>
+    <!-- The system prompt shown when turning the lock on. -->
+    <string name="settings_app_lock_confirm_title">Turn on app lock</string>
+    <string name="settings_app_lock_confirm_subtitle">Confirm it's you to lock OpenCode</string>
+    <string name="settings_app_lock_after">Ask again</string>
+    <string name="settings_app_lock_after_always_sub">Every time the app opens or comes back from the background.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">When you come back after %1$d minute away from the app, and every time it starts.</item>
+        <item quantity="other">When you come back after %1$d minutes away from the app, and every time it starts.</item>
+    </plurals>
+    <string name="settings_app_lock_always">Always</string>
+    <!-- A choice of minutes, as short as possible: "5 min". -->
+    <string name="settings_app_lock_minutes">%1$d min</string>
+    <string name="settings_app_lock_custom">Custom</string>
+    <string name="settings_app_lock_custom_title">Minutes away before asking again</string>
+    <string name="settings_app_lock_custom_label">Minutes, 1 to 1440</string>
+    <string name="settings_summary_app_lock_always">Every time</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="one">After %1$d minute away</item>
+        <item quantity="other">After %1$d minutes away</item>
+    </plurals>
+    <!-- The preview of the lock screen in Settings. -->
+    <string name="settings_preview_lock_title">OpenCode is locked</string>
+    <string name="settings_preview_lock_unlock">Unlock</string>
+    <string name="settings_preview_lock_off">Opens without asking</string>
+</resources>

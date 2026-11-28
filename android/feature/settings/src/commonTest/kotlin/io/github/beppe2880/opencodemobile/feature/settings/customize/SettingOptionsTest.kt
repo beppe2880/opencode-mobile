@@ -92,9 +92,13 @@ class SettingOptionsTest {
     @Test
     fun optionsApplyOnlyWhenTheirSwitchIsOn() {
         val defaults = AppSettings()
-        // Out of the box every option of this platform has an effect, but the cloud voice ones (phone dictation is the default).
+        // Out of the box every option of this platform has an effect, but the cloud voice ones (phone dictation
+        // is the default) and when the app lock asks again (the lock is off).
         val cloudVoice = VOICE_OPTIONS - SettingOption.Dictation - SettingOption.VoiceMode
-        assertTrue(SettingOption.entries.filter { it.supported && it !in cloudVoice }.all { it.appliesTo(defaults) })
+        val offByDefault = cloudVoice + SettingOption.AppLockAfter
+        assertTrue(SettingOption.entries.filter { it.supported && it !in offByDefault }.all { it.appliesTo(defaults) })
+        assertFalse(SettingOption.AppLockAfter.appliesTo(defaults))
+        assertTrue(SettingOption.AppLockAfter.appliesTo(AppSettings(appLock = true)))
         assertTrue(cloudVoice.none { it.appliesTo(defaults) })
         assertTrue(cloudVoice.all { it.appliesTo(AppSettings(voiceEngine = VoiceEngine.Cloud)) })
         assertFalse(SettingOption.VoiceMode.appliesTo(AppSettings(dictation = false)))

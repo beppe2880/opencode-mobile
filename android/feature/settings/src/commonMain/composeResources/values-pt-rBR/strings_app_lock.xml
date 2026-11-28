@@ -1,0 +1,27 @@
+<resources>
+    <string name="settings_area_security_sub">Bloqueio do app com rosto, impressão digital ou senha do aparelho</string>
+    <string name="settings_app_lock">Bloqueio do app</string>
+    <string name="settings_app_lock_sub">Peça seu rosto, uma impressão digital ou a senha do aparelho antes de mostrar o app. Vale qualquer um que você tenha configurado no aparelho.</string>
+    <string name="settings_app_lock_unavailable">Configure antes um bloqueio de tela neste aparelho: rosto, impressão digital ou senha.</string>
+    <string name="settings_app_lock_confirm_title">Ativar bloqueio do app</string>
+    <string name="settings_app_lock_confirm_subtitle">Confirme que é você para bloquear o OpenCode</string>
+    <string name="settings_app_lock_after">Pedir de novo</string>
+    <string name="settings_app_lock_after_always_sub">Toda vez que o app abrir ou voltar do segundo plano.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">Quando você voltar depois de %1$d minuto fora do app, e sempre que ele iniciar.</item>
+        <item quantity="other">Quando você voltar depois de %1$d minutos fora do app, e sempre que ele iniciar.</item>
+    </plurals>
+    <string name="settings_app_lock_always">Sempre</string>
+    <string name="settings_app_lock_minutes">%1$d min</string>
+    <string name="settings_app_lock_custom">Personalizar</string>
+    <string name="settings_app_lock_custom_title">Minutos fora antes de pedir de novo</string>
+    <string name="settings_app_lock_custom_label">Minutos, de 1 a 1440</string>
+    <string name="settings_summary_app_lock_always">Toda vez</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="one">Depois de %1$d minuto fora</item>
+        <item quantity="other">Depois de %1$d minutos fora</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode está bloqueado</string>
+    <string name="settings_preview_lock_unlock">Desbloquear</string>
+    <string name="settings_preview_lock_off">Abre sem pedir</string>
+</resources>

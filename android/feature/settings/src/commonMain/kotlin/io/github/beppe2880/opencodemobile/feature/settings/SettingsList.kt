@@ -29,6 +29,7 @@ import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Palette
@@ -162,6 +163,7 @@ internal val SettingsArea.icon: ImageVector
         SettingsArea.Sharing -> Icons.Outlined.Share
         SettingsArea.Notifications -> Icons.Outlined.Notifications
         SettingsArea.Terminal -> Icons.Outlined.Terminal
+        SettingsArea.Security -> Icons.Outlined.Lock
         SettingsArea.Updates -> Icons.Outlined.SystemUpdate
         SettingsArea.About -> Icons.Outlined.Info
     }

@@ -1,0 +1,35 @@
+<resources>
+    <string name="settings_area_security_sub">قفل التطبيق بالوجه أو البصمة أو رمز قفل الجهاز</string>
+    <string name="settings_app_lock">قفل التطبيق</string>
+    <string name="settings_app_lock_sub">اطلب وجهك أو بصمتك أو رمز قفل الجهاز قبل عرض التطبيق. أي طريقة أعددتها على الجهاز تعمل.</string>
+    <string name="settings_app_lock_unavailable">اضبط قفل الشاشة على هذا الجهاز أولًا: الوجه أو البصمة أو رمز.</string>
+    <string name="settings_app_lock_confirm_title">تفعيل قفل التطبيق</string>
+    <string name="settings_app_lock_confirm_subtitle">أكّد أنك صاحب الجهاز لقفل OpenCode</string>
+    <string name="settings_app_lock_after">اطلب مجددًا</string>
+    <string name="settings_app_lock_after_always_sub">في كل مرة يُفتح فيها التطبيق أو يعود من الخلفية.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="zero">عند العودة بعد %1$d دقيقة بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+        <item quantity="one">عند العودة بعد %1$d دقيقة بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+        <item quantity="two">عند العودة بعد %1$d دقيقة بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+        <item quantity="few">عند العودة بعد %1$d دقائق بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+        <item quantity="many">عند العودة بعد %1$d دقيقة بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+        <item quantity="other">عند العودة بعد %1$d دقيقة بعيدًا عن التطبيق، وفي كل مرة يبدأ فيها.</item>
+    </plurals>
+    <string name="settings_app_lock_always">دائمًا</string>
+    <string name="settings_app_lock_minutes">%1$d د</string>
+    <string name="settings_app_lock_custom">مخصص</string>
+    <string name="settings_app_lock_custom_title">الدقائق بعيدًا قبل الطلب مجددًا</string>
+    <string name="settings_app_lock_custom_label">دقائق، من 1 إلى 1440</string>
+    <string name="settings_summary_app_lock_always">في كل مرة</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="zero">بعد %1$d دقيقة بعيدًا عن التطبيق</item>
+        <item quantity="one">بعد %1$d دقيقة بعيدًا عن التطبيق</item>
+        <item quantity="two">بعد %1$d دقيقة بعيدًا عن التطبيق</item>
+        <item quantity="few">بعد %1$d دقائق بعيدًا عن التطبيق</item>
+        <item quantity="many">بعد %1$d دقيقة بعيدًا عن التطبيق</item>
+        <item quantity="other">بعد %1$d دقيقة بعيدًا عن التطبيق</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode مقفل</string>
+    <string name="settings_preview_lock_unlock">فتح القفل</string>
+    <string name="settings_preview_lock_off">يُفتح دون أن يطلب</string>
+</resources>

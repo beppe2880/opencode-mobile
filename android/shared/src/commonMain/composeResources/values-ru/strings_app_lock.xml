@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_lock_title">OpenCode заблокирован</string>
+    <string name="app_lock_message">Откройте его по лицу, отпечатку пальца или коду-паролю устройства.</string>
+    <string name="app_lock_unlock">Разблокировать</string>
+    <string name="app_lock_prompt_title">Разблокировать OpenCode</string>
+    <string name="app_lock_prompt_subtitle">Подтвердите, что это вы, чтобы увидеть сессии</string>
+    <string name="app_lock_failed">Слишком много попыток. Подождите немного и попробуйте снова.</string>
+</resources>

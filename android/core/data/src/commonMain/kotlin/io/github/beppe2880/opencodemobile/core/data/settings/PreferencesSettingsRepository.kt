@@ -1,6 +1,7 @@
 package io.github.beppe2880.opencodemobile.core.data.settings
 
 import com.russhwolf.settings.Settings
+import io.github.beppe2880.opencodemobile.core.domain.APP_LOCK_MAX_MINUTES
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 import io.github.beppe2880.opencodemobile.core.domain.AttachedImageSize
 import io.github.beppe2880.opencodemobile.core.domain.ChatHeaderLine
@@ -136,6 +137,8 @@ internal class PreferencesSettingsRepository(
         prefs.putString(KEY_SETTINGS_STYLE, next.settingsStyle.name)
         val previewFraction = next.settingsPreviewFraction
         if (previewFraction == null) prefs.remove(KEY_PREVIEW_FRACTION) else prefs.putFloat(KEY_PREVIEW_FRACTION, previewFraction)
+        prefs.putBoolean(KEY_APP_LOCK, next.appLock)
+        prefs.putInt(KEY_APP_LOCK_MINUTES, next.appLockAfterMinutes)
     }
 
     private fun read(): AppSettings {
@@ -227,6 +230,9 @@ internal class PreferencesSettingsRepository(
             showEditMarks = prefs.getBoolean(KEY_EDIT_MARKS, defaults.showEditMarks),
             settingsStyle = SettingsStyle.entries.firstOrNull { it.name == prefs.getStringOrNull(KEY_SETTINGS_STYLE) } ?: defaults.settingsStyle,
             settingsPreviewFraction = prefs.getFloatOrNull(KEY_PREVIEW_FRACTION)?.takeIf { it in 0f..1f },
+            appLock = prefs.getBoolean(KEY_APP_LOCK, defaults.appLock),
+            appLockAfterMinutes = prefs.getInt(KEY_APP_LOCK_MINUTES, defaults.appLockAfterMinutes)
+                .takeIf { it in 0..APP_LOCK_MAX_MINUTES } ?: defaults.appLockAfterMinutes,
             listPaneFraction = prefs.getFloatOrNull(KEY_LIST_PANE_FRACTION)?.takeIf { it in 0.05f..0.95f },
             terminalKeys = prefs.getStringOrNull(KEY_TERMINAL_KEYS)?.let { stored ->
                 try {
@@ -312,6 +318,8 @@ internal class PreferencesSettingsRepository(
         const val KEY_CHECK_UPDATES = "check_for_updates"
         const val KEY_UPDATE_NOTICE = "update_notice"
         const val KEY_WHATS_NEW_BUTTON = "whats_new_button"
+        const val KEY_APP_LOCK = "app_lock"
+        const val KEY_APP_LOCK_MINUTES = "app_lock_after_minutes"
         const val KEY_BACK_SHOWS_LIST = "back_shows_list"
         const val KEY_UNFOLDED_LAYOUT = "unfolded_layout"
         const val KEY_UNFOLD_OPEN_CHAT = "unfold_open_chat"

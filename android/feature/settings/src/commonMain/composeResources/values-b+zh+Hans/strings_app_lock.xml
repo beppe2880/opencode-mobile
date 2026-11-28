@@ -1,0 +1,25 @@
+<resources>
+    <string name="settings_area_security_sub">使用面容、指纹或设备密码锁定应用</string>
+    <string name="settings_app_lock">应用锁</string>
+    <string name="settings_app_lock_sub">在显示应用前要求面容、指纹或设备密码。设备上已设置的任一方式即可。</string>
+    <string name="settings_app_lock_unavailable">请先在此设备上设置屏幕锁：面容、指纹或密码。</string>
+    <string name="settings_app_lock_confirm_title">开启应用锁</string>
+    <string name="settings_app_lock_confirm_subtitle">确认是你本人，以锁定 OpenCode</string>
+    <string name="settings_app_lock_after">再次询问</string>
+    <string name="settings_app_lock_after_always_sub">每次打开应用或从后台返回时。</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="other">离开应用 %1$d 分钟后返回时，以及每次启动时都会询问。</item>
+    </plurals>
+    <string name="settings_app_lock_always">始终</string>
+    <string name="settings_app_lock_minutes">%1$d 分钟</string>
+    <string name="settings_app_lock_custom">自定义</string>
+    <string name="settings_app_lock_custom_title">离开多久后再次询问</string>
+    <string name="settings_app_lock_custom_label">分钟，1 到 1440</string>
+    <string name="settings_summary_app_lock_always">每次</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="other">离开应用 %1$d 分钟后</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode 已锁定</string>
+    <string name="settings_preview_lock_unlock">解锁</string>
+    <string name="settings_preview_lock_off">无需询问即可打开</string>
+</resources>

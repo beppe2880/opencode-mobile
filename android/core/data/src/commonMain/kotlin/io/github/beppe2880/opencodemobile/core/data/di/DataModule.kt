@@ -17,6 +17,7 @@ import io.github.beppe2880.opencodemobile.core.data.events.SseEventRepository
 import io.github.beppe2880.opencodemobile.core.data.files.RemoteFileRepository
 import io.github.beppe2880.opencodemobile.core.data.integration.BrowserOAuth
 import io.github.beppe2880.opencodemobile.core.data.integration.RemoteIntegrationRepository
+import io.github.beppe2880.opencodemobile.core.data.lock.VisibilityAppLock
 import io.github.beppe2880.opencodemobile.core.data.mcp.RemoteMcpRepository
 import io.github.beppe2880.opencodemobile.core.data.server.StoredServerRepository
 import io.github.beppe2880.opencodemobile.core.data.session.PreferencesMutedSessionRepository
@@ -32,6 +33,7 @@ import io.github.beppe2880.opencodemobile.core.data.terminal.RemoteTerminalRepos
 import io.github.beppe2880.opencodemobile.core.data.update.GitHubUpdateRepository
 import io.github.beppe2880.opencodemobile.core.data.update.GitHubWhatsNewRepository
 import io.github.beppe2880.opencodemobile.core.data.vcs.RemoteVcsRepository
+import io.github.beppe2880.opencodemobile.core.domain.AppLock
 import io.github.beppe2880.opencodemobile.core.domain.CatalogRepository
 import io.github.beppe2880.opencodemobile.core.domain.ChatRepository
 import io.github.beppe2880.opencodemobile.core.domain.DraftRepository
@@ -143,4 +145,5 @@ val dataModule = module {
         GitHubWhatsNewRepository(releases::history, get(SettingsStore))
     }
     single<GitHubStarRepository> { PreferencesGitHubStarRepository(get(SettingsStore)) }
+    single<AppLock> { VisibilityAppLock(get(), get<AppVisibility>().isVisible, get(AppScope)) }
 }

@@ -1,0 +1,25 @@
+<resources>
+    <string name="settings_area_security_sub">얼굴, 지문 또는 기기 잠금 코드로 앱 잠금</string>
+    <string name="settings_app_lock">앱 잠금</string>
+    <string name="settings_app_lock_sub">앱을 표시하기 전에 얼굴, 지문 또는 기기 잠금 코드를 요청합니다. 기기에 설정된 방법이면 무엇이든 작동합니다.</string>
+    <string name="settings_app_lock_unavailable">먼저 이 기기에서 화면 잠금을 설정하세요: 얼굴, 지문 또는 비밀번호.</string>
+    <string name="settings_app_lock_confirm_title">앱 잠금 켜기</string>
+    <string name="settings_app_lock_confirm_subtitle">본인임을 확인하여 OpenCode를 잠그세요</string>
+    <string name="settings_app_lock_after">다시 묻기</string>
+    <string name="settings_app_lock_after_always_sub">앱을 열 때마다, 또는 백그라운드에서 돌아올 때마다.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="other">앱에서 %1$d분 떨어져 있다가 돌아올 때와 앱이 시작될 때마다.</item>
+    </plurals>
+    <string name="settings_app_lock_always">항상</string>
+    <string name="settings_app_lock_minutes">%1$d분</string>
+    <string name="settings_app_lock_custom">사용자 지정</string>
+    <string name="settings_app_lock_custom_title">다시 묻기 전 자리를 비운 시간</string>
+    <string name="settings_app_lock_custom_label">분, 1~1440</string>
+    <string name="settings_summary_app_lock_always">매번</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="other">앱에서 %1$d분 떨어진 후</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode가 잠겨 있습니다</string>
+    <string name="settings_preview_lock_unlock">잠금 해제</string>
+    <string name="settings_preview_lock_off">묻지 않고 열립니다</string>
+</resources>

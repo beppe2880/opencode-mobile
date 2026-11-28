@@ -31,6 +31,7 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_ar
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_large_screens_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_live_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_notifications_sub
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_security_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_servers_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_sessions_sub
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_area_sharing_sub
@@ -60,6 +61,8 @@ import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_se
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_selection_apply_now
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_choose
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_share_opens_new
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_after
+import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_app_lock_always
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_apply
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_blocked
 import io.github.beppe2880.opencodemobile.feature.settings.resources.settings_summary_confirm_stop
@@ -193,6 +196,7 @@ val SettingsArea.groups: List<OptionGroup>
         SettingsArea.Terminal -> listOf(
             OptionGroup(null, listOf(SettingOption.TerminalKeys, SettingOption.TerminalKeyboard, SettingOption.TerminalFullscreen)),
         )
+        SettingsArea.Security -> listOf(OptionGroup(null, listOf(SettingOption.AppLock, SettingOption.AppLockAfter)))
         SettingsArea.Updates -> listOf(OptionGroup(null, listOf(SettingOption.UpdateNotice, SettingOption.WhatsNewButton)))
     }
 
@@ -269,6 +273,7 @@ val SettingsArea.description: StringResource
         SettingsArea.Sharing -> Res.string.settings_area_sharing_sub
         SettingsArea.Terminal -> Res.string.settings_area_terminal_sub
         SettingsArea.Notifications -> Res.string.settings_area_notifications_sub
+        SettingsArea.Security -> Res.string.settings_area_security_sub
         SettingsArea.Updates -> Res.string.settings_area_updates_sub
         SettingsArea.About -> Res.string.settings_area_about_sub
     }
@@ -365,6 +370,11 @@ fun summary(area: SettingsArea, state: SettingsState, demo: Boolean = false): Li
             s.terminalOpenKeyboard to Res.string.settings_summary_keyboard,
             s.terminalFullscreenByDefault to Res.string.settings_summary_fullscreen,
         )
+        SettingsArea.Security -> when {
+            !s.appLock -> listOf(res(Res.string.settings_summary_off))
+            s.appLockAfterMinutes == 0 -> listOf(res(Res.string.settings_summary_app_lock_always))
+            else -> listOf(UiText.Plural(Res.plurals.settings_summary_app_lock_after, s.appLockAfterMinutes, listOf(s.appLockAfterMinutes)))
+        }
         SettingsArea.Updates -> listOf(res(Res.string.settings_summary_notice, res(s.updateNotice.labelRes)))
         SettingsArea.About -> listOfNotNull(
             res(Res.string.settings_summary_version, state.appVersion),

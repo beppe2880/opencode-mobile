@@ -1,5 +1,6 @@
 package io.github.beppe2880.opencodemobile.feature.settings
 
+import io.github.beppe2880.opencodemobile.core.domain.APP_LOCK_MAX_MINUTES
 import io.github.beppe2880.opencodemobile.core.domain.AppSettings
 
 /** [this] changed by a settings switch or choice; null for events that are not a setting. */
@@ -69,6 +70,8 @@ internal fun AppSettings.updatedBy(event: SettingsEvent): AppSettings? = when (e
     is SettingsEvent.NotifyFinishedChanged -> copy(notifyFinished = event.enabled)
     is SettingsEvent.UpdateNoticeChanged -> copy(updateNotice = event.style)
     is SettingsEvent.WhatsNewButtonChanged -> copy(whatsNewButton = event.enabled)
+    is SettingsEvent.AppLockChanged -> copy(appLock = event.enabled)
+    is SettingsEvent.AppLockAfterChanged -> copy(appLockAfterMinutes = event.minutes.coerceIn(0, APP_LOCK_MAX_MINUTES))
     is SettingsEvent.EditMarksChanged -> copy(showEditMarks = event.visible)
     SettingsEvent.ResetTerminalKeys -> copy(terminalKeys = null)
     is SettingsEvent.SettingsStyleChanged -> copy(settingsStyle = event.style)

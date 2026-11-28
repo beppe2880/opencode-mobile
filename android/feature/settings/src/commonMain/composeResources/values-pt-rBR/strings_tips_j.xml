@@ -8,4 +8,7 @@
     <string name="tips_j_hide_keyboard_demo">Um prompt é digitado e enviado; o teclado desliza para fora e a resposta aparece em streaming sobre todo o chat.</string>
     <string name="tips_j_hide_keyboard_prompt">Por que a compilação falha?</string>
     <string name="tips_j_hide_keyboard_answer">O teste **ParserTest** espera uma quebra de linha no final. Eu a adicionei a `fixtures/input.txt` e a compilação volta a passar.</string>
+    <string name="tips_j_app_lock_title">Bloqueie o app com rosto ou impressão digital</string>
+    <string name="tips_j_app_lock_body">Ative o Bloqueio do app em Configurações → Segurança: o OpenCode pede seu rosto, uma impressão digital ou a senha do aparelho antes de mostrar suas sessões. Escolha se ele pede toda vez que o app abre ou só depois de alguns minutos fora, de 1 minuto até um tempo personalizado.</string>
+    <string name="tips_j_app_lock_demo">O app volta bloqueado; Desbloquear abre o pedido do sistema e uma impressão digital mostra as sessões de novo.</string>
 </resources>

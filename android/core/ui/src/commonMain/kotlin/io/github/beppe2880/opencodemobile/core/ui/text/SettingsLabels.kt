@@ -11,6 +11,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_composer
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_large_screens
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_live
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_notifications
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_security
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_servers
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_sessions
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_area_sharing
@@ -30,6 +31,7 @@ import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_live_reads
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_live_shell
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_live_step
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_live_thinking
+import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_lock_screen
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_messages
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_new_chat
 import io.github.beppe2880.opencodemobile.core.ui.resources.oc_part_notifications
@@ -70,6 +72,7 @@ private val SettingsArea.labelRes: StringResource
         SettingsArea.Sharing -> Res.string.oc_area_sharing
         SettingsArea.Terminal -> Res.string.oc_area_terminal
         SettingsArea.Notifications -> Res.string.oc_area_notifications
+        SettingsArea.Security -> Res.string.oc_area_security
         SettingsArea.Updates -> Res.string.oc_area_updates
         SettingsArea.About -> Res.string.oc_area_about
     }
@@ -110,5 +113,6 @@ fun SettingsPart.label(): String = stringResource(
         SettingsPart.QuestionNotification -> Res.string.oc_part_notify_question
         SettingsPart.FinishedNotification -> Res.string.oc_part_notify_finished
         SettingsPart.UpdateNotice -> Res.string.oc_part_update
+        SettingsPart.LockScreen -> Res.string.oc_part_lock_screen
     },
 )

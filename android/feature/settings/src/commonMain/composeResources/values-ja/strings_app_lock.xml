@@ -1,0 +1,25 @@
+<resources>
+    <string name="settings_area_security_sub">顔、指紋、またはデバイスのパスコードでアプリをロック</string>
+    <string name="settings_app_lock">アプリのロック</string>
+    <string name="settings_app_lock_sub">アプリを表示する前に、顔、指紋、またはデバイスのパスコードを求めます。デバイスに設定されている方法であれば使えます。</string>
+    <string name="settings_app_lock_unavailable">このデバイスで先に画面ロックを設定してください：顔、指紋、またはパスコード。</string>
+    <string name="settings_app_lock_confirm_title">アプリのロックをオンにする</string>
+    <string name="settings_app_lock_confirm_subtitle">本人確認をして OpenCode をロックします</string>
+    <string name="settings_app_lock_after">再確認</string>
+    <string name="settings_app_lock_after_always_sub">アプリを開くたび、またはバックグラウンドから戻るたびに。</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="other">アプリから %1$d 分離れた後に戻ったときと、起動するたびに。</item>
+    </plurals>
+    <string name="settings_app_lock_always">常に</string>
+    <string name="settings_app_lock_minutes">%1$d 分</string>
+    <string name="settings_app_lock_custom">カスタム</string>
+    <string name="settings_app_lock_custom_title">再確認までに離れている時間</string>
+    <string name="settings_app_lock_custom_label">分、1～1440</string>
+    <string name="settings_summary_app_lock_always">毎回</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="other">アプリから %1$d 分離れた後</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode はロックされています</string>
+    <string name="settings_preview_lock_unlock">ロック解除</string>
+    <string name="settings_preview_lock_off">確認なしで開きます</string>
+</resources>

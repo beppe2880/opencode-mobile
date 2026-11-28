@@ -208,6 +208,10 @@ sealed interface SettingsEvent {
     data class UpdateNoticeChanged(val style: UpdateNoticeStyle) : SettingsEvent
     data class WhatsNewButtonChanged(val enabled: Boolean) : SettingsEvent
 
+    /** Sent once the user authenticated to turn it on; turning it off needs nothing. */
+    data class AppLockChanged(val enabled: Boolean) : SettingsEvent
+    data class AppLockAfterChanged(val minutes: Int) : SettingsEvent
+
     /** Notification access read from the system, or the result of the permission request. */
     data class NotificationAccess(val allowed: Boolean, val blocked: Boolean = false) : SettingsEvent
 }

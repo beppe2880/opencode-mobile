@@ -1,0 +1,31 @@
+<resources>
+    <string name="settings_area_security_sub">Блокировка приложения по лицу, отпечатку пальца или коду-паролю устройства</string>
+    <string name="settings_app_lock">Блокировка приложения</string>
+    <string name="settings_app_lock_sub">Запрашивать лицо, отпечаток пальца или код-пароль устройства перед показом приложения. Подойдёт любой способ, настроенный на устройстве.</string>
+    <string name="settings_app_lock_unavailable">Сначала настройте блокировку экрана на этом устройстве: лицо, отпечаток пальца или код-пароль.</string>
+    <string name="settings_app_lock_confirm_title">Включить блокировку приложения</string>
+    <string name="settings_app_lock_confirm_subtitle">Подтвердите, что это вы, чтобы заблокировать OpenCode</string>
+    <string name="settings_app_lock_after">Запрашивать снова</string>
+    <string name="settings_app_lock_after_always_sub">Каждый раз при открытии приложения или возврате из фонового режима.</string>
+    <plurals name="settings_app_lock_after_sub">
+        <item quantity="one">Когда вы вернётесь, пробыв вне приложения %1$d минуту, и при каждом запуске.</item>
+        <item quantity="few">Когда вы вернётесь, пробыв вне приложения %1$d минуты, и при каждом запуске.</item>
+        <item quantity="many">Когда вы вернётесь, пробыв вне приложения %1$d минут, и при каждом запуске.</item>
+        <item quantity="other">Когда вы вернётесь, пробыв вне приложения %1$d минут, и при каждом запуске.</item>
+    </plurals>
+    <string name="settings_app_lock_always">Всегда</string>
+    <string name="settings_app_lock_minutes">%1$d мин</string>
+    <string name="settings_app_lock_custom">Своё</string>
+    <string name="settings_app_lock_custom_title">Сколько минут вне приложения до повторного запроса</string>
+    <string name="settings_app_lock_custom_label">Минуты, от 1 до 1440</string>
+    <string name="settings_summary_app_lock_always">Каждый раз</string>
+    <plurals name="settings_summary_app_lock_after">
+        <item quantity="one">Через %1$d минуту вне приложения</item>
+        <item quantity="few">Через %1$d минуты вне приложения</item>
+        <item quantity="many">Через %1$d минут вне приложения</item>
+        <item quantity="other">Через %1$d минут вне приложения</item>
+    </plurals>
+    <string name="settings_preview_lock_title">OpenCode заблокирован</string>
+    <string name="settings_preview_lock_unlock">Разблокировать</string>
+    <string name="settings_preview_lock_off">Открывается без запроса</string>
+</resources>
