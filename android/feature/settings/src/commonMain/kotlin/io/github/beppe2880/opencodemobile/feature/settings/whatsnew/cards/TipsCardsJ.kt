@@ -63,7 +63,7 @@ internal val tipsCardsJ: List<FeatureCard> = listOf(
         body = Res.string.tips_j_app_lock_body,
         demoDescription = Res.string.tips_j_app_lock_demo,
         author = "beppe2880",
-        pullRequest = 0,
+        pullRequest = 292,
         demo = { AppLockDemo(it) },
     ),
 )
