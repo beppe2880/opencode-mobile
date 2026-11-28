@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.20.0](https://github.com/beppe2880/opencode-mobile/compare/v0.19.0...v0.20.0) (2026-11-28)
+
+
+### Features
+
+* **sessions:** Add a configurable bulk action toolbar ([#287](https://github.com/beppe2880/opencode-mobile/issues/287)) ([9909b4f](https://github.com/beppe2880/opencode-mobile/commit/9909b4fdd9299648f45dd7718c73ae9a48db0acd))
+* **sessions:** Show action names under the selection toolbar icons ([#290](https://github.com/beppe2880/opencode-mobile/issues/290)) ([5168629](https://github.com/beppe2880/opencode-mobile/commit/516862919917b98da53026481b6455df1a2cc7f9))
+
+
+### Bug fixes
+
+* **chat:** Fit the actions menu to the available space ([#279](https://github.com/beppe2880/opencode-mobile/issues/279)) ([edb9cba](https://github.com/beppe2880/opencode-mobile/commit/edb9cbaf0a32fce81fb4edb2647eb9499e41cfcf))
+* **connect:** Allow plain HTTP to server host names on iOS ([#282](https://github.com/beppe2880/opencode-mobile/issues/282)) ([572c9a4](https://github.com/beppe2880/opencode-mobile/commit/572c9a42c376bfe5607e245fde1438904b68c239))
+* **network:** Probe the default port when the server URL has none on iOS ([#283](https://github.com/beppe2880/opencode-mobile/issues/283)) ([4e909af](https://github.com/beppe2880/opencode-mobile/commit/4e909af25bb8d6bc89da2d057158f11953d233ad))
+
 ## [0.19.0](https://github.com/beppe2880/opencode-mobile/compare/v0.18.0...v0.19.0) (2026-11-26)
 
 
